@@ -1,0 +1,814 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.0
+% 최종 수정일: 2025-10-26
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[margin=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: 자연어 처리 입문}}
+\fancyhead[R]{\small\textit{Lecture 05}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-89B: 자연어 처리 입문 - Lecture 05},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+% 개요 섹션
+\begin{overviewbox}
+\textbf{학습 목표:}
+\begin{itemize}
+    \item 이 강의의 핵심 개념을 이해합니다
+    \item 실전에 적용할 수 있는 지식을 습득합니다
+\end{itemize}
+
+\textbf{주요 키워드:} [자동으로 채워질 예정]
+
+\textbf{선행 지식:} 기본적인 컴퓨터 사용 능력
+\end{overviewbox}
+
+% 목차
+\tableofcontents
+\newpage
+
+
+
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 05}{Dmitry Kurochkin}{Lecture 05의 핵심 개념 학습}
+
+
+\newpage
+
+\begin{summarybox}{개요: 이 노트의 핵심}
+    이 문서는 자연어 처리의 핵심적인 두 가지 텍스트 표현 기법을 다룹니다.
+    
+    첫째, \textbf{TF-IDF}는 어떤 단어가 특정 문서 내에서는 자주 나타나지만, 전체 문서 집합에서는 드물게 나타날수록 중요하다고 판단하는 가중치 계산 방법입니다.
+    
+    둘째, \textbf{단어 임베딩(Word Embeddings)}은 단어를 의미가 풍부한 저차원의 실수 벡터로 표현하여 단어 간의 의미적, 문법적 관계를 포착하는 기법입니다.
+    
+    이를 통해 컴퓨터가 단순히 단어의 빈도를 세는 것을 넘어, 단어와 문서의 '의미'를 이해하도록 돕는 원리와 실제 구현 방법을 학습합니다.
+\end{summarybox}
+
+\begin{examplebox}{학습 로드맵}
+    \begin{enumerate}
+        \item \textbf{기초 다지기:} 단어의 빈도만 세는 Bag-of-Words(BoW) 방식의 한계를 이해합니다.
+        \item \textbf{핵심 개념 (TF-IDF):} BoW를 개선하여 '중요한 단어'에 가중치를 부여하는 TF-IDF의 원리를 배웁니다.
+        \item \textbf{심화 개념 (단어 임베딩):} 단어의 '의미' 자체를 벡터 공간에 표현하는 단어 임베딩의 개념으로 나아갑니다.
+        \item \textbf{주요 모델:} 대표적인 단어 임베딩 모델인 Word2Vec과 GloVe의 차이점을 파악합니다.
+        \item \textbf{실습:} Python의 Scikit-learn과 Gensim 라이브러리를 사용해 TF-IDF와 Word2Vec을 직접 구현해봅니다.
+    \end{enumerate}
+\end{examplebox}
+
+\section*{주요 용어 정리}
+\begin{tabular}{@{}lp{6cm}p{3.5cm}p{3cm}@{}}
+    \toprule
+    \textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+    \midrule
+    TF-IDF & 특정 문서에서 중요하지만 전체에서는 흔치 않은 단어에 높은 점수를 주는 가중치 & Term Frequency-Inverse Document Frequency & 키워드 추출, 문서 분류에 사용 \\
+    단어 임베딩 & 단어를 의미를 담은 촘촘한(dense) 숫자 벡터로 변환하는 기법 & Word Embedding & 단어 간 의미 관계 포착 가능 \\
+    Bag-of-Words (BoW) & 문서를 단어의 순서는 무시하고, 출현 빈도만 담은 가방(bag)으로 보는 표현 방식 & Bag-of-Words & 가장 단순한 텍스트 표현 \\
+    One-Hot Encoding & 단어 사전에 있는 단어 중 하나만 1이고 나머지는 0인 벡터로 단어를 표현하는 방식 & One-Hot Encoding & 희소(sparse), 고차원, 의미 없음 \\
+    코사인 유사도 & 두 벡터 사이의 각도를 이용해 얼마나 유사한지 측정하는 지표. (1에 가까울수록 유사) & Cosine Similarity & 단어/문서 벡터의 유사도 측정 \\
+    불용어 & 분석에 큰 의미가 없는 단어들 (예: a, the, is, in) & Stop Words & 전처리 과정에서 보통 제거 \\
+    어간 추출 (스테밍) & 단어의 어미를 잘라 어간(기본 형태)을 추출하는 과정 (예: cats → cat) & Stemming & 형태적으로 단순화 \\
+    \bottomrule
+\end{tabular}
+
+\newpage
+
+\section{TF-IDF (Term Frequency-Inverse Document Frequency)}
+
+\subsection{핵심 개념: 왜 TF-IDF가 필요한가?}
+단순히 단어의 빈도만 세는 Bag-of-Words(BoW) 방식은 큰 한계가 있습니다. 예를 들어, 보스턴 지역 뉴스를 분석할 때 '보스턴(Boston)'이라는 단어는 모든 기사에 자주 등장할 것입니다. BoW 방식에서는 이 단어가 매우 중요하다고 판단하겠지만, 실제로는 모든 문서에 나타나므로 문서를 구별하는 데 아무런 도움이 되지 않습니다.
+
+TF-IDF는 이러한 문제를 해결하기 위해 등장했습니다. 핵심 아이디어는 다음과 같습니다.
+\begin{quote}
+    \textbf{한 문서 안에서 자주 등장하는 단어(TF, Term Frequency)일수록 중요하지만, 여러 문서에 걸쳐 공통적으로 자주 나타나는 단어(DF, Document Frequency)일수록 중요도는 낮아진다.}
+\end{quote}
+즉, 특정 주제를 잘 나타내는 핵심 단어에 높은 가중치를 부여하는 방식입니다.
+
+\subsection{계산 원리}
+TF-IDF는 \textbf{Term Frequency (TF)}와 \textbf{Inverse Document Frequency (IDF)} 두 값의 곱으로 계산됩니다.
+
+\begin{summarybox}{TF-IDF 계산 공식}
+    \begin{itemize}
+        \item \textbf{TF (단어 빈도):} 특정 문서 내에서 단어가 얼마나 자주 등장하는가?
+        $$ \text{TF}(t, d) = \frac{\text{문서 } d \text{에서 단어 } t \text{의 등장 횟수}}{\text{문서 } d \text{의 전체 단어 수}} $$
+        
+        \item \textbf{IDF (역문서 빈도):} 특정 단어가 전체 문서 집합에서 얼마나 희귀한가?
+        $$ \text{IDF}(t) = \ln\left(\frac{\text{총 문서의 수}}{\text{단어 } t \text{를 포함하는 문서의 수}}\right) $$
+        \begin{itemize}
+            \item 이 공식에서 분모가 0이 되는 것을 방지하고, 모든 단어가 최소한의 값을 갖도록 실제 구현에서는 분모와 분자에 1을 더하는 '스무딩(smoothing)' 기법이 자주 사용됩니다.
+        \end{itemize}
+
+        \item \textbf{최종 TF-IDF:}
+        $$ \text{TF-IDF}(t, d) = \text{TF}(t, d) \times \text{IDF}(t) $$
+    \end{itemize}
+\end{summarybox}
+
+\subsection{계산 예시}
+다음 4개의 문서가 있다고 가정해봅시다.
+
+\begin{itemize}
+    \item \textbf{Doc 1:} "cat dog cat"
+    \item \textbf{Doc 2:} "dog mouse dog"
+    \item \textbf{Doc 3:} "dog mouse"
+    \item \textbf{Doc 4:} "mouse cat dog"
+\end{itemize}
+단어 집합(Vocabulary): \{cat, dog, mouse\}
+
+\textbf{1. TF 계산}
+\begin{tabular}{@{}lccc@{}}
+    \toprule
+     & \textbf{cat} & \textbf{dog} & \textbf{mouse} \\
+    \midrule
+    \textbf{Doc 1} (3단어) & 2/3 & 1/3 & 0/3 \\
+    \textbf{Doc 2} (3단어) & 0/3 & 2/3 & 1/3 \\
+    \textbf{Doc 3} (2단어) & 0/2 & 1/2 & 1/2 \\
+    \textbf{Doc 4} (3단어) & 1/3 & 1/3 & 1/3 \\
+    \bottomrule
+\end{tabular}
+
+\textbf{2. IDF 계산} (총 문서 수 = 4)
+\begin{itemize}
+    \item \texttt{cat}은 Doc 1, 4 (2개 문서)에 등장: $ \text{IDF(cat)} = \ln(4/2) \approx 0.693 $
+    \item \texttt{dog}는 Doc 1, 2, 3, 4 (4개 문서)에 등장: $ \text{IDF(dog)} = \ln(4/4) = \ln(1) = 0 $
+    \item \texttt{mouse}는 Doc 2, 3, 4 (3개 문서)에 등장: $ \text{IDF(mouse)} = \ln(4/3) \approx 0.288 $
+\end{itemize}
+\cautionbox{IDF 해석}
+\texttt{dog}는 모든 문서에 등장하여 IDF 값이 0이 되었습니다. 이는 \texttt{dog}가 문서를 구별하는 데 전혀 도움이 되지 않는다는 의미입니다. 반면 \texttt{cat}은 비교적 드물게 나타나 IDF 값이 가장 높습니다.
+
+\textbf{3. 최종 TF-IDF 행렬 계산 (TF $\times$ IDF)}
+\begin{tabular}{@{}lccc@{}}
+    \toprule
+     & \textbf{cat} & \textbf{dog} & \textbf{mouse} \\
+    \midrule
+    \textbf{Doc 1} & $2/3 \times 0.693 \approx 0.462$ & $1/3 \times 0 = 0$ & $0/3 \times 0.288 = 0$ \\
+    \textbf{Doc 2} & $0$ & $0$ & $1/3 \times 0.288 \approx 0.096$ \\
+    \textbf{Doc 3} & $0$ & $0$ & $1/2 \times 0.288 \approx 0.144$ \\
+    \textbf{Doc 4} & $1/3 \times 0.693 \approx 0.231$ & $0$ & $1/3 \times 0.288 \approx 0.096$ \\
+    \bottomrule
+\end{tabular}
+
+\subsection{벡터 정규화 (Vector Normalization)}
+위에서 계산된 TF-IDF 벡터는 문서의 길이에 따라 벡터 크기(magnitude)가 달라질 수 있습니다. 긴 문서가 단지 길다는 이유만으로 더 큰 벡터 값을 갖게 되는 것을 방지하기 위해, 각 문서 벡터를 자신의 길이(L2-norm)로 나누어 단위 벡터(unit vector)로 만드는 \textbf{정규화} 과정을 거칩니다.
+
+이렇게 하면 모든 문서 벡터가 동일한 '척도' 위에 놓이게 되어, 순수하게 방향(단어 구성 비율)만으로 유사도를 비교할 수 있게 됩니다. Scikit-learn의 \texttt{TfidfVectorizer}는 기본적으로 L2 정규화를 수행합니다.
+
+\newpage
+
+\section{Scikit-learn을 이용한 TF-IDF 실습}
+
+\subsection{기본 사용법}
+Python의 \texttt{scikit-learn} 라이브러리는 \texttt{TfidfVectorizer}를 통해 TF-IDF 계산을 쉽게 할 수 있도록 지원합니다.
+
+\begin{lstlisting}[language=Python, caption={TfidfVectorizer 기본 사용 예제}, label={code:tfidf_basic}]
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# 예제 문서
+documents = [
+    "cat dog cat",
+    "dog mouse dog",
+    "dog mouse",
+    "mouse cat dog"
+]
+
+# TfidfVectorizer 객체 초기화 및 학습
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+# 단어 사전과 TF-IDF 행렬 출력
+print("Vocabulary:", vectorizer.get_feature_names_out())
+print("TF-IDF Matrix (normalized):\n", tfidf_matrix.toarray())
+\end{lstlisting}
+
+\subsection{주요 파라미터 설정}
+\texttt{TfidfVectorizer}는 다양한 파라미터를 통해 전처리 방식을 세밀하게 제어할 수 있습니다.
+
+\begin{examplebox}{주요 파라미터}
+\begin{itemize}
+    \item \texttt{stop\_words}: 불용어를 지정합니다. \texttt{stop_words='english'}와 같이 내장된 목록을 사용하거나, \texttt{['cat', 'dog']}처럼 직접 리스트를 전달할 수 있습니다. 불용어로 지정된 단어는 최종 단어 사전에서 제외됩니다.
+    
+    \item \texttt{ngram\_range}: 고려할 n-gram의 범위를 튜플로 지정합니다.
+    \begin{itemize}
+        \item \texttt{(1, 1)}: 단일 단어 (unigram)만 사용 (기본값)
+        \item \texttt{(2, 2)}: 연속된 두 단어 (bigram)만 사용 (예: 'also my', 'my cat')
+        \item \texttt{(1, 2)}: unigram과 bigram을 모두 사용
+    \end{itemize}
+    
+    \item \texttt{token\_pattern}: 단어(토큰)를 정의하는 정규 표현식입니다. 기본값은 \texttt{r'(?u)\\b\\w\\w+\\b'}로, 두 글자 이상의 단어만 토큰으로 인정합니다. 이 때문에 'a'와 같은 한 글자 단어는 기본적으로 무시됩니다.
+    
+    \item \texttt{max\_features}: 단어 사전에 포함할 최대 단어 수를 지정합니다. 빈도가 높은 순서대로 단어를 선택합니다.
+\end{itemize}
+\end{examplebox}
+
+\subsection{전처리 결합: 어간 추출(Stemming)}
+TF-IDF를 적용하기 전에 텍스트를 정제하는 전처리 과정을 추가하면 성능을 높일 수 있습니다. 예를 들어, \texttt{cats}와 \texttt{cat}을 동일한 단어로 취급하기 위해 어간 추출(stemming)을 적용할 수 있습니다. NLTK 라이브러리를 활용하면 이 과정을 쉽게 구현할 수 있습니다.
+
+\begin{lstlisting}[language=Python, caption={NLTK Stemming을 적용한 TF-IDF}, label={code:tfidf_stemming}]
+import nltk
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# NLTK 리소스 다운로드 (최초 1회 실행)
+# nltk.download('punkt')
+
+documents = ["My cats are happy, but my dog is sad."]
+stemmer = PorterStemmer()
+
+# 전처리 함수 정의
+def stem_tokens(text):
+    tokens = word_tokenize(text)
+    stemmed_tokens = [stemmer.stem(token) for token in tokens]
+    return " ".join(stemmed_tokens)
+
+# 각 문서에 전처리 적용
+preprocessed_docs = [stem_tokens(doc) for doc in documents]
+print("Preprocessed:", preprocessed_docs)
+# 출력 결과: Preprocessed: ['My cat are happi, but my dog is sad .']
+
+# 전처리된 텍스트로 TF-IDF 벡터화
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform(preprocessed_docs)
+\end{lstlisting}
+\cautionbox{전처리 순서}
+이처럼 텍스트를 토큰화하고, 각 토큰에 어간 추출이나 표제어 추출(lemmatization) 같은 처리를 한 뒤, 다시 공백으로 연결된 문자열 형태로 만들어 \texttt{TfidfVectorizer}에 입력하는 것이 일반적인 파이프라인입니다.
+
+\newpage
+
+\section{단어 임베딩 (Word Embeddings)}
+
+\subsection{핵심 개념: 단어를 의미 벡터로}
+TF-IDF는 단어의 중요도를 표현할 수는 있지만, 단어 자체의 '의미'를 담지는 못합니다. '고양이'와 '강아지'는 의미적으로 가깝지만 TF-IDF 세계에서는 완전히 다른 단어일 뿐입니다. \textbf{단어 임베딩}은 이러한 한계를 극복하기 위해 등장했습니다.
+
+핵심 아이디어는 단어를 저차원의 \textbf{촘촘한(dense) 실수 벡터}로 표현하는 것입니다. 이 벡터 공간에서는 다음과 같은 특징이 나타납니다.
+\begin{itemize}
+    \item \textbf{의미적 유사성:} 의미가 비슷한 단어들은 벡터 공간에서 서로 가까운 위치에 존재합니다. (예: '고양이' 벡터와 '강아지' 벡터는 '자동차' 벡터보다 훨씬 가깝습니다.)
+    \item \textbf{의미적 관계성:} 단어 벡터 간의 연산을 통해 의미 관계를 유추할 수 있습니다. 가장 유명한 예시는 다음과 같습니다.
+    $$ \vec{v}_{\text{king}} - \vec{v}_{\text{man}} + \vec{v}_{\text{woman}} \approx \vec{v}_{\text{queen}} $$
+    이는 '왕' 벡터에서 '남자'의 속성을 빼고 '여자'의 속성을 더하면 '여왕' 벡터와 유사해진다는 의미입니다.
+\end{itemize}
+
+\begin{summarybox}{One-Hot Encoding vs. Word Embedding}
+\begin{tabular}{@{}p{6.5cm}p{6.5cm}@{}}
+    \toprule
+    \textbf{One-Hot Encoding (원-핫 인코딩)} & \textbf{Word Embedding (단어 임베딩)} \\
+    \midrule
+    - \textbf{희소(Sparse)}: 대부분이 0인 벡터 & - \textbf{밀집(Dense)}: 의미 있는 실수 값으로 채워진 벡터 \\
+    - \textbf{고차원}: 단어 수만큼의 차원 필요 & - \textbf{저차원}: 보통 100\textasciitilde300 차원 사용 \\
+    - \textbf{의미 없음}: 모든 단어 벡터가 직교(orthogonal)하여 유사도 계산 불가 & - \textbf{의미 내포}: 유사한 단어는 가까운 벡터를 가짐 \\
+    - \textbf{수동 생성}: 단순히 위치만 표시 & - \textbf{데이터로부터 학습}: 주변 단어와의 관계로부터 의미 학습 \\
+    \bottomrule
+\end{tabular}
+\end{summarybox}
+
+\subsection{주요 임베딩 모델}
+단어 임베딩은 주로 신경망을 통해 학습됩니다. 대표적인 모델은 다음과 같습니다.
+
+\begin{examplebox}{Word2Vec과 GloVe}
+    \begin{itemize}
+        \item \textbf{Word2Vec (Google, 2013):} "주변 단어를 보면 중심 단어를 알 수 있고, 중심 단어를 보면 주변 단어를 알 수 있다"는 아이디어에 기반합니다.
+        \begin{itemize}
+            \item \textbf{CBOW (Continuous Bag-of-Words):} 주변 단어들(context)로 중심 단어를 예측하는 모델.
+            \item \textbf{Skip-gram:} 중심 단어로 주변 단어들을 예측하는 모델. 일반적으로 CBOW보다 성능이 좋다고 알려져 있습니다.
+        \end{itemize}
+        Word2Vec은 \textbf{지역적(local) 문맥 정보}를 활용하여 학습합니다.
+        
+        \item \textbf{GloVe (Stanford, 2014):} 단어의 동시 등장(co-occurrence) 통계 정보를 활용합니다. 전체 말뭉치(corpus)의 통계 정보를 바탕으로, 두 단어 벡터의 내적(dot product)이 두 단어가 함께 등장할 확률의 로그 값에 근사하도록 학습합니다. GloVe는 \textbf{전역적(global) 통계 정보}를 활용하는 점이 특징입니다.
+    \end{itemize}
+\end{examplebox}
+
+\subsection{임베딩의 한계}
+단어 임베딩은 강력하지만 몇 가지 한계점을 가지고 있습니다.
+\begin{itemize}
+    \item \textbf{Out-of-Vocabulary (OOV):} 학습 시 보지 못한 새로운 단어는 벡터로 변환할 수 없습니다.
+    \item \textbf{문맥 둔감성 (Context Insensitivity):} 전통적인 Word2Vec, GloVe는 한 단어에 대해 오직 하나의 벡터만 할당합니다. 'bank'가 '은행'과 '강둑'이라는 다른 의미를 가져도 동일한 벡터로 표현됩니다. (이는 BERT와 같은 최신 모델에서 해결됩니다.)
+    \item \textbf{편향성 (Bias):} 학습 데이터에 존재하는 사회적, 문화적 편향(예: 성별, 인종)이 임베딩 벡터에 그대로 반영될 수 있습니다.
+\end{itemize}
+
+\newpage
+
+\section{Gensim을 이용한 Word2Vec 실습}
+Python의 \texttt{gensim} 라이브러리를 사용하면 Word2Vec 모델을 쉽게 학습하고 활용할 수 있습니다.
+
+\subsection{모델 학습}
+\begin{lstlisting}[language=Python, caption={Gensim으로 Word2Vec 모델 학습하기}, label={code:word2vec_train}]
+from gensim.models import Word2Vec
+
+# 학습에 사용할 문장 데이터 (토큰화된 리스트의 리스트)
+sentences = [
+    ['cat', 'sat', 'on', 'the', 'mat'],
+    ['dog', 'barked'],
+    ['cat', 'chased', 'dog']
+]
+
+# Word2Vec 모델 학습
+# vector_size: 임베딩 벡터의 차원
+# window: 중심 단어 기준, 주변 단어 범위
+# min_count: 모델에 포함할 단어의 최소 등장 빈도
+# workers: 학습에 사용할 CPU 코어 수
+model = Word2Vec(sentences, vector_size=100, window=5, min_count=1, workers=4)
+model.save("word2vec.model")
+
+# 학습된 단어 벡터 확인
+cat_vector = model.wv['cat']
+print("Vector for 'cat':\n", cat_vector)
+\end{lstlisting}
+
+\subsection{벡터 유사도 계산}
+학습된 모델을 사용하여 단어 간 유사도를 계산할 수 있습니다. 유사도는 주로 두 벡터 사이의 각도를 측정하는 \textbf{코사인 유사도}로 계산됩니다.
+
+\begin{summarybox}{코사인 유사도}
+    두 벡터 $A$와 $B$ 사이의 코사인 유사도는 다음과 같이 정의됩니다.
+    $$ \text{Cosine Similarity} = \cos(\theta) = \frac{A \cdot B}{\|A\| \|B\|} = \frac{\sum_{i=1}^{n} A_i B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \sqrt{\sum_{i=1}^{n} B_i^2}} $$
+    값은 -1에서 1 사이이며, 1에 가까울수록 두 벡터가 유사함을 의미합니다.
+\end{summarybox}
+
+\begin{lstlisting}[language=Python, caption={가장 유사한 단어 찾기}, label={code:word2vec_similar}]
+# 'cat'과 가장 유사한 단어 찾기
+similar_words = model.wv.most_similar('cat', topn=2)
+print("Words most similar to 'cat':", similar_words)
+\end{lstlisting}
+
+\subsection{유추 문제 해결 (Analogy Task)}
+단어 벡터 간의 덧셈과 뺄셈을 이용해 "A:B = C:?"와 같은 유추 문제를 풀 수 있습니다. \texttt{king - man + woman = queen} 문제를 \texttt{gensim}으로 풀면 다음과 같습니다.
+
+\begin{lstlisting}[language=Python, caption={'king-man+woman' 유추 문제 풀이}, label={code:word2vec_analogy}]
+# model.wv.most_similar()는 미리 학습된 대용량 모델에서 잘 동작합니다.
+# 예시: positive=['king', 'woman'], negative=['man']
+# 이는 king + woman - man 벡터와 가장 가까운 단어를 찾는 것을 의미합니다.
+try:
+    result = model.wv.most_similar(positive=['king', 'woman'], negative=['man'], topn=1)
+    print("king - man + woman is most similar to:", result)
+except KeyError as e:
+    print(f"Analogy failed: Word '{e.args[0]}' not in vocabulary.")
+\end{lstlisting}
+\cautionbox{작은 데이터셋의 한계}
+위 예제처럼 매우 작은 데이터셋으로 학습한 모델은 'king', 'woman' 등의 단어를 모르기 때문에 유추 문제를 풀 수 없습니다. 의미 있는 관계를 학습하려면 수백만, 수억 개의 단어로 구성된 대규모 말뭉치가 필요합니다.
+
+\newpage
+
+\section*{FAQ 및 체크리스트}
+
+\begin{summarybox}{자주 묻는 질문 (FAQ)}
+    \begin{itemize}
+        \item \textbf{Q: TF-IDF와 BoW의 가장 큰 차이점은 무엇인가요?} \\
+        \textbf{A:} BoW는 단순히 단어의 등장 횟수만 기록하는 반면, TF-IDF는 문서 내 빈도와 전체 문서에서의 희소성을 모두 고려하여 단어의 '중요도'에 가중치를 부여합니다. 즉, 문서를 구별하는 능력이 뛰어난 단어에 높은 점수를 줍니다.
+        
+        \item \textbf{Q: 왜 TF-IDF 벡터를 정규화(normalize)해야 하나요?} \\
+        \textbf{A:} 문서의 길이에 따른 영향을 줄이기 위해서입니다. 긴 문서가 단지 단어가 많다는 이유로 벡터의 크기가 커지는 것을 방지하고, 모든 문서 벡터를 동일한 크기(단위 벡터)로 만들어 순수하게 단어 구성 비율(방향)로만 유사도를 비교할 수 있게 합니다.
+        
+        \item \textbf{Q: 단어 임베딩의 차원 수(vector size)는 어떻게 정하나요?} \\
+        \textbf{A:} 차원 수는 모델의 성능에 영향을 주는 중요한 하이퍼파라미터입니다. 정해진 규칙은 없으며, 보통 50\textasciitilde300 차원 사이의 값을 사용합니다. 차원 수가 너무 작으면 충분한 의미를 담지 못하고, 너무 크면 과적합(overfitting)의 위험과 계산 비용이 증가하므로, 실험을 통해 문제에 가장 적합한 값을 찾아야 합니다.
+        
+        \item \textbf{Q: Word2Vec과 GloVe 중 무엇을 써야 하나요?} \\
+        \textbf{A:} 문제의 성격과 데이터셋의 크기에 따라 다릅니다. Word2Vec은 지역적 문맥(sliding window)에 집중하여 학습이 빠르고 작은 데이터셋에서도 잘 작동합니다. 반면 GloVe는 전역적인 단어 동시 등장 통계를 활용하므로, 말뭉치 전체의 통계적 패턴을 더 잘 반영할 수 있습니다.
+    \end{itemize}
+\end{summarybox}
+
+\begin{examplebox}{학습 내용 체크리스트}
+    \begin{itemize}
+        \item[\_] TF-IDF가 BoW에 비해 가지는 장점을 설명할 수 있는가?
+        \item[\_] TF와 IDF의 개념을 각각 설명하고, 왜 두 값을 곱하는지 이해했는가?
+        \item[\_] Scikit-learn의 \texttt{TfidfVectorizer}를 사용하여 텍스트를 벡터로 변환할 수 있는가?
+        \item[\_] \texttt{ngram_range}, \texttt{stop_words}와 같은 주요 파라미터의 역할을 아는가?
+        \item[\_] 단어 임베딩이 원-핫 인코딩과 어떻게 다른지 설명할 수 있는가?
+        \item[\_] Word2Vec의 CBOW와 Skip-gram 모델의 차이점을 이해했는가?
+        \item[\_] Gensim 라이브러리를 사용해 Word2Vec 모델을 학습하고 단어 유사도를 계산할 수 있는가?
+    \end{itemize}
+\end{examplebox}
+
+
+\newpage
+\section*{빠르게 훑어보기 (1-Page Summary)}
+
+\begin{tcolorbox}[
+    title={\Large\textbf{TF-IDF: 단어의 중요도에 가중치 부여}},
+    colback=blue!5!white, colframe=blue!75!black,
+    fonttitle=\bfseries, breakable, enhanced,
+    attach boxed title to top left={xshift=1cm,yshift=-2mm},
+    boxed title style={colback=blue!75!black, sharp corners}
+]
+    \textbf{핵심 아이디어} \\
+    문서 내에서 자주 등장하지만(\textbf{TF} 높음), 전체 문서 집합에서는 드물게 나타나는(\textbf{IDF} 높음) 단어가 핵심 단어다.
+    \vspace{1em}
+
+    \textbf{계산 공식} \\
+    $\text{TF-IDF} = (\text{문서 내 단어 빈도}) \times \ln(\frac{\text{총 문서 수}}{\text{해당 단어 포함 문서 수}})$
+    \vspace{1em}
+
+    \textbf{장점} \\
+    - 불용어처럼 의미 없지만 자주 나오는 단어의 영향력을 자동으로 감소시킨다. \\
+    - 문서의 핵심 키워드를 추출하거나 문서 간 유사도를 측정하는 데 효과적이다.
+    \vspace{1em}
+
+    \textbf{주요 도구} \\
+    Python Scikit-learn의 \texttt{TfidfVectorizer}
+\end{tcolorbox}
+
+\vspace{2em}
+
+\begin{tcolorbox}[
+    title={\Large\textbf{단어 임베딩: 단어의 의미를 벡터로 표현}},
+    colback=green!5!white, colframe=green!50!black,
+    fonttitle=\bfseries, breakable, enhanced,
+    attach boxed title to top left={xshift=1cm,yshift=-2mm},
+    boxed title style={colback=green!50!black, sharp corners}
+]
+    \textbf{핵심 아이디어} \\
+    단어를 저차원의 촘촘한(dense) 벡터로 표현하여, 벡터 공간에서 단어 간의 의미적/문법적 관계를 기하학적 거리와 방향으로 나타낸다.
+    \vspace{1em}
+
+    \textbf{특징} \\
+    - \textbf{유사성:} '강아지'와 '고양이' 벡터는 서로 가깝다. \\
+    - \textbf{관계성:} $\vec{v}_{\text{왕}} - \vec{v}_{\text{남자}} + \vec{v}_{\text{여자}} \approx \vec{v}_{\text{여왕}}$
+    \vspace{1em}
+    
+    \textbf{대표 모델} \\
+    - \textbf{Word2Vec:} 지역적 문맥(주변 단어)을 이용하여 단어를 예측하는 방식으로 학습한다. (CBOW, Skip-gram) \\
+    - \textbf{GloVe:} 전체 말뭉치의 단어 동시 등장 통계 정보를 활용하여 학습한다.
+    \vspace{1em}
+
+    \textbf{주요 도구} \\
+    Python Gensim 라이브러리
+\end{tcolorbox}
+
+\end{document}

@@ -1,0 +1,1547 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.0
+% 최종 수정일: 2025-10-26
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[margin=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: 데이터 과학 입문}}
+\fancyhead[R]{\small\textit{Lecture 03}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CS109A: 데이터 과학 입문 - Lecture 03},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: 데이터 과학 입문}{Lecture 03}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 03의 핵심 개념 학습}
+
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{개요}
+
+\begin{summarybox}
+이 문서는 Harvard CS1090A 데이터 과학 입문 강의의 Pandas 기초 부분을 다룹니다. Pandas는 파이썬에서 표 형태의 데이터를 다루는 데 필수적인 라이브러리입니다. 이 노트는 Pandas의 핵심 자료구조인 \texttt{Series}와 \texttt{DataFrame}의 개념, 생성 방법, 데이터 로딩, 검사, 정제, 기본적인 데이터 분석 방법을 설명합니다. 처음 배우는 사람도 쉽게 이해할 수 있도록 예시와 함께 단계별로 설명합니다. 이 노트만으로도 Pandas의 기본을 익히고 실습할 수 있도록 구성했습니다.
+\end{summarybox}
+
+\textbf{주요 학습 목표:}
+\begin{itemize}
+    \item Pandas의 기본 자료구조인 \texttt{Series}와 \texttt{DataFrame} 이해하기
+    \item 다양한 방법으로 \texttt{Series}와 \texttt{DataFrame} 생성하기
+    \item CSV 파일 등 외부 데이터를 Pandas \texttt{DataFrame}으로 불러오기
+    \item 데이터를 검사하고 요약하는 기본 방법 익히기 (`head`, `info`, `describe` 등)
+    \item 데이터 정제 기법 배우기 (컬럼명 변경, 타입 변환, 결측치 및 중복값 처리 등)
+    \item Boolean indexing, \texttt{loc}, \texttt{iloc}을 이용한 데이터 선택 및 필터링
+    \item 데이터 정렬, 집계, 그룹화 기초 (`sort\_values`, `groupby`, `agg`)
+    \item 정제된 데이터를 파일로 저장하기 (`to\_csv`)
+\end{itemize}
+
+\textbf{참고:} 이 노트는 실제 강의 내용과 코드를 바탕으로 재구성되었으며, 추가적인 설명과 예시가 포함되어 있습니다.
+
+\newpage
+
+\section{용어 정리}
+
+데이터 분석 여정에서 자주 만나게 될 Pandas 관련 용어들을 미리 알아두면 학습에 큰 도움이 됩니다. 아래 표는 이 노트에서 사용되는 주요 용어들을 정리한 것입니다.
+
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+Pandas & 파이썬으로 표 형태 데이터를 쉽게 다루게 해주는 도구 모음 & Pandas & 데이터 분석의 필수 라이브러리 \\
+Series & 1차원 배열 형태의 데이터 (하나의 열) & Series & 값과 인덱스로 구성됨 \\
+DataFrame & 2차원 표 형태의 데이터 (여러 개의 열) & DataFrame & Series 여러 개가 모인 것 \\
+Index & 데이터의 각 행(row)을 식별하는 이름표 또는 번호 & Index & 기본은 0부터 시작하는 숫자 \\
+dtype & 데이터의 종류 (숫자, 문자열, 날짜 등) & Data Type & \texttt{int64}, \texttt{float64}, \texttt{object}, \texttt{bool}, \texttt{datetime64}, \texttt{category} 등 \\
+NaN & 데이터가 없음을 나타내는 특별한 값 & Not a Number & 결측치(Missing Value)라고도 함 \\
+Boolean Indexing & 참/거짓(True/False) 값으로 원하는 데이터만 골라내는 방법 & Boolean Indexing & 조건에 맞는 데이터를 필터링할 때 사용 \\
+loc & 이름표(label) 기반으로 데이터를 선택하는 방법 & loc (Label-based) & 예: \texttt{df.loc[3]}, \texttt{df.loc['row\_name']} \\
+iloc & 위치(position) 기반으로 데이터를 선택하는 방법 & iloc (Integer position-based) & 예: \texttt{df.iloc[0]}, \texttt{df.iloc[0:5]} \\
+Method Chaining & 여러 함수(메서드)를 점(.)으로 연결하여 순차적으로 실행하는 것 & Method Chaining & 코드를 간결하게 만듦. 예: \texttt{df.sort\_values().head()} \\
+GroupBy & 특정 기준(컬럼 값)에 따라 데이터를 그룹으로 묶는 작업 & GroupBy & 그룹별 통계 계산 등에 사용 \\
+Aggregation & 그룹으로 묶인 데이터에 대해 요약 통계(평균, 합계 등)를 계산하는 것 & Aggregation & \texttt{agg()}, \texttt{mean()}, \texttt{sum()}, \texttt{count()} 등 \\
+Crosstab & 두 변수(컬럼) 간의 빈도수를 표 형태로 교차 분석하는 것 & Cross-tabulation & 범주형 변수 간의 관계 파악에 유용 \\
+Explode & 하나의 셀에 리스트 형태로 들어있는 값을 여러 행으로 펼치는 작업 & Explode & 콤마로 구분된 문자열 등을 분리할 때 사용 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Pandas 주요 용어 정리}
+\label{tab:pandas_terms}
+
+\newpage
+
+\section{핵심 개념: Pandas 자료구조}
+
+Pandas는 파이썬에서 기본적으로 제공하지 않는, 데이터 분석에 특화된 두 가지 핵심 자료구조를 제공합니다: \textbf{Series}와 \textbf{DataFrame}.
+
+\subsection{Series: 1차원 데이터의 마법 지팡이}
+
+\begin{tcolorbox}[title=Series란?]
+\texttt{Series}는 마치 라벨(이름표)이 붙어 있는 1차원 배열과 같습니다. 엑셀 시트의 한 열(column)이나, 키(key)와 값(value)으로 이루어진 사전(dictionary)을 떠올리면 이해하기 쉽습니다. 각 데이터 값에는 고유한 이름표, 즉 \textbf{인덱스(index)}가 붙어 있어 데이터를 쉽게 찾고 다룰 수 있습니다.
+\end{tcolorbox}
+
+\textbf{왜 Series가 필요한가?}
+파이썬의 기본 리스트(list)도 1차원 데이터를 저장할 수 있지만, Series는 다음과 같은 장점을 가집니다.
+\begin{itemize}
+    \item \textbf{명시적인 인덱스:} 단순한 숫자 위치뿐만 아니라 원하는 문자열 등으로 인덱스를 지정할 수 있습니다.
+    \item \textbf{NumPy 기반 성능:} 내부적으로 고성능 NumPy 배열을 사용하므로 대량 데이터 처리 속도가 빠릅니다.
+    \item \textbf{데이터 정렬 및 연산 용이성:} 인덱스를 기준으로 데이터를 정렬하거나, Series 간의 연산을 쉽게 수행할 수 있습니다.
+    \item \textbf{다양한 데이터 타입 지원 및 결측치 처리:} 숫자, 문자열뿐 아니라 다양한 데이터 타입을 지원하며, 데이터가 없는 경우(결측치, NaN)를 효과적으로 다룰 수 있습니다.
+\end{itemize}
+
+\subsubsection{Series 생성하기}
+
+가장 기본적인 방법은 파이썬 리스트를 사용하는 것입니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={파이썬 리스트로 Series 생성}, label={lst:series_from_list}]
+import pandas as pd
+import numpy as np
+
+# 숫자 리스트로 Series 생성
+numbers = [1, 3, 5, np.nan, 6, 8]
+s = pd.Series(numbers)
+print(s)
+\end{lstlisting}
+\textbf{결과:}
+\begin{verbatim}
+0    1.0
+1    3.0
+2    5.0
+3    NaN
+4    6.0
+5    8.0
+dtype: float64
+\end{verbatim}
+왼쪽의 0, 1, 2...는 자동으로 생성된 기본 인덱스이고, 오른쪽은 리스트의 값입니다. \texttt{np.nan}은 데이터가 없음을 의미하는 결측치입니다. 데이터 타입(\texttt{dtype})은 실수(\texttt{float64})로 자동 지정되었습니다. (NaN 때문에)
+\end{codeexamplebox}
+
+인덱스를 직접 지정할 수도 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={인덱스를 지정하여 Series 생성}, label={lst:series_with_index}]
+# 문자열 리스트와 사용자 정의 인덱스
+data = ['a', 'b', 'c']
+index = [5, 3, 1]
+s_custom_index = pd.Series(data, index=index)
+print(s_custom_index)
+
+# 인덱스를 문자열로 지정
+s_string_index = pd.Series([-3, -2, -1], index=['foo', 'bar', 'baz'])
+print(s_string_index)
+\end{lstlisting}
+\textbf{결과:}
+\begin{verbatim}
+5    a
+3    b
+1    c
+dtype: object
+
+foo   -3
+bar   -2
+baz   -1
+dtype: int64
+\end{verbatim}
+인덱스가 숫자가 아닌 문자열이어도 되며, 순서대로가 아니어도 됩니다.
+\end{codeexamplebox}
+
+\subsubsection{Series의 주요 속성}
+
+Series 객체는 데이터 자체 외에도 유용한 정보를 속성으로 가지고 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={Series 속성 확인}, label={lst:series_attributes}]
+l = [-3, -2, -1]
+series = pd.Series(l, name='ints!', dtype=str) # 이름과 타입 지정
+series.index = ['foo', 'bar', 'foo'] # 인덱스 변경 (중복 가능!)
+
+print(f"값 (Values): {series.values}")
+print(f"인덱스 (Index): {series.index}")
+print(f"이름 (Name): {series.name}")
+print(f"데이터 타입 (dtype): {series.dtype}")
+print(f"값의 타입: {type(series.values)}")
+\end{lstlisting}
+\textbf{결과:}
+\begin{verbatim}
+값 (Values): ['-3' '-2' '-1']
+인덱스 (Index): Index(['foo', 'bar', 'foo'], dtype='object')
+이름 (Name): ints!
+데이터 타입 (dtype): object
+값의 타입: <class 'numpy.ndarray'>
+\end{verbatim}
+\end{codeexamplebox}
+\begin{itemize}
+    \item \texttt{values}: Series의 실제 데이터 값들을 NumPy 배열 형태로 반환합니다. (\textbf{주의:} NumPy 배열은 모든 원소가 동일한 데이터 타입이어야 합니다. 만약 다양한 타입의 데이터가 Series에 있다면, 가장 포괄적인 타입인 \texttt{object}로 변환됩니다. \texttt{object} 타입은 실제 값 대신 메모리 주소를 저장하므로 성능 저하의 원인이 될 수 있습니다.)
+    \item \texttt{index}: Series의 인덱스 객체를 반환합니다. 인덱스는 단순한 숫자가 아니라, 데이터를 식별하는 라벨이며 중복될 수도 있습니다.
+    \item \texttt{name}: Series의 이름을 문자열로 반환합니다. DataFrame의 컬럼명으로 사용됩니다.
+    \item \texttt{dtype}: Series에 저장된 데이터의 타입을 알려줍니다.
+\end{itemize}
+
+\subsubsection{Series 기본 메서드}
+
+Series에는 데이터를 탐색하고 요약하는 데 유용한 여러 메서드가 내장되어 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={Series 기본 메서드 사용}, label={lst:series_methods}]
+data = [1, 3, 5, np.nan, 6, 8]
+s = pd.Series(data)
+
+print("--- 처음 2개 데이터 (head) ---")
+print(s.head(2))
+
+print("\n--- 마지막 2개 데이터 (tail) ---")
+print(s.tail(2))
+
+print("\n--- 기술 통계 요약 (describe) ---")
+print(s.describe())
+\end{lstlisting}
+\textbf{결과:}
+\begin{verbatim}
+--- 처음 2개 데이터 (head) ---
+0    1.0
+1    3.0
+dtype: float64
+
+--- 마지막 2개 데이터 (tail) ---
+4    6.0
+5    8.0
+dtype: float64
+
+--- 기술 통계 요약 (describe) ---
+count    5.000000
+mean     4.600000
+std      2.701851
+min      1.000000
+25%      3.000000
+50%      5.000000
+75%      6.000000
+max      8.000000
+dtype: float64
+\end{verbatim}
+\end{codeexamplebox}
+\begin{itemize}
+    \item \texttt{head(n)}: Series의 처음 n개 데이터를 보여줍니다. (기본값 n=5)
+    \item \texttt{tail(n)}: Series의 마지막 n개 데이터를 보여줍니다. (기본값 n=5)
+    \item \texttt{describe()}: 수치형 데이터의 경우 개수(count), 평균(mean), 표준편차(std), 최솟값(min), 사분위수(25%, 50%, 75%), 최댓값(max) 등 주요 기술 통계량을 요약하여 보여줍니다. (문자열 데이터의 경우 다른 요약 정보를 보여줍니다.)
+\end{itemize}
+
+\newpage
+
+\subsection{DataFrame: 2차원 데이터의 강력한 테이블}
+
+\begin{tcolorbox}[title=DataFrame란?]
+\texttt{DataFrame}은 여러 개의 \texttt{Series}가 같은 인덱스를 공유하며 모여 있는 2차원 표 형태의 자료구조입니다. 엑셀 스프레드시트나 데이터베이스 테이블과 매우 유사합니다. 각 열(column)은 하나의 \texttt{Series}에 해당하며, 고유한 컬럼 이름을 가집니다. 각 행(row)은 인덱스로 식별됩니다.
+\end{tcolorbox}
+
+\textbf{왜 DataFrame이 필요한가?}
+\texttt{Series}가 1차원 데이터를 다루는 데 유용하다면, \texttt{DataFrame}은 다음과 같은 이유로 2차원 데이터를 다루는 데 필수적입니다.
+\begin{itemize}
+    \item \textbf{표 형태 데이터 처리:} 엑셀, CSV 파일 등 일반적인 표 형태 데이터를 직관적으로 표현하고 조작할 수 있습니다.
+    \item \textbf{다양한 데이터 타입:} 각 열(Series)마다 다른 데이터 타입(숫자, 문자, 날짜 등)을 가질 수 있습니다.
+    \item \textbf{유연한 인덱싱 및 선택:} 행과 열의 이름 또는 위치를 이용해 원하는 데이터를 쉽게 선택하고 필터링할 수 있습니다.
+    \item \textbf{강력한 데이터 정제 및 변환 기능:} 결측치 처리, 데이터 타입 변환, 데이터 합치기, 그룹화 등 다양한 데이터 처리 기능을 제공합니다.
+    \item \textbf{다양한 입출력 지원:} CSV, Excel, 데이터베이스 등 다양한 형식의 데이터를 쉽게 읽고 쓸 수 있습니다.
+\end{itemize}
+
+\subsubsection{DataFrame 생성하기}
+
+DataFrame을 만드는 방법은 여러 가지가 있습니다.
+
+\textbf{1. 딕셔너리의 리스트 사용 (행 단위 생성)}
+각 딕셔너리가 하나의 행(row)이 되고, 딕셔너리의 키가 열(column) 이름이 됩니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={딕셔너리의 리스트로 DataFrame 생성}, label={lst:df_from_list_of_dicts}]
+import pandas as pd
+
+data = [{'fruit': 'apple', 'color': 'red'},
+        {'fruit': 'grape', 'color': 'purple'}]
+
+df_fruits = pd.DataFrame(data)
+print(df_fruits)
+\end{lstlisting}
+\textbf{결과:}
+\begin{verbatim}
+   fruit   color
+0  apple     red
+1  grape  purple
+\end{verbatim}
+\end{codeexamplebox}
+
+\textbf{2. 리스트의 딕셔너리 사용 (열 단위 생성)}
+딕셔너리의 키가 열(column) 이름이 되고, 값으로 주어지는 리스트가 해당 열의 데이터가 됩니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={리스트의 딕셔너리로 DataFrame 생성}, label={lst:df_from_dict_of_lists}]
+import pandas as pd
+
+data = {'fruit': ['apple', 'grape'],
+        'color': ['red', 'purple']}
+
+df_fruits_alt = pd.DataFrame(data)
+print(df_fruits_alt)
+\end{lstlisting}
+\textbf{결과:}
+\begin{verbatim}
+   fruit   color
+0  apple     red
+1  grape  purple
+\end{verbatim}
+\end{codeexamplebox}
+
+\textbf{3. NumPy 배열 사용}
+2차원 NumPy 배열로부터 DataFrame을 생성할 수 있습니다. 이때 열 이름을 명시적으로 지정해주는 것이 좋습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={NumPy 배열로 DataFrame 생성}, label={lst:df_from_numpy}]
+import pandas as pd
+import numpy as np
+
+# 2차원 NumPy 배열 생성 (예: 100x2 크기, 다변량 정규분포 데이터)
+data_np = np.random.multivariate_normal(mean=[0,-1], cov=[[1,0.5],[0.5,1]], size=100)
+
+# NumPy 배열과 컬럼 이름을 사용하여 DataFrame 생성
+df_np = pd.DataFrame(data=data_np, columns=["X", "Y"])
+print(df_np.head()) # 처음 5개 행만 출력
+\end{lstlisting}
+\textbf{결과 (값은 실행 시마다 다름):}
+\begin{verbatim}
+          X         Y
+0 -1.558152 -1.781442
+1 -0.114449 -2.243731
+2 -1.675996 -2.528247
+3  0.308387 -1.627142
+4 -1.138339 -1.671097
+\end{verbatim}
+\end{codeexamplebox}
+
+\subsubsection{DataFrame의 주요 속성}
+
+DataFrame도 Series와 유사하게 유용한 속성들을 제공합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={DataFrame 속성 확인}, label={lst:df_attributes}]
+# 위의 df_np DataFrame 사용
+print(f"형태 (Shape): {df_np.shape}")
+print(f"컬럼 (Columns): {df_np.columns}")
+print(f"인덱스 (Index): {df_np.index}")
+print(f"값 (Values): \n{df_np.values[:2]}") # 값은 NumPy 배열, 처음 2행만 출력
+\end{lstlisting}
+\textbf{결과 (값은 실행 시마다 다름):}
+\begin{verbatim}
+형태 (Shape): (100, 2)
+컬럼 (Columns): Index(['X', 'Y'], dtype='object')
+인덱스 (Index): RangeIndex(start=0, stop=100, step=1)
+값 (Values):
+[[-1.55815228 -1.7814424 ]
+ [-0.11444917 -2.24373138]]
+\end{verbatim}
+\end{codeexamplebox}
+\begin{itemize}
+    \item \texttt{shape}: DataFrame의 형태(행 개수, 열 개수)를 튜플로 반환합니다.
+    \item \texttt{columns}: DataFrame의 열 이름(컬럼명)들을 Index 객체로 반환합니다.
+    \item \texttt{index}: DataFrame의 행 이름(인덱스)들을 Index 객체로 반환합니다.
+    \item \texttt{values}: DataFrame의 모든 데이터 값을 2차원 NumPy 배열 형태로 반환합니다.
+\end{itemize}
+
+\subsubsection{DataFrame 기본 메서드}
+
+DataFrame의 데이터를 빠르게 파악하기 위한 기본 메서드들입니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={DataFrame 기본 메서드 사용}, label={lst:df_methods}]
+# 위의 df_np DataFrame 사용
+print("--- 처음 3개 데이터 (head) ---")
+print(df_np.head(3))
+
+print("\n--- 마지막 2개 데이터 (tail) ---")
+print(df_np.tail(2))
+
+print("\n--- 요약 정보 (info) ---")
+df_np.info()
+
+print("\n--- 기술 통계 요약 (describe) ---")
+print(df_np.describe())
+\end{lstlisting}
+\textbf{결과 (값은 실행 시마다 다름):}
+\begin{verbatim}
+--- 처음 3개 데이터 (head) ---
+          X         Y
+0 -1.558152 -1.781442
+1 -0.114449 -2.243731
+2 -1.675996 -2.528247
+
+--- 마지막 2개 데이터 (tail) ---
+           X         Y
+98 -0.210365 -2.146889
+99  1.032841  0.338218
+
+--- 요약 정보 (info) ---
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 100 entries, 0 to 99
+Data columns (total 2 columns):
+ #   Column  Non-Null Count  Dtype
+---  ------  --------------  -----
+ 0   X       100 non-null    float64
+ 1   Y       100 non-null    float64
+dtypes: float64(2)
+memory usage: 1.7 KB
+
+--- 기술 통계 요약 (describe) ---
+                X           Y
+count  100.000000  100.000000
+mean    -0.088686   -0.963459
+std      0.981885    0.989715
+min     -2.428570   -3.131102
+25%     -0.781459   -1.639194
+50%     -0.122675   -0.970172
+75%      0.540450   -0.340263
+max      2.308703    1.638069
+\end{verbatim}
+\end{codeexamplebox}
+\begin{itemize}
+    \item \texttt{head(n)}: DataFrame의 처음 n개 행을 보여줍니다. (기본값 n=5)
+    \item \texttt{tail(n)}: DataFrame의 마지막 n개 행을 보여줍니다. (기본값 n=5)
+    \item \texttt{info()}: DataFrame의 전반적인 정보를 요약하여 보여줍니다. 인덱스 타입, 컬럼 정보(이름, non-null 개수, 데이터 타입), 메모리 사용량 등을 확인할 수 있습니다. 데이터 타입을 확인하고 결측치 유무를 파악하는 데 매우 유용합니다.
+    \item \texttt{describe()}: 수치형 컬럼들에 대한 기술 통계량을 계산하여 보여줍니다. 데이터의 분포를 빠르게 파악할 수 있습니다.
+\end{itemize}
+
+\newpage
+
+\section{절차/방법: 데이터 다루기 실전}
+
+이제 실제 데이터를 Pandas DataFrame으로 불러와서 검사하고, 필요한 형태로 정제하고, 간단한 분석을 수행하는 과정을 단계별로 살펴보겠습니다. 예제 데이터로는 CS1090A 학생 설문조사 결과를 사용합니다.
+
+\subsection{1단계: 데이터 불러오기 및 초기 검사}
+
+가장 먼저 할 일은 데이터를 DataFrame으로 읽어 들이는 것입니다. CSV(Comma Separated Values) 파일은 가장 흔한 데이터 형식 중 하나이며, \texttt{pd.read\_csv()} 함수를 사용합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={CSV 파일 읽어오기}, label={lst:read_csv}]
+import pandas as pd
+
+# CSV 파일을 DataFrame으로 불러오기
+# 'data/cs1090a_survey_raw.csv' 파일이 있다고 가정
+# 실제 파일 경로는 환경에 맞게 수정해야 합니다.
+try:
+    df = pd.read_csv("data/cs1090a_survey_raw.csv")
+    print("CSV 파일 로딩 성공!")
+except FileNotFoundError:
+    print("오류: CSV 파일을 찾을 수 없습니다. 파일 경로를 확인하세요.")
+    # 예제 진행을 위해 임시 DataFrame 생성
+    data = {'Timestamp': ['9/9/2025 17:43:09'],
+            'What\'s your Harvard affiliation?\n': ['Bachelor\'s (CS)'],
+            'Have you used Jupyter Notebooks before?': ['Yes'],
+            'How many years of Python programming experience do you have?\n(Choose the range that best fits your experience.)': ['Less than 1 year'],
+            'Rate your current Pandas skill level.': [2],
+            'What is your primary OS?': ['MacOS'],
+            'Do use normally code/browse in dark mode?': ['No'],
+            'What languages do you speak? \n(Comma separated)\n\nExample: Hittite, Elvish, Cornish, Klingon': ['English'],
+            'Which continents have you visited?': ['Africa, Asia, Europe, North America, South America'],
+            'When were you born?': ['11/15/2004'],
+            'What time do you usually wake up in the morning?': ['10:00:00 AM'],
+            'What time do you usually go to bed?': ['12:00:00 AM'],
+            'Favorite Season?': ['Spring'],
+            'Where do you usually get your caffeine?': ['Tea'],
+            'Which kind of pet do you prefer?': ['Pet rock'],
+            'What\'s your favorite movie?': [None], # 예시로 None 사용
+            'What movie genres do particularly enjoy?\n(select as many as you like)': ['Comedy'],
+            'List up to 3 of your hobbies.\n(comma separated)\n\nExample: playing kazoo, bird watching, stamp collecting': ['tennis, movies, eating'],
+            'How was HW0?': [None]}
+    df = pd.DataFrame(data)
+\end{lstlisting}
+\end{codeexamplebox}
+
+데이터를 불러온 후에는 어떤 데이터가 들어 있는지 확인하는 것이 중요합니다. \texttt{head()}, \texttt{shape}, \texttt{columns}, \texttt{info()}, \texttt{describe()} 등을 사용합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={데이터 초기 검사}, label={lst:initial_inspection}]
+# 처음 5개 행 확인
+print("--- 데이터 미리보기 (head) ---")
+print(df.head())
+
+# 데이터 크기 확인 (행, 열 개수)
+print(f"\n--- 데이터 크기 (shape) ---")
+print(f"{df.shape[0]} 행, {df.shape[1]} 열")
+
+# 컬럼명 리스트 확인
+print("\n--- 컬럼명 (columns) ---")
+print(list(df.columns))
+
+# 데이터 요약 정보 확인 (결측치, 데이터 타입)
+print("\n--- 요약 정보 (info) ---")
+df.info()
+
+# 수치형 데이터 기술 통계 확인
+print("\n--- 기술 통계 (describe) ---")
+print(df.describe())
+\end{lstlisting}
+\end{codeexamplebox}
+
+\textbf{초기 검사 결과 (예시 데이터 기준):}
+\begin{itemize}
+    \item \texttt{head()}: 데이터의 실제 값과 컬럼명을 눈으로 확인할 수 있습니다. 컬럼명이 너무 길거나 줄바꿈 문자가 포함되어 지저분해 보입니다. 일부 값은 비어있는 것 같습니다 (NaN).
+    \item \texttt{shape}: 데이터의 전체 크기를 알려줍니다. 예제 데이터는 175행 19열입니다.
+    \item \texttt{columns}: 모든 컬럼명을 리스트로 보여줍니다. 너무 길고 특수문자가 있어 다루기 불편합니다.
+    \item \texttt{info()}: 각 컬럼의 non-null 값 개수와 데이터 타입을 보여줍니다. 대부분의 컬럼이 \texttt{object} 타입(주로 문자열)이며, 'Rate your current Pandas skill level.' 컬럼만 \texttt{int64}(정수) 타입입니다. Non-null 개수를 보면 여러 컬럼에 결측치가 있음을 알 수 있습니다 ('dob', 'wake\_time', 'fav\_movie', 'hobbies', 'hw0' 등).
+    \item \texttt{describe()}: 현재는 'Rate your current Pandas skill level.' 컬럼에 대한 통계만 보여줍니다. 평균 2.5, 표준편차 1.1 정도임을 알 수 있습니다.
+\end{itemize}
+
+\newpage
+
+\subsection{2단계: 데이터 정제}
+
+초기 검사 결과를 바탕으로 데이터를 분석하기 좋은 형태로 만드는 정제 작업을 수행합니다.
+
+\subsubsection{컬럼명 변경}
+
+길고 복잡한 컬럼명은 사용하기 불편하므로, 짧고 의미 있는 이름으로 변경합니다. 일반적으로 소문자와 언더스코어(\_)를 사용하는 것이 좋습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={컬럼명 변경}, label={lst:rename_columns}]
+# 새 컬럼명 리스트 정의
+new_cols = [
+    "timestamp", "program", "jupyter", "python_exp", "pandas_skill", "os", "dark_mode",
+    "languages", "continents", "dob", "wake_time", "sleep_time", "fav_season",
+    "caffeine", "pet", "fav_movie", "fav_genres", "hobbies", "hw0"
+]
+
+# DataFrame의 columns 속성에 새 리스트 할당
+df.columns = new_cols
+
+# 변경된 컬럼명 확인
+print("--- 변경된 컬럼명 확인 (head) ---")
+print(df.head())
+\end{lstlisting}
+\end{codeexamplebox}
+이제 \texttt{df.program}이나 \texttt{df['pandas\_skill']}처럼 훨씬 간결하게 컬럼에 접근할 수 있습니다.
+
+\subsubsection{불필요한 컬럼 제거}
+
+분석에 사용하지 않을 컬럼은 제거하여 DataFrame을 가볍게 만듭니다. 여기서는 'timestamp' 컬럼을 제거합니다. \texttt{drop()} 메서드를 사용하며, \texttt{axis=1}은 열을 기준으로 제거하라는 의미입니다. (\texttt{axis=0}은 행 기준)
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={컬럼 제거}, label={lst:drop_column}]
+# 'timestamp' 컬럼 제거 (axis=1은 열을 의미)
+# inplace=True를 사용하면 원본 DataFrame이 바로 수정됨
+# 여기서는 수정된 결과를 다시 df에 할당
+df = df.drop("timestamp", axis=1)
+
+# 제거 확인 (shape 및 head)
+print(f"제거 후 데이터 크기: {df.shape}")
+print(df.head(2))
+\end{lstlisting}
+\end{codeexamplebox}
+컬럼 개수가 19개에서 18개로 줄어든 것을 확인할 수 있습니다.
+
+\subsubsection{데이터 타입 변환}
+
+현재 대부분의 컬럼이 \texttt{object} 타입입니다. 분석 목적에 맞게 적절한 데이터 타입으로 변환해야 합니다.
+
+\textbf{Boolean 타입 변환:} 'Yes'/'No' 형태의 데이터를 True/False로 변환합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={Boolean 타입 변환}, label={lst:astype_bool}]
+# 'dark_mode' 컬럼 값이 'yes'이면 True, 아니면 False로 변환
+# .str.lower()를 먼저 적용하여 대소문자 구분 없이 처리
+df['dark_mode'] = (df['dark_mode'].str.lower() == 'yes')
+
+# 'jupyter' 컬럼도 동일하게 처리
+df['jupyter'] = (df['jupyter'].str.lower() == 'yes')
+
+# 타입 변경 확인
+print("--- dark_mode dtype ---")
+print(df['dark_mode'].dtype)
+print("--- jupyter dtype ---")
+print(df['jupyter'].dtype)
+\end{lstlisting}
+\end{codeexamplebox}
+이제 \texttt{bool} 타입이 되어 논리 연산에 사용하기 편리해졌습니다.
+
+\textbf{Category 타입 변환:} 정해진 몇 가지 값 중 하나를 가지는 범주형 데이터는 \texttt{category} 타입으로 변환하는 것이 좋습니다. 메모리 효율성을 높이고, 해당 컬럼이 가질 수 있는 값을 제한할 수 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={Category 타입 변환}, label={lst:astype_category}]
+# 'os' 컬럼을 category 타입으로 변환
+df['os'] = df['os'].astype('category')
+
+# 타입 및 카테고리 확인
+print(df['os'].dtype)
+print(df['os'].cat.categories)
+\end{lstlisting}
+\end{codeexamplebox}
+
+\textbf{순서 있는 Category 타입 변환 (Ordinal):} 'python\_exp'처럼 순서가 있는 범주형 데이터는 순서를 명시하여 \texttt{category} 타입으로 변환합니다. 이렇게 하면 크기 비교나 정렬이 의미 있게 가능해집니다. \texttt{CategoricalDtype}을 사용합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={순서 있는 Category 타입 변환}, label={lst:astype_ordered_category}]
+from pandas.api.types import CategoricalDtype
+
+# Python 경험 순서 정의
+experience_order = ['Less than 1 year', '1-2 years', '2-4 years', '4+ years']
+
+# 순서 있는 CategoricalDtype 생성
+experience_dtype = CategoricalDtype(categories=experience_order, ordered=True)
+
+# 'python_exp' 컬럼을 정의된 타입으로 변환
+# 원본 컬럼을 유지하고 새 컬럼 'python_experience' 생성 (강의 노트 방식)
+# 실제로는 df['python_exp'] = df['python_exp'].astype(experience_dtype) 처럼 덮어쓰는 경우가 많음
+df['python_experience'] = df['python_exp'].astype(experience_dtype)
+
+# 타입 및 순서 확인
+print(df['python_experience'].dtype)
+print(df['python_experience'].head())
+# 예: 경험이 '1-2 years'보다 많은 사람 필터링
+print("\n--- 경험 '1-2 years' 초과 ---")
+print(df[df['python_experience'] > '1-2 years']['python_experience'].head())
+\end{lstlisting}
+\end{codeexamplebox}
+
+\textbf{Datetime 타입 변환:} 날짜/시간 관련 문자열은 \texttt{datetime} 타입으로 변환해야 날짜 계산 등을 수행할 수 있습니다. \texttt{pd.to\_datetime()} 함수를 사용하며, \texttt{errors='coerce'} 옵션은 변환 불가능한 값을 NaT(Not a Time)로 처리합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={Datetime 타입 변환}, label={lst:astype_datetime}]
+# 'dob' 컬럼을 datetime 타입으로 변환
+df['dob'] = pd.to_datetime(df['dob'], errors='coerce')
+
+# 타입 확인
+print(df['dob'].dtype)
+\end{lstlisting}
+\end{codeexamplebox}
+시간 정보를 가진 'wake\_time', 'sleep\_time'도 유사하게 처리할 수 있으나, 시간만 다룰 경우 다른 방식이 더 적합할 수 있습니다. 이 노트에서는 일단 변환하지 않습니다.
+
+\subsubsection{텍스트 정규화}
+
+사용자가 직접 입력한 텍스트 데이터는 대소문자가 섞여 있거나 앞뒤 공백이 있을 수 있습니다. 분석의 일관성을 위해 모두 소문자로 변환하고 불필요한 공백을 제거하는 것이 좋습니다. \texttt{str.lower()}와 \texttt{str.strip()} 메서드를 사용합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={텍스트 소문자 변환}, label={lst:text_lower}]
+# object 타입(주로 문자열) 컬럼만 선택
+str_cols = df.select_dtypes(include='object').columns
+
+# 각 문자열 컬럼에 대해 소문자 변환 적용
+for c in str_cols:
+    # 결측치가 있을 수 있으므로 .str 접근자 사용
+    df[c] = df[c].str.lower()
+    # 필요시 앞뒤 공백 제거: df[c] = df[c].str.strip()
+
+# 변경 확인 (예: program 컬럼)
+print(df['program'].head())
+\end{lstlisting}
+\end{codeexamplebox}
+
+\subsubsection{중복 데이터 확인 및 처리}
+
+완전히 동일한 행이 중복되어 있는지 확인합니다. \texttt{duplicated()}는 각 행이 중복인지 여부를 boolean Series로 반환하고, \texttt{sum()}을 사용하면 중복된 행의 개수를 알 수 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={중복 행 확인}, label={lst:check_duplicates}]
+duplicate_rows = df.duplicated().sum()
+print(f"중복된 행의 개수: {duplicate_rows}")
+
+# 만약 중복 행이 있다면 제거:
+# df = df.drop_duplicates()
+\end{lstlisting}
+\end{codeexamplebox}
+예제 데이터에는 중복 행이 없습니다.
+
+\subsubsection{결측치 확인 및 처리}
+
+데이터에 값이 없는 경우(NaN, NaT 등)를 결측치라고 합니다. \texttt{info()} 메서드로 컬럼별 non-null 개수를 확인하거나, \texttt{isna().sum()}으로 컬럼별 결측치 개수를 직접 확인할 수 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={컬럼별 결측치 개수 확인}, label={lst:check_na}]
+print("--- 컬럼별 결측치 개수 ---")
+print(df.isna().sum())
+\end{lstlisting}
+\end{codeexamplebox}
+결측치가 많은 컬럼('hw0', 'fav\_movie', 'hobbies' 등)과 적은 컬럼이 있습니다.
+
+결측치를 처리하는 방법은 여러 가지입니다.
+\begin{itemize}
+    \item \textbf{제거:} \texttt{dropna()} 메서드를 사용하여 결측치가 포함된 행 또는 열을 제거합니다. 특정 컬럼에 결측치가 있는 행만 제거할 수도 있습니다 (\texttt{subset} 인자 사용). 분석에 필수적인 정보가 없는 행을 제거할 때 사용합니다.
+    \item \textbf{대치:} \texttt{fillna()} 메서드를 사용하여 결측치를 특정 값(예: 0, 평균값, 최빈값, 'Unknown' 등)으로 채웁니다. 데이터 손실을 최소화하고 싶을 때 사용합니다.
+\end{itemize}
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={결측치 처리 예시 (제거)}, label={lst:handle_na_drop}]
+# 예시: 'hobbies' 컬럼에 결측치가 있는 행을 제거한 결과 확인 (원본 변경 X)
+df_dropped_hobbies = df.dropna(subset=['hobbies'])
+print(f"원본 행 개수: {df.shape[0]}")
+print(f"'hobbies' 결측치 제거 후 행 개수: {df_dropped_hobbies.shape[0]}")
+
+# 예시: 'languages' 컬럼에 결측치가 있는 행을 실제로 제거 (원본 변경 O)
+print(f"\n제거 전 'languages' 결측치 개수: {df['languages'].isna().sum()}")
+df.dropna(subset=['languages'], inplace=True) # inplace=True는 원본을 직접 수정
+print(f"제거 후 'languages' 결측치 개수: {df['languages'].isna().sum()}")
+print(f"최종 데이터 크기: {df.shape}")
+\end{lstlisting}
+\end{codeexamplebox}
+
+\begin{warningbox}
+결측치 처리는 분석 결과에 큰 영향을 미칠 수 있으므로 신중하게 결정해야 합니다. 무조건 제거하거나 특정 값으로 채우기보다는, 데이터의 특성과 분석 목적을 고려하여 가장 적절한 방법을 선택해야 합니다. 경우에 따라서는 결측치 자체를 하나의 정보로 활용할 수도 있습니다.
+\end{warningbox}
+
+\newpage
+
+\subsection{3단계: 데이터 선택, 필터링, 정렬}
+
+정제된 데이터에서 원하는 부분만 선택하거나 특정 조건에 맞는 데이터를 필터링하고, 필요에 따라 정렬하는 방법을 알아봅니다.
+
+\subsubsection{Boolean Indexing (마스크 활용)}
+
+가장 강력하고 흔하게 사용되는 방법입니다. 특정 조건(예: 'pandas\_skill' > 3)을 DataFrame이나 Series에 적용하면, 각 행(또는 원소)이 조건을 만족하는지 여부를 나타내는 True/False 값으로 이루어진 Series (이를 \textbf{마스크(mask)}라고 부름)가 반환됩니다. 이 마스크를 DataFrame의 인덱서(\texttt{[ ]})에 넣어주면 조건이 True인 행들만 선택됩니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={Boolean Indexing으로 필터링}, label={lst:boolean_indexing}]
+# 조건: Pandas 스킬 레벨이 3보다 큰 경우
+mask = df['pandas_skill'] > 3
+
+# 마스크를 사용하여 조건에 맞는 행들만 선택
+df_high_skill = df[mask]
+
+# 결과 확인 (pandas_skill 컬럼만 출력)
+print(df_high_skill['pandas_skill'].head())
+
+# 조건: dark mode를 사용하고(True) OS가 MacOS인 경우
+# 여러 조건은 & (AND), | (OR) 연산자로 연결하며, 각 조건은 괄호로 묶어야 함
+mask_dark_mac = (df['dark_mode'] == True) & (df['os'] == 'macos')
+df_dark_mac = df[mask_dark_mac]
+
+# 결과 확인 (os, dark_mode 컬럼 및 크기 출력)
+print("\n--- Dark Mode 사용자 (MacOS) ---")
+print(df_dark_mac[['os', 'dark_mode']].head())
+print(f"해당 학생 수: {df_dark_mac.shape[0]}")
+\end{lstlisting}
+\end{codeexamplebox}
+
+\subsubsection{loc 및 iloc 사용}
+
+\texttt{loc}과 \texttt{iloc}은 특정 행과 열을 선택하는 더 정교한 방법입니다.
+
+\begin{itemize}
+    \item \texttt{loc}: \textbf{라벨(이름)} 기반 인덱싱. 행과 열의 이름(인덱스 라벨, 컬럼명)을 사용합니다. 슬라이싱 시 끝점을 포함합니다.
+    \item \texttt{iloc}: \textbf{위치(정수)} 기반 인덱싱. 0부터 시작하는 행과 열의 순서(위치)를 사용합니다. 슬라이싱 시 끝점을 제외합니다 (파이썬 기본 슬라이싱과 동일).
+\end{itemize}
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={loc 및 iloc 사용 예시}, label={lst:loc_iloc}]
+# 예시 DataFrame 생성
+data = {'A': [10, 20, 30, 40], 'B': [50, 60, 70, 80]}
+index = ['r1', 'r2', 'r3', 'r4']
+df_example = pd.DataFrame(data, index=index)
+print("--- 예시 DataFrame ---")
+print(df_example)
+
+# loc 사용 예시
+print("\n--- loc 사용 ---")
+# 행 'r2' 선택 (Series 반환)
+print(f"행 'r2':\n{df_example.loc['r2']}")
+# 행 'r1', 'r3'과 열 'B' 선택 (DataFrame 반환)
+print(f"\n행 'r1', 'r3', 열 'B':\n{df_example.loc[['r1', 'r3'], 'B']}")
+# 행 'r2'부터 'r4'까지, 열 'A' 선택 (Series 반환)
+print(f"\n행 'r2':'r4', 열 'A':\n{df_example.loc['r2':'r4', 'A']}")
+
+# iloc 사용 예시
+print("\n--- iloc 사용 ---")
+# 첫 번째 행(위치 0) 선택 (Series 반환)
+print(f"첫 번째 행 (iloc[0]):\n{df_example.iloc[0]}")
+# 첫 번째, 세 번째 행(위치 0, 2)과 두 번째 열(위치 1) 선택 (Series 반환)
+print(f"\n행 0, 2, 열 1:\n{df_example.iloc[[0, 2], 1]}")
+# 첫 두 행(위치 0, 1)과 모든 열 선택 (DataFrame 반환)
+print(f"\n처음 두 행 (iloc[0:2]):\n{df_example.iloc[0:2]}")
+\end{lstlisting}
+\end{codeexamplebox}
+
+\begin{warningbox}
+\texttt{loc}과 \texttt{iloc}의 차이를 명확히 이해하는 것이 중요합니다. 특히 정수 인덱스를 사용할 때 혼동하기 쉽습니다. \texttt{df.loc[0]}은 인덱스 라벨이 '0'인 행을 찾고, \texttt{df.iloc[0]}은 첫 번째 위치에 있는 행을 찾습니다. 데이터 정렬이나 필터링 후 인덱스가 순차적이지 않을 때 \texttt{iloc}이 유용할 수 있습니다.
+\end{warningbox}
+
+\subsubsection{데이터 정렬}
+
+특정 컬럼의 값을 기준으로 행을 정렬할 때는 \texttt{sort\_values()} 메서드를 사용합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={데이터 정렬}, label={lst:sort_values}]
+# 'pandas_skill' 기준으로 내림차순 정렬 (ascending=False)
+df_sorted_skill = df.sort_values(by='pandas_skill', ascending=False)
+print(df_sorted_skill[['program', 'pandas_skill']].head())
+
+# 여러 컬럼 기준으로 정렬 (예: 'program' 오름차순, 'age' 내림차순)
+# df_sorted_multi = df.sort_values(by=['program', 'age'], ascending=[True, False])
+# print(df_sorted_multi[['program', 'age']].head())
+\end{lstlisting}
+\end{codeexamplebox}
+
+\textbf{주의:} 정렬 후에는 인덱스가 뒤섞이게 됩니다. 필요하다면 \texttt{reset\_index(drop=True)}를 사용하여 인덱스를 0부터 다시 부여하는 것이 좋습니다.
+
+\newpage
+
+\subsection{4단계: 데이터 변환 및 집계}
+
+데이터를 분석하기 좋은 형태로 변환하거나 그룹별로 요약 통계를 계산합니다.
+
+\subsubsection{값 변환 (\texttt{replace})}
+
+특정 값을 다른 값으로 바꿀 때 사용합니다. 정규 표현식(regex)을 사용하여 패턴 기반의 변환도 가능합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={값 변환 (replace)}, label={lst:replace_values}]
+# 'program' 컬럼에서 'certificate' 포함된 문자열을 하나로 통일
+df['program'] = df['program'].replace(r".*certificate.*",
+                                     "graduate certificate [extension school]",
+                                     regex=True)
+
+# 변경 확인 (value_counts)
+print(df['program'].value_counts().head())
+\end{lstlisting}
+\end{codeexamplebox}
+
+\subsubsection{문자열 분리 및 확장 (\texttt{str.split}, \texttt{explode})}
+
+'languages', 'hobbies', 'fav\_genres'처럼 콤마 등으로 구분된 여러 값이 하나의 문자열로 들어있는 경우, 각 값을 분리하여 분석하기 쉽게 만듭니다.
+
+\textbf{1. 문자열 분리 (\texttt{str.split}):} 특정 구분자(예: ', ')를 기준으로 문자열을 나누어 리스트로 만듭니다.
+
+\textbf{2. 데이터 확장 (\texttt{explode}):} 리스트가 들어있는 컬럼을 기준으로, 리스트의 각 원소가 별도의 행이 되도록 DataFrame을 확장합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={문자열 분리 및 확장}, label={lst:split_explode}]
+# 'languages' 컬럼을 콤마와 공백(', ') 기준으로 분리하여 리스트 생성
+split_languages = df['languages'].str.split(', ')
+print("--- 분리 후 (Series of lists) ---")
+print(split_languages.head())
+
+# 'languages' 컬럼을 기준으로 explode 수행 (원본 변경 X)
+df_exploded = df.explode('languages')
+print("\n--- Explode 후 (languages 컬럼만 확인) ---")
+# 예: 첫 번째 학생(index 0)이 여러 행으로 나타나는지 확인
+print(df_exploded[df_exploded.index == 0]['languages'])
+
+# 전체 언어 목록 확인 (중복 제거 및 정규화 포함)
+all_languages = df['languages'].str.split(', ').explode()
+# 'mandarin' 관련 표현 통일 (예시)
+all_languages = all_languages.replace(r'.*mandarin.*|madarin|(chinese$)',
+                                     'chinese (mandarin)', regex=True).str.strip()
+unique_languages = all_languages.unique()
+print(f"\n--- 고유 언어 개수: {len(unique_languages)} ---")
+# print(sorted(list(unique_languages))) # 정렬하여 출력 (생략)
+\end{lstlisting}
+\end{codeexamplebox}
+\texttt{explode}는 각 언어별 빈도수를 계산하거나, 특정 언어 사용자 그룹을 분석할 때 유용합니다.
+
+\subsubsection{함수 적용 (\texttt{apply})}
+
+Series나 DataFrame의 각 원소 또는 행/열에 대해 사용자 정의 함수나 내장 함수를 적용할 때 사용합니다. 예를 들어, \texttt{split}된 리스트의 길이를 계산하여 각 학생이 구사하는 언어의 수를 계산할 수 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={apply를 이용한 계산}, label={lst:apply_len}]
+# 'languages' 컬럼을 분리한 리스트의 길이를 계산하여 'num_languages' 컬럼 생성
+# 결측치(NaN)가 있는 경우 오류가 발생할 수 있으므로, fillna('') 등으로 사전 처리 필요
+# 여기서는 languages 결측치를 이미 제거했으므로 바로 적용
+df['num_languages'] = df['languages'].str.split(', ').apply(len)
+
+# 가장 많은 언어를 구사하는 경우 확인
+max_languages = df['num_languages'].max()
+print(f"가장 많은 언어 구사 수: {max_languages}")
+print(df.loc[df['num_languages'].idxmax(), ['languages', 'num_languages']]) # idxmax()는 최댓값의 인덱스 반환
+\end{lstlisting}
+\end{codeexamplebox}
+
+\subsubsection{데이터 그룹화 및 집계 (\texttt{groupby}, \texttt{agg})}
+
+특정 컬럼(들)의 값을 기준으로 데이터를 그룹화하고, 각 그룹에 대해 집계 함수(평균, 합계, 개수 등)를 적용하여 요약 통계를 계산합니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={groupby 및 agg 사용}, label={lst:groupby_agg}]
+# 'program' 별 평균 'pandas_skill' 계산
+avg_skill_by_program = df.groupby('program')['pandas_skill'].mean()
+print("--- 프로그램별 평균 Pandas 스킬 (상위 5개) ---")
+print(avg_skill_by_program.sort_values(ascending=False).head())
+
+# 여러 집계 함수를 동시에 적용 (예: 평균 나이와 학생 수)
+# 'age' 컬럼이 필요 (앞서 dob로부터 계산했다고 가정)
+if 'age' in df.columns:
+    program_summary = df.groupby('program').agg(
+        avg_age=('age', 'mean'),      # 'age' 컬럼에 mean 함수 적용
+        count=('program', 'size')   # 'program' 컬럼에 size 함수(개수 세기) 적용
+    )
+    # 학생 수가 2명 이상인 프로그램만 필터링하고 평균 나이 기준 정렬
+    program_summary_filtered = program_summary[program_summary['count'] >= 2].sort_values('avg_age')
+    print("\n--- 주요 프로그램별 평균 나이 및 학생 수 ---")
+    print(program_summary_filtered)
+else:
+    print("\n'age' 컬럼이 없어 프로그램별 요약 통계를 계산할 수 없습니다.")
+\end{lstlisting}
+\end{codeexamplebox}
+
+\subsubsection{교차 분석표 (\texttt{crosstab})}
+
+두 범주형 변수 간의 관계를 파악하기 위해 각 조합에 해당하는 빈도수를 표 형태로 보여줍니다. 예를 들어, 운영체제(os)와 다크 모드(dark\_mode) 선호도 간의 관계를 볼 수 있습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={crosstab 사용}, label={lst:crosstab}]
+# 'os'와 'dark_mode' 간의 교차표 생성
+os_darkmode_crosstab = pd.crosstab(df['os'], df['dark_mode'])
+print("--- OS별 Dark Mode 선호도 교차표 ---")
+print(os_darkmode_crosstab)
+
+# 비율로 보고 싶다면 normalize 인자 사용
+# os_darkmode_crosstab_ratio = pd.crosstab(df['os'], df['dark_mode'], normalize='index')
+# print("\n--- OS별 Dark Mode 선호도 비율 ---")
+# print(os_darkmode_crosstab_ratio)
+\end{lstlisting}
+\end{codeexamplebox}
+
+\newpage
+
+\subsection{5단계: 데이터 저장}
+
+정제 및 분석된 DataFrame을 나중에 다시 사용하기 위해 파일로 저장합니다. CSV 파일로 저장하는 것이 일반적이며, \texttt{to\_csv()} 메서드를 사용합니다. \texttt{index=False} 옵션을 주면 DataFrame의 인덱스가 파일에 저장되지 않습니다.
+
+\begin{codeexamplebox}
+\begin{lstlisting}[language=Python, caption={DataFrame을 CSV 파일로 저장}, label={lst:to_csv}]
+# 정제된 DataFrame을 'survey_final.csv' 파일로 저장 (인덱스 제외)
+try:
+    df.to_csv('survey_final.csv', index=False)
+    print("DataFrame이 'survey_final.csv' 파일로 저장되었습니다.")
+except Exception as e:
+    print(f"파일 저장 중 오류 발생: {e}")
+\end{lstlisting}
+\end{codeexamplebox}
+
+\newpage
+
+\section{실습 코드 종합 예제}
+
+다음은 위에서 설명한 주요 Pandas 작업을 연속적으로 보여주는 코드 예제입니다.
+
+\begin{lstlisting}[language=Python, caption={Pandas 데이터 처리 파이프라인 예제}, label={lst:pipeline_example}]
+import pandas as pd
+import numpy as np
+from pandas.api.types import CategoricalDtype
+
+# --- 1. 데이터 로딩 ---
+try:
+    df = pd.read_csv("data/cs1090a_survey_raw.csv")
+except FileNotFoundError:
+    # 파일 없을 경우 임시 데이터 사용 (위 예제 참고)
+    data = {'Timestamp': ['9/9/2025 17:43:09'], 'What\'s your Harvard affiliation?\n': ['Bachelor\'s (CS)'], 'Have you used Jupyter Notebooks before?': ['Yes'], 'How many years of Python programming experience do you have?\n(Choose the range that best fits your experience.)': ['Less than 1 year'], 'Rate your current Pandas skill level.': [2], 'What is your primary OS?': ['MacOS'], 'Do use normally code/browse in dark mode?': ['No'], 'What languages do you speak? \n(Comma separated)\n\nExample: Hittite, Elvish, Cornish, Klingon': ['English'], 'Which continents have you visited?': ['Africa, Asia, Europe, North America, South America'], 'When were you born?': ['11/15/2004'], 'What time do you usually wake up in the morning?': ['10:00:00 AM'], 'What time do you usually go to bed?': ['12:00:00 AM'], 'Favorite Season?': ['Spring'], 'Where do you usually get your caffeine?': ['Tea'], 'Which kind of pet do you prefer?': ['Pet rock'], 'What\'s your favorite movie?': [None], 'What movie genres do particularly enjoy?\n(select as many as you like)': ['Comedy'], 'List up to 3 of your hobbies.\n(comma separated)\n\nExample: playing kazoo, bird watching, stamp collecting': ['tennis, movies, eating'], 'How was HW0?': [None]}
+    df = pd.DataFrame(data)
+
+# --- 2. 데이터 정제 ---
+# 컬럼명 변경
+new_cols = ["timestamp", "program", "jupyter", "python_exp", "pandas_skill", "os", "dark_mode", "languages", "continents", "dob", "wake_time", "sleep_time", "fav_season", "caffeine", "pet", "fav_movie", "fav_genres", "hobbies", "hw0"]
+df.columns = new_cols
+
+# 불필요한 컬럼 제거
+df = df.drop("timestamp", axis=1)
+
+# 데이터 타입 변환 (Boolean, Category, Datetime)
+df['dark_mode'] = (df['dark_mode'].str.lower() == 'yes')
+df['jupyter'] = (df['jupyter'].str.lower() == 'yes')
+df['os'] = df['os'].astype('category')
+experience_order = ['Less than 1 year', '1-2 years', '2-4 years', '4+ years']
+experience_dtype = CategoricalDtype(categories=experience_order, ordered=True)
+df['python_experience'] = df['python_exp'].astype(experience_dtype)
+df['dob'] = pd.to_datetime(df['dob'], errors='coerce')
+
+# 텍스트 정규화 (소문자 변환)
+str_cols = df.select_dtypes(include='object').columns
+for c in str_cols:
+    df[c] = df[c].str.lower().str.strip() # 공백 제거 추가
+
+# 중복 행 제거 (있는 경우)
+df = df.drop_duplicates()
+
+# 결측치 처리 (예: 'languages'가 비어있는 행 제거)
+df.dropna(subset=['languages'], inplace=True)
+
+# 파생 변수 생성 (예: 나이, 언어 수)
+now = pd.Timestamp.now()
+df['age'] = np.floor((now - df['dob']).dt.days / 365.25).astype('Int64')
+df['num_languages'] = df['languages'].str.split(', ').apply(len)
+
+# --- 3. 데이터 분석 예시 ---
+# Pandas 스킬 4 이상인 학생 필터링
+df_high_skill = df[df['pandas_skill'] >= 4]
+
+# 프로그램별 평균 나이 계산 (학생 수 2명 이상)
+program_summary = df.groupby('program').agg(avg_age=('age', 'mean'), count=('program', 'size'))
+program_summary_filtered = program_summary[program_summary['count'] >= 2].sort_values('avg_age')
+
+# --- 4. 결과 확인 ---
+print("--- Pandas 스킬 4 이상 학생 (일부) ---")
+print(df_high_skill[['program', 'pandas_skill']].head())
+
+print("\n--- 주요 프로그램별 평균 나이 및 학생 수 ---")
+print(program_summary_filtered)
+
+# --- 5. 데이터 저장 ---
+# df.to_csv('survey_final.csv', index=False)
+# print("\n정제된 데이터가 'survey_final.csv'로 저장되었습니다.")
+\end{lstlisting}
+
+\newpage
+
+\section{체크리스트}
+
+Pandas를 사용하여 데이터를 처리할 때 다음 사항들을 점검하면 실수를 줄이고 효율적인 분석을 수행하는 데 도움이 됩니다.
+
+\begin{itemize}
+    \item[\checkmark] \textbf{데이터 로딩:} 데이터가 올바르게 DataFrame으로 로드되었는가? (\texttt{head()}, \texttt{shape} 확인)
+    \item[\checkmark] \textbf{컬럼명 확인 및 변경:} 컬럼명이 너무 길거나 복잡하지 않은가? 의미 있고 사용하기 쉬운 이름으로 변경했는가? (소문자, 언더스코어 사용 권장)
+    \item[\checkmark] \textbf{불필요한 데이터 제거:} 분석에 사용하지 않을 행이나 열은 제거했는가? (\texttt{drop})
+    \item[\checkmark] \textbf{데이터 타입 확인 및 변환:} 각 컬럼의 데이터 타입(\texttt{dtypes}, \texttt{info})이 적절한가? 숫자여야 할 컬럼이 문자열(\texttt{object})은 아닌가? 날짜, 범주형, boolean 등으로 변환이 필요한 컬럼은 없는가? (\texttt{astype}, \texttt{to\_datetime}, \texttt{CategoricalDtype})
+    \item[\checkmark] \textbf{텍스트 정규화:} 문자열 데이터에 대소문자나 앞뒤 공백 등 일관성 없는 부분이 있는가? (\texttt{str.lower()}, \texttt{str.strip()}, \texttt{replace})
+    \item[\checkmark] \textbf{중복값 확인 및 처리:} 완전히 동일한 행이 중복되어 있는가? (\texttt{duplicated()}, \texttt{drop\_duplicates})
+    \item[\checkmark] \textbf{결측치 확인 및 처리:} 결측치(NaN)가 어디에 얼마나 있는지 파악했는가? (\texttt{isna().sum()}, \texttt{info}) 분석 목적에 맞게 결측치를 제거(\texttt{dropna})하거나 적절한 값으로 대치(\texttt{fillna})했는가?
+    \item[\checkmark] \textbf{인덱스 확인 및 재설정:} 데이터 필터링, 정렬 후 인덱스가 순차적이지 않게 되었는가? 필요하다면 인덱스를 재설정했는가? (\texttt{reset\_index})
+    \item[\checkmark] \textbf{데이터 선택/필터링 검증:} Boolean indexing, \texttt{loc}, \texttt{iloc} 등을 사용하여 원하는 데이터를 정확히 선택했는지 확인했는가?
+    \item[\checkmark] \textbf{집계 결과 검증:} \texttt{groupby}, \texttt{agg}, \texttt{crosstab} 등의 집계 결과가 예상과 일치하는가? 집계 함수를 올바르게 사용했는가?
+    \item[\checkmark] \textbf{결과 저장:} 최종적으로 정제되거나 분석된 데이터를 저장할 필요가 있는가? (\texttt{to\_csv})
+\end{itemize}
+
+\newpage
+
+\section{FAQ (자주 묻는 질문)}
+
+Pandas를 처음 배울 때 흔히 궁금해하거나 혼동하는 부분들을 정리했습니다.
+
+\textbf{Q1: \texttt{df[column\_name]} 과 \texttt{df.column\_name} 중 어떤 것을 써야 하나요?}
+\begin{itemize}
+    \item \texttt{df['column\_name']} (대괄호와 문자열 사용) 방식이 더 안전하고 권장됩니다. 컬럼 이름에 공백이나 특수문자가 있거나, DataFrame의 기존 메서드 이름(예: 'head', 'count')과 겹치는 경우에도 사용할 수 있습니다.
+    \item \texttt{df.column\_name} (점 표기법) 방식은 타이핑이 간편하지만, 위와 같은 제약 조건이 있습니다. 간단하고 이름 충돌 가능성이 없는 경우에만 사용하는 것이 좋습니다.
+\end{itemize}
+
+\textbf{Q2: \texttt{loc}과 \texttt{iloc}은 언제 사용하나요? 왜 이렇게 복잡하게 나뉘어 있나요?}
+\begin{itemize}
+    \item 데이터를 선택하는 기준이 명확히 다릅니다. \texttt{loc}은 사람이 지정한 이름표(label)를 사용하고, \texttt{iloc}은 컴퓨터가 내부적으로 관리하는 순서(position, 0부터 시작하는 정수)를 사용합니다.
+    \item 예를 들어, 학생 명단에서 '홍길동' 학생의 정보를 찾을 때는 이름표(\texttt{loc['홍길동']})를 쓰는 것이 직관적입니다. 반면, 명단에서 그냥 '첫 번째 학생'의 정보를 볼 때는 위치(\texttt{iloc[0]})를 쓰는 것이 편합니다.
+    \item 데이터를 정렬하거나 필터링하면 원래의 순서와 이름표가 달라질 수 있기 때문에, 이 두 가지 방법을 명확히 구분하여 사용해야 원하는 데이터를 정확히 찾을 수 있습니다.
+\end{itemize}
+
+\textbf{Q3: 데이터를 정렬하거나 필터링한 후에 왜 \texttt{reset\_index()}를 자주 사용하나요?}
+\begin{itemize}
+    \item \texttt{sort\_values()}나 boolean indexing으로 DataFrame을 조작하면, 기존의 인덱스 라벨은 그대로 유지된 채 행의 순서만 바뀝니다. 예를 들어, 원래 100번 인덱스였던 행이 정렬 후 첫 번째 행이 되어도 인덱스 라벨은 여전히 100입니다.
+    \item 이렇게 되면 \texttt{iloc[0]} (첫 번째 위치의 행)과 \texttt{loc[0]} (인덱스 라벨이 0인 행)이 다른 행을 가리키게 되어 혼란을 야기할 수 있습니다.
+    \item \texttt{reset\_index(drop=True)}를 사용하면 현재 행 순서에 맞게 인덱스를 0부터 다시 깔끔하게 부여해주므로, 이후 작업에서 혼동을 줄일 수 있습니다. (\texttt{drop=False}로 하면 기존 인덱스가 새로운 컬럼으로 추가됩니다.)
+\end{itemize}
+
+\textbf{Q4: 컬럼의 데이터 타입(\texttt{dtype})이 왜 중요한가요? 그냥 \texttt{object}로 두면 안 되나요?}
+\begin{itemize}
+    \item \textbf{성능:} 숫자(\texttt{int}, \texttt{float}), boolean(\texttt{bool}) 등 명확한 타입은 메모리를 효율적으로 사용하고 계산 속도도 빠릅니다. 반면 \texttt{object} 타입은 다양한 종류의 데이터를 담을 수 있지만, 내부적으로는 메모리 주소를 저장하는 방식이라 처리 속도가 느리고 메모리도 많이 차지합니다.
+    \item \textbf{기능:} 날짜/시간 타입(\texttt{datetime64})으로 변환해야 날짜 관련 연산(예: 두 날짜 간의 차이 계산)이 가능합니다. 범주형 타입(\texttt{category})은 메모리를 절약하고 특정 통계 분석에 유용합니다. 숫자 타입이어야 평균, 합계 등 수학적 연산이 가능합니다.
+    \item \textbf{정확성:} '1', '2', '3'이 문자열(\texttt{object})로 저장되어 있다면 숫자 크기 비교나 덧셈이 제대로 되지 않습니다. 반드시 적절한 숫자 타입으로 변환해야 합니다.
+\end{itemize}
+
+\textbf{Q5: NumPy 배열과 Pandas Series/DataFrame은 무엇이 다른가요?}
+\begin{itemize}
+    \item \textbf{NumPy 배열 (\texttt{ndarray}):} 주로 숫자로 이루어진 다차원 배열을 효율적으로 다루기 위한 라이브러리입니다. 모든 원소는 동일한 데이터 타입이어야 하며, 인덱스는 0부터 시작하는 정수 위치만 사용합니다. 수학/과학 계산에 강력합니다.
+    \item \textbf{Pandas Series/DataFrame:} NumPy를 기반으로 만들어졌지만, 더 유연하고 다양한 기능을 제공합니다.
+        \begin{itemize}
+            \item \textbf{명시적 인덱스:} 숫자가 아닌 라벨 기반 인덱스를 사용할 수 있습니다.
+            \item \textbf{다양한 데이터 타입:} DataFrame의 경우 열마다 다른 데이터 타입을 가질 수 있습니다.
+            \item \textbf{결측치 처리:} NaN 값을 내장하여 쉽게 처리할 수 있습니다.
+            \item \textbf{데이터 조작 기능:} 데이터 정렬, 필터링, 그룹화, 병합 등 데이터 분석에 특화된 고수준의 기능을 풍부하게 제공합니다.
+            \item \textbf{입출력 편의성:} CSV, Excel 등 다양한 파일 형식을 쉽게 다룰 수 있습니다.
+        \end{itemize}
+    \item 요약하면, NumPy는 고성능 수치 계산의 기반이고, Pandas는 NumPy를 활용하여 표 형태의 데이터를 편리하게 분석할 수 있도록 확장한 도구입니다.
+\end{itemize}
+
+\newpage
+
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[title=Pandas 핵심 요약]
+\textbf{Pandas?} 파이썬에서 표(테이블) 데이터를 다루는 강력하고 편리한 라이브러리.
+
+\textbf{주요 자료구조}
+\begin{itemize}
+    \item \textbf{Series}: 1차원 배열 + 인덱스 (이름표). 엑셀의 한 열. \texttt{pd.Series(data, index=...)}
+    \item \textbf{DataFrame}: 2차원 표. 여러 Series의 묶음. 엑셀 시트. \texttt{pd.DataFrame(data, columns=...)}
+\end{itemize}
+
+\textbf{데이터 로딩 \& 저장}
+\begin{itemize}
+    \item \textbf{읽기}: \texttt{pd.read\_csv('파일경로')} (주로 사용), \texttt{pd.read\_excel()}, ...
+    \item \textbf{저장}: \texttt{df.to\_csv('파일경로', index=False)}
+\end{itemize}
+
+\textbf{기본 탐색}
+\begin{itemize}
+    \item \texttt{df.head(n)}: 처음 n개 행 보기
+    \item \texttt{df.tail(n)}: 마지막 n개 행 보기
+    \item \texttt{df.shape}: (행 개수, 열 개수) 확인
+    \item \texttt{df.columns}: 열 이름 목록
+    \item \texttt{df.index}: 행 이름(인덱스) 목록
+    \item \texttt{df.info()}: 전체 요약 정보 (결측치, 타입 확인 필수!)
+    \item \texttt{df.dtypes}: 열별 데이터 타입 확인
+    \item \texttt{df.describe()}: 수치형 데이터 기술 통계 요약
+\end{itemize}
+
+\textbf{데이터 정제}
+\begin{itemize}
+    \item \textbf{컬럼명 변경}: \texttt{df.columns = [...]}, \texttt{df.rename(columns={...})}
+    \item \textbf{컬럼/행 제거}: \texttt{df.drop(['col1', 'row1'], axis=1/0)}
+    \item \textbf{타입 변환}: \texttt{df['col'].astype('int')}, \texttt{pd.to\_datetime(df['col'])}, ...
+    \item \textbf{결측치 확인/처리}: \texttt{df.isna().sum()}, \texttt{df.dropna()}, \texttt{df.fillna(value)}
+    \item \textbf{중복값 확인/처리}: \texttt{df.duplicated().sum()}, \texttt{df.drop\_duplicates()}
+    \item \textbf{텍스트 처리}: \texttt{df['col'].str.lower()}, \texttt{.str.strip()}, \texttt{.str.replace()}, \texttt{.str.split()}
+\end{itemize}
+
+\textbf{데이터 선택 \& 필터링}
+\begin{itemize}
+    \item \textbf{열 선택}: \texttt{df['col']}, \texttt{df[['col1', 'col2']]}
+    \item \textbf{행 선택 (Boolean Indexing)}: \texttt{df[df['col'] > 10]}, \texttt{df[(cond1) \& (cond2)]}
+    \item \textbf{라벨 기반 선택 (\texttt{loc})}: \texttt{df.loc['row\_label', 'col\_label']}, \texttt{df.loc['start':'end']} (끝 포함)
+    \item \textbf{위치 기반 선택 (\texttt{iloc})}: \texttt{df.iloc[0, 1]}, \texttt{df.iloc[0:5]} (끝 제외)
+\end{itemize}
+
+\textbf{정렬 \& 집계}
+\begin{itemize}
+    \item \textbf{정렬}: \texttt{df.sort\_values(by='col', ascending=False)}
+    \item \textbf{값 개수}: \texttt{df['col'].value\_counts()}
+    \item \textbf{그룹화}: \texttt{df.groupby('col')}
+    \item \textbf{집계}: \texttt{grouped.agg({'col1': 'mean', 'col2': 'count'})}, \texttt{grouped.mean()}, \texttt{grouped.size()}
+    \item \textbf{교차 분석}: \texttt{pd.crosstab(df['col1'], df['col2'])}
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\section{부록: 환경 설정 및 추가 정보}
+
+\subsection{Python 환경 설정}
+
+Pandas를 사용하기 위해서는 Python과 Pandas 라이브러리가 설치되어 있어야 합니다. 강의에서는 가상 환경 사용을 권장하며, \texttt{uv} 또는 \texttt{conda}와 같은 도구를 사용할 수 있습니다.
+
+\textbf{uv 사용 (권장):}
+과제 파일과 함께 제공되는 \texttt{requirements.txt} 파일을 이용하여 필요한 라이브러리가 모두 포함된 가상 환경을 생성할 수 있습니다.
+\begin{enumerate}
+    \item \texttt{uv} 설치 (pip install uv)
+    \item 프로젝트 폴더에서 \texttt{uv venv} 실행하여 가상 환경 생성 (.venv 폴더 생성됨)
+    \item \texttt{source .venv/bin/activate} (macOS/Linux) 또는 \texttt{.venv\Scripts\activate} (Windows) 실행하여 가상 환경 활성화
+    \item \texttt{uv pip install -r requirements.txt} 실행하여 라이브러리 설치
+\end{enumerate}
+각 과제(프로젝트)마다 별도의 가상 환경을 만드는 것이 좋습니다.
+
+\textbf{Conda 사용:}
+Conda 환경을 사용하고 있다면, \texttt{conda install pandas} 명령어로 Pandas를 설치하거나, \texttt{requirements.txt} 파일을 이용하여 환경을 구성할 수 있습니다.
+
+\textbf{직접 설치:}
+기존 환경에 직접 설치하려면 \texttt{pip install pandas} 또는 \texttt{uv pip install pandas} 명령어를 사용합니다. 과제 진행 중 필요한 라이브러리가 없다는 오류가 발생하면 해당 라이브러리를 추가로 설치해주어야 합니다.
+
+\subsection{Harvard OnDemand (클라우드 환경)}
+
+로컬 환경 설정에 어려움을 겪는 경우, Harvard OnDemand에서 제공하는 클라우드 기반 JupyterLab 환경을 사용할 수 있습니다.
+\begin{itemize}
+    \item Canvas의 'Harvard OnDemand' 링크를 통해 접속합니다.
+    \item 'Interactive Apps' 메뉴에서 'JupyterLab CS1090A'를 선택합니다.
+    \item 사용 시간 등을 설정하고 'Launch' 버튼을 클릭합니다.
+    \item 잠시 후 생성된 환경에 접속하여 Jupyter 노트북을 사용합니다.
+    \item 과제 파일이나 강의 자료(zip 파일)를 업로드하여 작업할 수 있습니다.
+    \item 사용 시간이 만료되어도 작업 내용은 유지되므로, 다시 접속하여 이어서 작업할 수 있습니다.
+\end{itemize}
+\begin{warningbox}
+Harvard OnDemand는 제한된 자원이므로, 로컬 환경 설정이 가능한 경우에는 로컬 환경 사용을 권장합니다. 꼭 필요한 경우의 안전망으로 활용하세요.
+\end{warningbox}
+
+\subsection{Jupyter Notebook 사용 팁}
+
+\begin{itemize}
+    \item \textbf{Tab 자동 완성:} 코드 입력 중 Tab 키를 누르면 사용 가능한 변수, 함수, 메서드 목록을 보여주거나 자동 완성해줍니다. (\texttt{df.} 입력 후 Tab)
+    \item \textbf{Shift + Tab 도움말:} 함수 괄호 안에서 Shift + Tab 키를 누르면 해당 함수의 설명(docstring)을 보여줍니다. 인자나 사용법을 확인할 때 유용합니다.
+    \item \textbf{셀 실행 순서 주의:} 노트북 셀은 원하는 순서대로 실행할 수 있지만, 이로 인해 변수 상태가 꼬여 예상치 못한 오류가 발생할 수 있습니다. 문제가 발생하면 커널을 재시작(Kernel > Restart)하고 처음부터 순서대로 실행해보는 것이 좋습니다.
+\end{itemize}
+
+\subsection{추가 학습 자료}
+
+\begin{itemize}
+    \item \textbf{Pandas 공식 문서:} \url{https://pandas.pydata.org/docs/} (가장 정확하고 방대한 정보 제공)
+    \item \textbf{Pandas 10분 완성:} \url{https://pandas.pydata.org/docs/user_guide/10min.html} (빠른 시작 가이드)
+    \item \textbf{강의 플랫폼(Ed) 자료:} Bedrock Data Science, Bedrock Codecasts \& Tutorials 섹션의 추가 Pandas 자료 확인
+\end{itemize}
+
+\end{document}

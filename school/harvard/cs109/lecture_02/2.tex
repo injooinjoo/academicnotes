@@ -1,0 +1,1194 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.0
+% 최종 수정일: 2025-10-26
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[margin=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: 데이터 과학 입문}}
+\fancyhead[R]{\small\textit{Lecture 02}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CS109A: 데이터 과학 입문 - Lecture 02},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: 데이터 과학 입문}{Lecture 02}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 02의 핵심 개념 학습}
+
+
+% --- 개요 ---
+\begin{summarybox}
+본 문서는 데이터 과학의 핵심 구성요소인 '데이터'가 무엇인지 정의하고,
+데이터를 수집, 저장, 분류하는 방법을 다룹니다.
+또한, 데이터의 특성을 요약하는 '기술 통계' 방법(평균, 분산 등)과,
+데이터에 숨겨진 패턴을 찾는 '시각화'의 중요성(앤스컴 4중주) 및
+다양한 시각화 기법(히스토그램, 산점도, 박스 플롯 등)을 설명합니다.
+이 자료는 데이터 과학 프로세스의 2, 3단계(수집 및 탐색)의 기초를 다룹니다.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+% --- 용어 정리 ---
+\section{핵심 용어 정리}
+
+데이터 분석을 시작하기 위해 꼭 알아야 할 기본 용어들입니다.
+
+\begin{table}[h!]
+\centering
+\caption{데이터 분석 핵심 용어}
+\label{tab:terms}
+\begin{tabular}{@{}lp{5cm}lp{4cm}@{}}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+데이터 & 관찰을 통해 수집된 사실, 값, 정보의 집합. & Data & 단수형은 Datum. (Data는 복수형) \\
+정형 데이터 & 엑셀 시트처럼 행과 열로 명확히 구조화된 데이터. & Tabular Data & "Tidy Data"라고도 함. \\
+관측치 & 분석 대상의 개별 단위 (엑셀의 '행'). & Observation & 예: 한 명의 사람, 한 개의 영화. \\
+변수 & 측정하려는 특성 (엑셀의 '열'). & Variable & 예: 나이, 평점. (Feature라고도 함) \\
+모집단 & 연구 대상이 되는 전체 집단. & Population & 예: 이 수업을 듣는 '모든' 학생. \\
+표본 & 모집단에서 추출한 '일부' 대표 집합. & Sample & 예: 오늘 수업에 '출석한' 학생. \\
+EDA & 시각화와 통계를 통해 데이터의 패턴을 탐색하는 과정. & Exploratory Data Analysis & "탐색적 데이터 분석" \\
+\addlinespace
+\textbf{[중심 측정]} & & & \\
+평균 & 모든 값을 더해 개수로 나눈 값. (무게 중심) & Mean ($\overline{x}$) & 이상치(Outlier)에 매우 민감함. \\
+중앙값 & 데이터를 순서대로 나열했을 때 딱 중간에 있는 값. & Median & 이상치에 둔감함(Robust). \\
+최빈값 & 데이터에서 가장 자주 등장하는 값. & Mode & 범주형 데이터에서 주로 사용. \\
+\addlinespace
+\textbf{[퍼짐 측정]} & & & \\
+분산 & 데이터가 평균에서 얼마나 멀리 퍼져있는지의 정도. & Variance ($s^2$) & 단위가 원래 단위의 '제곱'이 됨. \\
+표준편차 & 분산에 제곱근을 씌운 값. & Standard Dev. ($s$) & 원래 데이터와 단위가 동일해 해석이 쉬움. \\
+\addlinespace
+\textbf{[시각화]} & & & \\
+히스토그램 & 수량형 데이터의 '분포'를 막대로 표현. & Histogram & 구간(bin) 너비에 따라 모양이 변함. \\
+막대 그래프 & 범주형 데이터의 '빈도'를 막대로 비교. & Bar Plot & 막대 순서를 바꿔도 의미가 통함. \\
+산점도 & 두 수량형 변수 간의 '관계'를 점으로 표현. & Scatter Plot & 방향, 강도, 형태, 이상치를 봄. \\
+박스 플롯 & 범주형 그룹 간 수량형 데이터의 분포를 '요약' 비교. & Box Plot & 중앙값, 사분위수, 이상치를 보여줌. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+% --- 핵심 개념 1: 데이터란 무엇인가? ---
+\section{핵심 개념 1: 데이터란 무엇인가? (What is Data?)}
+
+데이터 과학(Data Science)은 이름 그대로 '데이터'에서 시작합니다.
+
+\subsection{데이터의 정의}
+
+\begin{itemize}
+    \item \textbf{데이터(Data):} 관찰이나 측정을 통해 얻은 여러 개의 정보 조각들입니다. (복수형)
+    \item \textbf{데이터(Datum):} 정보 조각 '하나'를 의미합니다. (단수형)
+\end{itemize}
+
+과거에는 데이터가 주로 숫자(Numeric)였지만, 현대에는 텍스트, 이미지, 소리 등 모든 것이 데이터가 될 수 있습니다.
+
+\subsection{데이터 수집 방법 (어디서 오는가?)}
+
+데이터는 크게 세 가지 경로로 얻을 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{내부 소스 (Internal Sources):}
+    \begin{itemize}
+        \item 조직이나 개인이 직접 수집한 1차 데이터입니다.
+        \item 예: 과학 실험 결과, 임상 시험 데이터, 회사 내부의 판매 기록.
+    \end{itemize}
+
+    \item \textbf{기존 외부 소스 (Existing External Sources):}
+    \begin{itemize}
+        \item 이미 누군가 수집/가공하여 공개한 데이터입니다.
+        \item 예: 정부 공공 데이터 포털, Kaggle 데이터셋, 스포츠 기록 사이트.
+    \end{itemize}
+
+    \item \textbf{수집이 필요한 외부 소스 (External Sources Requiring Collection):}
+    \begin{itemize}
+        \item 외부에 존재하지만, 가져오려면 별도의 노력이 필요한 데이터입니다.
+        \item 이 강의에서 주목하는 방식이며, 주로 온라인 데이터를 의미합니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{온라인 데이터 수집 3가지 방법}
+
+온라인에서 데이터를 가져오는 대표적인 3가지 기술입니다.
+
+\begin{description}
+    \item[1. API (Application Programming Interface)]
+    \begin{itemize}
+        \item \textbf{개념:} 회사가 외부 사용자가 자신의 데이터나 서비스에 "합법적으로" 접근할 수 있도록 열어둔 '공식 창구'입니다.
+        \item \textbf{특징:} 보통 사용량 제한이 있거나 유료입니다. 안정적이고 정확한 데이터를 제공받습니다. (예: 구글 지도 API, 스포티파이 API)
+        \item \textbf{필요 기술:} 파이썬(Python)과 각 API의 사용 설명서(Dictionary)를 읽는 능력.
+    \end{itemize}
+
+    \item[2. RSS (Rich Site Summary)]
+    \begin{itemize}
+        \item \textbf{개념:} 블로그나 뉴스 사이트처럼 '자주 업데이트되는' 콘텐츠를 요약하여 스트림(Stream) 형태로 제공하는 규격입니다.
+        \item \textbf{특징:} 무료이며, 주로 새로운 게시물의 제목, 요약, 링크를 받아볼 때 사용됩니다.
+    \end{itemize}
+
+    \item[3. 웹 스크래핑 (Web Scraping)]
+    \begin{itemize}
+        \item \textbf{개념:} 웹사이트의 HTML 코드에서 직접 필요한 정보를 '추출'하는 기술입니다.
+        \item \textbf{특징:} API가 없거나 유료 API를 우회하고 싶을 때 사용됩니다. (예: 위키피디아의 표(table) 정보를 긁어오는 것)
+    \end{itemize}
+\end{description}
+
+\begin{warningbox}
+\textbf{웹 스크래핑의 윤리적/법적 문제}
+
+웹 스크래핑은 강력하지만 매우 조심해야 하는 기술입니다.
+\begin{itemize}
+    \item \textbf{서비스 약관(Terms of Service) 위반:} 많은 웹사이트가 스크래핑을 명시적으로 금지합니다.
+    \item \textbf{개인정보 침해:} 사용자의 비공개 정보를 수집하면 안 됩니다.
+    \item \textbf{서버 부하:} 과도한 스크래핑은 대상 웹사이트의 서버를 마비시킬 수 있습니다 (DoS 공격과 유사).
+    \item \textbf{해악(Harm):} 수집한 데이터를 통해 사생활을 침해하거나 불법적인 용도로 사용해서는 안 됩니다.
+\end{itemize}
+항상 데이터를 수집하기 전에 "이 데이터를 사용해도 되는가?"를 먼저 질문해야 합니다.
+\end{warningbox}
+
+\newpage
+
+% --- 핵심 개념 2: 데이터의 유형과 구조 ---
+\section{핵심 개념 2: 데이터의 유형과 구조}
+
+데이터를 수집했다면, 그 형태와 유형을 파악해야 합니다.
+
+\subsection{데이터 유형 (Data Types)}
+
+\begin{itemize}
+    \item \textbf{원자적 유형 (Atomic Types):} 더 이상 쪼갤 수 없는 기본 단위입니다.
+    \begin{itemize}
+        \item \textbf{수량형 (Numeric):} 정수(Integers, 예: 109), 실수(Floats, 예: 3.14)
+        \item \textbf{부울형 (Boolean):} 참/거짓 (True/False, Yes/No, 1/0)
+        \item \textbf{문자열 (Strings):} 텍스트 (예: "Hello")
+    \end{itemize}
+    \item \textbf{복합 유형 (Compound Types):} 원자적 유형들이 모여 구성됩니다.
+    \begin{itemize}
+        \item \textbf{리스트 (Lists):} 순서가 있는 값의 모음 (예: \texttt{[1, 2, 3]})
+        \item \textbf{사전 (Dictionaries):} '키(Key)'와 '값(Value)'이 짝을 이룬 모음 (예: \texttt{\{"name": "Kevin"\}})
+    \end{itemize}
+\end{itemize}
+
+\subsection{데이터 저장 구조}
+
+\begin{description}
+    \item[정형 데이터 (Tabular Data)]
+    \textbf{가장 중요합니다.} 엑셀 시트나 CSV 파일처럼 2차원 테이블(표) 형태입니다.
+    대부분의 데이터 분석 패키지(예: Pandas)는 이 형태를 기본으로 가정합니다.
+
+    \item[반정형 데이터 (Semistructured Data)]
+    JSON, XML처럼 키-값 쌍으로 이루어져 있지만, 정형 데이터처럼 엄격한 행/열 구조를 따르지 않을 수 있습니다.
+
+    \item[비정형 데이터 (Unstructured Data)]
+    텍스트 문서, 이미지, 오디오 파일 등 구조가 없는 데이터입니다.
+\end{description}
+
+\subsection{정형 데이터 (Tabular Data) 집중 탐구}
+
+정형 데이터는 데이터 분석의 표준입니다.
+
+\begin{itemize}
+    \item \textbf{관측치 (Observations):} 표의 \textbf{행(Row)}. 분석하려는 개별 대상 하나하나를 의미합니다. (예: 영화 1개, 학생 1명)
+    \item \textbf{변수 (Variables):} 표의 \textbf{열(Column)}. 관측치에서 측정한 특정 속성입니다. (예: 영화 평점, 학생 나이)
+\end{itemize}
+
+\begin{lstlisting}[language=Python, caption={Pandas를 이용한 정형 데이터(CSV) 로딩 예시}, label={lst:pandas}]
+# imdb_top_1000.csv 파일을 읽어들임
+imdb = pd.read_csv('imdb_top_1000.csv')
+# 처음 5줄(head)을 출력
+imdb.head()
+\end{lstlisting}
+
+\begin{center}
+    \textit{[lst:pandas의 출력 결과: IMDB 영화 목록 표]} \\
+    \textit{각 행(Row)은 영화 1개(관측치)를 나타내며,
+    각 열(Column)은 Series\_Title, Released\_Year, IMDB\_Rating 등(변수)을 나타냅니다.}
+\end{center}
+
+\subsection{변수의 유형: 분석의 첫걸음}
+
+\begin{warningbox}
+\textbf{왜 변수 유형을 구분해야 하나요?}
+
+변수의 유형에 따라 사용할 수 있는 \textbf{요약 방법(통계)}과 \textbf{시각화}가 완전히 달라지기 때문입니다.
+예를 들어, '키'는 평균을 낼 수 있지만 '좋아하는 색깔'은 평균을 낼 수 없습니다.
+\end{warningbox}
+
+변수는 크게 두 가지로 나뉩니다.
+
+\begin{enumerate}
+    \item \textbf{수량형 변수 (Quantitative / Numeric Variable)}
+    \begin{itemize}
+        \item 숫자로 측정되며, 산술 연산(+, -)이 의미가 있습니다.
+        \item \textbf{이산형 (Discrete):} 값이 정수처럼 딱딱 떨어져 셀 수 있습니다. (예: 형제자매 수, 주사위 눈금)
+        \item \textbf{연속형 (Continuous):} 값이 특정 범위 내에서 무한히 많은 값을 가질 수 있습니다. (예: 키, 몸무게, 온도)
+    \end{itemize}
+
+    \item \textbf{범주형 변수 (Categorical Variable)}
+    \begin{itemize}
+        \item 값이 몇 개의 그룹이나 범주로 나뉩니다.
+        \item \textbf{순서형 (Ordinal):} 범주 간에 자연스러운 순서가 있습니다. (예: 학점 A, B, C / 만족도 '높음', '중간', '낮음')
+        \item \textbf{명목형 (Nominal):} 범주 간에 순서가 없습니다. (예: 혈액형 A, B, O / 좋아하는 애완동물 '개', '고양이', '쥐')
+    \end{itemize}
+\end{enumerate}
+
+\subsection{데이터의 흔한 문제점과 "Tidy Data"}
+
+현실의 데이터는 깨끗하지 않습니다.
+\begin{itemize}
+    \item \textbf{결측치 (Missing values):} 값이 비어있습니다. (이 값을 버릴까요? 아니면 추측해서 채울까요?)
+    \item \textbf{오입력값 (Wrong values):} 잘못된 값이 입력되었습니다. (예: 나이 200세)
+    \item \textbf{형식 불일치 (Format mismatch):} 두 데이터를 합치려는데 형식이 다릅니다.
+    \item \textbf{지저분한 데이터 (Messy Data):} 데이터가 분석하기 어려운 형태로 되어있습니다.
+\end{itemize}
+
+\begin{examplebox}[지저분한(Messy) 데이터 변환하기]
+다음은 주말 농산물 배송 횟수를 기록한 "지저분한" 표입니다.
+
+\textbf{Before: (지저분한 형식)}
+\begin{table}[h!]
+\centering
+\caption{지저분한 데이터 예시 (Messy Data)}
+\label{tab:messy}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \textbf{Friday} & \textbf{Saturday} & \textbf{Sunday} \\
+\midrule
+\textbf{Morning} & 15 & 158 & 10 \\
+\textbf{Afternoon} & 2 & 90 & 20 \\
+\textbf{Evening} & 55 & 12 & 45 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{왜 이 형식이 나쁜가요?}
+\begin{itemize}
+    \item '관측치 1개 = 행 1개' 원칙이 깨졌습니다. 'Morning' 행 하나에 3개의 관측치(금요일 아침, 토요일 아침, 일요일 아침)가 들어있습니다.
+    \item 'Friday'는 변수 이름이어야 하는데, '값'처럼 취급되고 있습니다.
+    \item 이 상태로는 "평균 배송 횟수는?" 또는 "요일별 배송 횟수 합계는?"을 계산하기 어렵습니다.
+\end{itemize}
+
+\textbf{After: (정형/Tidy 형식)}
+이 데이터를 분석하기 쉬운 '정형(Tabular)' 또는 'Tidy' 형식으로 바꾸면 다음과 같습니다.
+
+\begin{table}[h!]
+\centering
+\caption{정리된 데이터 예시 (Tidy Data)}
+\label{tab:tidy}
+\begin{tabular}{@{}cllc@{}}
+\toprule
+\textbf{ID} & \textbf{Time} & \textbf{Day} & \textbf{Number} \\
+\midrule
+1 & Morning & Friday & 15 \\
+2 & Morning & Saturday & 158 \\
+3 & Morning & Sunday & 10 \\
+4 & Afternoon & Friday & 2 \\
+5 & Afternoon & Saturday & 90 \\
+... & ... & ... & ... \\
+9 & Evening & Sunday & 45 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{왜 이 형식이 좋은가요?}
+\begin{itemize}
+    \item \textbf{1 관측치 = 1 행:} '금요일 아침'이라는 관측치 하나가 행 하나를 차지합니다.
+    \item \textbf{1 변수 = 1 열:} '시간', '요일', '횟수'라는 명확한 변수(열)가 생겼습니다.
+    \item 이제 Pandas 같은 도구로 'Number' 열의 평균을 구하거나, 'Day'별로 그룹화하여 합계를 구하는 것이 매우 쉬워집니다.
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+% --- 핵심 개념 3: 탐색적 데이터 분석 (EDA) ---
+\section{핵심 개념 3: 탐색적 데이터 분석 (EDA)}
+
+\textbf{탐색적 데이터 분석 (Exploratory Data Analysis, EDA)}은 수집한 데이터를 본격적으로 모델링하기 전에,
+시각화나 간단한 통계 기법을 통해 데이터의 구조와 패턴을 파악하고,
+이상치나 잠재적인 문제점을 발견하는 과정을 말합니다.
+
+EDA는 "데이터와 친해지는 과정"이며, 데이터 과학 프로세스의 3단계에 해당합니다.
+
+\subsection{모집단 (Population) vs. 표본 (Sample)}
+
+\begin{itemize}
+    \item \textbf{모집단 (Population):} 내가 궁극적으로 알고 싶은 대상 '전체'입니다. (예: 하버드의 모든 학생)
+    \item \textbf{표본 (Sample):} 모집단 전체를 조사하기는 불가능하므로, 그중 '일부'를 뽑아서 조사한 것입니다. (예: 오늘 CS109A 수업에 온 학생)
+\end{itemize}
+
+우리는 '표본'을 분석해서 '모집단'의 특성을 추측합니다.
+이때 가장 중요한 것은 표본이 모집단을 잘 대표해야 한다는 것입니다.
+
+\subsection{표본 추출 편향 (Sampling Bias)}
+
+표본이 모집단을 잘 대표하지 못할 때 '편향(Bias)'이 발생했다고 말합니다.
+
+\begin{description}
+    \item[선택 편향 (Selection Bias):] 특정 하위 그룹이 다른 그룹보다 표본으로 더 잘 선택되는 경우.
+    \item[무응답/자발적 참여 편향 (Non-response/Volunteer Bias):]
+    응답하기 쉬운 대상만 응답하거나(예: 수업에 출석한 학생),
+    특정 주제에 열성적인 사람들(예: 앱 얼리 어답터)만 자발적으로 참여하는 경우.
+\end{description}
+
+\begin{examplebox}[잘못된 표본 추출 예시]
+\textbf{사례 1: 수업 출석률}
+\begin{itemize}
+    \item \textbf{목표:} CS109A 전체 학생의 평균 만족도 조사.
+    \item \textbf{표본:} 오늘 수업에 '출석한' 학생들.
+    \item \textbf{문제점:} 수업에 결석한 학생들(어쩌면 만족도가 매우 낮아서 안 온 학생들)의 의견이 반영되지 않습니다. (무응답 편향)
+    이 표본의 만족도 점수는 실제 모집단(전체 학생)의 점수보다 높게 나올 가능성이 큽니다.
+\end{itemize}
+
+\textbf{사례 2: 신규 앱 기능 테스트}
+\begin{itemize}
+    \item \textbf{목표:} 새로운 앱 기능이 모든 사용자에게 효과가 있는지 테스트.
+    \item \textbf{표본:} 신규 기능을 자발적으로 신청한 '얼리 어답터' 그룹.
+    \item \textbf{문제점:} 얼리 어답터들은 원래 새로운 기능에 호의적이고 IT 활용도가 높은 집단입니다. (자발적 참여 편향)
+    이들이 새 기능을 좋아한다고 해서, 변화를 싫어하는 일반 대중(모집단)도 좋아할 것이라고 일반화할 수 없습니다.
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+% --- 절차/방법 1: 기술 통계 ---
+\section{절차/방법 1: 기술 통계 (Descriptive Statistics)}
+
+기술 통계는 수집한 데이터(표본)의 특성을 몇 개의 숫자로 요약하는 방법입니다.
+주로 데이터의 '중심'이 어디인지, '얼마나 퍼져있는지'를 봅니다.
+
+\subsection{데이터의 "중심" 측정 (Measures of Center)}
+
+\subsubsection{평균 (Mean)}
+
+\begin{itemize}
+    \item \textbf{정의:} 모든 값을 더한 뒤, 값의 개수($n$)로 나눈 값.
+    \item \textbf{직관:} 데이터 분포의 "무게 중심" 또는 "균형점".
+    \item \textbf{공식:} $\overline{x} = \frac{1}{n}\sum_{i=1}^{n}x_{i} = \frac{x_1 + x_2 + \dots + x_n}{n}$
+    \item \textbf{단점:} \textbf{이상치(Outlier)}에 매우 민감합니다.
+    \item \textbf{예시:}
+    \begin{itemize}
+        \item 데이터: \texttt{[1, 2, 3, 4, 5]} $\rightarrow$ 평균: $(1+2+3+4+5) / 5 = 3$
+        \item 데이터: \texttt{[1, 2, 3, 4, \textbf{100}]} $\rightarrow$ 평균: $(1+2+3+4+100) / 5 = 22$
+        \item '100'이라는 극단값 하나 때문에 무게 중심이 3에서 22로 확 이동했습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{중앙값 (Median)}
+
+\begin{itemize}
+    \item \textbf{정의:} 데이터를 크기순으로 정렬했을 때, 정확히 '가운데'에 위치한 값.
+    \begin{itemize}
+        \item 데이터 개수($n$)가 홀수: 가운데 1개 값.
+        \item 데이터 개수($n$)가 짝수: 가운데 2개 값의 평균.
+    \end{itemize}
+    \item \textbf{장점:} 이상치에 거의 영향을 받지 않습니다. (Robust)
+    \item \textbf{예시:} (위의 예시를 다시 사용)
+    \begin{itemize}
+        \item 데이터 (정렬됨): \texttt{[1, 2, \textbf{3}, 4, 5]} $\rightarrow$ 중앙값: 3
+        \item 데이터 (정렬됨): \texttt{[1, 2, \textbf{3}, 4, 100]} $\rightarrow$ 중앙값: 3
+        \item '100'이 아니라 '1000'이 되어도 중앙값은 여전히 3입니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{평균 vs 중앙값: 왜도 (Skewness)}
+
+평균과 중앙값의 차이는 데이터 분포의 '비대칭성(왜도)'을 알려줍니다.
+
+\begin{itemize}
+    \item \textbf{대칭 분포 (Symmetric):} 평균 $\approx$ 중앙값 (예: 정규분포)
+    \item \textbf{오른쪽 꼬리 분포 (Right-skewed):} \textbf{평균 > 중앙값}
+    \begin{itemize}
+        \item 소수의 매우 큰 값(outlier)이 평균을 오른쪽으로 끌어당깁니다.
+        \item 예: 개인 소득 분포. (대부분은 중간 소득, 소수의 재벌이 평균을 높임)
+    \end{itemize}
+    \item \textbf{왼쪽 꼬리 분포 (Left-skewed):} \textbf{평균 < 중앙값}
+    \begin{itemize}
+        \item 소수의 매우 작은 값이 평균을 왼쪽으로 끌어당깁니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{center}
+    \textit{[이미지 플레이스홀더: 오른쪽 꼬리 분포(Right-skewed) 그래프]} \\
+    \textit{대부분의 데이터가 왼쪽에 몰려있고, 긴 꼬리가 오른쪽으로 뻗어 있음. \\
+    (중앙값)이 (평균)보다 왼쪽에 위치함.}
+\end{center}
+
+\subsubsection{최빈값 (Mode)}
+
+\begin{itemize}
+    \item \textbf{정의:} 데이터에서 가장 '자주' 등장하는 값.
+    \item \textbf{용도:} \textbf{범주형 데이터}의 중심을 나타낼 때 사용합니다.
+    \item \textbf{예시:} (선호하는 애완동물) \texttt{["개", "고양이", "개", "쥐", "고양이", "개"]} $\rightarrow$ 최빈값: "개"
+    \item 범주형 데이터는 순서가 없으므로 평균이나 중앙값을 계산하는 것이 의미가 없습니다.
+\end{itemize}
+
+\begin{examplebox}[어느 것이 더 빠를까? (Mean vs Median)]
+\textbf{질문:} 수십억 개의 데이터가 있을 때, 평균과 중앙값 중 무엇이 더 빠를까요?
+
+\textbf{답변:} \textbf{평균}이 훨씬 빠릅니다.
+\begin{itemize}
+    \item \textbf{평균 ($O(n)$):} 데이터를 한 번만 훑으면서 합계와 개수만 알면 됩니다.
+    \item \textbf{중앙값 ($O(n \log n)$):} '중간' 값을 찾으려면, 먼저 모든 데이터를 \textbf{정렬(Sorting)}해야 합니다. 정렬은 매우 비싼 연산입니다.
+\end{itemize}
+이러한 연산 속도 차이도 평균이 자주 사용되는 이유 중 하나입니다.
+\end{examplebox}
+
+\subsection{데이터의 "퍼짐" 측정 (Measures of Spread)}
+
+데이터가 중심에 밀집해 있는지, 아니면 넓게 퍼져있는지 측정합니다.
+
+\subsubsection{범위 (Range)}
+\begin{itemize}
+    \item \textbf{정의:} 최대값(Max) - 최소값(Min).
+    \item \textbf{단점:} 데이터 양 끝의 극단값 2개에만 의존하므로, 분포 전체의 퍼짐을 잘 설명하지 못합니다.
+\end{itemize}
+
+\subsubsection{분산 (Variance)}
+
+\begin{itemize}
+    \item \textbf{정의:} 데이터가 평균($\overline{x}$)으로부터 '평균적으로 얼마나 멀리 떨어져 있는지'를 나타내는 값.
+    \item \textbf{계산 (직관):}
+    \begin{enumerate}
+        \item 각 데이터가 평균과 얼마나 차이 나는지(편차: $x_i - \overline{x}$) 계산.
+        \item 편차를 '제곱'함 (음수를 없애고, 멀리 떨어진 값에 더 큰 가중치를 주기 위해).
+        \item 제곱한 값들의 평균을 냄.
+    \end{enumerate}
+    \item \textbf{공식 (표본 분산):} $s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \overline{x})^2$
+    \item \textbf{단점:} 값을 '제곱'했기 때문에, 원래 데이터와 단위가 맞지 않습니다. (예: 키(cm)의 분산은 $cm^2$가 됨)
+\end{itemize}
+
+\begin{examplebox}[Q\&A: 왜 $n$이 아니라 $n-1$로 나누나요?]
+\textbf{질문:} 평균은 $n$으로 나누는데, 왜 분산은 $n-1$로 나누나요?
+
+\textbf{답변 (직관):} "퍼짐(spread)"을 측정하려면 최소 몇 개의 데이터가 필요할까요?
+만약 데이터가 1개(\texttt{[5]})만 있다면, 이 데이터가 얼마나 퍼져있는지 말할 수 없습니다.
+분산 공식의 분모에 $n=1$을 넣어보면 $\frac{1}{1-1} = \frac{1}{0}$이 되어 정의되지 않습니다.
+즉, 이 공식은 "분산을 계산하려면 최소 2개 이상의 데이터가 필요하다"는 직관을 반영하고 있습니다.
+
+\textbf{답변 (기술):} 우리가 가진 '표본'의 분산($s^2$)을 가지고 '모집단'의 분산($\sigma^2$)을 추정할 때, $n$으로 나누면 실제보다 분산이 작게 추정되는 경향(편향)이 생깁니다. $n-1$로 나누면 이 편향이 보정되어 모집단의 분산을 더 잘 추정할 수 있습니다. (통계 용어로 '자유도(Degrees of Freedom)'를 고려한 '불편추정량(unbiased estimator)'이라고 합니다.)
+\end{examplebox}
+
+\subsubsection{표준편차 (Standard Deviation)}
+
+\begin{itemize}
+    \item \textbf{정의:} 분산에 제곱근($\sqrt{}$)을 씌운 값.
+    \item \textbf{공식:} $s = \sqrt{s^2} = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \overline{x})^2}$
+    \item \textbf{장점:} 분산의 "단위 문제"를 해결합니다. \textbf{원래 데이터와 단위가 동일}해져 해석이 매우 직관적입니다.
+    \item \textbf{직관:} "데이터가 평균으로부터 '평균적으로' 이 정도(s) 떨어져 있다."
+\end{itemize}
+
+\newpage
+
+% --- 절차/방법 2: 기본 시각화 ---
+\section{절차/방법 2: 기본 시각화 (Basic Visualizations)}
+
+EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그림은 그렇지 않습니다.
+
+\subsection{시각화의 중요성 (앤스컴 4중주)}
+
+\begin{warningbox}
+\textbf{앤스컴의 4중주 (Anscombe's Quartet)}는 "왜 통계 요약치만 보면 안 되는지"를 보여주는 고전적인 예시입니다.
+
+여기 4개의 서로 다른 (X, Y) 데이터셋이 있습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{@{}rr|rr|rr|rr@{}}
+\toprule
+\multicolumn{2}{c|}{\textbf{Dataset I}} & \multicolumn{2}{c|}{\textbf{Dataset II}} & \multicolumn{2}{c|}{\textbf{Dataset III}} & \multicolumn{2}{c}{\textbf{Dataset IV}} \\
+\textbf{X} & \textbf{Y} & \textbf{X} & \textbf{Y} & \textbf{X} & \textbf{Y} & \textbf{X} & \textbf{Y} \\
+\midrule
+10.0 & 8.04 & 10.0 & 9.14 & 10.0 & 7.46 & 8.0 & 6.58 \\
+8.0 & 6.95 & 8.0 & 8.14 & 8.0 & 6.77 & 8.0 & 5.76 \\
+13.0 & 7.58 & 13.0 & 8.74 & 13.0 & 12.74 & 8.0 & 7.71 \\
+9.0 & 8.81 & 9.0 & 8.77 & 9.0 & 7.11 & 8.0 & 8.84 \\
+11.0 & 8.33 & 11.0 & 9.26 & 11.0 & 7.81 & 8.0 & 8.47 \\
+14.0 & 9.96 & 14.0 & 8.10 & 14.0 & 8.84 & 8.0 & 7.04 \\
+6.0 & 7.24 & 6.0 & 6.13 & 6.0 & 6.08 & 8.0 & 5.25 \\
+4.0 & 4.26 & 4.0 & 3.10 & 4.0 & 5.39 & 19.0 & 12.50 \\
+12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15 & 8.0 & 5.56 \\
+7.0 & 4.82 & 7.0 & 7.26 & 7.0 & 6.42 & 8.0 & 7.91 \\
+5.0 & 5.68 & 5.0 & 4.74 & 5.0 & 5.73 & 8.0 & 6.89 \\
+\midrule
+\multicolumn{2}{c|}{\textbf{평균/분산}} & \multicolumn{2}{c|}{\textbf{평균/분산}} & \multicolumn{2}{c|}{\textbf{평균/분산}} & \multicolumn{2}{c}{\textbf{평균/분산}} \\
+\multicolumn{2}{c|}{X Avg: 9.0} & \multicolumn{2}{c|}{X Avg: 9.0} & \multicolumn{2}{c|}{X Avg: 9.0} & \multicolumn{2}{c}{X Avg: 9.0} \\
+\multicolumn{2}{c|}{Y Avg: 7.50} & \multicolumn{2}{c|}{Y Avg: 7.50} & \multicolumn{2}{c|}{Y Avg: 7.50} & \multicolumn{2}{c}{Y Avg: 7.50} \\
+\multicolumn{2}{c|}{X Var: 11.0} & \multicolumn{2}{c|}{X Var: 11.0} & \multicolumn{2}{c|}{X Var: 11.0} & \multicolumn{2}{c}{X Var: 11.0} \\
+\multicolumn{2}{c|}{Y Var: 4.12} & \multicolumn{2}{c|}{Y Var: 4.12} & \multicolumn{2}{c|}{Y Var: 4.12} & \multicolumn{2}{c}{Y Var: 4.12} \\
+\multicolumn{2}{c|}{상관계수: 0.816} & \multicolumn{2}{c|}{상관계수: 0.816} & \multicolumn{2}{c|}{상관계수: 0.816} & \multicolumn{2}{c}{상관계수: 0.816} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{놀랍게도, 이 4개 데이터셋의 X/Y 평균, X/Y 분산, 상관계수가 모두 동일합니다.}
+숫자만 보면 이 4개 셋은 "똑같은" 데이터처럼 보입니다.
+
+\textbf{하지만 시각화하면 진실이 드러납니다.}
+
+\begin{center}
+    \textit{[이미지 플레이스홀더: 앤스컴 4중주 산점도]} \\
+    \textit{Dataset I: 점들이 완만한 선형 관계를 보임 (정상)} \\
+    \textit{Dataset II: 점들이 위로 볼록한 2차 곡선(포물선) 모양을 보임 (비선형)} \\
+    \textit{Dataset III: 거의 완벽한 직선 위에 있으나, Y축 방향의 이상치 1개가 존재함} \\
+    \textit{Dataset IV: 모든 점이 X=8에 수직으로 있으나, X축 방향의 이상치 1개가 존재함}
+\end{center}
+
+\textbf{교훈: 절대 요약 통계치만 믿지 말고, 항상 데이터를 시각화해야 합니다.}
+\end{warningbox}
+
+\subsection{기본 플롯 유형 비교}
+
+시각화는 "내가 무엇을 보고 싶은가?"에 따라 종류가 나뉩니다.
+
+\begin{table}[h!]
+\centering
+\caption{목적별 기본 시각화 차트}
+\label{tab:plots}
+\begin{tabular}{@{}lp{4cm}p{4cm}p{3cm}@{}}
+\toprule
+\textbf{플롯 유형} & \textbf{주요 목적} & \textbf{사용 변수} & \textbf{확인 사항} \\
+\midrule
+\textbf{히스토그램} & 분포 확인 & 수량형 1개 & 모양 (대칭, 왜도), 중심, 퍼짐 \\
+(Histogram) & & & \\
+\addlinespace
+\textbf{막대 그래프} & 빈도/구성 비교 & 범주형 1개 & 어떤 범주가 가장 많은가/적은가 \\
+(Bar Plot) & & & \\
+\addlinespace
+\textbf{산점도} & 두 변수 간 관계 확인 & 수량형 2개 & 방향(+, -), 강도, 형태(선형, 비선형), 이상치 \\
+(Scatter Plot) & & & \\
+\addlinespace
+\textbf{박스 플롯} & 그룹 간 분포 비교 & 수량형 1개 + 범주형 1개 & 중앙값, 사분위수(IQR), 이상치 비교 \\
+(Box Plot) & & & \\
+\addlinespace
+\textbf{바이올린 플롯} & 그룹 간 분포 '모양' 비교 & 수량형 1개 + 범주형 1개 & 박스 플롯 + 분포의 밀도(KDE) \\
+(Violin Plot) & (박스 플롯의 상위 호환) & & (예: 분포가 쌍봉형인지 확인 가능) \\
+\addlinespace
+\textbf{스택 영역 그래프} & 시간/순서에 따른 구성 변화 & 수량형 1개 + 범주형 1개 & 전체 추세와 내부 구성비의 변화 \\
+(Stacked Area) & & (+ 시간 변수) & \\
+\addlinespace
+\textbf{KDE 플롯} & 부드러운 분포 곡선 확인 & 수량형 1개 & 히스토그램의 '빈(bin) 너비' 문제 해결 \\
+(Kernel Density) & (그룹 비교에 유용) & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{히스토그램 vs. 막대 그래프:} 둘 다 막대를 사용하지만, 히스토그램은 \textbf{수량형} 변수를 '구간(bin)'으로 나눠 그리고 (막대들이 붙어있음), 막대 그래프는 \textbf{범주형} 변수의 '범주'별로 그립니다 (막대들이 떨어져있음).
+    \item \textbf{파이 차트 (Pie Chart)는 왜 별로일까요?}
+    인간의 눈은 '각도'의 미세한 차이를 '길이'의 차이보다 훨씬 못 알아봅니다. 비슷한 비율을 비교할 때는 파이 차트보다 막대 그래프가 훨씬 효과적입니다.
+\end{itemize}
+
+\subsection{3개 이상의 변수 시각화하기}
+
+3개 이상의 고차원 데이터를 2D 화면에 표현하는 것은 어렵습니다.
+
+\begin{itemize}
+    \item \textbf{나쁜 예: 3D 산점도 (3D Scatter Plot)}
+    3개의 수량형 변수를 X, Y, Z축에 매핑하는 것은 그럴듯해 보이지만, 2D 모니터에서는 깊이감이 왜곡되어 "산점도 구름(scatter cloud)"처럼 보일 뿐, 관계 파악이 거의 불가능합니다.
+
+    \item \textbf{좋은 예: 미적 매핑 (Aesthetic Mapping) 활용}
+    X축과 Y축 외에, \textbf{색상(Color)}, \textbf{크기(Size)}, \textbf{모양(Shape)}, \textbf{애니메이션(Animation)} 등 추가적인 시각 요소를 사용하여 변수를 표현합니다.
+\end{itemize}
+
+\begin{examplebox}[사례 연구: 갭마인더(Gapminder)의 5변수 시각화]
+한스 로슬링의 "Wealth \& Health of Nations" 시각화는 5개의 변수를 하나의 차트에 훌륭하게 녹여냈습니다.
+
+\begin{center}
+    \textit{[이미지 플레이스홀더: 갭마인더 차트 (1950년 스냅샷)]} \\
+    \textit{X축: 소득, Y축: 기대 수명. 점들이 분포해 있음.}
+\end{center}
+
+이 차트는 다음 5가지 변수를 동시에 보여줍니다.
+\begin{itemize}
+    \item \textbf{변수 1 (수량형):} 1인당 소득 $\rightarrow$ \textbf{X축 위치}
+    \item \textbf{변수 2 (수량형):} 기대 수명 $\rightarrow$ \textbf{Y축 위치}
+    \item \textbf{변수 3 (수량형):} 국가 인구 수 $\rightarrow$ \textbf{원의 크기 (Size)}
+    \item \textbf{변수 4 (범주형):} 대륙 (아시아, 유럽...) $\rightarrow$ \textbf{원의 색상 (Color)}
+    \item \textbf{변수 5 (시간형):} 연도 (1800~2020) $\rightarrow$ \textbf{애니메이션 (Animation)}
+\end{itemize}
+
+\textbf{매핑 전략:}
+\begin{itemize}
+    \item \textbf{수량형 변수(인구)} $\rightarrow$ \textbf{크기:} 크고 작음으로 양을 표현하기 좋음.
+    \item \textbf{범주형 변수(대륙)} $\rightarrow$ \textbf{색상:} 그룹을 구분하기 좋음.
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+% --- 부록 1: 데이터 시각화의 역사 ---
+\section{부록 1: 데이터 시각화의 역사 (Historical Interlude)}
+
+데이터 시각화는 최근 기술이 아닌, 오래된 데이터 과학의 한 분야입니다.
+
+\begin{description}
+    \item[존 스노 (John Snow, 1854)]
+    \begin{itemize}
+        \item \textbf{시각화:} 런던 콜레라 발병 지도
+        \item \textbf{내용:} 콜레라 사망자 발생 위치를 지도에 점(dot)으로 찍었습니다.
+        \item \textbf{결과:} 특정 '펌프'(Broad Street Pump) 주변에 사망자가 밀집된 것을 시각적으로 확인하고, 펌프를 폐쇄하여 전염병의 원인이 '오염된 물'임을 증명했습니다.
+    \end{itemize}
+
+    \item[플로렌스 나이팅게일 (Florence Nightingale, 1858)]
+    \begin{itemize}
+        \item \textbf{시각화:} 로즈 차트 (Rose Chart / Coxcomb)
+        \item \textbf{내용:} 크림 전쟁 당시 사망 원인을 월별로 시각화했습니다. (파란색: 예방 가능한 질병, 빨간색: 부상, 검은색: 기타)
+        \item \textbf{결과:} 전투로 인한 사망(빨간색)보다, 열악한 위생으로 인한 질병 사망(파란색)이 압도적으로 많음을 보여주어 병원 위생 개혁을 이끌어냈습니다.
+    \end{itemize}
+
+    \item[샤를 미나르 (Charles Minard, 1869)]
+    \begin{itemize}
+        \item \textbf{시각화:} 나폴레옹의 러시아 원정 지도
+        \item \textbf{내용:} 단 하나의 차트에 나폴레옹 군대의 규모(선의 굵기), 이동 경로(지리), 방향(진격/후퇴), 시간, 그리고 후퇴 시의 기온 변화(하단 그래프)를 모두 담았습니다.
+        \item \textbf{결과:} 42만 대군이 모스크바로 진격했다가 1만 명만 돌아오는 과정을 처참하게 보여주는, 데이터 시각화 역사상 최고의 걸작 중 하나로 꼽힙니다.
+    \end{itemize}
+\end{description}
+
+\begin{center}
+    \textit{[이미지 플레이스홀더: 미나르의 나폴레옹 행군도]}
+\end{center}
+
+\newpage
+
+% --- 부록 2: 효과적인 시각화 원칙 ---
+\section{부록 2: 효과적인 시각화 원칙 (Effective Visualization)}
+
+좋은 시각화를 만들기 위한 5가지 원칙입니다.
+
+\subsubsection{1. 그래픽 무결성 (Graphical Integrity)}
+
+\textbf{"데이터로 거짓말을 하지 말아야 합니다."}
+
+\begin{examplebox}[잘못된 예: 2020년 미국 대선 지도]
+\begin{itemize}
+    \item \textbf{지리적 면적 지도 (A):} 각 '카운티(County)'의 면적을 기준으로 승리한 정당(빨간색/파란색)을 칠합니다. $\rightarrow$ \textit{결과: 미국 전역이 빨갛게 보입니다.}
+    \item \textbf{인구 기반 지도 (B):} 각 카운티의 '인구 수'에 비례하여 원의 크기를 조정한 점(dot) 지도를 만듭니다. $\rightarrow$ \textit{결과: 인구가 밀집된 해안가와 도시에 파란색 점이 집중되고, 인구가 적은 중부 내륙에 빨간색 점이 흩어져 보입니다.}
+    \item \textbf{결론:} (A) 지도는 땅이 넓지만 인구가 적은 지역을 과대평가하여 "미국 대부분이 빨간색을 지지한다"는 \textbf{잘못된 인상}을 줍니다. (B) 지도가 실제 득표 수에 더 가까운 '무결성'을 가집니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection{2. 단순성 (Keep it simple)}
+
+\textbf{"불필요한 장식을 피해야 합니다. (차트 정크 금지)"}
+
+\begin{itemize}
+    \item \textbf{차트 정크(Chart Junk):} 데이터 이해에 도움이 되지 않는 모든 시각적 요소를 말합니다.
+    \item \textbf{나쁜 예:} 3D 효과가 들어간 막대 그래프, 현란한 배경색, 의미 없는 그림자, 지나치게 복잡한 범례.
+    \item \textbf{좋은 예:} 데이터 잉크 비율(Data-Ink Ratio)을 높여, 꼭 필요한 선과 점, 텍스트만 남깁니다.
+\end{itemize}
+
+\subsubsection{3. 올바른 표현 (Use the right display)}
+
+인간의 뇌가 정보를 더 효율적으로 처리하는 시각적 수단이 있습니다.
+
+\begin{center}
+    \textit{[이미지 플레이스홀더: 시각적 표현의 효율성 계층]} \\
+    \textit{(가장 효율적 / 정량적) $\rightarrow$ \textbf{1. 위치 (Position)} (예: 산점도)} \\
+    \textit{$\downarrow \rightarrow$ \textbf{2. 길이 (Length)} (예: 막대 그래프)} \\
+    \textit{$\downarrow \rightarrow$ 3. 기울기 (Slope)} \\
+    \textit{$\downarrow \rightarrow$ 4. 각도 (Angle) (예: 파이 차트)} \\
+    \textit{$\downarrow \rightarrow$ 5. 면적 (Area) (예: 버블 차트)} \\
+    \textit{$\downarrow \rightarrow$ 6. 강도 (Intensity) / 색상 (Color)} \\
+    \textit{(가장 비효율적 / 범주형) $\rightarrow$ 7. 모양 (Shape)}
+\end{center}
+
+\textbf{교훈:} 같은 데이터라도 '면적'이나 '각도'로 표현하는 것보다, '위치'나 '길이'로 표현하는 것이 훨씬 더 정확한 비교를 가능하게 합니다. (이것이 파이 차트보다 막대 그래프가 나은 이유입니다.)
+
+\subsubsection{4. 전략적인 색상 사용 (Use color strategically)}
+
+색상은 강력하지만, 잘못 사용하면 혼란을 줍니다.
+
+\begin{itemize}
+    \item \textbf{정성적 (Qualitative):} 범주를 구분할 때. (예: 대륙별 색상) \textbf{5~8개 이하}의 색상 사용을 권장합니다.
+    \item \textbf{순차적 (Sequential):} 값이 낮음에서 높음으로 갈 때. (예: 연한 녹색 $\rightarrow$ 진한 녹색)
+    \item \textbf{발산형 (Diverging):} 값이 '0'이나 '평균'을 기준으로 양쪽으로 갈라질 때. (예: 파란색 $\leftarrow$ 흰색 $\rightarrow$ 빨간색)
+    \item \textbf{주의 1: 무지개색(Rainbow Colormap) 금지!} 무지개색은 순서가 명확하지 않고(노란색이 녹색보다 높은가?), 특정 부분이 불필요하게 강조됩니다.
+    \item \textbf{주의 2: 색맹/색약 고려 (Color Blindness)} 인구의 상당수가 적록색약입니다. 빨간색과 녹색을 동시에 사용한 비교는 피해야 합니다.
+\end{itemize}
+
+\subsubsection{5. 청중 이해 (Know your audience)}
+
+시각화의 목적이 무엇인지, 청중이 무엇을 알고 싶어 하는지 알아야 합니다.
+\begin{itemize}
+    \item \textbf{탐색적(Exploratory):} 스스로 데이터를 탐색하기 위한 (중립적인) 시각화. (예: 내부용 대시보드)
+    \item \textbf{설명적(Explanatory):} 청중에게 특정 메시지나 주장을 전달하기 위한 (의견이 담긴) 시각화. (예: 신문 기사의 "이라크의 피의 대가" 그래프)
+\end{itemize}
+
+\newpage
+
+% --- 체크리스트 ---
+\section{학습 체크리스트}
+
+이 강의를 올바르게 이해했는지 다음 질문에 답해보세요.
+
+\begin{itemize}
+    \item [ ] 데이터(Data)와 데이텀(Datum)의 차이를 설명할 수 있는가?
+    \item [ ] API, RSS, 웹 스크래핑의 차이점과 스크래핑 시 윤리적 문제점을 아는가?
+    \item [ ] '정형 데이터(Tidy Data)'의 3가지 원칙 (1행=1관측치, 1열=1변수)을 아는가?
+    \item [ ] 수량형 변수(이산형/연속형)와 범주형 변수(순서형/명목형)를 구분할 수 있는가?
+    \item [ ] 모집단과 표본의 차이를 알고, '표본 편향'의 예시를 2가지 들 수 있는가?
+    \item [ ] 평균과 중앙값의 차이를 설명하고, '오른쪽 꼬리 분포'에서 둘의 대소 관계(\textbf{평균 > 중앙값})를 아는가?
+    \item [ ] 분산($s^2$) 대신 표준편차($s$)를 주로 사용하는 이유(단위 문제)를 설명할 수 있는가?
+    \item [ ] 분산을 계산할 때 $n$이 아닌 $n-1$로 나누는 직관적인 이유를 설명할 수 있는가?
+    \item [ ] \textbf{앤스컴 4중주(Anscombe's Quartet)}가 주는 교훈(\textbf{"항상 시각화하라"})을 아는가?
+    \item [ ] 히스토그램과 막대 그래프의 차이점(수량형 vs. 범주형)을 아는가?
+    \item [ ] 파이 차트보다 막대 그래프가 권장되는 이유(각도 vs. 길이)를 아는가?
+    \item [ ] 3개 이상의 변수를 시각화할 때 '미적 매핑'(색상, 크기 등)을 활용하는 법을 아는가?
+    \item [ ] '차트 정크'를 피하고, 색상을 전략적으로 사용해야 함을 이해했는가?
+\end{itemize}
+
+\newpage
+
+% --- 1페이지 요약 ---
+\section{빠르게 훑어보기 (1-Page Summary)}
+
+\begin{tcolorbox}{title=\textbf{1. 데이터 수집 (Getting Data)}, colback=gray!10}
+\begin{itemize}
+    \item \textbf{API:} 공식적이고 안정적인 창구 (유료/제한 있음)
+    \item \textbf{RSS:} 블로그/뉴스 스트림 (무료, 요약본)
+    \item \textbf{웹 스크래핑:} HTML에서 직접 추출 (강력하지만 법적/윤리적 위험)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}{title=\textbf{2. 데이터 구조 (Data Structure)}, colback=gray!10}
+\textbf{정형 데이터 (Tidy Data)가 목표!}
+\begin{itemize}
+    \item 1 행 = 1 관측치 (Observation)
+    \item 1 열 = 1 변수 (Variable)
+    \item 1 테이블 = 1 종류의 데이터
+\end{itemize}
+\textit{지저분한(Messy) 데이터는 이 원칙에 맞게 변형(Tidying)해야 함!}
+\end{tcolorbox}
+
+\begin{tcolorbox}{title=\textbf{3. 변수 유형 (Variable Types) - (중요!)}, colback=gray!10}
+\begin{itemize}
+    \item \textbf{수량형 (Quantitative):} 숫자로 연산 가능.
+    \begin{itemize}
+        \item \textbf{이산형(Discrete):} 셀 수 있음 (예: 형제 수)
+        \item \textbf{연속형(Continuous):} 측정함 (예: 키)
+    \end{itemize}
+    \item \textbf{범주형 (Categorical):} 그룹으로 구분.
+    \begin{itemize}
+        \item \textbf{명목형(Nominal):} 순서 없음 (예: 애완동물 종류)
+        \item \textbf{순서형(Ordinal):} 순서 있음 (예: 학점)
+    \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}{title=\textbf{4. 기술 통계 (Descriptive Statistics)}, colback=gray!10}
+\begin{description}
+    \item[중심 (Center):]
+    \begin{itemize}
+        \item \textbf{평균 (Mean):} 무게 중심. (이상치에 민감)
+        \item \textbf{중앙값 (Median):} 순서상 중앙. (이상치에 둔감)
+        \item \textbf{최빈값 (Mode):} 최고 빈도. (범주형 데이터용)
+    \end{itemize}
+    \item[퍼짐 (Spread):]
+    \begin{itemize}
+        \item \textbf{분산 (Variance):} 퍼진 정도 (단위가 $^2$ 됨)
+        \item \textbf{표준편차 (Std Dev):} 퍼진 정도 (단위가 원본과 동일 $\rightarrow$ 해석 용이)
+    \end{itemize}
+\end{description}
+\end{tcolorbox}
+
+\begin{tcolorbox}{title=\textbf{5. 핵심 시각화 (Key Visualizations)}, colback=gray!10}
+\begin{description}
+    \item[앤스컴 4중주 (Anscombe's Quartet)]
+    \textit{교훈: "숫자(통계)만 보지 말고, 항상 그래프를 그려라!"}
+
+    \item[히스토그램 (Histogram)]
+    수량형 변수 1개의 \textbf{분포} 확인. (빈(bin) 너비에 민감)
+
+    \item[막대 그래프 (Bar Plot)]
+    범주형 변수 1개의 \textbf{빈도} 비교.
+
+    \item[산점도 (Scatter Plot)]
+    수량형 변수 2개의 \textbf{관계} 확인. (방향, 강도, 형태, 이상치)
+
+    \item[박스 플롯 (Box Plot) \& 바이올린 플롯 (Violin Plot)]
+    (범주형) 그룹 간 (수량형) 변수의 \textbf{분포 비교}. (바이올린이 더 많은 모양 정보 제공)
+
+    \item[5변수 시각화 (Gapminder)]
+    X축, Y축, \textbf{크기(Size)}, \textbf{색상(Color)}, \textbf{애니메이션(Time)}
+\end{description}
+\end{tcolorbox}
+
+\end{document}

@@ -1,0 +1,851 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.0
+% 최종 수정일: 2025-10-26
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[margin=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: 자연어 처리 입문}}
+\fancyhead[R]{\small\textit{Lecture 04}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-89B: 자연어 처리 입문 - Lecture 04},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 04}{Dmitry Kurochkin}{Lecture 04의 핵심 개념 학습}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 04}{Dmitry Kurochkin}{Lecture 04의 핵심 개념 학습}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 04}{Dmitry Kurochkin}{Lecture 04의 핵심 개념 학습}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 04}{Dmitry Kurochkin}{Lecture 04의 핵심 개념 학습}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 04}{Dmitry Kurochkin}{Lecture 04의 핵심 개념 학습}
+
+% 개요 섹션
+\begin{overviewbox}
+\textbf{학습 목표:}
+\begin{itemize}
+    \item 이 강의의 핵심 개념을 이해합니다
+    \item 실전에 적용할 수 있는 지식을 습득합니다
+\end{itemize}
+
+\textbf{주요 키워드:} [자동으로 채워질 예정]
+
+\textbf{선행 지식:} 기본적인 컴퓨터 사용 능력
+\end{overviewbox}
+
+
+
+\begin{center}
+    \huge\bfseries CSCI E-89B 자연어 처리 4주차 노트 \\[0.5em]
+    \large Bag of Words, n-grams, and CNN
+\end{center}
+
+\tableofcontents
+
+\newpage
+
+%====================================================================
+% 1. 개요
+%====================================================================
+\section{개요: 텍스트를 숫자로 바꾸는 여정}
+
+\begin{summarybox}{핵심 요약}
+이번 강의에서는 텍스트를 컴퓨터가 이해할 수 있는 숫자 벡터로 변환하는 방법을 다룹니다.
+가장 기본적인 \textbf{Bag of Words}부터 시작하여, 단어의 순서를 일부 고려하는 \textbf{n-grams}를 배웁니다.
+마지막으로, 이미지 처리에 주로 쓰이는 \textbf{Convolutional Neural Networks (CNN)}를 텍스트에 적용하는 원리를 탐구합니다.
+이러한 기법들은 텍스트 분류, 감성 분석 등 다양한 자연어 처리(NLP) 문제의 기초가 됩니다.
+궁극적으로는 텍스트의 의미적, 구조적 정보를 어떻게 효과적으로 포착할 것인가에 대한 고민이 담겨 있습니다.
+\end{summarybox}
+
+\begin{examplebox}{학습 로드맵}
+\begin{enumerate}
+    \item \textbf{기초 다지기}: Bag of Words (BoW)의 개념과 한계를 명확히 이해합니다.
+    \item \textbf{문맥 추가하기}: n-grams가 BoW의 어떤 단점을 보완하는지 파악합니다.
+    \item \textbf{고급 모델 맛보기}: 텍스트를 이미지처럼 다루는 CNN의 아이디어를 이해합니다.
+    \item \textbf{실습으로 체득하기}: Python 라이브러리(\texttt{sklearn}, \texttt{NLTK}, \texttt{spaCy})를 사용해 BoW와 n-grams를 직접 구현해봅니다.
+    \item \textbf{개념 연결하기}: BoW의 희소성(sparsity) 문제를 해결하기 위한 대안으로 임베딩(embedding)의 필요성을 인식합니다.
+\end{enumerate}
+\end{examplebox}
+
+
+\newpage
+
+%====================================================================
+% 2. 용어 정리
+%====================================================================
+\section{핵심 용어 정리}
+
+자주 사용되는 전문 용어를 미리 익혀두면 학습에 도움이 됩니다.
+
+\begin{table}[h!]
+\centering
+\caption{4주차 핵심 용어}
+\label{tab:terms}
+\begin{tabular}{lp{5cm}p{3.5cm}p{3cm}}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+\textbf{Bag of Words} & 문장의 단어 순서를 무시하고, 단어의 출현 빈도수만 가방에 담듯이 세는 방법 & Bag of Words (BoW) & 간단하지만 문맥 정보를 잃어버림 \\
+\textbf{토큰화} & 문장을 의미 있는 단위(토큰)로 쪼개는 과정 & Tokenization & 단어, 글자, 서브워드(subword) 등이 토큰이 될 수 있음 \\
+\textbf{n-gram} & 텍스트에서 연속적으로 나타나는 n개의 단어 묶음 & n-gram & 2-gram(bigram), 3-gram(trigram) 등이 있음. 지역적 문맥 포착 \\
+\textbf{어간 추출} & 단어에서 접사(prefix, suffix)를 제거하여 기본형(어간)을 찾는 과정 & Stemming & 빠르지만, 결과가 실제 단어가 아닐 수 있음 (예: octopi $\rightarrow$ octop) \\
+\textbf{표제어 추출} & 단어의 사전적 기본형(표제어)을 찾는 과정 & Lemmatization & 문법적 품사를 고려하여 더 정확하지만, 어간 추출보다 느림 \\
+\textbf{임베딩} & 단어를 의미를 담은 저차원의 조밀한(dense) 벡터로 표현하는 기법 & Embedding & 단어 간의 의미적 유사성을 벡터 공간의 거리로 표현 가능 \\
+\textbf{CNN} & 이미지의 지역적 패턴을 추출하는 데 특화된 딥러닝 모델 & Convolutional Neural Network & 텍스트에 적용 시, n-gram처럼 지역적 단어 패턴을 학습 \\
+\textbf{필터 (커널)} & CNN에서 특정 특징(예: 수직선, 특정 단어 조합)을 감지하는 가중치 행렬 & Filter (Kernel) & 필터를 입력 데이터에 슬라이딩하며 특징 맵(feature map)을 생성 \\
+\textbf{패딩} & 필터 연산 시 출력 크기가 줄어드는 것을 막기 위해 입력 데이터 주변을 특정 값(주로 0)으로 채우는 것 & Padding & \texttt{VALID}(패딩 없음) vs \texttt{SAME}(출력 크기 유지) \\
+\textbf{스트라이드} & 필터가 입력 데이터 위를 한 번에 이동하는 칸의 수 & Strides & 스트라이드가 크면 출력 크기가 더 많이 줄어듦 \\
+\textbf{풀링} & 특징 맵의 크기를 줄여(down-sampling) 계산량을 감소시키고, 주요 특징을 강조하는 과정 & Pooling & Max Pooling은 특정 영역에서 가장 큰 값만 남김 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+%====================================================================
+% 3. 핵심 개념/원리
+%====================================================================
+\section{Bag of Words (BoW)}
+
+\subsection{BoW의 정의와 직관}
+
+\textbf{Bag of Words (BoW)}는 텍스트를 숫자 벡터로 표현하는 가장 직관적이고 기본적인 방법입니다.  이름 그대로, 단어들을 순서 없이 '가방'에 넣고 각 단어가 몇 번 등장했는지만 세는 방식입니다. 
+
+\begin{summarybox}{핵심 아이디어}
+문법이나 단어의 순서는 완전히 무시하고, 오직 문서 내 각 단어의 출현 빈도에만 집중합니다. 
+"John likes to watch movies. Mary likes movies too." 라는 문장이 있다면, BoW는 단순히 'John:1, likes:2, to:1, watch:1, movies:2, Mary:1, too:1' 와 같이 빈도를 기록합니다.
+\end{summarybox}
+
+이 방법은 텍스트 분류, 감성 분석, 주제 모델링 등에서 간단하면서도 강력한 특징 벡터(feature vector)를 생성하는 데 사용됩니다. 
+
+\subsection{BoW 생성 절차}
+
+BoW 표현을 만드는 과정은 다음 3단계로 나눌 수 있습니다. 
+
+\begin{enumerate}
+    \item \textbf{1단계: 토큰화 (Tokenization)}
+    
+    분석할 전체 텍스트(말뭉치, Corpus)를 의미 있는 최소 단위인 \textbf{토큰(token)}으로 분리합니다.  보통 단어 단위로 쪼갭니다.
+    
+    \textbf{예시 문장}: "Henry Ford introduced the Model T. Ford Model T was revolutionary."
+    
+    \textbf{토큰화 결과}: \texttt{['Henry', 'Ford', 'introduced', 'the', 'Model', 'T', '.', 'Ford', 'Model', 'T', 'was', 'revolutionary']} 
+
+    \item \textbf{2단계: 어휘 집합(Vocabulary) 생성}
+    
+    전체 말뭉치에서 등장한 모든 고유한 토큰들을 모아 하나의 집합, 즉 어휘 집합을 만듭니다.  이 어휘 집합이 벡터의 차원이자 기준이 됩니다. 보통 텍스트에 등장하는 순서대로 추가합니다. 
+    
+    \textbf{예시 어휘 집합}: \texttt{\{"Henry", "Ford", "introduced", "the", "Model", "T", "was", "revolutionary"\}} 
+    
+    \item \textbf{3단계: 벡터화 (Vectorization)}
+    
+    각 문장(또는 문서)을 어휘 집합을 기준으로 벡터로 변환합니다. 벡터의 각 차원은 어휘 집합의 특정 단어에 해당하며, 값은 해당 단어가 문장에서 나타난 빈도수입니다. 
+    
+    \textbf{예시 문장 벡터}: 어휘 집합 순서에 따라 빈도를 세면 다음과 같습니다.
+    \begin{itemize}
+        \item Henry: 1
+        \item Ford: 2
+        \item introduced: 1
+        \item the: 1
+        \item Model: 2
+        \item T: 2
+        \item was: 1
+        \item revolutionary: 1
+    \end{itemize}
+    \textbf{최종 벡터}: \texttt{[1, 2, 1, 1, 2, 2, 1, 1]}
+\end{enumerate}
+
+\cautionbox{빈도수 vs 이진(Binary) 표현}
+BoW 벡터를 만들 때, 단어의 빈도수를 그대로 사용할 수도 있고(\texttt{[1, 2, 1, ...]}) 단순히 단어의 출현 여부만 0과 1로 표시할 수도 있습니다. (\texttt{[1, 1, 1, ...]}) 후자를 이진 BoW라고 하며, 어떤 방식을 택할지는 문제의 특성에 따라 달라집니다. 
+
+\subsection{BoW의 한계와 대안}
+
+BoW는 간단하고 효과적이지만, 명확한 한계점을 가집니다.
+
+\begin{itemize}
+    \item \textbf{문맥 정보 상실}: 단어의 순서를 무시하므로, "not good"과 "good, not bad"를 비슷하게 취급할 수 있습니다. 의미적 뉘앙스를 파악하기 어렵습니다. 
+    \item \textbf{희소성 (Sparsity) 문제}: 어휘 집합의 크기가 수만 개에 달하면, 각 문장 벡터는 대부분의 값이 0인 거대한 희소 벡터(sparse vector)가 됩니다. 이는 저장 공간과 계산 비효율을 초래합니다. 
+    \item \textbf{의미 관계 표현 불가}: 'car'와 'automobile'이 의미적으로 유사하다는 점을 BoW는 전혀 반영하지 못합니다. 모든 단어를 독립적인 개체로 취급합니다. 
+\end{itemize}
+
+이러한 한계를 극복하기 위해 다음과 같은 대안들이 제시됩니다.
+
+\begin{itemize}
+    \item \textbf{n-grams}: 연속된 단어 묶음을 사용해 지역적인 문맥을 포착합니다.
+    \item \textbf{단어 임베딩 (Word Embeddings)}: Word2Vec, GloVe 등 단어를 의미 공간의 조밀한 벡터로 표현하여 의미적 유사성을 학습합니다. 
+    \item \textbf{순환 신경망 (RNNs)}: 순서 정보를 모델링하여 장기 의존성을 학습합니다. 
+    \item \textbf{컨볼루션 신경망 (CNNs)}: 텍스트의 지역적 패턴(n-gram과 유사)을 효과적으로 포착합니다. 
+\end{itemize}
+
+\newpage
+
+%====================================================================
+% 4. n-grams
+%====================================================================
+\section{n-grams: 지역적 문맥 포착하기}
+
+\subsection{n-gram의 정의와 종류}
+
+\textbf{n-gram}은 텍스트에서 연속적으로 나타나는 n개의 아이템(주로 단어) 시퀀스를 의미합니다.  BoW가 잃어버리는 단어의 순서 정보를 일부 보완하여, 지역적인 문맥을 포착하는 데 도움을 줍니다. 
+
+\begin{itemize}
+    \item \textbf{1-gram (unigram)}: 단어 하나. BoW와 동일합니다. (예: 'this', 'is', 'a', 'movie') 
+    \item \textbf{2-gram (bigram)}: 연속된 두 단어. (예: 'this is', 'is a', 'a movie') 
+    \item \textbf{3-gram (trigram)}: 연속된 세 단어. (예: 'this is a', 'is a movie') 
+\end{itemize}
+
+\begin{examplebox}{n-gram의 효과}
+감성 분석에서 "This movie was \textbf{not funny}"라는 문장을 생각해 봅시다.
+\begin{itemize}
+    \item \textbf{BoW (unigram)}: 'not'과 'funny'를 별개의 긍정/부정 단어로 취급하여 문장의 전체적인 부정적 뉘앙스를 놓칠 수 있습니다.
+    \item \textbf{2-gram (bigram)}: '\textbf{not funny}'라는 토큰을 생성하여, 이 조합이 강한 부정적 의미를 지닌다는 것을 학습할 수 있습니다. 
+\end{itemize}
+따라서 2-gram이나 3-gram은 특히 감성 분석이나 기계 번역처럼 단어 조합이 중요한 작업에서 성능을 향상시킬 수 있습니다. 
+\end{examplebox}
+
+\subsection{n-gram의 한계}
+
+n-gram 역시 완벽한 해결책은 아니며 다음과 같은 한계를 가집니다.
+
+\begin{itemize}
+    \item \textbf{데이터 희소성 (Sparsity)}: n이 커질수록 가능한 n-gram의 조합은 기하급수적으로 늘어납니다. 훈련 데이터에 등장하지 않은 n-gram이 많아져 희소성 문제가 BoW보다 심각해집니다. 
+    \item \textbf{제한된 문맥 범위}: n-gram은 n개의 단어라는 고정된 창(window) 내의 지역적 문맥만 포착할 수 있습니다. 문장 전체에 걸친 장거리 의존성(long-range dependency)은 파악하기 어렵습니다. 
+    \item \textbf{저장 및 계산 비용}: 어휘 집합의 크기가 매우 커져 많은 저장 공간과 계산 자원을 필요로 합니다. 
+\end{itemize}
+
+\newpage
+
+%====================================================================
+% 5. Convolutional Neural Networks (CNN)
+%====================================================================
+\section{Convolutional Neural Networks (CNN) for Text}
+
+\subsection{CNN의 기본 아이디어}
+
+\textbf{CNN}은 본래 이미지 처리를 위해 개발된 딥러닝 모델입니다.  이미지의 픽셀처럼, 텍스트의 단어들도 순서대로 배열되어 있다는 점에서 착안하여 NLP에 적용할 수 있습니다. 
+
+\begin{summarybox}{핵심 아이디어: 텍스트를 1D 이미지로 보기}
+문장을 단어 임베딩 벡터의 시퀀스로 변환하면, 이는 \texttt{(문장 길이) x (임베딩 차원)} 크기의 2D 행렬이 됩니다. 이 행렬을 흑백 이미지처럼 간주하고, CNN의 \textbf{필터(filter)}를 적용하여 지역적인 특징을 추출할 수 있습니다. 
+
+여기서 CNN 필터는 마치 n-gram처럼, 연속된 몇 개의 단어(예: 2~3개)를 한 번에 훑으며 의미 있는 패턴을 감지하는 역할을 합니다. 
+\end{summarybox}
+
+% 이미지 설명을 텍스트로 대체
+\begin{tcolorbox}[title={시각적 비유: 컨볼루션 연산}, colback=gray!5, colframe=gray!50]
+    \textbf{컨볼루션(Convolution)}이란, 신호 처리에서 유래한 수학적 연산입니다. \texttt{f(s)}라는 신호가 있고, \texttt{h(x-s)}라는 감지기(필터)가 있다고 상상해 보세요. 감지기가 신호 위를 지나가면서 두 함수가 겹치는 영역의 값을 곱하고 모두 더하는 것이 컨볼루션입니다.
+    
+    CNN에서는 이미지(또는 텍스트 행렬)가 신호, 필터가 감지기 역할을 합니다. 필터가 이미지 위를 이동하면서, 필터의 가중치와 겹치는 이미지 픽셀 값을 곱해 더함으로써 특정 패턴(예: 수직선, 특정 단어 조합)이 얼마나 강하게 나타나는지를 측정합니다. 
+\end{tcolorbox}
+
+
+\subsection{CNN의 주요 구성 요소}
+
+텍스트 처리를 위한 CNN은 주로 다음과 같은 레이어들로 구성됩니다.
+
+\begin{enumerate}
+    \item \textbf{임베딩 레이어 (Embedding Layer)}
+    
+    입력된 텍스트의 각 단어(정수 인덱스)를 고정된 크기의 조밀한 벡터로 변환합니다. 이는 CNN이 처리할 수 있는 입력 형태를 만듭니다.
+
+    \item \textbf{컨볼루션 레이어 (Convolutional Layer)}
+    
+    이 레이어의 핵심은 \textbf{필터(Filter) 또는 커널(Kernel)}입니다. 필터는 작은 크기(예: 3x5, 3개의 단어, 5차원 임베딩)의 가중치 행렬입니다. 
+    
+    필터는 입력된 임베딩 행렬 위를 위에서 아래로 \textbf{스트라이드(stride)}만큼 이동하면서, 겹치는 부분과 요소별 곱(element-wise product)을 수행한 뒤 모두 더해 하나의 스칼라 값을 계산합니다. 
+    
+    이 과정을 통해 입력 데이터에서 필터가 감지하려는 특정 패턴(예: '매우 재미있는')이 얼마나 활성화되는지를 나타내는 \textbf{특징 맵(feature map)}이 생성됩니다.
+    
+    \begin{cautionbox}{가중치 공유 (Weight Sharing)}
+    하나의 필터는 입력 데이터의 모든 위치에서 동일한 가중치를 사용합니다. 이를 가중치 공유라고 합니다.  덕분에 "not good"이라는 패턴이 문장 처음에 나오든 끝에 나오든 동일한 필터로 감지할 수 있으며, 학습할 파라미터 수를 크게 줄여줍니다. 
+    \end{cautionbox}
+    
+    \item \textbf{풀링 레이어 (Pooling Layer)}
+    
+    컨볼루션 레이어를 통과한 특징 맵의 차원을 줄이는(down-sampling) 역할을 합니다. 
+    
+    \textbf{Max Pooling}이 가장 널리 쓰이며, 특징 맵을 일정 구역으로 나눈 뒤 각 구역에서 가장 큰 값(가장 활성화된 특징)만 남깁니다.  이를 통해 중요한 특징을 유지하면서 계산량을 줄이고, 특징의 위치 변화에 조금 더 강인한 모델을 만들 수 있습니다.
+
+    \item \textbf{완전 연결 레이어 (Fully-Connected Layer) 및 출력}
+    
+    여러 컨볼루션과 풀링 레이어를 거쳐 추출된 특징들은 \textbf{Flatten} 레이어를 통해 1차원 벡터로 펼쳐집니다.  이 벡터가 일반적인 신경망(Dense Layer)에 입력되어 최종적으로 텍스트 분류나 감성 분석 등의 결과를 출력합니다.
+\end{enumerate}
+
+\begin{examplebox}{CNN 아키텍처 예시 (Python Keras 코드 기반)}
+\begin{lstlisting}[caption={텍스트 분류를 위한 간단한 CNN 모델 구조}, label={lst:cnn_model}]
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, Conv1D, GlobalMaxPooling1D, Dense
+
+# 모델 정의
+model = Sequential([
+    # 1. 임베딩 레이어: 10000개의 단어를 128차원 벡터로
+    Embedding(input_dim=10000, output_dim=128, input_length=50),
+    
+    # 2. 컨볼루션 레이어: 3개 단어 크기의 필터 64개 적용
+    Conv1D(filters=64, kernel_size=3, activation='relu'),
+    
+    # 3. 풀링 레이어: 특징 맵 전체에서 가장 큰 값 하나를 선택
+    GlobalMaxPooling1D(),
+    
+    # 4. 출력 레이어: 긍정/부정(1개 유닛) 분류를 위한 Dense 레이어
+    Dense(1, activation='sigmoid')
+])
+
+model.summary()
+\end{lstlisting}
+\end{examplebox}
+
+\newpage
+
+%====================================================================
+% 6. 실습/코드
+%====================================================================
+\section{Python을 이용한 실습}
+
+\subsection{Scikit-learn을 이용한 BoW 및 n-gram 생성}
+
+\texttt{sklearn}의 \texttt{CountVectorizer}는 BoW와 n-gram을 손쉽게 생성할 수 있는 강력한 도구입니다.
+
+\begin{lstlisting}[caption={Scikit-learn으로 BoW 벡터 생성하기}, label={lst:sklearn_bow}]
+from sklearn.feature_extraction.text import CountVectorizer
+
+# 예시 말뭉치 (리스트의 각 요소가 하나의 문서)
+corpus = [
+    "Henry Ford introduced the Model T.",
+    "Ford Model T was revolutionary."
+]
+
+# 1. BoW (unigram)
+vectorizer_bow = CountVectorizer()
+X_bow = vectorizer_bow.fit_transform(corpus)
+
+print("BoW 어휘 집합:", vectorizer_bow.get_feature_names_out())
+print("BoW 벡터:\n", X_bow.toarray())
+
+# 2. 2-gram (bigram)
+# ngram_range=(2, 2)는 bigram만 사용하겠다는 의미
+vectorizer_ngram = CountVectorizer(ngram_range=(2, 2))
+X_ngram = vectorizer_ngram.fit_transform(corpus)
+
+print("\nn-gram 어휘 집합:", vectorizer_ngram.get_feature_names_out())
+print("n-gram 벡터:\n", X_ngram.toarray())
+\end{lstlisting}
+
+\subsection{NLTK를 이용한 BoW 및 n-gram 생성}
+\texttt{NLTK}는 더 세밀한 제어가 가능하며, 학술 연구에서 많이 사용됩니다. 
+
+\begin{lstlisting}[caption={NLTK로 BoW 및 n-gram 생성하기}, label={lst:nltk_bow}]
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.util import ngrams
+from collections import Counter
+
+# nltk.download('punkt') # 최초 실행 시 필요
+
+text = "Henry Ford introduced the Model T was revolutionary."
+tokens = word_tokenize(text)
+
+# 1. BoW (unigram)
+# NLTK에는 BoW를 위한 직접적인 클래스가 없으므로 수동으로 구현
+vocab_bow = sorted(list(set(tokens)))
+bow_vector = [tokens.count(word) for word in vocab_bow]
+print("BoW 어휘 집합:", vocab_bow)
+print("BoW 벡터:", bow_vector)
+
+# 2. n-gram (bigram)
+bigrams = list(ngrams(tokens, 2))
+vocab_ngram = sorted(list(set(bigrams)))
+bigram_counts = Counter(bigrams)
+ngram_vector = [bigram_counts[bigram] for bigram in vocab_ngram]
+
+print("\nn-gram (튜플 형태):", bigrams)
+print("n-gram 벡터:", ngram_vector)
+\end{lstlisting}
+
+\subsection{spaCy를 이용한 BoW 생성}
+\texttt{spaCy}는 상용 수준의 성능과 편의성을 제공하는 최신 라이브러리입니다. 
+
+\begin{lstlisting}[caption={spaCy로 BoW 생성하기}, label={lst:spacy_bow}]
+import spacy
+from collections import Counter
+
+# python -m spacy download en_core_web_sm # 최초 실행 시 모델 다운로드 필요
+nlp = spacy.load("en_core_web_sm")
+
+text = "Henry Ford introduced the Model T. Ford Model T was revolutionary."
+doc = nlp(text)
+
+# spaCy는 구두점 등을 자동으로 처리해줌
+tokens = [token.text for token in doc if not token.is_punct]
+
+vocab = sorted(list(set(tokens)))
+token_counts = Counter(tokens)
+bow_vector = [token_counts[word] for word in vocab]
+
+print("어휘 집합:", vocab)
+print("BoW 벡터:", bow_vector)
+\end{lstlisting}
+
+\cautionbox{신규 문서 처리 시 주의사항}
+모델을 훈련시킬 때 사용한 어휘 집합(vocabulary)은 고정되어야 합니다.  새로운 테스트 문서에 어휘 집합에 없는 단어(Out-of-Vocabulary, OOV)가 나타나면, 이 단어들은 무시되거나 특별한 'UNK' (Unknown) 토큰으로 처리됩니다. 훈련 시에 어휘 집합을 만들고, 테스트 시에는 이 어휘 집합을 그대로 사용하여 변환(\texttt{transform})만 수행해야 합니다. 
+
+\newpage
+
+%====================================================================
+% 7. FAQ
+%====================================================================
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{tcolorbox}[title={Q1: BoW와 단어 임베딩의 근본적인 차이는 무엇인가요?}]
+\textbf{A}: 가장 큰 차이는 \textbf{표현 방식}과 \textbf{정보 보존}에 있습니다.
+\begin{itemize}
+    \item \textbf{BoW}: 각 단어를 거대한 어휘 집합 크기의 벡터에서 하나의 차원으로 표현하는 \textbf{희소(sparse) 벡터}입니다. 단어 간 의미 관계나 순서 정보가 없습니다.
+    \item \textbf{임베딩}: 각 단어를 저차원(예: 100~300차원)의 \textbf{조밀한(dense) 벡터}로 표현합니다. 벡터 공간에서 비슷한 단어는 가깝게 위치하도록 학습되어 \textbf{의미 관계}를 내포하며, 모델에 따라 \textbf{순서 정보}를 활용할 수 있습니다. 
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Q2: 어간 추출(Stemming)과 표제어 추출(Lemmatization) 중 무엇을 써야 하나요?}]
+\textbf{A}: 목적과 자원에 따라 다릅니다.
+\begin{itemize}
+    \item \textbf{어간 추출}: 속도가 매우 빠르지만, 결과물이 사전에 없는 단어일 수 있습니다. (예: 'studies' $\rightarrow$ 'studi') 정보 검색처럼 속도가 중요하고 단어의 정확한 형태보다 핵심 의미만 필요할 때 유용합니다. 
+    \item \textbf{표제어 추출}: 품사 등 문법적 정보를 고려하여 사전적 원형을 찾아주므로 더 정확합니다. (예: 'studies' $\rightarrow$ 'study') 챗봇이나 기계 번역처럼 생성되는 단어의 문법적 정확성이 중요할 때 사용됩니다. 계산 비용은 더 높습니다. 
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Q3: CNN에서 필터 크기는 어떻게 정하나요?}]
+\textbf{A}: 경험적으로 정해지며, 문제에 따라 여러 크기를 함께 사용하기도 합니다. 텍스트 처리에서는 보통 2, 3, 4, 5개 단어에 해당하는 필터 크기를 많이 사용합니다. 이는 각각 bigram, trigram, 4-gram, 5-gram과 유사한 패턴을 감지하는 효과를 냅니다. 하나의 컨볼루션 레이어에 다양한 크기의 필터를 병렬로 적용하여 여러 수준의 지역적 패턴을 동시에 학습하는 구조도 널리 쓰입니다. (예: Inception 모델) 
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Q4: 불용어(Stop words)는 항상 제거해야 하나요?}]
+\textbf{A}: 꼭 그렇지는 않습니다. 'the', 'a', 'is'와 같은 불용어는 일반적으로 문장의 핵심 의미에 큰 영향을 주지 않아, BoW 모델의 차원을 줄이고 효율성을 높이기 위해 제거하는 경우가 많습니다.  하지만, 문맥이 중요한 최신 딥러닝 모델(예: BERT)에서는 불용어도 문법적 구조를 파악하는 데 중요한 단서가 될 수 있으므로 제거하지 않는 것이 일반적입니다. 
+\end{tcolorbox}
+
+
+\newpage
+
+%====================================================================
+% 8. 빠르게 훑어보기 (1페이지 요약)
+%====================================================================
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{summarybox}{Bag of Words (BoW)}
+\begin{itemize}
+    \item \textbf{개념}: 단어 순서 무시, 출현 빈도만 세는 텍스트 표현.
+    \item \textbf{장점}: 구현이 간단하고, 많은 경우 준수한 성능을 보임.
+    \item \textbf{단점}: 문맥 정보 상실, 희소성 문제, 유의어 처리 불가.
+    \item \textbf{프로세스}: 토큰화 $\rightarrow$ 어휘 집합 구축 $\rightarrow$ 빈도수 기반 벡터화.
+\end{itemize}
+\end{summarybox}
+
+\begin{summarybox}{n-grams}
+\begin{itemize}
+    \item \textbf{개념}: 연속된 n개의 단어 묶음. (예: 2-gram \texttt{not good})
+    \item \textbf{장점}: BoW가 놓치는 지역적 문맥과 단어 순서를 일부 포착.
+    \item \textbf{단점}: n이 커지면 희소성 문제 심화, 장거리 의존성 포착 불가.
+    \item \textbf{활용}: 감성 분석, 텍스트 예측 등에서 unigram의 한계 보완.
+\end{itemize}
+\end{summarybox}
+
+\begin{summarybox}{Convolutional Neural Networks (CNN) for Text}
+\begin{itemize}
+    \item \textbf{개념}: 텍스트를 이미지처럼 취급, 필터를 이용해 지역적 패턴 추출.
+    \item \textbf{핵심 요소}:
+    \begin{itemize}
+        \item \textbf{Filter}: n-gram처럼 여러 단어에 걸친 패턴 감지기.
+        \item \textbf{Pooling}: 중요한 특징을 강조하며 데이터 차원 축소.
+        \item \textbf{Weight Sharing}: 파라미터 수를 줄이고 위치 불변성 확보.
+    \end{itemize}
+    \item \textbf{장점}: n-gram과 유사한 패턴을 계층적으로 학습 가능, 효율적.
+    \item \textbf{프로세스}: 임베딩 $\rightarrow$ 컨볼루션 + 풀링 (반복) $\rightarrow$ 분류기.
+\end{itemize}
+\end{summarybox}
+
+\begin{cautionbox}{학습 체크리스트}
+\begin{itemize}
+    \item[\_] BoW가 문맥 정보를 잃는다는 것의 의미를 설명할 수 있는가?
+    \item[\_] "not good" 예시를 통해 n-gram의 필요성을 설명할 수 있는가?
+    \item[\_] CNN의 필터가 텍스트에서 어떤 역할을 하는지 비유적으로 설명할 수 있는가?
+    \item[\_] \texttt{CountVectorizer}의 \texttt{ngram_range} 파라미터를 사용하여 원하는 n-gram을 생성할 수 있는가?
+    \item[\_] 희소 벡터(sparse vector)가 왜 문제가 되며, 임베딩이 어떻게 이를 해결하는지 이해했는가?
+\end{itemize}
+\end{cautionbox}
+
+\end{document}

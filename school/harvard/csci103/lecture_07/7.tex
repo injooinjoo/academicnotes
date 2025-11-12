@@ -1,0 +1,949 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.0
+% 최종 수정일: 2025-10-26
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[margin=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: 재현 가능한 머신러닝}}
+\fancyhead[R]{\small\textit{Lecture 07}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-103: 재현 가능한 머신러닝 - Lecture 07},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+%--- 제목 페이지 ---
+\LARGE 7주차 학습 노트: 데이터 파이프라인 운영\\
+    \large (Operationalizing Data Pipelines)
+}
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 07}{Anindita Mahapatra & Eric Gieseke}{Lecture 07의 핵심 개념 학습}
+
+
+%--- 목차 ---
+\tableofcontents
+\newpage
+
+%--- 개요 ---
+\begin{summarybox}
+이 문서는 데이터 파이프라인을 개념 증명(PoC) 단계에서 실제 운영(Production) 환경으로 전환하는 데 필요한 핵심 원칙과 기술을 요약합니다.
+
+데이터 과학자가 만든 노트북(프로토타입)을 비즈니스에서 신뢰하고 사용할 수 있는 자동화된 시스템으로 만드는 과정을 다룹니다.
+
+이 과정에는 명확한 \textbf{요구사항 정의(기능적/비기능적)}, \textbf{데이터 품질} 보장, \textbf{거버넌스} 수립, 그리고 \textbf{확장성} 확보가 필수적입니다.
+
+Databricks의 \textbf{Lakeflow} 및 \textbf{DLT(Delta Live Tables)}와 같은 도구가 이 복잡한 과정을 어떻게 '선언형'으로 단순화하는지 살펴봅니다.
+\end{summarybox}
+
+%--- 용어 정리 ---
+\section{핵심 용어 정리}
+\label{sec:terminology}
+
+데이터 파이프라인 운영을 이해하기 위해 다음 용어들을 먼저 숙지해야 합니다.
+
+\begin{tcolorbox}[title=주요 용어 해설표]
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lllp{6cm}}
+    \toprule
+    \textbf{용어} & \textbf{원어} & \textbf{한 줄 요약} & \textbf{쉬운 설명 및 비고} \\
+    \midrule
+    운영(화) & Operationalizing & 프로토타입을 실제 서비스 가능한 자동화 시스템으로 전환하는 과정. & '실험실 레시피'를 '공장 대량생산'으로 바꾸는 것. \\
+    개념 증명 & PoC (Proof of Concept) & 아이디어가 기술적으로 실현 가능한지 검증하는 초기 모델. & 데이터 과학자의 Jupyter 노트북이 대표적 예시. \\
+    기능적 요구사항 & Functional Req. & 시스템이 '무엇을' 해야 하는지 정의. (기능) & 예: "사용자 인증", "일일 매출 리포트 생성". \\
+    비기능적 요구사항 & Non-Functional Req. & 시스템이 '어떻게' 동작해야 하는지 정의. (성능, 품질) & 예: "응답 시간 1초 이내", "연 99.99% 가용성". \\
+    \midrule
+    메달리온 아키텍처 & Medallion Arch. & 데이터를 Bronze $\rightarrow$ Silver $\rightarrow$ Gold 3단계로 정제하는 구조. & 원석(Bronze)을 다듬어 보석(Gold)으로 만드는 과정. \\
+    데이터 거버넌스 & Data Governance & 데이터의 품질, 보안, 접근성을 관리하는 전사적 정책 및 절차. & 데이터의 '헌법'이자 '관리 감독 시스템'. \\
+    데이터 계보 & Data Lineage & 데이터가 어디서 와서 어떻게 변환되었는지 추적하는 것. & 데이터의 '족보' 또는 '이력서'. \\
+    \midrule
+    ETL / ELT & - & 데이터 처리 순서. (Extract, Transform, Load) & \textbf{ETL}: 추출 $\rightarrow$ 변환 $\rightarrow$ 적재 (전통적). \newline \textbf{ELT}: 추출 $\rightarrow$ 적재 $\rightarrow$ 변환 (최신 Lakehouse). \\
+    Lakeflow & Lakeflow & Databricks의 데이터 파이프라인 도구 (수집, 변환, 오케스트레이션). & DLT를 포함하는 상위 개념. \\
+    DLT & Delta Live Tables & 선언형 ETL 프레임워크. 복잡한 파이프라인 구축을 단순화. & "파이프라인 만드는 공장" 자체를 제공. \\
+    선언형 파이프라인 & Declarative Pipeline & '어떻게'가 아닌 '무엇을' 정의하면 엔진이 알아서 처리하는 방식. & 식당에서 '레시피'가 아닌 '메뉴'를 주문하는 것. \\
+    오토로더 & Autoloader & 클라우드 스토리지에 새 파일이 도착하면 자동으로 감지하여 처리. & `cloudFiles` 포맷으로 사용. \\
+    \midrule
+    CDC & Change Data Capture & 원본 데이터의 변경(Insert, Update, Delete) 내역만 식별/추적. & `dlt.apply_changes()`가 이 기능을 자동화. \\
+    확장성 & Scalability & 시스템이 증가하는 작업량을 처리할 수 있는 능력. & \textbf{수직적(Up)}: 더 좋은 서버로 교체. \newline \textbf{수평적(Out)}: 서버 대수 추가. \\
+    탄력성 & Elasticity & 작업량 변화에 따라 자원을 동적으로 늘리거나 줄이는 능력. & 필요한 순간에만 자원을 쓰고 반납. (비용 효율적) \\
+    체크포인트 & Checkpoint & 스트리밍 작업이 어디까지 처리했는지 기록하는 '책갈피'. & 오류 발생 시 마지막 지점부터 재시작 가능. \\
+    \bottomrule
+    \end{tabular*}
+\end{tcolorbox}
+
+
+\newpage
+\section{1부: 데이터 파이프라인 운영의 개념}
+\label{sec:concepts}
+
+\subsection{왜 "운영(Operationalizing)"이 필요한가?}
+
+데이터 과학자가 만든 프로토타입(PoC) 노트북은 특정 문제를 해결할 수 있음을 보여주지만, 비즈니스에서 매일 신뢰하며 사용하기에는 부족합니다.
+
+\begin{examplebox}[title=비유: 주방 레시피 vs 공장 생산]
+    \begin{itemize}
+        \item \textbf{PoC (노트북)}: 셰프가 주방에서 실험적으로 만든 \textbf{'신메뉴 레시피'}와 같습니다. 맛은 있지만, 한 번에 1인분만 만들 수 있고, 셰프의 컨디션에 따라 품질이 달라질 수 있습니다.
+        \item \textbf{운영 (Production)}: 이 레시피를 \textbf{'대규모 식품 공장'}으로 가져와, 하루에 수만 개씩 일정한 품질로 자동 생산하는 시스템을 구축하는 것입니다.
+    \end{itemize}
+\end{examplebox}
+
+운영 파이프라인은 신뢰성(\textbf{Reliability}), 자동화(\textbf{Automation}), 확장성(\textbf{Scalability}), 모니터링(\textbf{Monitoring})을 갖춰야 합니다.
+
+\subsection{요구사항 정의: 모든 설계의 시작}
+
+설계를 시작하기 전에 비즈니스(고객)가 '무엇을' 원하고 '어떻게' 작동하길 기대하는지 명확히 해야 합니다. 이는 두 가지로 나뉩니다.
+
+\begin{tcolorbox}[title=1. 기능적 요구사항 (Functional Requirements) - "무엇을?"]
+    시스템이 사용자에게 제공해야 하는 구체적인 \textbf{기능}을 정의합니다.
+    \begin{itemize}
+        \item 비즈니스 규칙 (예: 특정 조건에서 거래 취소)
+        \item 인증 및 권한 수준 (예: 관리자만 데이터 삭제 가능)
+        \item 외부 인터페이스 (예: 여러 데이터 소스 연결)
+        \item 리포팅 요구사항 (예: 일일 매출 요약 생성)
+        \item 감사 추적 (예: 누가 데이터를 수정했는지 기록)
+    \end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=2. 비기능적 요구사항 (Non-Functional Requirements) - "어떻게?"]
+    시스템의 \textbf{품질, 성능, 제약 조건}을 정의합니다. 기능적 요구사항만큼, 때로는 그 이상으로 중요합니다.
+    \begin{itemize}
+        \item \textbf{성능 (Performance)}: 응답 시간(Latency), 처리량(Throughput) (예: 쿼리 응답은 5초 이내)
+        \item \textbf{확장성 (Scalability)}: 향후 데이터/사용자 증가에 대한 대비 (예: 10배 많은 데이터 처리 가능)
+        \item \textbf{가용성 (Availability)}: 시스템이 중단 없이 작동하는 시간의 비율
+        \item \textbf{보안 (Security)}: 데이터 접근 제어 및 규정 준수
+    \end{itemize}
+\end{tcolorbox}
+
+\begin{warningbox}[title=비기능적 요구사항의 함정]
+    비기능적 요구사항은 종종 간과되지만, 프로젝트 성패를 좌우합니다.
+    \begin{itemize}
+        \item \textbf{과잉 설계 (Over-design)}: 비즈니스는 하루 지연된 데이터를 받아도 되는데, 엔지니어가 1초 미만 실시간 시스템을 구축하면 막대한 비용이 낭비됩니다.
+        \item \textbf{미달 설계 (Under-design)}: 1초 미만 응답을 기대하는 고객에게 10초 걸리는 시스템을 제공하면, 그 시스템은 비즈니스 가치를 잃게 됩니다.
+    \end{itemize}
+    예를 들어, 'Five Nines' (99.999\%) 가용성은 1년 중 단 5분의 장애만 허용하며, 이는 엄청난 구축 비용을 요구합니다.
+\end{warningbox}
+
+\subsection{데이터 파이프라인의 6가지 핵심 원칙}
+
+효율적이고 견고한 데이터 레이크하우스(Data Lakehouse)를 구축하기 위한 6가지 지침입니다.
+
+\subsubsection{1. 데이터 큐레이션 및 신뢰할 수 있는 "데이터 제품" 제공}
+
+데이터를 목적에 맞게 정제하고 가공하여, 사용자가 신뢰하고 소비할 수 있는 '제품' 형태로 제공해야 합니다.
+
+\begin{infobox}[title=메달리온 아키텍처 (Medallion Architecture)]
+    데이터를 품질 수준에 따라 3단계로 관리하는 표준 방식입니다.
+    \begin{itemize}
+        \item \textbf{Bronze (Raw Layer)}: 원본 소스 데이터를 변경 없이 그대로 저장합니다. (원석)
+        \item \textbf{Silver (Curated Layer)}: Bronze 데이터를 가져와 정제(Cleansing), 필터링, 보강(Enriching)합니다. (정제된 은)
+        \item \textbf{Gold (Final Layer)}: Silver 데이터를 비즈니스 목적(예: BI, 리포팅, ML)에 맞게 집계(Aggregation)하고 요약합니다. (최종 제품, 금)
+    \end{itemize}
+    Bronze $\rightarrow$ Silver $\rightarrow$ Gold로 갈수록 데이터의 품질과 신뢰도는 높아지지만, 가공 비용(Cost)도 증가합니다.
+\end{infobox}
+
+\subsubsection{2. 데이터 사일로 제거 및 이동 최소화}
+
+데이터를 불필요하게 복제하고 이동시키면 비용, 지연 시간(Latency), 품질 문제가 발생하며, 부서 간 데이터가 고립되는 '사일로(Silo)'가 생깁니다.
+\begin{itemize}
+    \item \textbf{해결책}: 데이터 복제 대신 \textbf{얕은 복제(Shallow Clone, 메타데이터만 복사)}, \textbf{뷰(Views)}, \textbf{델타 타임 트래블(Delta Time Travel)} 등을 활용하여 데이터 중복을 최소화합니다.
+\end{itemize}
+
+\subsubsection{3. 셀프 서비스 경험으로 가치 창출 민주화}
+
+데이터 팀뿐만 아니라 현업의 비즈니스 사용자들도 필요한 데이터를 직접 탐색하고 활용할 수 있어야 합니다. (데이터 민주화)
+\begin{itemize}
+    \item \textbf{필수 조건}: 사용자가 데이터를 함부로 변경하거나 삭제하지 못하도록 적절한 \textbf{"가드레일(Guardrails)"}, 즉 데이터 거버넌스(보안 및 접근 제어)가 반드시 전제되어야 합니다.
+\end{itemize}
+
+\subsubsection{4. 전사적 데이터 거버넌스 전략 채택}
+
+데이터 거버넌스는 단순한 보안이 아니라, 데이터의 수명 주기 전반을 관리하는 시스템입니다.
+\begin{itemize}
+    \item \textbf{데이터 품질 (Quality)}: 데이터가 정확하고 일관되도록 제약 조건(Constraints)을 적용합니다.
+    \item \textbf{데이터 카탈로그 및 계보 (Catalog \& Lineage)}: 데이터의 의미(메타데이터)를 정의하고, 데이터의 출처와 변환 이력(Lineage)을 추적 가능하게 합니다.
+    \item \textbf{접근 제어 (Access Control)}: 누가(Who) 어떤(What) 데이터에 접근할 수 있는지 관리합니다. (예: PII-개인식별정보 마스킹, 행/열 단위 접근 제한)
+\end{itemize}
+
+\subsubsection{5. 개방형 인터페이스 및 포맷 사용}
+
+특정 벤더(Vendor)에 종속되는 독점적(Proprietary) 포맷 대신, 델타(Delta), 파케이(Parquet) 같은 개방형 포맷(Open Format)을 사용해야 합니다.
+\begin{itemize}
+    \item \textbf{이유}:
+        1.  \textbf{벤더 종속 탈피 (No Lock-in)}: 다른 플랫폼으로 자유롭게 이전할 수 있습니다.
+        2.  \textbf{상호 운용성 (Interoperability)}: 다양한 3rd-party 도구와 쉽게 연동됩니다.
+        3.  \textbf{비용 절감 (Lower Cost)}: 값비싼 독점 플랫폼 라이선스를 피할 수 있습니다.
+\end{itemize}
+
+\subsubsection{6. 확장성 및 비용/성능 최적화}
+
+대규모 데이터를 효율적으로 처리하려면 확장성과 비용 효율성을 모두 고려해야 합니다.
+
+\begin{infobox}[title=핵심: 스토리지와 컴퓨트의 분리 (Decoupling)]
+    가장 중요한 아키텍처 원칙 중 하나입니다.
+    \begin{itemize}
+        \item \textbf{전통적 시스템 (결합)}: 데이터를 저장하는 디스크(스토리지)와 데이터를 처리하는 CPU(컴퓨트)가 한 서버에 묶여 있습니다. 데이터만 10배 늘어도, 비싼 CPU까지 10배 증설해야 했습니다. (예: ElasticSearch)
+        \item \textbf{현대적 레이크하우스 (분리)}: 데이터는 저렴한 클라우드 스토리지(S3, ADLS 등)에 무한히 저장하고, 데이터 처리가 필요할 때만 컴퓨트 클러스터를 빌려 씁니다.
+    \end{itemize}
+\end{infobox}
+
+\begin{examplebox}[title=비유: 창고와 공장의 분리]
+    \begin{itemize}
+        \item \textbf{스토리지 (Storage)}: 물건을 보관하는 \textbf{'창고'}. 창고 크기는 저렴하게 무한히 늘릴 수 있습니다.
+        \item \textbf{컴퓨트 (Compute)}: 물건을 가공하는 \textbf{'공장 기계'}. 비싸지만, 물건을 가공할 때만 기계를 켜서 사용료를 냅니다.
+    \end{itemize}
+    이 둘을 분리하면, 창고가 아무리 커져도 공장 운영비는 필요한 만큼만 지불하게 되어 매우 효율적입니다.
+\end{examplebox}
+
+
+\newpage
+\section{2부: 데이터 품질 및 검증}
+\label{sec:quality}
+
+\subsection{데이터 품질이란? (Garbage In, Garbage Out)}
+
+"쓰레기가 들어가면, 쓰레기가 나온다 (GIGO)"
+데이터 파이프라인의 핵심은 데이터 품질을 보장하는 것입니다. 부정확한 데이터를 기반으로 한 분석이나 AI 모델은 잘못된 비즈니스 결정으로 이어집니다.
+
+\begin{itemize}
+    \item \textbf{정확성 (Accuracy)}: 데이터가 실제 값과 일치하는가?
+    \item \textbf{일관성 (Consistency)}: 데이터가 시스템 내에서 모순 없이 일관되는가? (예: 'NY'와 'New York'이 혼용)
+    \item \textbf{완전성 (Completeness)}: 필수 데이터가 누락되지 않았는가?
+    \item \textbf{적시성 (Timeliness)}: 데이터가 필요한 시점에 제공되는가? (신선도)
+    \item \textbf{무결성 (Integrity)}: 데이터 간의 관계(예: FK)가 올바른가?
+\end{itemize}
+
+\subsection{손상된 레코드 처리 (Handling Corrupt Records)}
+
+소스 데이터는 스키마 불일치, 형식 오류, 누락 값 등 다양한 이유로 '손상될' 수 있습니다. Spark은 이러한 데이터를 처리하는 3가지 모드(ParseMode)를 제공합니다.
+
+\begin{warningbox}[title=Spark의 3가지 오류 처리 모드]
+    \begin{enumerate}
+        \item \textbf{\texttt{PERMISSIVE} (기본값)}
+            \begin{itemize}
+                \item \textbf{동작}: 오류가 발생한 레코드를 \texttt{\_corrupt\_record}라는 별도 컬럼에 저장하고, 파싱 가능한 컬럼은 \texttt{null}로 채웁니다. 작업은 중단되지 않습니다.
+                \item \textbf{용도}: 파이프라인 중단 없이 모든 데이터를 일단 수집한 후, 나중에 손상된 데이터를 분석하거나 수정할 때 유용합니다.
+            \end{itemize}
+        \item \textbf{\texttt{DROPMALFORMED}}
+            \begin{itemize}
+                \item \textbf{동작}: 손상된 레코드를 \textbf{즉시 삭제(무시)}합니다.
+                \item \textbf{용도}: 품질이 중요하지 않거나, 일부 데이터가 손실되어도 무방한 로그 분석 등에 사용됩니다.
+            \end{itemize}
+        \item \textbf{\texttt{FAILFAST}}
+            \begin{itemize}
+                \item \textbf{동작}: 손상된 레코드를 만나는 즉시 \textbf{작업을 중단}시키고 예외(Exception)를 발생시킵니다.
+                \item \textbf{용도}: 데이터 품질이 매우 엄격하게 요구되는 금융 거래 데이터 등, 단 하나의 오류도 허용되지 않는 경우에 사용됩니다.
+            \end{itemize}
+    \end{enumerate}
+    또한, \texttt{option("badRecordsPath", "경로")}를 지정하여 오류 레코드의 원본 파일을 별도 위치에 기록할 수 있습니다.
+\end{warningbox}
+
+\subsection{결측치 및 중복 데이터 처리}
+
+\begin{itemize}
+    \item \textbf{중복 데이터}: \texttt{dropDuplicates(["id", "color"])}와 같이 고유 키를 기준으로 중복 행을 제거합니다.
+    \item \textbf{결측치 (Missing Values)}:
+        \begin{itemize}
+            \item \textbf{행 삭제 (Drop)}: \texttt{dropna()}를 사용하여 결측치가 있는 행을 무시합니다. (정보 손실 위험)
+            \item \textbf{대체값 (Placeholder)}: 스키마를 위반하지 않도록 \texttt{-1}이나 'N/A' 같은 값으로 채웁니다.
+            \item \textbf{기본 대체 (Basic Imputing)}: \texttt{na.fill()}을 사용하여 전체 평균값이나 중앙값으로 채웁니다.
+            \item \textbf{고급 대체 (Advanced Imputing)}: ML 모델(예: 회귀)을 사용하여 결측치를 예측합니다.
+        \end{itemize}
+\end{itemize}
+
+\subsection{DLT를 활용한 자동 데이터 품질 관리 (Expectations)}
+
+Delta Live Tables (DLT)는 데이터 품질 규칙을 파이프라인 정의에 직접 '기대(Expectations)'로 선언할 수 있게 해줍니다.
+
+\begin{infobox}[title=DLT Expectations: 데이터 품질 선언]
+    품질 규칙(제약 조건)을 정의하고, 위반 시(On Violation) 어떻게 처리할지 지정합니다.
+    \begin{itemize}
+        \item \textbf{\texttt{EXPECT ... ON VIOLATION FAIL UPDATE}}: 규칙 위반 시 \textbf{파이프라인을 중단}합니다. (Spark의 \texttt{FAILFAST}와 유사)
+        \item \textbf{\texttt{EXPECT ... ON VIOLATION DROP ROW}}: 규칙 위반 시 해당 \textbf{행을 삭제}합니다. (Spark의 \texttt{DROPMALFORMED}와 유사)
+        \item \textbf{\texttt{EXPECT ...}} (처리 지정 없음): 규칙 위반 시 \textbf{데이터는 통과}시키되, 위반 내역을 메트릭으로 기록하여 모니터링할 수 있게 합니다.
+    \end{itemize}
+\end{infobox}
+
+\begin{lstlisting}[language=Python, caption={DLT Python에서 Expectations를 선언하는 예시}, label=lst:dlt-expectations]
+import dlt
+from pyspark.sql.functions import col
+
+# @dlt.expect_or_drop: 규칙 위반 시 행 삭제
+@dlt.expect_or_drop("valid_age", "age > 0 AND age < 120")
+
+# @dlt.expect_or_fail: 규칙 위반 시 파이프라인 중단
+@dlt.expect_or_fail("valid_email", "email IS NOT NULL")
+
+# @dlt.expect: 위반 시 기록만 함
+@dlt.expect("reasonable_score", "score >= 50")
+
+@dlt.table(
+  comment="데이터 품질 제약 조건이 적용된 Silver 테이블"
+)
+def users_silver():
+  return (
+    dlt.read_stream("users_bronze")
+      .select("id", "age", "email", "score")
+  )
+\end{lstlisting}
+
+\begin{infobox}[title=데이터 격리 (Quarantining)]
+    규칙을 위반한(실패한) 데이터를 \texttt{DROP}하거나 \texttt{FAIL}시키는 대신, 별도의 '격리(Quarantine) 테이블'로 라우팅하는 패턴도 많이 사용됩니다.
+
+    이를 통해 메인 파이프라인은 계속 실행하면서, 실패한 데이터는 나중에 수동으로 검토하고 수정하여 다시 파이프라인에 주입(re-inject)할 수 있습니다.
+\end{infobox}
+
+
+\newpage
+\section{3부: Databricks Lakeflow 및 DLT 실습}
+\label{sec:dlt}
+
+Lakeflow는 데이터 수집(Ingest), 변환(Transform), 오케스트레이션(Orchestrate)을 통합 관리하는 Databricks의 플랫폼입니다. DLT는 Lakeflow의 핵심 기능으로, '선언형' 파이프라인을 구축합니다.
+
+\subsection{명령형 vs 선언형 파이프라인}
+
+전통적인 파이프라인 코딩과 DLT의 차이점입니다.
+
+\begin{examplebox}[title=비유: 식당에서 주문하기]
+    \begin{itemize}
+        \item \textbf{명령형 (Imperative - 전통 방식)}: 셰프에게 "1. 소고기 200g을 굽고, 2. 야채를 씻고, 3. 빵을 데우고, 4...." 라며 \textbf{'모든 절차(How)'}를 직접 지시합니다. (개발자가 스케일링, 오류 처리, 리트라이, 상태 관리 코드를 모두 작성)
+        \item \textbf{선언형 (Declarative - DLT 방식)}: 메뉴판을 보고 "스테이크 주세요"라고 \textbf{'원하는 결과(What)'}만 주문합니다. 주방(DLT 엔진)이 최적의 레시피로 요리(파이프라인 실행), 품질 검사, 서빙(데이터 저장)을 \textbf{알아서} 처리합니다.
+    \end{itemize}
+\end{examplebox}
+
+DLT를 사용하면 개발자는 비즈니스 로직(변환)에만 집중하고, 복잡한 인프라 관리(오류 처리, 확장, 최적화, 모니터링)는 DLT 엔진에 맡길 수 있습니다.
+
+\subsection{DLT의 핵심: CDC (Change Data Capture) 자동화}
+
+DLT의 가장 강력한 기능 중 하나는 원본 데이터의 변경(Insert, Update, Delete)을 자동으로 감지하고 Silver 테이블에 반영하는 \texttt{dlt.apply\_changes()}입니다.
+
+이 기능을 사용하면 복잡한 Merge/Upsert 로직을 직접 코딩할 필요가 없습니다.
+
+\begin{lstlisting}[language=Python, caption={DLT를 사용한 Bronze $\rightarrow$ Silver CDC 파이프라인 예시}, label=lst:dlt-cdc]
+import dlt
+from pyspark.sql.functions import col, expr
+
+# 소스 데이터 경로 (예: S3, ADLS)
+SOURCE_PATH = "/path/to/source-data/"
+
+# 1. Bronze: Autoloader로 원시 데이터 스트리밍 (JSON, CSV 등)
+@dlt.table(
+  comment="Autoloader로 원시 트랜잭션 수집"
+)
+def bronze_transactions():
+  return (
+    spark.readStream
+      .format("cloudFiles") # Autoloader 사용
+      .option("cloudFiles.format", "json")
+      .load(SOURCE_PATH)
+  )
+
+# 2. View: Bronze 데이터를 Silver에 적용하기 전 정제
+# (뷰는 디스크에 저장되지 않고 인메모리에서 사용됨)
+@dlt.view(
+  comment="Bronze 데이터 정제 및 시퀀스 컬럼 추가"
+)
+def clean_transactions():
+  return (
+    dlt.read_stream("bronze_transactions")
+      .selectExpr(
+        "transaction_id",
+        "CAST(amount AS DOUBLE)",
+        "operation_type", # 'INSERT', 'UPDATE', 'DELETE'
+        "CAST(update_timestamp AS LONG) as sequence" # 변경 순서
+      )
+  )
+
+# 3. Silver: CDC (Change Data Capture) 적용
+@dlt.table(
+  comment="정제된 트랜잭션 데이터를 CDC로 Silver에 적용"
+)
+def silver_transactions():
+  dlt.apply_changes(
+    target = "silver_transactions", # 최종 대상 테이블
+    source = dlt.read_stream("clean_transactions"), # 소스 (정제된 뷰)
+    keys = ["transaction_id"], # 레코드의 고유 키 (PK)
+    sequence_by = col("sequence"), # 변경 순서 식별 컬럼
+    apply_as_deletes = expr("operation_type = 'DELETE'") # 삭제 조건
+    # operation_type이 'DELETE'인 경우, 해당 키를 가진 레코드를 삭제
+    # INSERT, UPDATE는 자동으로 처리됨 (SCD Type 1)
+  )
+\end{lstlisting}
+
+\begin{infobox}[title=dlt.apply\_changes() 상세]
+    \begin{itemize}
+        \item \textbf{target}: 데이터가 최종적으로 저장될 테이블 이름.
+        \item \textbf{source}: 변경 사항이 포함된 스트리밍 데이터프레임.
+        \item \textbf{keys}: 레코드를 고유하게 식별하는 키(PK) 리스트.
+        \item \textbf{sequence\_by}: 변경 순서를 나타내는 컬럼 (예: 타임스탬프). 동일한 키의 레코드가 여러 개일 경우, 이 값이 가장 높은(최신) 레코드를 적용합니다.
+        \item \textbf{apply\_as\_deletes}: 이 조건이 참(True)이 되는 레코드는 `DELETE`로 처리됩니다.
+    \end{itemize}
+\end{infobox}
+
+
+\newpage
+\section{4부: 실습 오류 및 해결 (Checkpoint Q\&A)}
+\label{sec:errors}
+
+과제 수행 중 흔히 발생하는 `checkpointLocation` 오류는 스트리밍 파이프라인의 상태 관리와 밀접한 관련이 있습니다.
+
+\subsection{사례: 스트리밍 체크포인트 오류}
+
+\begin{faqbox}
+    \textbf{Q: 증상 (Symptom)}
+    
+    과제 3번에서 \texttt{spark.readStream.format("delta").load(...).writeStream.option("checkpointLocation", ...).start()} 코드를 실행할 때, 체크포인트 위치(checkpointLocation) 관련 오류가 계속 발생합니다. 경로를 바꿔봐도 해결되지 않습니다.
+\end{faqbox}
+
+\begin{infobox}[title=원인 분석 (Cause Analysis)]
+    스트리밍 쿼리는 '체크포인트(Checkpoint)'에 자신이 어디까지 데이터를 처리했는지 \textbf{'상태(State)'}를 기록합니다. 이 오류는 주로 두 가지 이유로 발생합니다.
+    \begin{enumerate}
+        \item \textbf{체크포인트 충돌}: 이전에 실행했던 스트리밍 쿼리의 체크포인트가 남아있는 상태에서, 파이프라인 코드(로직)를 수정하거나 소스 데이터를 삭제한 후 \textbf{다시 실행}하면, 이전 상태와 현재 상태가 충돌하여 오류가 발생합니다.
+        \item \textbf{잘못된 경로 사용}: (Databricks 환경) \texttt{dbfs:/...} 같은 경로 대신, Unity Catalog (UC)에서 관리하는 \texttt{/Volumes/...} 경로를 사용해야 할 수 있습니다.
+    \end{enumerate}
+\end{infobox}
+
+\subsection{해결 방안}
+
+\begin{examplebox}[title=해결책 1: 수동으로 체크포인트 삭제 (수동 방식)]
+    스트리밍 쿼리를 \textbf{새로 시작}하기 전에, 이전 체크포인트 디렉토리를 수동으로 삭제하여 상태를 초기화합니다.
+    
+\begin{lstlisting}[language=Python, caption={스트리밍 시작 전 체크포인트 강제 삭제}, label=lst:rm-checkpoint]
+# 체크포인트 경로 정의
+checkpoint_path = "/path/to/my/checkpoint"
+
+# (1) 스트리밍 쿼리 중지 (이미 실행 중이라면)
+# for s in spark.streams.active:
+#   s.stop()
+
+# (2) 체크포인트 디렉토리 강제 삭제
+# (주의: 실제 운영 환경에서는 복구 불가능하므로 신중해야 함)
+dbutils.fs.rm(checkpoint_path, recurse=True)
+
+# (3) 스트리밍 쿼리 다시 시작
+(
+  spark.readStream
+    .format("delta")
+    .load(...)
+    .writeStream
+    .option("checkpointLocation", checkpoint_path)
+    .table(...)
+)
+\end{lstlisting}
+\end{examplebox}
+
+\begin{tcolorbox}[title=해결책 2: DLT/Lakeflow 사용 (자동 방식), fonttitle=\bfseries, colback=green!5!white, colframe=green!75!black]
+    \textbf{근본적인 해결책: DLT가 상태 관리를 자동화합니다.}
+
+    이러한 수동 체크포인트 관리는 번거롭고 오류를 유발하기 쉽습니다.
+
+    DLT/Lakeflow는 파이프라인의 상태를 엔진이 직접 관리합니다. 만약 파이프라인을 처음부터 다시 실행하고 싶다면, DLT 실행 시 \textbf{"Full Refresh (전체 새로 고침)"} 옵션을 선택하면 됩니다.
+
+    "Full Refresh"는 DLT 엔진이 \textbf{자동으로} 모든 이전 상태와 체크포인트를 삭제하고, 소스 데이터를 처음부터 다시 처리하도록 지시합니다. (수동 \texttt{dbutils.fs.rm} 불필요)
+\end{tcolorbox}
+
+
+\newpage
+\section{5부: 요약 및 점검}
+\label{sec:summary}
+
+\subsection{운영 파이프라인 체크리스트}
+
+\begin{checklistbox}
+    \begin{enumerate}[label=\checkmark]
+        \item \textbf{요구사항}: 기능적 요구사항(What)과 비기능적 요구사항(How - 성능, 가용성, 비용)이 명확하게 정의되었는가?
+        \item \textbf{아키텍처}: Medallion 아키텍처(Bronze/Silver/Gold)가 설계되었는가?
+        \item \textbf{품질}: 데이터 품질 규칙(Expectations)이 정의되었고, 위반 시 처리(Fail/Drop/Log) 전략이 수립되었는가?
+        \item \textbf{오류 처리}: 손상된 레코드(Corrupt records) 및 파이프라인 실패 시 복구/재시도(Retry) 전략이 있는가?
+        \item \textbf{거버넌스}: 데이터 접근 제어, PII 마스킹, 데이터 계보(Lineage)가 고려되었는가?
+        \item \textbf{최적화}: 스토리지와 컴퓨트가 분리되었는가? 워크로드에 맞게 탄력적(Elastic)으로 자원이 조절되는가?
+        \item \textbf{자동화}: 수동 개입 없이 파이프라인이 스케줄링(Orchestration)되고 자동 실행되는가?
+        \item \textbf{모니터링}: 파이프라인 상태, 성능, 데이터 품질 메트릭이 모니터링되고 알림이 설정되었는가?
+    \end{enumerate}
+\end{checklistbox}
+
+\subsection{FAQ (자주 묻는 질문)}
+
+\begin{faqbox}
+    \textbf{Q: ETL과 ELT 중 무엇을 사용해야 하나요?}
+    
+    \textbf{A:} 상황에 따라 다릅니다. 원본 데이터가 이미 잘 구조화되어 있고(예: RDBMS) 스키마가 명확하면 전통적인 \textbf{ETL}(추출 $\rightarrow$ 변환 $\rightarrow$ 적재)이 효율적일 수 있습니다.
+    
+    하지만 대부분의 현대 데이터(비정형, 반정형)는 스키마가 불명확하므로, 일단 원본(Bronze)을 \textbf{적재(L)}한 후 Lakehouse의 강력한 컴퓨팅 파워를 이용해 \textbf{변환(T)}하는 \textbf{ELT} 방식이 더 유연하고 권장됩니다.
+\end{faqbox}
+
+\begin{faqbox}
+    \textbf{Q: DLT는 SQL과 Python 중 무엇으로 작성해야 하나요?}
+    
+    \textbf{A:} \textbf{둘 다 가능}하며, 동일한 파이프라인 내에서 혼용할 수도 있습니다. 간단한 변환이나 SQL에 익숙한 분석가들은 SQL을, 복잡한 로직, ML 전처리, Python 라이브러리 활용이 필요하면 Python을 사용합니다.
+\end{faqbox}
+
+\begin{faqbox}
+    \textbf{Q: 파이프라인은 항상 처음부터 다시 실행해야 하나요?}
+    
+    \textbf{A:} 아닙니다. 그럴 필요가 없습니다. DLT와 같은 현대적 파이프라인은 \textbf{증분 처리(Incremental Processing)}를 기본으로 합니다. 즉, 마지막 실행 이후 \textbf{새롭게 추가되거나 변경된 데이터만} 처리하여 비용과 시간을 획기적으로 줄입니다.
+    
+    "Full Refresh"는 스키마가 크게 변경되거나 로직을 근본적으로 수정했을 때만 예외적으로 사용합니다.
+\end{faqbox}
+
+\begin{faqbox}
+    \textbf{Q: 확장성(Scalability)과 탄력성(Elasticity)의 차이는 무엇인가요?}
+    
+    \textbf{A:}
+    \begin{itemize}
+        \item \textbf{확장성(Scalability)}: 시스템의 \textbf{최대 용량}을 늘릴 수 있는 능력입니다. (예: 100명용 $\rightarrow$ 1000명용 시스템으로 업그레이드)
+        \item \textbf{탄력성(Elasticity)}: \textbf{현재 수요}에 맞춰 자원을 동적으로 늘리거나 줄이는 능력입니다. (예: 낮에 1000명이 쓰면 1000명용, 밤에 10명만 쓰면 10명용으로 자동 축소)
+    \end{itemize}
+    탄력성은 클라우드 환경에서 비용을 최적화하는 핵심 개념입니다. Databricks의 Serverless 기능이 대표적인 예입니다.
+\end{faqbox}
+
+\subsection{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[title=PoC (프로토타입) vs Production (운영)]
+    \textbf{PoC}: 수동 실행, 불안정, 품질 보장 X, 1회성 분석 (예: 노트북) \newline
+    $\downarrow$ \textbf{Operationalizing} $\downarrow$ \newline
+    \textbf{Production}: 자동화, 신뢰성, 품질 보장(Quality), 확장성, 모니터링 (예: DLT)
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=요구사항 (Requirements)]
+    \begin{itemize}
+        \item \textbf{기능적 (Functional)}: 무엇을? (기능)
+        \item \textbf{비기능적 (Non-Func.)}: 어떻게? (성능, 품질, 비용) $\leftarrow$ 놓치기 쉬움!
+    \end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Medallion 아키텍처 (품질 향상)]
+    \textbf{Bronze (원시)} $\rightarrow$ \textbf{Silver (정제/검증)} $\rightarrow$ \textbf{Gold (집계/최종 제품)}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=6대 핵심 원칙 (Guiding Principles)]
+    \begin{enumerate}
+        \item 데이터 제품 (Data-as-Products)
+        \item 사일로 제거 (No Silos)
+        \item 셀프 서비스 (Self-Service) + 거버넌스
+        \item 전사적 거버넌스 (Governance)
+        \item 개방형 포맷 (Open Formats)
+        \item 확장 및 최적화 (Scale \& Cost)
+    \end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=DLT (Delta Live Tables) 핵심 기능]
+    \begin{itemize}
+        \item \textbf{선언형 (Declarative)}: "What"만 정의 (엔진이 "How" 처리)
+        \item \textbf{CDC 자동화}: \texttt{dlt.apply\_changes()}
+        \item \textbf{품질 자동화}: \texttt{@dlt.expect\_...} (Expectations)
+        \item \textbf{상태 관리}: 체크포인트, Full Refresh 자동화
+    \end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=확장성 (Scaling)]
+    \begin{itemize}
+        \item \textbf{수평적 확장 (Scale Out)}: 서버 대수 추가 (권장)
+        \item \textbf{수직적 확장 (Scale Up)}: 서버 사양 업그레이드
+        \item \textbf{핵심}: 스토리지(창고)와 컴퓨트(공장)는 반드시 분리!
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+\appendix
+\section{부록: 과제 및 공지사항}
+\label{sec:appendix}
+
+다음은 강의 초반에 공지된 행정 사항 요약입니다.
+
+\begin{itemize}
+    \item \textbf{Assignment 1 (Spark)}: 채점이 완료되었으며 성적이 배포되었습니다. 성적을 받지 못한 경우 교수진에게 연락 바랍니다.
+    \item \textbf{Assignment 2 (ETL/EDA)}: 채점이 진행 중이며, 곧 완료될 예정입니다.
+    \item \textbf{Assignment 3 (Batch \& Streaming)}: 과제가 공개되었으며, 현재 진행 중이어야 합니다.
+    \item \textbf{Quiz 1}: 퀴즈가 이번 주에 공개되었습니다. (시간 제한이 있는 퀴즈가 아니라 며칠 또는 1주일 정도의 기간을 두고 푸는 방식입니다.)
+    \item \textbf{Case Study 1 (Data Architectures)}:
+        \begin{itemize}
+            \item 이번 주 말(목요일 또는 금요일)에 공개될 예정입니다.
+            \item \textbf{팀 프로젝트}로 진행되며, 팀은 Canvas의 그룹 도구를 통해 랜덤으로 배정됩니다.
+            \item 과제 완료까지는 최소 2주의 시간이 주어질 것입니다.
+            \item 과제 수행을 위한 템플릿(Deck)이 제공될 예정입니다.
+            \item (참고: 여러 번의 케이스 스터디가 있을 예정이며, 이는 다른 학생들과 네트워킹할 기회입니다.)
+        \end{itemize}
+    \item \textbf{질문}: 질문은 \textbf{Slack}을 이용하는 것이 가장 좋습니다. Slack을 통해 질문과 답변을 공유하면 모든 학생이 도움을 받을 수 있습니다. 개인적인 질문은 교수 또는 TA에게 직접 연락 가능합니다.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX 문서 끝
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

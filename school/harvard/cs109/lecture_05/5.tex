@@ -1,0 +1,883 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.0
+% 최종 수정일: 2025-10-26
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[margin=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: 데이터 과학 입문}}
+\fancyhead[R]{\small\textit{Lecture 05}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CS109A: 데이터 과학 입문 - Lecture 05},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: 데이터 과학 입문}{Lecture 05}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 05의 핵심 개념 학습}
+
+
+\tableofcontents
+
+\part{선형 회귀의 기초}
+\newpage
+
+\section{개요 (Overview)}
+
+선형 회귀(Linear Regression)는 데이터 과학과 기계 학습에서 가장 기본이 되는 핵심 모델입니다.
+
+이 문서는 선형 회귀의 기초부터 실제 적용까지 초심자도 완벽히 이해할 수 있도록 구성되었습니다.
+
+\begin{summarybox}
+\textbf{이 문서의 핵심 요약:}
+\begin{itemize}
+    \item \textbf{선형 회귀란?} 하나 이상의 입력 변수(예측 변수)와 하나의 연속적인 출력 변수(반응 변수) 사이의 \textbf{선형(직선) 관계}를 모델링하는 기법입니다.
+    \item \textbf{왜 중요한가?} 복잡한 모델(신경망 등)을 이해하는 기초가 되며, "어떤 변수가 결과에 얼마나 영향을 미치는지" \textbf{해석}하기 용이합니다.
+    \item \textbf{학습 흐름:}
+        \begin{enumerate}
+            \item \textbf{단순 선형 회귀 (SLR):} 하나의 입력($X$)으로 하나의 출력($Y$)을 예측합니다. ($Y = \beta_0 + \beta_1 X$)
+            \item \textbf{다중 선형 회귀 (MLR):} 여러 개의 입력($X_1, X_2, ...$)으로 하나의 출력($Y$)을 예측합니다. ($Y = \beta_0 + \beta_1 X_1 + ...$)
+            \item \textbf{모델 학습:} '최적의 선'을 찾기 위해 \textbf{평균 제곱 오차(MSE)}라는 손실 함수를 최소화합니다.
+            \item \textbf{모델 해석 및 함정:} 계수(coefficient)의 의미, 스케일링, 다중공선성, 범주형 변수 처리 방법을 배웁니다.
+        \end{enumerate}
+\end{itemize}
+\end{summarybox}
+
+\section{핵심 용어 정리}
+선형 회귀를 이해하기 위해 다음 용어들을 먼저 숙지해야 합니다.
+
+\begin{table}[h!]
+\centering
+\caption{선형 회귀 핵심 용어}
+\label{tab:terminology}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{용어} & \textbf{원어} & \textbf{쉬운 설명} & \textbf{비고} \\ \midrule
+\textbf{반응 변수} & Response Variable & 우리가 예측하려는 \textbf{결과값} (Y) & 종속 변수(Dependent Variable)라고도 함 \\
+\textbf{예측 변수} & Predictor Variable & 결과를 예측하는 데 사용하는 \textbf{입력값} (X) & 특성(Feature), 독립 변수라고도 함 \\
+\textbf{계수} & Coefficient & 예측 변수가 결과에 미치는 \textbf{영향력} ($\beta_1, \beta_2...$) & 기울기(Slope)라고도 함 \\
+\textbf{절편} & Intercept & 모든 예측 변수가 0일 때의 \textbf{기본값} ($\beta_0$) & $y$절편, 편향(Bias)이라고도 함 \\
+\textbf{모델} & Model & 입력($X$)을 출력($Y$)으로 변환하는 수학 공식 & $\hat{Y} = \beta_0 + \beta_1 X$ \\
+\textbf{잔차} & Residual & \textbf{실제값}($Y$)과 모델의 \textbf{예측값}($\hat{Y}$)의 차이 & $r = Y - \hat{Y}$, 즉 '모델이 틀린 정도' \\
+\textbf{손실 함수} & Loss Function & 모델이 얼마나 '못'하는지 측정하는 함수 & 이 함수의 값을 최소화하는 것이 학습의 목표 \\
+\textbf{평균 제곱 오차} & MSE & 잔차들을 제곱하여 평균 낸 값 & \textbf{Mean Squared Error}. 대표적인 손실 함수 \\
+\textbf{학습/피팅} & Training / Fitting & 데이터로부터 최적의 계수($\beta$)를 찾는 과정 & 손실 함수(MSE)를 최소화하는 과정 \\
+\textbf{정규 방정식} & Normal Equation & 미분을 통해 MSE를 최소화하는 $\beta$를 한 번에 찾는 공식 & $\hat{\beta} = (X^T X)^{-1} X^T Y$ \\ \bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\section{왜 선형 회귀를 사용할까요?}
+
+세상에는 KNN, 신경망 등 복잡하고 강력한 모델이 많습니다. 왜 단순해 보이는 선형 회귀부터 배울까요?
+
+\begin{enumerate}
+    \item \textbf{모든 모델의 기초:}
+    복잡한 딥러닝 모델도 결국은 선형 변환과 비선형 함수의 조합입니다. 선형 회귀의 원리(모델 정의 $\rightarrow$ 손실 함수 $\rightarrow$ 최적화)를 완벽히 이해하면, 다른 모든 기계 학습 모델을 이해하는 튼튼한 기반이 됩니다.
+
+    \item \textbf{뛰어난 해석력 (Interpretability):}
+    KNN 같은 모델은 "왜" 그런 예측이 나왔는지 설명하기 어렵습니다 (Non-parametric). 하지만 선형 회귀는 "어떤 변수가 결과에 얼마나 영향을 주는지" 명확하게 숫자로 보여줍니다.
+    
+    \begin{examplebox}
+    \textbf{예시: KNN vs 선형 회귀}
+    \begin{itemize}
+        \item \textbf{KNN (K-최근접 이웃):}
+        "TV 광고 예산이 1억일 때 예상 매출은?" $\rightarrow$ "과거 1억과 비슷했던 3개 지점의 평균 매출이 10억이니, 10억일 겁니다."
+        "TV 광고 예산을 2배로 늘리면 매출은?" $\rightarrow$ "음... 다시 계산해봐야 합니다." (직관적이지 않음)
+        
+        \item \textbf{선형 회귀:}
+        "TV 광고 예산이 1억일 때 예상 매출은?" $\rightarrow$ "학습된 공식 $매출 = 5 + 0.05 \times (TV광고비)$ 에 따라 10억입니다."
+        "TV 광고 예산을 2배로 늘리면 매출은?" $\rightarrow$ "계수(기울기)가 0.05이므로, 광고비가 1억 증가할 때마다 매출이 5억씩 증가하는 경향이 있습니다." (직관적 해석 가능)
+    \end{itemize}
+    \end{examplebox}
+\end{enumerate}
+
+\section{단순 선형 회귀 (Simple Linear Regression, SLR)}
+
+가장 간단한 형태로, \textbf{하나의 예측 변수($X$)}가 \textbf{하나의 반응 변수($Y$)}에 미치는 영향을 모델링합니다.
+
+\subsection{모델 정의: "최적의 직선 찾기"}
+
+우리는 $X$와 $Y$ 사이에 직선 관계가 있다고 \textbf{가정}합니다.
+모든 데이터 포인트를 완벽하게 지나는 직선은 없으므로, 약간의 오차($\epsilon$)를 포함합니다.
+
+$$ Y = \beta_0 + \beta_1 X + \epsilon $$
+
+\begin{itemize}
+    \item $Y$: 반응 변수 (예: 매출)
+    \item $X$: 예측 변수 (예: TV 광고비)
+    \item $\beta_0$: \textbf{절편}. $X$가 0일 때의 $Y$ 값 (광고비가 0일 때의 기본 매출)
+    \item $\beta_1$: \textbf{기울기 (계수)}. $X$가 1단위 증가할 때 $Y$의 평균적인 변화량 (광고비 1원 증가 시 매출 변화량)
+    \item $\epsilon$: \textbf{오차(Error)}. 모델이 설명하지 못하는 무작위성 (다른 요인들)
+\end{itemize}
+
+우리의 목표는 데이터를 가장 잘 설명하는 $\beta_0$와 $\beta_1$를 찾는 것입니다. 이 예측된 모델을 $\hat{Y}$ (Y-hat)이라고 부릅니다.
+
+$$ \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 X $$
+
+\subsection{최적의 선 찾기: 손실 함수 (Loss Function)}
+
+수많은 직선 중에 "최적의 선"은 무엇일까요?
+바로 \textbf{"실제 데이터와 가장 가까운 선"}입니다.
+이 "가까운 정도"를 측정하는 것이 \textbf{손실 함수}입니다.
+
+\textbf{1. 잔차 (Residuals)}
+
+\begin{itemize}
+    \item \textbf{정의:} 실제 값($Y_i$)과 모델의 예측 값($\hat{Y}_i$)의 차이입니다.
+    \item \textbf{수식:} $r_i = Y_i - \hat{Y}_i$
+    \item \textbf{비유:} 예측 선에서 실제 데이터 점까지의 "수직 거리"입니다. 이 거리가 짧을수록 좋은 모델입니다.
+\end{itemize}
+
+\textbf{2. 평균 제곱 오차 (Mean Squared Error, MSE)}
+
+\begin{itemize}
+    \item \textbf{정의:} 모든 데이터의 잔차($r_i$)를 \textbf{제곱}하여 더한 뒤, 데이터 개수($n$)로 나눈 값입니다.
+    \item \textbf{수식:} $L(\beta_0, \beta_1) = \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (Y_i - \hat{Y}_i)^2 = \frac{1}{n} \sum_{i=1}^{n} (Y_i - (\beta_0 + \beta_1 X_i))^2$
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Q: 왜 잔차를 그냥 더하지 않고 제곱하나요?}
+
+\textbf{A:} 만약 제곱하지 않고 그냥 더하면, 예측보다 위에 있는 점(잔차 $> 0$)과 아래에 있는 점(잔차 $< 0$)이 서로 상쇄되어, 실제로는 오차가 큼에도 불구하고 총합이 0에 가까워질 수 있습니다.
+
+\textbf{제곱을 하는 이유:}
+\begin{enumerate}
+    \item 모든 잔차를 양수로 만듭니다. (상쇄 방지)
+    \item 오차가 큰 값(Outlier)에 더 큰 페널티를 부여합니다. (10의 제곱 = 100, 2의 제곱 = 4)
+    \item 수학적으로 미분하기 쉬워져 최적화에 유리합니다.
+\end{enumerate}
+\end{warningbox}
+
+\subsection{최적화: 손실 최소화하기}
+
+기계 학습의 핵심 3단계를 기억하세요.
+
+\begin{tcolorbox}[title=기계 학습의 핵심 3단계 프로세스]
+    \begin{enumerate}
+        \item \textbf{모델 정의 (Define Model):} $ \hat{Y} = \beta_0 + \beta_1 X $ (직선이라고 가정)
+        \item \textbf{손실 정의 (Define Loss):} $ \text{MSE} = \frac{1}{n} \sum (Y_i - \hat{Y}_i)^2 $ (틀린 정도를 측정)
+        \item \textbf{손실 최소화 (Minimize Loss):} MSE가 가장 작아지는 $\beta_0$와 $\beta_1$을 찾는다.
+    \end{enumerate}
+\end{tcolorbox}
+
+MSE는 $\beta_0$와 $\beta_1$에 대한 2차 함수(3D 그릇 모양)입니다. 이 그릇의 \textbf{가장 낮은 지점}을 찾는 것이 목표입니다.
+
+\begin{examplebox}
+\textbf{비유: 산에서 가장 낮은 계곡 찾기}
+\begin{itemize}
+    \item \textbf{현재 위치:} $(\beta_0, \beta_1)$ 값
+    \item \textbf{고도:} $\text{MSE}$ 값
+    \item \textbf{목표:} 고도(MSE)가 가장 낮은 지점 찾기
+    \item \textbf{방법:} \textbf{기울기(경사)}가 0이 되는 지점을 찾습니다.
+\end{itemize}
+\end{examplebox}
+
+수학적으로 "기울기가 0"인 지점은 \textbf{미분(Derivative)}을 통해 찾습니다.
+손실 함수 $L$을 $\beta_0$와 $\beta_1$ 각각에 대해 \textbf{편미분(Partial Derivative)}하여 0이 되는 지점을 찾습니다.
+
+$$ \frac{\partial L}{\partial \beta_0} = 0 \quad \text{and} \quad \frac{\partial L}{\partial \beta_1} = 0 $$
+
+이 두 방정식을 연립하여 풀면, MSE를 최소화하는 $\hat{\beta}_0$와 $\hat{\beta}_1$의 공식을 유도할 수 있습니다. 이를 \textbf{정규 방정식 (Normal Equation)} 또는 \textbf{최소 제곱법 (Least Squares)}이라고 합니다.
+
+\begin{tcolorbox}[title=단순 선형 회귀의 정규 방정식 (Closed-form Solution)]
+복잡한 미분 과정(연쇄 법칙 포함)을 거치면 다음과 같은 깔끔한 공식을 얻을 수 있습니다.
+
+$$ \hat{\beta}_1 = \frac{\sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})}{\sum_{i=1}^{n} (X_i - \bar{X})^2} $$
+$$ \hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X} $$
+
+\begin{itemize}
+    \item $\bar{X}$: $X$의 평균
+    \item $\bar{Y}$: $Y$의 평균
+\end{itemize}
+\textbf{중요:} 이 공식은 컴퓨터가 \texttt{.fit()} 명령을 실행할 때 내부적으로 계산하는 값입니다. 이처럼 최적의 해를 한 번의 계산으로 찾을 수 있는 경우는 매우 드물며, 선형 회귀의 강력한 특징입니다.
+\end{tcolorbox}
+
+
+\part{다중 선형 회귀로의 확장}
+\newpage
+
+\section{다중 선형 회귀 (Multi-Linear Regression, MLR)}
+
+현실에서는 하나의 요인만으로 결과를 예측하기 어렵습니다. (예: 매출은 TV 광고비뿐만 아니라 라디오, 신문 광고비, 소셜 미디어 등에도 영향을 받음)
+
+다중 선형 회귀는 \textbf{여러 개의 예측 변수($X_1, X_2, \dots, X_p$)}를 사용하여 $Y$를 예측합니다.
+
+\subsection{모델 정의: "최적의 초평면 찾기"}
+
+SLR이 2D 평면에서 '선'을 찾는 것이라면, MLR은 3D 공간에서 '평면'을, 그 이상의 $p$차원 공간에서 '\textbf{초평면(Hyperplane)}'을 찾는 것입니다.
+
+$$ Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + \epsilon $$
+
+\begin{itemize}
+    \item $\beta_0$: \textbf{절편}. 모든 예측 변수($X_1, \dots, X_p$)가 0일 때의 $Y$ 값.
+    \item $\beta_j$: $j$번째 예측 변수의 \textbf{계수}.
+    \textbf{해석이 중요:} \textbf{"다른 모든 예측 변수가 고정되어 있다고 가정할 때,"} $X_j$가 1단위 증가할 때 $Y$의 평균 변화량.
+\end{itemize}
+
+\subsection{행렬 표기법 (Matrix Notation)}
+
+변수가 많아지면 위 공식을 쓰기 번거롭습니다. \textbf{선형 대수(행렬)}를 사용하면 매우 깔끔하게 표현할 수 있습니다.
+
+$n$개의 데이터와 $p$개의 예측 변수가 있다고 가정합시다.
+
+\begin{itemize}
+    \item \textbf{Y (반응 변수 벡터):} $n \times 1$ 행렬 (결과값 $n$개)
+    $$ Y = \begin{pmatrix} Y_1 \\ Y_2 \\ \vdots \\ Y_n \end{pmatrix} $$
+
+    \item \textbf{X (설계 행렬, Design Matrix):} $n \times (p+1)$ 행렬 (데이터 $n$개, 변수 $p$개 + \textbf{절편용 1} )
+    $$ X = \begin{pmatrix} 
+    1 & X_{11} & X_{12} & \dots & X_{1p} \\
+    1 & X_{21} & X_{22} & \dots & X_{2p} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    1 & X_{n1} & X_{n2} & \dots & X_{np}
+    \end{pmatrix} $$
+    
+    \item \textbf{$\beta$ (계수 벡터):} $(p+1) \times 1$ 행렬 (찾아야 할 파라미터 $p+1$개)
+    $$ \beta = \begin{pmatrix} \beta_0 \\ \beta_1 \\ \vdots \\ \beta_p \end{pmatrix} $$
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Q: 왜 $X$ 행렬에 '1'로 채워진 첫 번째 열이 있나요?}
+
+\textbf{A: 수학적 트릭입니다.}
+$Y = \beta_0 + \beta_1 X_1 + \dots$ 공식을 행렬 곱으로 표현하면 $\beta_0$ (절편)이 따로 떨어져 있어 불편합니다.
+$X$에 1을 추가하고 $\beta$에 $\beta_0$를 포함시키면, 행렬 곱셈 $X\beta$의 첫 번째 항이
+$(1 \times \beta_0) + (X_1 \times \beta_1) + \dots$ 가 되어 절편을 자연스럽게 수식에 포함시킬 수 있습니다.
+\end{warningbox}
+
+이제 다중 선형 회귀 모델은 단 세 개의 기호로 표현됩니다.
+
+$$ Y = X\beta + \epsilon $$
+
+우리의 예측 모델은 $\hat{Y} = X\hat{\beta}$ 가 됩니다.
+
+\subsection{최적화: 다중 회귀의 정규 방정식}
+
+SLR과 마찬가지로, MSE를 최소화하는 $\hat{\beta}$ 벡터를 찾아야 합니다.
+손실 함수 MSE를 행렬로 표현하면 다음과 같습니다.
+
+$$ L(\beta) = \text{MSE} = \frac{1}{n} ||Y - X\beta||^2 = \frac{1}{n} (Y - X\beta)^T (Y - X\beta) $$
+
+이 손실 함수를 $\beta$ 벡터에 대해 미분하여 0으로 놓고 풀면 (선형 대수 연산 필요), $\hat{\beta}$를 구하는 강력한 공식을 얻습니다.
+
+\begin{tcolorbox}[title=다중 선형 회귀의 정규 방정식 (The Normal Equation)]
+MSE를 최소화하는 계수 벡터 $\hat{\beta}$는 다음 공식으로 한 번에 계산됩니다.
+
+$$ \hat{\beta} = (X^T X)^{-1} X^T Y $$
+
+\begin{itemize}
+    \item $X^T$: $X$의 \textbf{전치 행렬} (Transpose, 행과 열을 바꿈)
+    \item $(...)^{-1}$: \textbf{역행렬} (Inverse, 행렬의 나눗셈)
+\end{itemize}
+\textbf{이 공식이 바로 \texttt{scikit-learn}의 \texttt{reg.fit(X, y)} 명령이 내부적으로 수행하는 핵심 계산입니다.}
+\end{tcolorbox}
+
+\part{모델 활용 및 해석}
+\newpage
+
+\section{Python \texttt{scikit-learn}을 이용한 실습}
+
+이론적으로 유도된 정규 방정식을 직접 계산할 필요는 없습니다. Python의 \texttt{scikit-learn} 라이브러리가 이 모든 것을 대신해줍니다.
+
+\begin{codeexample}
+\begin{lstlisting}[language=Python, caption={scikit-learn을 이용한 선형 회귀 학습}, label={lst:sklearn}]
+# 1. 라이브러리 임포트
+from sklearn.linear_model import LinearRegression
+import pandas as pd
+import numpy as np
+
+# 2. 데이터 준비 (예시: 광고 데이터)
+# df = pd.read_csv('Advertising.csv')
+# X = df[['TV', 'Radio', 'Newspaper']].values # 예측 변수 (행렬)
+# y = df['Sales'].values                      # 반응 변수 (벡터)
+
+# --- (가상 데이터 생성) ---
+X = np.array([[100, 20], [150, 30], [200, 25], [300, 40]])
+y = np.array([11, 16, 18, 25])
+# -------------------------
+
+# 3. 모델 객체 생성 (인스턴스화)
+reg = LinearRegression()
+
+# 4. 모델 학습 (피팅)
+# 이 .fit() 한 줄이 (X^T X)^-1 X^T Y 계산을 수행합니다!
+reg.fit(X, y)
+
+# 5. 결과 확인
+print(f"계수 (beta_1, beta_2...): {reg.coef_}")
+print(f"절편 (beta_0): {reg.intercept_}")
+
+# 6. 새로운 데이터로 예측
+new_data = np.array([[250, 35]]) # TV=250, Radio=35일 때?
+prediction = reg.predict(new_data)
+print(f"예측된 매출: {prediction[0]}")
+\end{lstlisting}
+\end{codeexample}
+
+\section{모델 파라미터 해석하기}
+
+모델을 만드는 것보다 중요한 것은 \textbf{결과를 해석}하는 것입니다.
+
+\begin{itemize}
+    \item \textbf{단순 선형 회귀 (SLR)의 $\hat{\beta}_1$:}
+    "X가 1단위 증가할 때, Y는 평균적으로 $\hat{\beta}_1$만큼 변화한다."
+    (예: $\hat{\beta}_1 = 0.05$ $\rightarrow$ "TV 광고비를 1천원 더 쓰면, 매출은 평균 50유닛 증가한다.")
+    
+    \item \textbf{다중 선형 회귀 (MLR)의 $\hat{\beta}_j$:}
+    \textbf{"다른 모든 변수($X_k$)가 일정하다고 가정할 때,"} $X_j$가 1단위 증가하면, Y는 평균적으로 $\hat{\beta}_j$만큼 변화한다."
+    (예: $\hat{\beta}_{tv} = 0.04$, $\hat{\beta}_{radio} = 0.15$ $\rightarrow$ "라디오와 신문 광고비를 고정시킨 채, TV 광고비를 1천원 더 쓰면 매출은 평균 40유닛 증가한다.")
+\end{itemize}
+
+변수가 많을 때는 계수 값을 시각화하는 \textbf{특성 중요도 그래프(Feature Importance Plot)}를 사용합니다. 막대가 길수록(양/음 방향 모두) 해당 변수가 예측에 큰 영향을 미친다는 의미입니다.
+
+\section{모델 정확도를 위한 고려사항}
+
+모델을 그냥 만들고 끝내면 안 됩니다. 계수 값을 신뢰할 수 있는지, 모델이 안정적인지 확인해야 합니다.
+
+\subsection{스케일링 (Scaling)}
+
+\begin{warningbox}
+\textbf{문제점: "단위"가 다르면 계수 비교가 불가능합니다.}
+
+'TV 광고비' (단위: 억 원)와 '라디오 광고비' (단위: 만 원)를 예측 변수로 사용했다고 가정해봅시다.
+TV 광고비가 1단위(1억) 변하는 것과 라디오 광고비가 1단위(1만원) 변하는 것은 크기 자체가 다릅니다.
+
+이때 $\hat{\beta}_{tv} = 10$, $\hat{\beta}_{radio} = 0.1$ 이 나왔다고 해서 "TV 광고가 라디오보다 100배 중요하다"고 말할 수 없습니다.
+변수의 \textbf{스케일(단위)}이 다르기 때문에 $\beta$ 계수의 절대 크기를 직접 비교하는 것은 무의미합니다.
+\end{warningbox}
+
+\textbf{해결책: 스케일링}
+모든 예측 변수 $X$들을 학습 전에 비슷한 범위(스케일)로 변환합니다.
+
+\begin{enumerate}
+    \item \textbf{표준화 (Standardization):} 데이터를 평균 0, 표준편차 1인 분포로 변환합니다. (Z-score)
+    $$ X_{\text{scaled}} = \frac{X - \text{mean}(X)}{\text{std}(X)} $$
+    \item \textbf{정규화 (Normalization):} 데이터를 0과 1 사이의 범위로 변환합니다. (Min-Max Scaling)
+    $$ X_{\text{scaled}} = \frac{X - \min(X)}{\max(X) - \min(X)} $$
+\end{enumerate}
+
+스케일링을 수행한 후 모델을 학습시키면, $\beta$ 계수들은 \textbf{단위의 영향에서 벗어나} 변수의 순수한 중요도를 (근사적으로) 비교할 수 있게 됩니다.
+
+\subsection{다중공선성 (Collinearity)}
+
+\begin{warningbox}
+\textbf{문제점: 예측 변수끼리 너무 친한 경우}
+
+다중공선성이란 \textbf{예측 변수들끼리 높은 상관관계}를 갖는 상황을 말합니다.
+(예: $X_1$='신용 한도', $X_2$='신용 등급'. 두 변수는 거의 같은 정보를 담고 있음)
+
+\textbf{비유: 공로를 구분하기 힘든 두 가수}
+"두 명의 가수(예측 변수)가 정확히 똑같은 멜로디(정보)를 부르며 노래(반응 변수)의 인기에 기여하고 있습니다. 이때 노래 인기의 공로가 누구에게 몇 % 있는지 어떻게 나눌 수 있을까요? 구분이 불가능하거나 매우 불안정할 것입니다."
+
+\textbf{결과:}
+\begin{enumerate}
+    \item 모델의 전체적인 예측 성능(MSE)은 괜찮을 수 있습니다.
+    \item 하지만 \textbf{개별 $\beta$ 계수의 신뢰도가 박살납니다.}
+    \item $\beta$ 값이 비상식적으로 커지거나, 부호가 반대로 나올 수 있습니다.
+    \item 데이터를 조금만 바꿔도 $\beta$ 값이 크게 널뛰기합니다. (불안정)
+\end{enumerate}
+(예: '신용 한도'를 제거했더니 '신용 등급'의 $\beta$ 값이 1.1에서 3.9로 갑자기 뛰어오름)
+\end{warningbox}
+
+\textbf{해결책:}
+\begin{itemize}
+    \item \textbf{시각화:} 변수 간의 산점도 행렬(Scatter Matrix)을 그려 높은 상관관계를 확인합니다.
+    \item \textbf{제거:} 상관관계가 매우 높은 변수 중 하나를 제거합니다.
+\end{itemize}
+
+\subsection{범주형 예측 변수 (Qualitative Predictors)}
+
+'성별' (Male/Female), '학생 여부' (Yes/No), '인종' (Asian/Caucasian/...)처럼 숫자가 아닌 텍스트 데이터는 어떻게 처리할까요?
+
+\textbf{해결책 1: 더미 변수 (Dummy Variables)} (2개의 레벨을 가질 때)
+
+컴퓨터가 이해하도록 0과 1로 바꿔줍니다.
+(예: '성별' 변수 $\rightarrow$ 'is\_female' 이라는 새 변수 생성)
+
+$$ x_{\text{is\_female}} = \begin{cases} 1 & \text{if person is female} \\ 0 & \text{if person is male} \end{cases} $$
+
+이 변수를 모델에 포함시키면 ($Y = \beta_0 + \beta_1 x_{\text{is\_female}}$) 해석이 매우 흥미로워집니다.
+
+\begin{itemize}
+    \item \textbf{Male ($x=0$):} $Y = \beta_0 + \beta_1(0) = \beta_0$
+    $\rightarrow$ $\beta_0$ (절편)는 \textbf{남성의 평균 $Y$ 값 (기준선)}이 됩니다.
+    \item \textbf{Female ($x=1$):} $Y = \beta_0 + \beta_1(1) = \beta_0 + \beta_1$
+    $\rightarrow$ $\beta_1$은 \textbf{여성과 남성의 평균 $Y$ 값 차이}가 됩니다.
+\end{itemize}
+
+\textbf{해결책 2: 원-핫 인코딩 (One-Hot Encoding)} (3개 이상의 레벨을 가질 때)
+
+(예: '인종' 변수 $\rightarrow$ 'Asian', 'Caucasian', 'African American')
+
+$k$개의 레벨이 있다면, $k-1$개의 더미 변수를 만듭니다. (하나를 기준선으로 삼음)
+
+$$ x_{\text{is\_Asian}} = \begin{cases} 1 & \text{if Asian} \\ 0 & \text{else} \end{cases} \quad \quad x_{\text{is\_Caucasian}} = \begin{cases} 1 & \text{if Caucasian} \\ 0 & \text{else} \end{cases} $$
+
+모델: $Y = \beta_0 + \beta_1 x_{\text{is\_Asian}} + \beta_2 x_{\text{is\_Caucasian}}$
+
+\begin{itemize}
+    \item \textbf{African American (기준선, $x_1=0, x_2=0$):} $Y = \beta_0$
+    \item \textbf{Asian ($x_1=1, x_2=0$):} $Y = \beta_0 + \beta_1$
+    \item \textbf{Caucasian ($x_1=0, x_2=1$):} $Y = \beta_0 + \beta_2$
+\end{itemize}
+$\rightarrow \beta_0$는 기준선(African American)의 평균 $Y$가 되고, $\beta_1$과 $\beta_2$는 각각 기준선과의 차이를 나타냅니다.
+
+\part{학습 점검}
+\newpage
+
+\section{핵심 학습 체크리스트}
+
+이 문서를 다 읽은 후, 다음 질문에 답할 수 있는지 확인하세요.
+
+\begin{itemize}
+    \item [ ] 선형 회귀가 KNN과 같은 다른 모델에 비해 갖는 장점(해석력)은 무엇인가?
+    \item [ ] '모델 학습(Training)'의 3단계 프로세스(모델 정의, 손실 정의, 손실 최소화)를 설명할 수 있는가?
+    \item [ ] 손실 함수로 MSE를 사용할 때, 왜 잔차를 그냥 더하지 않고 '제곱'하는가?
+    \item [ ] 단순 선형 회귀(SLR)의 $\beta_1$ 계수의 의미를 정확히 설명할 수 있는가?
+    \item [ ] 다중 선형 회귀(MLR)의 $\beta_j$ 계수의 의미를 "다른 변수를 고정할 때"라는 조건과 함께 설명할 수 있는가?
+    \item [ ] \texttt{scikit-learn}의 \texttt{.fit()} 메소드가 내부적으로 어떤 수학적 계산(정규 방정식)을 수행하는지 아는가?
+    \item [ ] 왜 변수 스케일링(Scaling)이 필요한가? (단위가 다른 변수 간 계수 비교 문제)
+    \item [ ] 다중공선성(Collinearity)이 무엇이며, 왜 모델 '해석'에 문제를 일으키는지 설명할 수 있는가?
+    \item [ ] '성별'과 같은 범주형 데이터를 모델에 포함시키기 위한 '더미 변수' 기법을 설명할 수 있는가?
+\end{itemize}
+
+\section{초심자 FAQ}
+
+\begin{warningbox}
+\textbf{Q: 왜 손실 함수로 잔차의 '절대값'이 아닌 '제곱'(MSE)을 주로 쓰나요?}
+\textbf{A:} 절대값(MAE, Mean Absolute Error)도 좋은 손실 함수입니다. 하지만 MSE를 더 선호하는 두 가지 이유가 있습니다. 1) MSE는 수학적으로 미분이 부드럽게 가능하여 최적화(가장 낮은 지점 찾기)에 유리합니다. 2) MSE는 오차가 큰 값(Outlier)에 제곱으로 페널티를 주므로, 모델이 큰 실수를 하지 않도록 유도하는 경향이 있습니다.
+
+\textbf{Q: \texttt{reg.fit(X, y)} 명령은 마법 상자인가요? 정확히 뭘 하는 거죠?}
+\textbf{A:} 마법이 아닙니다! \texttt{.fit()}은 이 문서에서 배운 \textbf{정규 방정식 $\hat{\beta} = (X^T X)^{-1} X^T Y$} 공식을 데이터 $X$와 $y$에 대해 정확히 계산하여, MSE를 최소화하는 $\hat{\beta}$ 벡터(즉, \texttt{reg.coef\_}와 \texttt{reg.intercept\_})를 찾아내는 과정입니다.
+
+\textbf{Q: 스케일링을 하면 모델의 예측 성능(MSE)이 좋아지나요?}
+\textbf{A:} 단순 선형 회귀나 다중 선형 회귀에서는 스케일링이 예측 성능 자체에 영향을 주지 않습니다. (어차피 정규 방정식으로 최적의 해를 찾기 때문입니다.) 하지만 계수를 \textbf{해석}하고 \textbf{비교}하기 위해 스케일링이 필요합니다. (참고: 경사 하강법(Gradient Descent)을 사용하는 모델이나, 정규화(Ridge/Lasso)가 포함된 모델에서는 스케일링이 성능과 수렴 속도에 큰 영향을 줍니다.)
+
+\textbf{Q: 다중공선성이 높으면 모델이 "틀린" 건가요?}
+\textbf{A:} "틀렸다"기보다는 "불안정하다"고 표현하는 것이 맞습니다. 모델의 \textbf{예측 성능 자체는 여전히 높을 수 있습니다.} (어차피 변수들이 비슷한 정보를 담고 있으므로) 하지만 "각 변수가 얼마나 중요한가"를 나타내는 \textbf{$\beta$ 계수 값을 신뢰할 수 없게} 됩니다. 따라서 '예측'만이 목표라면 큰 문제가 아닐 수 있지만, '해석'이 목표라면 반드시 해결해야 합니다.
+
+\textbf{Q: 왜 $k$개의 범주(예: 3개 인종)에 $k$개가 아닌 $k-1$개(2개)의 더미 변수를 쓰나요?}
+\textbf{A:} $k$개를 모두 사용하면 완벽한 다중공선성(Dummy Variable Trap)이 발생합니다. 예를 들어 $x_{\text{Asian}}$, $x_{\text{Caucasian}}$, $x_{\text{AfricanAmerican}}$ 3개를 모두 만들면, $x_{\text{Asian}} + x_{\text{Caucasian}} + x_{\text{AfricanAmerican}} = 1$ 이라는 완벽한 선형 관계가 생깁니다. 이는 $X$ 행렬의 역행렬 $(X^T X)^{-1}$을 계산할 수 없게 만듭니다. 따라서 하나를 기준선(Baseline)으로 제외하여 이 문제를 피합니다.
+\end{warningbox}
+
+\newpage
+\section{빠르게 훑어보기 (1-Page Summary)}
+
+\begin{tcolorbox}[title=기계 학습 3단계 프로세스]
+모든 지도 학습은 이 3단계를 따릅니다.
+\begin{enumerate}
+    \item \textbf{모델 정의:} 데이터의 관계를 어떤 함수(예: 직선)로 가정할지 선택합니다.
+    \item \textbf{손실 함수 정의:} 모델의 예측이 실제와 얼마나 다른지(오차) 측정하는 기준(예: MSE)을 정합니다.
+    \item \textbf{손실 최소화:} 손실이 최소가 되는 모델의 파라미터(예: $\beta$)를 수학적 방법(예: 정규 방정식, 경사 하강법)으로 찾습니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=단순 선형 회귀 (SLR): $Y = \beta_0 + \beta_1 X$]
+\begin{itemize}
+    \item \textbf{목표:} 2D 평면에서 데이터를 가장 잘 표현하는 \textbf{직선}을 찾는다.
+    \item \textbf{해석:} $\beta_1$은 $X$가 1단위 증가할 때 $Y$의 평균 변화량이다.
+    \item \textbf{해법:} $\hat{\beta}_1 = \frac{\sum (X_i - \bar{X})(Y_i - \bar{Y})}{\sum (X_i - \bar{X})^2}$, $\hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X}$
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=다중 선형 회귀 (MLR): $Y = X\beta$]
+\begin{itemize}
+    \item \textbf{목표:} $p+1$ 차원 공간에서 데이터를 가장 잘 표현하는 \textbf{초평면(Hyperplane)}을 찾는다.
+    \item \textbf{해석:} $\beta_j$는 \textbf{다른 모든 변수가 고정}되었을 때 $X_j$가 1단위 증가할 때 $Y$의 평균 변화량이다.
+    \item \textbf{해법 (정규 방정식):} $\hat{\beta} = (X^T X)^{-1} X^T Y$ (이것이 \texttt{.fit()}의 핵심!)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=모델 해석의 3대 함정]
+\begin{enumerate}
+    \item \textbf{스케일링 문제 (Apple vs Orange):}
+    단위(스케일)가 다른 변수들의 $\beta$ 계수 크기는 직접 비교할 수 없다. $\rightarrow$ \textbf{해결: 표준화(Standardization) 후 비교}
+    
+    \item \textbf{다중공선성 문제 (Clones):}
+    서로 상관관계가 높은 변수들은 $\beta$ 계수 값을 불안정하게 만든다. $\rightarrow$ \textbf{해결: 상관관계 높은 변수 중 하나를 제거}
+    
+    \item \textbf{범주형 변수 문제 (Text):}
+    'Male'/'Female' 같은 텍스트는 0/1로 변환(더미 변수)해야 한다. $\rightarrow$ \textbf{해결: $k$개 레벨에 $k-1$개 더미 변수 사용}
+\end{enumerate}
+\end{tcolorbox}
+
+\end{document}
