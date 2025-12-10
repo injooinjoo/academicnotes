@@ -1,0 +1,1077 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 21: Bagging and Out-of-Bag Error
+% English Version - Beginner Friendly
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 21}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. Overview Box
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. Summary Box
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. Info Box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. Warning Box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. Example Box
+\newtcolorbox{examplebox}[1]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 6. Definition Box
+\newtcolorbox{definitionbox}[1]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 7. Important Box
+\newtcolorbox{importantbox}[1]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 8. Caution Box
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Style
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Captions
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 21},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 21: Bagging and Out-of-Bag Error}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understand ensemble learning through Bagging and learn how to use Out-of-Bag error for model validation}
+
+\tableofcontents
+\newpage
+
+%========================================================================================
+\section{The Big Picture: Why We Need Bagging}
+%========================================================================================
+
+\begin{summarybox}
+This lecture introduces \textbf{Bagging} (\textbf{B}ootstrap \textbf{Agg}regat\textbf{ing}), a powerful technique that combines multiple decision trees to create a stronger, more reliable model. We'll also learn about \textbf{Out-of-Bag (OOB) error}, a clever way to evaluate our model without needing a separate validation set.
+\end{summarybox}
+
+\subsection{Where We Are in the Course}
+
+Let's recap what we've learned so far about decision trees:
+
+\begin{enumerate}
+    \item \textbf{Classification trees}: Split data to maximize purity (using Gini index or entropy)
+    \item \textbf{Regression trees}: Split data to minimize MSE within each region
+    \item \textbf{Controlling complexity}: We use max depth, minimum samples per leaf, or pruning
+    \item \textbf{Cross-validation}: We use it to choose the best hyperparameters
+\end{enumerate}
+
+But here's the problem: \textbf{single decision trees have limitations}.
+
+\subsection{The Fundamental Problem with Single Trees}
+
+Decision trees make \textbf{axis-aligned splits}---they can only draw vertical and horizontal lines to separate data. This means:
+
+\begin{itemize}
+    \item If the true decision boundary is complex (like a circle), you need \textbf{many splits} to approximate it
+    \item Many splits means a \textbf{deep tree}
+    \item Deep trees tend to \textbf{overfit}
+\end{itemize}
+
+\begin{examplebox}{Approximating a Circular Boundary}
+Imagine your data has two classes separated by a circular boundary. With decision trees:
+
+\begin{itemize}
+    \item \textbf{Depth 1-2}: Makes a few horizontal/vertical cuts. Result: \textbf{severe underfitting}---the splits can't capture the circle at all
+    \item \textbf{Depth 4-5}: Starts to form a rough rectangular approximation of the circle
+    \item \textbf{Depth 20+}: Creates many small rectangles that start to look like a circle, but now you're \textbf{overfitting} to noise in your training data
+\end{itemize}
+
+The dilemma: go shallow and underfit, or go deep and overfit. There's no perfect depth!
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{The Bias-Variance Tradeoff in Trees:}
+\begin{itemize}
+    \item \textbf{Shallow trees}: High bias, low variance (underfit)
+    \item \textbf{Deep trees}: Low bias, high variance (overfit)
+\end{itemize}
+Single trees struggle to achieve \textbf{both} low bias AND low variance.
+\end{warningbox}
+
+\subsection{The Key Insight: Multiple Opinions Are Better Than One}
+
+Think about how you make important decisions in real life:
+
+\begin{examplebox}{The Medical Second Opinion Analogy}
+Suppose you get an MRI scan and one doctor tells you that you need surgery. What do you do?
+
+Most people get a \textbf{second opinion}. Maybe even a third. Why?
+
+\begin{itemize}
+    \item Each doctor might make mistakes (high variance)
+    \item Different doctors were trained at different hospitals with different experiences
+    \item By combining multiple opinions, individual errors tend to \textbf{cancel out}
+\end{itemize}
+
+If 3 doctors say ``surgery needed'' and 1 says ``no surgery,'' you'd probably go with the majority.
+
+\textbf{This is exactly the idea behind ensemble learning!}
+\end{examplebox}
+
+\subsection{The Mathematical Insight: Averaging Reduces Variance}
+
+Here's a beautiful statistical fact that underlies all of ensemble learning:
+
+\begin{definitionbox}{The Power of Averaging}
+If you have $n$ independent random variables, each with variance $\sigma^2$, then the variance of their average is:
+\[
+\text{Var}\left(\frac{1}{n}\sum_{i=1}^{n} X_i\right) = \frac{\sigma^2}{n}
+\]
+\end{definitionbox}
+
+In plain English: \textbf{averaging reduces variance by a factor of $n$}.
+
+This is a profound insight! It means:
+\begin{itemize}
+    \item One tree might overfit and give a wrong prediction
+    \item But if we train many trees and average their predictions, the errors wash out
+    \item The key requirement: the trees need to be \textbf{somewhat independent} (make different errors)
+\end{itemize}
+
+\begin{infobox}
+\textbf{Historical Note:} This idea traces back to Carl Friedrich Gauss in the late 1700s. When astronomers were trying to calculate planetary orbits, they initially thought they needed exactly 6 measurements for 6 unknowns. Gauss showed that \textbf{more measurements actually reduce error}---what seemed like ``too much data'' actually improved accuracy because random errors cancel out. This was one of the founding insights of statistics!
+\end{infobox}
+
+%========================================================================================
+\newpage
+\section{What is Bagging?}
+%========================================================================================
+
+\begin{definitionbox}{Bagging}
+\textbf{Bagging} stands for \textbf{B}ootstrap \textbf{Agg}regat\textbf{ing}. It's an ensemble method that:
+\begin{enumerate}
+    \item Creates multiple different training datasets using \textbf{bootstrap sampling}
+    \item Trains a separate model (typically a deep decision tree) on each dataset
+    \item \textbf{Aggregates} their predictions (majority vote for classification, average for regression)
+\end{enumerate}
+\end{definitionbox}
+
+The name ``Bagging'' was coined by Leo Breiman in 1996 when he introduced this technique. It's a portmanteau of ``Bootstrap'' and ``Aggregating.''
+
+\subsection{Step 1: Bootstrap Sampling}
+
+The first challenge: we want to train multiple trees on \textbf{different} training data, but we only have \textbf{one} dataset. How do we create multiple datasets?
+
+\begin{definitionbox}{Bootstrap Sampling}
+\textbf{Bootstrap sampling} creates new datasets by sampling \textbf{with replacement} from the original data:
+
+\begin{enumerate}
+    \item Start with original dataset of $N$ samples
+    \item Randomly select $N$ samples WITH REPLACEMENT (same sample can be picked multiple times)
+    \item This creates one ``bootstrap sample''
+    \item Repeat to create as many bootstrap samples as you want
+\end{enumerate}
+\end{definitionbox}
+
+\begin{examplebox}{Bootstrap in Action}
+Suppose your original dataset has 5 animals: $\{\text{cow, cat, horse, dog, rat}\}$
+
+Three bootstrap samples might look like:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Sample} & \textbf{Contents} \\
+\midrule
+Bootstrap 1 & dog, cat, dog, horse, horse \\
+Bootstrap 2 & rat, rat, cow, dog, cow \\
+Bootstrap 3 & dog, rat, horse, cat, rat \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Notice:
+\begin{itemize}
+    \item Bootstrap 1 has dog 3 times, horse 2 times, but NO rat or cow
+    \item Bootstrap 2 has rat and cow twice each
+    \item Each sample is the same SIZE as the original (5 animals), but with different compositions
+\end{itemize}
+\end{examplebox}
+
+\begin{importantbox}{The 36.8\% Rule}
+On average, each bootstrap sample will be missing about \textbf{36.8\%} of the original data points.
+
+Why? The probability that a specific point is NOT chosen in any of the $N$ draws is:
+\[
+\left(1 - \frac{1}{N}\right)^N \approx e^{-1} \approx 0.368
+\]
+
+This means roughly one-third of the data is ``out of bag'' (OOB) for each tree. We'll use this fact later!
+\end{importantbox}
+
+\subsection{Step 2: Train Multiple Trees}
+
+Once we have $B$ bootstrap samples, we train one decision tree on each sample:
+
+\begin{itemize}
+    \item \textbf{Tree 1} is trained on Bootstrap Sample 1
+    \item \textbf{Tree 2} is trained on Bootstrap Sample 2
+    \item ... and so on
+    \item \textbf{Tree B} is trained on Bootstrap Sample B
+\end{itemize}
+
+\begin{infobox}
+In bagging, we typically let each tree grow \textbf{deep} (high complexity). Why? Because even though deep trees overfit, the averaging process will reduce this overfitting. We're intentionally using low-bias, high-variance models and then reducing variance through aggregation.
+\end{infobox}
+
+\subsection{Step 3: Aggregate Predictions}
+
+When a new data point comes in, we get predictions from ALL trees and combine them:
+
+\textbf{For Classification:}
+\[
+\hat{y} = \text{majority vote of } \{\hat{y}_1, \hat{y}_2, \ldots, \hat{y}_B\}
+\]
+Each tree ``votes'' for a class, and we pick the class with the most votes.
+
+\textbf{For Regression:}
+\[
+\hat{y} = \frac{1}{B}\sum_{b=1}^{B} \hat{y}_b
+\]
+We simply average all the predictions.
+
+\begin{examplebox}{Complete Bagging Example}
+\textbf{Task:} Predict whether a patient has diabetes (classification)
+
+\textbf{Setup:}
+\begin{itemize}
+    \item Original training data: 1000 patients
+    \item Number of trees: $B = 100$
+    \item Tree depth: 20 (deep trees)
+\end{itemize}
+
+\textbf{Training:}
+\begin{enumerate}
+    \item Create 100 bootstrap samples, each with 1000 patients (with replacement)
+    \item Train a depth-20 decision tree on each sample
+\end{enumerate}
+
+\textbf{Prediction for a new patient:}
+\begin{enumerate}
+    \item Send patient through all 100 trees
+    \item Suppose 73 trees predict ``Diabetes'' and 27 predict ``No Diabetes''
+    \item Final prediction: ``Diabetes'' (majority vote)
+\end{enumerate}
+
+The confidence might even be interpreted as $73\%$, giving us a probability-like output!
+\end{examplebox}
+
+%========================================================================================
+\newpage
+\section{Why Bagging Works}
+%========================================================================================
+
+\subsection{Visualizing the Magic}
+
+Let's see how bagging reduces variance visually:
+
+\begin{examplebox}{Decision Boundaries at Different Depths}
+Consider a classification problem with a complex decision boundary.
+
+\textbf{With Single Trees:}
+\begin{itemize}
+    \item \textbf{Depth 2}: Decision boundary is too simple (underfit)
+    \item \textbf{Depth 5}: Starting to capture the shape
+    \item \textbf{Depth 100}: Captures detail but is extremely ``wiggly'' (overfit)
+\end{itemize}
+
+\textbf{With Bagging (100 trees, depth 100):}
+\begin{itemize}
+    \item Each individual tree has a wiggly, overfit boundary
+    \item But when we average/vote, the individual wiggles ``cancel out''
+    \item The average boundary is much smoother while still capturing the true pattern
+\end{itemize}
+
+It's like taking a photo with a shaky camera: one shot is blurry, but averaging 100 shots gives you a clearer image.
+\end{examplebox}
+
+\subsection{The Key Advantages of Bagging}
+
+\begin{enumerate}
+    \item \textbf{High Expressiveness}: Each tree can be deep, capturing complex patterns
+    \item \textbf{Low Variance}: Averaging multiple predictions reduces overall variance
+    \item \textbf{Reduced Overfitting}: Individual trees overfit differently; averaging cancels out
+    \item \textbf{Works with Any Base Model}: Though trees are most common, bagging works with any algorithm
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Bagging as Regularization:}
+
+Regularization is any technique that prevents overfitting. Usually we think of it as penalizing model complexity (like L1/L2 penalties). But bagging achieves regularization through a different mechanism: \textbf{averaging out the variance}. This makes bagging a form of ``implicit regularization.''
+\end{infobox}
+
+\subsection{Can We Use Bagging with Other Models?}
+
+Yes! While bagging is most commonly used with decision trees, the concept applies to any model:
+
+\begin{itemize}
+    \item \textbf{Bagged Linear Regression}: Train linear regression on bootstrap samples, average predictions
+    \item \textbf{Bagged Neural Networks}: Train neural networks on bootstrap samples, average predictions
+    \item \textbf{Bagged Any-Model}: Same principle applies
+\end{itemize}
+
+However, in practice:
+\begin{itemize}
+    \item Bagging helps most when the base model has \textbf{high variance} (like deep trees)
+    \item For already-stable models (like linear regression), the benefit is smaller
+    \item For expensive models (like deep neural networks), the computational cost is prohibitive
+\end{itemize}
+
+%========================================================================================
+\newpage
+\section{Hyperparameters in Bagging}
+%========================================================================================
+
+Bagging introduces new hyperparameters on top of the single-tree hyperparameters.
+
+\subsection{Single Tree Hyperparameters (Still Apply)}
+
+These control the complexity of each individual tree:
+
+\begin{itemize}
+    \item \textbf{max\_depth}: Maximum depth of each tree
+    \item \textbf{min\_samples\_split}: Minimum samples needed to split a node
+    \item \textbf{min\_samples\_leaf}: Minimum samples required in each leaf
+    \item \textbf{criterion}: Gini, entropy (classification) or MSE (regression)
+\end{itemize}
+
+\subsection{New Bagging Hyperparameter: Number of Estimators}
+
+The most important new hyperparameter is \textbf{n\_estimators}---the number of trees in the ensemble.
+
+\begin{definitionbox}{Number of Estimators}
+The \textbf{number of estimators} ($B$ or \code{n\_estimators} in sklearn) is the number of trees in the bagging ensemble.
+
+Key property: \textbf{More trees always helps (up to a point)} and \textbf{never hurts}!
+\end{definitionbox}
+
+\begin{importantbox}{n\_estimators Does NOT Control Complexity}
+This is a crucial distinction:
+\begin{itemize}
+    \item \textbf{max\_depth}: Controls bias-variance tradeoff (too much = overfit)
+    \item \textbf{n\_estimators}: Controls variance only (more = less variance)
+\end{itemize}
+
+Unlike max\_depth, increasing n\_estimators will NOT cause overfitting. It only reduces variance.
+\end{importantbox}
+
+\begin{examplebox}{How Error Changes with n\_estimators}
+\textbf{Training Error:} As n\_estimators increases, training error \textbf{goes up slightly}.
+
+Why? With one deep tree, you can perfectly memorize the training data. But when you average many trees, some of that memorization washes out.
+
+\textbf{Validation Error:} As n\_estimators increases, validation error \textbf{goes down significantly}.
+
+Why? The overfitting from individual trees cancels out, so the model generalizes better.
+
+The validation error will decrease and then \textbf{flatten out}---it won't go back up!
+\end{examplebox}
+
+\subsection{The Hyperparameter Explosion Problem}
+
+With bagging, we need to tune:
+\begin{itemize}
+    \item Splitting criterion (Gini vs. Entropy vs. MSE)
+    \item Stopping condition (depth, min samples, etc.)
+    \item Values for each stopping condition
+    \item Number of estimators
+\end{itemize}
+
+If each has 5-10 options, we might have $3 \times 4 \times 10 \times 10 = 1,200$ combinations!
+
+With 5-fold cross-validation, that's $1,200 \times 5 = 6,000$ models to train.
+
+\textbf{This is getting expensive!} We need a better way to validate...
+
+%========================================================================================
+\newpage
+\section{Out-of-Bag (OOB) Error}
+%========================================================================================
+
+\begin{summarybox}
+Out-of-Bag (OOB) error is a clever technique that uses the bootstrap's ``waste'' as a free validation set. It lets us evaluate our model without setting aside data for validation or performing expensive cross-validation.
+\end{summarybox}
+
+\subsection{The Key Insight}
+
+Remember: each bootstrap sample leaves out about 36.8\% of the original data. This ``left out'' data is called the \textbf{Out-of-Bag (OOB)} data for that tree.
+
+\begin{definitionbox}{Out-of-Bag Data}
+For tree $b$, the \textbf{Out-of-Bag samples} are all data points from the original training set that were NOT included in bootstrap sample $b$.
+
+Since the tree never saw these points during training, they act like a built-in validation set!
+\end{definitionbox}
+
+\begin{examplebox}{OOB Samples Illustration}
+Original data: $\{x_1, x_2, x_3, x_4, x_5\}$
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Tree} & \textbf{Bootstrap Sample} & \textbf{OOB Samples} \\
+\midrule
+Tree 1 & $\{x_1, x_1, x_3, x_3, x_5\}$ & $\{x_2, x_4\}$ \\
+Tree 2 & $\{x_2, x_2, x_4, x_5, x_5\}$ & $\{x_1, x_3\}$ \\
+Tree 3 & $\{x_1, x_3, x_3, x_4, x_5\}$ & $\{x_2\}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Each tree has different OOB samples. We can use this to get a validation error for each data point!
+\end{examplebox}
+
+\subsection{Computing OOB Error}
+
+The OOB error calculation works as follows:
+
+\begin{enumerate}
+    \item \textbf{For each data point $x_i$:}
+    \begin{enumerate}
+        \item Find all trees where $x_i$ was OUT of the bootstrap sample
+        \item Get predictions from only those trees
+        \item Aggregate these predictions (majority vote or average)
+        \item Compare to the true label $y_i$
+    \end{enumerate}
+
+    \item \textbf{Average the errors across all data points}
+\end{enumerate}
+
+\begin{definitionbox}{OOB Error Formula}
+\textbf{For Classification:}
+
+Let $\hat{y}_i^{OOB}$ be the majority vote from trees that didn't see $x_i$:
+\[
+\text{OOB Error} = \frac{1}{N}\sum_{i=1}^{N} \mathbf{1}[\hat{y}_i^{OOB} \neq y_i]
+\]
+
+\textbf{For Regression:}
+
+Let $\hat{y}_i^{OOB}$ be the average prediction from trees that didn't see $x_i$:
+\[
+\text{OOB Error} = \frac{1}{N}\sum_{i=1}^{N} (y_i - \hat{y}_i^{OOB})^2
+\]
+\end{definitionbox}
+
+\begin{examplebox}{Step-by-Step OOB Calculation}
+Using our earlier example with 5 data points and 3 trees:
+
+\textbf{Computing OOB prediction for $x_2$:}
+\begin{itemize}
+    \item Tree 1: $x_2$ is OOB, so use Tree 1's prediction
+    \item Tree 2: $x_2$ is IN the bootstrap, so skip
+    \item Tree 3: $x_2$ is OOB, so use Tree 3's prediction
+\end{itemize}
+
+If Tree 1 predicts ``Class A'' and Tree 3 predicts ``Class B'':
+\begin{itemize}
+    \item For classification: It's a tie! Typically we'd use more trees to break ties.
+    \item For regression: Average the two predictions
+\end{itemize}
+
+Repeat for all data points, then compute overall error.
+\end{examplebox}
+
+\subsection{Why OOB Error is Great}
+
+\begin{enumerate}
+    \item \textbf{It's FREE:} No extra computation---we're using data that was ``wasted'' anyway
+
+    \item \textbf{No data splitting needed:} We don't have to set aside a validation set, so we can use ALL data for training
+
+    \item \textbf{Lower leakage than CV:} In cross-validation, each data point appears in training sets for $(K-1)$ folds. There's subtle information leakage. OOB has \textbf{zero leakage} because each prediction uses only trees that never saw that point.
+
+    \item \textbf{Automatically computed:} Sklearn computes it for you with \code{oob\_score=True}
+\end{enumerate}
+
+\begin{importantbox}{OOB is for Validation, Not Final Testing}
+OOB error replaces your \textbf{validation set}. Use it for:
+\begin{itemize}
+    \item Hyperparameter tuning
+    \item Model selection
+    \item Comparing different configurations
+\end{itemize}
+
+But you still need a \textbf{separate test set} for final, unbiased evaluation!
+
+The workflow:
+\begin{enumerate}
+    \item Split data: 80\% train, 20\% test (test goes in a vault)
+    \item Train bagging model with \code{oob\_score=True}
+    \item Use OOB error to tune hyperparameters
+    \item Once happy, evaluate ONCE on the test set
+\end{enumerate}
+\end{importantbox}
+
+%========================================================================================
+\newpage
+\section{Bagging in Python with sklearn}
+%========================================================================================
+
+\subsection{Basic Implementation}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.ensemble import BaggingClassifier, BaggingRegressor
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.model_selection import train_test_split
+
+# Load your data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create bagging classifier
+bagging_clf = BaggingClassifier(
+    estimator=DecisionTreeClassifier(max_depth=20),  # Base model
+    n_estimators=100,     # Number of trees
+    oob_score=True,       # Enable OOB scoring
+    random_state=42,
+    n_jobs=-1             # Use all CPU cores
+)
+
+# Train
+bagging_clf.fit(X_train, y_train)
+
+# Get OOB score (for validation)
+print(f"OOB Accuracy: {bagging_clf.oob_score_:.4f}")
+
+# Final test score
+print(f"Test Accuracy: {bagging_clf.score(X_test, y_test):.4f}")
+\end{lstlisting}
+
+\subsection{Key Parameters}
+
+\begin{table}[h!]
+\centering
+\caption{Important BaggingClassifier/BaggingRegressor Parameters}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parameter} & \textbf{Default} & \textbf{Description} \\
+\midrule
+\code{estimator} & None & Base estimator (uses DecisionTree if None) \\
+\code{n\_estimators} & 10 & Number of trees in ensemble \\
+\code{max\_samples} & 1.0 & Fraction of samples for each bootstrap \\
+\code{max\_features} & 1.0 & Fraction of features for each tree \\
+\code{bootstrap} & True & Whether to use bootstrap sampling \\
+\code{oob\_score} & False & Whether to compute OOB error \\
+\code{n\_jobs} & None & Number of parallel jobs (-1 for all cores) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Tuning with OOB Error}
+
+\begin{lstlisting}[style=pythonstyle]
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Test different numbers of estimators
+n_estimators_range = [10, 25, 50, 100, 200, 500]
+oob_scores = []
+test_scores = []
+
+for n in n_estimators_range:
+    clf = BaggingClassifier(
+        estimator=DecisionTreeClassifier(max_depth=15),
+        n_estimators=n,
+        oob_score=True,
+        random_state=42
+    )
+    clf.fit(X_train, y_train)
+    oob_scores.append(clf.oob_score_)
+    test_scores.append(clf.score(X_test, y_test))
+
+# Plot results
+plt.figure(figsize=(10, 6))
+plt.plot(n_estimators_range, oob_scores, 'b-o', label='OOB Score')
+plt.plot(n_estimators_range, test_scores, 'r-s', label='Test Score')
+plt.xlabel('Number of Estimators')
+plt.ylabel('Accuracy')
+plt.title('Effect of Number of Trees')
+plt.legend()
+plt.grid(True)
+plt.show()
+\end{lstlisting}
+
+\subsection{Comparing with Single Decision Tree}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.tree import DecisionTreeClassifier
+
+# Single deep tree
+single_tree = DecisionTreeClassifier(max_depth=20)
+single_tree.fit(X_train, y_train)
+print(f"Single Tree - Train: {single_tree.score(X_train, y_train):.4f}")
+print(f"Single Tree - Test:  {single_tree.score(X_test, y_test):.4f}")
+
+# Bagged trees
+bagging = BaggingClassifier(
+    estimator=DecisionTreeClassifier(max_depth=20),
+    n_estimators=100,
+    oob_score=True,
+    random_state=42
+)
+bagging.fit(X_train, y_train)
+print(f"Bagging - Train: {bagging.score(X_train, y_train):.4f}")
+print(f"Bagging - OOB:   {bagging.oob_score_:.4f}")
+print(f"Bagging - Test:  {bagging.score(X_test, y_test):.4f}")
+
+# You'll typically see:
+# - Single tree: High training, low test (overfit)
+# - Bagging: Similar or lower training, much higher test
+\end{lstlisting}
+
+%========================================================================================
+\newpage
+\section{Limitations of Bagging}
+%========================================================================================
+
+Bagging is powerful, but it has some important limitations:
+
+\subsection{Loss of Interpretability}
+
+\begin{warningbox}
+One of the biggest advantages of decision trees is \textbf{interpretability}---you can explain exactly why a prediction was made by following the tree.
+
+With bagging, we have 100+ trees, each making slightly different decisions. There's no single ``path'' to explain. The interpretability is lost.
+
+We'll learn about techniques like \textbf{feature importance} in the Random Forest lecture to partially address this.
+\end{warningbox}
+
+\subsection{Still Need to Control Depth}
+
+While bagging reduces variance, you can't just set \code{max\_depth=1000} and expect magic:
+
+\begin{itemize}
+    \item \textbf{Too shallow}: Even averaging many underfit trees gives an underfit result
+    \item \textbf{Too deep}: Computational cost increases, and correlation between trees increases
+\end{itemize}
+
+You still need to tune the depth, just less aggressively than with single trees.
+
+\subsection{The Correlation Problem (MAJOR)}
+
+This is the most important limitation and motivates the next topic (Random Forests).
+
+\begin{importantbox}{Trees Are Often Correlated!}
+The mathematical formula for variance reduction assumes trees are \textbf{independent}. But in practice, they're often highly \textbf{correlated}.
+
+\textbf{Why?} If one feature (e.g., ``Glucose'' for diabetes prediction) is extremely predictive:
+\begin{itemize}
+    \item Tree 1 will split on Glucose at the root
+    \item Tree 2 will split on Glucose at the root
+    \item Tree 3 will split on Glucose at the root
+    \item ... and so on
+\end{itemize}
+
+All trees end up looking very similar! They make the same errors, so averaging doesn't help as much.
+\end{importantbox}
+
+\begin{examplebox}{Visualizing Tree Correlation}
+Look at bagged trees for diabetes prediction:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+& \textbf{Tree 1} & \textbf{Tree 2} & \textbf{Tree 3} \\
+\midrule
+Root Node & Glucose & Glucose & Glucose \\
+Level 2 & BMI & Blood Pressure & BMI \\
+Level 3 & Age & Age & Blood Pressure \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All three trees start with Glucose! This correlation limits how much variance we can reduce.
+\end{examplebox}
+
+This limitation leads us directly to \textbf{Random Forests}, which we'll cover in the next lecture. Random Forests add a clever twist: when building each tree, they only consider a \textbf{random subset of features} at each split. This ``decorrelates'' the trees and makes bagging much more effective.
+
+%========================================================================================
+\newpage
+\section{Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{What We Learned Today:}
+
+\begin{enumerate}
+    \item \textbf{The Problem:} Single decision trees struggle with bias-variance tradeoff
+
+    \item \textbf{The Solution:} Ensemble learning---combine multiple models
+
+    \item \textbf{Bagging = Bootstrap + Aggregating:}
+    \begin{itemize}
+        \item Create diverse training sets via bootstrap sampling
+        \item Train a model on each (typically deep decision trees)
+        \item Aggregate predictions (vote or average)
+    \end{itemize}
+
+    \item \textbf{Why It Works:} Averaging independent predictions reduces variance
+
+    \item \textbf{Key Hyperparameters:}
+    \begin{itemize}
+        \item Tree depth (controls complexity/bias-variance)
+        \item Number of estimators (reduces variance, never causes overfit)
+    \end{itemize}
+
+    \item \textbf{OOB Error:} Free validation using bootstrap ``leftovers''
+    \begin{itemize}
+        \item About 36.8\% of data is OOB for each tree
+        \item Replaces need for validation set
+        \item More robust than cross-validation
+    \end{itemize}
+
+    \item \textbf{Limitations:}
+    \begin{itemize}
+        \item Loss of interpretability
+        \item Tree correlation limits effectiveness
+    \end{itemize}
+
+    \item \textbf{Coming Up:} Random Forests solve the correlation problem!
+\end{enumerate}
+\end{summarybox}
+
+\begin{table}[h!]
+\centering
+\caption{Comparison: Single Tree vs. Bagging}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Aspect} & \textbf{Single Tree} & \textbf{Bagging} \\
+\midrule
+Bias & Can be low (deep tree) & Can be low \\
+Variance & High & Low (averaging) \\
+Interpretability & High & Low \\
+Computation & Fast & Slower (many trees) \\
+Overfitting Risk & High & Lower \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%========================================================================================
+\newpage
+\section{Practice Questions}
+%========================================================================================
+
+\begin{enumerate}
+    \item \textbf{Why does averaging reduce variance?} Explain the mathematical principle behind why combining multiple predictions gives a more stable result.
+
+    \item \textbf{Bootstrap Sampling:} If you have 1000 data points and create a bootstrap sample of 1000 points, approximately how many unique points will be in the sample? How many will be missing (OOB)?
+
+    \item \textbf{Hyperparameter Behavior:} Explain why increasing \code{n\_estimators} reduces variance but doesn't cause overfitting, while increasing \code{max\_depth} can cause overfitting.
+
+    \item \textbf{OOB vs. Cross-Validation:} What advantage does OOB error have over 5-fold cross-validation?
+
+    \item \textbf{The Correlation Problem:} Why might all trees in a bagging ensemble start with the same root node? How does this affect the variance reduction?
+
+    \item \textbf{Practical Question:} You train a bagging classifier with 100 trees. The training accuracy is 99\%, but the OOB score is 85\%. What does this tell you? What might you try to improve?
+
+    \item \textbf{Code Question:} Write sklearn code to:
+    \begin{itemize}
+        \item Create a BaggingRegressor with 200 trees
+        \item Use trees of depth 10
+        \item Enable OOB scoring
+        \item Print both OOB score and test score
+    \end{itemize}
+\end{enumerate}
+
+\end{document}

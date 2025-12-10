@@ -1,0 +1,1108 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Data Engineering for Analytics
+% Lecture 01: Introduction to Data Engineering
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Data Engineering for Analytics}}
+\fancyhead[R]{\small\textit{Lecture 01}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Data Engineering - Lecture 01},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Introduction to Data Engineering}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Settings
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\title{CSCI E-103: Data Engineering for Analytics\\Lecture 01: Introduction to Data Engineering}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Data Engineering for Analytics}{Lecture 01: Introduction}{Anindita Mahapatra \& Eric Gieseke}{Understand data engineering fundamentals, the big data ecosystem, and begin hands-on practice with Databricks}
+
+\begin{summarybox}
+This lecture introduces the field of data engineering—the discipline of transforming raw data into valuable insights. We'll explore the 5 V's of Big Data (Volume, Velocity, Variety, Veracity, Value), compare OLTP vs OLAP systems, understand ACID vs BASE properties, trace the evolution from data warehouses through Hadoop to modern Spark-based platforms, and get hands-on with Databricks Free Edition for our first practical exercises.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Why Data Engineering Matters}
+%========================================================================================
+
+\subsection{The Perfect Storm: Big Data + Cloud + AI}
+
+We are living through an unprecedented convergence of three major technological forces:
+
+\begin{itemize}
+    \item \textbf{Big Data}: Organizations now collect more data than ever before—terabytes and petabytes of information from every digital interaction
+    \item \textbf{Cloud Computing}: On-demand compute and storage resources have democratized access to powerful infrastructure
+    \item \textbf{Artificial Intelligence}: Machine learning models can extract patterns and make predictions, but only if fed properly prepared data
+\end{itemize}
+
+\begin{infobox}
+\textbf{The Analogy}: Think of data as the "new oil" of the digital economy. Just as crude oil requires refineries to become useful gasoline, raw data requires data engineering pipelines to become actionable insights. The data engineer is the modern-day refinery operator.
+\end{infobox}
+
+\subsection{What is Data Engineering?}
+
+\begin{definitionbox}{Data Engineering}
+Data Engineering is the practice of \textbf{turning raw data into valuable insights}. It encompasses the design, construction, and maintenance of systems and infrastructure that enable the collection, storage, transformation, and delivery of data at scale.
+\end{definitionbox}
+
+The key phrase businesses care about is \textbf{"Speed to Insights"}—the time from when data is generated to when decision-makers can act on meaningful conclusions. Data engineers are responsible for minimizing this time.
+
+\subsection{The Data Engineering Venn Diagram}
+
+Data Engineering sits at the intersection of three disciplines:
+
+\begin{enumerate}
+    \item \textbf{Software Engineering}: System design, distributed computing, DevOps, service deployment
+    \item \textbf{Data Science}: Understanding of ML algorithms, statistical modeling, business intelligence
+    \item \textbf{Database/Infrastructure}: Data structures, ETL pipelines, storage systems, query optimization
+\end{enumerate}
+
+\begin{examplebox}{The Carbon to Diamond Analogy}
+Data refinement is like transforming carbon into diamond:
+\begin{enumerate}
+    \item \textbf{Raw Data}: A messy pile of carbon atoms (e.g., application log files)
+    \item \textbf{Sorted Data}: Carbon arranged by some criteria (e.g., logs sorted by date and user)
+    \item \textbf{Cleaned Data}: Impurities removed (e.g., error logs filtered, user IDs mapped)
+    \item \textbf{Visualized Data}: Presented in digestible form (e.g., hourly access charts)
+    \item \textbf{Story/Insight}: Business meaning extracted (e.g., "3 AM spike in errors correlates with specific region")
+\end{enumerate}
+Each transformation adds value, just as pressure and time transform carbon into diamond.
+\end{examplebox}
+
+\newpage
+
+%========================================================================================
+\section{Data Personas: Who Works with Data?}
+%========================================================================================
+
+In any data-driven organization, multiple roles collaborate to extract value from data. Understanding these personas helps clarify where data engineering fits in the bigger picture.
+
+\subsection{The Five Key Data Personas}
+
+\begin{table}[h!]
+\centering
+\caption{Data Personas and Their Responsibilities}
+\begin{tabular}{p{3.5cm}p{10cm}}
+\toprule
+\textbf{Role} & \textbf{Primary Responsibilities} \\
+\midrule
+\textbf{Data Engineer} & Builds and maintains data pipelines. Responsible for ETL (Extract, Transform, Load), data quality, and infrastructure. Creates the "plumbing" that enables all other data work. \\
+\midrule
+\textbf{BI Analyst} & Creates dashboards and reports using SQL. Takes refined data and presents it in consumable formats for business stakeholders. \\
+\midrule
+\textbf{Data Scientist} & Performs exploratory data analysis (EDA) and builds machine learning models. Uses statistical methods to uncover patterns and make predictions. \\
+\midrule
+\textbf{MLOps Engineer} & Handles automation of ML pipelines. Ensures models are reliably deployed, monitored, and maintained in production. \\
+\midrule
+\textbf{Data Leader} & Strategic role (CDO, CIO). Sets data governance policies and drives organizational data strategy. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Hidden Complexity of ML Systems}
+
+\begin{warningbox}
+\textbf{The Iceberg Illusion}: When people think of AI/ML, they often focus only on the model code—the algorithm that makes predictions. But in reality, \textbf{90\% or more of a production ML system is data engineering work}.
+
+The model is just the tip of the iceberg. Below the surface lies:
+\begin{itemize}
+    \item Data collection and ingestion
+    \item Data validation and quality checks
+    \item Feature extraction and engineering
+    \item Resource management and compute allocation
+    \item Serving infrastructure
+    \item Monitoring and alerting
+    \item Configuration management
+\end{itemize}
+All of these fall within the data engineer's domain.
+\end{warningbox}
+
+\newpage
+
+%========================================================================================
+\section{The Five V's of Big Data}
+%========================================================================================
+
+Big Data isn't just "a lot of data"—it's characterized by five distinct dimensions known as the 5 V's.
+
+\subsection{Volume: The Size of Data}
+
+\begin{definitionbox}{Volume}
+The physical amount of data being stored and processed, typically measured in terabytes (TB), petabytes (PB), or even exabytes (EB). When data is too large to fit on a single machine, you're dealing with Big Data's volume challenge.
+\end{definitionbox}
+
+\textbf{Scale perspective}:
+\begin{itemize}
+    \item 1 Kilobyte (KB) = 1,000 bytes $\approx$ a short text message
+    \item 1 Megabyte (MB) = 1,000 KB $\approx$ a high-resolution photo
+    \item 1 Gigabyte (GB) = 1,000 MB $\approx$ an hour of HD video
+    \item 1 Terabyte (TB) = 1,000 GB $\approx$ a library of 500 hours of movies
+    \item 1 Petabyte (PB) = 1,000 TB $\approx$ all photos on Facebook (early 2010s)
+\end{itemize}
+
+\subsection{Velocity: The Speed of Data}
+
+\begin{definitionbox}{Velocity}
+How fast data is generated, collected, and processed. This ranges from batch processing (periodic bulk updates) to real-time streaming (continuous flow).
+\end{definitionbox}
+
+\textbf{Three processing modes}:
+\begin{enumerate}
+    \item \textbf{Batch Processing}: Collect data over time, process in bulk at scheduled intervals (e.g., nightly reports)
+    \item \textbf{Micro-batch}: Small chunks processed at short intervals (e.g., every 5 minutes)
+    \item \textbf{Streaming/Real-time}: Data processed immediately as it arrives (e.g., fraud detection)
+\end{enumerate}
+
+\subsection{Variety: The Types of Data}
+
+\begin{definitionbox}{Variety}
+The different forms and formats of data that must be handled. Modern systems must process structured, semi-structured, and unstructured data together.
+\end{definitionbox}
+
+\begin{table}[h!]
+\centering
+\caption{Data Structure Types}
+\begin{tabular}{p{3cm}p{4cm}p{5.5cm}}
+\toprule
+\textbf{Type} & \textbf{Characteristics} & \textbf{Examples} \\
+\midrule
+\textbf{Structured} & Fixed schema, rows/columns & SQL databases, spreadsheets \\
+\textbf{Semi-structured} & Schema embedded in data & JSON, XML, Parquet files \\
+\textbf{Unstructured} & No predefined schema & Images, audio, video, text documents \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{importantbox}{The 80-90\% Reality}
+Approximately 80-90\% of enterprise data today is \textbf{unstructured}. This includes images, audio, video, documents, and text—precisely the data that feeds modern AI models. Traditional SQL databases only handle the remaining 10-20\%.
+\end{importantbox}
+
+\subsection{Veracity: The Quality of Data}
+
+\begin{definitionbox}{Veracity}
+The trustworthiness and accuracy of data. Can you believe what the data is telling you? This encompasses data quality, noise, bias, and completeness.
+\end{definitionbox}
+
+The principle \textbf{GIGO (Garbage In, Garbage Out)} applies: even the most sophisticated ML model will produce useless results if trained on poor-quality data.
+
+\subsection{Value: The Business Impact}
+
+\begin{definitionbox}{Value}
+The ultimate worth of data to the business. Of all five V's, this is the most important—all the volume, velocity, variety, and veracity management is meaningless if the data doesn't create business value.
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{The Value Question}: Before investing in processing any dataset, always ask:
+\begin{itemize}
+    \item What business question will this answer?
+    \item Is the insight actionable?
+    \item Does the potential value justify the processing cost?
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{Data Temperature: Hot vs Cold}
+%========================================================================================
+
+Beyond the 5 V's, data engineers also think about data "temperature"—how frequently data is accessed and how urgently it needs to be processed.
+
+\subsection{The Temperature Spectrum}
+
+\begin{definitionbox}{Data Temperature}
+A classification of data based on how recently it was generated and how frequently it's accessed:
+\begin{itemize}
+    \item \textbf{Hot Data}: Recent, frequently accessed, requires immediate processing
+    \item \textbf{Warm Data}: Moderate access frequency, intermediate processing needs
+    \item \textbf{Cold Data}: Historical, rarely accessed, can be processed in batch
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Temperature Examples}
+\begin{itemize}
+    \item \textbf{Hot}: Current stock prices, real-time fraud detection signals, live website traffic
+    \item \textbf{Warm}: Last month's sales data, recent user activity logs
+    \item \textbf{Cold}: Historical archives, compliance records, data from years ago
+\end{itemize}
+\end{examplebox}
+
+\subsection{Temperature and Business Value}
+
+\begin{warningbox}
+\textbf{The Staleness Problem}: As data "cools down," its value typically decreases. A fraud detection signal is most valuable in the moment it's generated. A week later, the fraudulent transaction has already cleared.
+
+This is why businesses increasingly demand real-time processing—but real-time comes at a cost. Always ask: "Do we \textbf{really} need this in real-time? What action will we take with the insight?"
+\end{warningbox}
+
+\newpage
+
+%========================================================================================
+\section{OLTP vs OLAP: Two Worlds of Data Processing}
+%========================================================================================
+
+Understanding the distinction between transactional and analytical systems is fundamental to data engineering.
+
+\subsection{OLTP: Online Transactional Processing}
+
+\begin{definitionbox}{OLTP}
+Online Transactional Processing systems handle real-time, day-to-day operations. They process individual transactions quickly—inserts, updates, deletes—and maintain the current state of business operations.
+\end{definitionbox}
+
+\textbf{Analogy}: Think of OLTP as the \textbf{cash register} at a store. Every sale, return, or exchange is recorded immediately. The system must be fast and accurate for each individual transaction.
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Many small, fast transactions
+    \item Normalized data (minimal redundancy)
+    \item Current data (real-time state)
+    \item Users: Front-line employees, customers
+    \item Examples: ATM withdrawals, online shopping cart, seat reservations
+\end{itemize}
+
+\subsection{OLAP: Online Analytical Processing}
+
+\begin{definitionbox}{OLAP}
+Online Analytical Processing systems support complex queries across large volumes of historical data. They're optimized for reading and aggregating data, not for individual transaction updates.
+\end{definitionbox}
+
+\textbf{Analogy}: Think of OLAP as the \textbf{corporate headquarters analytics department}. They don't process individual sales—they analyze millions of past sales to find patterns like "Q3 revenue by region" or "customer churn rate over time."
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Complex queries across large datasets
+    \item Denormalized data (optimized for reading)
+    \item Historical data (aggregated over time)
+    \item Users: Analysts, executives, data scientists
+    \item Examples: Quarterly sales reports, customer segmentation, trend analysis
+\end{itemize}
+
+\subsection{Comparison Table}
+
+\begin{table}[h!]
+\centering
+\caption{OLTP vs OLAP Comparison}
+\begin{tabular}{p{3cm}p{5.5cm}p{5.5cm}}
+\toprule
+\textbf{Aspect} & \textbf{OLTP} & \textbf{OLAP} \\
+\midrule
+Purpose & Real-time transactions & Business analysis \\
+Analogy & Cash register & Corporate analytics \\
+Data & Current, operational & Historical, aggregated \\
+Operations & Insert, Update, Delete & Complex SELECT queries \\
+Users & Employees, customers & Analysts, executives \\
+Response time & Milliseconds & Seconds to minutes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{ETL: Bridging OLTP and OLAP}
+
+\begin{definitionbox}{ETL}
+\textbf{Extract, Transform, Load} is the process that moves data from operational (OLTP) systems to analytical (OLAP) systems:
+\begin{enumerate}
+    \item \textbf{Extract}: Pull data from source systems (databases, APIs, files)
+    \item \textbf{Transform}: Clean, validate, aggregate, and restructure the data
+    \item \textbf{Load}: Write the transformed data into the analytical system
+\end{enumerate}
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Reverse ETL}: When insights from analytical systems need to flow \textbf{back} to operational systems (e.g., ML model predictions feeding into a CRM), this is called Reverse ETL—a growing pattern in modern data architectures.
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{SQL vs NoSQL: ACID vs BASE}
+%========================================================================================
+
+How data is stored depends on the consistency requirements of your use case.
+
+\subsection{ACID Properties (SQL/Relational Databases)}
+
+\begin{definitionbox}{ACID}
+ACID is a set of properties guaranteeing reliable transaction processing in traditional relational databases:
+\begin{itemize}
+    \item \textbf{Atomicity}: Transactions complete entirely or not at all (no partial updates)
+    \item \textbf{Consistency}: Data always moves from one valid state to another
+    \item \textbf{Isolation}: Concurrent transactions don't interfere with each other
+    \item \textbf{Durability}: Once committed, data persists even after system failure
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Bank Transfer (ACID Required)}
+When transferring \$1,000 from Account A to Account B:
+\begin{itemize}
+    \item Account A: -\$1,000
+    \item Account B: +\$1,000
+\end{itemize}
+\textbf{Both} operations must succeed or \textbf{both} must fail. If only one succeeds, money is created or destroyed—a catastrophic inconsistency. This is why financial systems require ACID compliance.
+\end{examplebox}
+
+\subsection{BASE Properties (NoSQL Databases)}
+
+\begin{definitionbox}{BASE}
+BASE is a more relaxed consistency model for distributed NoSQL systems:
+\begin{itemize}
+    \item \textbf{Basically Available}: The system guarantees availability—it will always respond
+    \item \textbf{Soft State}: Data may be inconsistent across nodes temporarily
+    \item \textbf{Eventual Consistency}: Given enough time, all nodes will converge to the same state
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Social Media Likes (BASE Acceptable)}
+When you "like" a post on social media:
+\begin{itemize}
+    \item Your friend might see 100 likes
+    \item You might see 101 likes
+    \item After a few seconds, both see 101 likes
+\end{itemize}
+This temporary inconsistency is acceptable because:
+\begin{enumerate}
+    \item It's not financially critical
+    \item High availability (service never down) matters more
+    \item Users tolerate slight delays in like counts
+\end{enumerate}
+\end{examplebox}
+
+\subsection{The CAP Theorem}
+
+\begin{importantbox}{CAP Theorem}
+In any distributed data system, you can only guarantee \textbf{two out of three} properties simultaneously:
+\begin{itemize}
+    \item \textbf{Consistency}: All nodes see the same data at the same time
+    \item \textbf{Availability}: Every request receives a response (success or failure)
+    \item \textbf{Partition Tolerance}: System continues operating despite network failures
+\end{itemize}
+
+Since network partitions are inevitable in distributed systems, the real choice is between CP (consistency + partition tolerance) and AP (availability + partition tolerance):
+\begin{itemize}
+    \item \textbf{CP systems}: Traditional RDBMS, prioritize consistency
+    \item \textbf{AP systems}: NoSQL (Cassandra, DynamoDB), prioritize availability
+\end{itemize}
+\end{importantbox}
+
+\newpage
+
+%========================================================================================
+\section{Evolution of Data Platforms}
+%========================================================================================
+
+Data platforms have evolved dramatically over the past 40 years. Understanding this history helps explain why modern architectures look the way they do.
+
+\subsection{Generation 1: Data Warehouses (1980s)}
+
+\begin{itemize}
+    \item \textbf{Purpose}: Business intelligence and reporting
+    \item \textbf{Data type}: Structured data only (SQL)
+    \item \textbf{Technology}: Proprietary systems (Teradata, Oracle)
+    \item \textbf{Limitations}: Expensive hardware, no unstructured data support, limited scalability
+\end{itemize}
+
+\subsection{Generation 2: Hadoop and the Data Lake (2010s)}
+
+\begin{definitionbox}{Hadoop}
+An open-source framework for distributed storage (HDFS) and processing (MapReduce) across clusters of commodity hardware. Originated at Yahoo in 2006.
+\end{definitionbox}
+
+\textbf{Key innovations}:
+\begin{itemize}
+    \item \textbf{Commodity hardware}: Use cheap, off-the-shelf servers instead of expensive proprietary machines
+    \item \textbf{HDFS}: Hadoop Distributed File System—store data across many machines with 3x replication
+    \item \textbf{Data Lake}: Store \textbf{all} data (structured, semi-structured, unstructured) in raw form
+    \item \textbf{Open source}: Free software, vibrant ecosystem
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Why Hadoop/MapReduce Was Slow}
+
+MapReduce processing follows a Map $\to$ Reduce pattern. The critical problem: \textbf{every stage writes intermediate results to disk} (HDFS), then the next stage reads from disk.
+
+Disk I/O is thousands of times slower than memory access. This made Hadoop processing painfully slow for iterative algorithms (like machine learning).
+\end{warningbox}
+
+\subsection{Generation 3: Apache Spark (2012+)}
+
+\begin{definitionbox}{Apache Spark}
+A unified analytics engine for large-scale data processing. Originally developed at UC Berkeley's AMPLab, Spark is 10-100x faster than Hadoop MapReduce for most workloads.
+\end{definitionbox}
+
+\begin{summarybox}
+\textbf{Why Spark is Fast: In-Memory Processing}
+
+Spark's key innovation: keep data \textbf{in RAM} (memory) as much as possible, only spilling to disk when necessary.
+
+Additionally, Spark uses:
+\begin{itemize}
+    \item \textbf{DAG (Directed Acyclic Graph)}: Plans the entire computation before executing
+    \item \textbf{Lazy Evaluation}: Transformations aren't executed until an "action" (like \code{count()} or \code{collect()}) triggers computation
+    \item \textbf{RDD/DataFrame abstraction}: Resilient Distributed Datasets provide fault tolerance without constant disk writes
+\end{itemize}
+\end{summarybox}
+
+\subsection{Generation 4: The Lakehouse (2020s)}
+
+\begin{definitionbox}{Lakehouse}
+A modern architecture combining the best of Data Warehouses (ACID transactions, governance, reliability) with Data Lakes (flexibility, all data types, low cost). Examples: Databricks Delta Lake, Apache Iceberg.
+\end{definitionbox}
+
+\begin{itemize}
+    \item \textbf{From Data Warehouse}: ACID transactions, schema enforcement, data governance
+    \item \textbf{From Data Lake}: Support for all data types, scalable cloud storage, open formats
+    \item \textbf{Key technology}: Delta Lake adds a transaction log to Parquet files, enabling ACID on data lakes
+\end{itemize}
+
+\newpage
+
+%========================================================================================
+\section{Understanding Spark Architecture}
+%========================================================================================
+
+Since we'll use Spark extensively through Databricks, understanding its architecture is essential.
+
+\subsection{Core Components}
+
+\begin{enumerate}
+    \item \textbf{Driver Program}: The master process that coordinates the overall execution
+    \item \textbf{Cluster Manager}: Allocates resources across the cluster (YARN, Kubernetes, or Spark Standalone)
+    \item \textbf{Worker Nodes}: Execute the actual computation tasks
+    \item \textbf{Executors}: JVM processes on worker nodes that run tasks and cache data
+\end{enumerate}
+
+\subsection{RDDs and DataFrames}
+
+\begin{definitionbox}{RDD (Resilient Distributed Dataset)}
+The original Spark abstraction. RDDs are:
+\begin{itemize}
+    \item \textbf{Resilient}: Can recover from node failures
+    \item \textbf{Distributed}: Data partitioned across cluster nodes
+    \item \textbf{Immutable}: Transformations create new RDDs, never modify existing ones
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}{DataFrame}
+A higher-level abstraction built on RDDs. DataFrames organize data into named columns (like a SQL table) and enable Spark's query optimizer to generate efficient execution plans. \textbf{This is what you'll use in practice.}
+\end{definitionbox}
+
+\subsection{Transformations vs Actions}
+
+\begin{itemize}
+    \item \textbf{Transformations}: Operations that define a new DataFrame (e.g., \code{select()}, \code{filter()}, \code{groupBy()}). They are \textbf{lazy}—nothing executes immediately.
+    \item \textbf{Actions}: Operations that trigger actual computation (e.g., \code{count()}, \code{collect()}, \code{show()}). Only when an action is called does Spark execute the transformation pipeline.
+\end{itemize}
+
+\begin{examplebox}{Lazy Evaluation in Action}
+\begin{lstlisting}[style=pythonstyle]
+# These are transformations - nothing executes yet
+df = spark.read.csv("data.csv")
+df_filtered = df.filter(df["age"] > 21)
+df_selected = df_filtered.select("name", "age")
+
+# This is an action - NOW everything executes
+df_selected.count()  # Triggers the entire pipeline
+\end{lstlisting}
+Spark waits until the \code{count()} action to optimize and execute the entire pipeline at once.
+\end{examplebox}
+
+\newpage
+
+%========================================================================================
+\section{Cloud Computing Models: IaaS, PaaS, SaaS}
+%========================================================================================
+
+Understanding cloud service models helps contextualize where Databricks fits.
+
+\subsection{The Pizza Analogy}
+
+\begin{examplebox}{Pizza as a Service}
+Imagine you want pizza:
+\begin{itemize}
+    \item \textbf{IaaS (Infrastructure as a Service)}: You get a kitchen with an oven. You buy flour, tomatoes, cheese, and make everything from scratch. Maximum control, maximum effort.
+    \item \textbf{PaaS (Platform as a Service)}: You get pre-made dough and sauce. You just add toppings and bake. Less work, less control.
+    \item \textbf{SaaS (Software as a Service)}: You order delivery. Pizza arrives ready to eat. Minimal effort, no control over how it's made.
+\end{itemize}
+\end{examplebox}
+
+\begin{table}[h!]
+\centering
+\caption{Cloud Service Models}
+\begin{tabular}{p{2cm}p{4cm}p{4cm}p{3cm}}
+\toprule
+\textbf{Model} & \textbf{You Manage} & \textbf{Provider Manages} & \textbf{Examples} \\
+\midrule
+\textbf{IaaS} & OS, runtime, data, apps & Hardware, networking, virtualization & AWS EC2, Azure VMs \\
+\textbf{PaaS} & Data, applications & Everything else & Heroku, Google App Engine \\
+\textbf{SaaS} & Just use it & Everything & Gmail, Salesforce, \textbf{Databricks} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Databricks as SaaS}
+
+Databricks is a SaaS platform for data engineering and analytics. You don't manage:
+\begin{itemize}
+    \item Cluster provisioning and scaling
+    \item Spark installation and configuration
+    \item Storage infrastructure
+    \item Security patching
+\end{itemize}
+
+You focus on:
+\begin{itemize}
+    \item Writing data pipelines
+    \item Building ML models
+    \item Creating dashboards and reports
+\end{itemize}
+
+\newpage
+
+%========================================================================================
+\section{The Medallion Architecture: Bronze, Silver, Gold}
+%========================================================================================
+
+A common pattern for organizing data in modern lakehouse architectures.
+
+\begin{definitionbox}{Medallion Architecture}
+A multi-layer approach to organizing data by quality level:
+\begin{itemize}
+    \item \textbf{Bronze Layer}: Raw data, ingested as-is from sources
+    \item \textbf{Silver Layer}: Cleaned, validated, and enriched data
+    \item \textbf{Gold Layer}: Aggregated, business-level data ready for consumption
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Why Bronze Matters}
+
+\begin{infobox}
+\textbf{Never Throw Away Raw Data}
+
+The Bronze layer preserves original data because:
+\begin{enumerate}
+    \item Business logic may change, requiring reprocessing
+    \item New use cases may need different transformations
+    \item Debugging issues requires access to source data
+    \item Compliance may require data lineage tracking
+\end{enumerate}
+Storage is cheap. Recreating lost data is expensive or impossible.
+\end{infobox}
+
+\subsection{Layer Characteristics}
+
+\begin{table}[h!]
+\centering
+\caption{Medallion Architecture Layers}
+\begin{tabular}{p{2cm}p{4cm}p{4cm}p{3.5cm}}
+\toprule
+\textbf{Layer} & \textbf{Data State} & \textbf{Transformations} & \textbf{Users} \\
+\midrule
+\textbf{Bronze} & Raw, as-is & None or minimal & Data engineers \\
+\textbf{Silver} & Cleaned, validated & Deduplication, type casting, null handling & Data engineers, analysts \\
+\textbf{Gold} & Business-ready & Aggregation, joins, business logic & Business users, dashboards \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{Lab 0: Getting Started with Databricks}
+%========================================================================================
+
+\subsection{Databricks Free Edition Setup}
+
+\begin{warningbox}
+\textbf{Free Edition vs Trial Account}
+
+Databricks offers two types of accounts:
+\begin{itemize}
+    \item \textbf{Free Edition}: Completely free forever for learning. Look for "Free Edition" logo in top-left.
+    \item \textbf{Trial Account}: 14-day trial of enterprise features, then requires payment.
+\end{itemize}
+\textbf{Make sure you sign up for the Free Edition!} The Trial account has different features and may cause notebook loading errors.
+\end{warningbox}
+
+\subsection{Key Concepts in Databricks}
+
+\begin{enumerate}
+    \item \textbf{Workspace}: Your personal file system in Databricks for notebooks and folders
+    \item \textbf{Notebook}: An interactive document mixing code, text, and visualizations
+    \item \textbf{Cluster/Compute}: The processing power that runs your code
+    \item \textbf{Catalog}: Top-level container for organizing data (Unity Catalog)
+    \item \textbf{Schema}: A collection of tables within a catalog (like a database)
+    \item \textbf{Volume}: A path to cloud storage for files
+\end{enumerate}
+
+\subsection{Magic Commands}
+
+In Databricks notebooks, magic commands change the cell's language:
+
+\begin{lstlisting}[language=Python]
+%python    # Execute Python code (default)
+%sql       # Execute SQL queries
+%md        # Render Markdown text
+%sh        # Run shell commands
+%fs        # File system operations (DBFS)
+\end{lstlisting}
+
+\subsection{Your First Spark Code}
+
+\begin{lstlisting}[style=pythonstyle, caption={Reading a CSV file into a DataFrame}]
+# Path to a public dataset in Databricks
+file_path = "/databricks-datasets/bikeSharing/data-001/day.csv"
+
+# Read CSV into a Spark DataFrame
+df = spark.read.format("csv") \
+         .option("header", "true") \
+         .option("inferSchema", "true") \
+         .load(file_path)
+
+# Display the results in a nice table
+display(df)
+\end{lstlisting}
+
+\subsection{Creating Tables with SQL}
+
+\begin{lstlisting}[style=sqlstyle, caption={Creating and querying a table}]
+-- Set context to your catalog and schema
+USE CATALOG csci_e103;
+USE SCHEMA lab00;
+
+-- Create a table from existing data
+CREATE TABLE IF NOT EXISTS bike_data AS
+SELECT * FROM parquet.`/databricks-datasets/samples/lending_club/parquet/`;
+
+-- Query your new table
+SELECT * FROM bike_data LIMIT 10;
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{Delta Lake is the Default}
+
+When you \code{CREATE TABLE} in Databricks, it automatically creates a Delta table (not regular Parquet). Delta adds:
+\begin{itemize}
+    \item ACID transactions
+    \item Time travel (access previous versions)
+    \item Efficient updates and deletes
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{Best Practices for Data Platforms}
+%========================================================================================
+
+\subsection{Architectural Principles}
+
+\begin{enumerate}
+    \item \textbf{Decouple Storage and Compute}: Storage grows forever; compute should scale independently based on workload needs.
+
+    \item \textbf{Use Open Formats}: Avoid vendor lock-in by using open formats like Parquet, Delta Lake, or Iceberg. If your data is in a proprietary format, migration becomes expensive.
+
+    \item \textbf{Service-Oriented Design}: Build reusable, modular components. Each pipeline should do one thing well.
+
+    \item \textbf{Right Tool for the Right Job}: Not every problem needs the same solution. Consider trade-offs:
+    \begin{itemize}
+        \item Latency requirements
+        \item Throughput needs
+        \item Access patterns
+        \item Cost constraints
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Business Alignment}
+
+\begin{infobox}
+\textbf{Technology Serves Business}
+
+Every technical decision should have business justification:
+\begin{itemize}
+    \item What problem does this solve?
+    \item What's the expected ROI?
+    \item Who is the economic buyer?
+    \item What are the success metrics (KPIs)?
+\end{itemize}
+
+The thrill of trying new technology isn't sufficient justification. Projects without business alignment rarely make it to production.
+\end{infobox}
+
+\subsection{Build vs Buy}
+
+\begin{itemize}
+    \item \textbf{Build}: Leverage in-house expertise, full control, but costs time
+    \item \textbf{Buy}: Faster time-to-market, proven solutions, but costs money and reduces control
+\end{itemize}
+
+When competitors are catching up and you lack internal expertise, buying may be the right choice even if building would be technically possible.
+
+\newpage
+
+%========================================================================================
+\section{Summary and Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{What We Learned}
+
+\begin{enumerate}
+    \item \textbf{Data Engineering} transforms raw data into valuable insights—it's the "plumbing" that makes analytics and ML possible.
+
+    \item \textbf{The 5 V's of Big Data}: Volume (size), Velocity (speed), Variety (types), Veracity (quality), and Value (business impact).
+
+    \item \textbf{OLTP vs OLAP}: Transactional systems (fast, current data) vs analytical systems (complex queries, historical data). ETL bridges them.
+
+    \item \textbf{ACID vs BASE}: Strong consistency (SQL/relational) vs eventual consistency (NoSQL). Choose based on use case requirements.
+
+    \item \textbf{CAP Theorem}: In distributed systems, choose two of three: Consistency, Availability, Partition Tolerance.
+
+    \item \textbf{Platform Evolution}: Data Warehouses $\to$ Hadoop/Data Lakes $\to$ Spark $\to$ Lakehouse. Each generation solved problems of the previous.
+
+    \item \textbf{Spark's Speed}: In-memory processing + lazy evaluation + DAG optimization = 100x faster than Hadoop MapReduce.
+
+    \item \textbf{Medallion Architecture}: Bronze (raw) $\to$ Silver (cleaned) $\to$ Gold (business-ready) for progressive data refinement.
+
+    \item \textbf{Databricks}: A SaaS platform providing managed Spark, Delta Lake, and collaborative notebooks.
+\end{enumerate}
+\end{summarybox}
+
+\begin{warningbox}
+\textbf{Action Items for This Week}
+
+\begin{itemize}
+    \item[$\square$] Create a Databricks \textbf{Free Edition} account (NOT Trial!)
+    \item[$\square$] Import Lab 0 files into your workspace
+    \item[$\square$] Connect to serverless compute and run the initialize notebook
+    \item[$\square$] Complete all Lab 0 notebooks to familiarize yourself with the platform
+    \item[$\square$] Read Chapters 1-3 of "Simplifying Data Engineering and Analytics with Delta"
+\end{itemize}
+\end{warningbox}
+
+\end{document}

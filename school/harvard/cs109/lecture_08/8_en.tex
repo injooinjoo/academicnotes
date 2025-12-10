@@ -1,0 +1,955 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 08: Statistical Inference for Regression
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages (English - No kotex)
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 08}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 08},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Statistical Inference for Regression}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begin
+%========================================================================================
+
+\title{Lecture 08: Statistical Inference for Regression}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 08}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understanding uncertainty in regression coefficients through bootstrapping, building confidence intervals, evaluating predictor significance using t-tests and p-values, and distinguishing confidence intervals from prediction intervals}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Introduction: Why Do We Need Inference?}
+%========================================================================================
+
+\begin{overviewbox}
+So far, we've learned how to \textit{fit} models and \textit{predict} outcomes. But fitting a model gives us just one estimate---one set of coefficients based on one sample of data. How certain can we be about these numbers?
+
+This lecture answers a critical question: \textbf{``How much should we trust our model?''}
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item \textbf{Accuracy of Estimates}: How precise are our $\hat{\beta}$ values?
+    \item \textbf{Bootstrapping}: Simulating ``parallel universes'' to measure uncertainty
+    \item \textbf{Confidence Intervals}: A range where the true $\beta$ likely falls
+    \item \textbf{Feature Importance}: Which predictors actually matter?
+    \item \textbf{Statistical Significance}: Is the effect real or just random noise?
+    \item \textbf{Prediction Intervals}: How uncertain are our predictions $\hat{y}$?
+\end{itemize}
+\end{overviewbox}
+
+\subsection{The Consultant Scenario}
+
+Professor Protopapas sets up a vivid scenario:
+
+\begin{examplebox}[The \$10,000 Consultant]
+Imagine you're a consultant who built a model for advertising:
+\[
+\hat{y} = 1.01x + 0.05
+\]
+
+Where $x$ = TV advertising budget (in thousands), $y$ = sales (in thousands).
+
+\textbf{Your interpretation}: ``For every \$1,000 spent on TV ads, sales increase by \$1,010. Net profit: \$10 per \$1,000 invested.''
+
+\textbf{The question}: If you go to your boss and ask for \$10,000 for your analysis, will they pay?
+
+\textbf{The doubt}: That coefficient 1.01 came from \textit{one} sample of data. What if you had collected data on a different day? You might have gotten 1.03, or 0.98, or something completely different!
+
+\textbf{The core issue}: How do we \textit{quantify} and \textit{communicate} our uncertainty?
+\end{examplebox}
+
+\subsection{Sources of Uncertainty}
+
+Before measuring uncertainty, let's understand where it comes from:
+
+\begin{definitionbox}[Two Types of Error]
+\textbf{1. Irreducible Error (Aleatoric Error, $\epsilon$)}
+\begin{itemize}
+    \item Inherent randomness in the system
+    \item Even with perfect model, there's noise we can't eliminate
+    \item Example: Same ad budget on different days yields different sales due to weather, competitor actions, random human behavior
+\end{itemize}
+
+\textbf{2. Reducible Error}
+\begin{itemize}
+    \item \textbf{Model misspecification}: We assumed linear but reality is curved
+    \item \textbf{Limited samples}: We only observed one ``realization'' of reality
+    \item Can be reduced with better models or more data
+\end{itemize}
+
+\textbf{For this lecture}: We bundle everything into $\epsilon$ (epsilon)---the error term that makes our $\hat{\beta}$ uncertain.
+\end{definitionbox}
+
+%========================================================================================
+\section{The Thought Experiment: Parallel Universes}
+%========================================================================================
+
+\subsection{What If We Could Repeat the Experiment?}
+
+To understand how much $\hat{\beta}$ varies, imagine this scenario:
+
+\begin{infobox}[title=The Parallel Universe Thought Experiment]
+\textbf{Scenario}: We know the true relationship $y = f(x) + \epsilon$. But due to error $\epsilon$, each measurement is slightly different from the true value.
+
+\textbf{Process}:
+\begin{enumerate}
+    \item \textbf{Universe 1}: Collect data (with random error). Fit model. Get $\hat{\beta}^{(1)}$.
+    \item \textbf{Universe 2}: Collect new data (different random error). Fit model. Get $\hat{\beta}^{(2)}$.
+    \item \textbf{Universe 3}: Collect new data. Get $\hat{\beta}^{(3)}$.
+    \item ... repeat 100 times ...
+\end{enumerate}
+
+\textbf{Result}: We get 100 different $\hat{\beta}$ values. We can plot their histogram!
+
+\textbf{Insight}: If the histogram is \textbf{narrow}, our estimate is precise. If \textbf{wide}, it's uncertain.
+\end{infobox}
+
+\begin{examplebox}[Visualizing the Spaghetti Plot]
+If we plot all 100 fitted regression lines from our parallel universes, we get a ``spaghetti plot''---many lines clustered together.
+
+\begin{itemize}
+    \item \textbf{Tight spaghetti}: All lines are similar $\rightarrow$ Low variance $\rightarrow$ Confident estimate
+    \item \textbf{Wild spaghetti}: Lines spread everywhere $\rightarrow$ High variance $\rightarrow$ Uncertain estimate
+\end{itemize}
+
+(This is exactly what we saw in Lecture 07 when discussing bias-variance!)
+\end{examplebox}
+
+\subsection{The Problem: We Can't Actually Visit Parallel Universes}
+
+This thought experiment is beautiful, but impossible in practice. We only have \textbf{one} dataset. We can't go back in time and recollect data under different random conditions.
+
+\textbf{Solution}: \textbf{Bootstrapping}---a clever trick to simulate parallel universes using only the data we have!
+
+%========================================================================================
+\section{Bootstrapping: Creating ``Parallel Universes''}
+%========================================================================================
+
+\subsection{The Core Idea}
+
+\begin{definitionbox}[Bootstrapping]
+\textbf{Bootstrapping} is a resampling technique that creates many simulated datasets by randomly sampling \textit{with replacement} from our original data.
+
+\textbf{Key insight}: Our original dataset represents the ``population'' (as best we know it). By resampling from it, we create variations that mimic what we'd see in parallel universes.
+\end{definitionbox}
+
+\subsection{The Ball-in-Bucket Analogy}
+
+\begin{examplebox}[Understanding Sampling with Replacement]
+\textbf{Setup}: You have a bucket with 5 numbered balls: \{1, 3, 5, 8, 9\}
+
+\textbf{Goal}: Create a new ``parallel universe'' dataset of size 5
+
+\textbf{Process (Sampling WITH Replacement)}:
+\begin{enumerate}
+    \item Reach in, randomly grab ball \#8. Record it. \textbf{Put it back.}
+    \item Reach in again. Grab ball \#8 again (possible because we replaced it!). Record.
+    \item Grab ball \#3. Record. Put back.
+    \item Grab ball \#5. Record. Put back.
+    \item Grab ball \#1. Record.
+\end{enumerate}
+
+\textbf{Result}:
+\begin{itemize}
+    \item Original: \{1, 3, 5, 8, 9\}
+    \item Bootstrap sample: \{8, 8, 3, 5, 1\}
+\end{itemize}
+
+\textbf{Notice}:
+\begin{itemize}
+    \item Ball \#8 appears \textit{twice}
+    \item Ball \#9 doesn't appear at all
+    \item This is exactly what we want---random variation!
+\end{itemize}
+\end{examplebox}
+
+\begin{warningbox}[title=Why ``With Replacement''?]
+If we sampled \textit{without} replacement, we'd just get the original dataset back (in a different order). That wouldn't create any variation!
+
+Sampling \textit{with} replacement means each draw is independent, and we naturally get variations where some points appear multiple times and others don't appear at all.
+\end{warningbox}
+
+\subsection{The Full Bootstrap Procedure}
+
+\begin{summarybox}[title=Bootstrap Algorithm for Confidence Intervals]
+\textbf{Input}: Original dataset of size $n$
+
+\textbf{Procedure}:
+\begin{enumerate}
+    \item Set number of bootstrap samples: $S$ (typically 1000-10000)
+    \item For $s = 1$ to $S$:
+    \begin{enumerate}
+        \item Create bootstrap sample: randomly select $n$ points from original data \textit{with replacement}
+        \item Fit regression model to this bootstrap sample
+        \item Record coefficients: $\hat{\beta}_0^{(s)}, \hat{\beta}_1^{(s)}, \ldots$
+    \end{enumerate}
+    \item Now you have $S$ values of each coefficient
+    \item Analyze the distribution of these values
+\end{enumerate}
+
+\textbf{Output}: Distribution of $\hat{\beta}$ values from which we can compute confidence intervals
+\end{summarybox}
+
+\subsection{Building Confidence Intervals from Bootstrap}
+
+Once we have $S$ bootstrap estimates of $\hat{\beta}_1$, we can build a confidence interval:
+
+\begin{definitionbox}[Percentile Method for Confidence Intervals]
+\textbf{95\% Confidence Interval}:
+
+\begin{enumerate}
+    \item Sort all $S$ bootstrap $\hat{\beta}$ values from smallest to largest
+    \item Find the 2.5th percentile (lower bound)
+    \item Find the 97.5th percentile (upper bound)
+    \item The interval between these is your 95\% CI
+\end{enumerate}
+
+\textbf{In Python}:
+\begin{lstlisting}[language=Python]
+lower = np.percentile(bootstrap_betas, 2.5)
+upper = np.percentile(bootstrap_betas, 97.5)
+confidence_interval = [lower, upper]
+\end{lstlisting}
+\end{definitionbox}
+
+\begin{examplebox}[Computing Bootstrap CI]
+You ran 1000 bootstrap samples and got 1000 values of $\hat{\beta}_1$.
+
+After sorting: [11.50, 12.26, 12.81, ..., 15.21]
+
+\begin{itemize}
+    \item 2.5th percentile (25th value): 12.80
+    \item 97.5th percentile (975th value): 13.71
+\end{itemize}
+
+\textbf{95\% CI}: [12.80, 13.71]
+
+\textbf{Interpretation}: We are 95\% confident that the true $\beta_1$ lies between 12.80 and 13.71.
+\end{examplebox}
+
+\subsection{Standard Error}
+
+\begin{definitionbox}[Standard Error]
+The \textbf{standard error} (SE) of $\hat{\beta}$ is simply the \textbf{standard deviation} of the bootstrap distribution.
+
+\[
+SE_{\hat{\beta}} = \text{std}(\hat{\beta}^{(1)}, \hat{\beta}^{(2)}, \ldots, \hat{\beta}^{(S)})
+\]
+
+If we assume the distribution is approximately normal, we can approximate:
+\[
+\text{95\% CI} \approx [\bar{\beta} - 2 \cdot SE, \quad \bar{\beta} + 2 \cdot SE]
+\]
+
+where $\bar{\beta}$ is the mean of bootstrap estimates.
+\end{definitionbox}
+
+\begin{warningbox}[title=Standard Deviation vs. Standard Error]
+\textbf{Standard Deviation (SD)}: Measures spread of \textit{data points} around their mean
+\begin{itemize}
+    \item How spread out are the $y$ values in our dataset?
+\end{itemize}
+
+\textbf{Standard Error (SE)}: Measures spread of an \textit{estimate} across hypothetical samples
+\begin{itemize}
+    \item How much would $\hat{\beta}$ vary if we re-did the study many times?
+\end{itemize}
+
+In bootstrapping, SE is calculated as the standard deviation of the bootstrap $\hat{\beta}$ values.
+\end{warningbox}
+
+%========================================================================================
+\section{Evaluating Predictor Significance}
+%========================================================================================
+
+Now that we can quantify uncertainty in $\hat{\beta}$, we can ask more sophisticated questions about which predictors matter.
+
+\subsection{The Naive Approach: Largest Coefficient}
+
+\begin{examplebox}[Advertising Data - Three Predictors]
+Suppose we have three predictors: TV, Radio, Newspaper.
+
+After bootstrapping, we get:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Predictor} & \textbf{Mean $\hat{\beta}$} & \textbf{Std Dev (SE)} \\
+\midrule
+Newspaper & 0.10 & 0.10 \\
+TV & 0.05 & 0.005 \\
+Radio & -0.05 & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Naive question}: Which predictor is most important?
+
+\textbf{Naive answer}: Newspaper! It has the largest $|\hat{\beta}|$.
+
+\textbf{But wait}... Look at the uncertainty! Newspaper's true $\beta$ could be anywhere from -0.10 to +0.30. TV's is tightly concentrated around 0.05.
+\end{examplebox}
+
+\subsection{The t-test: Signal-to-Noise Ratio}
+
+We need a metric that considers \textbf{both} the coefficient value (signal) and its uncertainty (noise):
+
+\begin{definitionbox}[The t-test Statistic ($\hat{t}$)]
+The \textbf{t-test statistic} measures how many standard errors the coefficient is from zero:
+
+\[
+\hat{t} = \frac{\text{Mean}(\hat{\beta})}{\text{SE}(\hat{\beta})} = \frac{\bar{\beta}}{\sigma_{\hat{\beta}}}
+\]
+
+\textbf{Interpretation}:
+\begin{itemize}
+    \item Large $|\hat{t}|$: Coefficient is far from zero relative to uncertainty $\rightarrow$ Strong signal
+    \item Small $|\hat{t}|$: Coefficient is close to zero relative to uncertainty $\rightarrow$ Weak/uncertain signal
+\end{itemize}
+
+Note: Professor Protopapas uses $\hat{t}$ (``t-hat'') because the classical t-statistic includes $\sqrt{n}$, which we omit for simplicity since $n$ is fixed.
+\end{definitionbox}
+
+\begin{examplebox}[Revisiting Advertising Data with t-test]
+Using the data from before:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Predictor} & \textbf{Mean $\hat{\beta}$} & \textbf{SE} & \textbf{$\hat{t} = \frac{\bar{\beta}}{SE}$} \\
+\midrule
+Newspaper & 0.10 & 0.10 & \textbf{1.0} \\
+TV & 0.05 & 0.005 & \textbf{10.0} \\
+Radio & -0.05 & 0.10 & \textbf{-0.5} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{New ranking by $|\hat{t}|$}:
+\begin{enumerate}
+    \item TV: $|\hat{t}| = 10$ (most important!)
+    \item Newspaper: $|\hat{t}| = 1$
+    \item Radio: $|\hat{t}| = 0.5$
+\end{enumerate}
+
+Even though TV has the \textit{smallest} coefficient, it's the \textit{most reliably} non-zero!
+\end{examplebox}
+
+\begin{infobox}[title=Feature Importance Rankings Change!]
+The California Housing Price dataset example:
+
+\textbf{By coefficient magnitude $|\bar{\beta}|$}:
+\begin{enumerate}
+    \item Average Bedrooms
+    \item Median Income
+    \item Average Rooms
+\end{enumerate}
+
+\textbf{By t-statistic $|\hat{t}|$}:
+\begin{enumerate}
+    \item \textbf{Median Income}
+    \item \textbf{House Age}
+    \item Latitude
+\end{enumerate}
+
+The coefficient-based ranking can be misleading! Average Bedrooms has a large coefficient but high uncertainty, so it drops in the t-statistic ranking.
+\end{infobox}
+
+%========================================================================================
+\section{Statistical Significance: The p-value}
+%========================================================================================
+
+\subsection{The Key Question}
+
+We've found that Median Income has the highest $\hat{t}$ score. But there's still a nagging question:
+
+\begin{center}
+\textit{``What if ALL my predictors are junk, and Median Income is just the `least bad'?''}
+\end{center}
+
+We need to test whether the observed effect is \textbf{real} or just \textbf{random chance}.
+
+\subsection{Hypothesis Testing Framework}
+
+\begin{definitionbox}[Hypothesis Testing]
+\textbf{Null Hypothesis ($H_0$)}: The predictor has \textit{no} effect on the outcome.
+\begin{itemize}
+    \item Mathematically: $\beta = 0$
+    \item Any non-zero $\hat{\beta}$ we observed was pure luck/noise
+\end{itemize}
+
+\textbf{Alternative Hypothesis ($H_1$)}: The predictor \textit{does} have an effect.
+\begin{itemize}
+    \item Mathematically: $\beta \neq 0$
+\end{itemize}
+
+\textbf{Strategy}: Assume $H_0$ is true. Calculate how ``surprising'' our observed $\hat{t}$ would be under this assumption.
+\end{definitionbox}
+
+\subsection{The p-value Concept}
+
+\begin{definitionbox}[p-value]
+The \textbf{p-value} is the probability of observing a test statistic \textit{as extreme or more extreme} than what we actually observed, \textit{assuming $H_0$ is true}.
+
+\[
+p\text{-value} = P(|t_{\text{random}}| \geq |t^*_{\text{observed}}| \;|\; H_0 \text{ is true})
+\]
+
+\textbf{In plain English}: If there were truly no relationship, how often would random data produce a $\hat{t}$ value this large (or larger)?
+\end{definitionbox}
+
+\subsection{How to Calculate p-value}
+
+\begin{examplebox}[The p-value Calculation Process]
+\textbf{Step 1}: Generate random data (no relationship between $x$ and $y$)
+
+\textbf{Step 2}: Fit a model and calculate $\hat{t}$
+
+\textbf{Step 3}: Repeat many times to build a distribution of ``random $\hat{t}$ values''
+
+\textbf{Step 4}: See where your actual $\hat{t}$ falls in this distribution
+
+\textbf{Shortcut}: This distribution is the well-known \textbf{Student's t-distribution}. We don't need to simulate---we can compute directly!
+
+\textbf{Visualization}: Plot the t-distribution. Your p-value is the area in the ``tails'' beyond your observed $\hat{t}$ value (both positive and negative tails, since we consider absolute values).
+\end{examplebox}
+
+\subsection{Interpreting p-values}
+
+\begin{summarybox}[title=p-value Interpretation Guide]
+\textbf{Large p-value} (e.g., $p = 0.50$):
+\begin{itemize}
+    \item ``If there were no real effect, there's a 50\% chance we'd see this result by luck.''
+    \item This is very plausible under $H_0$.
+    \item \textbf{Conclusion}: Cannot reject $H_0$. No evidence the predictor matters.
+\end{itemize}
+
+\textbf{Small p-value} (e.g., $p = 0.01$):
+\begin{itemize}
+    \item ``If there were no real effect, there's only a 1\% chance we'd see this result by luck.''
+    \item This is very unlikely under $H_0$.
+    \item \textbf{Conclusion}: Reject $H_0$. The predictor is \textbf{statistically significant}.
+\end{itemize}
+
+\textbf{Convention}: We use $\alpha = 0.05$ as the threshold.
+\begin{itemize}
+    \item $p < 0.05$: Reject $H_0$ (significant)
+    \item $p \geq 0.05$: Cannot reject $H_0$ (not significant)
+\end{itemize}
+\end{summarybox}
+
+\begin{warningbox}[title=Common p-value Misconceptions]
+\textbf{WRONG}: ``$p = 0.03$ means there's a 3\% probability that $H_0$ is true.''
+
+\textbf{CORRECT}: ``$p = 0.03$ means \textit{if} $H_0$ were true, we'd see results this extreme only 3\% of the time.''
+
+The p-value is about the \textit{data}, not the hypothesis!
+\end{warningbox}
+
+%========================================================================================
+\section{Prediction Intervals vs. Confidence Intervals}
+%========================================================================================
+
+Now we shift from uncertainty in \textit{coefficients} to uncertainty in \textit{predictions}.
+
+\subsection{The Spaghetti Plot of Predictions}
+
+\begin{examplebox}[Visualizing Prediction Uncertainty]
+From our $S$ bootstrap samples, we have $S$ different models:
+\[
+\hat{f}^{(1)}(x), \hat{f}^{(2)}(x), \ldots, \hat{f}^{(S)}(x)
+\]
+
+Plotting all $S$ regression lines gives us a ``spaghetti plot'' for predictions.
+
+For any specific $x$ value (e.g., TV budget = \$200K):
+\begin{itemize}
+    \item We get $S$ different predicted values
+    \item We can compute a histogram of these predictions
+    \item We can compute the 2.5th and 97.5th percentiles $\rightarrow$ \textbf{Confidence Interval for $f(x)$}
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Key Distinction}
+
+\begin{importantbox}[Confidence Interval vs. Prediction Interval]
+\textbf{Confidence Interval (CI)}: Uncertainty in the \textit{mean response} $f(x)$
+\begin{itemize}
+    \item ``Where does the \textit{average} sales fall for TV budget = \$200K?''
+    \item Only accounts for uncertainty in $\hat{\beta}$
+\end{itemize}
+
+\textbf{Prediction Interval (PI)}: Uncertainty in a \textit{new individual observation} $y$
+\begin{itemize}
+    \item ``What sales will a \textit{specific new store} get with TV budget = \$200K?''
+    \item Accounts for uncertainty in $\hat{\beta}$ \textbf{AND} the irreducible error $\epsilon$
+\end{itemize}
+
+\textbf{Key fact}: \textbf{Prediction Interval is ALWAYS wider than Confidence Interval!}
+
+Why? Because an individual $y$ includes noise $\epsilon$ on top of the mean:
+\[
+y = f(x) + \epsilon
+\]
+\end{importantbox}
+
+\begin{examplebox}[CI vs. PI Example]
+For TV Budget = \$200,000:
+
+\textbf{95\% Confidence Interval for $f(x)$}: [\$16.5M, \$17.5M]
+\begin{itemize}
+    \item ``The \textit{average} sales for stores with this budget is 95\% likely to be in this range.''
+\end{itemize}
+
+\textbf{95\% Prediction Interval for $y$}: [\$14.0M, \$20.0M]
+\begin{itemize}
+    \item ``A \textit{specific new} store with this budget is 95\% likely to have sales in this range.''
+    \item Much wider because we added uncertainty from $\epsilon$!
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Funnel Shape}
+
+Both CI and PI have a characteristic ``funnel'' or ``hourglass'' shape:
+\begin{itemize}
+    \item \textbf{Narrowest at $\bar{x}$}: Near the center of our data, we have the most information
+    \item \textbf{Widens at extremes}: Far from the center, small errors in slope get amplified
+\end{itemize}
+
+This is because the regression line ``pivots'' around the data center $(\bar{x}, \bar{y})$.
+
+%========================================================================================
+\section{Model Comparison Summary: When to Use What}
+%========================================================================================
+
+This lecture began with comparing our three main model types:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Aspect} & \textbf{Linear Reg.} & \textbf{Polynomial Reg.} & \textbf{kNN} \\
+\midrule
+Type & Parametric & Parametric & Non-parametric \\
+Interpretability & High & Moderate & Low \\
+Coefficient meaning & Clear & Complex & None \\
+Computational cost & Low & Moderate & High \\
+\bottomrule
+\end{tabular}
+\caption{Model comparison summary}
+\end{table}
+
+\textbf{Key points}:
+\begin{itemize}
+    \item \textbf{Linear regression}: Fast (closed-form solution), interpretable
+    \item \textbf{Polynomial regression}: Flexible but design matrix grows quickly
+    \item \textbf{kNN}: Computationally expensive (must compute distances to all training points for every prediction)
+\end{itemize}
+
+%========================================================================================
+\section{Quick Reference Summary}
+%========================================================================================
+
+\begin{tcolorbox}[title=Lecture 08 Quick Reference Card, colback=white]
+
+\begin{tcolorbox}[colback=lightblue, title=\textbf{1. Bootstrapping}]
+\begin{itemize}
+    \item Create $S$ ``parallel universe'' datasets by sampling \textit{with replacement}
+    \item Fit model to each $\rightarrow$ get distribution of $\hat{\beta}$
+    \item \textbf{Confidence Interval}: Use 2.5th and 97.5th percentiles
+    \item \textbf{Standard Error}: Standard deviation of bootstrap $\hat{\beta}$ values
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightgreen, title=\textbf{2. Feature Importance}]
+\begin{itemize}
+    \item \textbf{Naive}: Rank by $|\hat{\beta}|$ (ignores uncertainty!)
+    \item \textbf{Better}: Rank by $|\hat{t}| = |\bar{\beta}|/SE$ (signal-to-noise ratio)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightyellow, title=\textbf{3. Statistical Significance}]
+\begin{itemize}
+    \item \textbf{Null hypothesis $H_0$}: $\beta = 0$ (no effect)
+    \item \textbf{p-value}: Probability of seeing our result if $H_0$ is true
+    \item $p < 0.05$ $\rightarrow$ Reject $H_0$ $\rightarrow$ Significant!
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpurple, title=\textbf{4. CI vs. PI}]
+\begin{itemize}
+    \item \textbf{Confidence Interval (CI)}: Uncertainty in mean $f(x)$
+    \item \textbf{Prediction Interval (PI)}: Uncertainty in individual $y = f(x) + \epsilon$
+    \item \textbf{PI is always wider} (includes $\epsilon$ variance)
+\end{itemize}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+%========================================================================================
+\section{Common Questions and Answers}
+%========================================================================================
+
+\textbf{Q: How many bootstrap samples ($S$) should I use?}
+
+A: Typically 1,000-10,000. More is better but has diminishing returns. For rough estimates, 1,000 is fine. For precise confidence intervals, use 10,000+.
+
+\textbf{Q: How does bootstrapping relate to overfitting?}
+
+A: Great question! Bootstrapping helps us understand coefficient uncertainty, but doesn't prevent overfitting. You should still use regularization (Ridge/Lasso) and cross-validation. In fact, you can bootstrap a Ridge regression model---apply regularization within each bootstrap iteration.
+
+\textbf{Q: When should I use bootstrap CIs vs. analytical formulas?}
+
+A: Analytical formulas (which assume normality) are faster but make assumptions. Bootstrap is more general---it works even when data isn't normal. Professor Protopapas prefers bootstrap because it's ``assumption-free.'' In practice, both give similar results for large samples.
+
+\textbf{Q: Why does the confidence/prediction interval have a funnel shape?}
+
+A: The regression line is best constrained at the data center $(\bar{x}, \bar{y})$. Away from the center, small errors in the slope get amplified. Think of it like a see-saw pivoting at the center---small tilts at the pivot become large movements at the ends.
+
+\textbf{Q: Is p < 0.05 a universal rule?}
+
+A: No! It's a convention that works in many contexts, but:
+\begin{itemize}
+    \item Some fields (particle physics) use much stricter thresholds
+    \item Multiple testing requires adjustments (Bonferroni correction)
+    \item Effect size matters too---a tiny effect can be ``significant'' with enough data
+\end{itemize}
+
+%========================================================================================
+\section{Looking Ahead}
+%========================================================================================
+
+This lecture introduced key concepts that will be developed further:
+\begin{itemize}
+    \item Kevin Rader will cover the \textbf{probabilistic foundations} of these ideas
+    \item Formal hypothesis testing with assumptions about the error distribution
+    \item Connection to the t-distribution and degrees of freedom
+    \item These concepts extend to classification (logistic regression) and beyond
+\end{itemize}
+
+The key takeaway: Always quantify and communicate uncertainty. A point estimate without a confidence interval is incomplete!
+
+\end{document}

@@ -1,0 +1,1145 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Data Engineering for Analytics
+% Lecture 02: Data Modeling and Metadata
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Data Engineering for Analytics}}
+\fancyhead[R]{\small\textit{Lecture 02}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, CREATE, TABLE},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Data Engineering - Lecture 02},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Data Modeling and Metadata}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Settings
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\title{CSCI E-103: Data Engineering for Analytics\\Lecture 02: Data Modeling and Metadata}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Data Engineering for Analytics}{Lecture 02: Data Modeling \& Metadata}{Anindita Mahapatra \& Eric Gieseke}{Master data modeling techniques (conceptual, logical, physical), understand OLTP vs OLAP systems, compare DWH architectures, and learn data formats and compression}
+
+\begin{summarybox}
+This lecture covers the core discipline of \textbf{data modeling}—organizing data to meet business needs. We explore the three modeling levels (conceptual, logical, physical), contrast OLTP and OLAP systems, examine dimensional modeling with Star and Snowflake schemas, and compare data warehouse architectures (Inmon, Kimball, Data Vault). We also cover metadata management, data formats (CSV, JSON, Parquet, Delta Lake), compression techniques, and data profiling. The lab introduces housing price prediction using linear regression.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Review: Key Concepts from Lecture 01}
+%========================================================================================
+
+Before diving into data modeling, let's reinforce the foundational concepts:
+
+\begin{table}[h!]
+\centering
+\caption{Lecture 01 Key Terms Review}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Term} & \textbf{Key Explanation} \\
+\midrule
+\textbf{ACID} & Atomicity, Consistency, Isolation, Durability (relational databases, bank transactions) \\
+\textbf{BASE} & Basically Available, Soft State, Eventual Consistency (NoSQL, social media) \\
+\textbf{CAP Theorem} & Distributed systems can only have 2 of 3: Consistency, Availability, Partition Tolerance \\
+\textbf{IaaS/PaaS/SaaS} & Cloud service models (Infrastructure, Platform, Software as a Service) \\
+\textbf{Lakehouse} & Combines data lake (flexibility) + data warehouse (reliability) \\
+\textbf{DAG} & Directed Acyclic Graph—defines workflow in data pipelines \\
+\textbf{ETL} & Extract, Transform, Load—moving data between systems \\
+\textbf{5 V's of Big Data} & Volume, Velocity, Variety, Veracity (accuracy), Value \\
+\textbf{Spark Advantage} & In-memory processing (100x faster than Hadoop's disk-based MapReduce) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{warningbox}
+\textbf{The Biggest Challenge: Data Quality and Staleness}
+
+According to industry research, the biggest problems in big data aren't volume or velocity—they're ensuring data is \textbf{accurate} and \textbf{up-to-date}. "Garbage In, Garbage Out" (GIGO) remains the cardinal rule: no amount of sophisticated modeling can fix fundamentally bad data.
+\end{warningbox}
+
+\newpage
+
+%========================================================================================
+\section{What is Data Modeling?}
+%========================================================================================
+
+\begin{definitionbox}{Data Modeling}
+Data modeling is the process of \textbf{organizing and structuring data} to meet business process requirements. It creates a "blueprint" that defines how data is stored, accessed, and related—transforming real-world complexity into a computer-understandable structure.
+\end{definitionbox}
+
+\subsection{Why Data Modeling Matters}
+
+\begin{enumerate}
+    \item \textbf{Consistency and Quality}: Standardizes names, rules, and formats across the organization
+    \item \textbf{Efficient Storage and Retrieval}: Optimizes how data is persisted and queried
+    \item \textbf{Communication Tool}: Creates common vocabulary between business and technical teams
+    \item \textbf{Early Error Detection}: Catches inconsistencies in design phase, not production
+    \item \textbf{Documentation}: Serves as living documentation of data assets
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Cost of Late Discovery}
+
+Fixing a data model error during design costs \$1. Fixing the same error in development costs \$10. Fixing it in production costs \$100+. Data modeling is an investment that pays dividends throughout the system's lifecycle.
+\end{infobox}
+
+\subsection{The Three Levels of Data Modeling}
+
+Data modeling progresses from abstract business concepts to concrete technical implementations:
+
+\subsubsection{1. Conceptual (Semantic) Model}
+
+\begin{itemize}
+    \item \textbf{Purpose}: Define core business concepts and rules
+    \item \textbf{Audience}: Business stakeholders, domain experts
+    \item \textbf{Focus}: Entities and relationships (e.g., "Customer purchases Product")
+    \item \textbf{Technical details}: None—purely business-focused
+\end{itemize}
+
+\subsubsection{2. Logical Model}
+
+\begin{itemize}
+    \item \textbf{Purpose}: Define data structure, attributes, and relationships in detail
+    \item \textbf{Audience}: Developers, data architects, business analysts
+    \item \textbf{Focus}: Entity attributes, data types, keys, cardinality
+    \item \textbf{Technical details}: Technology-agnostic (not tied to specific database)
+\end{itemize}
+
+\subsubsection{3. Physical Model}
+
+\begin{itemize}
+    \item \textbf{Purpose}: Translate logical model into specific database technology
+    \item \textbf{Audience}: DBAs, data engineers
+    \item \textbf{Focus}: Table names, column types, indexes, partitions, constraints
+    \item \textbf{Technical details}: Fully specified for target platform (e.g., PostgreSQL, Delta Lake)
+\end{itemize}
+
+\begin{examplebox}{Online Bookstore Example}
+\textbf{1. Conceptual Model}: "Customer orders Book"
+
+\textbf{2. Logical Model}:
+\begin{itemize}
+    \item Customer(CustomerID [PK], Name, Email)
+    \item Book(BookID [PK], Title, Author)
+    \item Order(OrderID [PK], OrderDate, CustomerID [FK], BookID [FK])
+\end{itemize}
+
+\textbf{3. Physical Model (PostgreSQL)}:
+\begin{lstlisting}[style=sqlstyle]
+CREATE TABLE T_CUSTOMER (
+  CUST_ID SERIAL PRIMARY KEY,
+  CUST_NAME VARCHAR(100) NOT NULL,
+  EMAIL VARCHAR(255) UNIQUE
+);
+CREATE TABLE T_BOOK (
+  BOOK_ID SERIAL PRIMARY KEY,
+  TITLE VARCHAR(500) NOT NULL,
+  AUTHOR VARCHAR(200)
+);
+CREATE TABLE T_ORDER_ITEMS (
+  ORDER_ID INT NOT NULL,
+  BOOK_ID INT REFERENCES T_BOOK(BOOK_ID),
+  QUANTITY INT DEFAULT 1,
+  PRIMARY KEY (ORDER_ID, BOOK_ID)
+);
+\end{lstlisting}
+\end{examplebox}
+
+\newpage
+
+%========================================================================================
+\section{OLTP vs OLAP: Two Different Worlds}
+%========================================================================================
+
+Database systems are designed for fundamentally different purposes. Understanding this distinction is crucial for choosing the right modeling approach.
+
+\subsection{OLTP: Online Transaction Processing}
+
+\begin{definitionbox}{OLTP}
+Systems designed for real-time operational transactions—handling many concurrent users performing fast, individual read/write operations.
+\end{definitionbox}
+
+\textbf{Analogy}: The \textbf{bank teller's computer}—processing deposits, withdrawals, and transfers in real-time.
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Many users, short transactions
+    \item Data integrity is critical (ACID compliance)
+    \item \textbf{Normalized} data (minimize redundancy)
+    \item Current, operational data
+    \item Examples: ATM systems, e-commerce carts, reservation systems
+\end{itemize}
+
+\subsection{OLAP: Online Analytical Processing}
+
+\begin{definitionbox}{OLAP}
+Systems designed for complex analytical queries across large volumes of historical data—supporting business intelligence and decision-making.
+\end{definitionbox}
+
+\textbf{Analogy}: The \textbf{corporate headquarters analytics department}—analyzing years of sales data to find patterns.
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Few users, complex queries
+    \item Query speed is critical
+    \item \textbf{Denormalized} data (optimize for reads)
+    \item Historical, aggregated data
+    \item Examples: Sales reports, customer segmentation, trend analysis
+\end{itemize}
+
+\subsection{Comparison Table}
+
+\begin{table}[h!]
+\centering
+\caption{OLTP vs OLAP Systems}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Aspect} & \textbf{OLTP} & \textbf{OLAP} \\
+\midrule
+\textbf{Purpose} & Day-to-day operations & Decision support \\
+\textbf{Design} & Application-oriented & Subject-oriented \\
+\textbf{Data} & Current, up-to-date & Historical, summarized \\
+\textbf{Operations} & Read/Write/Update & Mostly Read (scans) \\
+\textbf{Data Size} & Gigabytes & Terabytes to Petabytes \\
+\textbf{Performance} & Transaction throughput & Query response time \\
+\textbf{Modeling} & \textbf{ER Model (Normalized)} & \textbf{Dimensional (Denormalized)} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{infobox}
+\textbf{The Bridge: ETL}
+
+ETL (Extract, Transform, Load) connects OLTP and OLAP worlds. Data flows from operational systems (OLTP) through transformation pipelines into analytical systems (OLAP), enabling business intelligence without impacting operational performance.
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{Dimensional Modeling for Analytics}
+%========================================================================================
+
+OLAP systems use \textbf{dimensional modeling} to optimize analytical queries. This approach separates data into two categories: Facts and Dimensions.
+
+\subsection{Facts and Dimensions}
+
+\begin{definitionbox}{Fact Table}
+Contains the \textbf{measurable, quantitative data}—the "what" of business events.
+\begin{itemize}
+    \item Numeric measures: sales amount, quantity, clicks
+    \item Foreign keys to dimension tables
+    \item Very large (millions/billions of rows), narrow (few columns)
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}{Dimension Table}
+Contains the \textbf{descriptive context}—the "who, when, where, what" of business events.
+\begin{itemize}
+    \item Descriptive attributes: customer name, product category, date details
+    \item Provides filtering and grouping criteria
+    \item Relatively small, wide (many columns)
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Sales Analysis}
+\textbf{Question}: "What was total revenue by product category and region last quarter?"
+
+\textbf{Fact Table}: Sales transactions with amount, quantity, profit
+
+\textbf{Dimension Tables}:
+\begin{itemize}
+    \item Product: category, brand, price tier
+    \item Customer: region, segment, acquisition date
+    \item Time: date, quarter, year, day of week
+\end{itemize}
+\end{examplebox}
+
+\subsection{Star Schema}
+
+\begin{definitionbox}{Star Schema}
+A dimensional model where one central \textbf{fact table} is surrounded by multiple \textbf{dimension tables}. The visual representation resembles a star.
+\end{definitionbox}
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Dimension tables are \textbf{denormalized} (contain redundant data)
+    \item Only \textbf{one join} needed between fact and dimension
+    \item \textbf{Fast query performance}
+    \item Higher storage due to redundancy
+\end{itemize}
+
+\subsection{Snowflake Schema}
+
+\begin{definitionbox}{Snowflake Schema}
+An extension of star schema where dimension tables are \textbf{normalized} into sub-dimensions. The visual representation resembles a snowflake.
+\end{definitionbox}
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Dimension tables are \textbf{normalized} (separated into related tables)
+    \item \textbf{Multiple joins} needed to traverse dimension hierarchies
+    \item \textbf{Lower storage} due to reduced redundancy
+    \item Slower query performance
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{Star Schema vs Snowflake Schema}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Aspect} & \textbf{Star Schema} & \textbf{Snowflake Schema} \\
+\midrule
+Dimension tables & Denormalized & Normalized \\
+Data redundancy & High & Low \\
+Joins required & Few (typically 1) & Many (multiple levels) \\
+Query performance & \textbf{Faster} & Slower \\
+Storage efficiency & Lower & Higher \\
+Complexity & Simple & Complex \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{infobox}
+\textbf{Modern Preference: Star Schema}
+
+With cheap storage and powerful compute, most modern data warehouses prefer star schemas. The query performance benefits outweigh storage costs. Snowflake schemas are used when storage is truly constrained or when data governance requires strict normalization.
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{NoSQL Data Modeling}
+%========================================================================================
+
+NoSQL databases require a fundamentally different mindset for data modeling.
+
+\subsection{The Key Difference: Query-First Design}
+
+\begin{warningbox}
+\textbf{Different Questions}
+
+\begin{itemize}
+    \item \textbf{SQL/Relational}: "Given this data structure, what questions can I answer?"
+    \item \textbf{NoSQL}: "Given the questions business needs answered, how should I structure data?"
+\end{itemize}
+
+NoSQL is \textbf{schema-flexible}, not schema-free. The modeling is just as important—it's driven by \textbf{access patterns} rather than normalization theory.
+\end{warningbox}
+
+\subsection{Denormalization is the Norm}
+
+NoSQL databases often don't support joins (or support them poorly). Therefore:
+
+\begin{itemize}
+    \item \textbf{Duplicate data} to avoid joins
+    \item Structure data so \textbf{one query retrieves everything needed}
+    \item Optimize for \textbf{read performance} over storage efficiency
+\end{itemize}
+
+\subsection{Embedded vs Referenced Documents}
+
+\begin{examplebox}{Blog Posts and Comments}
+\textbf{Embedded Model (Denormalized)}:
+\begin{lstlisting}[language=json]
+{
+  "post_id": "p123",
+  "title": "My First Post",
+  "content": "Hello world!",
+  "comments": [
+    { "user": "alice", "text": "Great post!" },
+    { "user": "bob", "text": "Welcome." }
+  ]
+}
+\end{lstlisting}
+\textbf{Pros}: One query gets everything\\
+\textbf{Cons}: Document grows unbounded with comments
+
+\textbf{Referenced Model (Normalized)}:
+\begin{lstlisting}[language=json]
+// Posts Collection
+{ "post_id": "p123", "title": "My First Post" }
+
+// Comments Collection
+{ "comment_id": "c1", "post_id": "p123", "user": "alice" }
+{ "comment_id": "c2", "post_id": "p123", "user": "bob" }
+\end{lstlisting}
+\textbf{Pros}: Scalable, documents stay small\\
+\textbf{Cons}: Two queries (or expensive join) needed
+\end{examplebox}
+
+\begin{infobox}
+\textbf{Rule of Thumb}
+
+\begin{itemize}
+    \item \textbf{Embed} when: Data is accessed together, bounded growth, 1:1 or 1:few relationships
+    \item \textbf{Reference} when: Data accessed independently, unbounded growth, many:many relationships
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{Data Warehouse Architectures}
+%========================================================================================
+
+Three major approaches have shaped how organizations build data warehouses.
+
+\subsection{Inmon (Top-Down)}
+
+\begin{definitionbox}{Inmon Approach}
+Build a \textbf{centralized, normalized (3NF) enterprise data warehouse} first. Then create department-specific data marts from this single source of truth.
+\end{definitionbox}
+
+\textbf{Analogy}: "Paint the entire house first, then decorate individual rooms"
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Third Normal Form (3NF) for the central DWH
+    \item Data marts derived from the warehouse
+    \item Strong data consistency and integrity
+    \item Long initial implementation time
+\end{itemize}
+
+\subsection{Kimball (Bottom-Up)}
+
+\begin{definitionbox}{Kimball Approach}
+Build \textbf{department-specific data marts} (using star schema) first. The enterprise warehouse emerges as the collection of these marts connected by conformed dimensions.
+\end{definitionbox}
+
+\textbf{Analogy}: "Build LEGO blocks first, then assemble the structure"
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Dimensional model (star/snowflake) from the start
+    \item Faster initial delivery of business value
+    \item Risk of inconsistent data across marts
+    \item Conformed dimensions needed to maintain consistency
+\end{itemize}
+
+\subsection{Data Vault (Hybrid)}
+
+\begin{definitionbox}{Data Vault}
+A modeling technique designed for \textbf{flexibility and auditability}. Separates data into three components: Hubs (business keys), Links (relationships), and Satellites (attributes and history).
+\end{definitionbox}
+
+\textbf{Analogy}: "A vault that tracks every change to every piece of data"
+
+\textbf{Components}:
+\begin{itemize}
+    \item \textbf{Hubs}: Core business entities (e.g., CustomerID)
+    \item \textbf{Links}: Relationships between hubs
+    \item \textbf{Satellites}: Descriptive attributes and their change history
+\end{itemize}
+
+\textbf{Advantages}:
+\begin{itemize}
+    \item Easily add new data sources
+    \item Full audit trail of all changes
+    \item Handles change better than Inmon/Kimball
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{DWH Architecture Comparison}
+\begin{tabularx}{\textwidth}{lXXX}
+\toprule
+\textbf{Aspect} & \textbf{Inmon} & \textbf{Kimball} & \textbf{Data Vault} \\
+\midrule
+Approach & Top-down & Bottom-up & Hybrid \\
+Structure & 3NF & Star schema & Hub/Link/Satellite \\
+Time to value & Slow & Fast & Medium \\
+Single source of truth & Yes & No & Yes \\
+Handle change & Poor & Poor & \textbf{Good} \\
+Complexity & Medium & Low & High \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{Modern Architecture: Medallion (Bronze/Silver/Gold)}
+%========================================================================================
+
+The Medallion Architecture organizes data by quality level in lakehouse environments.
+
+\subsection{The LEGO Analogy}
+
+\begin{infobox}
+\textbf{Data Conformance = Building with LEGO}
+
+Raw data is like a pile of mismatched LEGO pieces. Data engineering transforms them into:
+\begin{enumerate}
+    \item \textbf{Sorted}: Organized by color/type
+    \item \textbf{Arranged}: Grouped logically
+    \item \textbf{Consistent}: Standardized sizes
+\end{enumerate}
+The result: "Conformed data" that anyone can build with.
+\end{infobox}
+
+\subsection{The Three Layers}
+
+\begin{definitionbox}{Bronze Layer (Raw)}
+\textbf{Purpose}: Ingest source data with minimal transformation
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Data as-is from sources
+    \item Maybe add ingestion timestamp, source file name
+    \item Preserves original for audit and reprocessing
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}{Silver Layer (Cleaned)}
+\textbf{Purpose}: Clean, validate, and enrich data
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Deduplicated
+    \item Data types corrected
+    \item Null values handled
+    \item Business rules applied
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}{Gold Layer (Business-Ready)}
+\textbf{Purpose}: Aggregated, business-level data for consumption
+
+\textbf{Characteristics}:
+\begin{itemize}
+    \item Star schemas and data marts
+    \item Pre-computed aggregations
+    \item Ready for dashboards, reports, ML
+\end{itemize}
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{Why Keep Bronze?}
+
+Never throw away raw data! Business logic changes, new use cases emerge, and you may need to reprocess from scratch. Storage is cheap—recreating lost data is expensive or impossible.
+\end{warningbox}
+
+\newpage
+
+%========================================================================================
+\section{Metadata: Data About Data}
+%========================================================================================
+
+\begin{definitionbox}{Metadata}
+Information that describes, explains, and provides context about data. It answers questions like: Who created this? Where did it come from? How should it be used?
+\end{definitionbox}
+
+\subsection{Categories of Metadata}
+
+\begin{enumerate}
+    \item \textbf{Business Metadata}: Business definitions, KPIs, data ownership, glossary
+    \item \textbf{Technical Metadata}: Schema, data types, lineage, storage location
+    \item \textbf{Operational Metadata}: SLAs, refresh frequency, usage patterns, freshness
+\end{enumerate}
+
+\subsection{Key Metadata Questions}
+
+\begin{table}[h!]
+\centering
+\caption{Essential Metadata Questions}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Category} & \textbf{Questions} \\
+\midrule
+\textbf{Who} & Created? Manages? Uses? Owns? Regulates? \\
+\textbf{What} & Business definition? Rules? Abbreviations? \\
+\textbf{Where} & Stored? Source? Used? Backup? \\
+\textbf{When} & Created? Updated? Retention period? \\
+\textbf{Why} & Purpose? Business drivers? \\
+\textbf{How} & Formatted? Accessed? Protected? \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Data Catalogs}
+
+\begin{definitionbox}{Data Catalog}
+A centralized repository for storing and managing metadata. Enables data discovery, governance, lineage tracking, and quality monitoring.
+\end{definitionbox}
+
+Examples: Databricks Unity Catalog, AWS Glue Catalog, Apache Atlas
+
+\newpage
+
+%========================================================================================
+\section{Data Formats}
+%========================================================================================
+
+Choosing the right data format significantly impacts storage, performance, and compatibility.
+
+\subsection{Text vs Binary Formats}
+
+\begin{table}[h!]
+\centering
+\caption{Data Format Comparison}
+\begin{tabularx}{\textwidth}{lXXXX}
+\toprule
+\textbf{Format} & \textbf{Type} & \textbf{Orientation} & \textbf{Splitable} & \textbf{Use Case} \\
+\midrule
+CSV & Text & Row & No & Simple interchange \\
+JSON & Text & Row & No* & APIs, documents \\
+Avro & Binary & Row & Yes & Streaming, schema evolution \\
+Parquet & Binary & Column & Yes & Analytics, DWH \\
+ORC & Binary & Column & Yes & Hive/Hadoop analytics \\
+Delta & Binary & Column & Yes & Lakehouse (ACID) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Row vs Column Orientation}
+
+\begin{itemize}
+    \item \textbf{Row-oriented}: Fast writes, good for OLTP
+    \item \textbf{Column-oriented}: Fast analytical queries (aggregations), better compression
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Why Avoid Text Formats for Big Data?}
+
+\begin{itemize}
+    \item Inefficient storage (numbers as strings)
+    \item No type checking (cars in numeric fields)
+    \item No native compression
+    \item Not splitable (can't parallelize)
+    \item JSON repeats metadata in every record
+\end{itemize}
+\end{warningbox}
+
+\subsection{Delta Lake}
+
+\begin{definitionbox}{Delta Lake}
+An open-source storage layer that brings \textbf{ACID transactions} to data lakes. Built on Parquet files with a transaction log.
+\end{definitionbox}
+
+\textbf{Key Benefits}:
+\begin{itemize}
+    \item ACID transactions on data lakes
+    \item Time travel (access previous versions)
+    \item Efficient upserts (UPDATE + INSERT in one operation)
+    \item Schema enforcement and evolution
+    \item Unified batch and streaming
+\end{itemize}
+
+\newpage
+
+%========================================================================================
+\section{Data Compression}
+%========================================================================================
+
+\begin{definitionbox}{Compression}
+Encoding data using fewer bits than the original representation, reducing storage and I/O bandwidth requirements.
+\end{definitionbox}
+
+\subsection{Lossy vs Lossless}
+
+\begin{itemize}
+    \item \textbf{Lossy}: Some information lost (acceptable for images, audio)
+    \item \textbf{Lossless}: Original data fully recoverable (required for databases)
+\end{itemize}
+
+\subsection{Common Codecs}
+
+\begin{table}[h!]
+\centering
+\caption{Compression Algorithms}
+\begin{tabularx}{\textwidth}{lXXX}
+\toprule
+\textbf{Codec} & \textbf{Splitable} & \textbf{Compression Ratio} & \textbf{Speed} \\
+\midrule
+Gzip (.gz) & No & High & Medium \\
+Bzip2 (.bz2) & No & Very High & Slow \\
+LZO (.lzo) & Yes & Medium & Fast \\
+Snappy (.snappy) & Yes & Medium & Very Fast \\
+LZ4 & Yes & Medium & Very Fast \\
+Zstandard (.zst) & Yes & High & Fast \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{infobox}
+\textbf{Splitable Matters}
+
+For distributed processing, compression format must be \textbf{splitable}—otherwise you can't parallelize across workers. Snappy and LZ4 are popular choices for big data because they're fast and splitable.
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{Data Profiling}
+%========================================================================================
+
+\begin{definitionbox}{Data Profiling}
+The process of examining data to understand its structure, quality, and characteristics before using it for analysis or ML.
+\end{definitionbox}
+
+\subsection{Profiling Techniques}
+
+\begin{enumerate}
+    \item \textbf{Structural Discovery}: Schema consistency, data types, format correctness
+    \item \textbf{Content Analysis}: Min/max, mean, median, standard deviation, null counts, unique values
+    \item \textbf{Relationship Discovery}: Connections between datasets, entity resolution
+    \item \textbf{Data Correlation}: Univariate and multivariate analysis, identifying dependent variables
+    \item \textbf{Visualization}: Outlier detection, distribution analysis
+\end{enumerate}
+
+\subsection{Spark Data Profiling}
+
+\begin{lstlisting}[style=pythonstyle, caption={Basic Data Profiling in Spark}]
+# Quick statistics
+df.describe().show()
+
+# More detailed summary
+df.summary().show()
+
+# Check nulls
+from pyspark.sql.functions import col, isnan, when, count
+df.select([count(when(col(c).isNull(), c)).alias(c)
+           for c in df.columns]).show()
+\end{lstlisting}
+
+\newpage
+
+%========================================================================================
+\section{Lab 01: Housing Price Prediction}
+%========================================================================================
+
+\subsection{Overview}
+
+This lab walks through a complete ML workflow using housing data:
+\begin{enumerate}
+    \item Load and explore data
+    \item Feature engineering
+    \item Train/test split
+    \item Linear regression model
+    \item Evaluate with RMSE
+\end{enumerate}
+
+\subsection{Key Steps}
+
+\begin{lstlisting}[style=pythonstyle, caption={Loading and Preparing Housing Data}]
+# Read CSV into Spark DataFrame
+df = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .load("/path/to/housing.csv")
+
+# Add derived columns
+from pyspark.sql.functions import from_unixtime, col
+df = df.withColumn("date", from_unixtime(col("date")/1000))
+df = df.withColumn("zipcode", col("zipcode").cast("string"))
+
+# Write as Delta table
+df.write.format("delta").mode("overwrite").saveAsTable("housing")
+\end{lstlisting}
+
+\subsection{Training the Model}
+
+\begin{lstlisting}[style=pythonstyle, caption={Linear Regression with scikit-learn}]
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np
+
+# Split data
+train_df, test_df = df.randomSplit([0.8, 0.2], seed=123)
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict
+predictions = model.predict(X_test)
+
+# Evaluate
+rmse = np.sqrt(mean_squared_error(y_test, predictions))
+print(f"RMSE: {rmse:.2f}")
+\end{lstlisting}
+
+\subsection{Understanding RMSE}
+
+\begin{definitionbox}{RMSE (Root Mean Square Error)}
+A measure of the average magnitude of prediction errors. Lower is better.
+
+$$RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}$$
+
+Where $y_i$ is actual value and $\hat{y}_i$ is predicted value.
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Interpreting RMSE}
+
+RMSE depends on the scale of your target variable. For housing prices ranging from \$50,000 to \$5,000,000, an RMSE of \$50,000 might be excellent. For prices ranging \$100-\$500, the same RMSE would be terrible. Always consider RMSE relative to your data range.
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{Summary and Best Practices}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Key Takeaways}
+
+\begin{enumerate}
+    \item \textbf{Data Modeling} progresses: Conceptual $\to$ Logical $\to$ Physical
+
+    \item \textbf{OLTP} (operational) uses normalized models; \textbf{OLAP} (analytical) uses denormalized dimensional models
+
+    \item \textbf{Star Schema}: Fast queries, more storage (denormalized dimensions)
+
+    \item \textbf{Snowflake Schema}: Less storage, slower queries (normalized dimensions)
+
+    \item \textbf{DWH Approaches}: Inmon (top-down, 3NF), Kimball (bottom-up, dimensional), Data Vault (hybrid, audit-friendly)
+
+    \item \textbf{Medallion Architecture}: Bronze (raw) $\to$ Silver (cleaned) $\to$ Gold (business-ready)
+
+    \item \textbf{NoSQL Modeling}: Query-first design, denormalize for read performance
+
+    \item \textbf{Data Formats}: Use columnar formats (Parquet, Delta) for analytics; avoid text formats for big data
+
+    \item \textbf{Compression}: Choose splitable formats (Snappy, LZ4) for distributed processing
+
+    \item \textbf{Metadata}: Essential for data discovery, governance, and trust
+\end{enumerate}
+\end{summarybox}
+
+\begin{warningbox}
+\textbf{Design Principles}
+
+\begin{itemize}
+    \item[$\square$] Design a \textbf{system}, not just a schema—schemas evolve
+    \item[$\square$] Start with \textbf{core business data}—don't try to model everything at once
+    \item[$\square$] Document with clear \textbf{metadata}—future you will thank you
+    \item[$\square$] Identify \textbf{consumption patterns}—model for how data will be queried
+    \item[$\square$] Match \textbf{compression and format} to data characteristics and access patterns
+\end{itemize}
+\end{warningbox}
+
+\end{document}

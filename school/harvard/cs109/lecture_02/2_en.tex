@@ -1,0 +1,1161 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CS109A: Introduction to Data Science - Lecture 02
+% Data and Visualization
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 02}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced, colback=lightpurple, colframe=darkpurple,
+    fonttitle=\bfseries\large, title=Lecture Overview,
+    arc=3mm, boxrule=1pt, left=8pt, right=8pt, top=8pt, bottom=8pt, breakable, #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced, colback=lightblue, colframe=darkblue,
+    fonttitle=\bfseries, title=Key Summary,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced, colback=lightgreen, colframe=darkgreen,
+    fonttitle=\bfseries, title=Key Information,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced, colback=lightyellow, colframe=darkorange,
+    fonttitle=\bfseries, title=Warning,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced, colback=lightgray, colframe=black!60,
+    fonttitle=\bfseries, title=Example: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced, colback=lightpink, colframe=purple!70!black,
+    fonttitle=\bfseries, title=Definition: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced, colback=boxred, colframe=red!70!black,
+    fonttitle=\bfseries, title=Important: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left, numbersep=8pt,
+    breaklines=true, breakatwhitespace=false,
+    frame=single, frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b, showstringspaces=false,
+    tabsize=2, xleftmargin=15pt, xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 02},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple, colframe=darkpurple,
+    boxrule=1pt, arc=2mm, left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CS109A: Introduction to Data Science\\Lecture 02: Data and Visualization}
+\author{Harvard University}
+\date{Fall 2024}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 02: Data and Visualization}{Kevin Rader}{Understand data types, collection methods, descriptive statistics, and visualization techniques for exploratory data analysis}
+
+
+\begin{summarybox}
+This lecture covers the fundamental building blocks of data science: understanding what data are, where they come from, how to structure them for analysis, and how to explore them effectively. We cover the distinction between populations and samples, measures of center (mean, median, mode) and spread (variance, standard deviation), and the critical importance of data visualization. The famous Anscombe's Quartet demonstrates why you should \textbf{always visualize your data} rather than relying solely on summary statistics. We also explore various visualization techniques including histograms, bar plots, scatter plots, box plots, and violin plots.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================
+\section{Key Terminology}
+%========================================
+
+Before diving into data analysis, you need to understand these fundamental terms:
+
+\begin{table}[h!]
+\centering
+\caption{Essential Data Science Terminology}
+\begin{tabular}{@{}lp{5.5cm}p{5.5cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Simple Explanation} & \textbf{Notes} \\
+\midrule
+Data & A collection of facts, values, or information obtained through observation & Plural form; singular is ``datum'' \\
+Tabular Data & Data organized in rows and columns like a spreadsheet & Also called ``Tidy Data'' \\
+Observation & A single unit of analysis (one row) & Example: one movie, one student \\
+Variable & A characteristic being measured (one column) & Also called ``feature'' or ``attribute'' \\
+Population & The entire group you want to study & Example: ALL students in this class \\
+Sample & A subset taken from the population & Example: Students who attended today \\
+EDA & Exploratory Data Analysis & Using visuals and statistics to find patterns \\
+\midrule
+\multicolumn{3}{l}{\textbf{Measures of Center}} \\
+Mean ($\bar{x}$) & Sum of all values divided by count & Sensitive to outliers \\
+Median & The middle value when data is sorted & Robust to outliers \\
+Mode & Most frequently occurring value & Used for categorical data \\
+\midrule
+\multicolumn{3}{l}{\textbf{Measures of Spread}} \\
+Variance ($s^2$) & Average squared distance from the mean & Units are squared \\
+Std. Dev. ($s$) & Square root of variance & Same units as original data \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+%========================================
+\section{What is Data?}
+%========================================
+
+Data science starts with \textbf{data}. But what exactly is data?
+
+\subsection{Definition of Data}
+
+\begin{definitionbox}{Data vs. Datum}
+\begin{itemize}
+    \item \textbf{Datum} (singular): A single piece of information or measurement
+    \item \textbf{Data} (plural): A collection of information pieces obtained through observation or measurement
+\end{itemize}
+
+Data can be:
+\begin{itemize}
+    \item \textbf{Numeric}: Numbers (integers, decimals)
+    \item \textbf{Categorical}: Groups or categories (``male/female'', ``red/blue/green'')
+    \item \textbf{Boolean}: True/False, Yes/No, 1/0
+    \item \textbf{Strings}: Text (``Hello World'')
+\end{itemize}
+\end{definitionbox}
+
+In the modern world, \textbf{everything is data}. Facebook collects your social interactions, Google tracks your searches, your phone records your location, and even your grocery store tracks your purchases.
+
+\subsection{Where Does Data Come From?}
+
+Data can come from three main sources:
+
+\subsubsection{1. Internal Sources (Primary Data)}
+Data you or your organization collect directly:
+\begin{itemize}
+    \item Scientific experiments
+    \item Clinical trials
+    \item Surveys you design and distribute
+    \item Company sales records
+\end{itemize}
+
+\subsubsection{2. Existing External Sources}
+Data that someone else has already collected and made available:
+\begin{itemize}
+    \item Government open data portals
+    \item Kaggle datasets
+    \item Sports statistics websites
+    \item Academic research databases
+\end{itemize}
+
+\subsubsection{3. External Sources Requiring Collection}
+Data that exists online but requires effort to extract:
+\begin{itemize}
+    \item \textbf{APIs}: Official interfaces provided by companies
+    \item \textbf{RSS Feeds}: Streams from blogs and news sites
+    \item \textbf{Web Scraping}: Extracting data from HTML pages
+\end{itemize}
+
+\newpage
+
+\subsection{Methods of Online Data Collection}
+
+\begin{table}[h!]
+\centering
+\caption{Three Methods of Online Data Collection}
+\begin{tabular}{@{}lp{5cm}p{5cm}@{}}
+\toprule
+\textbf{Method} & \textbf{Description} & \textbf{Pros/Cons} \\
+\midrule
+\textbf{API} & Official interface provided by companies (Google Maps, Twitter, Spotify) & Pro: Legal, stable, accurate data. Con: Often rate-limited or paid. \\
+\textbf{RSS} & Streams of updated content from blogs/news sites & Pro: Free, real-time updates. Con: Limited to what publishers provide. \\
+\textbf{Web Scraping} & Extracting data directly from HTML code & Pro: Flexible, free. Con: Legal/ethical concerns, fragile. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}
+\textbf{Ethical and Legal Concerns with Web Scraping}
+
+Web scraping is powerful but comes with serious responsibilities:
+\begin{itemize}
+    \item \textbf{Terms of Service}: Many websites explicitly prohibit scraping
+    \item \textbf{Privacy}: Never collect or publish private/personal information
+    \item \textbf{Server Load}: Excessive scraping can overwhelm servers (similar to a DoS attack)
+    \item \textbf{Potential Harm}: Ask yourself: ``Could publishing this data harm someone?''
+\end{itemize}
+
+\textbf{Rule of thumb}: Just because data is publicly available doesn't mean you can use it however you want. Always ask ``Should I be doing this?'' before scraping.
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{Data Types and Structures}
+%========================================
+
+\subsection{Atomic Data Types}
+
+The most basic building blocks of data:
+
+\begin{itemize}
+    \item \textbf{Numeric}:
+    \begin{itemize}
+        \item \textbf{Integers}: Whole numbers (e.g., 42, -7, 0)
+        \item \textbf{Floats}: Decimal numbers (e.g., 3.14, -0.001)
+    \end{itemize}
+    \item \textbf{Boolean}: True/False values (1/0, Yes/No)
+    \item \textbf{Strings}: Text sequences (e.g., ``Hello'', ``CS109A'')
+\end{itemize}
+
+\subsection{Compound Data Types}
+
+More complex structures built from atomic types:
+
+\begin{itemize}
+    \item \textbf{Lists}: Ordered sequences of values
+    \begin{lstlisting}[language=Python]
+my_list = [1, 2, 3, 4, 5]
+    \end{lstlisting}
+
+    \item \textbf{Dictionaries}: Key-value pairs
+    \begin{lstlisting}[language=Python]
+student = {
+    "first": "Kevin",
+    "last": "Rader",
+    "classes": ["CS109A", "STAT104"]
+}
+    \end{lstlisting}
+\end{itemize}
+
+\subsection{Tabular Data: The Gold Standard}
+
+\begin{infobox}
+\textbf{Why Tabular Data Matters}
+
+Most data analysis tools (pandas, sklearn, etc.) expect your data in \textbf{tabular format}---like an Excel spreadsheet with rows and columns.
+
+\begin{itemize}
+    \item \textbf{Rows} = \textbf{Observations}: Each row represents one unit of analysis (one movie, one student, one transaction)
+    \item \textbf{Columns} = \textbf{Variables}: Each column represents one characteristic being measured (rating, age, price)
+\end{itemize}
+\end{infobox}
+
+\begin{lstlisting}[language=Python, caption={Loading tabular data with pandas}]
+import pandas as pd
+
+# Read a CSV file into a DataFrame
+imdb = pd.read_csv('imdb_top_1000.csv')
+
+# View the first 5 rows
+imdb.head()
+\end{lstlisting}
+
+The output shows a table where:
+\begin{itemize}
+    \item Each \textbf{row} is a different movie (The Shawshank Redemption, The Godfather, etc.)
+    \item Each \textbf{column} is a variable (Series\_Title, Released\_Year, IMDB\_Rating, etc.)
+\end{itemize}
+
+\newpage
+
+\subsection{Variable Types: A Critical Distinction}
+
+\begin{importantbox}{Why Variable Types Matter}
+The type of variable determines:
+\begin{itemize}
+    \item Which \textbf{summary statistics} you can calculate
+    \item Which \textbf{visualizations} are appropriate
+    \item Which \textbf{models} you can use
+\end{itemize}
+
+You can calculate the mean of ``height'' but not the mean of ``favorite color''!
+\end{importantbox}
+
+Variables are divided into two main categories:
+
+\subsubsection{Quantitative (Numeric) Variables}
+Values are numbers where arithmetic operations make sense.
+
+\begin{itemize}
+    \item \textbf{Discrete}: Values are countable, typically integers
+    \begin{itemize}
+        \item Examples: Number of siblings, dice rolls, page views
+    \end{itemize}
+    \item \textbf{Continuous}: Values can be any number within a range
+    \begin{itemize}
+        \item Examples: Height, weight, temperature, time
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Categorical Variables}
+Values fall into distinct groups or categories.
+
+\begin{itemize}
+    \item \textbf{Nominal}: No natural ordering
+    \begin{itemize}
+        \item Examples: Blood type (A, B, O, AB), pet preference (dog, cat, rat)
+    \end{itemize}
+    \item \textbf{Ordinal}: Natural ordering exists
+    \begin{itemize}
+        \item Examples: Letter grades (A, B, C, D, F), satisfaction (high, medium, low)
+    \end{itemize}
+\end{itemize}
+
+\newpage
+
+\subsection{Messy Data and Tidy Data}
+
+Real-world data is rarely clean. Common problems include:
+\begin{itemize}
+    \item \textbf{Missing values}: Empty cells
+    \item \textbf{Wrong values}: Data entry errors (age = 200)
+    \item \textbf{Format mismatches}: Different date formats, inconsistent naming
+    \item \textbf{Messy structure}: Data not in tabular format
+\end{itemize}
+
+\begin{examplebox}{Converting Messy Data to Tidy Data}
+\textbf{BEFORE (Messy):} Weekend produce deliveries
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{Friday} & \textbf{Saturday} & \textbf{Sunday} \\
+\midrule
+\textbf{Morning} & 15 & 158 & 10 \\
+\textbf{Afternoon} & 2 & 90 & 20 \\
+\textbf{Evening} & 55 & 12 & 45 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Problems:}
+\begin{itemize}
+    \item One row contains 3 observations (Friday morning, Saturday morning, Sunday morning)
+    \item ``Friday'' is a value, not a variable name
+    \item Hard to calculate ``average deliveries'' or ``total by day''
+\end{itemize}
+
+\textbf{AFTER (Tidy):}
+
+\begin{center}
+\begin{tabular}{cllc}
+\toprule
+\textbf{ID} & \textbf{Time} & \textbf{Day} & \textbf{Deliveries} \\
+\midrule
+1 & Morning & Friday & 15 \\
+2 & Morning & Saturday & 158 \\
+3 & Morning & Sunday & 10 \\
+4 & Afternoon & Friday & 2 \\
+5 & Afternoon & Saturday & 90 \\
+... & ... & ... & ... \\
+9 & Evening & Sunday & 45 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Why this is better:}
+\begin{itemize}
+    \item \textbf{1 observation = 1 row}: Each row is a unique time-day combination
+    \item \textbf{1 variable = 1 column}: Time, Day, and Deliveries are separate columns
+    \item Easy to filter, group, and analyze with pandas
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+%========================================
+\section{Population vs. Sample}
+%========================================
+
+Understanding the distinction between population and sample is fundamental to all of statistics.
+
+\begin{definitionbox}{Population and Sample}
+\begin{itemize}
+    \item \textbf{Population}: The \textit{entire} set of objects/individuals you want to study
+    \begin{itemize}
+        \item Example: ALL students enrolled in CS109A
+    \end{itemize}
+    \item \textbf{Sample}: A \textit{subset} of the population that you actually observe
+    \begin{itemize}
+        \item Example: Students who attended class today
+    \end{itemize}
+\end{itemize}
+
+We analyze the \textbf{sample} to make inferences about the \textbf{population}.
+\end{definitionbox}
+
+\subsection{Sampling Bias}
+
+The sample must be \textbf{representative} of the population. When it isn't, we have \textbf{sampling bias}.
+
+\begin{table}[h!]
+\centering
+\caption{Types of Sampling Bias}
+\begin{tabular}{@{}lp{8cm}@{}}
+\toprule
+\textbf{Type} & \textbf{Description} \\
+\midrule
+\textbf{Selection Bias} & Some individuals are more likely to be selected than others \\
+\textbf{Non-response Bias} & People who don't respond may be systematically different from those who do \\
+\textbf{Volunteer Bias} & People who volunteer may be more enthusiastic or have stronger opinions \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{examplebox}{Sampling Bias in Practice}
+\textbf{Example 1: Class Attendance}
+\begin{itemize}
+    \item \textbf{Goal}: Survey satisfaction of ALL CS109A students
+    \item \textbf{Sample}: Only students who came to class today
+    \item \textbf{Problem}: Students who skip class might be less satisfied---their opinions are missing!
+    \item \textbf{Result}: Overestimated satisfaction scores
+\end{itemize}
+
+\textbf{Example 2: Early Adopters}
+\begin{itemize}
+    \item \textbf{Goal}: Test if a new app feature works for all users
+    \item \textbf{Sample}: ``Early adopters'' who signed up for beta testing
+    \item \textbf{Problem}: Early adopters are tech-savvy and excited about new features
+    \item \textbf{Result}: Feature seems great in testing, but flops when released to everyone
+\end{itemize}
+
+\textbf{Lesson}: Always ask ``Who is missing from my sample?'' and ``How might they be different?''
+\end{examplebox}
+
+\newpage
+
+%========================================
+\section{Descriptive Statistics: Measures of Center}
+%========================================
+
+Descriptive statistics summarize the characteristics of your data. We start with measures of \textbf{center}---where the ``typical'' value is located.
+
+\subsection{Mean (Average)}
+
+\begin{definitionbox}{Sample Mean}
+The \textbf{mean} is the sum of all values divided by the count:
+\[
+\bar{x} = \frac{1}{n}\sum_{i=1}^{n}x_i = \frac{x_1 + x_2 + \cdots + x_n}{n}
+\]
+
+\textbf{Intuition}: The mean is the ``balancing point'' of the distribution---if you placed the data on a seesaw, the mean is where it would balance.
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{The Mean is Sensitive to Outliers}
+
+Consider these two datasets:
+\begin{itemize}
+    \item Dataset A: [1, 2, 3, 4, 5] $\rightarrow$ Mean = 3
+    \item Dataset B: [1, 2, 3, 4, \textbf{100}] $\rightarrow$ Mean = 22
+\end{itemize}
+
+One extreme value (100) pulled the mean from 3 to 22! This is why the mean can be misleading when outliers are present.
+\end{warningbox}
+
+\subsection{Median}
+
+\begin{definitionbox}{Sample Median}
+The \textbf{median} is the middle value when data is sorted:
+\begin{itemize}
+    \item If $n$ is odd: The middle value
+    \item If $n$ is even: Average of the two middle values
+\end{itemize}
+
+\textbf{Advantage}: The median is \textbf{robust} to outliers---extreme values don't affect it much.
+\end{definitionbox}
+
+\begin{examplebox}{Mean vs. Median}
+Student ages: [17, 19, 21, 22, 23, 24, 26, \textbf{38}]
+
+\textbf{Median}: Average of 22 and 23 = \textbf{22.5}
+
+\textbf{Mean}: $(17+19+21+22+23+24+26+38)/8 = \textbf{23.75}$
+
+The 38-year-old graduate student pulls the mean up, but the median barely moves!
+\end{examplebox}
+
+\newpage
+
+\subsection{Mean vs. Median: Skewness}
+
+The relationship between mean and median tells you about the \textbf{shape} of the distribution:
+
+\begin{table}[h!]
+\centering
+\caption{Mean, Median, and Distribution Shape}
+\begin{tabular}{lll}
+\toprule
+\textbf{Distribution Shape} & \textbf{Relationship} & \textbf{Example} \\
+\midrule
+Symmetric & Mean $\approx$ Median & Normal (bell curve) \\
+Right-skewed & Mean $>$ Median & Income distribution \\
+Left-skewed & Mean $<$ Median & Age at retirement \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{infobox}
+\textbf{Why Financial Data Uses Medians}
+
+Income and housing prices are typically \textbf{right-skewed}---most people earn moderate amounts, but a few billionaires earn enormously more.
+
+If we reported mean income, those billionaires would make everyone seem richer than they are. That's why economists report \textbf{median household income}---it better represents the ``typical'' household.
+\end{infobox}
+
+\subsection{Mode}
+
+\begin{definitionbox}{Mode}
+The \textbf{mode} is the most frequently occurring value in a dataset.
+
+\textbf{Use case}: Primarily for \textbf{categorical data} where mean and median don't make sense.
+\end{definitionbox}
+
+\begin{examplebox}{Mode for Categorical Data}
+Favorite pets: [``Dog'', ``Cat'', ``Dog'', ``Rat'', ``Cat'', ``Dog'']
+
+\textbf{Mode}: ``Dog'' (appears 3 times)
+
+You can't calculate the ``mean'' of pet preferences, but you can find the most popular choice!
+\end{examplebox}
+
+\subsection{Computational Efficiency}
+
+\begin{infobox}
+\textbf{Mean is Faster to Compute Than Median}
+
+\begin{itemize}
+    \item \textbf{Mean}: $O(n)$ --- Just scan through once, keeping track of sum and count
+    \item \textbf{Median}: $O(n \log n)$ --- Requires sorting first!
+\end{itemize}
+
+When you have billions of data points (like Facebook or Google), this difference matters. This is one reason why means are more commonly reported even when medians might be more appropriate.
+\end{infobox}
+
+\newpage
+
+%========================================
+\section{Descriptive Statistics: Measures of Spread}
+%========================================
+
+Knowing the center isn't enough---we also need to know how \textbf{spread out} the data is.
+
+\subsection{Range}
+
+\begin{definitionbox}{Range}
+\[
+\text{Range} = \text{Maximum} - \text{Minimum}
+\]
+
+\textbf{Problem}: Only uses two values (max and min), ignoring everything in between.
+\end{definitionbox}
+
+\subsection{Variance}
+
+\begin{definitionbox}{Sample Variance}
+The \textbf{variance} measures the average squared distance from the mean:
+\[
+s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2
+\]
+
+\textbf{Steps}:
+\begin{enumerate}
+    \item Calculate the mean ($\bar{x}$)
+    \item For each value, find the distance from the mean $(x_i - \bar{x})$
+    \item Square each distance (removes negatives, emphasizes larger deviations)
+    \item Take the average of squared distances (dividing by $n-1$)
+\end{enumerate}
+\end{definitionbox}
+
+\begin{examplebox}{Why $n-1$ Instead of $n$?}
+\textbf{Question}: Why do we divide by $n-1$ instead of $n$?
+
+\textbf{Simple Intuition}: What's the minimum number of observations needed to measure ``spread''?
+
+With just \textbf{one observation} (e.g., [5]), you can't say anything about how spread out the data is! The formula with $n-1$ agrees: $\frac{1}{1-1} = \frac{1}{0}$ is undefined.
+
+\textbf{You need at least 2 observations to talk about spread.}
+
+\textbf{Technical Answer}: Dividing by $n-1$ (called ``degrees of freedom'') corrects for a bias that occurs because we estimate the mean from the same data. This gives us an ``unbiased estimator'' of the true population variance.
+\end{examplebox}
+
+\subsection{Standard Deviation}
+
+\begin{definitionbox}{Sample Standard Deviation}
+\[
+s = \sqrt{s^2} = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\]
+
+\textbf{Key advantage}: The standard deviation has the \textbf{same units as the original data}, making it interpretable.
+
+If heights are measured in cm, variance is in cm$^2$ (meaningless), but standard deviation is back in cm!
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Interpreting Standard Deviation}
+
+The standard deviation is roughly the ``average distance'' from the mean.
+
+If the mean height is 170 cm and the standard deviation is 10 cm, most people are within about 10 cm of 170 cm (between 160--180 cm).
+\end{infobox}
+
+\newpage
+
+%========================================
+\section{Why Visualization Matters: Anscombe's Quartet}
+%========================================
+
+\begin{importantbox}{Never Trust Summary Statistics Alone!}
+\textbf{Anscombe's Quartet} is a famous example showing why you must \textbf{always visualize your data}.
+
+Four different datasets have:
+\begin{itemize}
+    \item Same mean of X (9.0)
+    \item Same mean of Y (7.50)
+    \item Same variance of X (11.0)
+    \item Same variance of Y (4.12)
+    \item Same correlation (0.816)
+\end{itemize}
+
+Based on these statistics, the datasets seem identical. But when you plot them...
+\end{importantbox}
+
+\begin{center}
+\textbf{The Four Datasets (with identical summary statistics):}
+\end{center}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{@{}rr|rr|rr|rr@{}}
+\toprule
+\multicolumn{2}{c|}{\textbf{Dataset I}} & \multicolumn{2}{c|}{\textbf{Dataset II}} & \multicolumn{2}{c|}{\textbf{Dataset III}} & \multicolumn{2}{c}{\textbf{Dataset IV}} \\
+\textbf{X} & \textbf{Y} & \textbf{X} & \textbf{Y} & \textbf{X} & \textbf{Y} & \textbf{X} & \textbf{Y} \\
+\midrule
+10.0 & 8.04 & 10.0 & 9.14 & 10.0 & 7.46 & 8.0 & 6.58 \\
+8.0 & 6.95 & 8.0 & 8.14 & 8.0 & 6.77 & 8.0 & 5.76 \\
+13.0 & 7.58 & 13.0 & 8.74 & 13.0 & 12.74 & 8.0 & 7.71 \\
+9.0 & 8.81 & 9.0 & 8.77 & 9.0 & 7.11 & 8.0 & 8.84 \\
+11.0 & 8.33 & 11.0 & 9.26 & 11.0 & 7.81 & 8.0 & 8.47 \\
+14.0 & 9.96 & 14.0 & 8.10 & 14.0 & 8.84 & 8.0 & 7.04 \\
+6.0 & 7.24 & 6.0 & 6.13 & 6.0 & 6.08 & 8.0 & 5.25 \\
+4.0 & 4.26 & 4.0 & 3.10 & 4.0 & 5.39 & 19.0 & 12.50 \\
+12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15 & 8.0 & 5.56 \\
+7.0 & 4.82 & 7.0 & 7.26 & 7.0 & 6.42 & 8.0 & 7.91 \\
+5.0 & 5.68 & 5.0 & 4.74 & 5.0 & 5.73 & 8.0 & 6.89 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{What the scatter plots reveal:}
+\begin{itemize}
+    \item \textbf{Dataset I}: Linear relationship with random scatter (what you'd expect)
+    \item \textbf{Dataset II}: Perfect \textbf{parabola}---clearly nonlinear!
+    \item \textbf{Dataset III}: Perfect line except for one \textbf{Y-outlier}
+    \item \textbf{Dataset IV}: All X values are 8, except one \textbf{X-outlier} at 19
+\end{itemize}
+
+\begin{summarybox}
+\textbf{The Lesson of Anscombe's Quartet}
+
+\textbf{Always visualize your data before modeling.} Summary statistics can hide crucial patterns:
+\begin{itemize}
+    \item Nonlinear relationships
+    \item Outliers
+    \item Clusters or subgroups
+    \item Data quality issues
+\end{itemize}
+
+Don't just calculate $R^2$ and call it a day!
+\end{summarybox}
+
+\newpage
+
+%========================================
+\section{Basic Visualization Types}
+%========================================
+
+Different visualizations serve different purposes. Choose based on what you want to learn.
+
+\subsection{Visualizations by Purpose}
+
+\begin{table}[h!]
+\centering
+\caption{Choosing the Right Visualization}
+\begin{tabular}{@{}lp{3.5cm}p{3cm}p{4cm}@{}}
+\toprule
+\textbf{Chart Type} & \textbf{Purpose} & \textbf{Variables} & \textbf{What to Look For} \\
+\midrule
+\textbf{Histogram} & Distribution of one numeric variable & 1 numeric & Shape, center, spread, outliers \\
+\textbf{Bar Plot} & Frequency of categories & 1 categorical & Which categories are most/least common \\
+\textbf{Scatter Plot} & Relationship between two variables & 2 numeric & Direction, strength, form, outliers \\
+\textbf{Box Plot} & Compare distributions across groups & 1 numeric + 1 categorical & Median, IQR, outliers by group \\
+\textbf{Violin Plot} & Compare distribution shapes across groups & 1 numeric + 1 categorical & Full distribution shape (bimodality, etc.) \\
+\textbf{KDE Plot} & Smooth distribution curve & 1 numeric & Avoids bin-width problems of histograms \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Histogram vs. Bar Plot}
+
+Both use bars, but they're fundamentally different:
+
+\begin{table}[h!]
+\centering
+\caption{Histogram vs. Bar Plot}
+\begin{tabular}{lll}
+\toprule
+\textbf{Feature} & \textbf{Histogram} & \textbf{Bar Plot} \\
+\midrule
+Variable type & Numeric (continuous) & Categorical \\
+Bars & Touch each other & Separated \\
+X-axis & Has natural order & Order is arbitrary \\
+Purpose & Show distribution shape & Compare category frequencies \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Histogram Bin Width Matters}
+
+\begin{warningbox}
+The appearance of a histogram depends heavily on \textbf{bin width}:
+\begin{itemize}
+    \item \textbf{Too wide}: Loses detail, everything looks uniform
+    \item \textbf{Too narrow}: Too much noise, hard to see patterns
+    \item \textbf{Just right}: Shows the true shape of the distribution
+\end{itemize}
+
+Always try multiple bin widths to make sure you're not missing important patterns!
+
+\textbf{Alternative}: Use a \textbf{Kernel Density Estimate (KDE)} which creates a smooth curve and avoids the bin-width problem.
+\end{warningbox}
+
+\newpage
+
+\subsection{Scatter Plots: Reading Relationships}
+
+When looking at a scatter plot, ask four questions:
+
+\begin{enumerate}
+    \item \textbf{Direction}: Is the relationship positive (both increase together) or negative (one increases as the other decreases)?
+    \item \textbf{Strength}: How tightly do points cluster around the trend? (Strong = tight, Weak = scattered)
+    \item \textbf{Form}: Is the relationship linear or curved?
+    \item \textbf{Outliers}: Are there any points that don't fit the pattern?
+\end{enumerate}
+
+\subsection{Box Plots: Comparing Distributions}
+
+A box plot shows five key statistics:
+\begin{itemize}
+    \item \textbf{Median}: Line in the middle of the box
+    \item \textbf{Q1 and Q3}: Bottom and top of the box (middle 50\% of data)
+    \item \textbf{Whiskers}: Extend to the smallest/largest non-outlier values
+    \item \textbf{Outliers}: Individual points beyond the whiskers
+\end{itemize}
+
+\textbf{Use case}: Comparing how a numeric variable differs across categories (e.g., income by education level).
+
+\subsection{Violin Plots: More Detail Than Box Plots}
+
+A violin plot is a box plot combined with a KDE:
+\begin{itemize}
+    \item Shows the full distribution shape on both sides
+    \item Reveals bimodality or unusual shapes that box plots hide
+    \item More informative but takes more space
+\end{itemize}
+
+\subsection{Why Pie Charts Are Usually Bad}
+
+\begin{warningbox}
+\textbf{The Problem with Pie Charts}
+
+Humans are bad at comparing angles. When pie slices are similar sizes, it's nearly impossible to tell which is bigger.
+
+\textbf{Better alternative}: Use a bar plot. Humans easily compare bar heights.
+
+\textbf{Exception}: Pie charts work when you want to emphasize ``parts of a whole'' and there are only 2--3 categories with very different sizes.
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{Visualizing Multiple Variables}
+%========================================
+
+What if you have more than two variables? Three-dimensional scatter plots are tempting but usually fail on 2D screens.
+
+\subsection{The Problem with 3D Scatter Plots}
+
+A ``scatter cloud'' is nearly impossible to interpret:
+\begin{itemize}
+    \item Depth perception is lost on a flat screen
+    \item Occlusion: points hide behind other points
+    \item You can't rotate the view interactively in a static report
+\end{itemize}
+
+\subsection{Better Approaches: Aesthetic Mappings}
+
+Instead of adding a third spatial dimension, map additional variables to visual properties:
+
+\begin{itemize}
+    \item \textbf{Color}: Great for categorical variables (up to 5--8 groups)
+    \item \textbf{Size}: Good for numeric variables
+    \item \textbf{Shape}: Good for categorical variables (2--3 groups max)
+    \item \textbf{Animation}: Good for time (each frame = one time point)
+\end{itemize}
+
+\begin{examplebox}{Gapminder: 5 Variables in One Plot}
+The famous ``Wealth and Health of Nations'' visualization shows:
+\begin{enumerate}
+    \item \textbf{X-axis}: Income per person
+    \item \textbf{Y-axis}: Life expectancy
+    \item \textbf{Circle size}: Population
+    \item \textbf{Circle color}: Continent
+    \item \textbf{Animation}: Year (time)
+\end{enumerate}
+
+\textbf{Key insights visible}:
+\begin{itemize}
+    \item Positive (but nonlinear) relationship between income and life expectancy
+    \item China's dramatic rise from poverty to prosperity
+    \item The US has lower life expectancy than peers with similar income
+\end{itemize}
+
+\textbf{Design choices}:
+\begin{itemize}
+    \item Population $\rightarrow$ Size (numeric $\rightarrow$ size works well)
+    \item Continent $\rightarrow$ Color (categorical $\rightarrow$ distinct colors)
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+%========================================
+\section{Historical Examples of Data Visualization}
+%========================================
+
+Data visualization isn't new---some of history's most important discoveries came from visualizing data.
+
+\subsection{John Snow's Cholera Map (1854)}
+
+\begin{itemize}
+    \item \textbf{Problem}: Cholera outbreak in London---source unknown
+    \item \textbf{Visualization}: Dot map showing location of each cholera death
+    \item \textbf{Discovery}: Deaths clustered around the Broad Street water pump
+    \item \textbf{Action}: Removed the pump handle; outbreak ended
+    \item \textbf{Legacy}: Proved that cholera spread through contaminated water, not ``bad air''
+\end{itemize}
+
+\subsection{Florence Nightingale's Rose Chart (1858)}
+
+\begin{itemize}
+    \item \textbf{Problem}: High death rates in military hospitals during the Crimean War
+    \item \textbf{Visualization}: Rose chart showing deaths by cause over time
+    \item \textbf{Discovery}: Blue (preventable disease) vastly exceeded red (combat wounds)
+    \item \textbf{Action}: Hospital sanitation reforms
+    \item \textbf{Legacy}: Pioneered the use of statistics in healthcare policy
+\end{itemize}
+
+\subsection{Charles Minard's Napoleon Map (1869)}
+
+\begin{itemize}
+    \item \textbf{Subject}: Napoleon's disastrous invasion of Russia (1812)
+    \item \textbf{Variables shown}: Army size (line width), geography (map), direction (color), time, and temperature
+    \item \textbf{Story}: 422,000 troops entered; only 10,000 returned
+    \item \textbf{Legacy}: Called ``the best statistical graphic ever drawn''
+\end{itemize}
+
+\newpage
+
+%========================================
+\section{Principles of Effective Visualization}
+%========================================
+
+\subsection{1. Graphical Integrity}
+\textbf{Don't lie with your visuals.}
+\begin{itemize}
+    \item Y-axis should usually start at zero for bar charts
+    \item Geographic maps should account for population, not just area
+    \item Don't use 3D effects that distort perception
+\end{itemize}
+
+\subsection{2. Keep It Simple}
+\textbf{Avoid ``chart junk''---unnecessary decoration that doesn't help understanding.}
+\begin{itemize}
+    \item No 3D effects on 2D data
+    \item No excessive gridlines or backgrounds
+    \item Maximize the ``data-ink ratio'' (information per pixel)
+\end{itemize}
+
+\subsection{3. Use the Right Display}
+\textbf{Visual channels have different effectiveness for encoding data:}
+\begin{enumerate}
+    \item Position (most accurate)
+    \item Length
+    \item Angle (pie charts are here---not great!)
+    \item Area
+    \item Color intensity
+    \item Shape (least accurate for quantitative data)
+\end{enumerate}
+
+\subsection{4. Use Color Strategically}
+\begin{itemize}
+    \item \textbf{Qualitative}: Distinct colors for categories (limit to 5--8)
+    \item \textbf{Sequential}: Light-to-dark for ordered values
+    \item \textbf{Diverging}: Two colors from a neutral center (e.g., blue--white--red)
+    \item \textbf{Avoid}: Rainbow color maps (no natural order)
+    \item \textbf{Consider}: Color blindness (avoid red-green combinations)
+\end{itemize}
+
+\subsection{5. Know Your Audience}
+\begin{itemize}
+    \item \textbf{Exploratory}: For yourself---neutral, finding patterns
+    \item \textbf{Explanatory}: For others---making a specific point
+\end{itemize}
+
+\newpage
+
+%========================================
+\section{Key Takeaways}
+%========================================
+
+\begin{summarybox}
+\textbf{Summary of Lecture 02}
+
+\textbf{What is Data?}
+\begin{itemize}
+    \item Data = collected information; tabular format is ideal
+    \item Variables can be numeric (discrete/continuous) or categorical (nominal/ordinal)
+    \item Always consider: Where did this data come from? What might be missing?
+\end{itemize}
+
+\textbf{Population vs. Sample}
+\begin{itemize}
+    \item Population = everyone you care about
+    \item Sample = the subset you actually observe
+    \item Watch out for sampling bias (selection, non-response, volunteer)
+\end{itemize}
+
+\textbf{Measures of Center}
+\begin{itemize}
+    \item Mean: Balancing point (sensitive to outliers)
+    \item Median: Middle value (robust to outliers)
+    \item Mode: Most frequent (for categorical data)
+    \item If Mean $>$ Median: Right-skewed distribution
+\end{itemize}
+
+\textbf{Measures of Spread}
+\begin{itemize}
+    \item Variance: Average squared deviation (units are squared)
+    \item Standard Deviation: Square root of variance (same units as data)
+\end{itemize}
+
+\textbf{Visualization}
+\begin{itemize}
+    \item Anscombe's Quartet: ALWAYS visualize before modeling!
+    \item Choose the right chart for your purpose
+    \item Histograms/KDE for distributions, scatter plots for relationships, box/violin plots for comparisons
+    \item Multiple variables: Use color, size, shape, animation
+    \item Follow principles: integrity, simplicity, appropriate display, strategic color
+\end{itemize}
+\end{summarybox}
+
+\end{document}

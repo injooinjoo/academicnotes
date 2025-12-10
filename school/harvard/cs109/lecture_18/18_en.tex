@@ -1,0 +1,1110 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 18: Decision Trees for Classification
+% English Version - Comprehensive Notes for Beginners
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 18}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 18},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Decision Trees}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 18: Decision Trees for Classification}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 18}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Decision Trees, Splitting Criteria, Gini Index, Entropy, Stopping Conditions, Overfitting}
+
+\begin{overviewbox}
+This lecture introduces \textbf{Decision Trees}, a fundamentally different approach to classification compared to logistic regression. Decision trees are intuitive, interpretable, and can model complex decision boundaries.
+
+\textbf{Key Topics:}
+\begin{enumerate}
+    \item Why we need decision trees (limitations of logistic regression)
+    \item How decision trees make predictions (tree traversal)
+    \item How decision trees learn (splitting criteria)
+    \item How to prevent overfitting (stopping conditions)
+\end{enumerate}
+
+\textbf{Key Insight:} Decision trees work like a game of ``20 Questions''---a series of yes/no questions leads to a final classification. This simple idea creates surprisingly powerful models that can handle non-linear decision boundaries.
+\end{overviewbox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Motivation: Why Not Just Use Logistic Regression?}
+%========================================================================================
+
+\subsection{What Logistic Regression Does Well}
+
+Logistic regression works beautifully when:
+\begin{itemize}
+    \item Classes are \textbf{linearly separable} (or close to it)
+    \item The \textbf{decision boundary} can be expressed as a straight line (or hyperplane)
+\end{itemize}
+
+\begin{examplebox}{Logistic Regression Success}
+Consider classifying land as ``agricultural'' (green) vs ``dry'' (white) based on longitude and latitude.
+
+If the data looks like this:
+\begin{itemize}
+    \item Green points clustered on the right
+    \item White points clustered on the left
+\end{itemize}
+
+A simple linear decision boundary works perfectly: $\text{latitude} = -0.8 \times \text{longitude} + 0.1$
+\end{examplebox}
+
+\subsection{Where Logistic Regression Fails}
+
+The problem arises when the decision boundary is \textbf{not linear}:
+
+\begin{examplebox}{Logistic Regression Failure}
+\textbf{Case 1: Circular boundary}
+\begin{itemize}
+    \item Green points (agricultural) in the center
+    \item White points (dry land) surrounding them in a ring
+\end{itemize}
+
+No straight line can separate these! You'd need a circle: $x_1^2 + x_2^2 < r^2$
+
+\textbf{Case 2: Scattered regions}
+\begin{itemize}
+    \item Green points in the top-left and bottom-right corners
+    \item White points in the top-right and bottom-left corners
+\end{itemize}
+
+Now you'd need diagonal lines or complex polynomial boundaries!
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{The Polynomial Solution Has Limits}
+
+Yes, you could use polynomial logistic regression (adding $x^2$, $x_1 x_2$ terms) to create curved boundaries. But:
+\begin{itemize}
+    \item It requires manually engineering features
+    \item Complex boundaries need very high-degree polynomials
+    \item You don't know what shape the boundary should be beforehand
+\end{itemize}
+\end{warningbox}
+
+\subsection{Our Wish List for a New Model}
+
+We want a model that can:
+
+\begin{enumerate}
+    \item \textbf{Create complex decision boundaries} without manually engineering features
+    \item Be \textbf{easy to interpret}---we can explain why the model made a decision
+    \item Be \textbf{computationally efficient} to train and predict
+\end{enumerate}
+
+\begin{summarybox}
+\textbf{Enter Decision Trees!}
+
+Decision trees satisfy all three criteria:
+\begin{itemize}
+    \item Complex boundaries through recursive splitting
+    \item Interpretable through a flowchart-like structure
+    \item Efficient through simple comparison operations
+\end{itemize}
+\end{summarybox}
+
+%========================================================================================
+\newsection{The Intuition: Flowcharts and 20 Questions}
+%========================================================================================
+
+\subsection{Everyday Decision Making}
+
+We make tree-like decisions every day:
+\begin{itemize}
+    \item ``Is it raining? If yes, take umbrella. If no, check temperature...''
+    \item ``Did I finish my homework? If yes, go to party. If no, how much time left?...''
+\end{itemize}
+
+\begin{examplebox}{The Engineering Flowchart}
+Classic problem-solving flowchart:
+
+\textbf{Question 1:} Does it move?
+\begin{itemize}
+    \item \textbf{Yes} $\rightarrow$ Question 2: Should it move?
+    \begin{itemize}
+        \item Yes $\rightarrow$ \textit{No problem!}
+        \item No $\rightarrow$ \textit{Use duct tape}
+    \end{itemize}
+    \item \textbf{No} $\rightarrow$ Question 2: Should it move?
+    \begin{itemize}
+        \item Yes $\rightarrow$ \textit{Use WD-40}
+        \item No $\rightarrow$ \textit{No problem!}
+    \end{itemize}
+\end{itemize}
+
+This is exactly how a decision tree works! Binary questions leading to final decisions.
+\end{examplebox}
+
+\subsection{Key Properties of This Approach}
+
+\begin{enumerate}
+    \item \textbf{Binary decisions:} Each question has only two answers (yes/no)
+    \item \textbf{Interpretable:} You can explain any decision by tracing the path
+    \item \textbf{Simple:} No distributions, no gradients---just comparisons
+    \item \textbf{Flexible:} The shape of the final regions can be arbitrarily complex
+\end{enumerate}
+
+%========================================================================================
+\newsection{Decision Tree Terminology}
+%========================================================================================
+
+Before diving deeper, let's establish the vocabulary:
+
+\begin{definitionbox}{Tree Components}
+\begin{itemize}
+    \item \textbf{Root Node:} The topmost node where the tree starts (first question)
+    \item \textbf{Internal Nodes:} Nodes that ask questions and split into children
+    \item \textbf{Leaf Nodes (Terminal Nodes):} Final nodes that make predictions (no children)
+    \item \textbf{Split:} The act of dividing a node into child nodes based on a question
+    \item \textbf{Depth:} The number of splits from root to a node
+    \item \textbf{Branch:} The path from root to any node
+\end{itemize}
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Visualizing the Tree:}
+
+Decision trees are typically drawn ``upside down'':
+\begin{itemize}
+    \item Root at the top (like a family tree)
+    \item Leaves at the bottom
+    \item Data flows downward through questions
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\newsection{How Decision Trees Make Predictions}
+%========================================================================================
+
+\subsection{The Lemon vs Orange Example}
+
+Suppose we have a trained decision tree that classifies fruits as ``Lemon'' or ``Orange'' based on:
+\begin{itemize}
+    \item \code{height}: Height of the fruit
+    \item \code{width}: Width of the fruit
+\end{itemize}
+
+The tree structure:
+\begin{verbatim}
+                    height > 6.5?
+                    /           \
+                  No            Yes
+                  /               \
+           width > 6.0?      width > 9.5?
+           /        \         /        \
+         No        Yes      No        Yes
+          |          |       |          |
+       Orange     Lemon   Orange     Lemon
+\end{verbatim}
+
+\subsection{Prediction: Tree Traversal}
+
+\begin{definitionbox}{Tree Traversal}
+\textbf{Tree traversal} is the process of starting at the root node and following the appropriate branches based on feature values until reaching a leaf node, which provides the prediction.
+\end{definitionbox}
+
+\begin{examplebox}{Predicting a New Fruit}
+A new fruit arrives with measurements: \code{height = 5.9}, \code{width = 5.8}
+
+\textbf{Step 1:} Root node asks: ``Is height $> 6.5$?''
+\begin{itemize}
+    \item 5.9 is NOT greater than 6.5 $\rightarrow$ Go \textbf{left} (No branch)
+\end{itemize}
+
+\textbf{Step 2:} Next node asks: ``Is width $> 6.0$?''
+\begin{itemize}
+    \item 5.8 is NOT greater than 6.0 $\rightarrow$ Go \textbf{left} (No branch)
+\end{itemize}
+
+\textbf{Step 3:} We've reached a leaf node labeled ``Orange''
+
+\textbf{Prediction:} This fruit is an \textbf{Orange}
+\end{examplebox}
+
+\subsection{Decision Boundaries in Feature Space}
+
+Each split in the tree creates a boundary that is \textbf{parallel to a feature axis}:
+
+\begin{itemize}
+    \item Split on \code{height > 6.5} creates a \textbf{horizontal line} at height = 6.5
+    \item Split on \code{width > 6.0} creates a \textbf{vertical line} at width = 6.0
+\end{itemize}
+
+The final decision regions are \textbf{axis-aligned rectangles}:
+\begin{itemize}
+    \item Region 1: height $\leq$ 6.5 AND width $\leq$ 6.0 $\rightarrow$ Orange
+    \item Region 2: height $\leq$ 6.5 AND width $>$ 6.0 $\rightarrow$ Lemon
+    \item Region 3: height $>$ 6.5 AND width $\leq$ 9.5 $\rightarrow$ Orange
+    \item Region 4: height $>$ 6.5 AND width $>$ 9.5 $\rightarrow$ Lemon
+\end{itemize}
+
+\begin{infobox}
+\textbf{Why Rectangles?}
+
+Decision trees always create \textbf{axis-aligned rectangular regions} because:
+\begin{enumerate}
+    \item Each split is on a single feature
+    \item Splits create boundaries perpendicular to that feature's axis
+    \item Multiple splits partition space into nested rectangles
+\end{enumerate}
+
+This is different from logistic regression, which creates tilted linear boundaries.
+\end{infobox}
+
+%========================================================================================
+\newsection{How Decision Trees Learn: Splitting Criteria}
+%========================================================================================
+
+\subsection{The Learning Problem}
+
+We've seen how to \textit{use} a decision tree. But how do we \textit{build} one?
+
+\textbf{The key questions:}
+\begin{enumerate}
+    \item Which feature should we split on?
+    \item What threshold value should we use?
+    \item When should we stop splitting?
+\end{enumerate}
+
+\subsection{The Goal: Maximize Purity}
+
+\begin{definitionbox}{Purity and Impurity}
+\begin{itemize}
+    \item A node is \textbf{pure} if all its data points belong to the same class
+    \item A node is \textbf{impure} if it contains a mixture of classes
+    \item \textbf{Impurity} measures how ``mixed'' a node is
+\end{itemize}
+\end{definitionbox}
+
+The goal of each split is to create child nodes that are \textbf{more pure} than the parent.
+
+\begin{examplebox}{Good vs Bad Splits}
+\textbf{Parent node:} 6 blue circles, 8 orange triangles (14 total)
+
+\textbf{Split A:}
+\begin{itemize}
+    \item Left child: 6 blue, 0 orange (100\% pure!)
+    \item Right child: 0 blue, 8 orange (100\% pure!)
+\end{itemize}
+$\rightarrow$ \textbf{Excellent split!} Both children are perfectly pure.
+
+\textbf{Split B:}
+\begin{itemize}
+    \item Left child: 3 blue, 4 orange (mixed)
+    \item Right child: 3 blue, 4 orange (mixed)
+\end{itemize}
+$\rightarrow$ \textbf{Terrible split!} Children are just as impure as parent.
+\end{examplebox}
+
+\subsection{Measuring Impurity: Three Approaches}
+
+\subsubsection{Method 1: Classification Error}
+
+The most intuitive measure: what fraction would we get wrong if we predicted the majority class?
+
+\begin{equation}
+\text{Classification Error} = 1 - \max_k \hat{p}_k
+\end{equation}
+
+Where $\hat{p}_k$ is the proportion of class $k$ in the node.
+
+\begin{examplebox}{Classification Error Calculation}
+Node with 5 blue circles and 8 orange triangles (13 total):
+\begin{itemize}
+    \item $\hat{p}_{\text{blue}} = 5/13 = 0.385$
+    \item $\hat{p}_{\text{orange}} = 8/13 = 0.615$
+\end{itemize}
+
+If we predict ``orange'' (majority), we get 5 wrong.
+
+Classification Error $= 1 - \max(0.385, 0.615) = 1 - 0.615 = 0.385$
+\end{examplebox}
+
+\subsubsection{Method 2: Gini Impurity (Index)}
+
+The most commonly used measure in practice:
+
+\begin{equation}
+\text{Gini} = 1 - \sum_{k=1}^{K} \hat{p}_k^2
+\end{equation}
+
+\begin{definitionbox}{Interpreting Gini}
+Gini impurity represents the probability that two randomly chosen samples from the node would have \textbf{different} class labels.
+
+\begin{itemize}
+    \item \textbf{Gini = 0:} Node is perfectly pure (all same class)
+    \item \textbf{Gini = 0.5:} Maximum impurity for 2 classes (50-50 split)
+    \item For K classes: Maximum Gini = $1 - 1/K$
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Gini Calculation}
+Same node: 5 blue, 8 orange (13 total)
+
+$\text{Gini} = 1 - \left[\left(\frac{5}{13}\right)^2 + \left(\frac{8}{13}\right)^2\right]$
+
+$= 1 - \left[\frac{25}{169} + \frac{64}{169}\right] = 1 - \frac{89}{169} = \frac{80}{169} \approx 0.47$
+
+Compare to a pure node (all orange):
+$\text{Gini} = 1 - [0^2 + 1^2] = 0$
+\end{examplebox}
+
+\subsubsection{Method 3: Entropy}
+
+From information theory, entropy measures the ``uncertainty'' or ``disorder'':
+
+\begin{equation}
+\text{Entropy} = -\sum_{k=1}^{K} \hat{p}_k \log_2(\hat{p}_k)
+\end{equation}
+
+\begin{definitionbox}{Interpreting Entropy}
+Entropy measures the number of bits needed to encode the class of a random sample.
+
+\begin{itemize}
+    \item \textbf{Entropy = 0:} Node is perfectly pure (no uncertainty)
+    \item \textbf{Entropy = 1:} Maximum impurity for 2 classes (1 bit needed)
+    \item For K classes: Maximum Entropy = $\log_2(K)$
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Entropy Calculation}
+Same node: 5 blue, 8 orange
+
+$\text{Entropy} = -\left[\frac{5}{13}\log_2\left(\frac{5}{13}\right) + \frac{8}{13}\log_2\left(\frac{8}{13}\right)\right]$
+
+$= -[0.385 \times (-1.38) + 0.615 \times (-0.70)]$
+
+$= -[-0.53 - 0.43] = 0.96$
+
+Compare to a pure node: $\text{Entropy} = -[1 \times \log_2(1)] = -[1 \times 0] = 0$
+\end{examplebox}
+
+\subsection{Why Squaring in Gini?}
+
+The squaring operation in Gini impurity has an important effect:
+
+\begin{infobox}
+\textbf{Effect of Squaring:}
+
+Squaring the proportions \textbf{accentuates the difference} between pure and impure regions:
+\begin{itemize}
+    \item Large proportions (majority class) contribute more when squared
+    \item Small proportions (minority classes) are diminished when squared
+    \item This makes Gini more sensitive to ``almost pure'' vs ``quite mixed''
+\end{itemize}
+
+Think of it like \textbf{softmax}---it emphasizes the maximum without explicitly computing max!
+\end{infobox}
+
+\subsection{Comparing the Three Measures}
+
+All three measures:
+\begin{itemize}
+    \item Equal 0 when the node is pure
+    \item Reach maximum when classes are evenly split
+    \item Are monotonically related to purity
+\end{itemize}
+
+\textbf{Key difference: Sensitivity to impurity changes}
+
+\begin{table}[h!]
+\caption{Impurity Measures Comparison}
+\begin{adjustbox}{width=\textwidth, center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Property} & \textbf{Classification Error} & \textbf{Gini Impurity} & \textbf{Entropy} \\
+\midrule
+Value at pure node & 0 & 0 & 0 \\
+Max value (2 classes) & 0.5 & 0.5 & 1.0 \\
+Sensitivity to changes & Least sensitive & Moderately sensitive & Most sensitive \\
+Computational cost & Lowest & Low & Slightly higher \\
+Default in sklearn & No & \textbf{Yes} & No \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{warningbox}
+\textbf{Why Not Use Classification Error?}
+
+Classification error is the most intuitive but the \textbf{least sensitive} to small improvements in purity.
+
+Consider: A node goes from (50\%, 50\%) to (60\%, 40\%)
+\begin{itemize}
+    \item Classification error: $0.5 \rightarrow 0.4$ (decrease of 0.1)
+    \item Gini: $0.5 \rightarrow 0.48$ (slight decrease)
+\end{itemize}
+
+Gini and Entropy have \textbf{curved shapes} that penalize impurity more heavily near 50-50, making them better for finding good splits.
+\end{warningbox}
+
+\subsection{Evaluating a Split: Weighted Average}
+
+When evaluating a split, we must consider the \textbf{sizes} of the resulting child nodes.
+
+\begin{definitionbox}{Weighted Impurity}
+For a split creating regions $R_1$ (with $N_1$ samples) and $R_2$ (with $N_2$ samples):
+
+\begin{equation}
+\text{Weighted Impurity} = \frac{N_1}{N} \times \text{Impurity}(R_1) + \frac{N_2}{N} \times \text{Impurity}(R_2)
+\end{equation}
+
+where $N = N_1 + N_2$ is the total samples.
+\end{definitionbox}
+
+\begin{examplebox}{Why Weighted Average Matters}
+Consider two splits of a node with 18 samples:
+
+\textbf{Split A:}
+\begin{itemize}
+    \item $R_1$: 1 sample, Gini = 0 (pure)
+    \item $R_2$: 17 samples, Gini = 0.45 (impure)
+\end{itemize}
+Weighted: $\frac{1}{18}(0) + \frac{17}{18}(0.45) = 0.425$
+
+\textbf{Split B:}
+\begin{itemize}
+    \item $R_1$: 9 samples, Gini = 0.2
+    \item $R_2$: 9 samples, Gini = 0.2
+\end{itemize}
+Weighted: $\frac{9}{18}(0.2) + \frac{9}{18}(0.2) = 0.2$
+
+\textbf{Split B is better!} Even though Split A has a ``pure'' child, it only contains 1 sample.
+\end{examplebox}
+
+%========================================================================================
+\newsection{The Learning Algorithm: Greedy Approach}
+%========================================================================================
+
+\subsection{Why Can't We Find the ``Best'' Tree?}
+
+Finding the globally optimal decision tree is \textbf{NP-complete}---computationally infeasible for any reasonable dataset.
+
+Why? Consider:
+\begin{itemize}
+    \item $p$ features, each with many possible split points
+    \item At each node, we choose one split
+    \item The number of possible trees grows \textbf{exponentially}
+\end{itemize}
+
+\subsection{The Greedy Solution}
+
+\begin{definitionbox}{Greedy Algorithm}
+A \textbf{greedy algorithm} makes the locally optimal choice at each step, without considering future consequences. It doesn't guarantee a globally optimal solution but is computationally tractable.
+\end{definitionbox}
+
+\textbf{Decision Tree Learning Algorithm:}
+
+\begin{enumerate}
+    \item \textbf{Start:} All training data in root node
+    \item \textbf{For each node:}
+    \begin{itemize}
+        \item For each feature $p$
+        \item For each possible threshold $t$
+        \item Calculate weighted impurity of split $(p, t)$
+    \end{itemize}
+    \item \textbf{Choose:} The $(p^*, t^*)$ that \textbf{minimizes weighted impurity}
+    \item \textbf{Split:} Create two child nodes based on $(p^*, t^*)$
+    \item \textbf{Recurse:} Repeat steps 2-4 for each child
+    \item \textbf{Stop:} When stopping criterion is met
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Key Insight:}
+
+Unlike linear/logistic regression where we minimize a single loss function over all data, decision trees:
+\begin{itemize}
+    \item Don't have a global loss function
+    \item Make locally optimal decisions at each split
+    \item This greedy approach is fast but may miss globally better trees
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\newsection{Preventing Overfitting: Stopping Conditions}
+%========================================================================================
+
+\subsection{The Overfitting Problem}
+
+If we let the tree grow without limits, it will keep splitting until:
+\begin{itemize}
+    \item Every leaf node contains exactly \textbf{one} training sample
+    \item Training accuracy is 100\%
+\end{itemize}
+
+This is \textbf{severe overfitting}:
+\begin{itemize}
+    \item The tree memorizes every training point, including noise
+    \item It creates tiny rectangular regions around individual points
+    \item Test accuracy will be poor
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Visualizing Overfitting:}
+
+Imagine the true pattern is a circle of green points surrounded by white points.
+
+\textbf{Shallow tree (max\_depth=4):}
+\begin{itemize}
+    \item Creates a rough square approximating the circle
+    \item High bias, low variance
+    \item Underfitting
+\end{itemize}
+
+\textbf{Deep tree (max\_depth=100):}
+\begin{itemize}
+    \item Creates tiny squares around every green point
+    \item Even captures isolated green points in ``white'' regions (noise!)
+    \item Low bias, high variance
+    \item Overfitting
+\end{itemize}
+\end{warningbox}
+
+\subsection{Stopping Conditions (Hyperparameters)}
+
+To prevent overfitting, we \textbf{intentionally limit} tree growth:
+
+\begin{definitionbox}{Common Stopping Conditions}
+\begin{enumerate}
+    \item \textbf{\code{max\_depth}}: Maximum number of splits from root to any leaf
+    \begin{itemize}
+        \item \code{max\_depth=3} means at most 3 questions to reach a prediction
+        \item Most commonly used regularization
+    \end{itemize}
+
+    \item \textbf{\code{min\_samples\_leaf}}: Minimum samples required in a leaf node
+    \begin{itemize}
+        \item \code{min\_samples\_leaf=5} means stop if split would create a leaf with $<5$ samples
+        \item Prevents very specific rules based on few points
+    \end{itemize}
+
+    \item \textbf{\code{max\_leaf\_nodes}}: Maximum total number of leaf nodes
+    \begin{itemize}
+        \item \code{max\_leaf\_nodes=8} limits the tree to 8 final regions
+        \item Controls overall model complexity
+    \end{itemize}
+
+    \item \textbf{\code{min\_impurity\_decrease}}: Minimum impurity improvement required
+    \begin{itemize}
+        \item Only split if it reduces impurity by at least this amount
+        \item Prevents splits that barely improve purity
+    \end{itemize}
+
+    \item \textbf{Pure nodes}: Automatically stop if a node is already 100\% pure
+\end{enumerate}
+\end{definitionbox}
+
+\subsection{Tree Growth Strategies}
+
+\subsubsection{Level-Order Growth (Default)}
+
+The standard approach:
+\begin{itemize}
+    \item Split all nodes at depth 1
+    \item Then split all nodes at depth 2
+    \item Continue level by level
+\end{itemize}
+
+Used with \code{max\_depth} and most stopping conditions.
+
+\subsubsection{Best-First Growth}
+
+Alternative approach (used when \code{max\_leaf\_nodes} is set):
+\begin{itemize}
+    \item At each step, consider ALL current leaf nodes
+    \item Split the one that gives the \textbf{greatest impurity reduction}
+    \item Regardless of its depth
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Computational Cost of Best-First:}
+
+Best-first growth is more computationally expensive because:
+\begin{itemize}
+    \item Must evaluate all possible splits at all leaf nodes
+    \item Compare across different depths
+    \item Number of comparisons grows with tree size
+\end{itemize}
+
+Use level-order when possible for efficiency.
+\end{warningbox}
+
+\subsection{Bias-Variance Tradeoff}
+
+Tree depth directly affects the bias-variance tradeoff:
+
+\begin{table}[h!]
+\caption{Tree Depth and Bias-Variance}
+\begin{adjustbox}{width=\textwidth, center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+& \textbf{Shallow Tree} & \textbf{Deep Tree} \\
+\midrule
+\textbf{Complexity} & Low (simple model) & High (complex model) \\
+\textbf{Bias} & High (underfits) & Low (fits training data well) \\
+\textbf{Variance} & Low (stable across datasets) & High (changes with different data) \\
+\textbf{Training Error} & Higher & Lower (approaching 0) \\
+\textbf{Test Error} & May be high (underfitting) & May be high (overfitting) \\
+\textbf{Interpretability} & High (few rules) & Low (many rules) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{Finding Optimal Hyperparameters}
+
+How do we choose the right \code{max\_depth} or \code{min\_samples\_leaf}?
+
+\textbf{Answer: Cross-Validation!}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+
+# Try different max_depth values
+for depth in [2, 3, 4, 5, 6, 8, 10, None]:
+    tree = DecisionTreeClassifier(max_depth=depth, random_state=42)
+    scores = cross_val_score(tree, X, y, cv=5)
+    print(f"max_depth={depth}: CV accuracy = {scores.mean():.3f}")
+
+# Choose the depth with highest CV accuracy
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Decision Trees in Python}
+%========================================================================================
+
+\subsection{Basic Usage}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Create and train model
+tree = DecisionTreeClassifier(
+    criterion='gini',      # 'gini' or 'entropy'
+    max_depth=5,           # Maximum depth
+    min_samples_leaf=5,    # Minimum samples in leaf
+    random_state=42
+)
+tree.fit(X_train, y_train)
+
+# Predict
+y_pred = tree.predict(X_test)
+y_prob = tree.predict_proba(X_test)  # Probability estimates
+
+# Evaluate
+from sklearn.metrics import accuracy_score
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+\end{lstlisting}
+
+\subsection{Visualizing the Tree}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+# Plot the tree
+plt.figure(figsize=(20, 10))
+plot_tree(tree,
+          feature_names=X.columns,
+          class_names=['Orange', 'Lemon'],
+          filled=True,
+          rounded=True)
+plt.title("Decision Tree Visualization")
+plt.show()
+\end{lstlisting}
+
+\subsection{Feature Importance}
+
+\begin{lstlisting}[style=pythonstyle]
+# Get feature importances
+importances = tree.feature_importances_
+
+# Display
+for name, importance in zip(X.columns, importances):
+    print(f"{name}: {importance:.3f}")
+
+# Most important feature = used in highest splits or most impurity reduction
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Decision Trees Summary}
+
+\textbf{What they are:}
+\begin{itemize}
+    \item Flowchart-like models that make binary decisions at each node
+    \item Predictions by traversing from root to leaf
+    \item Decision boundaries are axis-aligned rectangles
+\end{itemize}
+
+\textbf{How they learn:}
+\begin{itemize}
+    \item Greedy algorithm: find best split at each step
+    \item Goal: maximize purity (minimize impurity)
+    \item Criteria: Gini impurity (default), Entropy, or Classification Error
+    \item Evaluate splits using weighted average impurity
+\end{itemize}
+
+\textbf{How to prevent overfitting:}
+\begin{itemize}
+    \item Stopping conditions: \code{max\_depth}, \code{min\_samples\_leaf}, etc.
+    \item Find optimal values via cross-validation
+\end{itemize}
+
+\textbf{Advantages:}
+\begin{itemize}
+    \item Highly interpretable (``white box'' model)
+    \item No feature scaling needed
+    \item Handle nonlinear boundaries
+    \item Fast training and prediction
+\end{itemize}
+
+\textbf{Limitations:}
+\begin{itemize}
+    \item Can only create axis-aligned boundaries
+    \item Prone to overfitting without proper constraints
+    \item Greedy algorithm may miss global optimum
+    \item High variance (sensitive to training data)
+\end{itemize}
+\end{summarybox}
+
+\section{Learning Checklist}
+
+\begin{itemize}[label=$\square$]
+    \item Can you explain why logistic regression fails for certain decision boundaries?
+    \item Can you define: root node, internal node, leaf node, split, depth?
+    \item Can you walk through tree traversal to make a prediction?
+    \item Do you understand why decision boundaries are rectangular?
+    \item Can you calculate Gini impurity for a given node?
+    \item Can you calculate Entropy for a given node?
+    \item Do you know why we use weighted average when evaluating splits?
+    \item Can you explain why Gini/Entropy are preferred over classification error?
+    \item Do you understand what ``greedy'' means in this context?
+    \item Can you list 3+ stopping conditions and explain their purpose?
+    \item Do you understand the bias-variance tradeoff as tree depth changes?
+    \item Do you know how to find optimal hyperparameters using cross-validation?
+\end{itemize}
+
+\section{Looking Ahead}
+
+In the next lectures, we'll extend decision trees to:
+\begin{enumerate}
+    \item \textbf{Regression Trees}: Predicting continuous values instead of classes
+    \item \textbf{Random Forests}: Combining many trees to reduce variance
+    \item \textbf{Bagging and Boosting}: Ensemble methods for better performance
+    \item \textbf{Gradient Boosting}: XGBoost, LightGBM---state-of-the-art for tabular data
+\end{enumerate}
+
+\end{document}

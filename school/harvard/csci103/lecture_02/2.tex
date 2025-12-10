@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Harvard Academic Notes - 통합 마스터 템플릿
 % 모든 강의 노트에 적용되는 통일된 스타일
-% 버전: 2.0
-% 최종 수정일: 2025-10-26
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[11pt,a4paper]{article}
@@ -15,10 +15,10 @@
 \usepackage{kotex}
 
 % --- 페이지 레이아웃 ---
-\usepackage[margin=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing                      % 1.5배 줄간격
-\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parskip}{0.5em}          % 문단 간격
 \setlength{\parindent}{0pt}          % 들여쓰기 없음
 
 % --- 표 관련 ---
@@ -26,7 +26,7 @@
 \usepackage{tabularx}              % 자동 너비 조절 표
 \usepackage{array}                 % 표 컬럼 확장
 \usepackage{longtable}             % 여러 페이지 표
-\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
 
 %========================================================================================
 % 헤더 및 푸터
@@ -388,14 +388,11 @@
 
 \begin{document}
 
-}
 \maketitle
 \thispagestyle{firstpage}
 
 \metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 02}{Anindita Mahapatra & Eric Gieseke}{Lecture 02의 핵심 개념 학습}
 
-
-\thispagestyle{fancy} % 제목 페이지에도 헤더/푸터 적용
 
 \begin{summarybox}
 본 문서는 데이터 엔지니어링의 핵심인 \textbf{데이터 모델링}을 다룹니다.
@@ -407,7 +404,6 @@ Inmon, Kimball 등 전통적인 \textbf{데이터 웨어하우스(DWH)} 모델�
 마지막으로, 주택 가격 예측 \textbf{실습(Lab-01)}을 통해 Databricks 환경에서 데이터를 준비하고 \textbf{선형 회귀 모델}을 훈련시키는 전 과정을 살펴봅니다.
 \end{summarybox}
 
-\clearpage
 \tableofcontents
 
 \newpage
@@ -420,8 +416,8 @@ Inmon, Kimball 등 전통적인 \textbf{데이터 웨어하우스(DWH)} 모델�
   \centering
   \caption{1주차 핵심 용어 복습}
   \label{tab:review}
-  \adjustbox{max width=\textwidth}{
-    \begin{tabular}{ll}
+  
+    \begin{tabularx}{\textwidth}{lX}
       \toprule
       \textbf{용어 (영문)} & \textbf{핵심 설명} \\
       \midrule
@@ -437,9 +433,7 @@ Inmon, Kimball 등 전통적인 \textbf{데이터 웨어하우스(DWH)} 모델�
       \textbf{Spark의 장점} & \textbf{Polyglot} (다양한 언어 지원: Python, SQL, Scala 등) / \textbf{빠른 속도} (Hadoop과 달리 디스크가 아닌 메모리 사용) \\
       \textbf{빅데이터의 5V} & Volume(규모), Velocity(속도), Variety(다양성), \textbf{Veracity(정확성)}, Value(가치). \\
       \bottomrule
-    \end{tabular}
-  }
-\end{adjustbox}
+    \end{tabularx}
 \end{table}
 
 \begin{warningbox}
@@ -573,8 +567,8 @@ CREATE TABLE T_ORDER_ITEMS (
   \centering
   \caption{OLTP vs OLAP 시스템 비교}
   \label{tab:oltp_olap}
-  \adjustbox{max width=\textwidth}{
-    \begin{tabular}{lll}
+  
+    \begin{tabularx}{\textwidth}{llX}
       \toprule
       \textbf{특징} & \textbf{OLTP (운영 시스템)} & \textbf{OLAP (분석 시스템)} \\
       \midrule
@@ -586,9 +580,7 @@ CREATE TABLE T_ORDER_ITEMS (
       \textbf{성능 척도} & 트랜잭션 처리량 (Transaction throughput) & 쿼리 응답 속도 (Query response time) \\
       \textbf{모델링} & \textbf{ER 모델 (정규화)} & \textbf{차원 모델 (비정규화)} \\
       \bottomrule
-    \end{tabular}
-  }
-\end{adjustbox}
+    \end{tabularx}
 \end{table}
 
 \section{분석형 모델링 (Dimensional Modeling)}
@@ -639,8 +631,8 @@ OLAP 시스템(DWH)에서는 분석 속도를 높이기 위해 \textbf{차원 �
   \centering
   \caption{스타 스키마 vs 눈송이 스키마}
   \label{tab:star_snowflake}
-  \adjustbox{max width=\textwidth}{
-    \begin{tabular}{lll}
+  
+    \begin{tabularx}{\textwidth}{llX}
       \toprule
       \textbf{특징} & \textbf{스타 스키마 (Star Schema)} & \textbf{눈송이 스키마 (Snowflake Schema)} \\
       \midrule
@@ -651,9 +643,7 @@ OLAP 시스템(DWH)에서는 분석 속도를 높이기 위해 \textbf{차원 �
       \textbf{데이터 구조} & 단순함 & 복잡함 \\
       \textbf{큐브 처리 속도} & 빠름 & 느릴 수 있음 \\
       \bottomrule
-    \end{tabular}
-  }
-\end{adjustbox}
+    \end{tabularx}
 \end{table}
 
 \section{NoSQL 데이터 모델링}
@@ -931,7 +921,6 @@ NoSQL 모델링의 핵심은 \textbf{비정규화(Denormalization)}입니다.
       \bottomrule
     \end{tabular}
   }
-\end{adjustbox}
 \end{table}
 
 \section{메타데이터 (Metadata)}
@@ -1121,8 +1110,8 @@ NoSQL 모델링의 핵심은 \textbf{비정규화(Denormalization)}입니다.
   \centering
   \caption{2주차 핵심 용어}
   \label{tab:glossary}
-  \adjustbox{max width=\textwidth}{
-    \begin{tabular}{lll}
+  
+    \begin{tabularx}{\textwidth}{llX}
       \toprule
       \textbf{용어} & \textbf{영문} & \textbf{쉬운 설명} \\
       \midrule
@@ -1145,9 +1134,7 @@ NoSQL 모델링의 핵심은 \textbf{비정규화(Denormalization)}입니다.
       분할 가능 압축 & Splittable Compression & 분산 시스템에서 병렬 처리가 가능한 압축 방식. (예: Bzip2) (매우 중요) \\
       데이터 프로파일링 & Data Profiling & 데이터의 품질과 구조를 파악하기 위한 '건강검진'. \\
       \bottomrule
-    \end{tabular}
-  }
-\end{adjustbox}
+    \end{tabularx}
 \end{table}
 
 \section{빠르게 훑어보기 (1-Page Summary)}

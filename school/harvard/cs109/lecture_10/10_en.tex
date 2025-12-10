@@ -1,0 +1,1089 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 10: Bayesian Inference and Bayes' Rule
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages (English - No kotex)
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 10}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 10},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Bayesian Inference and Bayes' Rule}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begin
+%========================================================================================
+
+\title{Lecture 10: Bayesian Inference and Bayes' Rule}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 10}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Reviewing statistical inference, understanding the distinction between confidence and prediction intervals, learning Bayes' rule, and introducing Bayesian inference as an alternative paradigm to frequentist statistics}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Introduction and Motivation}
+%========================================================================================
+
+\begin{overviewbox}
+This lecture reviews statistical inference concepts and introduces a fundamentally different way of thinking about probability and parameters: \textbf{Bayesian inference}. The Bayesian approach treats parameters as random variables with probability distributions, rather than fixed unknown constants.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item \textbf{Review of Inference}: Standard errors, confidence intervals, hypothesis testing
+    \item \textbf{Bootstrap vs. Permutation}: When to use which resampling method
+    \item \textbf{Confidence Interval vs. Prediction Interval}: A crucial distinction
+    \item \textbf{Likelihood Review}: The foundation for Bayesian methods
+    \item \textbf{Bayes' Rule}: Flipping conditional probabilities
+    \item \textbf{Bayesian Inference}: Updating beliefs based on evidence
+    \item \textbf{Frequentist vs. Bayesian}: Two worldviews of statistics
+\end{itemize}
+\end{overviewbox}
+
+\subsection{Continuing the Housing Example}
+
+We continue with the Cambridge/Somerville housing data from last lecture:
+
+\begin{itemize}
+    \item \textbf{Simple regression}: Price $\sim$ Square footage
+    \item \textbf{Estimated model}: $\hat{y} = 247.4 + 0.5898x$
+    \item \textbf{Interpretation}: Each additional square foot is associated with roughly \$600 higher selling price
+\end{itemize}
+
+\begin{warningbox}[title=Correlation vs. Causation Reminder]
+``Be careful. Doesn't mean it's causal because there could be other confounders in that data set that we haven't controlled for.''
+
+The coefficient 0.5898 represents an \textit{association}, not necessarily a causal effect. Other factors correlated with square footage (neighborhood quality, lot size, etc.) might be driving part of this relationship.
+\end{warningbox}
+
+%========================================================================================
+\section{Review: Statistical Inference}
+%========================================================================================
+
+\subsection{Population vs. Sample}
+
+\begin{definitionbox}[Two Models]
+\textbf{Population Model} (what we want):
+\[
+Y_i = \beta_0 + \beta_1 X_i + \epsilon_i
+\]
+\begin{itemize}
+    \item $\beta_0, \beta_1$ are the \textit{true} parameters for all homes in this geographic region
+    \item $\sigma^2 = \text{Var}(\epsilon_i)$ is another unknown parameter
+\end{itemize}
+
+\textbf{Estimated Model} (what we have):
+\[
+\hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1 x_i
+\]
+\begin{itemize}
+    \item $\hat{\beta}_0, \hat{\beta}_1$ are estimates from our sample of $\sim$500 homes
+    \item These are one ``realization'' from the sampling distribution
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Standard Errors: Understanding Uncertainty}
+
+The \textbf{standard error} (SE) quantifies how much our estimate would vary across different samples:
+
+\begin{definitionbox}[Standard Error of the Slope]
+\[
+\hat{SE}(\hat{\beta}_1) = \sqrt{\frac{\hat{\sigma}^2}{\sum_{i=1}^{n}(x_i - \bar{x})^2}}
+\]
+
+where $\hat{\sigma}^2$ is the estimated residual variance.
+\end{definitionbox}
+
+\subsubsection{What Controls the Standard Error?}
+
+Looking at the formula, we can build intuition:
+
+\begin{infobox}[title=How to Reduce Standard Error]
+\begin{enumerate}
+    \item \textbf{Increase sample size ($n$)}:
+    \begin{itemize}
+        \item More observations $\rightarrow$ larger denominator
+        \item The sum $\sum(x_i - \bar{x})^2$ increases with $n$
+        \item \textbf{Most reliable way to reduce SE}
+    \end{itemize}
+
+    \item \textbf{Increase spread in $X$}:
+    \begin{itemize}
+        \item Wider range of $X$ values $\rightarrow$ larger $\sum(x_i - \bar{x})^2$
+        \item Hard to control in observational studies
+        \item In experiments, you can deliberately sample extreme $X$ values
+    \end{itemize}
+
+    \item \textbf{Reduce residual variance ($\hat{\sigma}^2$)}:
+    \begin{itemize}
+        \item Better model $\rightarrow$ tighter fit around the line
+        \item Add relevant predictors, use transformations
+        \item Limited by irreducible error
+    \end{itemize}
+\end{enumerate}
+\end{infobox}
+
+\subsubsection{What About Standardizing Predictors?}
+
+Professor Rader poses a ``midterm type question'': What happens to the SE formula if you standardize the predictor?
+
+\begin{examplebox}[The Standardization Trap]
+At first glance, standardizing $X$ (mean 0, variance 1) might seem to reduce SE since the denominator becomes smaller.
+
+\textbf{But wait!}
+
+When you standardize $X$:
+\begin{itemize}
+    \item The denominator $\sum(x_i - \bar{x})^2$ decreases
+    \item BUT $\hat{\beta}_1$ itself changes (different units!)
+    \item Interpretation changes from ``per unit $X$'' to ``per standard deviation of $X$''
+\end{itemize}
+
+\textbf{Net effect}: The t-statistic remains the same!
+\[
+t = \frac{\hat{\beta}_1}{\hat{SE}(\hat{\beta}_1)}
+\]
+
+Standardizing doesn't magically make your predictor more ``significant.'' The narrower CI is offset by a smaller $\hat{\beta}_1$.
+\end{examplebox}
+
+\subsection{Confidence Intervals: Formula-Based}
+
+\begin{definitionbox}[Confidence Interval Formula]
+\[
+\text{CI for } \beta_1: \quad \hat{\beta}_1 \pm t^* \cdot \hat{SE}(\hat{\beta}_1)
+\]
+
+where $t^*$ is the critical value from the t-distribution (roughly 2 for 95\% CI with large samples).
+\end{definitionbox}
+
+\subsubsection{Why t-distribution Instead of Normal?}
+
+\begin{summarybox}[title=t-Distribution vs. Normal Distribution]
+\textbf{Normal (Z) distribution}: Used when $\sigma$ is \textit{known} (rare in practice).
+
+\textbf{t-distribution}: Used when $\sigma$ must be \textit{estimated} from data.
+\begin{itemize}
+    \item Estimating $\sigma$ adds extra uncertainty
+    \item t-distribution has ``fatter tails'' to account for this
+    \item As sample size $\rightarrow \infty$, t-distribution $\rightarrow$ normal distribution
+    \item With $n \geq 50$, the difference is minimal
+\end{itemize}
+\end{summarybox}
+
+\subsection{Hypothesis Testing Review}
+
+\begin{summarybox}[title=Hypothesis Testing for $\beta_1$]
+\textbf{Hypotheses}:
+\begin{itemize}
+    \item $H_0: \beta_1 = 0$ (no association between $X$ and $Y$)
+    \item $H_A: \beta_1 \neq 0$ (there is an association)
+\end{itemize}
+
+\textbf{Test Statistic}:
+\[
+t = \frac{\hat{\beta}_1 - 0}{\hat{SE}(\hat{\beta}_1)} = \frac{\hat{\beta}_1}{\hat{SE}(\hat{\beta}_1)}
+\]
+
+This measures: ``How many standard errors is our estimate from zero?''
+
+\textbf{p-value}: Probability of observing a $|t|$ this extreme or more extreme, assuming $H_0$ is true.
+
+\textbf{Decision}: If p-value $< 0.05$, reject $H_0$.
+\end{summarybox}
+
+\subsection{Two-Sided Tests and Absolute Values}
+
+\begin{examplebox}[Why Absolute Values in p-value Calculation?]
+The p-value formula often looks like:
+\[
+\text{p-value} = P(|T| \geq |t_{\text{observed}}|)
+\]
+
+\textbf{Why absolute values?}
+
+Because our alternative hypothesis is $\beta_1 \neq 0$ (two-sided). We consider evidence against $H_0$ whether the association is positive or negative.
+
+If we observed $t = -4$:
+\begin{itemize}
+    \item Area to the left of $-4$ (extreme negative)
+    \item Plus area to the right of $+4$ (equally extreme positive)
+\end{itemize}
+\end{examplebox}
+
+%========================================================================================
+\section{Bootstrap vs. Permutation Tests}
+%========================================================================================
+
+\subsection{When to Use Each}
+
+\begin{importantbox}[Bootstrap vs. Permutation: Critical Distinction]
+\textbf{Bootstrap}: For \textbf{confidence intervals}
+\begin{itemize}
+    \item Resample \textit{with replacement} from your data
+    \item Preserves the relationships in your data
+    \item Estimates the sampling distribution of your statistic
+\end{itemize}
+
+\textbf{Permutation Test}: For \textbf{hypothesis testing (p-values)}
+\begin{itemize}
+    \item Shuffle the response variable $Y$, keep $X$ fixed
+    \item \textbf{Enforces the null hypothesis} (no relationship between $X$ and $Y$)
+    \item Builds a reference distribution \textit{under $H_0$}
+\end{itemize}
+
+\textbf{Why not bootstrap for hypothesis testing?}
+
+Bootstrap doesn't enforce $H_0$. Under certain conditions (violated assumptions, multicollinearity), it can lead to \textbf{inflated Type I error}---rejecting $H_0$ too often when it's actually true.
+\end{importantbox}
+
+\begin{examplebox}[Permutation Testing Procedure]
+To test $H_0: \beta_1 = 0$:
+
+\begin{enumerate}
+    \item \textbf{Shuffle}: Randomly permute the $Y$ values (break the $X$-$Y$ relationship)
+    \item \textbf{Refit}: Calculate $\hat{\beta}_1^*$ on the shuffled data
+    \item \textbf{Repeat}: Do this many times (e.g., 1000 permutations)
+    \item \textbf{Result}: A distribution of $\hat{\beta}_1^*$ values, centered at 0 (since $H_0$ is enforced)
+\end{enumerate}
+
+The p-value is the proportion of permuted $|\hat{\beta}_1^*|$ values that exceed your observed $|\hat{\beta}_1|$.
+\end{examplebox}
+
+\subsection{Comparing Bootstrap and Formula-Based CIs}
+
+From the housing data:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{95\% CI for $\beta_1$} & \textbf{Width} \\
+\midrule
+statsmodels (formula) & (0.544, 0.636) & 0.092 \\
+Bootstrap & (0.487, 0.705) & 0.218 \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of confidence intervals}
+\end{table}
+
+\begin{warningbox}[title=Why the Difference?]
+The bootstrap CI is \textbf{wider} because:
+\begin{itemize}
+    \item The formula-based CI assumes constant variance (homoscedasticity)
+    \item Our data shows clear heteroscedasticity (variance fanning out with larger homes)
+    \item When assumptions are violated, formulas give \textbf{incorrectly narrow} CIs
+    \item Bootstrap makes fewer assumptions and captures the true variability
+\end{itemize}
+
+\textbf{Lesson}: When in doubt, bootstrap is safer!
+\end{warningbox}
+
+\subsection{Linear Regression Assumptions (LINE)}
+
+\begin{infobox}[title=The LINE Assumptions]
+\begin{enumerate}
+    \item \textbf{L}inearity: The relationship is linear
+    \item \textbf{I}ndependence: Observations are independent (most important!)
+    \item \textbf{N}ormality: Residuals are normally distributed (least important if $n > 50$)
+    \item \textbf{E}qual variance: Constant variance (homoscedasticity)
+\end{enumerate}
+
+\textbf{Bootstrap}: Relaxes N and E, still requires L and I
+
+\textbf{Formula-based}: Requires all four
+\end{infobox}
+
+%========================================================================================
+\section{Confidence Interval vs. Prediction Interval}
+%========================================================================================
+
+This is one of the most commonly confused distinctions in regression!
+
+\subsection{Two Different Questions}
+
+\begin{definitionbox}[CI vs. PI]
+\textbf{Confidence Interval (CI)}: Uncertainty about the \textit{mean} response
+\begin{itemize}
+    \item Question: ``What is the \textbf{average} selling price of \textit{all} homes with 2860 sqft?''
+    \item Only includes uncertainty in the regression line ($\hat{\beta}$'s)
+\end{itemize}
+
+\textbf{Prediction Interval (PI)}: Uncertainty about a \textit{single} new observation
+\begin{itemize}
+    \item Question: ``What will \textit{this specific new home} with 2860 sqft sell for?''
+    \item Includes uncertainty in the line \textbf{AND} the individual noise ($\sigma^2$)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Why PI is Always Wider}
+
+\begin{summarybox}[title=Two Sources of Uncertainty for Predictions]
+\textbf{Source 1}: Uncertainty in the regression line
+\begin{itemize}
+    \item We estimated $\hat{\beta}_0$ and $\hat{\beta}_1$ from a sample
+    \item Different samples would give different estimates
+    \item This is what the CI captures
+\end{itemize}
+
+\textbf{Source 2}: Individual observation variability (irreducible error)
+\begin{itemize}
+    \item Even if we knew the exact population line, individual homes vary around it
+    \item This is $\sigma^2$ (the variance of $\epsilon$)
+    \item No matter how much data you collect, this never goes away!
+\end{itemize}
+
+\textbf{Prediction Interval}:
+\[
+\text{PI} = \hat{y} \pm t^* \cdot \sqrt{(\text{SE of fit})^2 + \hat{\sigma}^2}
+\]
+
+The extra $\hat{\sigma}^2$ term is why PI is always wider than CI.
+\end{summarybox}
+
+\begin{examplebox}[Game Time Question]
+Use this output to predict with 95\% uncertainty the selling price of a home that is 2860 sqft:
+
+\begin{verbatim}
+Intercept: 247.4,  sqft coef: 0.5898,  SE(sqft): 0.023
+\end{verbatim}
+
+Options:
+\begin{enumerate}[label=\Alph*.]
+    \item $0.5898 \pm 2 \times 0.023$ (CI for slope)
+    \item $247.4 + 0.5898 \times 2860$ (point prediction only)
+    \item $247.4 + 0.5898(2860) \pm 2 \times 0.023$ (CI for mean response)
+    \item $247.4 + 0.5898(2860) \pm 2\sqrt{0.023^2 + \hat{\sigma}^2}$ (PI for new observation)
+\end{enumerate}
+
+\textbf{Answer}: \textbf{D}!
+
+Since we're predicting ``a home''---a single new observation---we need the \textbf{Prediction Interval}, which includes both the model uncertainty and the residual variance $\hat{\sigma}^2$.
+\end{examplebox}
+
+%========================================================================================
+\section{Likelihood Review}
+%========================================================================================
+
+Before diving into Bayesian inference, let's solidify our understanding of likelihood.
+
+\subsection{Flipping the Perspective}
+
+\begin{definitionbox}[Likelihood Function]
+\textbf{PDF/PMF}: $f(x | \theta)$ --- Given parameters, what's the probability of the data?
+
+\textbf{Likelihood}: $L(\theta | x)$ --- Given data, how plausible is each parameter value?
+
+\textbf{Mathematically}: They're the same function! The difference is conceptual:
+\begin{itemize}
+    \item PDF: $\theta$ is fixed, $x$ varies
+    \item Likelihood: $x$ is fixed (observed), $\theta$ varies
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Why Products Become Sums}
+
+\begin{infobox}[title=Log-Likelihood]
+For independent observations $x_1, \ldots, x_n$:
+\[
+L(\theta) = \prod_{i=1}^{n} f(x_i | \theta)
+\]
+
+Taking the log:
+\[
+\ell(\theta) = \log L(\theta) = \sum_{i=1}^{n} \log f(x_i | \theta)
+\]
+
+\textbf{Why use log?}
+\begin{enumerate}
+    \item Products $\rightarrow$ sums (much easier calculus!)
+    \item Numerical stability (avoids underflow from multiplying many small numbers)
+    \item Same maximum: $\arg\max L(\theta) = \arg\max \ell(\theta)$
+\end{enumerate}
+\end{infobox}
+
+\subsection{The OLS-MLE Connection (Review)}
+
+\begin{summarybox}[title=OLS = MLE Under Normality]
+If we assume $\epsilon_i \sim N(0, \sigma^2)$, then maximizing the likelihood is equivalent to minimizing the sum of squared errors.
+
+\textbf{Why?} The negative log-likelihood becomes:
+\[
+-\ell(\beta_0, \beta_1) = \text{constant} + \frac{1}{2\sigma^2}\sum_{i=1}^{n}(y_i - \beta_0 - \beta_1 x_i)^2
+\]
+
+Minimizing this with respect to $\beta_0, \beta_1$ is the same as minimizing SSE!
+\end{summarybox}
+
+%========================================================================================
+\section{Bayes' Rule: Flipping Conditional Probabilities}
+%========================================================================================
+
+\subsection{The Basic Formula}
+
+\begin{definitionbox}[Bayes' Rule]
+For events $A$ and $B$:
+\[
+P(A | B) = \frac{P(B | A) \cdot P(A)}{P(B)}
+\]
+
+\textbf{Extended version} (using Law of Total Probability for denominator):
+\[
+P(A | B) = \frac{P(B | A) \cdot P(A)}{P(B | A) \cdot P(A) + P(B | A^c) \cdot P(A^c)}
+\]
+\end{definitionbox}
+
+\subsection{Example: CS and STAT Concentrators}
+
+\begin{examplebox}[Conditional Probability Practice]
+In a hypothetical CS109A class (among undergrads):
+\begin{itemize}
+    \item 40\% are STAT concentrators: $P(\text{STAT}) = 0.40$
+    \item 60\% are CS concentrators: $P(\text{CS}) = 0.60$
+    \item 20\% are both (joint/double): $P(\text{STAT} \cap \text{CS}) = 0.20$
+\end{itemize}
+
+\textbf{Question 1}: Among STAT concentrators, what fraction are also CS?
+\[
+P(\text{CS} | \text{STAT}) = \frac{P(\text{STAT} \cap \text{CS})}{P(\text{STAT})} = \frac{0.20}{0.40} = 0.50
+\]
+
+\textbf{Question 2}: Among CS concentrators, what fraction are also STAT?
+\[
+P(\text{STAT} | \text{CS}) = \frac{P(\text{STAT} \cap \text{CS})}{P(\text{CS})} = \frac{0.20}{0.60} = 0.333
+\]
+
+\textbf{Key Insight}: $P(\text{CS} | \text{STAT}) \neq P(\text{STAT} | \text{CS})$!
+
+These are fundamentally different questions---don't confuse them.
+\end{examplebox}
+
+\subsection{Independence and Dependence}
+
+\begin{infobox}[title=Are STAT and CS Independent?]
+Events are \textbf{independent} if $P(A \cap B) = P(A) \cdot P(B)$.
+
+Check: $P(\text{STAT}) \cdot P(\text{CS}) = 0.40 \times 0.60 = 0.24$
+
+But $P(\text{STAT} \cap \text{CS}) = 0.20 \neq 0.24$
+
+\textbf{Conclusion}: They are \textbf{dependent}!
+
+\textbf{Meaning}: Knowing someone's CS status gives you information about whether they're also STAT. The probability changes once you have additional information.
+\end{infobox}
+
+%========================================================================================
+\section{Bayes' Rule in Diagnostic Testing}
+%========================================================================================
+
+This is a classic application that will connect directly to classification later.
+
+\begin{examplebox}[Pregnancy Test Example]
+A pregnancy test has:
+\begin{itemize}
+    \item \textbf{Sensitivity}: $P(\text{Test}+ | \text{Pregnant}) = 0.97$ (true positive rate)
+    \item \textbf{Specificity}: $P(\text{Test}- | \text{Not Pregnant}) = 0.99$ (true negative rate)
+\end{itemize}
+
+Among people taking this test, about 30\% are actually pregnant: $P(\text{Pregnant}) = 0.30$
+
+\textbf{Question}: If someone tests positive, what's the probability they're actually pregnant?
+
+\textbf{We want}: $P(\text{Pregnant} | \text{Test}+)$
+
+\textbf{We have}: $P(\text{Test}+ | \text{Pregnant})$
+
+We need to \textbf{flip the conditional}---use Bayes' Rule!
+\end{examplebox}
+
+\subsection{Applying Bayes' Rule}
+
+\begin{align*}
+P(\text{Preg} | T+) &= \frac{P(T+ | \text{Preg}) \cdot P(\text{Preg})}{P(T+)} \\[1em]
+&= \frac{P(T+ | \text{Preg}) \cdot P(\text{Preg})}{P(T+ | \text{Preg}) \cdot P(\text{Preg}) + P(T+ | \text{Not Preg}) \cdot P(\text{Not Preg})} \\[1em]
+&= \frac{0.97 \times 0.30}{0.97 \times 0.30 + 0.01 \times 0.70} \\[1em]
+&= \frac{0.291}{0.291 + 0.007} = \frac{0.291}{0.298} \approx 0.977
+\end{align*}
+
+\begin{summarybox}[title=Belief Update: Prior to Posterior]
+\begin{itemize}
+    \item \textbf{Prior probability} of being pregnant: 30\%
+    \item \textbf{Evidence}: Positive test result
+    \item \textbf{Posterior probability} of being pregnant: 97.7\%
+\end{itemize}
+
+The positive test dramatically updated our belief from 30\% to 97.7\%!
+
+\textbf{This is the essence of Bayesian inference}: Using evidence to update our beliefs.
+\end{summarybox}
+
+%========================================================================================
+\section{Bayesian Inference: A New Paradigm}
+%========================================================================================
+
+\subsection{From Events to Parameters}
+
+Now we apply this same logic to statistical parameters:
+
+\begin{definitionbox}[Bayesian Inference Formula]
+\[
+f(\theta | X) = \frac{f(X | \theta) \cdot f(\theta)}{f(X)}
+\]
+
+\textbf{Components}:
+\begin{itemize}
+    \item $f(\theta | X)$ --- \textbf{Posterior Distribution}: Our updated belief about $\theta$ after seeing data
+    \item $f(X | \theta)$ --- \textbf{Likelihood}: How probable is our data given $\theta$?
+    \item $f(\theta)$ --- \textbf{Prior Distribution}: Our initial belief about $\theta$ before seeing data
+    \item $f(X)$ --- \textbf{Evidence/Marginal Likelihood}: A normalizing constant
+\end{itemize}
+
+\textbf{Simplified}:
+\[
+\text{Posterior} \propto \text{Likelihood} \times \text{Prior}
+\]
+\end{definitionbox}
+
+\subsection{The Bayesian Philosophy}
+
+\begin{importantbox}[Frequentist vs. Bayesian Worldviews]
+\begin{table}[h!]
+\centering
+\begin{tabular}{p{3cm}|p{5cm}|p{5cm}}
+\toprule
+\textbf{Aspect} & \textbf{Frequentist} & \textbf{Bayesian} \\
+\midrule
+View of $\theta$ & Fixed but unknown constant & Random variable with a distribution \\
+\midrule
+View of probability & Long-run frequency of events & Degree of belief/uncertainty \\
+\midrule
+Key question & ``Is $\theta = 0$ a reasonable value?'' & ``What do we believe about $\theta$ given the data?'' \\
+\midrule
+Result & Point estimate $\hat{\theta}$ + CI & Full posterior distribution $f(\theta | X)$ \\
+\midrule
+CI interpretation & ``95\% of intervals from this procedure contain $\theta$'' & ``95\% probability $\theta$ is in this interval'' \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{importantbox}
+
+\subsection{Example: Three Coins}
+
+\begin{examplebox}[Discrete Bayesian Inference]
+You have three coins in your pocket:
+\begin{itemize}
+    \item Coin A: $P(\text{Heads}) = 0.1$ (biased toward tails)
+    \item Coin B: $P(\text{Heads}) = 0.5$ (fair)
+    \item Coin C: $P(\text{Heads}) = 0.9$ (biased toward heads)
+\end{itemize}
+
+You randomly select one coin (equal probability) and flip it 4 times.
+
+\textbf{Data observed}: 3 Heads, 1 Tail
+
+\textbf{Question}: Which coin did you probably pick?
+
+\textbf{Step 1: Prior}
+
+Before seeing any flips, each coin is equally likely:
+\[
+P(p = 0.1) = P(p = 0.5) = P(p = 0.9) = \frac{1}{3}
+\]
+
+\textbf{Step 2: Likelihood}
+
+Calculate probability of ``3H, 1T'' for each coin using binomial distribution:
+\begin{align*}
+L(p = 0.1) &= \binom{4}{3}(0.1)^3(0.9)^1 = 4 \times 0.001 \times 0.9 = 0.0036 \\
+L(p = 0.5) &= \binom{4}{3}(0.5)^3(0.5)^1 = 4 \times 0.125 \times 0.5 = 0.2500 \\
+L(p = 0.9) &= \binom{4}{3}(0.9)^3(0.1)^1 = 4 \times 0.729 \times 0.1 = 0.2916
+\end{align*}
+
+\textbf{Step 3: Posterior (unnormalized)}
+\begin{align*}
+P(p = 0.1 | \text{data}) &\propto 0.0036 \times \frac{1}{3} = 0.0012 \\
+P(p = 0.5 | \text{data}) &\propto 0.2500 \times \frac{1}{3} = 0.0833 \\
+P(p = 0.9 | \text{data}) &\propto 0.2916 \times \frac{1}{3} = 0.0972
+\end{align*}
+
+\textbf{Step 4: Normalize} (sum = 0.0012 + 0.0833 + 0.0972 = 0.1817)
+\begin{align*}
+P(p = 0.1 | \text{data}) &= \frac{0.0012}{0.1817} \approx 0.007 \quad (0.7\%) \\
+P(p = 0.5 | \text{data}) &= \frac{0.0833}{0.1817} \approx 0.458 \quad (45.8\%) \\
+P(p = 0.9 | \text{data}) &= \frac{0.0972}{0.1817} \approx 0.535 \quad (53.5\%)
+\end{align*}
+
+\textbf{Conclusion}: Our belief shifted from (33.3\%, 33.3\%, 33.3\%) to (0.7\%, 45.8\%, 53.5\%). We now believe we most likely picked the biased-toward-heads coin!
+\end{examplebox}
+
+%========================================================================================
+\section{Game Time: Bootstrap Sample Size}
+%========================================================================================
+
+\begin{examplebox}[Class Question]
+What happens to the bootstrap distribution when $B$ (number of bootstrap samples) increases?
+
+Options:
+\begin{enumerate}[label=\Alph*.]
+    \item The distribution becomes more normal
+    \item The variance decreases
+    \item The confidence intervals become narrower
+    \item The distribution gets smoother
+\end{enumerate}
+
+\textbf{Correct Answer}: \textbf{D} (and arguably A)
+
+\textbf{What increasing $B$ does}:
+\begin{itemize}
+    \item Gets a more \textit{precise estimate} of the true sampling distribution
+    \item Makes the histogram smoother (less jagged)
+    \item Does NOT change the underlying variability of your estimate!
+\end{itemize}
+
+\textbf{What increasing $B$ does NOT do}:
+\begin{itemize}
+    \item Narrow confidence intervals
+    \item Reduce the variance of $\hat{\beta}$
+\end{itemize}
+
+\textbf{To actually narrow CIs}, you need to increase \textbf{$n$} (original sample size), not $B$!
+\end{examplebox}
+
+%========================================================================================
+\section{Quick Reference Summary}
+%========================================================================================
+
+\begin{tcolorbox}[title=Lecture 10 Quick Reference Card, colback=white]
+
+\begin{tcolorbox}[colback=lightblue, title=\textbf{1. CI vs. PI}]
+\begin{itemize}
+    \item \textbf{CI}: Uncertainty in mean response (where is the line?)
+    \item \textbf{PI}: Uncertainty in single observation (includes $\hat{\sigma}^2$)
+    \item PI is \textbf{always wider}!
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightgreen, title=\textbf{2. Bootstrap vs. Permutation}]
+\begin{itemize}
+    \item \textbf{Bootstrap}: Confidence intervals (resample with replacement)
+    \item \textbf{Permutation}: Hypothesis tests (shuffle $Y$, enforces $H_0$)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightyellow, title=\textbf{3. Bayes' Rule}]
+\[
+P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+\]
+Allows ``flipping'' conditional probabilities!
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpurple, title=\textbf{4. Bayesian Inference}]
+\[
+\text{Posterior} \propto \text{Likelihood} \times \text{Prior}
+\]
+\[
+f(\theta|X) \propto f(X|\theta) \cdot f(\theta)
+\]
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpink, title=\textbf{5. Frequentist vs. Bayesian}]
+\begin{itemize}
+    \item \textbf{Frequentist}: $\theta$ is fixed constant, probability = long-run frequency
+    \item \textbf{Bayesian}: $\theta$ has a distribution, probability = belief
+\end{itemize}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+%========================================================================================
+\section{Common Questions and Answers}
+%========================================================================================
+
+\textbf{Q: The prior seems subjective. Isn't that a problem?}
+
+A: It can be, but:
+\begin{enumerate}
+    \item Use ``informative priors'' based on previous research or domain knowledge
+    \item Use ``uninformative/flat priors'' when you have no prior knowledge
+    \item Most importantly: \textbf{With enough data, the prior gets overwhelmed}. The posterior converges to the same answer regardless of (reasonable) prior choices.
+\end{enumerate}
+
+\textbf{Q: When should I use Bayesian vs. Frequentist methods?}
+
+A: Both have their place:
+\begin{itemize}
+    \item \textbf{Frequentist}: Simpler, faster computation, standard in clinical trials
+    \item \textbf{Bayesian}: Can incorporate prior knowledge, gives full posterior distribution, better for small samples
+\end{itemize}
+
+Modern data science often uses both and compares results.
+
+\textbf{Q: Why does increasing bootstrap samples $B$ not narrow the CI?}
+
+A: $B$ controls how accurately you \textit{estimate} the sampling distribution. But the \textit{width} of the sampling distribution depends on your original sample size $n$. More bootstrap samples give you a smoother histogram of the same width.
+
+%========================================================================================
+\section{The Monty Hall Problem (Bonus)}
+%========================================================================================
+
+Professor Rader mentions this classic probability puzzle:
+
+\begin{examplebox}[The Monty Hall Problem]
+\textbf{Setup}:
+\begin{itemize}
+    \item 3 doors: 1 car (prize), 2 goats (losers)
+    \item You pick a door (say, Door 1)
+    \item Host (who knows where the car is) opens another door revealing a goat
+    \item You're offered: ``Do you want to switch to the remaining door?''
+\end{itemize}
+
+\textbf{Counterintuitive Result}:
+\begin{itemize}
+    \item Stay: Win probability = 1/3
+    \item Switch: Win probability = 2/3
+\end{itemize}
+
+\textbf{Intuition (100 doors version)}:
+\begin{itemize}
+    \item Pick 1 door out of 100. Probability you picked the car = 1/100.
+    \item Host reveals 98 goats, leaving 2 doors.
+    \item If you switch, you win unless you initially picked the car (probability 99/100)!
+\end{itemize}
+
+This demonstrates how conditional probability can be counterintuitive!
+\end{examplebox}
+
+%========================================================================================
+\section{Looking Ahead}
+%========================================================================================
+
+In the next lecture, we'll:
+\begin{itemize}
+    \item Work through the three-coins example in more detail
+    \item Explore continuous priors and posteriors
+    \item See how Bayesian inference connects to regression
+    \item Start applying these ideas in Python
+\end{itemize}
+
+The Bayesian framework will also be crucial when we move to classification, where we'll care about $P(\text{Class} | \text{Features})$---a natural application of Bayes' Rule!
+
+\end{document}

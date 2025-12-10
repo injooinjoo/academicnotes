@@ -1,0 +1,1221 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 14: Advanced Logistic Regression and Classification Evaluation
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 14}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 14},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 14: Advanced Logistic Regression and Classification Evaluation}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 14}{Pavlos Protopapas, Kevin Rader, Chris Tanner}{Logistic Regression Inference, Interactions, Decision Boundaries, Regularization, Multiclass Classification, Confusion Matrix, ROC/AUC}
+
+\begin{summarybox}
+This lecture builds upon the foundations of logistic regression to cover advanced topics essential for practical classification tasks.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item Inference in logistic regression: confidence intervals and hypothesis tests using Z-statistics
+    \item Interpreting coefficients with binary predictors and the concept of reference groups
+    \item Multiple logistic regression with interaction terms
+    \item Decision boundaries: what they are and how polynomial features create non-linear boundaries
+    \item Regularization (Ridge/L2) in logistic regression to prevent overfitting
+    \item Multiclass classification: One-vs-Rest (OvR) and Multinomial approaches
+    \item Classification evaluation: Confusion Matrix, Sensitivity, Specificity, Precision, ROC curves, and AUC
+\end{itemize}
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%================================================================================
+\section{Review: The Probabilistic View of Logistic Regression}
+%================================================================================
+
+\subsection{Setting Up the Problem}
+
+In logistic regression, our response variable $Y$ takes values 0 or 1 (binary outcomes). We model the \textbf{probability of success} $P(Y=1|X)$ using a probabilistic framework.
+
+Since $Y$ is binary (0 or 1), each observation follows a \textbf{Bernoulli distribution}:
+$$Y_i | X_i \sim \text{Bernoulli}(p_i)$$
+
+where $p_i = P(Y_i = 1 | X_i)$ is the probability of success for observation $i$.
+
+\begin{definitionbox}{Bernoulli Distribution}
+A random variable $Y$ follows a Bernoulli distribution with parameter $p$ if:
+$$P(Y = y) = p^y (1-p)^{1-y}$$
+
+This gives:
+\begin{itemize}
+    \item $P(Y = 1) = p$ (probability of success)
+    \item $P(Y = 0) = 1-p$ (probability of failure)
+\end{itemize}
+
+The binomial distribution with $n=1$ is simply a Bernoulli distribution.
+\end{definitionbox}
+
+\subsection{Linking Probability to Predictors}
+
+We link the probability $p$ to our predictors through the \textbf{log-odds} (logit) function:
+$$\log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 X$$
+
+Solving for $p$, we get the \textbf{sigmoid function}:
+$$p = \frac{e^{\beta_0 + \beta_1 X}}{1 + e^{\beta_0 + \beta_1 X}}$$
+
+This is the ``exponentiated odds'' form mentioned in the lecture.
+
+\subsection{The Likelihood Function}
+
+Given our data, we want to find the $\beta$ values that make observing our data most likely. The likelihood function for a single observation is the Bernoulli PMF:
+$$L(p | y) = p^y (1-p)^{1-y}$$
+
+\begin{examplebox}{Understanding the Bernoulli Likelihood}
+Let's verify the likelihood makes intuitive sense:
+\begin{itemize}
+    \item If $y = 1$ (success): $L = p^1 (1-p)^0 = p$. We want $p$ to be high.
+    \item If $y = 0$ (failure): $L = p^0 (1-p)^1 = 1-p$. We want $p$ to be low (so $1-p$ is high).
+\end{itemize}
+
+The formula correctly captures what we want: high probability for what actually happened.
+\end{examplebox}
+
+The total likelihood for all $n$ observations is:
+$$L(\boldsymbol{\beta}) = \prod_{i=1}^{n} p_i^{y_i} (1-p_i)^{1-y_i}$$
+
+where the $\beta$ parameters are hidden inside each $p_i$.
+
+\newpage
+
+%================================================================================
+\section{Maximum Likelihood Estimation (MLE)}
+%================================================================================
+
+\subsection{The Estimation Process}
+
+To find the optimal $\beta$ values, we:
+\begin{enumerate}
+    \item Take the \textbf{logarithm} of the likelihood (easier to work with sums than products)
+    \item Take the \textbf{derivative} with respect to each $\beta$
+    \item Set the derivatives equal to \textbf{zero} and solve
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{No Closed-Form Solution!}
+
+Unlike linear regression where we can solve for $\hat{\beta} = (X^TX)^{-1}X^TY$ directly, logistic regression has no closed-form solution. The equations are non-linear and must be solved \textbf{numerically}.
+\end{warningbox}
+
+\subsection{Numerical Optimization}
+
+Since we cannot solve analytically, we use numerical methods:
+\begin{itemize}
+    \item \textbf{Gradient Descent}: Iteratively move in the direction that decreases the loss
+    \item \textbf{Newton-Raphson Method}: Uses second derivatives for faster convergence
+\end{itemize}
+
+We typically minimize the \textbf{negative log-likelihood}, which is equivalent to maximizing the likelihood. This negative log-likelihood is called \textbf{Binary Cross-Entropy}:
+
+$$\text{Loss} = -\sum_{i=1}^{n} \left[ y_i \log(p_i) + (1-y_i) \log(1-p_i) \right]$$
+
+\begin{infobox}
+\textbf{What Happens Under the Hood in sklearn}
+
+When you call \code{LogisticRegression().fit(X, y)}, sklearn is running an optimization algorithm (typically LBFGS or similar) to minimize the binary cross-entropy loss and find the optimal $\beta$ coefficients.
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{Inference in Logistic Regression}
+%================================================================================
+
+Once we have estimates $\hat{\beta}$, we want to:
+\begin{enumerate}
+    \item \textbf{Interpret} what these coefficients mean
+    \item \textbf{Quantify uncertainty} through confidence intervals
+    \item \textbf{Test hypotheses} about whether coefficients are significantly different from zero
+\end{enumerate}
+
+\subsection{Z-Statistics vs T-Statistics}
+
+\begin{importantbox}{Key Difference from Linear Regression}
+\begin{itemize}
+    \item \textbf{Linear Regression}: Uses \textbf{t-distribution} because we estimate variance separately
+    \item \textbf{Logistic Regression}: Uses \textbf{Z-distribution} (standard normal) because variance is ``free''
+\end{itemize}
+
+In Bernoulli/Binomial distributions, once you know $p$, the variance is $p(1-p)$---no separate estimation needed!
+\end{itemize}
+\end{importantbox}
+
+\subsection{Practical Implications}
+
+For confidence intervals:
+\begin{itemize}
+    \item Linear regression: $\hat{\beta} \pm t_{\alpha/2, df} \times SE(\hat{\beta})$ (often $\approx 2$)
+    \item Logistic regression: $\hat{\beta} \pm \textbf{1.96} \times SE(\hat{\beta})$ for 95\% CI
+\end{itemize}
+
+The value 1.96 comes from the standard normal distribution (Z-distribution).
+
+\subsection{Using statsmodels for Inference}
+
+While \code{sklearn} is great for prediction, it does not provide standard errors directly. For statistical inference, use \code{statsmodels}:
+
+\begin{lstlisting}[style=pythonstyle, caption={Logistic Regression with statsmodels}]
+import statsmodels.formula.api as smf
+
+# Fit logistic regression with formula interface
+model = smf.logit("heart_disease ~ max_heart_rate", data=df).fit()
+
+# View the summary with coefficients, standard errors, z-stats, p-values, and CIs
+print(model.summary())
+\end{lstlisting}
+
+The output will include:
+\begin{itemize}
+    \item \textbf{Coefficients} ($\hat{\beta}$)
+    \item \textbf{Standard Errors} (from Fisher's Information)
+    \item \textbf{Z-statistic}: $z = \hat{\beta} / SE(\hat{\beta})$
+    \item \textbf{P-value}: for testing $H_0: \beta = 0$
+    \item \textbf{95\% Confidence Interval}: $\hat{\beta} \pm 1.96 \times SE$
+\end{itemize}
+
+\begin{infobox}
+\textbf{Fisher's Information}
+
+The standard errors in logistic regression come from \textbf{Fisher's Information}, which measures the curvature of the log-likelihood function at its maximum. More curvature (sharper peak) means more certainty, hence smaller standard errors.
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{Interpreting Coefficients with Binary Predictors}
+%================================================================================
+
+When a predictor $X$ is binary (0 or 1), interpretation becomes especially clear.
+
+\subsection{Setting Up: Reference Groups}
+
+Consider predicting heart disease based on biological sex:
+\begin{itemize}
+    \item $X = 1$ if female
+    \item $X = 0$ if male (the \textbf{reference group} or \textbf{baseline group})
+\end{itemize}
+
+The model is:
+$$\log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 \cdot \text{Female}$$
+
+\subsection{Interpreting $\beta_0$ (Intercept)}
+
+When $X = 0$ (male):
+$$\log(\text{Odds}_{\text{male}}) = \beta_0$$
+
+So $\beta_0$ is the \textbf{log-odds of success for the reference group}.
+
+\begin{examplebox}{Calculating $\beta_0$ from Data}
+From the lecture, approximately 52\% of males had heart disease:
+\begin{itemize}
+    \item Probability: $\hat{p} = 0.52$
+    \item Odds: $\frac{0.52}{1-0.52} = \frac{0.52}{0.48} \approx 1.08$
+    \item Log-odds: $\ln(1.08) \approx 0.077$
+\end{itemize}
+
+So $\beta_0 \approx 0.077$ (or about 0.214 with exact numbers).
+\end{examplebox}
+
+\subsection{Interpreting $\beta_1$ (Slope for Binary Predictor)}
+
+$\beta_1$ represents the \textbf{difference in log-odds} comparing the indicated group (female) to the reference group (male).
+
+When $X = 1$ (female):
+$$\log(\text{Odds}_{\text{female}}) = \beta_0 + \beta_1$$
+
+Therefore:
+$$\beta_1 = \log(\text{Odds}_{\text{female}}) - \log(\text{Odds}_{\text{male}})$$
+
+\begin{examplebox}{Calculating $\beta_1$ from Data}
+From the lecture, approximately 25\% of females had heart disease:
+\begin{itemize}
+    \item Odds for females: $\frac{0.25}{0.75} = 0.33$
+    \item Log-odds for females: $\ln(0.33) \approx -1.11$
+    \item Difference: $-1.11 - 0.077 \approx -1.19$ (about $-1.272$ with exact numbers)
+\end{itemize}
+
+A negative $\beta_1$ means females have \textbf{lower} log-odds of heart disease than males.
+\end{examplebox}
+
+\subsection{Exponentiation: Odds Ratios}
+
+Raw coefficients are on the log-odds scale, which is hard to interpret. \textbf{Exponentiate} to get interpretable \textbf{odds ratios}:
+
+\begin{itemize}
+    \item $e^{\beta_0}$ = Odds for the reference group
+    \item $e^{\beta_1}$ = \textbf{Odds Ratio} (multiplicative change in odds)
+\end{itemize}
+
+\begin{definitionbox}{Odds Ratio Interpretation}
+If $e^{\beta_1} = 0.28$:
+
+``The odds of heart disease for females are \textbf{0.28 times} (or 28\%) the odds for males.''
+
+Equivalently: ``Females have 72\% \textbf{lower odds} of heart disease compared to males.''
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{Odds $\neq$ Probability!}
+
+Never say ``72\% lower probability.'' The relationship between odds ratios and probability changes is non-linear and depends on the baseline probability.
+
+\textbf{Correct}: ``The odds are 0.28 times as high'' or ``72\% reduction in odds''
+
+\textbf{Incorrect}: ``72\% reduction in probability''
+\end{warningbox}
+
+\newpage
+
+%================================================================================
+\section{Multiple Logistic Regression}
+%================================================================================
+
+Just like in linear regression, we can include multiple predictors:
+$$\log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p$$
+
+\subsection{Key Points}
+
+\begin{enumerate}
+    \item \textbf{Interpretation}: Each $\beta_j$ represents the change in log-odds for a one-unit increase in $X_j$, \textbf{holding all other predictors constant}.
+
+    \item \textbf{Same issues as linear regression}:
+    \begin{itemize}
+        \item Multicollinearity (correlated predictors inflate variance)
+        \item Overfitting (too many predictors relative to sample size)
+    \end{itemize}
+
+    \item \textbf{Visualization}: Instead of fitting an S-curve to a scatter plot, we're fitting an ``S-shaped hyperplane'' in higher dimensions.
+\end{enumerate}
+
+\subsection{Interaction Terms}
+
+Interaction terms allow the effect of one predictor to \textbf{depend on} the value of another predictor.
+
+\begin{examplebox}{Heart Disease: Age $\times$ Female Interaction}
+Model:
+$$\log(\text{Odds}) = \beta_0 + \beta_1 \cdot \text{Age} + \beta_2 \cdot \text{Female} + \beta_3 \cdot (\text{Age} \times \text{Female})$$
+
+Let's separate this by sex:
+
+\textbf{For Males (Female = 0):}
+$$\log(\text{Odds})_{\text{male}} = \beta_0 + \beta_1 \cdot \text{Age}$$
+\begin{itemize}
+    \item Intercept: $\beta_0$
+    \item Slope for Age: $\beta_1$
+\end{itemize}
+
+\textbf{For Females (Female = 1):}
+$$\log(\text{Odds})_{\text{female}} = \beta_0 + \beta_1 \cdot \text{Age} + \beta_2 + \beta_3 \cdot \text{Age}$$
+$$= (\beta_0 + \beta_2) + (\beta_1 + \beta_3) \cdot \text{Age}$$
+\begin{itemize}
+    \item Intercept: $\beta_0 + \beta_2$ (different from males!)
+    \item Slope for Age: $\beta_1 + \beta_3$ (different from males!)
+\end{itemize}
+\end{examplebox}
+
+\textbf{Coefficient Interpretations:}
+\begin{itemize}
+    \item $\beta_1$: Effect of age on log-odds \textbf{for males} (reference group)
+    \item $\beta_3$: How much the age effect \textbf{differs} for females compared to males
+\end{itemize}
+
+If $\beta_3 = 0$, the age effect is the same for both sexes (no interaction). Testing $H_0: \beta_3 = 0$ tests whether the interaction is significant.
+
+\newpage
+
+%================================================================================
+\section{From Probabilities to Classifications}
+%================================================================================
+
+Logistic regression outputs \textbf{probabilities} $\hat{p} = P(Y=1|X)$. To make actual \textbf{classifications} (predict 0 or 1), we need a \textbf{threshold}.
+
+\subsection{The 0.5 Threshold}
+
+The most common approach:
+$$\hat{Y} = \begin{cases} 1 & \text{if } \hat{p} \geq 0.5 \\ 0 & \text{if } \hat{p} < 0.5 \end{cases}$$
+
+\textbf{Intuition}: If the probability of success is at least 50\%, predict success.
+
+\begin{infobox}
+\textbf{What about exactly 0.5?}
+
+In practice, this rarely matters. You can round up, round down, or flip a coin. The exact handling of 0.5 typically has negligible impact on overall performance.
+\end{infobox}
+
+\subsection{Extension to Multiple Classes (K > 2)}
+
+When you have 3+ classes, the 0.5 rule doesn't work---you're not guaranteed any class has probability $> 0.5$.
+
+\textbf{Solution: Plurality Wins}
+
+Predict the class with the \textbf{highest probability}, even if it's below 0.5.
+
+Example with 3 classes:
+\begin{itemize}
+    \item $P(\text{CS}) = 0.35$
+    \item $P(\text{Stat}) = 0.40$
+    \item $P(\text{Other}) = 0.25$
+\end{itemize}
+Prediction: \textbf{Stat} (highest probability)
+
+\newpage
+
+%================================================================================
+\section{Decision Boundaries}
+%================================================================================
+
+A \textbf{decision boundary} is the line (or curve) where the model switches from predicting one class to another.
+
+\subsection{Mathematical Derivation}
+
+The decision boundary occurs where $P(Y=1) = 0.5$. Let's trace through the math:
+
+\begin{enumerate}
+    \item $P(Y=1) = 0.5$
+    \item Odds $= \frac{0.5}{1-0.5} = \frac{0.5}{0.5} = 1$
+    \item Log-odds $= \ln(1) = 0$
+\end{enumerate}
+
+Therefore, the decision boundary is defined by:
+$$\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots = 0$$
+
+\begin{definitionbox}{Decision Boundary}
+The decision boundary in logistic regression is the set of all points where:
+$$X\boldsymbol{\beta} = 0$$
+
+Equivalently, it's where the log-odds equals zero, the odds equals one, and the probability equals 0.5.
+\end{definitionbox}
+
+\subsection{Linear vs Non-Linear Decision Boundaries}
+
+\textbf{Linear Decision Boundary}:
+
+If the model only includes linear terms ($X_1, X_2, \ldots$), the equation $\beta_0 + \beta_1 X_1 + \beta_2 X_2 = 0$ defines a \textbf{straight line} (or hyperplane in higher dimensions).
+
+\textbf{Non-Linear Decision Boundary}:
+
+If the model includes:
+\begin{itemize}
+    \item \textbf{Polynomial terms}: $X_1^2, X_2^2, X_1^3, \ldots$
+    \item \textbf{Interaction terms}: $X_1 \cdot X_2$
+\end{itemize}
+
+Then the decision boundary becomes a \textbf{curve} (or curved surface).
+
+\begin{examplebox}{Creating a Circular Decision Boundary}
+To create a circular decision boundary, include quadratic terms:
+$$\log(\text{Odds}) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1^2 + \beta_4 X_2^2 + \beta_5 X_1 X_2$$
+
+Setting this equal to zero can give a circle, ellipse, or other conic section depending on the coefficient values.
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Complexity vs Overfitting}
+
+More complex decision boundaries (from polynomial features) can capture more intricate patterns, but they also risk \textbf{overfitting}---fitting the training data too closely and performing poorly on new data.
+\end{warningbox}
+
+\newpage
+
+%================================================================================
+\section{Regularization in Logistic Regression}
+%================================================================================
+
+When we have many features or polynomial terms, the model can become overfit. \textbf{Regularization} prevents this by penalizing large coefficients.
+
+\subsection{The Regularized Loss Function}
+
+Standard logistic regression minimizes binary cross-entropy. With \textbf{Ridge (L2) regularization}, we add a penalty:
+
+$$\text{Loss}_{\text{regularized}} = \underbrace{-\sum_{i=1}^{n} \left[ y_i \log(p_i) + (1-y_i) \log(1-p_i) \right]}_{\text{Binary Cross-Entropy}} + \underbrace{\lambda \sum_{j=1}^{p} \beta_j^2}_{\text{L2 Penalty}}$$
+
+\begin{itemize}
+    \item $\lambda$ controls the \textbf{strength of regularization}
+    \item The penalty is applied to all $\beta_j$ \textbf{except} $\beta_0$ (the intercept)
+\end{itemize}
+
+\subsection{Effect of $\lambda$}
+
+\begin{itemize}
+    \item $\lambda = 0$: No regularization (standard logistic regression)
+    \item $\lambda$ small: Weak regularization, coefficients can be large
+    \item $\lambda$ large: Strong regularization, coefficients shrink toward zero
+    \item $\lambda \to \infty$: All coefficients become zero (except intercept)
+\end{itemize}
+
+\subsection{sklearn's C Parameter}
+
+\begin{importantbox}{Understanding C in sklearn}
+sklearn uses \code{C} instead of $\lambda$, where $C \approx 1/\lambda$:
+
+\begin{itemize}
+    \item \textbf{Large C} (e.g., 100): \textbf{Weak} regularization (small $\lambda$). Model fits training data more closely. Risk of overfitting.
+    \item \textbf{Small C} (e.g., 0.01): \textbf{Strong} regularization (large $\lambda$). Coefficients shrink. Simpler model. Risk of underfitting.
+\end{itemize}
+\end{importantbox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Regularized Logistic Regression in sklearn}]
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+
+# Strong regularization (small C = large lambda)
+model = LogisticRegression(penalty='l2', C=0.1)
+
+# Find optimal C through cross-validation
+param_grid = {'C': [0.001, 0.01, 0.1, 1, 10, 100]}
+grid_search = GridSearchCV(
+    LogisticRegression(penalty='l2'),
+    param_grid,
+    cv=5,
+    scoring='accuracy'
+)
+grid_search.fit(X_train, y_train)
+print(f"Best C: {grid_search.best_params_['C']}")
+\end{lstlisting}
+
+\subsection{Visualizing Regularization's Effect on Decision Boundaries}
+
+Imagine an overfit model with a very ``wiggly'' decision boundary that perfectly separates training points. Regularization smooths out this boundary, making it more generalizable:
+
+\begin{itemize}
+    \item \textbf{Unregularized}: Complex, possibly overfit boundary
+    \item \textbf{Regularized}: Smoother, more generalizable boundary
+\end{itemize}
+
+\newpage
+
+%================================================================================
+\section{Multiclass Classification}
+%================================================================================
+
+When the response variable has \textbf{more than two categories} (e.g., CS major, Stats major, Other), we need to extend binary logistic regression.
+
+We focus on \textbf{nominal} categories (no inherent order). For \textbf{ordinal} categories (e.g., low/medium/high), specialized ordinal regression methods exist.
+
+\subsection{Approach 1: Multinomial Logistic Regression}
+
+Choose one class as the \textbf{reference group} (e.g., ``Other''). Build $K-1$ separate log-odds models comparing each class to the reference.
+
+For 3 classes (CS, Stat, Other):
+$$\log\left(\frac{P(\text{CS})}{P(\text{Other})}\right) = \beta_0^{(1)} + \beta_1^{(1)} X_1 + \cdots$$
+$$\log\left(\frac{P(\text{Stat})}{P(\text{Other})}\right) = \beta_0^{(2)} + \beta_1^{(2)} X_1 + \cdots$$
+
+\textbf{Note}: These are fit simultaneously, not independently, ensuring probabilities sum to 1.
+
+\begin{lstlisting}[style=pythonstyle, caption={Multinomial Logistic Regression in sklearn}]
+from sklearn.linear_model import LogisticRegression
+
+# Multinomial is now the default in newer sklearn versions
+model = LogisticRegression(multi_class='multinomial', solver='lbfgs')
+model.fit(X_train, y_train)
+
+# Predict probabilities for all classes
+probs = model.predict_proba(X_test)  # Shape: (n_samples, n_classes)
+\end{lstlisting}
+
+\subsection{Approach 2: One-vs-Rest (OvR)}
+
+Build $K$ separate binary classifiers:
+\begin{itemize}
+    \item Classifier 1: CS vs Not-CS
+    \item Classifier 2: Stat vs Not-Stat
+    \item Classifier 3: Other vs Not-Other
+\end{itemize}
+
+For prediction, run all classifiers and pick the one with highest probability/confidence.
+
+\begin{lstlisting}[style=pythonstyle, caption={One-vs-Rest Classification}]
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.linear_model import LogisticRegression
+
+model = OneVsRestClassifier(LogisticRegression())
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+\end{lstlisting}
+
+\subsection{Softmax: Converting Scores to Probabilities}
+
+Both approaches produce ``scores'' for each class. To convert to proper probabilities (that sum to 1), we use the \textbf{Softmax function}:
+
+$$P(Y = k | X) = \frac{e^{s_k}}{\sum_{j=1}^{K} e^{s_j}}$$
+
+where $s_k$ is the score (log-odds) for class $k$.
+
+\begin{infobox}
+\textbf{Properties of Softmax}
+\begin{itemize}
+    \item All outputs are between 0 and 1
+    \item All outputs sum to exactly 1
+    \item Higher scores get higher probabilities
+    \item The relative differences are preserved (monotonic transformation)
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{Classification Evaluation: The Confusion Matrix}
+%================================================================================
+
+Once we have a classifier, how do we evaluate its performance? Simple accuracy can be misleading, especially with imbalanced classes.
+
+\subsection{The Confusion Matrix}
+
+The confusion matrix organizes all possible prediction outcomes:
+
+\begin{center}
+\begin{tabular}{cc|cc}
+\multicolumn{2}{c}{} & \multicolumn{2}{c}{\textbf{Predicted}} \\
+\multicolumn{2}{c}{} & Negative (0) & Positive (1) \\ \hline
+\textbf{Actual} & Negative (0) & \textbf{TN} (True Negative) & \textbf{FP} (False Positive) \\
+& Positive (1) & \textbf{FN} (False Negative) & \textbf{TP} (True Positive) \\
+\end{tabular}
+\end{center}
+
+\begin{definitionbox}{Confusion Matrix Terms}
+\begin{itemize}
+    \item \textbf{True Positive (TP)}: Actually positive, predicted positive. \textcolor{darkgreen}{Correct!}
+    \item \textbf{True Negative (TN)}: Actually negative, predicted negative. \textcolor{darkgreen}{Correct!}
+    \item \textbf{False Positive (FP)}: Actually negative, predicted positive. \textcolor{red}{Type I Error.}
+    \item \textbf{False Negative (FN)}: Actually positive, predicted negative. \textcolor{red}{Type II Error.}
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Medical Diagnosis Context}
+Consider a test for cancer:
+\begin{itemize}
+    \item \textbf{TP}: Patient has cancer, test says positive. (Detected the disease)
+    \item \textbf{TN}: Patient is healthy, test says negative. (Correctly cleared)
+    \item \textbf{FP}: Patient is healthy, test says positive. (False alarm, unnecessary anxiety)
+    \item \textbf{FN}: Patient has cancer, test says negative. (Missed diagnosis---\textbf{dangerous!})
+\end{itemize}
+\end{examplebox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Computing Confusion Matrix in sklearn}]
+from sklearn.metrics import confusion_matrix, classification_report
+
+y_pred = model.predict(X_test)
+
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix:")
+print(cm)
+# [[TN, FP],
+#  [FN, TP]]
+
+# Detailed report
+print(classification_report(y_test, y_pred))
+\end{lstlisting}
+
+\newpage
+
+%================================================================================
+\section{Key Performance Metrics}
+%================================================================================
+
+Different metrics focus on different aspects of performance. The choice depends on the application and costs of different errors.
+
+\subsection{Sensitivity (Recall, True Positive Rate)}
+
+$$\text{Sensitivity} = \text{TPR} = \frac{TP}{TP + FN}$$
+
+\textbf{Question answered}: Of all actually positive cases, what fraction did we correctly identify?
+
+\textbf{When it matters}: When \textbf{missing a positive is costly}. In medical diagnosis, we don't want to miss cancer patients (minimize FN).
+
+\subsection{Specificity (True Negative Rate)}
+
+$$\text{Specificity} = \text{TNR} = \frac{TN}{TN + FP}$$
+
+\textbf{Question answered}: Of all actually negative cases, what fraction did we correctly identify?
+
+\textbf{When it matters}: When \textbf{false alarms are costly}. In spam filtering, we don't want to mark important emails as spam (minimize FP).
+
+\subsection{Precision (Positive Predictive Value)}
+
+$$\text{Precision} = \text{PPV} = \frac{TP}{TP + FP}$$
+
+\textbf{Question answered}: Of all cases we predicted positive, what fraction are actually positive?
+
+\textbf{When it matters}: When \textbf{acting on positive predictions is costly}. If treatment is expensive/harmful, we want predictions to be reliable.
+
+\subsection{False Positive Rate}
+
+$$\text{FPR} = 1 - \text{Specificity} = \frac{FP}{TN + FP}$$
+
+\textbf{Question answered}: Of all actually negative cases, what fraction did we incorrectly classify as positive?
+
+\begin{warningbox}
+\textbf{The Base Rate Problem (Bayes' Theorem)}
+
+Even with 99\% sensitivity and 99\% specificity, if a disease is very rare (e.g., 0.1\% prevalence), most positive test results will be \textbf{false positives}!
+
+This is why precision (PPV) can be low even with excellent sensitivity and specificity when the base rate is low.
+\end{warningbox}
+
+\newpage
+
+%================================================================================
+\section{The Threshold Trade-off}
+%================================================================================
+
+The classification threshold (default 0.5) is not sacred. Adjusting it creates a \textbf{trade-off} between sensitivity and specificity.
+
+\subsection{Lowering the Threshold (e.g., 0.5 $\to$ 0.3)}
+
+The model becomes more ``eager'' to predict positive:
+\begin{itemize}
+    \item More True Positives (TP $\uparrow$) --- \textbf{good}
+    \item Fewer False Negatives (FN $\downarrow$) --- \textbf{good}
+    \item \textbf{Sensitivity increases}
+\end{itemize}
+
+But also:
+\begin{itemize}
+    \item More False Positives (FP $\uparrow$) --- \textbf{bad}
+    \item Fewer True Negatives (TN $\downarrow$) --- \textbf{bad}
+    \item \textbf{Specificity decreases}
+\end{itemize}
+
+\textbf{Use case}: Medical screening where missing a case is unacceptable.
+
+\subsection{Raising the Threshold (e.g., 0.5 $\to$ 0.7)}
+
+The model becomes more ``conservative'' about predicting positive:
+\begin{itemize}
+    \item Fewer False Positives (FP $\downarrow$) --- \textbf{good}
+    \item More True Negatives (TN $\uparrow$) --- \textbf{good}
+    \item \textbf{Specificity increases}
+\end{itemize}
+
+But also:
+\begin{itemize}
+    \item Fewer True Positives (TP $\downarrow$) --- \textbf{bad}
+    \item More False Negatives (FN $\uparrow$) --- \textbf{bad}
+    \item \textbf{Sensitivity decreases}
+\end{itemize}
+
+\textbf{Use case}: When false positives are very costly (e.g., invasive surgery based on prediction).
+
+\begin{infobox}
+\textbf{No Free Lunch}
+
+You cannot simultaneously maximize both sensitivity and specificity. Improving one typically hurts the other. The optimal threshold depends on the \textbf{relative costs} of false positives vs false negatives in your specific application.
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{ROC Curves and AUC}
+%================================================================================
+
+The \textbf{ROC Curve} (Receiver Operating Characteristic) visualizes the trade-off across \textbf{all possible thresholds}.
+
+\subsection{Constructing the ROC Curve}
+
+\begin{enumerate}
+    \item For each threshold from 0 to 1:
+    \begin{itemize}
+        \item Calculate the True Positive Rate (TPR = Sensitivity)
+        \item Calculate the False Positive Rate (FPR = 1 - Specificity)
+    \end{itemize}
+    \item Plot each (FPR, TPR) pair as a point
+    \item Connect the points to form the curve
+\end{enumerate}
+
+\textbf{Axes}:
+\begin{itemize}
+    \item X-axis: False Positive Rate (FPR)
+    \item Y-axis: True Positive Rate (TPR)
+\end{itemize}
+
+\subsection{Interpreting the ROC Curve}
+
+\begin{itemize}
+    \item \textbf{Perfect classifier}: Goes from (0,0) to (0,1) to (1,1). It achieves 100\% TPR with 0\% FPR.
+    \item \textbf{Random classifier}: The diagonal line from (0,0) to (1,1). TPR equals FPR at every threshold.
+    \item \textbf{Good classifier}: Curves toward the upper-left corner (0,1).
+\end{itemize}
+
+\subsection{AUC: Area Under the Curve}
+
+The \textbf{AUC} summarizes the entire ROC curve in a single number:
+
+$$\text{AUC} = \int_0^1 \text{ROC}(x) \, dx$$
+
+\begin{itemize}
+    \item \textbf{AUC = 1.0}: Perfect classifier
+    \item \textbf{AUC = 0.5}: Random classifier (useless)
+    \item \textbf{AUC = 0.8-0.9}: Good classifier
+    \item \textbf{AUC < 0.5}: Worse than random (predictions are inverted)
+\end{itemize}
+
+\begin{infobox}
+\textbf{Probabilistic Interpretation of AUC}
+
+AUC equals the probability that a randomly chosen positive example is ranked higher (assigned higher probability) than a randomly chosen negative example.
+
+AUC = 0.8 means: if you pick one positive and one negative case at random, there's an 80\% chance the model assigns a higher probability to the positive case.
+\end{infobox}
+
+\begin{lstlisting}[style=pythonstyle, caption={ROC Curve and AUC in sklearn}]
+from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt
+
+# Get predicted probabilities
+y_proba = model.predict_proba(X_test)[:, 1]
+
+# Calculate ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+
+# Calculate AUC
+auc = roc_auc_score(y_test, y_proba)
+print(f"AUC: {auc:.3f}")
+
+# Plot
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, label=f'ROC Curve (AUC = {auc:.3f})')
+plt.plot([0, 1], [0, 1], 'k--', label='Random Classifier')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+\end{lstlisting}
+
+\newpage
+
+%================================================================================
+\section{Alternative Inference: Bootstrap and Permutation}
+%================================================================================
+
+Just as in linear regression, we have two approaches to inference:
+
+\subsection{Probabilistic Approach (Default)}
+
+Uses mathematical theory (Fisher's Information) to derive standard errors, confidence intervals, and p-values. This is what \code{statsmodels} provides.
+
+\textbf{Advantages}:
+\begin{itemize}
+    \item Fast computation
+    \item Well-established theory
+\end{itemize}
+
+\textbf{Disadvantages}:
+\begin{itemize}
+    \item Relies on asymptotic approximations (large sample)
+    \item May not be accurate for small samples
+\end{itemize}
+
+\subsection{Empirical Approach (Bootstrap/Permutation)}
+
+\textbf{Bootstrap for Confidence Intervals}:
+\begin{enumerate}
+    \item Resample your data with replacement
+    \item Fit the model on each bootstrap sample
+    \item Calculate the coefficient
+    \item Repeat many times to get a distribution
+    \item Use percentiles for confidence intervals
+\end{enumerate}
+
+\textbf{Permutation for Hypothesis Testing}:
+\begin{enumerate}
+    \item Shuffle the $Y$ values (break association with $X$)
+    \item Fit the model and record the coefficient
+    \item Repeat many times to get the null distribution
+    \item Compare observed coefficient to null distribution
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Advantages of Empirical Methods in Logistic Regression}
+
+In logistic regression, we don't have to worry about:
+\begin{itemize}
+    \item Heteroscedasticity (variance depends on $p$, not separate)
+    \item Normality of errors (no continuous errors)
+\end{itemize}
+
+The main assumption that matters is the correct specification of the model (right predictors, right functional form).
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{Practical Checklist}
+%================================================================================
+
+\begin{tcolorbox}[title={Before Your Midterm: Key Concepts Checklist}]
+\begin{itemize}
+    \item[$\square$] Can you explain why logistic regression uses MLE instead of OLS?
+    \item[$\square$] Do you understand why there's no closed-form solution (numerical methods needed)?
+    \item[$\square$] Can you interpret $\beta_0$ for a model with a binary predictor (reference group concept)?
+    \item[$\square$] Can you interpret $\beta_1$ as a difference in log-odds and $e^{\beta_1}$ as an odds ratio?
+    \item[$\square$] Do you understand the Z-distribution vs t-distribution distinction for inference?
+    \item[$\square$] Can you write out how interaction terms create different slopes for different groups?
+    \item[$\square$] Can you derive why $X\beta = 0$ is the decision boundary (from $P = 0.5$)?
+    \item[$\square$] Do you understand how polynomial terms create non-linear decision boundaries?
+    \item[$\square$] Can you explain regularization and the meaning of sklearn's $C$ parameter?
+    \item[$\square$] Do you know the difference between multinomial and one-vs-rest for multiclass?
+    \item[$\square$] Can you calculate sensitivity, specificity, and precision from a confusion matrix?
+    \item[$\square$] Do you understand the threshold trade-off (sensitivity vs specificity)?
+    \item[$\square$] Can you interpret an ROC curve and explain what AUC measures?
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Exam Tips from the Lecture}]
+\begin{itemize}
+    \item For back-of-envelope calculations: use 2 for t-values and 1.96 for z-values
+    \item Default answers if stuck: ``cross-validation'' or ``it depends'' or ``MSE''
+    \item Remember: logistic regression uses Z (not t) because variance is determined by p
+    \item Coefficient interpretation: always talk about \textbf{odds}, not probability
+    \item $C$ in sklearn is \textbf{inverse} of $\lambda$: small $C$ = strong regularization
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+%================================================================================
+\section{Summary: Key Formulas}
+%================================================================================
+
+\begin{tcolorbox}[title={Logistic Regression Model}]
+$$\log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
+
+$$p = \frac{e^{X\beta}}{1 + e^{X\beta}} = \frac{1}{1 + e^{-X\beta}}$$
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Loss Function}]
+Binary Cross-Entropy:
+$$\text{Loss} = -\sum_{i=1}^{n} \left[ y_i \log(p_i) + (1-y_i) \log(1-p_i) \right]$$
+
+With L2 Regularization:
+$$\text{Loss}_{\text{reg}} = \text{Loss} + \lambda \sum_{j=1}^{p} \beta_j^2$$
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Evaluation Metrics}]
+\begin{align*}
+\text{Sensitivity (TPR)} &= \frac{TP}{TP + FN} \\[0.5em]
+\text{Specificity (TNR)} &= \frac{TN}{TN + FP} \\[0.5em]
+\text{Precision (PPV)} &= \frac{TP}{TP + FP} \\[0.5em]
+\text{FPR} &= \frac{FP}{TN + FP} = 1 - \text{Specificity} \\[0.5em]
+\text{Accuracy} &= \frac{TP + TN}{TP + TN + FP + FN}
+\end{align*}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Key Relationships}]
+\begin{itemize}
+    \item Probability $\to$ Odds: $\text{Odds} = \frac{p}{1-p}$
+    \item Odds $\to$ Probability: $p = \frac{\text{Odds}}{1 + \text{Odds}}$
+    \item Odds $\to$ Log-Odds: $\log(\text{Odds})$
+    \item Coefficient $\to$ Odds Ratio: $e^{\beta}$
+    \item Decision Boundary: where $X\beta = 0$ (equivalently $p = 0.5$)
+    \item sklearn's C: $C \approx 1/\lambda$ (inverse regularization strength)
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

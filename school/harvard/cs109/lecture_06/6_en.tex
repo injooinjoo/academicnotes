@@ -1,0 +1,1257 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 06: Model Selection and Cross-Validation
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages (English - No kotex)
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 06}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 06},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Model Selection and Cross-Validation}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begin
+%========================================================================================
+
+\title{Lecture 06: Model Selection and Cross-Validation}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 06}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understanding interaction terms, polynomial regression, model selection techniques, and cross-validation for choosing optimal models}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Introduction and Motivation}
+%========================================================================================
+
+\begin{overviewbox}
+This lecture marks a crucial turning point in our machine learning journey. We move beyond simple linear models to tackle more complex relationships in data, while also confronting the central challenge of machine learning: \textbf{overfitting}.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item \textbf{Interaction Terms}: Modeling synergy effects between predictors
+    \item \textbf{Polynomial Regression}: Capturing nonlinear relationships
+    \item \textbf{Overfitting}: Understanding why more complex models aren't always better
+    \item \textbf{Model Selection}: Techniques for choosing the best model
+    \item \textbf{Cross-Validation}: A robust method for estimating model performance
+\end{itemize}
+\end{overviewbox}
+
+\subsection{The Progression of Model Building}
+
+Professor Protopapas emphasizes a fundamental philosophy for approaching any data science project:
+
+\begin{infobox}[title=The Incremental Approach to Modeling]
+\begin{enumerate}
+    \item \textbf{Start simple}: Begin with the simplest possible model (e.g., linear regression)
+    \item \textbf{Fully understand it}: Interpret coefficients, check assumptions
+    \item \textbf{Ask ``Can we do better?''}: Identify limitations of the current model
+    \item \textbf{Add complexity gradually}: Only add features when justified by data
+\end{enumerate}
+
+``I dislike with passion'' jumping straight to complex models like visual transformers or diffusion models just because you found a tutorial that works. Start with EDA and simple models first!
+\end{infobox}
+
+This approach prevents us from building overly complex models that we don't understand and that may actually perform worse on new data.
+
+\subsection{The Mantra of This Lecture}
+
+Throughout this lecture, one phrase keeps recurring:
+
+\begin{center}
+\Large\textbf{``Too many predictors and collinearity lead to overfitting.''}
+\end{center}
+
+And by the end, we'll extend this to:
+
+\begin{center}
+\Large\textbf{``Too many predictors, collinearity, too many interaction terms,}
+
+\Large\textbf{and too high polynomial degree lead to overfitting.''}
+\end{center}
+
+%========================================================================================
+\section{Understanding Overfitting}
+%========================================================================================
+
+\subsection{What Is Overfitting?}
+
+Before diving into complex models, we need to understand the primary enemy we'll be fighting: \textbf{overfitting}.
+
+\begin{definitionbox}[Overfitting]
+\textbf{Overfitting} occurs when a model learns not only the true underlying patterns in the training data but also the \textbf{noise} and \textbf{outliers}. The model essentially ``memorizes'' the training data rather than learning generalizable patterns.
+
+\textbf{Consequence}: The model performs excellently on training data but poorly on new, unseen data.
+\end{definitionbox}
+
+\begin{examplebox}[Student Analogy for Overfitting]
+Imagine overfitting were a student. Which behavior best describes it?
+
+\begin{enumerate}[label=\Alph*.]
+    \item Studying just the night before the test
+    \item \textbf{Memorizing every lecture note word for word} $\leftarrow$ \textbf{This is overfitting!}
+    \item Only studying one chapter for all subjects
+    \item Taking extensive notes but forgetting to understand concepts
+\end{enumerate}
+
+The overfitting ``student'' memorizes everything perfectly but cannot answer questions that are even slightly different from what they memorized. They haven't learned the \textbf{concepts}---they've just memorized the \textbf{data}.
+\end{examplebox}
+
+\begin{examplebox}[TA Analogy for Overfitting]
+If a teaching assistant (TA) were an overfitting model, their grading behavior would be:
+
+``Subtract points for every answer that does not include the word 'overfitting'.''
+
+This TA has learned a very specific pattern from limited examples and applies it rigidly, failing to generalize to what good answers actually look like.
+\end{examplebox}
+
+\subsection{When Does Overfitting Occur?}
+
+Overfitting happens when we give our model ``too much power.'' And as the saying goes:
+
+\begin{center}
+\textit{``With great power comes great responsibility.''}
+\end{center}
+
+\begin{warningbox}[title=Factors That Lead to Overfitting]
+\begin{enumerate}
+    \item \textbf{Too many predictors}: High-dimensional feature space
+    \item \textbf{Too high polynomial degree}: Excessively flexible curves
+    \item \textbf{Too many interaction terms}: Modeling spurious relationships
+    \item \textbf{Collinearity}: Redundant information confuses the model
+\end{enumerate}
+
+The more complex the model, the more tendency it has to overfit. But if we remove all model power, we get \textbf{underfitting}---the model is too simple to capture the true patterns.
+\end{warningbox}
+
+\subsection{Generalization Error}
+
+The ultimate goal of any machine learning model is to perform well on \textbf{unseen data}---data the model has never seen during training.
+
+\begin{definitionbox}[Generalization Error]
+\textbf{Generalization error} measures how well a model performs on new, unseen data. It is the error we ultimately care about, not the training error.
+
+\textbf{Goal of model selection}: Find the model that minimizes generalization error (equivalently, the model that minimizes overfitting).
+\end{definitionbox}
+
+%========================================================================================
+\section{Assumptions of Linear Regression Revisited}
+%========================================================================================
+
+Before extending linear regression to handle nonlinearity, we need to understand its underlying assumptions. These assumptions come from the two key decisions we made when setting up linear regression:
+\begin{enumerate}
+    \item We assumed a \textbf{linear relationship} between predictors and response
+    \item We chose \textbf{MSE (Mean Squared Error)} as our loss function
+\end{enumerate}
+
+\subsection{The Four Key Assumptions}
+
+\begin{infobox}[title=Linear Regression Assumptions from MSE Loss]
+\begin{enumerate}
+    \item \textbf{Linearity}: The relationship between $X$ and $Y$ is linear
+    \begin{itemize}
+        \item This is explicit in our model: $Y = \beta_0 + \beta_1 X_1 + \ldots$
+    \end{itemize}
+
+    \item \textbf{Independence}: Errors are independent of each other
+    \begin{itemize}
+        \item MSE simply \textit{sums} squared errors
+        \item If errors were correlated, simple summation would be inappropriate
+    \end{itemize}
+
+    \item \textbf{Homoscedasticity}: Constant variance of errors across all values of $X$
+    \begin{itemize}
+        \item MSE treats all errors \textit{equally} (no weighting)
+        \item If variance varied, we should weight errors differently
+    \end{itemize}
+
+    \item \textbf{Normality}: Errors are normally distributed
+    \begin{itemize}
+        \item Squaring errors connects to normal distribution assumptions
+        \item This will be explained in more detail in Lecture 9
+    \end{itemize}
+\end{enumerate}
+\end{infobox}
+
+\subsection{Additional Considerations}
+
+Two more assumptions are often mentioned (though they don't directly violate linear regression assumptions):
+
+\begin{itemize}
+    \item \textbf{Fixed X (No measurement error)}: We assume predictors are measured without error. If there's error in $X$, Bayesian approaches are needed.
+    \item \textbf{No multicollinearity}: Low correlation between predictors. Multicollinearity won't break linear regression but will cause problems with interpretation.
+\end{itemize}
+
+\subsection{Diagnosing Assumption Violations: Residual Analysis}
+
+How do we know if our assumptions hold? The primary diagnostic tool is \textbf{residual analysis}.
+
+\begin{definitionbox}[Residuals]
+The \textbf{residual} for observation $i$ is the difference between the actual value and the predicted value:
+\[
+e_i = y_i - \hat{y}_i
+\]
+
+Residuals represent what our model \textit{couldn't explain}.
+\end{definitionbox}
+
+\subsubsection{Residual Plot Interpretation}
+
+We plot residuals ($e$) against either the predictor ($X$) or fitted values ($\hat{Y}$):
+
+\begin{summarybox}[title=Reading Residual Plots]
+\textbf{Good Model (Assumptions Satisfied):}
+\begin{itemize}
+    \item Residuals scattered randomly around zero
+    \item No discernible pattern (looks like ``white noise'')
+    \item Histogram of residuals resembles a bell curve (normal distribution)
+\end{itemize}
+
+\textbf{Bad Model (Linearity Violated):}
+\begin{itemize}
+    \item Residuals show a U-shape, S-shape, or other systematic pattern
+    \item This indicates the model is missing a nonlinear trend in the data
+\end{itemize}
+
+\textbf{Bad Model (Homoscedasticity Violated):}
+\begin{itemize}
+    \item Residuals show a ``fanning'' or ``funnel'' pattern
+    \item Spread of residuals increases (or decreases) with $X$
+    \item This is called \textbf{heteroscedasticity}
+\end{itemize}
+\end{summarybox}
+
+Professor Protopapas offers a memorable rule:
+
+\begin{center}
+\textit{``If you see \textbf{any} pattern in your residual plot---even if you imagine}
+
+\textit{dragons flying over castles---that means your assumptions are violated.''}
+\end{center}
+
+\subsubsection{The Histogram Trap}
+
+\begin{warningbox}[title=Is a Bell-Shaped Histogram Enough?]
+If residuals are symmetric (histogram looks normal) but have different spreads at different values of $X$, the normality assumption may appear satisfied while homoscedasticity is violated.
+
+For example: residuals near $X=0$ might be small, but residuals for large $X$ might be huge. The marginal histogram (combining all residuals) might still look bell-shaped!
+
+\textbf{Lesson}: Always examine residual plots alongside histograms.
+\end{warningbox}
+
+%========================================================================================
+\section{Extending Linear Regression: Interaction Terms}
+%========================================================================================
+
+Now we begin extending our linear models to handle more complex relationships.
+
+\subsection{The Synergy Effect}
+
+In reality, the effect of one predictor often depends on the value of another predictor. This is called a \textbf{synergy effect} or \textbf{interaction effect}.
+
+\begin{examplebox}[TV and Radio Advertising]
+Consider predicting sales based on advertising budgets:
+
+\textbf{Without considering interaction:}
+If I increase the TV budget by \$1,000, sales increase by $\beta_1$ (some fixed amount), regardless of what the radio budget is.
+
+\textbf{With interaction:}
+If I increase TV budget by \$1,000 \textit{while also having high radio spending}, the effect on sales might be \textit{greater} than if radio spending were low. The two advertising channels might have a synergistic effect.
+\end{examplebox}
+
+\subsection{Modeling Interactions}
+
+To capture interaction effects, we multiply predictors together:
+
+\begin{definitionbox}[Interaction Term]
+For predictors $X_1$ and $X_2$, the \textbf{interaction term} is $X_1 \times X_2$.
+
+The model becomes:
+\[
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 \times X_2)
+\]
+
+Note: The term $X_1 \times X_2$ is \textbf{nonlinear} in the predictors (though still linear in the coefficients $\beta$).
+\end{definitionbox}
+
+\subsection{Detailed Example: Credit Card Balance}
+
+Let's examine the credit card balance dataset, predicting balance from income and student status.
+
+\subsubsection{Model Without Interaction}
+
+\begin{align*}
+\text{Balance} &= \beta_0 + \beta_1 \times \text{Income} + \beta_2 \times \text{Student}
+\end{align*}
+
+Where Student is a dummy variable: 0 for non-student, 1 for student.
+
+\textbf{For non-students (Student = 0):}
+\[
+\text{Balance} = \beta_0 + \beta_1 \times \text{Income}
+\]
+
+\textbf{For students (Student = 1):}
+\[
+\text{Balance} = (\beta_0 + \beta_2) + \beta_1 \times \text{Income}
+\]
+
+\begin{infobox}[title=Interpretation Without Interaction]
+Both students and non-students have the \textbf{same slope} ($\beta_1$).
+
+This means: when income increases by \$1,000, balance increases by exactly $\beta_1$ dollars---regardless of whether you're a student or not.
+
+Graphically: Two \textbf{parallel lines} with different intercepts.
+\end{infobox}
+
+\subsubsection{Model With Interaction}
+
+\begin{align*}
+\text{Balance} &= \beta_0 + \beta_1 \times \text{Income} + \beta_2 \times \text{Student} + \beta_3 \times (\text{Income} \times \text{Student})
+\end{align*}
+
+\textbf{For non-students (Student = 0):}
+\[
+\text{Balance} = \beta_0 + \beta_1 \times \text{Income}
+\]
+
+\textbf{For students (Student = 1):}
+\[
+\text{Balance} = (\beta_0 + \beta_2) + (\beta_1 + \beta_3) \times \text{Income}
+\]
+
+\begin{infobox}[title=Interpretation With Interaction]
+Now students and non-students have \textbf{different slopes}!
+
+\begin{itemize}
+    \item Non-students: slope = $\beta_1$
+    \item Students: slope = $\beta_1 + \beta_3$
+\end{itemize}
+
+If $\beta_3 > 0$: Students increase their balance \textit{more} for each additional \$1,000 of income (perhaps they spend more freely).
+
+If $\beta_3 < 0$: Students increase their balance \textit{less} per income increase (perhaps they're more cautious savers).
+
+Graphically: Two lines with different slopes that may cross.
+\end{infobox}
+
+\begin{warningbox}[title=Where Do These Coefficients Come From?]
+We don't choose $\beta_0, \beta_1, \beta_2, \beta_3$---\textbf{the data tells us}!
+
+We fit the model to our training data, and the optimization process finds the coefficient values that minimize MSE.
+
+If $\beta_3 \approx 0$, the data is telling us there's no significant interaction effect.
+\end{warningbox}
+
+%========================================================================================
+\section{Polynomial Regression}
+%========================================================================================
+
+What if the relationship between $X$ and $Y$ is fundamentally curved, not just complicated by interactions?
+
+\subsection{When Linear Isn't Enough}
+
+\begin{examplebox}[Curved Relationships]
+Imagine plotting your data and seeing this:
+\begin{itemize}
+    \item Blue dots follow a clear curved pattern
+    \item The best linear fit (straight line) misses the curve
+    \item Residuals show a systematic U-shaped pattern
+\end{itemize}
+
+What we need is a model that can fit a curved line---a polynomial!
+\end{examplebox}
+
+\subsection{The Polynomial Model}
+
+\begin{definitionbox}[Polynomial Regression]
+A polynomial regression model of degree $M$ is:
+\[
+Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \ldots + \beta_M X^M
+\]
+
+This allows the model to fit curves of varying complexity depending on $M$.
+\end{definitionbox}
+
+\subsection{The Key Insight: It's Still Linear Regression!}
+
+Here's the crucial trick that makes polynomial regression easy:
+
+\begin{summarybox}[title=Polynomial Regression is a Special Case of Multiple Linear Regression]
+\textbf{The Trick}: Define new ``fake'' predictors:
+\begin{align*}
+\tilde{X}_1 &= X \\
+\tilde{X}_2 &= X^2 \\
+\tilde{X}_3 &= X^3 \\
+&\vdots \\
+\tilde{X}_M &= X^M
+\end{align*}
+
+Now our polynomial model looks like:
+\[
+Y = \beta_0 + \beta_1 \tilde{X}_1 + \beta_2 \tilde{X}_2 + \ldots + \beta_M \tilde{X}_M
+\]
+
+This is exactly a \textbf{multiple linear regression} with $M$ predictors!
+
+\textbf{Why this matters}: We can use the exact same formulas and algorithms we developed for linear regression. The normal equation still works:
+\[
+\hat{\beta} = (\tilde{X}^T \tilde{X})^{-1} \tilde{X}^T y
+\]
+\end{summarybox}
+
+\subsection{Implementation in Python}
+
+\begin{lstlisting}[language=Python, caption={Polynomial Regression in sklearn}]
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+
+# Step 1: Create the polynomial features (design matrix)
+poly = PolynomialFeatures(degree=3)
+X_poly = poly.fit_transform(X)  # Creates columns: 1, X, X^2, X^3
+
+# Step 2: Fit regular linear regression
+model = LinearRegression()
+model.fit(X_poly, y)
+
+# That's it! Same optimization, same formulas, curvy results.
+\end{lstlisting}
+
+\subsection{Important Warnings}
+
+\begin{warningbox}[title=PolynomialFeatures Creates More Than You Expect]
+\textbf{Warning 1: Intercept Column}
+
+\texttt{PolynomialFeatures} by default creates a column of 1s (the intercept term). If you also use \texttt{LinearRegression} with its default \texttt{fit\_intercept=True}, you'll have \textbf{two intercepts}!
+
+\textbf{Solution}: Either:
+\begin{itemize}
+    \item Use \texttt{PolynomialFeatures(include\_bias=False)} and \texttt{fit\_intercept=True}, OR
+    \item Use \texttt{PolynomialFeatures(include\_bias=True)} and \texttt{fit\_intercept=False}
+\end{itemize}
+
+\textbf{TL;DR}: If using polynomial features, set \texttt{fit\_intercept=False}.
+\end{warningbox}
+
+\begin{warningbox}[title=Interaction Terms Are Included!]
+\textbf{Warning 2: Multiple Predictors}
+
+If you have multiple predictors (e.g., $X_1$ and $X_2$) and use \texttt{PolynomialFeatures(degree=2)}, you get:
+\begin{itemize}
+    \item $1, X_1, X_2$ (degree 0 and 1 terms)
+    \item $X_1^2, X_1 X_2, X_2^2$ (degree 2 terms, including interaction!)
+\end{itemize}
+
+For degree 3, you'd also get $X_1^3, X_1^2 X_2, X_1 X_2^2, X_2^3$, etc.
+
+\textbf{This can lead to explosion of features and potential overfitting!}
+
+Note: sklearn doesn't have a simple flag to exclude interaction terms. You'd need to manually remove columns.
+\end{warningbox}
+
+\begin{warningbox}[title=Feature Scaling is Critical]
+\textbf{Warning 3: Numerical Stability}
+
+Consider $X = 100$:
+\begin{itemize}
+    \item $X^2 = 10,000$
+    \item $X^3 = 1,000,000$
+    \item $X^{10} = 10^{20}$
+\end{itemize}
+
+These vastly different scales cause numerical instability when computing $(\tilde{X}^T \tilde{X})^{-1}$.
+
+\textbf{Solution}: Always standardize your features before polynomial expansion!
+
+\begin{lstlisting}[language=Python]
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+# Then apply PolynomialFeatures to X_scaled
+\end{lstlisting}
+\end{warningbox}
+
+\subsection{Choosing the Polynomial Degree}
+
+The degree $M$ is a \textbf{hyperparameter}---a choice we must make before training.
+
+\begin{itemize}
+    \item $M$ too low (e.g., $M=1$): \textbf{Underfitting}---model can't capture the curve
+    \item $M$ too high (e.g., $M=50$): \textbf{Overfitting}---model fits every little wiggle and noise
+    \item $M$ just right: Captures the true underlying trend without fitting noise
+\end{itemize}
+
+How do we find the right $M$? That's the topic of model selection!
+
+%========================================================================================
+\section{Model Selection: Finding the Right Balance}
+%========================================================================================
+
+Model selection is the process of choosing among different model candidates to find the one that will perform best on new data.
+
+\subsection{The Train-Validation-Test Split}
+
+\begin{infobox}[title=The Three Data Splits]
+\begin{enumerate}
+    \item \textbf{Training Set}: Used to \textit{train} the model (find the $\beta$ coefficients)
+    \item \textbf{Validation Set}: Used to \textit{select} the best model/hyperparameters
+    \item \textbf{Test Set}: Used \textit{once at the very end} to report final model performance
+\end{enumerate}
+\end{infobox}
+
+\begin{importantbox}[The Sacred Test Set]
+\textbf{``There's a special place in hell for people who use test data to choose the model.''}
+
+---Professor Protopapas
+
+The test set must be kept completely separate until final evaluation. Do NOT:
+\begin{itemize}
+    \item Use it to tune hyperparameters
+    \item Use it to compare different models
+    \item Look at it during model development
+\end{itemize}
+
+Best practice: Have someone else hold the test set and only evaluate your final model once.
+\end{importantbox}
+
+\subsection{Model Selection Methods}
+
+\subsubsection{Exhaustive Search}
+
+With $J$ predictors, we could have $2^J$ possible models (each predictor is either in or out).
+
+\begin{examplebox}[Exhaustive Search Complexity]
+\begin{itemize}
+    \item $J = 3$ predictors $\rightarrow$ $2^3 = 8$ models (manageable)
+    \item $J = 10$ predictors $\rightarrow$ $2^{10} = 1,024$ models
+    \item $J = 20$ predictors $\rightarrow$ $2^{20} = 1,048,576$ models!
+\end{itemize}
+
+Exhaustive search is only practical for very small feature spaces.
+\end{examplebox}
+
+\subsubsection{Greedy Algorithms}
+
+Greedy algorithms make locally optimal choices at each step, without looking at the big picture.
+
+\begin{definitionbox}[Forward Selection]
+\textbf{Forward Selection} is a greedy algorithm for feature selection:
+
+\begin{enumerate}
+    \item Start with model $M_0$ containing no predictors (just intercept)
+    \item For each of the $J$ predictors, try adding it to the model
+    \item Keep the one that reduces validation error the most $\rightarrow$ Model $M_1$
+    \item Repeat: try adding each remaining predictor to $M_1$
+    \item Keep going until you've tried models with all predictors
+    \item Select the model with lowest validation error among $M_0, M_1, \ldots, M_J$
+\end{enumerate}
+
+\textbf{Complexity}: $O(J^2)$ instead of $O(2^J)$---much faster!
+
+\textbf{Limitation}: May miss optimal combinations (e.g., $X_1 + X_2$ might be best, but if $X_3$ alone beats $X_1$ alone, we'd never try $X_1 + X_2$).
+\end{definitionbox}
+
+Other greedy approaches include:
+\begin{itemize}
+    \item \textbf{Backward Elimination}: Start with all predictors, remove the least helpful one at each step
+    \item \textbf{Stepwise Selection}: Combination of forward and backward
+\end{itemize}
+
+\subsection{Hyperparameter Tuning with Validation}
+
+For polynomial regression, we tune the degree $M$ using the validation set:
+
+\begin{enumerate}
+    \item For each candidate degree $M \in \{1, 2, 3, \ldots, 10\}$:
+    \begin{enumerate}
+        \item Train the model on the training set
+        \item Compute MSE on the validation set
+    \end{enumerate}
+    \item Plot validation MSE vs. degree $M$
+    \item Select the $M$ with lowest validation MSE
+\end{enumerate}
+
+\subsubsection{The U-Shaped Curve}
+
+\begin{summarybox}[title=Training Error vs. Validation Error]
+\textbf{Training Error} (MSE on training data):
+\begin{itemize}
+    \item Decreases monotonically as model complexity increases
+    \item More complex model can always fit training data better (or at least as well)
+    \item Can reach zero with enough complexity (just memorize the data!)
+\end{itemize}
+
+\textbf{Validation Error} (MSE on validation data):
+\begin{itemize}
+    \item Initially decreases as complexity captures true patterns
+    \item Reaches a minimum at the ``sweet spot''
+    \item Then \textbf{increases} as model starts fitting noise (overfitting)
+\end{itemize}
+
+The validation error curve is typically \textbf{U-shaped}. We choose the complexity at the bottom of the U.
+\end{summarybox}
+
+%========================================================================================
+\section{Cross-Validation: A Robust Approach}
+%========================================================================================
+
+\subsection{The Problem with a Single Validation Set}
+
+Using a single validation set has a critical flaw:
+
+\begin{examplebox}[Overfitting to the Validation Set]
+Suppose the true underlying relationship is cubic (degree 3).
+
+But by chance, our randomly chosen validation points happen to lie almost perfectly on a straight line!
+
+When we compare models:
+\begin{itemize}
+    \item Degree 1 model: Low validation error (lucky fit)
+    \item Degree 3 model: Higher validation error (validation points don't follow cubic well)
+\end{itemize}
+
+We'd incorrectly choose degree 1!
+
+\textbf{The problem}: We avoided overfitting to training data, but ended up \textbf{overfitting to the validation data}.
+\end{examplebox}
+
+\subsection{The Solution: K-Fold Cross-Validation}
+
+The remedy is to validate on \textbf{multiple different splits} and average the results.
+
+\begin{definitionbox}[K-Fold Cross-Validation]
+\textbf{K-Fold Cross-Validation} procedure:
+
+\begin{enumerate}
+    \item Set aside the test set (never touch it during CV)
+    \item Divide the remaining data into $K$ equal ``folds'' (typically $K=5$ or $K=10$)
+    \item For $i = 1$ to $K$:
+    \begin{enumerate}
+        \item Use fold $i$ as the validation set
+        \item Use all other $K-1$ folds as the training set
+        \item Train the model and compute validation error $MSE_i$
+    \end{enumerate}
+    \item Compute the average: $CV = \frac{1}{K}\sum_{i=1}^{K} MSE_i$
+\end{enumerate}
+
+This CV score is a more robust estimate of how the model will perform on new data.
+\end{definitionbox}
+
+\subsubsection{Visual Representation of 5-Fold CV}
+
+\begin{center}
+\begin{tabular}{ccccc|c}
+\toprule
+\textbf{Iteration} & \textbf{Fold 1} & \textbf{Fold 2} & \textbf{Fold 3} & \textbf{Fold 4} & \textbf{Fold 5} \\
+\midrule
+1 & \textbf{Val} & Train & Train & Train & Train \\
+2 & Train & \textbf{Val} & Train & Train & Train \\
+3 & Train & Train & \textbf{Val} & Train & Train \\
+4 & Train & Train & Train & \textbf{Val} & Train \\
+5 & Train & Train & Train & Train & \textbf{Val} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Each data point gets to be in the validation set exactly once!
+
+\subsection{Using Cross-Validation for Model Selection}
+
+To select the best hyperparameter (e.g., polynomial degree $M$):
+
+\begin{enumerate}
+    \item For each candidate $M \in \{1, 2, 3, \ldots, 10\}$:
+    \begin{enumerate}
+        \item Perform K-fold CV
+        \item Record the CV score (average validation MSE)
+    \end{enumerate}
+    \item Select the $M$ with the lowest CV score
+    \item (Optional) Retrain on all training data with chosen $M$
+    \item Evaluate final performance on test set
+\end{enumerate}
+
+\subsection{Leave-One-Out Cross-Validation (LOOCV)}
+
+An extreme case of K-fold CV where $K = N$ (number of data points):
+
+\begin{itemize}
+    \item Each iteration uses just 1 point for validation, $N-1$ for training
+    \item Repeated $N$ times
+    \item \textbf{Pros}: Very low bias in estimate
+    \item \textbf{Cons}: Computationally expensive (train $N$ models!)
+\end{itemize}
+
+In practice, $K=5$ or $K=10$ provides a good balance between bias and computational cost.
+
+\subsection{Implementation: The Negative MSE Trick}
+
+\begin{warningbox}[title=sklearn Uses Negative MSE]
+sklearn's cross-validation functions are designed to \textbf{maximize} a scoring metric (like accuracy).
+
+But we want to \textbf{minimize} MSE!
+
+\textbf{Solution}: Use \texttt{scoring='neg\_mean\_squared\_error'}
+
+The function returns \textit{negative} MSE values. To get actual MSE:
+\begin{lstlisting}[language=Python]
+cv_results = cross_validate(model, X, y, cv=5,
+                           scoring='neg_mean_squared_error')
+actual_mse = -cv_results['test_score'].mean()
+\end{lstlisting}
+\end{warningbox}
+
+\begin{lstlisting}[language=Python, caption={Complete Cross-Validation Example}]
+from sklearn.model_selection import cross_validate
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+import numpy as np
+
+# Find best polynomial degree using CV
+degrees = range(1, 11)
+cv_scores = []
+
+for degree in degrees:
+    # Create pipeline: Scale -> Polynomial -> Linear Regression
+    model = make_pipeline(
+        StandardScaler(),
+        PolynomialFeatures(degree=degree, include_bias=False),
+        LinearRegression()
+    )
+
+    # 5-fold cross-validation
+    cv_results = cross_validate(
+        model, X, y, cv=5,
+        scoring='neg_mean_squared_error',
+        return_train_score=True
+    )
+
+    # Convert to positive MSE and store
+    cv_scores.append(-cv_results['test_score'].mean())
+
+# Find best degree
+best_degree = degrees[np.argmin(cv_scores)]
+print(f"Best polynomial degree: {best_degree}")
+\end{lstlisting}
+
+%========================================================================================
+\section{Interpreting Models: Beyond Numbers}
+%========================================================================================
+
+Even when a model has good MSE or $R^2$, we must interpret it to ensure it makes sense.
+
+\begin{examplebox}[When Numbers Lie]
+\textbf{Case 1}: Model for TV budget ($X$) vs. Sales ($Y$):
+\[
+Y = -0.05X + 6.2
+\]
+
+\textbf{Problem}: Negative slope means more TV spending leads to \textit{less} sales. Does that make sense? Probably not! Either:
+\begin{itemize}
+    \item The data is wrong
+    \item The model is misspecified
+    \item There's some confounding factor we're missing
+\end{itemize}
+
+\textbf{Case 2}: Another model:
+\[
+Y = 0.02X - 0.5
+\]
+
+\textbf{Problem}: Negative intercept means when $X=0$ (no TV spending), sales are \textit{negative}. That's impossible!
+
+\textbf{Lesson}: Always sanity-check your model coefficients against domain knowledge.
+\end{examplebox}
+
+\begin{infobox}[title=The Complete Model Evaluation Checklist]
+\begin{enumerate}
+    \item Check quantitative metrics (MSE, $R^2$)
+    \item Examine residual plots for assumption violations
+    \item Interpret coefficients---do they make intuitive sense?
+    \item Consider the domain context---is the model telling a plausible story?
+    \item Validate on held-out data to ensure generalization
+\end{enumerate}
+\end{infobox}
+
+%========================================================================================
+\section{Dealing with Categorical Variables (Reminder)}
+%========================================================================================
+
+\subsection{Two Categories: Dummy Variables}
+
+For a categorical variable with 2 categories (e.g., Student: Yes/No):
+\begin{itemize}
+    \item Create one dummy variable: 0 = No, 1 = Yes
+\end{itemize}
+
+\subsection{More Than Two Categories: One-Hot Encoding}
+
+\begin{examplebox}[Encoding Ethnicity]
+Variable: Ethnicity with categories Asian, Caucasian, African-American
+
+\textbf{Wrong approach}: Code as 0, 1, 2
+\begin{itemize}
+    \item This implies ordering (0 < 1 < 2)
+    \item Implies equal ``distances'' between categories
+    \item Neither makes sense for categorical data!
+\end{itemize}
+
+\textbf{Correct approach}: One-hot encoding
+\begin{itemize}
+    \item Create 3 dummy variables: \texttt{Is\_Asian}, \texttt{Is\_Caucasian}, \texttt{Is\_AfricanAmerican}
+    \item Each observation has exactly one 1 and two 0s
+\end{itemize}
+
+\textbf{But wait}: We can drop one column! If we know someone is not Asian and not Caucasian, they must be African-American.
+
+So we use only 2 dummy variables, and the third category becomes the ``baseline.''
+\end{examplebox}
+
+\begin{infobox}[title=Interpreting Coefficients with Dummy Variables]
+Model: $\text{Balance} = \beta_0 + \beta_1 \times \text{Is\_Asian} + \beta_2 \times \text{Is\_Caucasian}$
+
+Interpretations:
+\begin{itemize}
+    \item $\beta_0$: Average balance for African-Americans (the baseline)
+    \item $\beta_0 + \beta_1$: Average balance for Asians
+    \item $\beta_0 + \beta_2$: Average balance for Caucasians
+    \item $\beta_1$: Difference in balance between Asians and African-Americans
+    \item $\beta_2$: Difference in balance between Caucasians and African-Americans
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\section{Quick Reference Summary}
+%========================================================================================
+
+\begin{tcolorbox}[title=Lecture 06 Quick Reference Card, colback=white]
+
+\begin{tcolorbox}[colback=lightblue, title=\textbf{1. Overfitting}]
+\begin{itemize}
+    \item Model memorizes training data including noise
+    \item Low training error, high test/validation error
+    \item Caused by: too many predictors, high polynomial degree, too many interactions
+    \item Solution: Model selection with validation/cross-validation
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightgreen, title=\textbf{2. Interaction Terms}]
+\begin{itemize}
+    \item Model: $Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 \times X_2)$
+    \item Captures synergy effects between predictors
+    \item Changes the slope of one variable based on another
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightyellow, title=\textbf{3. Polynomial Regression}]
+\begin{itemize}
+    \item Model: $Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \ldots + \beta_M X^M$
+    \item Special case of multiple linear regression (linear in $\beta$!)
+    \item Warnings: Scale features, watch for intercept duplication
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpurple, title=\textbf{4. Data Splits}]
+\begin{itemize}
+    \item \textbf{Training}: Fit model parameters ($\beta$)
+    \item \textbf{Validation}: Choose hyperparameters/model
+    \item \textbf{Test}: Final performance report (use ONCE!)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpink, title=\textbf{5. K-Fold Cross-Validation}]
+\begin{itemize}
+    \item Split data into K folds, rotate validation fold
+    \item Average K validation scores for robust estimate
+    \item Avoids overfitting to a single validation split
+    \item Typical K: 5 or 10
+\end{itemize}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+%========================================================================================
+\section{Common Questions and Answers}
+%========================================================================================
+
+\textbf{Q: How can polynomial regression be ``linear'' when it fits curves?}
+
+A: It's linear \textit{in the coefficients}. The model $Y = \beta_0 + \beta_1 X + \beta_2 X^2$ is nonlinear in $X$ (the graph is curved), but it's a linear combination of the $\beta$ terms. We can treat $X^2$ as a new variable $\tilde{X}$, and then it's just $Y = \beta_0 + \beta_1 X + \beta_2 \tilde{X}$---standard multiple linear regression!
+
+\textbf{Q: What's the difference between validation and test sets?}
+
+A: Purpose!
+\begin{itemize}
+    \item \textbf{Validation}: Used repeatedly during development to compare models and tune hyperparameters
+    \item \textbf{Test}: Used exactly once at the end to report final performance
+\end{itemize}
+
+Think of validation as ``practice exams'' and test as the ``final exam.''
+
+\textbf{Q: How do I choose K for K-fold CV?}
+
+A: There's no perfect answer, but $K=5$ or $K=10$ are standard choices. They balance:
+\begin{itemize}
+    \item Bias (larger K = less bias, since training sets are larger)
+    \item Variance (larger K = more variance, since validation sets are smaller)
+    \item Computational cost (larger K = more model fits)
+\end{itemize}
+
+\textbf{Q: Should I always standardize my features?}
+
+A: Not always required, but usually a good idea:
+\begin{itemize}
+    \item Required for: Polynomial regression, regularization, KNN, SVM, neural networks
+    \item Optional for: Simple/multiple linear regression (doesn't affect predictions, only coefficient interpretation)
+\end{itemize}
+
+When in doubt, standardize!
+
+\textbf{Q: My model has high $R^2$ but coefficients don't make sense. What's wrong?}
+
+A: Several possibilities:
+\begin{itemize}
+    \item Multicollinearity between predictors
+    \item Overfitting to noise
+    \item Data errors or preprocessing issues
+    \item Confounding variables not in the model
+\end{itemize}
+
+Always combine quantitative metrics with qualitative interpretation!
+
+%========================================================================================
+\section{Looking Ahead}
+%========================================================================================
+
+In the next lecture (Lecture 07), we will explore:
+
+\begin{itemize}
+    \item \textbf{Regularization}: A powerful technique to prevent overfitting by penalizing large coefficients
+    \item \textbf{Ridge Regression}: L2 regularization
+    \item \textbf{Lasso Regression}: L1 regularization (also performs feature selection!)
+    \item \textbf{Bias-Variance Tradeoff}: The fundamental tension in machine learning
+\end{itemize}
+
+These techniques give us another tool (beyond cross-validation) to combat overfitting.
+
+\end{document}

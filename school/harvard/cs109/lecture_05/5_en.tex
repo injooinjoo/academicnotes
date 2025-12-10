@@ -1,0 +1,868 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CS109A: Introduction to Data Science - Lecture 05
+% Linear Regression
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 05}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced, colback=lightpurple, colframe=darkpurple,
+    fonttitle=\bfseries\large, title=Lecture Overview,
+    arc=3mm, boxrule=1pt, left=8pt, right=8pt, top=8pt, bottom=8pt, breakable, #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced, colback=lightblue, colframe=darkblue,
+    fonttitle=\bfseries, title=Key Summary,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced, colback=lightgreen, colframe=darkgreen,
+    fonttitle=\bfseries, title=Key Information,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced, colback=lightyellow, colframe=darkorange,
+    fonttitle=\bfseries, title=Warning,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced, colback=lightgray, colframe=black!60,
+    fonttitle=\bfseries, title=Example: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced, colback=lightpink, colframe=purple!70!black,
+    fonttitle=\bfseries, title=Definition: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced, colback=boxred, colframe=red!70!black,
+    fonttitle=\bfseries, title=Important: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced, colback=lightgreen, colframe=darkgreen,
+    fonttitle=\bfseries, title=Analogy: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left, numbersep=8pt,
+    breaklines=true, breakatwhitespace=false,
+    frame=single, frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b, showstringspaces=false,
+    tabsize=2, xleftmargin=15pt, xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 05},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple, colframe=darkpurple,
+    boxrule=1pt, arc=2mm, left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CS109A: Introduction to Data Science\\Lecture 05: Linear Regression}
+\author{Harvard University}
+\date{Fall 2024}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 05: Linear Regression}{Pavlos Protopapas}{Master simple and multiple linear regression, understand the normal equation, interpret coefficients, and handle practical issues like scaling and collinearity}
+
+
+\begin{summarybox}
+This lecture introduces \textbf{Linear Regression}---the foundational model for all of machine learning. We start with \textbf{Simple Linear Regression} (one predictor), derive the optimal coefficients using calculus, then extend to \textbf{Multiple Linear Regression} (many predictors) using matrix notation. We learn to \textbf{interpret coefficients}, understand the importance of \textbf{feature scaling}, recognize \textbf{collinearity} problems, and handle \textbf{categorical variables}. Linear regression is the ``first principles'' model that helps you understand every other ML algorithm.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================
+\section{Key Terminology}
+%========================================
+
+\begin{table}[h!]
+\centering
+\caption{Linear Regression Terminology}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{@{}llp{7cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Symbol} & \textbf{Description} \\
+\midrule
+Response Variable & $Y$ or $y$ & The outcome we're predicting \\
+Predictor Variable & $X$ or $x$ & Input used for prediction \\
+Intercept & $\beta_0$ & Value of $Y$ when all $X$s are zero \\
+Coefficient/Slope & $\beta_1, \beta_2, ...$ & Effect of each predictor on $Y$ \\
+Residual & $r_i = y_i - \hat{y}_i$ & Error for one observation \\
+Loss Function & $L(\beta)$ & Measures how wrong the model is \\
+MSE & $\frac{1}{n}\sum(y_i - \hat{y}_i)^2$ & Mean Squared Error \\
+Normal Equation & $\hat{\beta} = (X^TX)^{-1}X^Ty$ & Closed-form solution \\
+Design Matrix & $X$ & Matrix of all predictors ($n \times (p+1)$) \\
+Feature Scaling & --- & Normalizing predictors to similar scales \\
+Collinearity & --- & When predictors are correlated with each other \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+
+%========================================
+\section{Why Linear Regression?}
+%========================================
+
+\subsection{The Foundation of All Machine Learning}
+
+You might wonder: ``Why study something so simple when neural networks exist?''
+
+\begin{infobox}
+\textbf{Linear Regression is the Rosetta Stone of ML}
+
+Even the most complex models (neural networks, transformers, GPT) follow the same pattern:
+\begin{enumerate}
+    \item \textbf{Define a model} (structure/hypothesis)
+    \item \textbf{Define a loss function} (measure of error)
+    \item \textbf{Minimize the loss} (find optimal parameters)
+\end{enumerate}
+
+Linear regression is the simplest case where you can see this pattern clearly. Master it, and every other algorithm becomes easier to understand.
+\end{infobox}
+
+\subsection{Interpretability: The Killer Feature}
+
+Unlike kNN (``the neighbors said so''), linear regression tells you \textbf{exactly how each variable affects the outcome}.
+
+\begin{examplebox}{kNN vs Linear Regression}
+\textbf{Question}: ``What happens if we double the TV advertising budget?''
+
+\textbf{kNN answer}: ``Uh... let me find similar data points and recalculate...''
+
+\textbf{Linear Regression answer}: ``The coefficient is 0.05, so every \$1,000 increase in TV budget increases sales by 50 units. Doubling from \$100k to \$200k should increase sales by approximately 5,000 units.''
+
+Linear regression gives you \textbf{actionable insights}.
+\end{examplebox}
+
+\newpage
+
+%========================================
+\section{Simple Linear Regression (SLR)}
+%========================================
+
+\subsection{The Model}
+
+We assume a \textbf{linear relationship} between one predictor $X$ and response $Y$:
+
+\begin{definitionbox}{Simple Linear Regression}
+\[
+Y = \beta_0 + \beta_1 X + \epsilon
+\]
+
+\begin{itemize}
+    \item $\beta_0$: \textbf{Intercept} --- value of $Y$ when $X = 0$
+    \item $\beta_1$: \textbf{Slope} --- change in $Y$ for a 1-unit change in $X$
+    \item $\epsilon$: \textbf{Error} --- everything the model can't explain
+\end{itemize}
+
+Our prediction (without error) is:
+\[
+\hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 X
+\]
+\end{definitionbox}
+
+\subsection{Finding the Best Line: Loss Function}
+
+Among all possible lines, which is ``best''? The one that's \textbf{closest to all data points}.
+
+\subsubsection{Residuals}
+
+\begin{definitionbox}{Residual}
+The \textbf{residual} for observation $i$ is the vertical distance from the point to the line:
+\[
+r_i = y_i - \hat{y}_i = y_i - (\hat{\beta}_0 + \hat{\beta}_1 x_i)
+\]
+
+A good model has small residuals.
+\end{definitionbox}
+
+\subsubsection{Mean Squared Error (MSE)}
+
+\begin{definitionbox}{MSE Loss Function}
+\[
+L(\beta_0, \beta_1) = \text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2 = \frac{1}{n}\sum_{i=1}^{n}(y_i - \beta_0 - \beta_1 x_i)^2
+\]
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{Why Square the Residuals?}
+
+If we just summed residuals, positive errors ($y > \hat{y}$) and negative errors ($y < \hat{y}$) would cancel out. A model could have huge errors that sum to zero!
+
+\textbf{Squaring ensures}:
+\begin{enumerate}
+    \item All errors are positive (no cancellation)
+    \item Large errors are penalized more heavily ($10^2 = 100$ vs $2^2 = 4$)
+    \item The function is differentiable everywhere (nice for optimization)
+\end{enumerate}
+\end{warningbox}
+
+\newpage
+
+\subsection{The Three Steps of Machine Learning}
+
+\begin{importantbox}{The Universal ML Recipe}
+\begin{enumerate}
+    \item \textbf{Define the Model}: $\hat{Y} = \beta_0 + \beta_1 X$ (assume a linear relationship)
+    \item \textbf{Define the Loss}: $L = \frac{1}{n}\sum(y_i - \hat{y}_i)^2$ (MSE measures error)
+    \item \textbf{Minimize the Loss}: Find $\hat{\beta}_0, \hat{\beta}_1$ that minimize $L$
+\end{enumerate}
+
+\textbf{This pattern applies to almost every ML algorithm!}
+\begin{itemize}
+    \item Neural networks: Same idea, but model is more complex
+    \item ChatGPT: Define transformer model, define cross-entropy loss, minimize with backpropagation
+\end{itemize}
+\end{importantbox}
+
+\subsection{Minimizing MSE: The Calculus}
+
+How do we find the $\beta$ values that minimize MSE?
+
+\begin{analogybox}{Finding the Bottom of a Bowl}
+Imagine MSE as a 3D bowl where:
+\begin{itemize}
+    \item $x$-axis = $\beta_0$
+    \item $y$-axis = $\beta_1$
+    \item $z$-axis = MSE value
+\end{itemize}
+
+The optimal point is at the \textbf{bottom of the bowl} where the surface is flat (slope = 0).
+
+Mathematically: Set the \textbf{partial derivatives} to zero.
+\end{analogybox}
+
+\subsubsection{Setting Derivatives to Zero}
+
+To find the minimum, we set:
+\[
+\frac{\partial L}{\partial \beta_0} = 0 \quad \text{and} \quad \frac{\partial L}{\partial \beta_1} = 0
+\]
+
+\subsubsection{The Normal Equation (Closed-Form Solution)}
+
+Solving these equations gives us:
+
+\begin{tcolorbox}[colback=lightblue, colframe=darkblue, title=Simple Linear Regression: Optimal Coefficients]
+\[
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2}
+\]
+\[
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}
+\]
+
+where $\bar{x}$ and $\bar{y}$ are the means of $X$ and $Y$.
+\end{tcolorbox}
+
+\begin{infobox}
+\textbf{What \code{.fit()} Actually Does}
+
+When you call \code{model.fit(X, y)} in sklearn, it computes these formulas using your data. That's it---no magic, just algebra!
+\end{infobox}
+
+\newpage
+
+\subsection{Implementation in Python}
+
+\begin{lstlisting}[language=Python, caption={Simple Linear Regression with sklearn}]
+from sklearn.linear_model import LinearRegression
+import pandas as pd
+
+# Load data
+df = pd.read_csv('advertising.csv')
+
+# Prepare X and y
+X = df[['TV']]        # Double brackets: returns DataFrame (required by sklearn)
+y = df['Sales']       # Single brackets: returns Series
+
+# Create and fit model
+model = LinearRegression()
+model.fit(X, y)       # <-- This runs the normal equation!
+
+# Access the learned parameters
+print(f"Intercept (beta_0): {model.intercept_}")
+print(f"Slope (beta_1): {model.coef_[0]}")
+
+# Make predictions
+prediction = model.predict([[150]])  # Predict sales for TV budget = $150k
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Why Double Brackets for X?}
+
+sklearn expects $X$ to be a 2D array (matrix), even with one predictor:
+\begin{itemize}
+    \item \code{df['TV']} returns a \textbf{Series} with shape \code{(n,)} --- \textbf{Error!}
+    \item \code{df[['TV']]} returns a \textbf{DataFrame} with shape \code{(n, 1)} --- \textbf{Works!}
+\end{itemize}
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{Multiple Linear Regression (MLR)}
+%========================================
+
+\subsection{From One to Many Predictors}
+
+Real predictions often require multiple inputs:
+
+\begin{itemize}
+    \item Height prediction: weight, biological sex, parents' heights
+    \item Sales prediction: TV budget, radio budget, newspaper budget
+    \item House price: square footage, bedrooms, location, age
+\end{itemize}
+
+\begin{definitionbox}{Multiple Linear Regression}
+\[
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \epsilon
+\]
+
+\textbf{Interpretation of $\beta_j$}: The change in $Y$ for a 1-unit change in $X_j$, \textbf{holding all other predictors constant}.
+\end{definitionbox}
+
+\subsection{Matrix Notation}
+
+With many predictors, writing out $\beta_0 + \beta_1 X_1 + \beta_2 X_2 + ...$ gets tedious. Matrix notation is cleaner:
+
+\[
+\mathbf{Y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+\]
+
+\begin{itemize}
+    \item $\mathbf{Y}$: Response vector ($n \times 1$)
+    \item $\mathbf{X}$: Design matrix ($n \times (p+1)$)
+    \item $\boldsymbol{\beta}$: Coefficient vector ($(p+1) \times 1$)
+\end{itemize}
+
+\subsubsection{The Design Matrix}
+
+\[
+\mathbf{X} = \begin{pmatrix}
+1 & x_{11} & x_{12} & \cdots & x_{1p} \\
+1 & x_{21} & x_{22} & \cdots & x_{2p} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_{n1} & x_{n2} & \cdots & x_{np}
+\end{pmatrix}
+\]
+
+\begin{warningbox}
+\textbf{Why the Column of 1s?}
+
+The first column (all 1s) is a mathematical trick to include the intercept $\beta_0$ in the matrix multiplication:
+
+\[
+\begin{pmatrix} 1 & x_1 & x_2 \end{pmatrix} \begin{pmatrix} \beta_0 \\ \beta_1 \\ \beta_2 \end{pmatrix} = \beta_0 \cdot 1 + \beta_1 x_1 + \beta_2 x_2
+\]
+
+Without the 1s column, we'd need to handle $\beta_0$ separately.
+\end{warningbox}
+
+\newpage
+
+\subsection{The Normal Equation for Multiple Regression}
+
+The same logic (set derivatives to zero) gives us the matrix form:
+
+\begin{tcolorbox}[colback=lightblue, colframe=darkblue, title=The Normal Equation (Closed-Form Solution)]
+\[
+\hat{\boldsymbol{\beta}} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{Y}
+\]
+
+This single formula gives you all optimal coefficients at once!
+\end{tcolorbox}
+
+\begin{infobox}
+\textbf{This Only Works for Linear Regression}
+
+The closed-form solution is special. For most other models (logistic regression, neural networks, decision trees), no such formula exists. You need iterative methods like gradient descent.
+
+That's why we \textbf{love} linear regression---it's mathematically elegant.
+\end{infobox}
+
+\subsection{Implementation with Multiple Predictors}
+
+\begin{lstlisting}[language=Python, caption={Multiple Linear Regression}]
+# Multiple predictors
+X = df[['TV', 'Radio', 'Newspaper']]  # Shape: (n, 3)
+y = df['Sales']
+
+model = LinearRegression()
+model.fit(X, y)
+
+print(f"Intercept: {model.intercept_}")
+print(f"Coefficients: {model.coef_}")
+# Output might be: [0.046, 0.189, -0.001]
+# Interpretation: Radio has strongest effect, Newspaper almost none
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Interpreting Coefficients}
+%========================================
+
+\subsection{What Does a Coefficient Mean?}
+
+\begin{definitionbox}{Coefficient Interpretation}
+In the model $Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + ...$:
+
+\textbf{$\beta_j$} represents the expected change in $Y$ for a \textbf{one-unit increase in $X_j$}, \textbf{holding all other predictors constant}.
+\end{definitionbox}
+
+\begin{examplebox}{Advertising Example}
+Model: $\text{Sales} = 2.94 + 0.046 \cdot \text{TV} + 0.189 \cdot \text{Radio} - 0.001 \cdot \text{Newspaper}$
+
+\textbf{Interpretations}:
+\begin{itemize}
+    \item \textbf{TV (0.046)}: Each additional \$1,000 in TV budget increases sales by 46 units (holding Radio and Newspaper constant)
+    \item \textbf{Radio (0.189)}: Each additional \$1,000 in Radio budget increases sales by 189 units---much larger effect!
+    \item \textbf{Newspaper (-0.001)}: Almost zero effect; possibly not worth including
+\end{itemize}
+\end{examplebox}
+
+\subsection{Feature Importance}
+
+To compare which predictors matter most, look at \textbf{coefficient magnitudes}:
+
+\begin{warningbox}
+\textbf{Danger: Different Scales!}
+
+If TV is in thousands (\$0--300k) and Radio is in hundreds (\$0--50k), comparing raw coefficients is misleading!
+
+A ``small'' coefficient on a large-scale variable might have more total effect than a ``large'' coefficient on a small-scale variable.
+
+\textbf{Solution}: \textbf{Scale your features} before comparing.
+\end{warningbox}
+
+\subsection{Coefficient Interpretation Summary}
+
+\begin{itemize}
+    \item \textbf{$\beta = 0$}: Predictor has no effect (can be removed)
+    \item \textbf{$\beta > 0$}: Positive relationship (increase $X$ → increase $Y$)
+    \item \textbf{$\beta < 0$}: Negative relationship (increase $X$ → decrease $Y$)
+    \item \textbf{$|\beta|$ large}: Strong effect (but check the scale!)
+\end{itemize}
+
+\newpage
+
+%========================================
+\section{Feature Scaling}
+%========================================
+
+\subsection{Why Scale?}
+
+Different predictors often have different units and ranges:
+\begin{itemize}
+    \item Age: 0--100
+    \item Income: \$0--\$10,000,000
+    \item Height: 150--200 cm
+\end{itemize}
+
+Without scaling, coefficients can't be directly compared.
+
+\subsection{Standardization (Z-Score)}
+
+\begin{definitionbox}{Standardization}
+Transform each feature to have mean 0 and standard deviation 1:
+\[
+z = \frac{x - \mu}{\sigma}
+\]
+
+After standardization, \textbf{all features are on the same scale}. A coefficient of 0.5 means ``a 1-standard-deviation increase in $X$ produces a 0.5-unit change in $Y$.''
+\end{definitionbox}
+
+\subsection{Min-Max Scaling (Normalization)}
+
+\begin{definitionbox}{Min-Max Scaling}
+Transform each feature to the range $[0, 1]$:
+\[
+x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}}
+\]
+\end{definitionbox}
+
+\subsection{Does Scaling Affect Predictions?}
+
+\begin{infobox}
+\textbf{For Linear Regression: No!}
+
+Scaling predictors changes the coefficient values but \textbf{not the predictions}. If you scale $X$ by 2, the coefficient gets divided by 2---the final prediction is identical.
+
+\textbf{Why scale then?}
+\begin{enumerate}
+    \item \textbf{Interpretation}: Compare feature importance fairly
+    \item \textbf{Numerical stability}: Prevents very large/small numbers in computations
+    \item \textbf{Other algorithms}: kNN, neural networks \textbf{require} scaling
+\end{enumerate}
+\end{infobox}
+
+\newpage
+
+%========================================
+\section{Collinearity}
+%========================================
+
+\subsection{What is Collinearity?}
+
+\begin{definitionbox}{Collinearity}
+\textbf{Collinearity} (or multicollinearity) occurs when two or more predictors are highly correlated with each other.
+
+\textbf{Example}: Credit card ``Limit'' and ``Rating'' are nearly identical---one is probably computed from the other.
+\end{definitionbox}
+
+\subsection{Why is Collinearity a Problem?}
+
+\begin{warningbox}
+\textbf{Collinearity Confuses Coefficient Interpretation}
+
+If $X_1$ and $X_2$ are perfectly correlated:
+\begin{itemize}
+    \item When $X_1$ increases, $X_2$ also increases
+    \item The model can't tell which one is ``causing'' the change in $Y$
+    \item Coefficients become unstable and hard to interpret
+\end{itemize}
+
+\textbf{Mathematical issue}: $(X^TX)^{-1}$ becomes unstable when columns of $X$ are nearly identical.
+\end{warningbox}
+
+\subsection{Detecting Collinearity}
+
+\begin{enumerate}
+    \item \textbf{Correlation matrix}: Look for high correlations ($|r| > 0.8$) between predictors
+    \item \textbf{Scatter plot matrix}: Visualize relationships between all pairs
+    \item \textbf{VIF (Variance Inflation Factor)}: Formal measure (covered later)
+\end{enumerate}
+
+\subsection{What Collinearity Doesn't Break}
+
+\begin{infobox}
+\textbf{Collinearity is OK for prediction!}
+
+If you only care about \textbf{predictions} (not interpretation), collinearity doesn't hurt MSE. The predictions will still be accurate.
+
+It only matters when you want to \textbf{interpret} which variables are important.
+\end{infobox}
+
+\subsection{Handling Collinearity}
+
+\begin{enumerate}
+    \item \textbf{Remove one of the correlated variables}
+    \item \textbf{Combine them} into a single feature
+    \item \textbf{Use regularization} (Ridge regression---covered later)
+    \item \textbf{Accept it} if you only care about prediction
+\end{enumerate}
+
+\newpage
+
+%========================================
+\section{Categorical Predictors}
+%========================================
+
+\subsection{The Problem with Categories}
+
+Linear regression requires \textbf{numbers}. But what about:
+\begin{itemize}
+    \item Gender: Male/Female
+    \item Color: Red/Blue/Green
+    \item Education: High School/Bachelor's/Master's/PhD
+\end{itemize}
+
+You can't multiply $\beta \times \text{``Male''}$!
+
+\subsection{Dummy Variables (One-Hot Encoding)}
+
+\begin{definitionbox}{Dummy Variables}
+Convert each category into a \textbf{binary (0/1) column}:
+
+\begin{center}
+\begin{tabular}{l|ccc}
+Original & IsMale & IsFemale & IsOther \\
+\hline
+Male & 1 & 0 & 0 \\
+Female & 0 & 1 & 0 \\
+Female & 0 & 1 & 0 \\
+Other & 0 & 0 & 1 \\
+\end{tabular}
+\end{center}
+\end{definitionbox}
+
+\subsection{The Dummy Variable Trap}
+
+\begin{warningbox}
+\textbf{Drop One Category!}
+
+If you include \textbf{all} dummy columns, they sum to 1 (perfect collinearity with the intercept).
+
+\textbf{Solution}: Drop one category (the ``reference'' or ``baseline'').
+
+With only IsMale and IsFemale:
+\begin{itemize}
+    \item If IsMale = 0 and IsFemale = 0, we know it's ``Other''
+    \item The ``Other'' effect is absorbed into the intercept
+\end{itemize}
+\end{warningbox}
+
+\subsection{Implementation}
+
+\begin{lstlisting}[language=Python, caption={Handling Categorical Variables}]
+import pandas as pd
+
+# Create dummy variables
+df_dummies = pd.get_dummies(df, columns=['Gender'], drop_first=True)
+# drop_first=True avoids the dummy variable trap
+
+# Now 'Gender_Male', 'Gender_Other' are included (Female is baseline)
+X = df_dummies[['Income', 'Age', 'Gender_Male', 'Gender_Other']]
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Key Takeaways}
+%========================================
+
+\begin{summarybox}
+\textbf{Summary of Lecture 05: Linear Regression}
+
+\textbf{The Big Picture}
+\begin{itemize}
+    \item Linear regression follows the universal ML recipe: Model → Loss → Minimize
+    \item Unlike kNN, it gives \textbf{interpretable coefficients}
+\end{itemize}
+
+\textbf{Simple Linear Regression}
+\begin{itemize}
+    \item Model: $\hat{Y} = \beta_0 + \beta_1 X$
+    \item Loss: MSE $= \frac{1}{n}\sum(y_i - \hat{y}_i)^2$
+    \item Solution: Set derivatives to zero → Normal equation
+\end{itemize}
+
+\textbf{Multiple Linear Regression}
+\begin{itemize}
+    \item Model: $\mathbf{Y} = \mathbf{X}\boldsymbol{\beta}$
+    \item Solution: $\hat{\boldsymbol{\beta}} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{Y}$
+    \item The column of 1s in $X$ handles the intercept
+\end{itemize}
+
+\textbf{Interpretation}
+\begin{itemize}
+    \item $\beta_j$: Change in $Y$ for 1-unit change in $X_j$, holding others constant
+    \item Scale features before comparing coefficient magnitudes
+\end{itemize}
+
+\textbf{Practical Issues}
+\begin{itemize}
+    \item \textbf{Collinearity}: Confuses interpretation (not predictions)
+    \item \textbf{Categorical variables}: Use dummy encoding, drop one category
+    \item \textbf{Scaling}: Doesn't change predictions, but helps interpretation
+\end{itemize}
+\end{summarybox}
+
+\subsection{Looking Ahead}
+
+Next lectures will cover:
+\begin{itemize}
+    \item \textbf{Polynomial regression}: What if the relationship isn't linear?
+    \item \textbf{Model selection}: How to choose which predictors to include?
+    \item \textbf{Regularization}: Ridge and Lasso regression
+    \item \textbf{Assumptions of linear regression}: What makes it valid?
+\end{itemize}
+
+\end{document}

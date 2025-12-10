@@ -1,0 +1,1002 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 07: Bias-Variance Tradeoff and Regularization
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages (English - No kotex)
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 07}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 07},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Bias-Variance Tradeoff and Regularization}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begin
+%========================================================================================
+
+\title{Lecture 07: Bias-Variance Tradeoff and Regularization}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 07}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understanding the bias-variance tradeoff, diagnosing overfitting through coefficient analysis, and learning regularization techniques (Ridge and Lasso) to combat overfitting}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Introduction and Motivation}
+%========================================================================================
+
+\begin{overviewbox}
+This lecture addresses one of the most fundamental concepts in machine learning: the \textbf{bias-variance tradeoff}. We'll understand why models fail, how to diagnose the problem, and introduce powerful techniques called \textbf{regularization} to fix it.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item \textbf{Sources of Error}: Irreducible vs. reducible error
+    \item \textbf{Bias-Variance Tradeoff}: The fundamental tension in model complexity
+    \item \textbf{Diagnosing Overfitting}: Looking at coefficient magnitudes
+    \item \textbf{Ridge Regression (L2)}: Penalizing squared coefficients
+    \item \textbf{Lasso Regression (L1)}: Penalizing absolute coefficients (with feature selection!)
+    \item \textbf{Hyperparameter Tuning}: Finding optimal $\lambda$ using cross-validation
+\end{itemize}
+\end{overviewbox}
+
+\subsection{The Big Picture}
+
+Our ultimate goal is \textbf{generalization}---building models that perform well on \textit{new, unseen data}, not just the training data we happened to collect.
+
+We've learned that:
+\begin{itemize}
+    \item Too simple models \textbf{underfit}: They can't capture the true patterns
+    \item Too complex models \textbf{overfit}: They memorize noise instead of learning patterns
+\end{itemize}
+
+Today we formalize this intuition mathematically and introduce techniques to navigate between these extremes.
+
+%========================================================================================
+\section{Sources of Prediction Error}
+%========================================================================================
+
+When our model makes errors on test data, those errors can come from different sources.
+
+\subsection{Irreducible Error (Aleatoric Error)}
+
+\begin{definitionbox}[Irreducible Error]
+\textbf{Irreducible error} is the inherent noise in the data that cannot be eliminated no matter how good our model is. This is also called \textbf{aleatoric error}.
+
+This error exists because:
+\begin{itemize}
+    \item Measurements have inherent randomness
+    \item There are unmeasured variables affecting the outcome
+    \item The relationship itself may have stochastic components
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[Irreducible Error Analogy]
+Imagine recording audio with the world's best microphone. Even with perfect equipment, you'll still pick up ambient noise---air molecules vibrating, electronic interference, etc.
+
+No matter how much you improve the microphone (model), you can't eliminate environmental noise (irreducible error).
+
+\textbf{Acceptance}: We acknowledge this error exists and focus on what we \textit{can} control.
+\end{examplebox}
+
+\subsection{Reducible Error}
+
+The error we \textit{can} control comes from our choice of model. This \textbf{reducible error} decomposes into two components:
+
+\begin{enumerate}
+    \item \textbf{Bias}: Error from wrong assumptions in the model
+    \item \textbf{Variance}: Error from sensitivity to training data fluctuations
+\end{enumerate}
+
+%========================================================================================
+\section{The Bias-Variance Tradeoff}
+%========================================================================================
+
+\subsection{Understanding Bias}
+
+\begin{definitionbox}[Bias]
+\textbf{Bias} measures how far off the model's average prediction is from the true value.
+
+\begin{itemize}
+    \item \textbf{High Bias}: Model consistently misses the target (inaccurate)
+    \item \textbf{Low Bias}: Model's predictions are centered around the truth
+\end{itemize}
+
+High bias typically occurs when the model is \textbf{too simple} to capture the underlying patterns.
+\end{definitionbox}
+
+\begin{examplebox}[High Bias: The Linear Model on Curved Data]
+Imagine the true relationship is curved (like a parabola), but you fit a straight line.
+
+No matter how many times you collect new data and refit:
+\begin{itemize}
+    \item Every fitted line will miss the curve
+    \item The average of all fitted lines still misses the truth
+    \item This systematic error is \textbf{bias}
+\end{itemize}
+
+The model is fundamentally incapable of capturing the true pattern---it's \textbf{underfitting}.
+\end{examplebox}
+
+\subsection{Understanding Variance}
+
+\begin{definitionbox}[Variance]
+\textbf{Variance} measures how much the model's predictions change when trained on different datasets.
+
+\begin{itemize}
+    \item \textbf{High Variance}: Predictions swing wildly with different training data
+    \item \textbf{Low Variance}: Predictions are stable regardless of training data
+\end{itemize}
+
+High variance typically occurs when the model is \textbf{too complex} and learns noise specific to each training set.
+\end{definitionbox}
+
+\begin{examplebox}[High Variance: The Spaghetti Plot]
+Professor Protopapas demonstrates this beautifully with a simulation:
+
+\textbf{Experiment}: Take 2,000 different random samples from the same population. For each sample, fit a model. Plot all 2,000 fitted curves.
+
+\textbf{Linear Model (Low Variance)}:
+All 2,000 lines cluster tightly together---very stable predictions across different training sets.
+
+\textbf{Degree-10 Polynomial (High Variance)}:
+The 2,000 curves look like ``spaghetti noodles''---wildly different predictions for each training set. The model is chasing the noise in each particular sample.
+\end{examplebox}
+
+\subsection{The Tradeoff Visualized}
+
+\begin{infobox}[title=The Fundamental Tradeoff]
+As model complexity increases:
+\begin{itemize}
+    \item \textbf{Bias decreases}: More complex models can fit more patterns
+    \item \textbf{Variance increases}: More complex models are more sensitive to noise
+\end{itemize}
+
+As model complexity decreases:
+\begin{itemize}
+    \item \textbf{Bias increases}: Simpler models miss true patterns
+    \item \textbf{Variance decreases}: Simpler models are more stable
+\end{itemize}
+
+\textbf{Total Error} = Bias$^2$ + Variance + Irreducible Error
+
+This creates a U-shaped curve when plotted against complexity. Our goal is to find the \textbf{sweet spot} at the bottom of the U.
+\end{infobox}
+
+\subsection{The Dartboard Analogy}
+
+Think of model predictions like throwing darts at a target:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l|cc}
+\toprule
+& \textbf{Low Variance} & \textbf{High Variance} \\
+\midrule
+\textbf{High Bias} & \begin{minipage}{0.35\textwidth}
+Darts clustered together,\\but away from bullseye\\(Underfitting)
+\end{minipage} & \begin{minipage}{0.35\textwidth}
+Darts scattered everywhere,\\missing the bullseye\\(Worst case)
+\end{minipage} \\
+\midrule
+\textbf{Low Bias} & \begin{minipage}{0.35\textwidth}
+Darts clustered tightly\\around the bullseye\\(\textbf{Ideal model!})
+\end{minipage} & \begin{minipage}{0.35\textwidth}
+Darts scattered around\\the bullseye\\(Overfitting)
+\end{minipage} \\
+\bottomrule
+\end{tabular}
+\caption{The four scenarios of bias and variance}
+\end{table}
+
+%========================================================================================
+\section{Diagnosing Overfitting: Coefficient Analysis}
+%========================================================================================
+
+How can we tell if our model is overfitting? Look at the \textbf{coefficients}!
+
+\subsection{The Key Insight}
+
+\begin{summarybox}[title=Overfitting Symptom: Exploding Coefficients]
+When a model overfits:
+\begin{itemize}
+    \item Coefficients ($\beta$ values) become \textbf{extremely large}
+    \item Coefficient values are \textbf{unstable}---they vary wildly across different training sets
+\end{itemize}
+
+This happens because the model is trying to fit every tiny wiggle in the training data, requiring extreme parameter values.
+\end{summarybox}
+
+\begin{examplebox}[Coefficient Distributions: Linear vs. Polynomial]
+From the 2,000-model simulation:
+
+\textbf{Linear Model}:
+\begin{itemize}
+    \item $\beta_0$ values range from roughly 0.0 to 1.25
+    \item $\beta_1$ values similarly bounded
+    \item Narrow violin plots (low variance in coefficients)
+\end{itemize}
+
+\textbf{Degree-10 Polynomial}:
+\begin{itemize}
+    \item Some coefficients ($\beta_5, \beta_8, \beta_9$) reach values on the order of $10^9$ (one billion!)
+    \item Extremely wide violin plots (high variance in coefficients)
+    \item The y-axis label shows ``1e9''---coefficients are astronomically large
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Solution Preview}
+
+This observation leads directly to our solution:
+
+\begin{center}
+\textbf{If overfitting = large coefficients,}
+
+\textbf{then preventing overfitting = keeping coefficients small!}
+\end{center}
+
+This is the core idea behind \textbf{regularization}.
+
+%========================================================================================
+\section{Regularization: The Core Idea}
+%========================================================================================
+
+\subsection{Penalizing Complexity}
+
+\begin{definitionbox}[Regularization]
+\textbf{Regularization} modifies the loss function to penalize model complexity, encouraging simpler models that generalize better.
+
+Instead of minimizing just MSE, we minimize:
+\[
+\mathcal{L}_{\text{regularized}} = \underbrace{\text{MSE}}_{\text{Fit the data}} + \underbrace{\lambda \cdot \text{Penalty}}_{\text{Keep model simple}}
+\]
+
+The model must now balance two competing objectives:
+\begin{enumerate}
+    \item Fit the training data well (minimize MSE)
+    \item Keep coefficients small (minimize penalty)
+\end{enumerate}
+\end{definitionbox}
+
+\begin{examplebox}[Game Time: How to Discourage Large Coefficients?]
+Professor Protopapas poses this question to the class:
+
+\textbf{Options}:
+\begin{enumerate}[label=\Alph*.]
+    \item Divide all model parameters by large numbers
+    \item Make sure the causal relation between predictors and response is true
+    \item Discard any model with parameter values larger than one
+    \item Penalize the model with a penalty proportional to parameter values
+\end{enumerate}
+
+\textbf{Answer}: D!
+
+Why not A? Dividing just scales the data---nothing fundamentally changes.
+
+Why not C? Discarding models creates bias and arbitrary cutoffs.
+
+\textbf{The right approach}: Add a term to the loss function that grows when coefficients grow.
+\end{examplebox}
+
+\subsection{The Regularization Parameter $\lambda$}
+
+The hyperparameter $\lambda$ (lambda) controls the \textbf{strength} of regularization:
+
+\begin{infobox}[title=Understanding $\lambda$]
+\begin{itemize}
+    \item \textbf{$\lambda = 0$}: No regularization. This is just ordinary linear regression. Risk of overfitting if model is complex.
+
+    \item \textbf{$\lambda$ small}: Mild regularization. Coefficients are somewhat constrained.
+
+    \item \textbf{$\lambda$ large}: Strong regularization. Coefficients are heavily constrained, pushed toward zero.
+
+    \item \textbf{$\lambda \to \infty$}: Extreme regularization. All coefficients become exactly zero. The model predicts just the mean (severe underfitting).
+\end{itemize}
+
+We need to find the $\lambda$ that balances bias and variance optimally.
+\end{infobox}
+
+%========================================================================================
+\section{Ridge Regression (L2 Regularization)}
+%========================================================================================
+
+\subsection{The Ridge Loss Function}
+
+\begin{definitionbox}[Ridge Regression]
+\textbf{Ridge Regression} uses the \textbf{L2 norm} (sum of squared coefficients) as the penalty:
+
+\[
+\mathcal{L}_{\text{Ridge}} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2
+\]
+
+Equivalently:
+\[
+\mathcal{L}_{\text{Ridge}} = \text{MSE} + \lambda \|\boldsymbol{\beta}\|_2^2
+\]
+
+where $\|\boldsymbol{\beta}\|_2^2 = \beta_1^2 + \beta_2^2 + \ldots + \beta_p^2$
+\end{definitionbox}
+
+\begin{warningbox}[title=Important: Don't Regularize the Intercept!]
+Notice the penalty sums from $j=1$ to $p$, \textbf{not} including $\beta_0$ (the intercept).
+
+\textbf{Why?} The intercept $\beta_0$ is just an overall offset---it doesn't relate to any predictor's influence. Overfitting comes from being too sensitive to predictors, not from the baseline level.
+
+Always exclude $\beta_0$ from regularization.
+\end{warningbox}
+
+\subsection{Properties of Ridge Regression}
+
+\begin{infobox}[title=Ridge Regression Characteristics]
+\textbf{How it shrinks coefficients}:
+\begin{itemize}
+    \item Shrinks all coefficients \textbf{toward zero}
+    \item But coefficients never become \textbf{exactly} zero
+    \item Larger coefficients are penalized more heavily (due to squaring)
+\end{itemize}
+
+\textbf{Advantages}:
+\begin{itemize}
+    \item \textbf{Closed-form solution}: Very fast to compute
+    \[
+    \hat{\boldsymbol{\beta}}_{\text{Ridge}} = (X^TX + \lambda I)^{-1}X^Ty
+    \]
+    \item Excellent for \textbf{multicollinearity}: Stabilizes estimates when predictors are correlated
+    \item Keeps all predictors in the model (useful when you believe all matter)
+\end{itemize}
+
+\textbf{When to use}:
+\begin{itemize}
+    \item When you believe all predictors contribute somewhat
+    \item When predictors are highly correlated
+    \item When you need fast computation
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\section{Lasso Regression (L1 Regularization)}
+%========================================================================================
+
+\subsection{The Lasso Loss Function}
+
+\begin{definitionbox}[Lasso Regression]
+\textbf{Lasso Regression} (Least Absolute Shrinkage and Selection Operator) uses the \textbf{L1 norm} (sum of absolute values) as the penalty:
+
+\[
+\mathcal{L}_{\text{Lasso}} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j|
+\]
+
+Equivalently:
+\[
+\mathcal{L}_{\text{Lasso}} = \text{MSE} + \lambda \|\boldsymbol{\beta}\|_1
+\]
+
+where $\|\boldsymbol{\beta}\|_1 = |\beta_1| + |\beta_2| + \ldots + |\beta_p|$
+\end{definitionbox}
+
+\subsection{Properties of Lasso Regression}
+
+\begin{infobox}[title=Lasso Regression Characteristics]
+\textbf{How it shrinks coefficients}:
+\begin{itemize}
+    \item Can shrink coefficients to \textbf{exactly zero}
+    \item Effectively \textbf{removes} predictors from the model
+    \item Performs automatic \textbf{feature selection}
+\end{itemize}
+
+\textbf{Advantages}:
+\begin{itemize}
+    \item \textbf{Sparse solutions}: Produces interpretable models with fewer predictors
+    \item \textbf{Feature selection}: Identifies which predictors actually matter
+    \item Useful when you suspect only a few predictors are truly important
+\end{itemize}
+
+\textbf{Disadvantages}:
+\begin{itemize}
+    \item \textbf{No closed-form solution}: Must use numerical optimization (slower)
+    \item With correlated predictors, tends to pick one arbitrarily and zero others
+\end{itemize}
+
+\textbf{When to use}:
+\begin{itemize}
+    \item When you have many predictors and suspect few are truly relevant
+    \item When you want an interpretable model
+    \item When you need automatic feature selection
+\end{itemize}
+\end{infobox}
+
+\subsection{Why Lasso Produces Zeros (Intuition)}
+
+\begin{examplebox}[Why L1 Creates Sparsity]
+The geometric intuition involves the shape of the constraint regions:
+
+\textbf{Ridge (L2)}: The constraint $\sum \beta_j^2 \leq c$ forms a \textbf{circle} (or sphere in higher dimensions). The MSE contours typically intersect this circle somewhere on the smooth boundary---rarely exactly at an axis.
+
+\textbf{Lasso (L1)}: The constraint $\sum |\beta_j| \leq c$ forms a \textbf{diamond} (or cross-polytope). The corners of the diamond lie on the axes. The MSE contours are much more likely to hit a corner, where some coefficient is exactly zero.
+
+This is why Lasso naturally produces sparse solutions!
+\end{examplebox}
+
+%========================================================================================
+\section{Ridge vs. Lasso: Comparison}
+%========================================================================================
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{Ridge (L2)} & \textbf{Lasso (L1)} \\
+\midrule
+Penalty term & $\sum \beta_j^2$ & $\sum |\beta_j|$ \\
+Coefficient shrinkage & Toward zero, never exactly zero & Can be exactly zero \\
+Feature selection & No (keeps all predictors) & Yes (automatic) \\
+Solution type & Closed-form (analytical) & Numerical solver \\
+Computation speed & Fast & Slower \\
+Multicollinearity & Handles well & May pick one predictor arbitrarily \\
+Interpretability & All predictors remain & Sparse, easier to interpret \\
+Best when & All predictors matter & Few predictors matter \\
+\bottomrule
+\end{tabular}
+\caption{Ridge vs. Lasso comparison}
+\end{table}
+
+\begin{summarybox}[title=Which to Choose?]
+\textbf{The honest answer}: Try both and use cross-validation to compare!
+
+\textbf{General guidelines}:
+\begin{itemize}
+    \item If you have hundreds of predictors but suspect only a handful matter $\rightarrow$ \textbf{Lasso}
+    \item If you believe all predictors contribute at least a little $\rightarrow$ \textbf{Ridge}
+    \item If predictors are highly correlated $\rightarrow$ \textbf{Ridge} (more stable)
+    \item If you need interpretability and feature selection $\rightarrow$ \textbf{Lasso}
+\end{itemize}
+
+There's also \textbf{Elastic Net} which combines both penalties---a topic for another day!
+\end{summarybox}
+
+%========================================================================================
+\section{Finding Optimal $\lambda$: The Complete Procedure}
+%========================================================================================
+
+$\lambda$ is a \textbf{hyperparameter}---it's not learned from data but must be set by us. We find it through validation or cross-validation.
+
+\begin{importantbox}[Hyperparameter Tuning Rules]
+\begin{itemize}
+    \item \textbf{NEVER} tune on training data (model will choose $\lambda = 0$)
+    \item \textbf{NEVER} tune on test data (that's cheating---information leakage)
+    \item \textbf{ALWAYS} use validation set or cross-validation
+\end{itemize}
+\end{importantbox}
+
+\subsection{Method 1: Single Validation Set}
+
+\begin{enumerate}
+    \item \textbf{Split data}: Training / Validation / Test
+
+    \item \textbf{Choose $\lambda$ candidates}: Select a range to search
+    \begin{itemize}
+        \item Typically: $\lambda \in \{10^{-5}, 10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}, 1, 10, 100\}$
+        \item Use logarithmic spacing (orders of magnitude)
+    \end{itemize}
+
+    \item \textbf{For each $\lambda$}: Train model on training set, find $\boldsymbol{\beta}_\lambda$
+    \begin{itemize}
+        \item Ridge: Use closed-form formula
+        \item Lasso: Use numerical solver
+    \end{itemize}
+
+    \item \textbf{Evaluate on validation set}: Compute MSE \textbf{without} the penalty term!
+    \begin{warningbox}[title=Critical Point]
+    When evaluating models, compute \textbf{pure MSE only}---don't include the $\lambda \cdot \text{penalty}$ term.
+
+    Why? The penalty was a training tool to prevent overfitting. For evaluation, we care about actual prediction accuracy (how close to true values), not about coefficient sizes.
+    \end{warningbox}
+
+    \item \textbf{Select best $\lambda^*$}: Choose the $\lambda$ with lowest validation MSE
+
+    \item \textbf{Refit (recommended)}: Combine training + validation data, retrain with $\lambda^*$
+    \begin{itemize}
+        \item Model selection is done---no need to keep validation separate
+        \item More training data = better final model
+    \end{itemize}
+
+    \item \textbf{Final evaluation}: Report MSE on test set (use only once!)
+\end{enumerate}
+
+\subsection{Method 2: K-Fold Cross-Validation}
+
+A more robust approach that reduces dependence on a single validation split:
+
+\begin{enumerate}
+    \item \textbf{Split data}: Training Pool (for CV) / Test
+
+    \item \textbf{Choose $\lambda$ candidates}: Same as before
+
+    \item \textbf{Divide training pool into K folds}: Typically $K=5$ or $K=10$
+
+    \item \textbf{For each $\lambda$, run K iterations}:
+    \begin{itemize}
+        \item Iteration 1: Fold 1 = validation, Folds 2-K = training
+        \item Iteration 2: Fold 2 = validation, Folds 1,3-K = training
+        \item ... and so on ...
+        \item Record validation MSE for each iteration
+    \end{itemize}
+
+    \item \textbf{Average MSEs}: For each $\lambda$, compute mean of K validation MSEs
+
+    \item \textbf{Select best $\lambda^*$}: Choose $\lambda$ with lowest \textbf{average} validation MSE
+
+    \item \textbf{Refit on all training data}: Train final model using entire training pool with $\lambda^*$
+    \begin{itemize}
+        \item Don't use one of the K models---retrain on all data
+        \item This ensures maximum information for final model
+    \end{itemize}
+
+    \item \textbf{Final evaluation}: Report MSE on test set
+\end{enumerate}
+
+\begin{examplebox}[Why Refit After Cross-Validation?]
+After K-fold CV, you have K different models (one per fold). Which do you use?
+
+\textbf{Answer}: None of them! Each was trained on only $(K-1)/K$ of the data.
+
+Instead, now that you've found $\lambda^*$, retrain a \textbf{new model} on the \textbf{entire} training pool. This final model benefits from all available training data.
+\end{examplebox}
+
+\subsection{Practical Implementation}
+
+\begin{lstlisting}[language=Python, caption={Ridge and Lasso with Cross-Validation in sklearn}]
+from sklearn.linear_model import Ridge, Lasso, RidgeCV, LassoCV
+from sklearn.model_selection import cross_val_score
+import numpy as np
+
+# Define lambda values to search (sklearn calls it 'alpha')
+alphas = np.logspace(-5, 2, 50)  # 50 values from 10^-5 to 10^2
+
+# Method 1: Manual cross-validation
+ridge = Ridge(alpha=1.0)
+cv_scores = cross_val_score(ridge, X_train, y_train,
+                           cv=5,
+                           scoring='neg_mean_squared_error')
+mean_mse = -cv_scores.mean()
+
+# Method 2: Built-in CV (recommended)
+# RidgeCV automatically finds best alpha
+ridge_cv = RidgeCV(alphas=alphas, cv=5)
+ridge_cv.fit(X_train, y_train)
+print(f"Best alpha: {ridge_cv.alpha_}")
+
+# Similarly for Lasso
+lasso_cv = LassoCV(alphas=alphas, cv=5)
+lasso_cv.fit(X_train, y_train)
+print(f"Best alpha: {lasso_cv.alpha_}")
+
+# Final evaluation on test set
+test_mse = mean_squared_error(y_test, ridge_cv.predict(X_test))
+\end{lstlisting}
+
+\begin{warningbox}[title=Edge Cases in $\lambda$ Selection]
+What if the optimal $\lambda$ is at the edge of your search range?
+
+For example, if your lowest validation MSE occurs at $\lambda = 100$ (your maximum):
+
+\textbf{Problem}: The true optimum might be at $\lambda = 1000$ or higher!
+
+\textbf{Solution}: Expand your search range and try again. The optimal $\lambda$ should be in the ``middle'' of the U-shaped curve, not at the boundary.
+
+If optimal is at $\lambda = 10^{-5}$ (your minimum), try smaller values.
+\end{warningbox}
+
+%========================================================================================
+\section{Common Questions and Answers}
+%========================================================================================
+
+\textbf{Q: Why don't we include the regularization term when evaluating on validation?}
+
+A: The penalty term was a \textit{training tool} to prevent overfitting---like training wheels on a bike. When we evaluate the model's true performance, we care about prediction accuracy (how close predictions are to actual values), not how ``simple'' the model is. MSE measures prediction quality; the penalty doesn't.
+
+\textbf{Q: Should I use the same $\lambda$ search range for all problems?}
+
+A: No! The appropriate range depends on your data scale and problem. Start with a wide range (e.g., $10^{-5}$ to $10^5$), visualize the results, and narrow down. If the optimum is at an edge, expand the range.
+
+\textbf{Q: Can I tune K in K-fold CV?}
+
+A: Technically yes, but it's usually not worth it. K=5 or K=10 work well in practice. The difference is rarely significant, and tuning K with another CV creates complexity. Just pick 5 or 10 and move on.
+
+\textbf{Q: What about Elastic Net?}
+
+A: Elastic Net combines Ridge and Lasso penalties:
+\[
+\mathcal{L}_{\text{ElasticNet}} = \text{MSE} + \lambda_1 \sum|\beta_j| + \lambda_2 \sum\beta_j^2
+\]
+It gets the best of both worlds: feature selection from Lasso and stability from Ridge. But now you have \textit{two} hyperparameters to tune!
+
+\textbf{Q: How much of data science is ``art'' vs. ``science''?}
+
+A: Professor Protopapas says roughly 70\% science, 30\% art. Not everything has proofs. With hyperparameters, you develop intuition over time. Start with reasonable defaults, use cross-validation, and accept that ``good enough'' is often the goal. You can't search infinite parameter spaces.
+
+%========================================================================================
+\section{Quick Reference Summary}
+%========================================================================================
+
+\begin{tcolorbox}[title=Lecture 07 Quick Reference Card, colback=white]
+
+\begin{tcolorbox}[colback=lightblue, title=\textbf{1. Error Decomposition}]
+\[
+\text{Total Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Error}
+\]
+\begin{itemize}
+    \item High Bias = Underfitting (too simple)
+    \item High Variance = Overfitting (too complex)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightgreen, title=\textbf{2. Overfitting Diagnosis}]
+Overfitting $\Rightarrow$ Large, unstable coefficients
+
+Solution: Penalize large coefficients!
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightyellow, title=\textbf{3. Regularization Formula}]
+\[
+\mathcal{L} = \text{MSE} + \lambda \cdot \text{Penalty}
+\]
+\begin{itemize}
+    \item Ridge (L2): Penalty $= \sum \beta_j^2$ (shrinks toward zero)
+    \item Lasso (L1): Penalty $= \sum |\beta_j|$ (can make zeros)
+\end{itemize}
+Don't regularize $\beta_0$!
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpurple, title=\textbf{4. Finding $\lambda^*$}]
+\begin{enumerate}
+    \item Choose range: $\{10^{-5}, \ldots, 10^2\}$
+    \item For each $\lambda$: train, compute validation MSE (no penalty!)
+    \item Choose $\lambda^*$ with minimum validation MSE
+    \item Refit on train+validation with $\lambda^*$
+    \item Report on test (once!)
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpink, title=\textbf{5. Ridge vs. Lasso}]
+\begin{itemize}
+    \item Ridge: Fast, keeps all predictors, good for multicollinearity
+    \item Lasso: Feature selection, sparse models, slower
+    \item When unsure: Try both, compare with CV
+\end{itemize}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+%========================================================================================
+\section{Looking Ahead}
+%========================================================================================
+
+With regularization in our toolkit, we now have powerful techniques to:
+\begin{itemize}
+    \item Prevent overfitting without reducing model complexity
+    \item Automatically select important features (Lasso)
+    \item Handle multicollinearity (Ridge)
+\end{itemize}
+
+In upcoming lectures, we'll move beyond regression to \textbf{classification} problems, where we predict categories rather than continuous values. Many of the same principles---bias-variance tradeoff, regularization, cross-validation---will apply!
+
+\end{document}

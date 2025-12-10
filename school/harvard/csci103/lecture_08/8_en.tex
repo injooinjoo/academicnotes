@@ -1,0 +1,1380 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Reproducible Data Science and Machine Learning
+% Lecture 08: Reproducible Machine Learning
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Data Science}}
+\fancyhead[R]{\small\textit{Lecture 08}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Reproducible Machine Learning - Lecture 08},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Info Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 08: Reproducible Machine Learning}
+\author{CSCI E-103: Reproducible Data Science and Machine Learning}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Reproducible Data Science}{Lecture 08}{Anindita Mahapatra \& Eric Gieseke}{Understand how to achieve reproducibility in ML projects through MLOps culture and MLflow tools}
+
+\tableofcontents
+
+\newpage
+
+%===================================================================================
+\section{The Core Problem: Why Is ML Reproducibility So Hard?}
+%===================================================================================
+
+\begin{overviewbox}
+This lecture addresses a fundamental challenge in machine learning: \textbf{Reproducibility}---the ability to recreate the exact same model and results given the same data and code. While this sounds simple, it's extraordinarily difficult in practice.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item The ``Hidden Technical Debt'' in ML systems
+    \item ML lifecycle and the roles of Data Engineer, Data Scientist, and ML Engineer
+    \item Feature Engineering and Feature Stores
+    \item ML Pipelines: Transformers vs. Estimators
+    \item Model Drift and its four types
+    \item MLOps culture and MLflow as the solution
+\end{itemize}
+\end{overviewbox}
+
+\subsection{The Iceberg Metaphor: Hidden Technical Debt}
+
+One of the most important insights in ML engineering comes from Google's famous paper on ``Hidden Technical Debt in Machine Learning Systems.'' The key revelation is:
+
+\begin{warningbox}[title={The Misconception vs. Reality}]
+\textbf{Common Misconception:}
+``Machine Learning is about writing sophisticated algorithms and model code.''
+
+\textbf{Reality:}
+The actual ML code is just a \textbf{tiny fraction} of a real-world ML system. It's like the tip of an iceberg---what you see above water is tiny compared to the massive infrastructure lurking beneath.
+
+\vspace{0.5em}
+\textbf{The Hidden Infrastructure (90\%+ of the system):}
+\begin{itemize}
+    \item \textbf{Data Collection}: Gathering data from multiple sources
+    \item \textbf{Data Verification}: Ensuring data quality and integrity
+    \item \textbf{Configuration}: Managing hyperparameters, feature flags, data versions
+    \item \textbf{Feature Extraction}: Engineering meaningful inputs for models
+    \item \textbf{Infrastructure}: Managing compute resources (CPU, GPU, clusters)
+    \item \textbf{Monitoring}: Tracking model performance and data drift
+    \item \textbf{Serving}: Deploying models to production systems
+\end{itemize}
+\end{warningbox}
+
+\begin{examplebox}[Analogy: Building a House]
+Think of an ML system like building a house:
+\begin{itemize}
+    \item \textbf{ML Code} = The visible part of the house (walls, roof, windows)
+    \item \textbf{Infrastructure} = Everything you don't see (foundation, plumbing, electrical, HVAC)
+\end{itemize}
+You can have a beautiful house, but if the foundation is weak or the plumbing is broken, the house is unusable. Similarly, you can have a brilliant ML algorithm, but without solid data pipelines, monitoring, and serving infrastructure, it's worthless in production.
+\end{examplebox}
+
+\textbf{Why does this matter for reproducibility?}
+
+To reproduce a model, you don't just need the ML code---you need to recreate the \textbf{entire environment}: the exact data version, the library versions, the configuration settings, the feature engineering logic, and more. This is why reproducibility is so challenging.
+
+\subsection{The Fragmented Ecosystem Problem}
+
+ML projects don't use a single tool. They involve a complex mix of:
+
+\begin{itemize}
+    \item \textbf{Languages}: Python, R, SQL, Scala, Java
+    \item \textbf{Frameworks}: Scikit-learn, PyTorch, TensorFlow, XGBoost, Spark MLlib
+    \item \textbf{Deployment Environments}: Docker, Kubernetes, AWS SageMaker, Databricks
+\end{itemize}
+
+\begin{warningbox}[title={Dependency Hell}]
+``It worked on my laptop!''
+
+This is the most common phrase in ML engineering. When you manually connect different tools, you enter what's called \textbf{dependency hell}:
+\begin{itemize}
+    \item You trained a model with \texttt{pandas==1.3.0} but production has \texttt{pandas==1.5.0}
+    \item Your colleague uses \texttt{numpy==1.21} while you have \texttt{numpy==1.23}
+    \item The server has Python 3.8 but you developed on Python 3.10
+\end{itemize}
+Even tiny version differences can cause different results or outright failures.
+\end{warningbox}
+
+\subsection{Models Are Living Assets}
+
+Perhaps the most counterintuitive aspect of ML: \textbf{models are not static artifacts}. They're ``living'' assets that degrade over time.
+
+\begin{definitionbox}[Model Drift]
+\textbf{Model Drift} is the phenomenon where a deployed model's performance degrades over time because the real-world data patterns have changed since the model was trained.
+
+Think of it like a driver's license: passing the driving test (training) doesn't mean you can handle every situation on real roads (production), especially when traffic laws change or new types of intersections appear.
+\end{definitionbox}
+
+This means that even if you perfectly reproduce a 6-month-old model, it might be \textbf{useless} because the world has changed. What truly matters is:
+\begin{enumerate}
+    \item \textbf{Tracking} exactly how that model was built (so you can understand what worked)
+    \item Having an \textbf{automated pipeline} to quickly retrain on fresh data
+\end{enumerate}
+
+This is precisely what MLOps and MLflow solve.
+
+\newpage
+
+%===================================================================================
+\section{The ML Lifecycle and Key Roles}
+%===================================================================================
+
+\subsection{The Six Stages of an ML Project}
+
+Every ML project follows a cyclical pattern, not a linear one. Understanding this lifecycle is crucial.
+
+\begin{infobox}[title={The ML Project Lifecycle}]
+\textbf{Forward Process:}
+\begin{enumerate}
+    \item \textbf{Raw Data} $\rightarrow$ Collect data from various sources
+    \item \textbf{ETL (Cleanse)} $\rightarrow$ Extract, Transform, Load---clean and prepare data
+    \item \textbf{Featurize} $\rightarrow$ Create meaningful features for the model
+    \item \textbf{Train} $\rightarrow$ Train the model (the ``small'' part!)
+    \item \textbf{Serve/Inference} $\rightarrow$ Deploy and serve predictions
+    \item \textbf{Monitor} $\rightarrow$ Watch for performance degradation
+\end{enumerate}
+
+\textbf{Feedback Loop:} When monitoring detects drift $\rightarrow$ Return to step 1, 2, or 3 to retrain
+\end{infobox}
+
+\begin{examplebox}[The Feedback Loop in Action]
+\textbf{Scenario}: You built a fraud detection model in January.
+
+\textbf{May}: Monitoring shows false positive rate increased by 40\%.
+
+\textbf{Investigation}: New payment methods (Apple Pay, crypto) have emerged that your model never saw during training.
+
+\textbf{Action}:
+\begin{itemize}
+    \item Go back to \textbf{Featurize}: Add features for new payment types
+    \item \textbf{Train}: Retrain on 6 months of new data
+    \item \textbf{Deploy}: Push the updated model to production
+\end{itemize}
+
+This is why ML is a \textbf{continuous cycle}, not a one-time project.
+\end{examplebox}
+
+\subsection{The Three Key Personas}
+
+The ML lifecycle requires collaboration between three specialized roles:
+
+\begin{table}[htbp]
+\centering
+\caption{The Three Pillars of ML Projects}
+\label{tab:roles}
+\begin{tabular}{@{}p{0.15\textwidth}p{0.25\textwidth}p{0.25\textwidth}p{0.25\textwidth}@{}}
+\toprule
+\textbf{Aspect} & \textbf{Data Engineer (DE)} & \textbf{Data Scientist (DS)} & \textbf{ML Engineer (MLE)} \\
+\midrule
+\textbf{Primary Mission}
+& Build data infrastructure
+& Extract insights \& build models
+& Productionize \& operate models
+\\ \addlinespace
+
+\textbf{Key Tasks}
+& \begin{tabular}[t]{@{}l@{}}
+  - Data ingestion \\
+  - Data storage \\
+  - ETL pipelines \\
+  - Data curation
+  \end{tabular}
+& \begin{tabular}[t]{@{}l@{}}
+  - Feature engineering \\
+  - Model development \\
+  - Training \& tuning \\
+  - Validation
+  \end{tabular}
+& \begin{tabular}[t]{@{}l@{}}
+  - Model evaluation \\
+  - Packaging \\
+  - Deployment \& serving \\
+  - MLOps pipelines
+  \end{tabular}
+\\ \addlinespace
+
+\textbf{Analogy}
+& Raw material supplier \& factory builder
+& Prototype developer
+& Mass production line operator
+\\ \addlinespace
+
+\textbf{Where in Medallion}
+& Bronze $\rightarrow$ Silver
+& Silver $\rightarrow$ Gold
+& Gold $\rightarrow$ Production
+\\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}[title={The Silo Problem}]
+Traditionally, these three roles work in \textbf{silos} (separate teams with poor communication):
+
+\begin{enumerate}
+    \item DS builds a model in Jupyter Notebook $\rightarrow$ Hands off code to MLE
+    \item MLE rewrites the code for production (Docker, APIs) $\rightarrow$ Different environment!
+    \item Versions get confused, environments differ, results can't be reproduced
+    \item Deployment takes \textbf{weeks or months} instead of hours
+\end{enumerate}
+
+\textbf{MLOps} and \textbf{MLflow} break down these silos by standardizing how models are tracked, packaged, and deployed.
+\end{warningbox}
+
+\newpage
+
+%===================================================================================
+\section{Feature Engineering and Feature Stores}
+%===================================================================================
+
+\subsection{What is Feature Engineering?}
+
+\begin{definitionbox}[Feature Engineering]
+\textbf{Feature Engineering} is the process of using domain knowledge to transform raw data into meaningful inputs (features) that help ML algorithms learn more effectively.
+
+\textbf{Andrew Ng's famous quote:}
+``Applied machine learning is basically feature engineering.''
+
+This means that the quality of your features often matters more than the sophistication of your algorithm. Good features can make a simple model outperform a complex one with poor features.
+\end{definitionbox}
+
+\begin{examplebox}[From Raw Data to Features]
+\textbf{Raw Transaction Data:}
+\begin{itemize}
+    \item Customer ID, Product Name, Purchase DateTime, Amount
+\end{itemize}
+
+\textbf{Engineered Features:}
+\begin{itemize}
+    \item \texttt{avg\_transaction\_amount}: Average purchase amount per customer (aggregation)
+    \item \texttt{purchase\_frequency\_7d}: Number of purchases in last 7 days (time-window aggregation)
+    \item \texttt{is\_weekend}: Whether purchase was on weekend (transformation)
+    \item \texttt{weather\_on\_purchase}: Weather conditions at purchase time (external data enrichment)
+    \item \texttt{customer\_lifetime\_value}: Predicted total revenue from customer (complex aggregation)
+\end{itemize}
+
+The model learns much more from \texttt{purchase\_frequency\_7d} than from raw timestamps. This is the power of feature engineering.
+\end{examplebox}
+
+\subsection{Why Feature Engineering is Expensive}
+
+Creating good features often requires:
+\begin{itemize}
+    \item \textbf{Domain expertise}: Understanding what matters in your business
+    \item \textbf{Significant computation}: ``7-day rolling average'' requires scanning millions of records
+    \item \textbf{Time-consuming iteration}: Testing which features actually help
+\end{itemize}
+
+\subsection{The Training-Serving Skew Problem}
+
+Here's where reproducibility becomes critical:
+
+\begin{warningbox}[title={Training-Serving Skew}]
+\textbf{Symptom:} ``My model had 99\% accuracy in training, but only 60\% in production!''
+
+\textbf{Cause:} Features were computed \textbf{differently} during training vs. serving:
+
+\textbf{During Training (Offline):}
+\begin{lstlisting}[style=sqlstyle]
+-- Batch computation, can be slow
+SELECT AVG(purchase_amount) as avg_purchase
+FROM transactions
+WHERE customer_id = ?
+GROUP BY customer_id
+\end{lstlisting}
+
+\textbf{During Serving (Online):}
+\begin{lstlisting}[style=pythonstyle]
+# Real-time computation, must be fast
+avg_purchase = (sum_so_far + new_purchase) / (count + 1)
+\end{lstlisting}
+
+Even small differences (rounding, null handling, time zones) can cause features to be \textbf{slightly different}. These small differences compound and destroy model performance.
+\end{warningbox}
+
+\subsection{Feature Stores: The Solution}
+
+\begin{definitionbox}[Feature Store]
+A \textbf{Feature Store} is a centralized repository for storing and serving ML features. It ensures that the \textbf{exact same features} are used during both training and serving.
+
+\textbf{Key Benefits:}
+\begin{enumerate}
+    \item \textbf{Consistency}: Features computed once, used everywhere (eliminates skew)
+    \item \textbf{Reusability}: Team A's expensive ``customer profile'' feature can be reused by Team B, C, D
+    \item \textbf{Efficiency}: Avoid redundant computation of expensive features
+    \item \textbf{Governance}: Track feature lineage, ownership, and freshness
+\end{enumerate}
+\end{definitionbox}
+
+\begin{examplebox}[Feature Store in Action]
+\textbf{Without Feature Store:}
+\begin{itemize}
+    \item Team A computes ``customer\_lifetime\_value'' for their fraud model
+    \item Team B computes it again (slightly differently) for their churn model
+    \item Team C computes it yet again for their recommendation model
+    \item Result: 3x computation cost, inconsistent features, debugging nightmares
+\end{itemize}
+
+\textbf{With Feature Store:}
+\begin{itemize}
+    \item Feature team computes ``customer\_lifetime\_value'' once
+    \item Stores it in the Feature Store with documentation
+    \item Teams A, B, C all read the \textbf{exact same feature}
+    \item Training and serving both use the Feature Store as the source of truth
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+%===================================================================================
+\section{ML Pipelines: Transformers vs. Estimators}
+%===================================================================================
+
+When building ML systems, especially with frameworks like Spark ML, you'll encounter two fundamental concepts: \textbf{Transformers} and \textbf{Estimators}. Understanding the difference is crucial.
+
+\subsection{The Key Distinction: Learning vs. Not Learning}
+
+\begin{table}[htbp]
+\centering
+\caption{Transformers vs. Estimators}
+\label{tab:trans_est}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspect} & \textbf{Transformer} & \textbf{Estimator} \\
+\midrule
+\textbf{Purpose}
+& Data preprocessing/transformation
+& \textbf{Learning} from data
+\\ \addlinespace
+
+\textbf{Key Method}
+& \texttt{.transform()}
+& \texttt{.fit()}
+\\ \addlinespace
+
+\textbf{Input $\rightarrow$ Output}
+& DataFrame $\rightarrow$ DataFrame
+& DataFrame $\rightarrow$ \textbf{Model}
+\\ \addlinespace
+
+\textbf{Does it Learn?}
+& No (applies fixed rules)
+& \textbf{Yes} (learns from data)
+\\ \addlinespace
+
+\textbf{Examples}
+& \begin{tabular}[t]{@{}l@{}}
+  - StringIndexer \\
+  - OneHotEncoder \\
+  - StandardScaler \\
+  - VectorAssembler
+  \end{tabular}
+& \begin{tabular}[t]{@{}l@{}}
+  - LinearRegression \\
+  - RandomForestClassifier \\
+  - XGBoostRegressor \\
+  - KMeans
+  \end{tabular}
+\\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{examplebox}[Cooking Pipeline Analogy]
+Imagine a food assembly line:
+
+\textbf{Transformers} (Food Prep Machines):
+\begin{itemize}
+    \item \textbf{StringIndexer} = Onion peeler (string ``red'' $\rightarrow$ number 0)
+    \item \textbf{StandardScaler} = Portion measurer (normalize ingredient weights)
+    \item \textbf{VectorAssembler} = Ingredient combiner (put all prepped items together)
+\end{itemize}
+
+\textbf{Estimator} (The Chef):
+\begin{itemize}
+    \item \textbf{LinearRegression} = A chef who \textbf{learns} the perfect recipe by tasting many dishes
+    \item Input: Ingredients (DataFrame)
+    \item Output: A trained recipe (Model) that can make predictions on new ingredients
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Critical Insight: Estimators Produce Models}
+
+Here's the key insight that often confuses beginners:
+
+\begin{summarybox}
+When you call \texttt{.fit()} on an \textbf{Estimator}, the output is a \textbf{Model}.
+
+And crucially, this \textbf{Model} is itself a \textbf{Transformer}!
+
+Why? Because once trained, the model can \texttt{.transform()} new data into predictions.
+
+\textbf{Conceptual Flow:}
+\begin{enumerate}
+    \item \texttt{Estimator.fit(training\_data)} $\rightarrow$ Returns a \texttt{Model}
+    \item \texttt{Model.transform(new\_data)} $\rightarrow$ Returns predictions (DataFrame)
+\end{enumerate}
+\end{summarybox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Transformer vs. Estimator in Code}]
+from sklearn.preprocessing import StandardScaler  # Transformer
+from sklearn.linear_model import LinearRegression  # Estimator
+
+# Transformer: transform() takes data, returns transformed data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)  # fit() learns stats, transform() applies
+
+# Estimator: fit() takes data, returns a trained MODEL
+model = LinearRegression()
+model.fit(X_scaled, y_train)  # Learning happens here!
+
+# The trained model can now transform (predict) new data
+predictions = model.predict(X_test_scaled)  # Model acts like a Transformer
+\end{lstlisting}
+
+\newpage
+
+%===================================================================================
+\section{Model Drift: Why Models Degrade Over Time}
+%===================================================================================
+
+\subsection{Understanding Model Drift}
+
+\begin{definitionbox}[Model Drift]
+\textbf{Model Drift} is the degradation of model performance over time due to changes in the underlying data patterns that the model was trained on.
+
+\textbf{Key Insight:} Models are trained on historical data. When the ``future'' arrives and looks different from the ``past,'' the model struggles.
+\end{definitionbox}
+
+\begin{examplebox}[The Driver's License Analogy]
+Imagine you passed your driving test in 2010 (training data).
+
+\textbf{2020 Problems:}
+\begin{itemize}
+    \item New traffic laws you never learned
+    \item Electric vehicles with different behaviors
+    \item Roundabouts that didn't exist in your town
+    \item GPS navigation (you only knew paper maps)
+\end{itemize}
+
+Your 2010 ``model'' (driving skills) is now outdated. This is model drift---the world changed, but your model didn't.
+\end{examplebox}
+
+\subsection{The Four Types of Drift}
+
+Understanding \textbf{what} drifted helps you know \textbf{how} to fix it:
+
+\begin{table}[htbp]
+\centering
+\caption{The Four Types of Model Drift}
+\label{tab:drift}
+\begin{tabular}{@{}p{0.18\textwidth}p{0.45\textwidth}p{0.32\textwidth}@{}}
+\toprule
+\textbf{Drift Type} & \textbf{What Changed?} & \textbf{Response Strategy} \\
+\midrule
+\textbf{Feature Drift}
+& The distribution of \textbf{input features (X)} changed.
+\newline \textit{Example: A new product category appears that the model never saw.}
+& Review feature engineering.
+\newline Retrain with new data.
+\\ \addlinespace
+
+\textbf{Label Drift}
+& The distribution of \textbf{target labels (Y)} changed.
+\newline \textit{Example: Fraud rate suddenly doubles due to new attack vectors.}
+& Review label generation process.
+\newline Retrain with new data.
+\\ \addlinespace
+
+\textbf{Prediction Drift}
+& The distribution of \textbf{model predictions ($\hat{Y}$)} changed.
+\newline \textit{Example: Model suddenly predicts everything as ``not fraud.''}
+& Investigate model behavior.
+\newline Check for data pipeline issues.
+\\ \addlinespace
+
+\textbf{Concept Drift}
+& The \textbf{relationship between X and Y} fundamentally changed. \textbf{(Most severe!)}
+\newline \textit{Example: COVID-19 changed how ``weekend'' relates to ``store visits''}
+& \textbf{Simple retraining won't work!}
+\newline Need new features, new model architecture.
+\\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}[title={Concept Drift is the Most Dangerous}]
+Feature drift and label drift can often be fixed by retraining on new data.
+
+\textbf{Concept drift} means the fundamental rules of your domain have changed. The relationship that existed in your training data \textbf{no longer exists}.
+
+\textbf{COVID-19 Example:}
+\begin{itemize}
+    \item \textbf{Pre-COVID}: ``Weekend'' $\rightarrow$ ``High store traffic'' (strong positive correlation)
+    \item \textbf{During COVID}: ``Weekend'' $\rightarrow$ ``Zero store traffic'' (correlation broken)
+    \item \textbf{Post-COVID}: ``Weekend'' $\rightarrow$ ``Moderate online traffic'' (new relationship)
+\end{itemize}
+
+Your old model learned the wrong relationships. You need to completely rethink your features and possibly your entire model architecture.
+\end{warningbox}
+
+\newpage
+
+%===================================================================================
+\section{The Solution: MLOps and the Three ``Ops''}
+%===================================================================================
+
+\subsection{From DevOps to MLOps}
+
+To understand MLOps, first understand the ``Ops'' progression:
+
+\begin{infobox}[title={The Evolution of ``Ops''}]
+\begin{itemize}
+    \item \textbf{DevOps} = Development + Operations
+    \begin{itemize}
+        \item Automates building, testing, and deploying \textbf{software code}
+        \item Tools: Git, Jenkins, Docker, Kubernetes
+    \end{itemize}
+
+    \item \textbf{DataOps} = Data + Operations
+    \begin{itemize}
+        \item Automates building, testing, and deploying \textbf{data pipelines}
+        \item Tools: Airflow, dbt, Delta Live Tables
+    \end{itemize}
+
+    \item \textbf{MLOps} = Machine Learning + Operations
+    \begin{itemize}
+        \item Automates training, testing, deploying, and monitoring \textbf{ML models}
+        \item Tools: MLflow, Kubeflow, SageMaker
+    \end{itemize}
+\end{itemize}
+
+\textbf{MLOps = DataOps + ModelOps + DevOps}
+
+It's the integration of all three: data pipelines feed feature stores, which feed model training, which feeds model serving, which feeds monitoring, which triggers retraining.
+\end{infobox}
+
+\subsection{Why MLOps Matters}
+
+\begin{summarybox}[title={MLOps Goals}]
+\begin{enumerate}
+    \item \textbf{Reproducibility}: Anyone can recreate any model at any time
+    \item \textbf{Automation}: Models retrain and redeploy automatically when drift is detected
+    \item \textbf{Collaboration}: DS, DE, and MLE work from the same platform
+    \item \textbf{Governance}: Track who created what model, with what data, for what purpose
+    \item \textbf{Speed}: Deploy models in hours, not months
+\end{enumerate}
+\end{summarybox}
+
+\newpage
+
+%===================================================================================
+\section{MLflow: The Swiss Army Knife for MLOps}
+%===================================================================================
+
+\subsection{What is MLflow?}
+
+\begin{definitionbox}[MLflow]
+\textbf{MLflow} is an open-source platform for managing the entire ML lifecycle. Created by Databricks, it has become the de facto standard---even competitors use it.
+
+\textbf{Key Characteristics:}
+\begin{itemize}
+    \item \textbf{Open Source}: Free, community-backed, works anywhere
+    \item \textbf{Framework Agnostic}: Works with Scikit-learn, PyTorch, TensorFlow, XGBoost, etc.
+    \item \textbf{API First}: REST APIs, Python/R/Java clients
+    \item \textbf{Modular}: Use all components or just the ones you need
+\end{itemize}
+\end{definitionbox}
+
+\subsection{The Four Components of MLflow}
+
+MLflow provides four integrated components that solve the reproducibility crisis:
+
+\begin{table}[htbp]
+\centering
+\caption{MLflow's Four Components}
+\label{tab:mlflow}
+\begin{tabular}{@{}p{0.22\textwidth}p{0.35\textwidth}p{0.38\textwidth}@{}}
+\toprule
+\textbf{Component} & \textbf{Problem It Solves} & \textbf{What It Does} \\
+\midrule
+\textbf{1. Tracking}
+& ``What parameters did I use for that good model last week?''
+& Records all experiments: parameters, metrics, artifacts, code
+\\ \addlinespace
+
+\textbf{2. Projects}
+& ``It worked on my laptop but fails on the server''
+& Packages code + environment (dependencies) together
+\\ \addlinespace
+
+\textbf{3. Models}
+& ``How do I serve a PyTorch model in a Spark pipeline?''
+& Standard model format with multiple ``flavors'' for deployment
+\\ \addlinespace
+
+\textbf{4. Model Registry}
+& ``Which model is in production? Is v3 tested?''
+& Central hub for model versioning, staging, and promotion
+\\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Component 1: MLflow Tracking}
+
+\begin{infobox}[title={MLflow Tracking: Your Experiment Notebook}]
+\textbf{Problem:} Data scientists run hundreds of experiments, changing parameters each time. ``Which hyperparameters gave me the best result?'' becomes impossible to answer.
+
+\textbf{Solution:} Automatically log everything about every experiment.
+
+\textbf{What Gets Tracked:}
+\begin{itemize}
+    \item \textbf{Parameters}: Input hyperparameters (e.g., \texttt{learning\_rate=0.01})
+    \item \textbf{Metrics}: Output performance measures (e.g., \texttt{accuracy=0.95})
+    \item \textbf{Artifacts}: Files---the model itself, plots, feature importance graphs
+    \item \textbf{Source}: The code that ran the experiment (e.g., notebook version)
+    \item \textbf{Tags}: Custom metadata (e.g., \texttt{team=fraud-detection})
+\end{itemize}
+\end{infobox}
+
+\begin{lstlisting}[style=pythonstyle, caption={MLflow Tracking: Manual vs. AutoLog}]
+import mlflow
+
+# OPTION 1: Manual Logging (explicit control)
+with mlflow.start_run(run_name="my_experiment"):
+    # Log input parameters
+    mlflow.log_param("learning_rate", 0.01)
+    mlflow.log_param("max_depth", 5)
+
+    # Train your model (any framework)
+    model = train_my_model(...)
+
+    # Log output metrics
+    mlflow.log_metric("accuracy", 0.95)
+    mlflow.log_metric("f1_score", 0.92)
+
+    # Log artifacts (files)
+    mlflow.log_artifact("feature_importance.png")
+    mlflow.sklearn.log_model(model, "model")
+
+# OPTION 2: AutoLog (magic one-liner!)
+mlflow.autolog()  # <-- This single line logs EVERYTHING automatically
+
+# Now just train as usual - MLflow captures all params, metrics, model
+model = XGBClassifier(learning_rate=0.01, max_depth=5)
+model.fit(X_train, y_train)  # autolog captures this automatically!
+\end{lstlisting}
+
+\subsubsection{Component 2: MLflow Projects}
+
+\begin{infobox}[title={MLflow Projects: Environment Packaging}]
+\textbf{Problem:} ``It worked on my machine'' --- the eternal curse of data science.
+
+\textbf{Solution:} Package the code \textbf{and} its environment together.
+
+\textbf{How It Works:}
+Your project folder contains an \texttt{MLproject} file that specifies:
+\begin{itemize}
+    \item The entry point (e.g., \texttt{python train.py})
+    \item The environment file (e.g., \texttt{conda.yaml} or \texttt{requirements.txt})
+\end{itemize}
+
+Anyone can then run \texttt{mlflow run <project\_path>} and MLflow automatically:
+\begin{enumerate}
+    \item Creates an isolated environment with exact library versions
+    \item Runs the code in that environment
+    \item Guarantees reproducible results
+\end{enumerate}
+\end{infobox}
+
+\subsubsection{Component 3: MLflow Models}
+
+\begin{infobox}[title={MLflow Models: Universal Model Format}]
+\textbf{Problem:} DS trained with Scikit-learn, but MLE needs to serve via Spark UDF or REST API.
+
+\textbf{Solution:} Save models in a standardized format with multiple ``flavors.''
+
+\textbf{Model Flavors:}
+\begin{itemize}
+    \item \texttt{python\_function} (pyfunc): Universal wrapper---any model can be called as a Python function
+    \item \texttt{sklearn}: Native Scikit-learn format
+    \item \texttt{pytorch}: Native PyTorch format
+    \item \texttt{spark}: Ready for Spark UDF deployment
+\end{itemize}
+
+\textbf{Key Benefit:} Save a model once, deploy it anywhere. The MLE doesn't need to know if it was originally Scikit-learn or PyTorch---they just use the \texttt{pyfunc} flavor.
+\end{infobox}
+
+\subsubsection{Component 4: MLflow Model Registry}
+
+\begin{infobox}[title={MLflow Model Registry: Git for Models}]
+\textbf{Problem:} ``Which model is currently in production? Is v3 tested? Who approved v2?''
+
+\textbf{Solution:} A central repository for managing model versions and lifecycle stages.
+
+\textbf{Key Features:}
+\begin{itemize}
+    \item \textbf{Versioning}: Every registered model gets v1, v2, v3, etc.
+    \item \textbf{Stage Management}: Models transition through stages
+    \begin{itemize}
+        \item \textbf{None}: Just registered, not deployed
+        \item \textbf{Staging}: Being tested (A/B testing)
+        \item \textbf{Production}: Serving real traffic
+        \item \textbf{Archived}: Retired, kept for audit
+    \end{itemize}
+    \item \textbf{Aliases}: Human-readable names like ``champion'' or ``best\_model''
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%===================================================================================
+\section{Practical MLflow Usage}
+%===================================================================================
+
+\subsection{The Complete MLflow Workflow}
+
+Here's how all four components work together:
+
+\begin{lstlisting}[style=pythonstyle, caption={Complete MLflow Workflow}]
+import mlflow
+from sklearn.model_selection import train_test_split
+from xgboost import XGBRegressor
+
+# 1. SETUP: Configure MLflow to use Unity Catalog for model storage
+mlflow.set_registry_uri("databricks-uc")
+
+# 2. TRACKING: Start an experiment run
+mlflow.set_experiment("/my_experiments/house_price_prediction")
+
+with mlflow.start_run(run_name="xgboost_tuning_v1"):
+
+    # 3. Log parameters (inputs)
+    params = {"max_depth": 6, "learning_rate": 0.1, "n_estimators": 100}
+    mlflow.log_params(params)
+
+    # 4. Train the model
+    model = XGBRegressor(**params)
+    model.fit(X_train, y_train)
+
+    # 5. Evaluate and log metrics (outputs)
+    predictions = model.predict(X_test)
+    rmse = mean_squared_error(y_test, predictions, squared=False)
+    mlflow.log_metric("rmse", rmse)
+
+    # 6. MODELS: Log the model with signature (input/output schema)
+    signature = mlflow.models.infer_signature(X_test, predictions)
+    mlflow.xgboost.log_model(
+        model,
+        "model",
+        signature=signature,
+        input_example=X_test[:5]
+    )
+
+    # 7. Log additional artifacts
+    import matplotlib.pyplot as plt
+    # ... create feature importance plot ...
+    mlflow.log_figure(fig, "feature_importance.png")
+
+# 8. REGISTRY: Register the best model
+model_uri = f"runs:/{mlflow.active_run().info.run_id}/model"
+mlflow.register_model(model_uri, "my_catalog.my_schema.house_price_model")
+
+# 9. Load and use the registered model for predictions
+loaded_model = mlflow.pyfunc.load_model(
+    "models:/my_catalog.my_schema.house_price_model@best"  # Using alias
+)
+new_predictions = loaded_model.predict(new_data)
+\end{lstlisting}
+
+\subsection{Hyperparameter Tuning with MLflow}
+
+When doing hyperparameter tuning (with Optuna, Hyperopt, etc.), use \textbf{nested runs}:
+
+\begin{lstlisting}[style=pythonstyle, caption={Hyperparameter Tuning with Nested Runs}]
+import optuna
+
+def objective(trial):
+    # Each trial is a nested (child) run
+    with mlflow.start_run(nested=True):
+        params = {
+            "max_depth": trial.suggest_int("max_depth", 2, 10),
+            "learning_rate": trial.suggest_float("lr", 0.01, 0.3),
+        }
+        mlflow.log_params(params)
+
+        model = XGBRegressor(**params)
+        model.fit(X_train, y_train)
+        rmse = evaluate(model, X_val, y_val)
+        mlflow.log_metric("rmse", rmse)
+
+        return rmse  # Optuna minimizes this
+
+# Parent run contains all child runs
+with mlflow.start_run(run_name="hyperparameter_tuning"):
+    study = optuna.create_study(direction="minimize")
+    study.optimize(objective, n_trials=50)
+
+    # Log the best parameters
+    mlflow.log_params(study.best_params)
+    mlflow.log_metric("best_rmse", study.best_value)
+\end{lstlisting}
+
+\subsection{Important Lab Modifications}
+
+\begin{warningbox}[title={Lab Environment Modifications}]
+When running the labs in the free Databricks Community Edition:
+
+\textbf{1. Change Catalog Name:}
+Replace \texttt{main.default} with your own catalog (e.g., \texttt{cscie103\_catalog.default})
+
+\textbf{2. Use Local Trials Instead of SparkTrials:}
+\begin{lstlisting}[style=pythonstyle]
+# ORIGINAL (may fail in serverless):
+from hyperopt import SparkTrials
+trials = SparkTrials(parallelism=4)
+
+# MODIFIED (works everywhere):
+from hyperopt import Trials
+trials = Trials()  # Single-node execution
+\end{lstlisting}
+
+\textbf{3. Reduce Trial Count for Faster Testing:}
+Change \texttt{n\_trials=50} to \texttt{n\_trials=10} or \texttt{max\_evals=10}
+\end{warningbox}
+
+\newpage
+
+%===================================================================================
+\section{A/B Testing and Model Promotion}
+%===================================================================================
+
+\subsection{The Champion-Challenger Pattern}
+
+When you have a new model, you don't immediately replace the production model. Instead, you use \textbf{A/B testing}:
+
+\begin{definitionbox}[Champion-Challenger Testing]
+\begin{itemize}
+    \item \textbf{Champion}: The current production model (proven performance)
+    \item \textbf{Challenger}: The new model (potentially better, but unproven)
+\end{itemize}
+
+\textbf{Process:}
+\begin{enumerate}
+    \item Deploy challenger to \textbf{Staging}
+    \item Route 10-20\% of traffic to challenger, 80-90\% to champion
+    \item Monitor performance metrics for both
+    \item If challenger wins consistently, promote to \textbf{Production}
+    \item Move old champion to \textbf{Archived}
+\end{enumerate}
+\end{definitionbox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Model Stage Transitions in MLflow}]
+from mlflow import MlflowClient
+
+client = MlflowClient()
+
+# Register a new model version
+model_version = mlflow.register_model(model_uri, "fraud_detection_model")
+
+# Promote to Staging for A/B testing
+client.set_registered_model_alias(
+    "fraud_detection_model",
+    "challenger",
+    model_version.version
+)
+
+# After successful A/B testing, promote to Production
+client.set_registered_model_alias(
+    "fraud_detection_model",
+    "champion",  # or "production"
+    model_version.version
+)
+
+# Archive the old champion
+client.delete_registered_model_alias("fraud_detection_model", "old_champion")
+\end{lstlisting}
+
+\newpage
+
+%===================================================================================
+\section{Key Metrics and Evaluation}
+%===================================================================================
+
+\subsection{Common ML Metrics}
+
+\begin{table}[htbp]
+\centering
+\caption{Common ML Evaluation Metrics}
+\label{tab:metrics}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Task Type} & \textbf{Metric} & \textbf{When to Use} \\
+\midrule
+\multirow{4}{*}{\textbf{Regression}}
+& RMSE (Root Mean Squared Error) & General purpose, penalizes large errors \\
+& MAE (Mean Absolute Error) & When outliers should have less impact \\
+& R$^2$ (R-squared) & Explains variance in predictions \\
+& MAPE & When you need percentage error \\
+\midrule
+\multirow{5}{*}{\textbf{Classification}}
+& Accuracy & Balanced classes only! \\
+& Precision & When false positives are costly (spam detection) \\
+& Recall & When false negatives are costly (disease detection) \\
+& F1 Score & Balance of precision and recall \\
+& AUC-ROC & Overall model discrimination ability \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Confusion Matrix}
+
+For classification, the confusion matrix is essential:
+
+\begin{examplebox}[Understanding the Confusion Matrix]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+& \textbf{Predicted Positive} & \textbf{Predicted Negative} \\
+\hline
+\textbf{Actual Positive} & True Positive (TP) & False Negative (FN) \\
+\hline
+\textbf{Actual Negative} & False Positive (FP) & True Negative (TN) \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Key Insight:} Different domains care about different quadrants!
+
+\begin{itemize}
+    \item \textbf{Medical Diagnosis}: Minimize FN (don't miss cancer!)
+    \item \textbf{Spam Filter}: Minimize FP (don't delete important emails!)
+    \item \textbf{Fraud Detection}: Balance both (catch fraud but don't block legitimate users)
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+%===================================================================================
+\section{Quick Review: ML Concepts from Previous Lectures}
+%===================================================================================
+
+\subsection{Scaling Concepts Review}
+
+\begin{table}[htbp]
+\centering
+\caption{Scaling Terminology Quick Reference}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+Scale Out (Horizontal) & Add more nodes/workers to the cluster \\
+Scale Up (Vertical) & Upgrade to larger instance (more CPU/RAM) \\
+Elasticity & Ability to automatically grow/shrink resources \\
+Availability & Ability to use service at any time (uptime guarantee) \\
+Autoscale & Dynamic adjustment of node count based on load \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{ML Algorithm Categories Review}
+
+\begin{table}[htbp]
+\centering
+\caption{ML Algorithm Categories}
+\begin{tabular}{@{}llll@{}}
+\toprule
+& \textbf{Supervised} & \textbf{Unsupervised} \\
+\midrule
+\textbf{Discrete (Classification)}
+& Classification (spam/not spam)
+& Clustering (customer segments)
+\\
+\textbf{Continuous (Prediction)}
+& Regression (house prices)
+& Dimensionality Reduction (PCA)
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{BI vs. BA Review}
+
+\begin{itemize}
+    \item \textbf{Business Intelligence (BI)}: ``What happened?'' --- Descriptive, dashboards, reports
+    \item \textbf{Business Analytics (BA)}: ``Why did it happen? What will happen?'' --- Predictive, ML models
+\end{itemize}
+
+\newpage
+
+%===================================================================================
+\section{Summary: One-Page Quick Reference}
+%===================================================================================
+
+\begin{tcolorbox}[
+  title={The Problem: ML Reproducibility Crisis},
+  colframe=red!75!black, colback=red!5!white, fonttitle=\bfseries
+]
+\textbf{1. Hidden Technical Debt}: ML code is the tip of the iceberg. Data management, infrastructure, monitoring are the 90\% below water.
+\newline
+\textbf{2. Fragmented Ecosystem}: Python, R, TensorFlow, Spark---too many tools, version conflicts, ``worked on my machine'' syndrome.
+\newline
+\textbf{3. Model Drift}: Models are living assets that degrade as real-world patterns change.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={The Solution: MLOps + MLflow},
+  colframe=blue!75!black, colback=blue!5!white, fonttitle=\bfseries
+]
+\textbf{MLOps}: Culture + Practice of automating the entire ML lifecycle.
+\newline
+\textbf{MLflow}: Open-source framework implementing MLOps with 4 components.
+\end{tcolorbox}
+
+\tcbset{colframe=green!60!black, colback=green!5!white, fonttitle=\bfseries}
+
+\begin{tcolorbox}[title={MLflow Tracking (Experiment Notebook)}]
+\textbf{Purpose}: Never forget what you did.
+\newline
+\textbf{What it logs}: Parameters, metrics, artifacts, source code.
+\newline
+\textbf{Magic command}: \texttt{mlflow.autolog()} --- logs everything automatically.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={MLflow Projects (Environment Packaging)}]
+\textbf{Purpose}: ``Works on any machine.''
+\newline
+\textbf{How}: Packages code + \texttt{requirements.txt} together.
+\newline
+\textbf{Run anywhere}: \texttt{mlflow run <project>} reproduces exact environment.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={MLflow Models (Standard Format)}]
+\textbf{Purpose}: Train once, deploy anywhere.
+\newline
+\textbf{Flavors}: \texttt{pyfunc}, \texttt{sklearn}, \texttt{spark}, \texttt{pytorch}.
+\newline
+\textbf{Key benefit}: MLE doesn't care what framework DS used.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={MLflow Model Registry (Git for Models)}]
+\textbf{Purpose}: Track model versions and lifecycle.
+\newline
+\textbf{Stages}: None $\rightarrow$ Staging $\rightarrow$ Production $\rightarrow$ Archived
+\newline
+\textbf{Aliases}: Human names like ``champion'', ``best\_model''
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Key Concepts Quick Reference},
+  colframe=purple!75!black, colback=purple!5!white, fonttitle=\bfseries
+]
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Feature Store}: Central repository for features; prevents training-serving skew
+    \item \textbf{Transformer}: Applies fixed rules (\texttt{.transform()}) --- no learning
+    \item \textbf{Estimator}: Learns from data (\texttt{.fit()}) --- produces Models
+    \item \textbf{Model Drift}: Performance degradation over time (Feature, Label, Prediction, Concept)
+    \item \textbf{A/B Testing}: Champion vs. Challenger model comparison
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

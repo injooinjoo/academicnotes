@@ -1,0 +1,1050 @@
+\documentclass[11pt,a4paper]{article}
+
+% ===== Packages =====
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ===== Page Setup =====
+\geometry{margin=25mm}
+\setstretch{1.15}
+
+% ===== Colors =====
+\definecolor{harvardcrimson}{RGB}{165,28,48}
+\definecolor{accentblue}{RGB}{41,128,185}
+\definecolor{boxgray}{RGB}{245,245,245}
+\definecolor{darkgray}{RGB}{60,60,60}
+
+% ===== tcolorbox Setup =====
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{summarybox}[1][]{
+  colback=harvardcrimson!5,
+  colframe=harvardcrimson,
+  fonttitle=\bfseries,
+  title=Summary,
+  breakable,
+  #1
+}
+
+\newtcolorbox{overviewbox}[1][]{
+  colback=accentblue!5,
+  colframe=accentblue,
+  fonttitle=\bfseries,
+  title=Overview,
+  breakable,
+  #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+  colback=orange!5,
+  colframe=orange!80!black,
+  fonttitle=\bfseries,
+  title=Warning,
+  breakable,
+  #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+  colback=green!5,
+  colframe=green!60!black,
+  fonttitle=\bfseries,
+  title=Example,
+  breakable,
+  #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+  colback=purple!5,
+  colframe=purple!70!black,
+  fonttitle=\bfseries,
+  title=Definition,
+  breakable,
+  #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+  colback=red!5,
+  colframe=red!70!black,
+  fonttitle=\bfseries,
+  title=Important,
+  breakable,
+  #1
+}
+
+\newtcolorbox{infobox}[1][]{
+  colback=cyan!5,
+  colframe=cyan!60!black,
+  fonttitle=\bfseries,
+  title=Info,
+  breakable,
+  #1
+}
+
+% ===== Code Style =====
+\lstdefinestyle{pythonstyle}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{accentblue}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{harvardcrimson},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{boxgray}
+}
+
+% ===== Header/Footer =====
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{harvardcrimson}{CSCI E-89B: Introduction to NLP}}
+\fancyhead[R]{\textcolor{harvardcrimson}{Lecture 13}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ===== Document Info =====
+\newcommand{\metainfo}{
+\begin{tcolorbox}[colback=boxgray,colframe=darkgray,title=Lecture Information]
+\begin{tabular}{@{}ll}
+\textbf{Course:} & CSCI E-89B: Introduction to Natural Language Processing \\
+\textbf{Lecture:} & 13 -- Machine Translation: Theory and Practice \\
+\textbf{Institution:} & Harvard Extension School \\
+\textbf{Topics:} & Machine Translation, Seq2Seq, Attention, Transformers, BLEU Score, Hybrid Models
+\end{tabular}
+\end{tcolorbox}
+}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\textcolor{harvardcrimson}{Machine Translation: From Rules to Neural Networks}}\\[0.5em]
+{\large CSCI E-89B: Introduction to Natural Language Processing}\\[0.3em]
+{\large Lecture 13}
+\end{center}
+
+\metainfo
+
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction to Machine Translation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{overviewbox}
+This lecture provides a comprehensive exploration of \textbf{Machine Translation (MT)}---the task of automatically converting text from one language to another. We trace the evolution from rule-based systems through statistical methods to modern neural approaches, culminating in the transformer architecture that powers today's state-of-the-art translation systems.
+\end{overviewbox}
+
+\subsection{What is Machine Translation?}
+
+\begin{definitionbox}
+\textbf{Machine Translation (MT):} The use of software to translate text or speech from one natural language to another, with the goal of producing output that is:
+\begin{itemize}
+    \item Semantically accurate (preserves meaning)
+    \item Grammatically correct (follows target language rules)
+    \item Culturally appropriate (handles idioms and cultural references)
+    \item Fluent and natural (reads like human-written text)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Why is Translation Difficult?}
+
+Translation is far more complex than word-for-word substitution. Consider the challenges:
+
+\subsubsection{1. Lexical Ambiguity}
+
+\begin{examplebox}
+\textbf{The Word ``Bank'':}
+\begin{itemize}
+    \item ``I deposited money at the \underline{bank}.'' $\rightarrow$ Financial institution
+    \item ``I sat by the river \underline{bank}.'' $\rightarrow$ Edge of water
+    \item ``Don't \underline{bank} on it.'' $\rightarrow$ Rely/depend
+\end{itemize}
+
+Without context, the system cannot know which meaning to use!
+\end{examplebox}
+
+\subsubsection{2. Structural Differences}
+
+Different languages have different word orders:
+
+\begin{itemize}
+    \item \textbf{English (SVO):} ``The cat ate the fish.''
+    \item \textbf{Japanese/Korean (SOV):} ``The cat the fish ate.''
+    \item \textbf{Arabic/Welsh (VSO):} ``Ate the cat the fish.''
+\end{itemize}
+
+\begin{warningbox}
+\textbf{The Reordering Problem:}
+
+To translate ``I will go to school tomorrow'' from English to Japanese, the system needs to:
+\begin{enumerate}
+    \item Read the entire sentence
+    \item Understand the structure
+    \item Rearrange to: ``I tomorrow school to will go''
+\end{enumerate}
+
+This requires understanding the \textit{entire} sentence before producing output!
+\end{warningbox}
+
+\subsubsection{3. Idiomatic Expressions}
+
+\begin{examplebox}
+\textbf{Idioms Cannot Be Translated Literally:}
+
+\begin{tabular}{lll}
+\toprule
+\textbf{English Idiom} & \textbf{Literal Translation} & \textbf{Correct Translation} \\
+\midrule
+``It's raining cats and dogs'' & Animals falling & ``It's raining heavily'' \\
+``Break a leg'' & Fracture your bone & ``Good luck'' \\
+``Shoot the breeze'' & Fire at wind & ``Chat casually'' \\
+``Hit the nail on the head'' & Strike metal & ``Exactly right'' \\
+\bottomrule
+\end{tabular}
+\end{examplebox}
+
+\subsubsection{4. Context and Coreference}
+
+\begin{examplebox}
+\textbf{Pronoun Resolution:}
+
+``The trophy doesn't fit in the suitcase because \underline{it} is too big.''
+
+What does ``it'' refer to?
+\begin{itemize}
+    \item If ``it'' = trophy $\rightarrow$ The trophy is too large
+    \item If ``it'' = suitcase $\rightarrow$ Wait, that doesn't make sense here
+\end{itemize}
+
+Compare: ``The trophy doesn't fit in the suitcase because \underline{it} is too small.''
+\begin{itemize}
+    \item Now ``it'' = suitcase (the suitcase is too small)
+\end{itemize}
+
+Resolving this requires world knowledge and reasoning!
+\end{examplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Historical Evolution of Machine Translation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Timeline Overview}
+
+\begin{table}[h]
+\centering
+\caption{Evolution of Machine Translation Approaches}
+\begin{tabular}{@{}llp{7cm}@{}}
+\toprule
+\textbf{Era} & \textbf{Approach} & \textbf{Key Characteristics} \\
+\midrule
+1950s--1980s & Rule-Based (RBMT) & Hand-crafted rules, dictionaries, linguistic knowledge \\
+1990s--2010s & Statistical (SMT) & Learn from parallel corpora, phrase-based, n-gram models \\
+2014--Present & Neural (NMT) & End-to-end deep learning, Seq2Seq, Attention, Transformers \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Rule-Based Machine Translation (RBMT)}
+
+\begin{definitionbox}
+\textbf{RBMT:} Translation systems that use hand-crafted linguistic rules, bilingual dictionaries, and grammar specifications created by human experts.
+\end{definitionbox}
+
+\subsubsection{How RBMT Works}
+
+\begin{enumerate}
+    \item \textbf{Analysis:} Parse the source sentence to understand its grammatical structure
+    \item \textbf{Transfer:} Apply rules to convert source structure to target structure
+    \item \textbf{Generation:} Produce the output sentence following target language grammar
+\end{enumerate}
+
+\begin{examplebox}
+\textbf{RBMT Rule Example:}
+
+English to Spanish rule for adjective placement:
+\begin{verbatim}
+IF: English has [Adjective] [Noun]
+THEN: Spanish uses [Noun] [Adjective]
+
+Input:  "the red car"
+        [Det] [Adj] [Noun]
+Output: "el coche rojo"
+        [Det] [Noun] [Adj]
+\end{verbatim}
+\end{examplebox}
+
+\subsubsection{Advantages of RBMT}
+\begin{itemize}
+    \item \textbf{Precision:} Very accurate for well-defined domains (weather reports, legal documents)
+    \item \textbf{Transparency:} Easy to understand why a translation was produced
+    \item \textbf{No data required:} Works without large parallel corpora
+    \item \textbf{Consistency:} Same input always produces same output
+\end{itemize}
+
+\subsubsection{Disadvantages of RBMT}
+\begin{itemize}
+    \item \textbf{Labor-intensive:} Requires years of expert work to create rules
+    \item \textbf{Incomplete coverage:} Cannot handle exceptions not anticipated by rule writers
+    \item \textbf{Poor generalization:} Rules for one domain don't transfer to others
+    \item \textbf{Unnatural output:} Often produces grammatically correct but stilted text
+\end{itemize}
+
+\subsection{Statistical Machine Translation (SMT)}
+
+\begin{definitionbox}
+\textbf{SMT:} Translation systems that learn statistical patterns from large collections of parallel texts (texts and their human translations).
+\end{definitionbox}
+
+\subsubsection{The Noisy Channel Model}
+
+SMT is based on Bayes' theorem. To find the best translation $\hat{e}$ of foreign sentence $f$:
+
+\begin{align}
+\hat{e} = \arg\max_e P(e|f) = \arg\max_e P(f|e) \cdot P(e)
+\end{align}
+
+where:
+\begin{itemize}
+    \item $P(f|e)$ = \textbf{Translation model}: How likely is $f$ given $e$?
+    \item $P(e)$ = \textbf{Language model}: How likely is $e$ to be a valid sentence?
+\end{itemize}
+
+\begin{examplebox}
+\textbf{SMT Intuition:}
+
+To translate French ``le chat'' to English:
+
+\textbf{Translation model} says:
+\begin{itemize}
+    \item $P(\text{``le chat''} | \text{``the cat''}) = 0.8$
+    \item $P(\text{``le chat''} | \text{``cat the''}) = 0.1$
+\end{itemize}
+
+\textbf{Language model} says:
+\begin{itemize}
+    \item $P(\text{``the cat''}) = 0.01$ (common phrase)
+    \item $P(\text{``cat the''}) = 0.0001$ (ungrammatical)
+\end{itemize}
+
+Combined: ``the cat'' wins because it's both a good translation AND good English.
+\end{examplebox}
+
+\subsubsection{Phrase-Based SMT}
+
+The breakthrough came with \textbf{phrase-based models} that translate multi-word phrases as units:
+
+\begin{itemize}
+    \item ``in spite of'' $\rightarrow$ ``a pesar de'' (as one unit)
+    \item Better than word-by-word: ``in'' $\rightarrow$ ``en'', ``spite'' $\rightarrow$ ``rencor'', ``of'' $\rightarrow$ ``de''
+\end{itemize}
+
+\subsubsection{Advantages of SMT}
+\begin{itemize}
+    \item \textbf{Data-driven:} Learns from examples, no manual rules needed
+    \item \textbf{Better coverage:} Can handle diverse vocabulary
+    \item \textbf{Scalable:} More data = better translations
+\end{itemize}
+
+\subsubsection{Disadvantages of SMT}
+\begin{itemize}
+    \item \textbf{Local context only:} Phrases are translated independently, losing global coherence
+    \item \textbf{Reordering issues:} Hard to model long-distance word movement
+    \item \textbf{Complex pipelines:} Many separate components to tune
+    \item \textbf{Data hungry:} Needs millions of sentence pairs
+\end{itemize}
+
+\subsection{Neural Machine Translation (NMT)}
+
+\begin{definitionbox}
+\textbf{NMT:} Translation systems that use deep neural networks to learn a direct mapping from source to target language in an end-to-end fashion.
+\end{definitionbox}
+
+\subsubsection{Key Advantages of NMT}
+
+\begin{itemize}
+    \item \textbf{End-to-end learning:} Single model learns everything jointly
+    \item \textbf{Continuous representations:} Words/phrases are vectors, enabling generalization
+    \item \textbf{Global context:} Can consider entire sentence when translating each word
+    \item \textbf{Fluent output:} Produces more natural-sounding translations
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sequence-to-Sequence Models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Architecture Overview}
+
+The Seq2Seq model, introduced in 2014, consists of two main components:
+
+\begin{definitionbox}
+\textbf{Seq2Seq Architecture:}
+\begin{enumerate}
+    \item \textbf{Encoder:} Reads the source sentence and compresses it into a fixed-length vector (context vector)
+    \item \textbf{Decoder:} Takes the context vector and generates the target sentence word by word
+\end{enumerate}
+\end{definitionbox}
+
+\subsubsection{The Encoder}
+
+The encoder processes the input sequence one token at a time:
+
+\begin{align}
+h_t &= \text{RNN}(h_{t-1}, x_t) \\
+c &= h_T \quad \text{(final hidden state = context vector)}
+\end{align}
+
+where:
+\begin{itemize}
+    \item $x_t$ = input token at time $t$
+    \item $h_t$ = hidden state at time $t$
+    \item $c$ = context vector (summary of entire input)
+\end{itemize}
+
+\subsubsection{The Decoder}
+
+The decoder generates output tokens one at a time:
+
+\begin{align}
+s_t &= \text{RNN}(s_{t-1}, y_{t-1}, c) \\
+P(y_t | y_{<t}, x) &= \text{softmax}(W_o \cdot s_t)
+\end{align}
+
+where:
+\begin{itemize}
+    \item $s_t$ = decoder hidden state
+    \item $y_{t-1}$ = previous output token
+    \item $c$ = context vector from encoder
+\end{itemize}
+
+\subsection{The Bottleneck Problem}
+
+\begin{warningbox}
+\textbf{Critical Limitation:}
+
+The entire source sentence must be compressed into a single fixed-length vector!
+
+\textbf{Analogy:} Imagine reading a 500-page novel and summarizing it in a single sentence, then asking someone to recreate the entire novel from just that sentence.
+
+\textbf{Consequences:}
+\begin{itemize}
+    \item Information loss, especially for long sentences
+    \item Performance degrades significantly as sentence length increases
+    \item No way to ``go back'' and look at specific parts of the input
+\end{itemize}
+\end{warningbox}
+
+\begin{examplebox}
+\textbf{Empirical Evidence:}
+
+Early Seq2Seq models showed BLEU scores dropping dramatically for sentences longer than 20 words. The context vector simply couldn't capture all the necessary information.
+\end{examplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Attention Mechanism in Translation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The Core Idea}
+
+\begin{importantbox}
+\textbf{Key Insight:} Instead of compressing everything into one vector, let the decoder ``look back'' at the input at each step and focus on the most relevant parts!
+\end{importantbox}
+
+\begin{definitionbox}
+\textbf{Attention Mechanism:} A method that allows the decoder to access all encoder hidden states and compute a weighted average based on relevance to the current decoding step.
+\end{definitionbox}
+
+\subsection{How Attention Works for Translation}
+
+\subsubsection{Step 1: Compute All Encoder Hidden States}
+
+Unlike basic Seq2Seq, we keep ALL hidden states:
+\begin{align}
+H = [h_1, h_2, \ldots, h_T]
+\end{align}
+
+\subsubsection{Step 2: Compute Attention Scores}
+
+For each decoder step $t$, compute how relevant each encoder state is:
+\begin{align}
+e_{ti} = \text{score}(s_{t-1}, h_i)
+\end{align}
+
+Common scoring functions:
+\begin{itemize}
+    \item \textbf{Dot product:} $e_{ti} = s_{t-1}^T h_i$
+    \item \textbf{Bilinear:} $e_{ti} = s_{t-1}^T W h_i$
+    \item \textbf{Additive:} $e_{ti} = v^T \tanh(W_s s_{t-1} + W_h h_i)$
+\end{itemize}
+
+\subsubsection{Step 3: Convert to Probabilities}
+
+\begin{align}
+\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{j=1}^{T} \exp(e_{tj})}
+\end{align}
+
+\subsubsection{Step 4: Compute Context Vector}
+
+\begin{align}
+c_t = \sum_{i=1}^{T} \alpha_{ti} h_i
+\end{align}
+
+\subsubsection{Step 5: Generate Output}
+
+\begin{align}
+s_t &= \text{RNN}(s_{t-1}, [y_{t-1}; c_t]) \\
+P(y_t) &= \text{softmax}(W_o [s_t; c_t])
+\end{align}
+
+\subsection{Attention Visualization}
+
+\begin{examplebox}
+\textbf{English to French Translation:}
+
+Source: ``The agreement on the European Economic Area was signed in August 1992''
+
+When generating the French word ``zone'' (area), the attention mechanism assigns high weight to the English word ``Area'' and lower weights to other words.
+
+This creates an \textbf{alignment matrix} showing which source words are most relevant for each target word.
+
+\begin{center}
+\begin{tabular}{lccccc}
+ & The & agreement & ... & Area & 1992 \\
+L' & \textbf{0.9} & 0.05 & ... & 0.01 & 0.01 \\
+accord & 0.1 & \textbf{0.8} & ... & 0.02 & 0.01 \\
+... & ... & ... & ... & ... & ... \\
+zone & 0.01 & 0.05 & ... & \textbf{0.85} & 0.02 \\
+1992 & 0.01 & 0.01 & ... & 0.01 & \textbf{0.95} \\
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\subsection{Benefits of Attention}
+
+\begin{summarybox}
+\textbf{Why Attention Revolutionized Translation:}
+\begin{enumerate}
+    \item \textbf{No bottleneck:} Each decoding step has access to all encoder states
+    \item \textbf{Long sentences:} Performance doesn't degrade with length
+    \item \textbf{Alignment learning:} Model learns word correspondences automatically
+    \item \textbf{Interpretability:} Can visualize what the model focuses on
+    \item \textbf{Variable-length handling:} Works for any sequence length
+\end{enumerate}
+\end{summarybox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Transformers for Translation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{From RNN+Attention to Pure Attention}
+
+\begin{importantbox}
+The key insight of Transformers: If attention is so powerful, \textbf{do we even need the RNN?}
+
+Answer: \textbf{No!} The 2017 paper ``Attention Is All You Need'' showed that a model using \textit{only} attention mechanisms can outperform RNN-based models.
+\end{importantbox}
+
+\subsection{Advantages Over RNN-Based Models}
+
+\begin{table}[h]
+\centering
+\caption{Transformer Advantages for Translation}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Feature} & \textbf{RNN+Attention} & \textbf{Transformer} \\
+\midrule
+Parallel training & No & Yes \\
+Long-range dependencies & Difficult & Easy \\
+Training speed & Slow & Fast \\
+Gradient flow & Problematic & Stable \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Self-Attention in Translation}
+
+In transformers, \textbf{self-attention} allows each word to attend to all other words in the same sentence:
+
+\begin{examplebox}
+\textbf{Self-Attention Example:}
+
+``The animal didn't cross the street because it was too tired.''
+
+Self-attention helps the model learn that ``it'' refers to ``animal'' (not ``street'') by allowing direct connections between these words.
+\end{examplebox}
+
+\subsection{The Encoder-Decoder Structure}
+
+\begin{definitionbox}
+\textbf{Transformer for Translation:}
+\begin{itemize}
+    \item \textbf{Encoder:} 6 identical layers of (Self-Attention + Feed-Forward)
+    \item \textbf{Decoder:} 6 identical layers of (Masked Self-Attention + Encoder-Decoder Attention + Feed-Forward)
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Encoder Self-Attention}
+
+Every position in the source sentence can attend to every other position:
+\begin{itemize}
+    \item Word ``bank'' can see ``deposit'' later in the sentence
+    \item This helps disambiguate word meanings
+\end{itemize}
+
+\subsubsection{Masked Self-Attention in Decoder}
+
+During generation, we can only attend to previously generated words:
+\begin{itemize}
+    \item Prevents ``cheating'' by looking at future words
+    \item Implemented by masking future positions with $-\infty$ before softmax
+\end{itemize}
+
+\subsubsection{Encoder-Decoder Attention}
+
+Each decoder layer attends to the encoder output:
+\begin{itemize}
+    \item Query: current decoder state
+    \item Keys and Values: encoder outputs
+    \item This is analogous to traditional attention over the source
+\end{itemize}
+
+\subsection{Multi-Head Attention for Translation}
+
+Using multiple attention heads allows the model to capture different types of relationships:
+
+\begin{examplebox}
+\textbf{What Different Heads Learn:}
+\begin{itemize}
+    \item Head 1: Syntactic relationships (subject-verb agreement)
+    \item Head 2: Semantic relationships (synonyms, related concepts)
+    \item Head 3: Position-based patterns (nearby words)
+    \item Head 4: Long-range dependencies (coreference)
+\end{itemize}
+\end{examplebox}
+
+\subsection{Positional Encoding for Word Order}
+
+Since transformers process all positions simultaneously, word order must be explicitly encoded:
+
+\begin{align}
+PE_{(pos, 2i)} &= \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right) \\
+PE_{(pos, 2i+1)} &= \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)
+\end{align}
+
+\begin{infobox}
+\textbf{Why Sinusoidal Functions?}
+\begin{itemize}
+    \item Create unique encoding for each position
+    \item Allow model to learn relative positions
+    \item Generalize to longer sequences than seen during training
+\end{itemize}
+\end{infobox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Evaluating Machine Translation: BLEU Score}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The Need for Automatic Evaluation}
+
+Human evaluation is the gold standard but:
+\begin{itemize}
+    \item Expensive and time-consuming
+    \item Not scalable for rapid development
+    \item Subjective and inconsistent
+\end{itemize}
+
+\begin{definitionbox}
+\textbf{BLEU (Bilingual Evaluation Understudy):} An automatic metric that measures how similar machine translation output is to human reference translations.
+\end{definitionbox}
+
+\subsection{How BLEU Works}
+
+\subsubsection{Step 1: N-gram Precision}
+
+Count how many n-grams in the machine translation appear in the reference:
+
+\begin{align}
+p_n = \frac{\sum_{\text{n-gram} \in \text{candidate}} \text{Count}_{\text{clip}}(\text{n-gram})}{\sum_{\text{n-gram} \in \text{candidate}} \text{Count}(\text{n-gram})}
+\end{align}
+
+where $\text{Count}_{\text{clip}}$ prevents counting the same reference n-gram multiple times.
+
+\begin{examplebox}
+\textbf{Calculating Unigram Precision:}
+
+Reference: ``The cat sat on the mat''\\
+Candidate: ``The the the the''
+
+Without clipping: precision = 4/4 = 100\% (wrong!)
+
+With clipping: ``the'' appears 2 times in reference\\
+Clipped count = min(4, 2) = 2\\
+Precision = 2/4 = 50\%
+\end{examplebox}
+
+\subsubsection{Step 2: Brevity Penalty}
+
+Prevent gaming the system by outputting very short translations:
+
+\begin{align}
+BP = \begin{cases}
+1 & \text{if } c > r \\
+e^{1-r/c} & \text{if } c \leq r
+\end{cases}
+\end{align}
+
+where $c$ = candidate length, $r$ = reference length.
+
+\subsubsection{Step 3: Final BLEU Score}
+
+\begin{align}
+\boxed{\text{BLEU} = BP \cdot \exp\left(\sum_{n=1}^{N} w_n \log p_n\right)}
+\end{align}
+
+Typically $N=4$ and $w_n = 1/4$ (uniform weights).
+
+\begin{examplebox}
+\textbf{BLEU Score Interpretation:}
+
+\begin{tabular}{cl}
+\toprule
+\textbf{BLEU Score} & \textbf{Quality Level} \\
+\midrule
+$< 10$ & Almost useless \\
+$10-19$ & Hard to understand \\
+$20-29$ & Gist is clear \\
+$30-39$ & Understandable \\
+$40-49$ & Good quality \\
+$50-59$ & Very good quality \\
+$60+$ & Near human quality \\
+\bottomrule
+\end{tabular}
+
+Note: Human translators typically score 60-80 on BLEU against other humans.
+\end{examplebox}
+
+\subsection{Limitations of BLEU}
+
+\begin{warningbox}
+\textbf{BLEU Has Significant Limitations:}
+
+\begin{enumerate}
+    \item \textbf{Synonym blindness:} ``beautiful'' vs ``pretty'' are both correct but BLEU penalizes
+    \item \textbf{Word order flexibility:} Some languages allow multiple valid orderings
+    \item \textbf{Meaning ignorance:} Can't detect semantic errors
+    \item \textbf{Single reference bias:} One reference may not cover all valid translations
+\end{enumerate}
+\end{warningbox}
+
+\begin{examplebox}
+\textbf{BLEU Failure Case:}
+
+Reference: ``The quick brown fox jumps over the lazy dog.''
+
+Candidate A: ``A fast brown fox leaps over a lazy dog.'' (Semantically perfect)\\
+BLEU: \textbf{Low} (different words)
+
+Candidate B: ``The quick brown jumps fox over lazy the dog.'' (Nonsensical)\\
+BLEU: \textbf{Higher} (more matching n-grams!)
+\end{examplebox}
+
+\subsection{Alternative Metrics}
+
+\begin{itemize}
+    \item \textbf{METEOR:} Considers synonyms and stemming
+    \item \textbf{TER (Translation Edit Rate):} Number of edits needed
+    \item \textbf{COMET:} Neural metric trained on human judgments
+    \item \textbf{BERTScore:} Uses BERT embeddings for semantic similarity
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hybrid Translation Systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Why Combine Approaches?}
+
+\begin{definitionbox}
+\textbf{Hybrid MT:} Systems that combine multiple translation approaches (neural, statistical, rule-based) to leverage their respective strengths.
+\end{definitionbox}
+
+\subsubsection{Weaknesses of Pure NMT}
+
+\begin{itemize}
+    \item \textbf{Rare words:} May hallucinate translations for uncommon terms
+    \item \textbf{Domain-specific terminology:} Medical/legal terms need exact translations
+    \item \textbf{Consistency:} May translate the same term differently
+    \item \textbf{``Hallucination'':} Sometimes generates fluent but completely wrong content
+\end{itemize}
+
+\subsubsection{Strengths of Rule-Based Components}
+
+\begin{itemize}
+    \item \textbf{Precision:} Exact translation of technical terms
+    \item \textbf{Consistency:} Same term always translates the same way
+    \item \textbf{Controllability:} Can enforce specific rules
+\end{itemize}
+
+\subsection{Hybrid Architecture Examples}
+
+\begin{enumerate}
+    \item \textbf{Pre-processing:} Use rules to identify and protect special terms before NMT
+    \item \textbf{Post-processing:} Use rules to fix grammar or terminology after NMT
+    \item \textbf{Ensemble:} Combine outputs from multiple systems
+    \item \textbf{Terminology injection:} Force specific translations into NMT output
+\end{enumerate}
+
+\begin{examplebox}
+\textbf{Medical Translation Pipeline:}
+
+\begin{enumerate}
+    \item \textbf{Step 1 (Rule-based):} Identify medical terms (``myocardial infarction'')
+    \item \textbf{Step 2 (NMT):} Translate general text fluently
+    \item \textbf{Step 3 (Rule-based):} Replace medical terms with verified translations
+    \item \textbf{Step 4 (Rule-based):} Check grammar and formatting
+\end{enumerate}
+
+Result: Fluent translation with guaranteed accurate medical terminology.
+\end{examplebox}
+
+\subsection{Real-World Hybrid Systems}
+
+\begin{itemize}
+    \item \textbf{SYSTRAN:} Pioneer in hybrid MT, combines neural with rules
+    \item \textbf{Microsoft Translator:} Uses neural models with terminology databases
+    \item \textbf{DeepL:} Primarily neural but with extensive post-processing
+    \item \textbf{Google Translate:} Neural with fallbacks for rare languages
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Practical Implementation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Building a Simple Seq2Seq Model}
+
+\begin{lstlisting}[style=pythonstyle,caption={Basic Seq2Seq Encoder-Decoder}]
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Encoder
+class Encoder(keras.Model):
+    def __init__(self, vocab_size, embedding_dim, enc_units):
+        super().__init__()
+        self.embedding = layers.Embedding(vocab_size, embedding_dim)
+        self.lstm = layers.LSTM(enc_units, return_state=True)
+
+    def call(self, x):
+        x = self.embedding(x)
+        output, state_h, state_c = self.lstm(x)
+        return state_h, state_c
+
+# Decoder with Attention
+class Decoder(keras.Model):
+    def __init__(self, vocab_size, embedding_dim, dec_units):
+        super().__init__()
+        self.embedding = layers.Embedding(vocab_size, embedding_dim)
+        self.lstm = layers.LSTM(dec_units, return_sequences=True,
+                                return_state=True)
+        self.fc = layers.Dense(vocab_size)
+        self.attention = layers.Attention()
+
+    def call(self, x, encoder_output, states):
+        x = self.embedding(x)
+        context = self.attention([x, encoder_output])
+        x = tf.concat([context, x], axis=-1)
+        output, state_h, state_c = self.lstm(x, initial_state=states)
+        output = self.fc(output)
+        return output, state_h, state_c
+\end{lstlisting}
+
+\subsection{Using Pre-trained Translation Models}
+
+\begin{lstlisting}[style=pythonstyle,caption={Using Hugging Face Transformers}]
+from transformers import MarianMTModel, MarianTokenizer
+
+# Load pre-trained English to French model
+model_name = 'Helsinki-NLP/opus-mt-en-fr'
+tokenizer = MarianTokenizer.from_pretrained(model_name)
+model = MarianMTModel.from_pretrained(model_name)
+
+# Translate
+text = "Machine translation has come a long way."
+inputs = tokenizer(text, return_tensors="pt", padding=True)
+translated = model.generate(**inputs)
+output = tokenizer.decode(translated[0], skip_special_tokens=True)
+print(output)
+# "La traduction automatique a parcouru un long chemin."
+\end{lstlisting}
+
+\subsection{Computing BLEU Score}
+
+\begin{lstlisting}[style=pythonstyle,caption={BLEU Score Calculation}]
+from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
+
+# Single sentence BLEU
+reference = [['the', 'cat', 'sat', 'on', 'the', 'mat']]
+candidate = ['the', 'cat', 'is', 'on', 'the', 'mat']
+score = sentence_bleu(reference, candidate)
+print(f"Sentence BLEU: {score:.4f}")
+
+# Corpus BLEU (multiple sentences)
+references = [[['the', 'quick', 'brown', 'fox']],
+              [['jumped', 'over', 'the', 'dog']]]
+candidates = [['the', 'fast', 'brown', 'fox'],
+              ['jumped', 'over', 'a', 'dog']]
+corpus_score = corpus_bleu(references, candidates)
+print(f"Corpus BLEU: {corpus_score:.4f}")
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Current State and Future Directions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{State-of-the-Art Systems}
+
+\begin{infobox}
+\textbf{Leading Translation Systems (2024):}
+\begin{itemize}
+    \item \textbf{Google Translate:} 100+ languages, neural-based
+    \item \textbf{DeepL:} Known for quality in European languages
+    \item \textbf{Microsoft Translator:} Integrated into Office products
+    \item \textbf{GPT-4/Claude:} Large language models with translation capabilities
+\end{itemize}
+\end{infobox}
+
+\subsection{Remaining Challenges}
+
+\begin{enumerate}
+    \item \textbf{Low-resource languages:} Many languages lack training data
+    \item \textbf{Document-level translation:} Maintaining coherence across paragraphs
+    \item \textbf{Multimodal translation:} Combining text, speech, and images
+    \item \textbf{Real-time translation:} Simultaneous interpretation
+    \item \textbf{Cultural adaptation:} Beyond literal translation
+\end{enumerate}
+
+\subsection{Emerging Trends}
+
+\begin{itemize}
+    \item \textbf{Multilingual models:} Single model for many language pairs
+    \item \textbf{Zero-shot translation:} Translating between languages not seen together in training
+    \item \textbf{Large language models:} GPT-4 and similar models as general-purpose translators
+    \item \textbf{Human-in-the-loop:} Interactive translation with human feedback
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{One-Page Summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{summarybox}
+\textbf{Key Concepts from Lecture 13:}
+
+\textbf{1. Machine Translation Evolution:}
+\begin{itemize}
+    \item \textbf{RBMT} (1950s-80s): Hand-crafted rules, precise but limited
+    \item \textbf{SMT} (1990s-2010s): Statistical patterns from parallel data
+    \item \textbf{NMT} (2014-present): End-to-end neural networks
+\end{itemize}
+
+\textbf{2. Translation Challenges:}
+\begin{itemize}
+    \item Lexical ambiguity (bank = financial vs. river)
+    \item Structural differences (SVO vs. SOV word order)
+    \item Idioms (literal translation fails)
+    \item Context and coreference resolution
+\end{itemize}
+
+\textbf{3. Seq2Seq Models:}
+\begin{itemize}
+    \item Encoder $\rightarrow$ Context Vector $\rightarrow$ Decoder
+    \item Problem: Bottleneck---everything compressed into one vector
+    \item Solution: Attention mechanism
+\end{itemize}
+
+\textbf{4. Attention:}
+\begin{itemize}
+    \item Dynamic weighted sum of encoder states
+    \item Context vector: $c_t = \sum_i \alpha_{ti} h_i$
+    \item Enables handling of long sentences
+\end{itemize}
+
+\textbf{5. Transformers:}
+\begin{itemize}
+    \item ``Attention Is All You Need'' (2017)
+    \item Self-attention for parallel processing
+    \item Multi-head attention for diverse relationships
+    \item Foundation for BERT, GPT, modern NMT
+\end{itemize}
+
+\textbf{6. BLEU Score:}
+\begin{align*}
+\text{BLEU} = BP \cdot \exp\left(\sum_{n=1}^{N} w_n \log p_n\right)
+\end{align*}
+\begin{itemize}
+    \item Measures n-gram overlap with reference
+    \item Brevity penalty prevents short outputs
+    \item Limitation: ignores synonyms and meaning
+\end{itemize}
+
+\textbf{7. Hybrid Systems:}
+\begin{itemize}
+    \item Combine NMT fluency with rule-based precision
+    \item Important for domain-specific translation (medical, legal)
+\end{itemize}
+\end{summarybox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Glossary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{description}[style=nextline]
+    \item[Machine Translation (MT)] Automatic conversion of text from one language to another
+    \item[RBMT] Rule-Based Machine Translation using hand-crafted linguistic rules
+    \item[SMT] Statistical Machine Translation learning from parallel corpora
+    \item[NMT] Neural Machine Translation using deep learning
+    \item[Seq2Seq] Sequence-to-Sequence model with encoder-decoder architecture
+    \item[Encoder] Component that reads and encodes source sentence
+    \item[Decoder] Component that generates target sentence
+    \item[Context Vector] Fixed-length representation of input sequence
+    \item[Attention] Mechanism allowing decoder to focus on relevant input parts
+    \item[Transformer] Architecture using only attention, no recurrence
+    \item[Self-Attention] Attention where sequence attends to itself
+    \item[Multi-Head Attention] Multiple parallel attention operations
+    \item[BLEU Score] Automatic metric measuring translation quality
+    \item[N-gram Precision] Fraction of n-grams matching reference
+    \item[Brevity Penalty] BLEU component penalizing short translations
+    \item[Hybrid MT] Systems combining multiple translation approaches
+    \item[Parallel Corpus] Collection of texts with human translations
+    \item[Alignment] Correspondence between source and target words
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Learning Checklist}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{itemize}
+    \item[$\square$] Can explain the differences between RBMT, SMT, and NMT
+    \item[$\square$] Understand why translation is difficult (ambiguity, structure, idioms, context)
+    \item[$\square$] Can describe Seq2Seq architecture and its bottleneck problem
+    \item[$\square$] Understand how attention solves the bottleneck problem
+    \item[$\square$] Know why Transformers are better than RNN-based models
+    \item[$\square$] Can explain BLEU score calculation and its limitations
+    \item[$\square$] Understand the role of hybrid systems in specialized domains
+\end{itemize}
+
+\end{document}

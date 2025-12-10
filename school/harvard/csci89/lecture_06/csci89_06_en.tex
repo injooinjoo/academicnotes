@@ -1,0 +1,1067 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability improvements
+% Last modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: Introduction to Natural Language Processing}}
+\fancyhead[R]{\small\textit{Lecture 06}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Important Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Critical: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-89B: Introduction to NLP - Lecture 06},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Title
+%========================================================================================
+
+\title{CSCI E-89B: Introduction to Natural Language Processing\\Lecture 06: Character Embeddings and Autoencoders}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+%========================================================================================
+% Document Start
+%========================================================================================
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-89B: Introduction to Natural Language Processing}{Lecture 06}{Dmitry Kurochkin}{Understand character-level embeddings, autoencoder architectures for dimensionality reduction, and sparse/variational autoencoders}
+
+\tableofcontents
+
+%========================================================================================
+% SECTION 1: Quiz Review
+%========================================================================================
+\newpage
+\section{Quiz Review: TF-IDF and Embeddings}
+
+\begin{overviewbox}
+This lecture explores character-level embeddings as an alternative to word embeddings, then introduces autoencoders as a powerful technique for unsupervised representation learning. We cover standard autoencoders, stacked (deep) autoencoders, sparse autoencoders, and variational autoencoders.
+\end{overviewbox}
+
+\subsection{TF-IDF Computation Review}
+
+\begin{examplebox}[TF-IDF Calculation]
+\textbf{Documents}:
+\begin{itemize}
+    \item Doc 1: ``apple banana apple'' (3 terms)
+    \item Doc 2: ``banana cherry'' (2 terms)
+    \item Doc 3: ``apple cherry'' (2 terms)
+\end{itemize}
+
+\textbf{TF for ``apple'' in Doc 1}:
+\[
+\text{TF}(\text{apple}, D_1) = \frac{2}{3} \approx 0.667
+\]
+
+\textbf{IDF for ``apple''} (appears in 2 of 3 docs):
+\[
+\text{IDF}(\text{apple}) = \ln\left(\frac{3}{2}\right) \approx 0.405
+\]
+
+\textbf{TF-IDF}:
+\[
+\text{TF-IDF} = 0.667 \times 0.405 \approx 0.270
+\]
+\end{examplebox}
+
+\begin{infobox}[title=Logarithm Base Doesn't Matter]
+Whether using $\ln$ (natural log) or $\log_{10}$:
+\[
+\log_{10}(x) = \frac{\ln(x)}{\ln(10)} \approx 0.434 \times \ln(x)
+\]
+It's just a constant multiplier. After L2 normalization, results are identical!
+\end{infobox}
+
+\subsection{Static Embedding Issues}
+
+\begin{warningbox}[title=Semantic Drift]
+Static word embeddings face challenges when language evolves:
+\begin{itemize}
+    \item Words acquire new meanings over time
+    \item Slang and technical terms emerge
+    \item Cultural contexts shift
+\end{itemize}
+
+Example: ``viral'' meant only disease-related before social media.
+\end{warningbox}
+
+\subsection{Cosine Similarity Review}
+
+\begin{definitionbox}[Cosine Similarity]
+\[
+\cos(\theta) = \frac{\vec{a} \cdot \vec{b}}{\|\vec{a}\| \|\vec{b}\|} = \frac{\sum_i a_i b_i}{\sqrt{\sum_i a_i^2} \sqrt{\sum_i b_i^2}}
+\]
+
+\textbf{Interpretation}:
+\begin{itemize}
+    \item $\cos(\theta) = 1$: Identical direction (most similar)
+    \item $\cos(\theta) = 0$: Orthogonal (no similarity)
+    \item Higher cosine = smaller angle = more similar
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[Finding Most Similar Word]
+Given embeddings:
+\begin{itemize}
+    \item cat = [2, 3]
+    \item dog = [5, 7]
+    \item mouse = [1, 2]
+\end{itemize}
+
+\textbf{cat-dog similarity}: $\frac{2 \times 5 + 3 \times 7}{\sqrt{13} \times \sqrt{74}} \approx 0.9948$
+
+\textbf{cat-mouse similarity}: $\frac{2 \times 1 + 3 \times 2}{\sqrt{13} \times \sqrt{5}} \approx 0.9922$
+
+Dog is closer to cat (despite being farther in Euclidean distance!)
+\end{examplebox}
+
+%========================================================================================
+% SECTION 2: Character Embeddings
+%========================================================================================
+\newpage
+\section{Character-Level Embeddings}
+
+\subsection{Motivation}
+
+Word embeddings face limitations:
+\begin{itemize}
+    \item \textbf{Out-of-vocabulary (OOV) words}: Misspellings, new words
+    \item \textbf{Morphologically rich languages}: Turkish, Finnish (15+ word forms)
+    \item \textbf{Spell checking}: Need to recognize character-level patterns
+\end{itemize}
+
+\begin{summarybox}
+Character embeddings represent text at the character level:
+\begin{itemize}
+    \item Each character is a token
+    \item Vocabulary is tiny (26 letters + punctuation $\approx$ 40)
+    \item Naturally handles OOV, misspellings, any language
+\end{itemize}
+\end{summarybox}
+
+\subsection{Character vs Word Embeddings}
+
+\begin{center}
+\begin{tabular}{lp{5cm}p{5cm}}
+\toprule
+\textbf{Aspect} & \textbf{Word Embeddings} & \textbf{Character Embeddings} \\
+\midrule
+Vocabulary & Large (10k--100k) & Small ($\sim$40) \\
+OOV handling & Problematic & Natural \\
+Embedding dim & 100--300 & 8--20 (sufficient) \\
+Sequence length & \# words & \# characters (much longer) \\
+Training data & Moderate & More needed \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{When to Use Character Embeddings}
+
+\begin{infobox}[title=Best Applications]
+\begin{itemize}
+    \item \textbf{Spell checking/correction}: Character-level patterns matter
+    \item \textbf{Named Entity Recognition}: Recognize unseen names
+    \item \textbf{Morphologically rich languages}: Turkish, Finnish, Arabic
+    \item \textbf{Social media text}: Slang, misspellings, creative spelling
+\end{itemize}
+\end{infobox}
+
+\subsection{Implementation}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+texts = ["Hello world", "machine learning", "deep learning"]
+labels = [1, 0, 0]
+
+# Character-level tokenization
+tokenizer = Tokenizer(char_level=True)
+tokenizer.fit_on_texts(texts)
+sequences = tokenizer.texts_to_sequences(texts)
+
+# Pad sequences (add zeros to make equal length)
+padded = pad_sequences(sequences, padding='post')
+
+# Vocabulary size (characters + padding token)
+vocab_size = len(tokenizer.word_index) + 1  # ~20 characters
+
+# Build model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense
+
+model = Sequential([
+    Embedding(vocab_size, 8),  # Small embedding dim for characters
+    LSTM(32),
+    Dense(1, activation='sigmoid')
+])
+\end{lstlisting}
+
+\begin{warningbox}[title=Embedding Dimension for Characters]
+Since vocabulary is small ($\sim$40 characters), embedding dimension can be small too:
+\begin{itemize}
+    \item Word embeddings: 100--300 dimensions
+    \item Character embeddings: 8--20 dimensions
+\end{itemize}
+\end{warningbox}
+
+\subsection{Hybrid Approaches}
+
+Combine character and word embeddings:
+\begin{enumerate}
+    \item Process characters through RNN $\rightarrow$ word representation
+    \item Concatenate with standard word embedding
+    \item Use combined representation for downstream task
+\end{enumerate}
+
+\begin{infobox}[title=Benefits of Hybrid]
+\begin{itemize}
+    \item Word embedding captures semantic meaning
+    \item Character embedding handles morphology and OOV
+    \item Best of both worlds!
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+% SECTION 3: Autoencoders
+%========================================================================================
+\newpage
+\section{Autoencoders: Learning Efficient Representations}
+
+\subsection{The Compression Intuition}
+
+\begin{examplebox}[Memory and Patterns]
+Which is easier to remember?
+
+\textbf{Sequence A}: 7, 3, 9, 1, 5, 8, 2, 6, 4, 0
+
+\textbf{Sequence B}: 70, 68, 66, 64, 62, 60, 58, 56, 54, 52
+
+Sequence B has a \textbf{pattern} (subtract 2 each time). We can encode it as: ``start at 70, subtract 2''---much more efficient!
+\end{examplebox}
+
+\subsection{What is an Autoencoder?}
+
+\begin{definitionbox}[Autoencoder]
+A neural network trained to reconstruct its input through a \textbf{bottleneck}:
+\begin{itemize}
+    \item \textbf{Encoder}: Compresses input to lower-dimensional representation
+    \item \textbf{Bottleneck}: The compressed representation (encodings/codings)
+    \item \textbf{Decoder}: Reconstructs input from compressed representation
+\end{itemize}
+
+\textbf{Loss function}: Reconstruction loss $= \|x - \hat{x}\|^2$
+\end{definitionbox}
+
+\subsection{Architecture}
+
+\begin{center}
+\textbf{Autoencoder Structure}
+
+Input (784) $\rightarrow$ Encoder $\rightarrow$ \fbox{Bottleneck (30)} $\rightarrow$ Decoder $\rightarrow$ Output (784)
+\end{center}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense
+
+# Encoder
+input_img = Input(shape=(784,))
+encoded = Dense(128, activation='relu')(input_img)
+encoded = Dense(64, activation='relu')(encoded)
+encoded = Dense(30, activation='relu')(encoded)  # Bottleneck
+
+# Decoder
+decoded = Dense(64, activation='relu')(encoded)
+decoded = Dense(128, activation='relu')(decoded)
+decoded = Dense(784, activation='sigmoid')(decoded)
+
+autoencoder = Model(input_img, decoded)
+autoencoder.compile(optimizer='adam', loss='mse')
+\end{lstlisting}
+
+\subsection{Key Concepts}
+
+\begin{importantbox}[Undercomplete Autoencoder]
+When bottleneck dimension $<$ input dimension:
+\begin{itemize}
+    \item Network is forced to learn efficient representations
+    \item Similar to PCA (Principal Component Analysis) for linear activations
+    \item Captures the most important features
+\end{itemize}
+\end{importantbox}
+
+\subsubsection{Encoder and Decoder}
+
+\begin{itemize}
+    \item \textbf{Encoder}: Maps input $x$ to encoding $c$
+    \item \textbf{Decoder}: Maps encoding $c$ to reconstruction $\hat{x}$
+    \item \textbf{Encodings}: The compressed representation (bottleneck values)
+\end{itemize}
+
+\subsubsection{After Training}
+
+\begin{enumerate}
+    \item Train full autoencoder on unlabeled data
+    \item \textbf{Throw away decoder}
+    \item Use encoder to create compressed representations
+    \item Feed compressed representations to classifier (much fewer parameters!)
+\end{enumerate}
+
+\subsection{Why Autoencoders Work}
+
+\begin{infobox}[title=Dimensionality Reduction without Labels]
+Autoencoders learn to:
+\begin{itemize}
+    \item Keep important information (needed to reconstruct)
+    \item Discard noise and irrelevant details
+    \item Create clustered representations (similar inputs $\rightarrow$ similar encodings)
+\end{itemize}
+
+\textbf{Key benefit}: No labels needed! Train on millions of unlabeled images.
+\end{infobox}
+
+%========================================================================================
+% SECTION 4: Applications
+%========================================================================================
+\newpage
+\section{Autoencoder Applications}
+
+\subsection{Dimensionality Reduction for Classification}
+
+\begin{summarybox}
+\textbf{Problem}: Limited labeled data, high-dimensional input
+
+\textbf{Solution}:
+\begin{enumerate}
+    \item Train autoencoder on large unlabeled dataset
+    \item Use encoder to compress inputs (e.g., 784 $\rightarrow$ 30)
+    \item Train small classifier on compressed representations
+    \item Much fewer parameters = needs much less labeled data!
+\end{enumerate}
+\end{summarybox}
+
+\begin{examplebox}[Fashion MNIST]
+\begin{itemize}
+    \item Input: 28$\times$28 = 784 pixels
+    \item Bottleneck: 30 encodings
+    \item Result: T-shirts cluster together, shoes cluster together, etc.
+    \item After t-SNE visualization: Clear separation of classes!
+\end{itemize}
+\end{examplebox}
+
+\subsection{Denoising Autoencoders}
+
+\begin{definitionbox}[Denoising Autoencoder]
+Train to reconstruct \textbf{clean} input from \textbf{corrupted} input:
+\begin{itemize}
+    \item Input: Noisy/corrupted signal
+    \item Target output: Original clean signal
+    \item Network learns to ignore/remove noise
+\end{itemize}
+\end{definitionbox}
+
+\textbf{Applications}:
+\begin{itemize}
+    \item \textbf{Image restoration}: Remove scratches, artifacts
+    \item \textbf{Audio denoising}: Clean up recordings
+    \item \textbf{Text correction}: Fix spelling/grammar errors
+\end{itemize}
+
+\begin{lstlisting}[style=pythonstyle]
+# Add noise to training data
+noise_factor = 0.3
+x_train_noisy = x_train + noise_factor * np.random.normal(
+    size=x_train.shape
+)
+
+# Train: noisy input -> clean output
+autoencoder.fit(x_train_noisy, x_train, epochs=10)
+\end{lstlisting}
+
+\subsection{t-SNE for Visualization}
+
+\begin{definitionbox}[t-SNE]
+t-Distributed Stochastic Neighbor Embedding: Visualization technique that maps high-dimensional data to 2D while preserving local structure.
+
+\textbf{NOT for dimensionality reduction in pipelines}---only for visualization!
+\end{definitionbox}
+
+\begin{warningbox}[title=t-SNE Properties]
+\begin{itemize}
+    \item Non-deterministic (different runs give different results)
+    \item Preserves local neighborhoods
+    \item Distances between clusters may not be meaningful
+    \item Excellent for visualizing autoencoder encodings
+\end{itemize}
+\end{warningbox}
+
+%========================================================================================
+% SECTION 5: Stacked Autoencoders
+%========================================================================================
+\newpage
+\section{Stacked (Deep) Autoencoders}
+
+\subsection{The Deep Network Problem}
+
+Deep autoencoders have many layers:
+\[
+784 \rightarrow 200 \rightarrow 100 \rightarrow 30 \rightarrow 100 \rightarrow 200 \rightarrow 784
+\]
+
+\textbf{Problem}: Deep networks are hard to train:
+\begin{itemize}
+    \item Vanishing gradients
+    \item Different layers have vastly different gradient scales
+    \item Optimization landscape has stretched contours
+\end{itemize}
+
+\subsection{Layer-wise Pretraining}
+
+\begin{summarybox}
+Train one layer at a time:
+
+\textbf{Phase 1}: Train shallow autoencoder $784 \rightarrow 200 \rightarrow 784$
+
+\textbf{Phase 2}: Freeze Phase 1 weights. Train $200 \rightarrow 100 \rightarrow 200$
+
+\textbf{Phase 3}: Freeze Phases 1-2. Train $100 \rightarrow 30 \rightarrow 100$
+
+\textbf{Result}: Never train deep network from scratch!
+\end{summarybox}
+
+\begin{lstlisting}[style=pythonstyle]
+# Phase 1: Train first layer
+encoder1 = Dense(200, activation='relu')
+decoder1 = Dense(784, activation='sigmoid')
+ae1 = Model(input, decoder1(encoder1(input)))
+ae1.fit(x_train, x_train)
+
+# Phase 2: Freeze encoder1, train second layer
+encoder1.trainable = False
+encoder2 = Dense(100, activation='relu')
+decoder2 = Dense(200, activation='relu')
+# ... continue stacking
+\end{lstlisting}
+
+\begin{infobox}[title=Modern Alternative]
+Layer-wise pretraining was essential before modern techniques:
+\begin{itemize}
+    \item Adam optimizer handles scale differences better
+    \item Batch normalization stabilizes training
+    \item Skip connections (ResNet) enable very deep networks
+\end{itemize}
+
+Today: Often train deep autoencoders end-to-end.
+\end{infobox}
+
+%========================================================================================
+% SECTION 6: Sparse Autoencoders
+%========================================================================================
+\newpage
+\section{Sparse Autoencoders}
+
+\subsection{The Heterogeneous Data Problem}
+
+\begin{warningbox}[title=When Bottleneck Isn't Enough]
+For diverse datasets (digits + animals + cars):
+\begin{itemize}
+    \item 30 encodings might not capture all variation
+    \item Need more encodings (e.g., 300)
+    \item But with 300 encodings, \textbf{all} neurons activate for every input
+    \item No specialization: digits use same neurons as animals
+\end{itemize}
+\end{warningbox}
+
+\subsection{Sparsity Constraint}
+
+\begin{definitionbox}[Sparse Autoencoder]
+Add regularization to encourage only a \textbf{few} encodings to be active:
+\[
+\mathcal{L} = \|x - \hat{x}\|^2 + \lambda \sum_i |c_i|
+\]
+
+\textbf{Effect}: Most encodings are zero; only relevant ones activate.
+\end{definitionbox}
+
+\begin{examplebox}[Intuition]
+With 300 encodings and 10\% sparsity target:
+\begin{itemize}
+    \item Digits activate encodings 1--30
+    \item Animals activate encodings 31--60
+    \item Cars activate encodings 61--90
+    \item Each category has its own ``experts''
+\end{itemize}
+\end{examplebox}
+
+\subsection{L1 Activity Regularization}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.regularizers import l1
+
+# L1 regularization encourages zeros
+encoding_layer = Dense(
+    300,
+    activation='relu',
+    activity_regularizer=l1(1e-3)  # lambda = 0.001
+)
+\end{lstlisting}
+
+\subsection{KL Divergence Sparsity}
+
+More sophisticated approach: Match average activation to target sparsity.
+
+\begin{definitionbox}[KL Divergence for Sparsity]
+\[
+D_{KL}(p \| \hat{p}) = p \ln\frac{p}{\hat{p}} + (1-p) \ln\frac{1-p}{1-\hat{p}}
+\]
+
+Where:
+\begin{itemize}
+    \item $p$ = target sparsity (e.g., 0.1 = 10\% neurons active)
+    \item $\hat{p}$ = actual average activation
+\end{itemize}
+\end{definitionbox}
+
+\begin{lstlisting}[style=pythonstyle]
+import tensorflow.keras.backend as K
+
+def kl_divergence(target, actual):
+    return target * K.log(target / actual) + \
+           (1 - target) * K.log((1 - target) / (1 - actual))
+
+class KLDivergenceRegularizer:
+    def __init__(self, target=0.1, weight=0.05):
+        self.target = target
+        self.weight = weight
+
+    def __call__(self, activations):
+        mean_activations = K.mean(activations, axis=0)
+        return self.weight * K.sum(
+            kl_divergence(self.target, mean_activations)
+        )
+\end{lstlisting}
+
+\begin{infobox}[title=Why KL Divergence?]
+L1 makes encodings small but doesn't guarantee sparsity.
+
+KL divergence:
+\begin{itemize}
+    \item Explicitly targets specific sparsity level
+    \item Steeper gradient for faster convergence
+    \item More control over sparsity percentage
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+% SECTION 7: Variational Autoencoders
+%========================================================================================
+\newpage
+\section{Variational Autoencoders (VAE)}
+
+\subsection{The Structured Space Problem}
+
+\begin{warningbox}[title=Standard Autoencoder Limitation]
+In standard autoencoders, the encoding space is \textbf{unstructured}:
+\begin{itemize}
+    \item Small movements in encoding space may produce garbage
+    \item Gaps between encodings don't correspond to valid inputs
+    \item Can't smoothly interpolate between images
+    \item Can't generate new, meaningful samples
+\end{itemize}
+\end{warningbox}
+
+\subsection{VAE Key Idea}
+
+\begin{definitionbox}[Variational Autoencoder]
+During training, add \textbf{random noise} to encodings:
+\begin{enumerate}
+    \item Encoder outputs $\mu$ (mean) and $\sigma$ (std dev)
+    \item Sample encoding: $c = \mu + \sigma \cdot \epsilon$ where $\epsilon \sim \mathcal{N}(0, 1)$
+    \item Decoder reconstructs from noisy encoding
+\end{enumerate}
+
+\textbf{Result}: Encodings become probability distributions, not points!
+\end{definitionbox}
+
+\subsection{Why Noise Helps}
+
+\begin{infobox}[title=Structured Latent Space]
+Adding noise during training:
+\begin{itemize}
+    \item Forces decoder to handle nearby points
+    \item Fills gaps in encoding space with valid reconstructions
+    \item Creates smooth transitions between classes
+    \item Enables meaningful interpolation and generation
+\end{itemize}
+\end{infobox}
+
+\subsection{The Sigma Problem}
+
+If $\sigma$ is trainable, network will set $\sigma \rightarrow 0$ to minimize reconstruction loss!
+
+\textbf{Solution}: Add KL divergence to encourage $\sigma \approx 1$:
+\[
+\mathcal{L} = \|x - \hat{x}\|^2 + D_{KL}(\mathcal{N}(\mu, \sigma) \| \mathcal{N}(0, 1))
+\]
+
+The KL term simplifies to:
+\[
+D_{KL} = -\frac{1}{2}\sum_j \left(1 + \log(\sigma_j^2) - \mu_j^2 - \sigma_j^2\right)
+\]
+
+\subsection{VAE Applications}
+
+\begin{itemize}
+    \item \textbf{Image generation}: Sample from latent space
+    \item \textbf{Image editing}: Move in latent space (e.g., add smile)
+    \item \textbf{Interpolation}: Smooth transitions between images
+    \item \textbf{Anomaly detection}: Unusual inputs have high reconstruction loss
+\end{itemize}
+
+%========================================================================================
+% SECTION 8: One-Page Summary
+%========================================================================================
+\newpage
+\section{One-Page Summary}
+
+\begin{tcolorbox}[title=Character Embeddings, colback=blue!5]
+\textbf{When to use}: OOV words, spell checking, morphologically rich languages
+
+\textbf{Advantages}: Small vocabulary, handles any text
+
+\textbf{Embedding dim}: 8--20 (vs 100--300 for words)
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Autoencoder Architecture, colback=green!5]
+Input $\xrightarrow{\text{Encoder}}$ Bottleneck (Encodings) $\xrightarrow{\text{Decoder}}$ Reconstruction
+
+\textbf{Loss}: $\|x - \hat{x}\|^2$ (reconstruction loss)
+
+\textbf{Key idea}: Force network to compress through bottleneck
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Autoencoder Types, colback=purple!5]
+\begin{tabular}{ll}
+\textbf{Standard} & Bottleneck forces compression \\
+\textbf{Denoising} & Corrupt input, reconstruct clean \\
+\textbf{Sparse} & L1 or KL divergence for sparsity \\
+\textbf{Variational} & Add noise, structured latent space \\
+\end{tabular}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Sparse Autoencoder, colback=orange!5]
+\textbf{Problem}: Diverse data needs many encodings
+
+\textbf{Solution}: Regularize to activate only few encodings
+
+\textbf{L1}: $\mathcal{L} = \text{recon} + \lambda \sum |c_i|$
+
+\textbf{KL}: Match average activation to target sparsity
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=VAE Key Points, colback=yellow!5]
+\textbf{Standard AE problem}: Unstructured latent space
+
+\textbf{VAE solution}: Encode as distribution $(\mu, \sigma)$, sample with noise
+
+\textbf{KL term}: Prevents $\sigma \to 0$, encourages standard normal
+
+\textbf{Result}: Smooth, structured latent space for generation
+\end{tcolorbox}
+
+%========================================================================================
+% GLOSSARY
+%========================================================================================
+\newpage
+\section{Glossary}
+
+\begin{longtable}{p{4cm}p{11cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+
+Activity Regularization & Penalizing large activation values to encourage sparsity \\
+
+Autoencoder & Neural network trained to reconstruct input through bottleneck \\
+
+Bottleneck & Layer with fewer neurons than input, forcing compression \\
+
+Character Embedding & Dense vector representation for individual characters \\
+
+Denoising Autoencoder & AE trained to reconstruct clean input from corrupted input \\
+
+Encoder & Part of autoencoder that compresses input to encoding \\
+
+Decoder & Part of autoencoder that reconstructs from encoding \\
+
+Encodings/Codings & The compressed representation at the bottleneck \\
+
+KL Divergence & Measure of difference between two probability distributions \\
+
+Latent Space & The space of encodings/compressed representations \\
+
+Reconstruction Loss & $\|x - \hat{x}\|^2$, measures how well input is reconstructed \\
+
+Semantic Drift & Change in word meanings over time \\
+
+Sparse Autoencoder & AE with regularization encouraging few active encodings \\
+
+Stacked Autoencoder & Deep autoencoder with multiple hidden layers \\
+
+t-SNE & Visualization technique for high-dimensional data \\
+
+Undercomplete & Autoencoder where bottleneck dim $<$ input dim \\
+
+Variational AE & AE that encodes inputs as distributions, enabling generation \\
+
+\bottomrule
+\end{longtable}
+
+\end{document}

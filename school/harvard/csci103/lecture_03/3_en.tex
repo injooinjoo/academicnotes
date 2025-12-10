@@ -1,0 +1,957 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Data Engineering for Analytics
+% Lecture 03: Data Pipelines, ETL, and Streaming
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Data Engineering for Analytics}}
+\fancyhead[R]{\small\textit{Lecture 03}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, CREATE, TABLE},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Data Engineering - Lecture 03},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Data Pipelines and Streaming}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Settings
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\title{CSCI E-103: Data Engineering for Analytics\\Lecture 03: Data Pipelines, ETL, and Streaming}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Data Engineering for Analytics}{Lecture 03: Data Pipelines \& Streaming}{Anindita Mahapatra \& Eric Gieseke}{Understand data pipelines, ETL/ELT processes, batch vs streaming processing, and Lambda/Kappa architectures}
+
+\begin{summarybox}
+This lecture covers the backbone of data engineering: \textbf{data pipelines}. We explore different pipeline types (batch, streaming, ETL, ELT), dive deep into streaming concepts (triggers, checkpoints, watermarks), and compare the \textbf{Lambda Architecture} (separate batch and streaming layers) with the modern \textbf{Kappa Architecture} (unified streaming). We also examine popular streaming frameworks (Kafka, Flink, Spark Structured Streaming) and discuss real-world trade-offs in pipeline design.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Review: Key Concepts from Lecture 02}
+%========================================================================================
+
+\begin{table}[h!]
+\centering
+\caption{Data Modeling and Storage Review}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Concept} & \textbf{Key Explanation} & \textbf{Example} \\
+\midrule
+\textbf{3NF (Normalization)} & Minimize data redundancy, ensure data integrity & Separate Customer, Order, Product tables \\
+\textbf{Denormalization} & Accept redundancy for faster query performance & Store "last\_order\_date" in Customer table \\
+\textbf{ETL / ELT} & Extract $\to$ Transform $\to$ Load vs Extract $\to$ Load $\to$ Transform & Traditional DWH vs Data Lake \\
+\textbf{Star Schema} & Fact table surrounded by dimension tables (denormalized) & Sales fact + Date, Customer, Product dims \\
+\textbf{Key-Value Store} & Simplest NoSQL: key + value pairs & Amazon S3, Redis \\
+\textbf{Document Store} & Flexible JSON/XML document storage & MongoDB, CouchDB \\
+\textbf{Columnar Store} & Column-oriented for analytical workloads & Cassandra, DynamoDB \\
+\textbf{Parquet} & Binary columnar format, optimized for analytics & Hadoop/Spark ecosystem \\
+\textbf{Delta Lake} & ACID transactions on data lakes (Parquet + transaction log) & Databricks lakehouse \\
+\textbf{Metadata} & Data about data (schema, lineage, history) & Delta transaction log \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{Table Types in Data Platforms}
+%========================================================================================
+
+Before diving into pipelines, let's understand the different types of tables you'll encounter:
+
+\subsection{Permanent vs Temporary Tables}
+
+\begin{itemize}
+    \item \textbf{Permanent Tables}: Persist data durably—data survives session/cluster restarts
+    \item \textbf{Temporary Tables}: Exist only for a limited scope
+    \begin{itemize}
+        \item \textbf{Local}: Visible only within the current session
+        \item \textbf{Global}: Shared across sessions within the same cluster
+    \end{itemize}
+\end{itemize}
+
+\subsection{Views and Materialized Views}
+
+\begin{definitionbox}{View (Virtual Table)}
+A stored query definition—not the data itself. Every time you query a view, it re-executes the underlying query.
+
+\textbf{Pros}: Always current data, no storage overhead\\
+\textbf{Cons}: Slower (recomputes every time)
+\end{definitionbox}
+
+\begin{definitionbox}{Materialized View}
+A view where the query results are \textbf{cached/stored}. Results are precomputed and persisted.
+
+\textbf{Pros}: Much faster queries (no recomputation)\\
+\textbf{Cons}: Can return stale data if not refreshed; good for aggregations and BI reports
+\end{definitionbox}
+
+\subsection{Streaming Tables}
+
+\begin{definitionbox}{Streaming Table}
+A special table type for streaming pipelines that automatically updates as new data arrives. The table maintains state and incrementally processes incoming events.
+\end{definitionbox}
+
+\subsection{Managed vs External Tables}
+
+\begin{table}[h!]
+\centering
+\caption{Managed vs External Tables}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Aspect} & \textbf{Managed Table} & \textbf{External Table} \\
+\midrule
+Location & Platform-managed (warehouse path) & User-specified external path \\
+Data ownership & Platform owns data + metadata & Platform owns only metadata \\
+DROP behavior & \textbf{Deletes data + metadata} & Deletes only metadata \\
+Sharing & Less portable & More portable/shareable \\
+Risk of loss & Higher (DROP = data gone) & Lower (data remains after DROP) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{What is a Data Pipeline?}
+%========================================================================================
+
+\begin{definitionbox}{Data Pipeline}
+A data pipeline is the complete process of moving data from one point (source) to another (destination). Think of it as "plumbing" for data—the infrastructure that enables data flow through an organization.
+\end{definitionbox}
+
+Pipelines can range from simple (copy file A to location B) to complex (ingest from multiple sources, apply multiple transformations, write to multiple destinations).
+
+\subsection{ETL Pipelines: A Special Purpose}
+
+\begin{definitionbox}{ETL Pipeline}
+A specialized type of data pipeline designed to make data "analytics-ready." ETL (Extract, Transform, Load) pipelines:
+\begin{itemize}
+    \item \textbf{Extract}: Pull data from source systems
+    \item \textbf{Transform}: Clean, validate, enrich, aggregate
+    \item \textbf{Load}: Write to destination (data warehouse, data mart, ML system)
+\end{itemize}
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{ETL vs ELT}
+
+\begin{itemize}
+    \item \textbf{ETL}: Transform \textit{before} loading—traditional approach for structured data warehouses
+    \item \textbf{ELT}: Load raw data first, transform \textit{later}—modern approach for data lakes where schema may not be known upfront
+\end{itemize}
+\end{infobox}
+
+\subsection{Pipeline Lifecycle}
+
+Building a data pipeline is like building software:
+
+\begin{enumerate}
+    \item \textbf{Design}: Define sources, transformations, destinations
+    \item \textbf{Implement}: Write the pipeline code
+    \item \textbf{Test}: Validate correctness with sample data
+    \item \textbf{Deploy}: Move to production environment
+    \item \textbf{Monitor}: Track execution, detect failures, measure performance
+    \item \textbf{Iterate}: Handle changes, update, redeploy
+\end{enumerate}
+
+\subsection{Pipeline Triggers}
+
+How does a pipeline know when to run?
+
+\begin{itemize}
+    \item \textbf{File Arrival}: Triggered when new files appear in a directory
+    \item \textbf{Schedule}: Cron-based (e.g., "every day at 6 AM", "every Monday")
+    \item \textbf{Manual}: User explicitly initiates execution
+    \item \textbf{Event-Based}: Triggered by external events (API call, message queue)
+\end{itemize}
+
+\newpage
+
+%========================================================================================
+\section{Pipeline Types}
+%========================================================================================
+
+\begin{table}[h!]
+\centering
+\caption{Data Pipeline Types}
+\begin{tabularx}{\textwidth}{lXXX}
+\toprule
+\textbf{Type} & \textbf{Processing Style} & \textbf{Tools} & \textbf{Use Cases} \\
+\midrule
+\textbf{Batch} & Periodic bulk processing & Spark, AWS Glue & Daily reports, billing \\
+\textbf{Streaming} & Continuous event processing & Kafka, Flink, Kinesis & Fraud detection, IoT \\
+\textbf{ETL} & Extract $\to$ Transform $\to$ Load & Informatica, Talend, dbt & DWH loading \\
+\textbf{ELT} & Extract $\to$ Load $\to$ Transform & dbt, Snowflake & Data lake processing \\
+\textbf{Replication} & Sync data between systems & Fivetran, AWS DMS & OLTP $\to$ OLAP sync \\
+\textbf{ML Pipeline} & Data prep for ML training/inference & MLflow, Kubeflow & Model training \\
+\textbf{Orchestration} & Coordinate multiple pipelines & Airflow, Prefect & Complex workflows \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{Why Streaming?}
+%========================================================================================
+
+\begin{importantbox}{Speed}
+\textbf{"It's all about SPEED."}
+
+The goal of streaming is to transform event streams into actionable insights \textbf{faster}. When business decisions depend on real-time data, batch processing (hours/days) isn't acceptable.
+\end{importantbox}
+
+\subsection{The Speed Spectrum}
+
+Not every use case requires sub-second latency. Choose the right speed for your business needs:
+
+\begin{table}[h!]
+\centering
+\caption{Latency Requirements by Use Case}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Latency} & \textbf{Type} & \textbf{Use Cases} \\
+\midrule
+Hours to Days & \textbf{Batch} & ETL, billing, BI reports, ad-hoc analytics \\
+Minutes & \textbf{Near Real-Time} & Mobile/IoT ingestion, log aggregation, clickstream \\
+Seconds/Sub-second & \textbf{Real-Time} & Fraud detection, trading, gaming, ML inference \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{warningbox}
+\textbf{Don't Over-Engineer}
+
+Real-time processing is expensive (more compute, more complexity). Ask: "Do we \textbf{really} need this in real-time? What action will be taken with the insight?" If the answer is "generate a weekly report," batch is fine.
+\end{warningbox}
+
+\newpage
+
+%========================================================================================
+\section{Streaming Concepts}
+%========================================================================================
+
+\subsection{Core Terminology}
+
+\begin{table}[h!]
+\centering
+\caption{Essential Streaming Concepts}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Term} & \textbf{Description} \\
+\midrule
+\textbf{Source \& Sink} & Every pipeline has a source (where data comes from) and sink (where data goes) \\
+\textbf{File-Based vs Event-Based} & File-based: data lands on disk, then processed (slower). Event-based: data processed from memory/queue (faster, e.g., Kafka) \\
+\textbf{Micro-batch vs Continuous} & Micro-batch: process small chunks periodically (Spark default). Continuous: process each event immediately (Flink) \\
+\textbf{Trigger} & The interval at which micro-batches execute (e.g., every 30 seconds) \\
+\textbf{Output Modes} & How to write to sink: Append (add new rows), Complete (overwrite all), Update (modify changed rows) \\
+\textbf{Checkpoint} & \textbf{[Critical]} "Game save point"—records processing progress for fault recovery \\
+\textbf{Window} & Time interval for aggregations (e.g., "sum over last 5 minutes") \\
+\textbf{Watermark} & \textbf{[Critical]} How long to wait for late-arriving data before closing a window \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Checkpoints: The Game Save Point}
+
+\begin{definitionbox}{Checkpoint}
+A checkpoint records the exact position in the data stream that has been successfully processed. If the pipeline fails, it can restart from the checkpoint rather than reprocessing everything from the beginning.
+\end{definitionbox}
+
+\textbf{Why checkpoints matter}:
+\begin{itemize}
+    \item \textbf{Exactly-once semantics}: Ensures data isn't processed twice or dropped
+    \item \textbf{Fault tolerance}: Recover gracefully from failures
+    \item \textbf{No manual tracking}: The platform manages "what's been processed" automatically
+\end{itemize}
+
+\subsection{Watermarks: Handling Late Data}
+
+\begin{definitionbox}{Watermark}
+A watermark defines the maximum allowed lateness for data. Data arriving after the watermark threshold is considered "too late" and may be dropped or handled separately.
+\end{definitionbox}
+
+\begin{examplebox}{Watermark Analogy}
+Imagine a bus that waits 10 minutes past the scheduled departure time for late passengers. After 10 minutes, the bus leaves regardless.
+
+Similarly, a 10-minute watermark means: "Wait up to 10 minutes for late-arriving events. After that, close the aggregation window and move on."
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Watermarks Prevent OOM}
+
+Without watermarks, aggregation operations would need to keep state \textbf{forever} (in case late data arrives). Watermarks bound the state, preventing memory exhaustion.
+\end{warningbox}
+
+\newpage
+
+%========================================================================================
+\section{Lambda vs Kappa Architecture}
+%========================================================================================
+
+\begin{warningbox}
+\textbf{Terminology Alert: Lambda Architecture $\neq$ AWS Lambda}
+
+The \textbf{Lambda Architecture} discussed here is an \textbf{industry-standard architectural pattern} for data pipelines. It has nothing to do with AWS Lambda (Amazon's serverless compute service). The naming is coincidental.
+\end{warningbox}
+
+\subsection{Lambda Architecture (Old School)}
+
+Lambda Architecture was designed when streaming technology was immature. It tried to get the best of both worlds: \textbf{batch reliability} and \textbf{streaming speed}.
+
+\begin{definitionbox}{Lambda Architecture}
+A data processing architecture with \textbf{two parallel paths}:
+\begin{enumerate}
+    \item \textbf{Batch Layer}: Processes all data periodically (slow but accurate)
+    \item \textbf{Streaming Layer}: Processes real-time data (fast but approximate)
+    \item \textbf{Serving Layer}: Merges results from both layers for queries
+\end{enumerate}
+\end{definitionbox}
+
+\textbf{Pros}:
+\begin{itemize}
+    \item Balances speed and reliability
+\end{itemize}
+
+\textbf{Cons} (significant):
+\begin{itemize}
+    \item \textbf{Code duplication}: Same logic implemented twice (batch + streaming)
+    \item \textbf{Complexity}: Two pipelines to maintain
+    \item \textbf{Reconciliation nightmare}: Ensuring batch and streaming results match is extremely difficult
+\end{itemize}
+
+\subsection{Kappa Architecture (Modern)}
+
+Kappa Architecture emerged as streaming frameworks matured and could handle both real-time and batch workloads.
+
+\begin{definitionbox}{Kappa Architecture}
+A simplified architecture with \textbf{one unified streaming layer} that handles all data—whether real-time or batch.
+
+\textbf{Core idea}: "Treat everything as a stream."
+\end{definitionbox}
+
+\textbf{Pros}:
+\begin{itemize}
+    \item \textbf{Simplicity}: One codebase, one pipeline
+    \item \textbf{Scalability}: Horizontal scaling
+    \item \textbf{No reconciliation}: Results are inherently consistent
+\end{itemize}
+
+\subsection{FAQ: How Does Kappa Handle Batch?}
+
+\begin{infobox}
+\textbf{Q: If Kappa is streaming-only, how do I run daily batch jobs?}
+
+\textbf{A: Batch is just "streaming with a very long trigger interval."}
+
+Instead of \code{spark.read} (batch API), use \code{spark.readStream} (streaming API) with:
+\begin{lstlisting}[style=pythonstyle]
+.trigger(processingTime='24 hours')  # Wake up once per day
+# or
+.trigger(once=True)  # Run once, process all available data
+\end{lstlisting}
+
+The \textbf{design} is streaming (using \code{readStream}), but the \textbf{behavior} is batch-like. You still get checkpoint benefits—the platform tracks what's been processed.
+\end{infobox}
+
+\subsection{Comparison Table}
+
+\begin{table}[h!]
+\centering
+\caption{Lambda vs Kappa Architecture}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Aspect} & \textbf{Lambda} & \textbf{Kappa} \\
+\midrule
+Pipelines & Two (batch + streaming) & One (streaming only) \\
+Code duplication & Yes (same logic twice) & No \\
+Complexity & High & Low \\
+Reconciliation & Required (difficult) & Not needed \\
+Batch support & Separate batch layer & Streaming with long trigger \\
+Modern preference & Legacy & \textbf{Recommended} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{Streaming Processing Frameworks}
+%========================================================================================
+
+\begin{table}[h!]
+\centering
+\caption{Streaming Framework Comparison}
+\begin{tabularx}{\textwidth}{lXXXl}
+\toprule
+\textbf{Framework} & \textbf{Processing Model} & \textbf{Latency} & \textbf{Best For} & \textbf{Notes} \\
+\midrule
+\textbf{Kafka Streams} & Event-at-a-time & Very low (<10ms) & Kafka integration & Lightweight Java library \\
+\textbf{Apache Flink} & True streaming & Very low (ms) & Ultra-low latency, CEP & Complex stateful processing \\
+\textbf{Spark Structured Streaming} & Micro-batch (default) & Medium (100ms+) & Unified batch+stream & Spark ecosystem \\
+Apache Storm & Event-at-a-time & Very low & Legacy & Mostly obsolete \\
+Apache Samza & Event-at-a-time & Low & LinkedIn use cases & Niche \\
+KSQLDB & Continuous SQL & Low & SQL over Kafka & Easy Kafka streaming \\
+Amazon Kinesis & Managed streaming & Medium & AWS native & Serverless option \\
+Google Dataflow & Unified batch+stream & Low-Medium & GCP native & Apache Beam based \\
+Azure Stream Analytics & SQL-based streaming & Medium & Azure native & Low-code \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Framework Selection Guide}
+
+\begin{summarybox}
+\textbf{Rule of Thumb}
+
+\begin{itemize}
+    \item \textbf{Ultra-low latency + complex event processing?} $\rightarrow$ Apache Flink
+    \item \textbf{Unified batch + streaming with Spark ecosystem?} $\rightarrow$ Spark Structured Streaming
+    \item \textbf{Already using Kafka + simple processing?} $\rightarrow$ Kafka Streams or KSQLDB
+    \item \textbf{Cloud-native, serverless preferred?} $\rightarrow$ Kinesis, Dataflow, or Azure Stream Analytics
+\end{itemize}
+\end{summarybox}
+
+\subsection{File-Based vs Event-Based Streaming}
+
+\begin{itemize}
+    \item \textbf{File-Based}: Data lands on disk (S3, ADLS), then processed
+    \begin{itemize}
+        \item Slower (disk I/O)
+        \item Simpler to implement
+        \item Spark autoloader, Delta Live Tables
+    \end{itemize}
+
+    \item \textbf{Event-Based}: Data flows through message queue, processed in-memory
+    \begin{itemize}
+        \item Faster (no disk)
+        \item More complex
+        \item Kafka, Kinesis, Event Hubs
+    \end{itemize}
+\end{itemize}
+
+\newpage
+
+%========================================================================================
+\section{Spark Structured Streaming}
+%========================================================================================
+
+Spark Structured Streaming is the foundation for streaming in the Databricks/Lakehouse ecosystem.
+
+\subsection{Basic Streaming Pattern}
+
+\begin{lstlisting}[style=pythonstyle, caption={Basic Spark Streaming Pipeline}]
+# Read from stream (note: readStream, not read)
+df = spark.readStream \
+    .format("kafka") \
+    .option("kafka.bootstrap.servers", "host:9092") \
+    .option("subscribe", "topic_name") \
+    .load()
+
+# Transform the data
+transformed = df \
+    .selectExpr("CAST(value AS STRING) as json_data") \
+    .select(from_json("json_data", schema).alias("data")) \
+    .select("data.*")
+
+# Write to stream
+query = transformed.writeStream \
+    .format("delta") \
+    .option("checkpointLocation", "/path/to/checkpoint") \
+    .trigger(processingTime="30 seconds") \
+    .start("/path/to/output")
+\end{lstlisting}
+
+\subsection{Key Differences: Batch vs Streaming API}
+
+\begin{table}[h!]
+\centering
+\caption{Batch vs Streaming API}
+\begin{tabular}{ll}
+\toprule
+\textbf{Batch} & \textbf{Streaming} \\
+\midrule
+\code{spark.read} & \code{spark.readStream} \\
+\code{df.write} & \code{df.writeStream} \\
+No checkpoint needed & \textbf{Checkpoint required} \\
+Runs once, completes & Runs continuously (or triggered) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Trigger Options}
+
+\begin{lstlisting}[style=pythonstyle, caption={Trigger Options}]
+# Fixed interval micro-batch
+.trigger(processingTime="10 seconds")
+
+# Process all available data once, then stop
+.trigger(once=True)
+
+# Newer: available-now (process all, checkpoint, stop)
+.trigger(availableNow=True)
+
+# Continuous (true streaming, experimental)
+.trigger(continuous="1 second")
+\end{lstlisting}
+
+\newpage
+
+%========================================================================================
+\section{Trade-offs in Streaming Design}
+%========================================================================================
+
+\subsection{The Iterative Design Process}
+
+Streaming pipeline design is not "design once, build forever." It's an iterative process balancing requirements and costs:
+
+\begin{enumerate}
+    \item \textbf{Understand Goals}: What latency does business need? What's the SLA?
+    \item \textbf{Define Strategy}: Which framework? What trigger interval? Watermark settings?
+    \item \textbf{Estimate Resources}: How many VMs? What cluster size? Storage tier?
+    \item \textbf{Calculate Costs}: What's the monthly bill?
+    \item \textbf{Re-evaluate Trade-offs}: If too expensive, can we relax latency requirements?
+\end{enumerate}
+
+\subsection{The Three Dimensions}
+
+\begin{itemize}
+    \item \textbf{Scalability}: How much data? What TPS (transactions per second)?
+    \item \textbf{Processing}: How many transformations? Joins? Stateful operations?
+    \item \textbf{Quality}: Exactly-once semantics? Deduplication? Disaster recovery?
+\end{itemize}
+
+\subsection{Real-World Scenarios}
+
+\begin{warningbox}
+\textbf{Scenario 1: Storage Costs Higher Than Compute}
+
+\textbf{Symptom}: 70\% of costs are storage, only 30\% compute
+
+\textbf{Root Causes}:
+\begin{itemize}
+    \item \textbf{Small files problem}: Low-frequency streaming creates many tiny files. Cloud storage charges per API call (LIST, GET), so millions of small files = huge bills.
+    \item \textbf{Wrong storage tier}: Active data stored in "Cool" tier (cheap storage, \textbf{expensive access}). Should be in "Hot" tier.
+\end{itemize}
+
+\textbf{Solution}: Increase trigger interval to create larger files; keep active data in hot storage.
+\end{warningbox}
+
+\begin{examplebox}{Scenario 2: Multi-Tenancy}
+\textbf{Goal}: Process data for 100 different customers, isolated from each other.
+
+\textbf{Bad approach}: Create 100 separate clusters and jobs.\\
+\textbf{Problem}: Massive cost, low resource utilization, operational nightmare.
+
+\textbf{Good approach}: One large cluster processing all data, with \code{partitionBy("client\_id")} to physically separate data in storage. Create views per customer in the serving layer.
+\end{examplebox}
+
+\newpage
+
+%========================================================================================
+\section{Databricks Lakeflow and Jobs}
+%========================================================================================
+
+\subsection{Lakeflow Components}
+
+Databricks Lakeflow is the end-to-end data engineering platform:
+
+\begin{enumerate}
+    \item \textbf{Connect}: Connectors for data ingestion (Oracle, SQL Server, Salesforce, Workday)
+    \item \textbf{Pipelines}: Transformation logic (Medallion architecture, Delta Live Tables)
+    \item \textbf{Jobs}: Workflow orchestration (scheduling, dependencies, monitoring)
+\end{enumerate}
+
+\subsection{Jobs Features}
+
+\begin{table}[h!]
+\centering
+\caption{Databricks Jobs Capabilities}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Feature} & \textbf{Description} \\
+\midrule
+File Arrival Triggers & Start job when new files appear \\
+Conditional Tasks & If/else branching based on previous task results \\
+Job Parameters & Pass parameters to customize job execution \\
+Webhooks & Notifications to Slack, email, PagerDuty \\
+Duration Alerts & Alert if job exceeds expected runtime \\
+Task Looping & For-each construct for repeated execution \\
+Continuous Execution & Long-running streaming jobs \\
+System Tables & Audit logs of all job executions \\
+Modular Workflows & Call other jobs/workflows \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{Summary and Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Key Takeaways}
+
+\begin{enumerate}
+    \item \textbf{Data Pipelines} are the "plumbing" that moves data through an organization. ETL pipelines are specialized for analytics readiness.
+
+    \item \textbf{Pipeline Types}: Batch (periodic), Streaming (continuous), ETL/ELT, Replication, ML, Orchestration
+
+    \item \textbf{Streaming Concepts}:
+    \begin{itemize}
+        \item \textbf{Checkpoint}: "Game save point" for fault recovery
+        \item \textbf{Watermark}: How long to wait for late data
+        \item \textbf{Trigger}: When to execute micro-batches
+    \end{itemize}
+
+    \item \textbf{Lambda Architecture}: Two pipelines (batch + streaming) merged in serving layer. Complex, code duplication, reconciliation headache. \textbf{Legacy approach.}
+
+    \item \textbf{Kappa Architecture}: Single streaming pipeline handles everything. Batch = streaming with long trigger. \textbf{Modern standard.}
+
+    \item \textbf{Framework Selection}:
+    \begin{itemize}
+        \item Ultra-low latency $\rightarrow$ Flink
+        \item Unified batch+stream $\rightarrow$ Spark Structured Streaming
+        \item Kafka ecosystem $\rightarrow$ Kafka Streams or KSQLDB
+    \end{itemize}
+
+    \item \textbf{Trade-offs}: Balance latency, cost, and complexity. Not everything needs real-time processing.
+
+    \item \textbf{Batch API}: \code{spark.read} / \code{spark.write}\\
+    \textbf{Streaming API}: \code{spark.readStream} / \code{df.writeStream}
+\end{enumerate}
+\end{summarybox}
+
+\begin{warningbox}
+\textbf{The Golden Rule}
+
+\textbf{Always ask}: "Do we really need real-time?"
+
+Real-time is expensive. If the insight drives a weekly report, batch is fine. Design for business requirements, not technical elegance.
+\end{warningbox}
+
+\end{document}

@@ -1,0 +1,679 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: 재현 가능한 머신러닝}}
+\fancyhead[R]{\small\textit{Lecture 13}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-103: 재현 가능한 머신러닝 - Lecture 13},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 13}{Anindita Mahapatra & Eric Gieseke}{Lecture 13의 핵심 개념 학습}
+
+\tableofcontents
+\newpage
+
+
+% 제목 섹션
+\begin{center}
+    {\Large \textbf{Lecture 13: 데이터 이니셔티브 가치 극대화와 지속적 개선}}\\
+    \vspace{0.5em}
+    {\large (CI/CD, IaC, Observability, and Final Project)}
+\end{center}
+
+\rule{\linewidth}{0.4pt}
+
+% -----------------------------------------------------------------------------
+% 1. 개요 (Executive Summary)
+% -----------------------------------------------------------------------------
+\section*{개요 (Overview)}
+
+이번 강의는 데이터 파이프라인을 구축한 이후, 이를 **어떻게 안정적으로 운영하고 자동화하며 품질을 유지할 것인가**에 초점을 맞춥니다. 단순히 "돌아가는 코드"를 만드는 것을 넘어, 기업 환경에서 실제 가치를 창출하기 위한 엔지니어링 관행(DevOps)을 데이터 영역(DataOps/MLOps)에 적용하는 방법을 배웁니다.
+
+\begin{summarybox}[강의 핵심 목표]
+\begin{itemize}
+    \item \textbf{기말 과제(Final Project):} 팀 구성 및 역할, 발표 자료(20장 내외) 작성 요령 안내.
+    \item \textbf{SDLC (소프트웨어 개발 수명 주기):} 개발(Dev) $\rightarrow$ 스테이징(Stage) $\rightarrow$ 운영(Prod) 단계별 전략.
+    \item \textbf{인프라 자동화 (IaC):} 테라폼(Terraform) 등을 활용해 인프라를 코드로 관리하는 법.
+    \item \textbf{CI/CD & 관측성(Observability):} 자동화된 테스트/배포 파이프라인과 데이터 품질/비용 모니터링.
+    \item \textbf{Databricks Asset Bundles (DAB):} 프로젝트 자산을 패키징하여 배포하는 최신 표준.
+\end{itemize}
+\end{summarybox}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% 2. 기말 과제 (Final Project) 가이드
+% -----------------------------------------------------------------------------
+\section{기말 과제 (Final Project) 가이드}
+
+학기말 프로젝트는 "Lakehouse 아키텍처 구축"을 목표로 하며, 팀 단위로 진행됩니다. 실제 현업의 데이터 프로젝트 제안 및 구축 과정을 모사합니다.
+
+\subsection{발표 및 제출 요구사항}
+\begin{itemize}
+    \item \textbf{분량:} 슬라이드 최대 20장.
+    \item \textbf{시간:} 발표 15분 + 질의응답(Q\&A) 5분.
+    \item \textbf{일정:} 마지막 강의(12/15 예정) 시간에 팀별 발표 진행 (타임존 이슈가 있는 팀 우선 배정 가능).
+    \item \textbf{참여:} 모든 팀원이 발표에 참여해야 함 (슬라이드 넘기는 역할 포함).
+\end{itemize}
+
+\subsection{팀 구성 및 역할 (R\&R)}
+팀당 2명씩 짝을 이루어 아래의 핵심 역할을 분담하고 발표에 포함해야 합니다.
+
+\begin{table}[h!]
+    \centering
+    \caption{기말 프로젝트 팀원별 역할 정의}
+    \label{tab:team_roles}
+    \begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{l l l}
+        \toprule
+        \textbf{역할 (Role)} & \textbf{담당 업무 (Responsibilities)} & \textbf{발표 포인트} \\
+        \midrule
+        \textbf{데이터 아키텍트} & 전체 설계 및 아키텍처 & 확장성, 품질, 성능, 신뢰성, 거버넌스 전략 설명 \\
+        \textbf{데이터 엔지니어} & 데이터 파이프라인 구축 & 데이터 수집(Ingestion), 변환, 조인, 집계 과정 시연 \\
+        \textbf{ML 전문가} & 모델 개발 및 관리 & 모델 훈련, 추론(Inference), 모델 수명 주기 관리 \\
+        \textbf{데이터 분석가} & BI 대시보드 및 인사이트 & 쿼리 작성, 대시보드 시각화, 알림 설정, 비즈니스 인사이트 도출 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{alertbox}[프로젝트 필수 포함 사항]
+발표에는 반드시 **"문제 정의(Problem Statement)"**, **"팀 소개(역할별)"**, **"아키텍처 리뷰"**, **"인사이트 요약"**, 그리고 **"향후 개선 계획(Next Steps)"**이 포함되어야 합니다. 팀 이름(가상의 컨설팅 회사명 등)을 정하는 것도 잊지 마세요.
+\end{alertbox}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% 3. 소프트웨어 개발 수명 주기 (SDLC)
+% -----------------------------------------------------------------------------
+\section{데이터 프로젝트의 개발 수명 주기 (SDLC)}
+
+데이터 파이프라인을 만들 때, 로컬에서 대충 코드를 짜고 바로 운영 서버에 올리는 것은 매우 위험합니다. 안정적인 서비스를 위해 3단계 환경을 거칩니다.
+
+\begin{intuitionbox}[비유: 요리의 3단계]
+\begin{itemize}
+    \item \textbf{Dev (개발):} 집 부엌에서 혼자 새로운 레시피를 실험해보는 단계. 재료를 조금만 씀.
+    \item \textbf{Stage (스테이징):} 친구들을 불러 시식회를 하는 단계. 실제 손님상과 비슷하게 차려놓고 문제 없는지 확인.
+    \item \textbf{Prod (운영):} 실제 레스토랑에서 손님에게 돈 받고 파는 단계. 실수가 용납되지 않음.
+\end{itemize}
+\end{intuitionbox}
+
+\subsection{환경별 특징 및 전략}
+
+\begin{table}[h!]
+    \centering
+    \caption{SDLC 3단계 상세 비교}
+    \label{tab:sdlc_phases}
+    \begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{l l l l}
+        \toprule
+        \textbf{구분} & \textbf{1. 개발 (Development)} & \textbf{2. 스테이징 (Staging)} & \textbf{3. 운영 (Production)} \\
+        \midrule
+        \textbf{목표} & 비즈니스 로직 구현 및 단위 테스트 & 운영 환경 모사 및 통합 테스트 & 실제 서비스 제공 및 안정성 유지 \\
+        \textbf{데이터} & 가짜 데이터(Canned data) 또는 소량 샘플 & 운영 데이터와 유사한 대용량 데이터 & 실제 실시간/배치 데이터 전체 \\
+        \textbf{리소스} & 단일 노드 클러스터, Spot 인스턴스 (저비용) & 성능 테스트를 위한 확장된 리소스 & 고가용성 정책, 안정적인 인스턴스 \\
+        \textbf{권한} & 개발자 개인 계정(User) 사용 & 서비스 주체(Service Principal) 도입 시작 & **오직 서비스 주체(Service Principal)만 사용** \\
+        \textbf{상태} & 상호작용(Interactive) 중심 & 자동화(Automated)로 전환 & **완전 자동화 (Fully Automated)** \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\subsection{서비스 수준 계약 (SLA) 및 지표}
+운영 단계에서는 시스템이 얼마나 잘 돌아가는지 약속(SLA)하고 측정해야 합니다.
+\begin{itemize}
+    \item \textbf{가용성(Availability):} 시스템이 정상 작동하는 시간 비율. (예: 99.999\% = 연간 다운타임 5분 미만)
+    \item \textbf{재해 복구(Disaster Recovery):}
+    \begin{itemize}
+        \item \textbf{RTO (Recovery Time Objective):} 사고 후 복구까지 걸리는 시간 (얼마나 빨리 고치나?)
+        \item \textbf{RPO (Recovery Point Objective):} 데이터 백업 주기 (과거 데이터를 어디까지 잃어도 되나?)
+    \end{itemize}
+\end{itemize}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% 4. 인프라 자동화 (IaC) 및 CI/CD
+% -----------------------------------------------------------------------------
+\section{인프라 자동화(IaC)와 CI/CD}
+
+수백 개의 워크스페이스와 클러스터를 사람이 일일이 클릭해서 만들면 실수하기 쉽고 관리가 불가능합니다. 이를 코드로 관리하는 것이 **IaC(Infrastructure as Code)**입니다.
+
+\subsection{IaC: 코드로 인프라 관리하기}
+
+\begin{intuitionbox}[비유: 건물 설계도]
+웹 콘솔에서 클릭으로 서버를 만드는 건 '손으로 흙을 빚어 집을 짓는 것'과 같습니다. 똑같은 집을 또 지으려면 처음부터 다시 빚어야 합니다.
+\textbf{IaC}는 '3D 프린터 설계도'를 만드는 것입니다. 설계도(코드)만 있으면 버튼 하나로 똑같은 집을 100채든 1,000채든 완벽하게 지을 수 있습니다.
+\end{intuitionbox}
+
+\subsubsection{프로비저닝 vs 구성 관리}
+\begin{itemize}
+    \item \textbf{프로비저닝 (Provisioning):} 인프라 자체를 생성 (예: Terraform, CloudFormation). 
+    \begin{itemize}
+        \item \textit{특징:} 불변(Immutable). 변경이 필요하면 기존 것을 부수고 새로 짓는 방식을 선호.
+        \item \textit{Databricks 활용:} 워크스페이스 생성, 네트워크 설정 등 큰 틀을 잡을 때 주로 사용.
+    \end{itemize}
+    \item \textbf{구성 관리 (Config Management):} 이미 있는 인프라 내부의 소프트웨어를 관리 (예: Ansible, Puppet).
+    \begin{itemize}
+        \item \textit{특징:} 가변(Mutable). 기존 서버에 들어가서 라이브러리 버전을 업데이트하는 방식.
+    \end{itemize}
+\end{itemize}
+
+\subsection{CI/CD (지속적 통합/지속적 배포)}
+코드 변경 사항이 자동으로 테스트되고 배포되는 파이프라인입니다.
+\begin{enumerate}
+    \item \textbf{CI (통합):} 개발자가 Git에 코드를 `commit`하면 자동으로 빌드하고 유닛 테스트를 수행.
+    \item \textbf{CD (배포):} 테스트를 통과하면 스테이징/운영 환경으로 자동 배포(Deploy).
+    \item \textbf{이점:} 배포 주기가 빨라지고(분기별 $\rightarrow$ 매일), 버그를 조기에 발견.
+\end{enumerate}
+
+\subsection{데이터 메쉬(Data Mesh)와 워크스페이스}
+조직이 커지면 중앙 팀이 모든 데이터를 관리할 수 없습니다. **데이터 메쉬**는 데이터를 '제품(Product)'으로 취급하고, 도메인(마케팅, 영업 등)별로 소유권을 분산시킵니다.
+\begin{itemize}
+    \item \textbf{워크스페이스 분리:} 각 도메인/프로젝트별로 별도 워크스페이스를 할당하여 격리(Isolation) 확보.
+    \item \textbf{Unity Catalog:} 분산된 도메인 데이터를 하나로 묶어주는 중앙 거버넌스 역할.
+\end{itemize}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% 5. 관측성 (Observability) 및 데이터 품질
+% -----------------------------------------------------------------------------
+\section{관측성(Observability)과 데이터 품질 관리}
+
+시스템이 "잘 돌아가는지" 확인하는 것을 넘어, "무엇이 잘못되었고 왜 그런지"를 파악하는 능력입니다.
+
+\subsection{비용 및 사용량 모니터링 (System Tables)}
+Databricks의 `system` 카탈로그를 통해 모든 과금 및 사용 정보를 SQL로 조회할 수 있습니다.
+\begin{itemize}
+    \item \textbf{Cost Management:} 누가(어떤 태그가) 돈을 얼마나 썼는지 확인 $\rightarrow$ 예산 초과 방지.
+    \item \textbf{Audit Logs:} 누가 언제 어떤 데이터에 접근했는지 감사 추적.
+    \item \textbf{Cluster Usage:} 클러스터가 놀고 있는데 켜져 있는지(유휴 상태) 확인.
+\end{itemize}
+
+\subsection{데이터 품질 모니터링}
+데이터 팀은 보통 "데이터를 제때 주는 것(Delivery SLA)"에 집중하지만, 사용자는 "데이터가 정확한 것(Quality)"을 기대합니다. 이를 자동화해야 합니다.
+
+\begin{table}[h!]
+    \centering
+    \caption{데이터 품질 모니터링 도구 비교}
+    \label{tab:dq_tools}
+    \begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{l p{6cm} p{6cm}}
+        \toprule
+        \textbf{기능} & \textbf{설명} & \textbf{특징} \\
+        \midrule
+        \textbf{Anomaly Detection} & AI가 과거 패턴을 학습하여 이상 징후 감지. & 설정이 매우 쉽음(버튼 클릭). 신선도(Freshness)와 완전성(Completeness) 체크. \\
+        \textbf{Lakehouse Monitoring} & 테이블의 통계적 프로파일(분포, Null 비율 등) 및 드리프트(변화) 감지. & 대시보드 자동 생성. 데이터 내용의 변화(Drift)를 상세히 추적 가능. \\
+        \textbf{DQX (Data Quality X)} & 코드로 정의하는 데이터 품질 프레임워크. & 파이프라인 코드 내에서 `age > 18` 같은 구체적 규칙(Rule) 적용 가능. \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{intuitionbox}[비유: 건강 검진]
+\begin{itemize}
+    \item \textbf{Anomaly Detection:} 스마트워치가 "평소보다 심박수가 높아요"라고 알려주는 것 (자동, 패턴 기반).
+    \item \textbf{Lakehouse Monitoring:} 정기 건강검진 결과표(혈압, 콜레스테롤 수치 등)를 받아보는 것 (상세 통계).
+    \item \textbf{DQX:} 의사가 "술은 주 1회 이하로"라고 처방을 내리고 지키는지 체크하는 것 (명시적 규칙).
+\end{itemize}
+\end{intuitionbox}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% 6. Databricks Asset Bundles (DAB)
+% -----------------------------------------------------------------------------
+\section{Databricks Asset Bundles (DAB)}
+
+DAB는 데이터 프로젝트(코드, 잡 설정, 파이프라인 등)를 **하나의 패키지로 묶어** 개발, 스테이징, 운영 환경으로 손쉽게 배포하는 최신 도구입니다.
+
+\subsection{왜 DAB를 쓰는가?}
+기존에는 API를 일일이 호출하거나 수동으로 옮겨야 했지만, DAB를 쓰면 `bundle deploy` 명령어 하나로 프로젝트 전체를 다른 환경에 똑같이 복제할 수 있습니다.
+
+\subsection{DAB의 핵심 구성 요소}
+\begin{itemize}
+    \item \textbf{YAML 설정 파일 (`databricks.yml`):} 프로젝트의 모든 설정(어떤 잡을 실행할지, 어떤 클러스터를 쓸지)이 정의된 설계도.
+    \item \textbf{Target (타겟):} 배포할 목적지 (Dev, Stage, Prod). 타겟별로 설정을 다르게(Override) 할 수 있음.
+    \item \textbf{CLI 명령어:} `databricks bundle validate`, `databricks bundle deploy`, `databricks bundle run`.
+\end{itemize}
+
+\subsection{DAB 워크플로우 예시 (CLI)}
+\begin{lstlisting}[language=bash, caption={DAB를 활용한 배포 및 실행 절차}]
+# 1. 번들 유효성 검사 (YAML 문법 등 확인)
+databricks bundle validate
+
+# 2. 개발(dev) 환경에 배포
+databricks bundle deploy -t development
+
+# 3. 개발 환경에서 잡 실행 (테스트)
+databricks bundle run -t development <job_key>
+
+# 4. (테스트 통과 후) 운영(prod) 환경에 배포
+databricks bundle deploy -t production
+\end{lstlisting}
+
+\newpage
+
+% -----------------------------------------------------------------------------
+% 7. 용어 정리 (Glossary)
+% -----------------------------------------------------------------------------
+\section*{부록: 핵심 용어 정리 (Glossary)}
+
+\begin{table}[h!]
+    \centering
+    \begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{l l l}
+        \toprule
+        \textbf{용어} & \textbf{원어} & \textbf{쉬운 설명} \\
+        \midrule
+        \textbf{서비스 주체} & Service Principal & 사람이 아닌 '로봇 ID'. 자동화 작업이나 파이프라인 실행 시 사용하는 계정. \\
+        \textbf{스팟 인스턴스} & Spot Instance & 클라우드 남는 자원을 싸게 쓰는 것. 회수될 수 있어 중요 작업엔 비추천. \\
+        \textbf{데이터 메쉬} & Data Mesh & 데이터를 중앙에서 독점하지 않고, 각 부서(도메인)가 직접 관리/제공하는 방식. \\
+        \textbf{드리프트} & Drift & 데이터의 통계적 속성이 과거와 달라지는 현상 (예: 갑자기 Null이 늘어남). \\
+        \textbf{테라폼} & Terraform & 인프라 생성 도구. 코드로 서버, 네트워크 등을 정의하고 생성함. \\
+        \textbf{단위 테스트} & Unit Test & 코드의 가장 작은 단위(함수 등)가 의도대로 작동하는지 검사하는 것. \\
+        \textbf{통합 테스트} & Integration Test & 여러 모듈을 합쳤을 때 서로 잘 연결되어 작동하는지 검사하는 것. \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+% -----------------------------------------------------------------------------
+% 8. 체크리스트 (Checklist)
+% -----------------------------------------------------------------------------
+\section*{부록: 학습 및 프로젝트 체크리스트}
+
+\begin{tcolorbox}[colback=white, colframe=black, title=✅ 기말 프로젝트 및 시험 대비 점검]
+\begin{itemize}[label=$\square$]
+    \item \textbf{프로젝트 준비:} 팀원 컨택 및 역할 분담(아키텍트, 엔지니어, ML, 분석가) 완료했는가?
+    \item \textbf{발표 자료:} 문제 정의, 아키텍처, 파이프라인 시연, 인사이트, 향후 계획이 모두 포함되었는가?
+    \item \textbf{개념 이해:} SDLC 3단계(Dev/Stage/Prod)의 데이터/리소스/권한 차이를 설명할 수 있는가?
+    \item \textbf{자동화:} IaC(Terraform)와 DAB(Asset Bundle)의 차이(인프라 vs 프로젝트)를 구분할 수 있는가?
+    \item \textbf{모니터링:} System Table로 비용을 추적하고, Lakehouse Monitoring으로 데이터 품질을 감시하는 방법을 아는가?
+    \item \textbf{CI/CD:} 코드가 변경되었을 때 배포까지의 자동화 흐름을 그릴 수 있는가?
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

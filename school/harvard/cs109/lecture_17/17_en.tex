@@ -1,0 +1,1217 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 17: MCMC and Missing Data
+% English Version - Comprehensive Notes for Beginners
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 17}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 17},
+    pdfauthor={Lecture Notes},
+    pdfsubject={MCMC and Missing Data}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 17: MCMC and Missing Data}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 17}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{MCMC (Markov Chain Monte Carlo), Metropolis-Hastings Algorithm, Missing Data, Imputation}
+
+\begin{overviewbox}
+This lecture covers two important but distinct topics in data science:
+
+\begin{enumerate}
+    \item \textbf{MCMC (Markov Chain Monte Carlo):} When Bayesian posterior distributions don't have nice closed forms (like in logistic regression), we need numerical methods to sample from them. MCMC provides a powerful framework for this.
+
+    \item \textbf{Missing Data:} Real-world datasets often have missing values. How you handle missing data can dramatically affect your results. We'll learn principled approaches beyond simply dropping rows.
+\end{enumerate}
+
+\textbf{Key Takeaway:} These methods help us deal with the messy reality of statistical modeling---complex posteriors that can't be solved analytically, and datasets that aren't complete.
+\end{overviewbox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Review: Why Do We Need MCMC?}
+%========================================================================================
+
+\subsection{The Problem with Non-Conjugate Posteriors}
+
+In previous lectures, we discussed Bayesian inference and the concept of \keyword{conjugacy}:
+
+\begin{itemize}
+    \item \textbf{Normal-Normal:} Normal prior on mean $\mu$ with Normal likelihood gives Normal posterior
+    \item \textbf{Gamma-Normal:} Gamma prior on precision ($1/\sigma^2$) gives Gamma posterior
+    \item \textbf{Beta-Binomial:} Beta prior on probability $p$ with Binomial likelihood gives Beta posterior
+\end{itemize}
+
+\begin{infobox}
+\textbf{Why Conjugacy is Nice:}
+
+When the posterior has a known distribution family, we can:
+\begin{itemize}
+    \item Write down the posterior analytically
+    \item Easily sample from it using standard functions
+    \item Compute means, variances, credible intervals directly
+\end{itemize}
+\end{infobox}
+
+\subsection{What Happens in Logistic Regression?}
+
+When we tried to apply Bayesian methods to logistic regression, things fell apart:
+
+\begin{enumerate}
+    \item Our unknown parameters are $\alpha$ (intercept) and $\beta$ (slope)
+    \item These are linked to probability through the logistic function:
+    $$p = \frac{e^{\alpha + \beta x}}{1 + e^{\alpha + \beta x}}$$
+    \item We put Normal priors on $\alpha$ and $\beta$
+    \item The posterior is no longer a named distribution!
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{The Core Problem:}
+
+The logistic function is \textbf{nonlinear}, and this nonlinearity destroys the nice conjugate relationship. The Beta-Binomial-Beta pattern doesn't work when we transform through $\frac{e^x}{1+e^x}$.
+
+The posterior is some complicated function that we can write down but can't identify as any standard distribution.
+\end{warningbox}
+
+\subsection{What Can We Still Do?}
+
+Even though we can't name the posterior distribution, we can:
+\begin{itemize}
+    \item \textbf{Evaluate its height:} Given any $(\alpha, \beta)$, we can compute the posterior density (up to a normalizing constant)
+    \item \textbf{Compare relative probabilities:} We can tell which $(\alpha, \beta)$ pairs are more likely
+\end{itemize}
+
+The question becomes: \textit{How do we explore and summarize a distribution we can evaluate but can't sample from directly?}
+
+\begin{summarybox}
+\textbf{Key Insight:}
+
+The posterior is \textit{proportional to} prior $\times$ likelihood:
+$$\pi(\alpha, \beta | \text{data}) \propto \pi(\alpha) \cdot \pi(\beta) \cdot L(\text{data} | \alpha, \beta)$$
+
+We know the right-hand side. We just don't know what distribution it forms.
+\end{summarybox}
+
+%========================================================================================
+\newsection{Monte Carlo Methods: The Big Picture}
+%========================================================================================
+
+\subsection{What is Monte Carlo?}
+
+\begin{definitionbox}{Monte Carlo Methods}
+\textbf{Monte Carlo methods} are computational algorithms that use random sampling to obtain numerical results. The idea is simple: if you want to understand a distribution, generate many random samples from it and use those samples to estimate properties like the mean, variance, or credible intervals.
+\end{definitionbox}
+
+Think of it like this: instead of solving a complex integral analytically, we:
+\begin{enumerate}
+    \item Generate thousands of random samples from the distribution
+    \item Use the empirical distribution of samples to estimate whatever we need
+\end{enumerate}
+
+\begin{examplebox}{Estimating $\pi$ with Monte Carlo}
+Imagine a square with a circle inscribed inside it:
+\begin{itemize}
+    \item Square has side length 2 (area = 4)
+    \item Circle has radius 1 (area = $\pi$)
+\end{itemize}
+
+To estimate $\pi$:
+\begin{enumerate}
+    \item Randomly throw darts at the square (uniform random points)
+    \item Count how many land inside the circle
+    \item Ratio $\approx$ Circle area / Square area = $\pi / 4$
+\end{enumerate}
+
+If 78.5\% of 10,000 darts land in the circle, we estimate $\pi \approx 4 \times 0.785 = 3.14$
+\end{examplebox}
+
+\subsection{Where Have We Seen This Before?}
+
+Monte Carlo principles appear throughout statistics:
+
+\begin{itemize}
+    \item \textbf{Bootstrapping:} Resample data to estimate sampling distribution of statistics
+    \item \textbf{Permutation testing:} Randomly permute labels to create null distribution
+    \item \textbf{Cross-validation:} Randomly split data to estimate model performance
+\end{itemize}
+
+All of these use repeated random sampling to empirically estimate something we can't compute analytically.
+
+%========================================================================================
+\newsection{Rejection Sampling}
+%========================================================================================
+
+\subsection{The Basic Idea}
+
+\keyword{Rejection sampling} is a technique for sampling from a \textbf{target distribution} when we can only easily sample from a different \textbf{proposal distribution}.
+
+\begin{definitionbox}{Rejection Sampling}
+\textbf{Goal:} Sample from target distribution $f(x)$ (e.g., our posterior)
+
+\textbf{Tool:} We can sample from proposal distribution $g(x)$ (e.g., a Normal)
+
+\textbf{Requirement:} $f(x) \leq M \cdot g(x)$ for all $x$ and some constant $M$
+\end{definitionbox}
+
+The analogy: \textit{We want to sample from the unit circle, but we can only sample from the unit square. So we sample from the square and reject points outside the circle.}
+
+\subsection{The Cookie Monster Example}
+
+Imagine Cookie Monster is analyzing cookies from a bakery with four types: chocolate chip, oatmeal raisin, peanut butter, and sugar. Each type has different size distributions:
+
+\begin{itemize}
+    \item Chocolate chip: centered around 8 cm diameter
+    \item Oatmeal raisin: centered around 10 cm
+    \item Peanut butter: centered around 12 cm
+    \item Sugar: centered around 14 cm
+\end{itemize}
+
+When we look at the \textbf{marginal distribution} of all cookies combined, we get a complex multimodal distribution (possibly 3-4 peaks visible).
+
+\textbf{How do we sample from this weird distribution?}
+
+\subsection{The Algorithm}
+
+\begin{enumerate}
+    \item Choose a proposal distribution $g(x)$ (e.g., a single Normal) that we can sample from
+    \item Scale it up by constant $M$ so that $M \cdot g(x) \geq f(x)$ everywhere
+    \item Repeat:
+    \begin{itemize}
+        \item Draw $x$ from $g(x)$
+        \item Draw $u$ from Uniform(0, 1)
+        \item If $u < \frac{f(x)}{M \cdot g(x)}$, accept $x$; otherwise reject
+    \end{itemize}
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Why This Works:}
+
+\begin{itemize}
+    \item When $f(x)$ is close to $M \cdot g(x)$: We accept most of the time
+    \item When $f(x)$ is much smaller than $M \cdot g(x)$: We reject most of the time
+\end{itemize}
+
+The acceptance probability is exactly $\frac{f(x)}{M \cdot g(x)}$, which ensures we end up with samples distributed according to $f(x)$.
+\end{infobox}
+
+\subsection{Practical Example}
+
+Suppose:
+\begin{itemize}
+    \item Target (black curve): Complex multimodal cookie size distribution
+    \item Proposal (red curve): Single Normal, scaled up by $M = 11$
+\end{itemize}
+
+At $x = 10$ (center):
+\begin{itemize}
+    \item Black curve height: 0.05
+    \item Red curve height: 0.55
+    \item Acceptance probability: $0.05 / 0.55 \approx 9\%$
+\end{itemize}
+
+At $x = 14$ (tail where black is higher relative to red):
+\begin{itemize}
+    \item Black curve height: 0.04
+    \item Red curve height: 0.045
+    \item Acceptance probability: $0.04 / 0.045 \approx 89\%$
+\end{itemize}
+
+\begin{warningbox}
+\textbf{The Inefficiency Problem:}
+
+If $M = 11$, on average only about 1 in 11 proposals are accepted!
+
+To get 10,000 samples from the target, we need to generate about 110,000 samples from the proposal. This gets even worse in high dimensions.
+\end{warningbox}
+
+\subsection{Using the Samples}
+
+Once we have enough accepted samples, we can:
+
+\begin{itemize}
+    \item Plot the histogram $\rightarrow$ Visual representation of posterior
+    \item Compute the mean $\rightarrow$ Posterior mean estimate
+    \item Find the 2.5th and 97.5th percentiles $\rightarrow$ 95\% credible interval
+\end{itemize}
+
+Just like in bootstrapping, we use the \textbf{empirical distribution} of samples to estimate properties of the \textbf{theoretical distribution}.
+
+\subsection{Limitations of Rejection Sampling}
+
+\begin{enumerate}
+    \item \textbf{Computational waste:} Many proposals are rejected
+    \item \textbf{Curse of dimensionality:} In high dimensions (e.g., logistic regression with 20 predictors = 21 parameters), finding a good proposal distribution is nearly impossible
+    \item \textbf{Scaling constant $M$:} Needs to be large enough to cover the target everywhere, leading to low acceptance rates
+\end{enumerate}
+
+\begin{summarybox}
+Rejection sampling is conceptually simple and works well in low dimensions, but it becomes impractical for complex, high-dimensional posteriors. We need a better approach: \textbf{MCMC}.
+\end{summarybox}
+
+%========================================================================================
+\newsection{Markov Chain Monte Carlo (MCMC)}
+%========================================================================================
+
+\subsection{What is MCMC?}
+
+\begin{definitionbox}{MCMC}
+\textbf{Markov Chain Monte Carlo (MCMC)} is a class of algorithms that sample from a probability distribution by constructing a Markov chain that has the desired distribution as its equilibrium distribution.
+\end{definitionbox}
+
+Let's break this down:
+\begin{itemize}
+    \item \textbf{Monte Carlo:} Using random sampling
+    \item \textbf{Markov Chain:} A sequence where each step depends only on the previous step
+\end{itemize}
+
+\subsection{The Markovian Property}
+
+\begin{definitionbox}{Markov Property (Memorylessness)}
+A process has the \textbf{Markov property} if the probability of being in a future state depends \textit{only} on the current state, not on how we got there.
+
+$$P(\theta_{t+1} | \theta_t, \theta_{t-1}, \ldots, \theta_0) = P(\theta_{t+1} | \theta_t)$$
+\end{definitionbox}
+
+\begin{examplebox}{Real-World Markov Chains}
+\textbf{Weather:}
+\begin{itemize}
+    \item Tomorrow's weather depends mainly on today's weather
+    \item If it's raining today, there's a higher chance of rain tomorrow
+    \item We don't need to know what happened last week
+\end{itemize}
+
+\textbf{Stock Prices:}
+\begin{itemize}
+    \item Tomorrow's price depends on today's price
+    \item The path that got us to today's price doesn't matter
+    \item ``Where you are'' is what matters, not ``how you got there''
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Key Insight of MCMC}
+
+Instead of sampling independently from the distribution (like rejection sampling), MCMC creates a \textbf{random walk} through the parameter space.
+
+Imagine a robot walking around a landscape where height represents probability:
+\begin{itemize}
+    \item Higher terrain = Higher posterior probability
+    \item The robot tends to move uphill (toward higher probability)
+    \item Sometimes it moves downhill (but less often)
+    \item Over time, the robot spends more time in high-probability regions
+\end{itemize}
+
+\begin{infobox}
+\textbf{Why MCMC Works:}
+
+If we construct the random walk correctly, the \textbf{long-run frequency} of visits to any region will be proportional to the posterior probability of that region.
+
+After enough steps, the sequence of positions forms a sample from the posterior distribution!
+\end{infobox}
+
+%========================================================================================
+\newsection{The Metropolis-Hastings Algorithm}
+%========================================================================================
+
+\subsection{Algorithm Overview}
+
+The \keyword{Metropolis-Hastings algorithm} is the most common MCMC method:
+
+\begin{enumerate}
+    \item Start at some initial parameter value $\theta_0$
+    \item At each step $t$:
+    \begin{itemize}
+        \item Propose a new value $\theta^*$ based on current position $\theta_t$
+        \item Decide whether to accept or reject the proposal
+        \item If accept: $\theta_{t+1} = \theta^*$
+        \item If reject: $\theta_{t+1} = \theta_t$ (stay in place)
+    \end{itemize}
+    \item Repeat many times
+\end{enumerate}
+
+\subsection{The Proposal Distribution}
+
+The \keyword{proposal distribution} $q(\theta^* | \theta_t)$ determines how we suggest new values:
+
+Common choice: \textbf{Random walk proposal}
+$$\theta^* = \theta_t + \epsilon, \quad \epsilon \sim \text{Normal}(0, \sigma^2)$$
+
+This means: ``Take a random step from current position''
+
+\begin{itemize}
+    \item Small $\sigma$: Small steps, slow exploration
+    \item Large $\sigma$: Big steps, might miss important regions
+\end{itemize}
+
+\subsection{The Acceptance Probability}
+
+Here's the key formula---the probability of accepting a proposed move:
+
+\begin{equation}
+\alpha = \min\left(1, \frac{f(\theta^*)}{f(\theta_t)} \cdot \frac{q(\theta_t | \theta^*)}{q(\theta^* | \theta_t)}\right)
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $f(\theta)$ is the target distribution (posterior, up to normalizing constant)
+    \item $q(\theta^* | \theta_t)$ is the proposal distribution
+\end{itemize}
+
+\begin{infobox}
+\textbf{Intuition Behind the Formula:}
+
+\textbf{Ratio $\frac{f(\theta^*)}{f(\theta_t)}$:}
+\begin{itemize}
+    \item If $\theta^*$ has higher posterior probability $\rightarrow$ ratio $> 1$
+    \item We accept with probability 1 (always move uphill!)
+    \item If $\theta^*$ has lower probability $\rightarrow$ ratio $< 1$
+    \item We accept with that probability (sometimes move downhill)
+\end{itemize}
+
+\textbf{The proposal correction term $\frac{q(\theta_t | \theta^*)}{q(\theta^* | \theta_t)}$:}
+\begin{itemize}
+    \item For symmetric proposals (like random walk), this equals 1
+    \item Needed for asymmetric proposals to ensure proper sampling
+\end{itemize}
+\end{infobox}
+
+\subsection{Step-by-Step Example}
+
+Suppose we're at $\theta_t$ where $f(\theta_t) = 0.5$
+
+We propose $\theta^*$ where $f(\theta^*) = 0.3$ (downhill move)
+
+Acceptance probability (with symmetric proposal):
+$$\alpha = \min\left(1, \frac{0.3}{0.5}\right) = 0.6$$
+
+We generate $u \sim \text{Uniform}(0,1)$:
+\begin{itemize}
+    \item If $u < 0.6$: Accept, move to $\theta^*$
+    \item If $u \geq 0.6$: Reject, stay at $\theta_t$
+\end{itemize}
+
+\begin{summarybox}
+\textbf{Key Properties of Metropolis-Hastings:}
+\begin{enumerate}
+    \item \textbf{Uphill moves:} Always accepted
+    \item \textbf{Downhill moves:} Sometimes accepted (proportional to ratio)
+    \item \textbf{Result:} Spends more time in high-probability regions
+    \item \textbf{Doesn't require normalizing constant:} Only needs ratios!
+\end{enumerate}
+\end{summarybox}
+
+%========================================================================================
+\newsection{Practical MCMC: The Skittles Example}
+%========================================================================================
+
+\subsection{The Problem Setup}
+
+A candy company wants to introduce a new Skittles flavor: Mango. They need to determine the optimal amount of ``mango essence'' ingredient.
+
+\textbf{Data collection:}
+\begin{itemize}
+    \item Different dosages (amounts of mango essence) are tested
+    \item Multiple taste testers try each dosage
+    \item Each tester says ``Yes, I love it'' or ``No''
+\end{itemize}
+
+This is a classic \textbf{dose-response} problem!
+
+\subsection{The Model}
+
+\begin{itemize}
+    \item \textbf{Predictor $x$:} Amount of mango essence (mg)
+    \item \textbf{Response $y$:} Number of people who love it out of $n$ testers
+    \item \textbf{Distribution:} $Y \sim \text{Binomial}(n, p(x))$
+\end{itemize}
+
+We link $p$ to $x$ through logistic regression:
+$$\log\left(\frac{p}{1-p}\right) = \alpha + \beta x$$
+
+Or equivalently:
+$$p = \frac{e^{\alpha + \beta x}}{1 + e^{\alpha + \beta x}}$$
+
+\subsection{Bayesian Setup}
+
+\textbf{Unknown parameters:} $\alpha$ (intercept) and $\beta$ (slope)
+
+\textbf{Priors:}
+\begin{align*}
+\alpha &\sim \text{Normal}(0, 100^2) \\
+\beta &\sim \text{Normal}(0, 100^2)
+\end{align*}
+
+Why Normal(0, 100)?
+\begin{itemize}
+    \item Centered at 0: No prior assumption about direction of effect
+    \item Large variance (100): Very non-informative, letting data speak
+    \item On log-odds scale, $\alpha$ and $\beta$ can be any real number
+\end{itemize}
+
+\textbf{Posterior:}
+$$\pi(\alpha, \beta | \text{data}) \propto \pi(\alpha) \cdot \pi(\beta) \cdot \prod_{i=1}^{n} \binom{n_i}{y_i} p_i^{y_i} (1-p_i)^{n_i - y_i}$$
+
+This is a complicated function---not a named distribution!
+
+\subsection{Using PyMC for MCMC}
+
+\begin{lstlisting}[style=pythonstyle]
+import pymc as pm
+import numpy as np
+
+# Data
+flavoring = np.array([1.88, 1.86, 1.84, 1.82, ...])  # Dosages
+y = np.array([60, 61, 58, 56, ...])  # Number who loved it
+n = np.array([60, 62, 60, 58, ...])  # Total testers
+
+with pm.Model() as skittles_model:
+    # Priors
+    alpha = pm.Normal('alpha', mu=0, sigma=100)
+    beta = pm.Normal('beta', mu=0, sigma=100)
+
+    # Logistic transformation
+    p = pm.math.invlogit(alpha + beta * flavoring)
+
+    # Likelihood
+    y_obs = pm.Binomial('y_obs', n=n, p=p, observed=y)
+
+    # MCMC Sampling
+    trace = pm.sample(2000, tune=2000, return_inferencedata=True)
+\end{lstlisting}
+
+\textbf{Key parameters:}
+\begin{itemize}
+    \item \code{tune=2000}: Burn-in period (samples to discard)
+    \item \code{2000}: Number of samples to keep after burn-in
+\end{itemize}
+
+\subsection{Interpreting the Results}
+
+After running MCMC, we get a \textbf{trace}---a sequence of sampled $(\alpha, \beta)$ pairs.
+
+\textbf{Trace plots} show the sampled values over time:
+\begin{itemize}
+    \item Should look like ``fuzzy caterpillars'' or ``hairy worms''
+    \item No trends or patterns
+    \item Bouncing randomly around a stable mean
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Signs of Problems in Trace Plots:}
+\begin{itemize}
+    \item Gradual drift upward or downward
+    \item Getting stuck in one place for many iterations
+    \item Different chains showing different patterns
+\end{itemize}
+These indicate the chain hasn't converged to the posterior!
+\end{warningbox}
+
+\textbf{Posterior histograms} show the distribution of samples:
+\begin{itemize}
+    \item For $\beta$: Values range from about 25 to 42
+    \item All positive! This tells us more mango essence $\rightarrow$ more people love it
+    \item Posterior mean: around 33-34
+    \item 95\% credible interval: approximately [28, 40]
+\end{itemize}
+
+%========================================================================================
+\newsection{MCMC Diagnostics}
+%========================================================================================
+
+\subsection{The Burn-in Period}
+
+\begin{definitionbox}{Burn-in (Warm-up)}
+The \textbf{burn-in} period is the initial portion of the MCMC chain that is discarded before collecting samples. During burn-in, the chain is ``warming up'' and moving from its arbitrary starting point toward the high-probability region.
+\end{definitionbox}
+
+Why is burn-in necessary?
+\begin{itemize}
+    \item We start the chain at some arbitrary initial value
+    \item If we start in a low-probability region, early samples don't represent the posterior
+    \item We wait until the chain ``finds'' the high-probability region
+\end{itemize}
+
+\subsection{The R-hat Statistic ($\hat{R}$)}
+
+\begin{definitionbox}{R-hat ($\hat{R}$)}
+\textbf{R-hat} (also called the potential scale reduction factor) measures whether multiple MCMC chains have converged to the same distribution.
+
+$$\hat{R} \approx 1.0 \quad \text{indicates convergence}$$
+\end{definitionbox}
+
+How it works:
+\begin{enumerate}
+    \item Run multiple independent chains (typically 4)
+    \item Compare the variance \textit{within} each chain to variance \textit{between} chains
+    \item If chains have converged, these should be similar ($\hat{R} \approx 1$)
+    \item If chains are exploring different regions, between-chain variance is larger ($\hat{R} > 1$)
+\end{enumerate}
+
+\begin{importantbox}{Convergence Rules}
+\begin{itemize}
+    \item $\hat{R} < 1.01$: Excellent convergence
+    \item $\hat{R} < 1.05$: Generally acceptable
+    \item $\hat{R} > 1.1$: \textbf{Serious problem!} Do not trust results!
+\end{itemize}
+
+If $\hat{R} > 1.1$, try:
+\begin{enumerate}
+    \item Increase burn-in period
+    \item Run chains longer
+    \item Try different initial values
+    \item Reparameterize the model
+\end{enumerate}
+\end{importantbox}
+
+\subsection{Effective Sample Size (ESS)}
+
+Because MCMC samples are \textbf{correlated} (each depends on the previous), they don't provide as much information as independent samples.
+
+\begin{definitionbox}{Effective Sample Size}
+The \textbf{effective sample size (ESS)} is the equivalent number of independent samples that would provide the same information as the correlated MCMC samples.
+
+If you have 2000 MCMC samples but ESS = 500, your samples are as informative as 500 independent samples.
+\end{definitionbox}
+
+The MCMC standard error for the mean is:
+$$\text{MCSE} = \frac{\text{Posterior SD}}{\sqrt{\text{ESS}}}$$
+
+Not $\sqrt{n}$ where $n$ is the number of MCMC samples!
+
+\subsection{Summary Statistics from PyMC}
+
+Typical output includes:
+\begin{itemize}
+    \item \textbf{mean}: Posterior mean estimate
+    \item \textbf{sd}: Posterior standard deviation
+    \item \textbf{hdi\_3\%}, \textbf{hdi\_97\%}: 94\% credible interval bounds
+    \item \textbf{mcse\_mean}: Monte Carlo standard error for the mean
+    \item \textbf{ess\_bulk}: Effective sample size
+    \item \textbf{r\_hat}: Convergence diagnostic
+\end{itemize}
+
+\begin{summarybox}
+\textbf{MCMC Summary:}
+\begin{enumerate}
+    \item MCMC constructs a random walk through parameter space
+    \item After burn-in, samples represent the posterior distribution
+    \item Always check diagnostics: trace plots, $\hat{R}$, ESS
+    \item Use posterior samples to compute means, credible intervals, predictions
+\end{enumerate}
+\end{summarybox}
+
+%========================================================================================
+\newsection{Missing Data: Introduction}
+%========================================================================================
+
+\subsection{What is Missing Data?}
+
+In real-world datasets, values are often missing:
+\begin{itemize}
+    \item Survey respondents skip questions
+    \item Sensors fail to record measurements
+    \item Data entry errors leave blanks
+    \item Information is not collected for some subjects
+\end{itemize}
+
+\textbf{How does Python handle missing values?}
+\begin{itemize}
+    \item Pandas represents missing as \code{NaN} (Not a Number) or \code{NA}
+    \item Scikit-learn \textbf{throws errors} if given data with \code{NaN}
+    \item You must handle missing data before modeling!
+\end{itemize}
+
+\subsection{Common (But Problematic) Approaches}
+
+\textbf{Option 1: Drop rows with missing values}
+\begin{lstlisting}[style=pythonstyle]
+df_clean = df.dropna()  # Remove rows with any NaN
+\end{lstlisting}
+
+\textbf{Option 2: Drop columns with missing values}
+\begin{lstlisting}[style=pythonstyle]
+df_clean = df.dropna(axis=1)  # Remove columns with any NaN
+\end{lstlisting}
+
+\textbf{Option 3: Fill with mean/median}
+\begin{lstlisting}[style=pythonstyle]
+df['column'] = df['column'].fillna(df['column'].mean())
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Problems with Simple Approaches:}
+
+\textbf{Dropping rows:}
+\begin{itemize}
+    \item Loses valuable data
+    \item Can introduce \textbf{bias} if missingness is related to the outcome
+    \item Reduces sample size and statistical power
+\end{itemize}
+
+\textbf{Mean imputation:}
+\begin{itemize}
+    \item \textbf{Underestimates variance} (makes distribution narrower)
+    \item Distorts relationships between variables
+    \item Doesn't account for uncertainty in imputed values
+\end{itemize}
+\end{warningbox}
+
+%========================================================================================
+\newsection{Types of Missing Data}
+%========================================================================================
+
+Understanding \textit{why} data is missing is crucial for choosing the right approach.
+
+\subsection{Missing Completely at Random (MCAR)}
+
+\begin{definitionbox}{MCAR}
+Data is \textbf{Missing Completely at Random} if the probability of being missing is unrelated to:
+\begin{itemize}
+    \item The missing value itself
+    \item Any other observed variables
+\end{itemize}
+Missingness is purely random, like someone randomly punching holes in your spreadsheet.
+\end{definitionbox}
+
+Example: A survey is accidentally not sent to 5\% of randomly selected participants.
+
+\textbf{Implication:} Complete case analysis (dropping rows) gives unbiased estimates, just with reduced sample size.
+
+\subsection{Missing at Random (MAR)}
+
+\begin{definitionbox}{MAR}
+Data is \textbf{Missing at Random} if the probability of being missing can be fully explained by other \textit{observed} variables (but not by the missing value itself).
+\end{definitionbox}
+
+Example: In a depression study, younger people are less likely to report their income. The missingness is related to age (which we observe), not to income itself.
+
+\textbf{Implication:} We can use observed variables to model the missingness and correct for bias.
+
+\subsection{Missing Not at Random (MNAR)}
+
+\begin{definitionbox}{MNAR}
+Data is \textbf{Missing Not at Random} if the probability of being missing depends on the unobserved value itself or on unobserved variables.
+\end{definitionbox}
+
+Example: People with very high incomes are less likely to report their income \textit{because} it's high.
+
+\textbf{Implication:} This is the hardest case. No statistical method can fully correct for the bias without strong assumptions.
+
+\begin{importantbox}{The Fundamental Problem}
+We can never know for certain which type of missingness we have. The classification depends on information we don't observe. This is why missing data handling requires careful thought and often sensitivity analysis.
+\end{importantbox}
+
+%========================================================================================
+\newsection{Better Approaches to Missing Data}
+%========================================================================================
+
+\subsection{The Indicator Variable Method}
+
+A simple but often effective approach:
+
+\begin{enumerate}
+    \item Create a new variable indicating whether the original value was missing
+    \item Impute a constant (like 0) for missing values
+    \item Include \textbf{both} the imputed variable and the indicator in your model
+\end{enumerate}
+
+\begin{examplebox}{Indicator Method}
+Original data:
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+ID & Income & Outcome \\
+\midrule
+1 & 50000 & 1 \\
+2 & NaN & 0 \\
+3 & 75000 & 1 \\
+4 & NaN & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+After transformation:
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+ID & Income\_imputed & Income\_missing & Outcome \\
+\midrule
+1 & 50000 & 0 & 1 \\
+2 & 0 & 1 & 0 \\
+3 & 75000 & 0 & 1 \\
+4 & 0 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\textbf{Why this works:}
+\begin{itemize}
+    \item The imputed zeros aren't treated as real zeros
+    \item The indicator variable captures the ``missingness effect''
+    \item The model can learn different relationships for missing vs. non-missing cases
+\end{itemize}
+
+\begin{lstlisting}[style=pythonstyle]
+import pandas as pd
+import numpy as np
+
+def add_missing_indicator(df, column):
+    """Add missing indicator and impute zeros"""
+    # Create indicator
+    df[f'{column}_missing'] = df[column].isna().astype(int)
+    # Impute with 0
+    df[f'{column}_imputed'] = df[column].fillna(0)
+    return df
+
+# Usage
+df = add_missing_indicator(df, 'income')
+# Now use both 'income_imputed' and 'income_missing' in model
+\end{lstlisting}
+
+\subsection{Categorical Variables}
+
+For categorical variables, treat ``missing'' as its own category:
+
+\begin{examplebox}{Missing as a Category}
+Original variable \code{color} with values: Red, Blue, Green, NaN
+
+After transformation: Red, Blue, Green, Missing
+
+This is equivalent to one-hot encoding with three original categories plus one missing category.
+\end{examplebox}
+
+\subsection{Multiple Imputation (Advanced)}
+
+The gold standard for handling missing data:
+
+\begin{enumerate}
+    \item Create multiple (5-20) imputed datasets, each with slightly different imputed values
+    \item Analyze each dataset separately
+    \item Combine results using special rules that account for imputation uncertainty
+\end{enumerate}
+
+This is more complex but properly accounts for uncertainty about the missing values.
+
+%========================================================================================
+\newsection{Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{MCMC and Missing Data: Summary}
+
+\textbf{MCMC:}
+\begin{itemize}
+    \item When posteriors don't have closed forms, MCMC lets us sample from them
+    \item Metropolis-Hastings: Propose $\rightarrow$ Accept/Reject $\rightarrow$ Repeat
+    \item Always check convergence: trace plots, $\hat{R} \approx 1.0$, adequate ESS
+    \item Use samples to estimate means, credible intervals, predictions
+\end{itemize}
+
+\textbf{Missing Data:}
+\begin{itemize}
+    \item Three types: MCAR, MAR, MNAR (we usually don't know which)
+    \item Simple dropping or mean imputation can bias results
+    \item Better: Indicator variable method (impute + flag)
+    \item Best: Multiple imputation (accounts for uncertainty)
+\end{itemize}
+
+\textbf{The Common Theme:}
+Both topics deal with \textbf{uncertainty}---uncertainty in posterior distributions (MCMC) and uncertainty about missing values (imputation). Good data science acknowledges and properly accounts for uncertainty.
+\end{summarybox}
+
+\begin{table}[h!]
+\caption{MCMC vs. Rejection Sampling Comparison}
+\begin{adjustbox}{width=\textwidth, center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspect} & \textbf{Rejection Sampling} & \textbf{MCMC} \\
+\midrule
+Sample independence & Independent samples & Correlated samples \\
+Efficiency in high-D & Very poor & Much better \\
+Requires & Envelope distribution $M \cdot g(x)$ & Proposal distribution $q$ \\
+Acceptance rate & Can be very low & Tunable (aim for 20-50\%) \\
+Burn-in needed & No & Yes \\
+Convergence diagnostics & Not applicable & Essential ($\hat{R}$, ESS) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+\caption{Missing Data Handling Methods}
+\begin{adjustbox}{width=\textwidth, center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Method} & \textbf{Pros} & \textbf{Cons} \\
+\midrule
+Drop rows (listwise deletion) & Simple, unbiased if MCAR & Loses data, biased if not MCAR \\
+Mean imputation & Simple, preserves sample size & Underestimates variance, biased \\
+Indicator variable method & Captures missingness pattern & Assumes missingness is informative \\
+Multiple imputation & Proper uncertainty quantification & Complex, computationally intensive \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+%========================================================================================
+\section{Python Code Reference}
+%========================================================================================
+
+\subsection{MCMC with PyMC}
+
+\begin{lstlisting}[style=pythonstyle]
+import pymc as pm
+import arviz as az  # For diagnostics
+
+# Define model
+with pm.Model() as model:
+    # Priors
+    alpha = pm.Normal('alpha', mu=0, sigma=10)
+    beta = pm.Normal('beta', mu=0, sigma=10)
+
+    # Likelihood (logistic regression example)
+    p = pm.math.invlogit(alpha + beta * X)
+    y_obs = pm.Binomial('y_obs', n=n, p=p, observed=y)
+
+    # Sample
+    trace = pm.sample(2000, tune=2000, cores=4,
+                      return_inferencedata=True)
+
+# Diagnostics
+az.plot_trace(trace)  # Trace plots
+az.summary(trace)     # Summary statistics including r_hat
+\end{lstlisting}
+
+\subsection{Missing Data Handling}
+
+\begin{lstlisting}[style=pythonstyle]
+import pandas as pd
+import numpy as np
+from sklearn.impute import SimpleImputer
+
+# Method 1: Indicator variable approach
+def handle_missing_with_indicator(df, columns):
+    for col in columns:
+        df[f'{col}_missing'] = df[col].isna().astype(int)
+        df[col] = df[col].fillna(0)  # or fillna(df[col].mean())
+    return df
+
+# Method 2: Using sklearn
+imputer = SimpleImputer(strategy='mean')  # or 'median', 'most_frequent'
+X_imputed = imputer.fit_transform(X)
+
+# Check missingness pattern
+print(df.isna().sum())  # Count NaN per column
+print(df.isna().mean())  # Proportion NaN per column
+\end{lstlisting}
+
+\section{Checklist for Understanding}
+
+\begin{itemize}[label=$\square$]
+    \item Can you explain why we need MCMC when the posterior isn't a named distribution?
+    \item Can you describe the basic idea of Metropolis-Hastings (propose, accept/reject)?
+    \item Do you understand what trace plots should look like for a converged chain?
+    \item Can you interpret $\hat{R}$ and know when it indicates problems?
+    \item Do you know the three types of missing data (MCAR, MAR, MNAR)?
+    \item Can you implement the indicator variable method for handling missing data?
+    \item Do you understand why simple mean imputation can be problematic?
+\end{itemize}
+
+\end{document}

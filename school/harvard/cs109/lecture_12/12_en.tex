@@ -1,0 +1,998 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CS109A: Introduction to Data Science
+% Lecture 12: PCA, High Dimensionality, and Midterm Review
+% Version: 1.0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 12}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Important Note,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Critical: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 12},
+    pdfauthor={Lecture Notes},
+    pdfsubject={PCA and High Dimensionality}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Styling
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+\textbf{Course:} & #1 \\[0.3em]
+\textbf{Lecture:} & #2 \\[0.3em]
+\textbf{Instructors:} & #3 \\[0.3em]
+\textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\begin{document}
+
+\title{Lecture 12: PCA, High Dimensionality, and Midterm Review}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 12}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Bayesian simulation (MCMC), Big Data challenges, Curse of Dimensionality, Principal Components Analysis (PCA), Hypothesis Testing review, Permutation Tests}
+
+\tableofcontents
+
+%========================================================================================
+\section{Introduction and Course Updates}
+%========================================================================================
+
+\begin{overviewbox}
+This lecture wraps up the material before the midterm exam. We cover three major topics:
+
+\begin{enumerate}
+    \item \textbf{Bayesian Simulation (MCMC):} How to work with complex posterior distributions when closed-form solutions don't exist
+    \item \textbf{High Dimensionality and PCA:} Understanding the ``curse of dimensionality'' and using Principal Components Analysis to handle many predictors
+    \item \textbf{Midterm Review:} Key concepts in hypothesis testing and permutation tests
+\end{enumerate}
+
+\textbf{Important:} All material through this lecture (Lecture 12) is covered on the midterm. Classification modeling (starting next week) is NOT on the midterm.
+\end{overviewbox}
+
+\subsection{Midterm Exam Information}
+
+\begin{itemize}
+    \item \textbf{When:} Next week during section time
+    \item \textbf{In-class portion:}
+    \begin{itemize}
+        \item 75 minutes
+        \item Approximately 2.2x the length of the quiz
+        \item Multiple choice and short answer/fill-in-the-blank
+        \item \textbf{Closed book}, but 2 cheat sheets allowed (front and back)
+    \end{itemize}
+    \item \textbf{Take-home coding portion:}
+    \begin{itemize}
+        \item Released after the in-class exam
+        \item 24-hour window to start, 2-hour time limit once started
+        \item No AI/LLM allowed; notes permitted
+        \item Best practice: homework problems and section material
+    \end{itemize}
+\end{itemize}
+
+%========================================================================================
+\newsection{Bayesian Simulation: Working with Complex Posteriors}
+%========================================================================================
+
+\subsection{Why Simulation?}
+
+In Bayesian inference, we combine a \textbf{prior distribution} with a \textbf{likelihood} to get a \textbf{posterior distribution}. When using conjugate priors, this posterior has a nice closed-form solution (e.g., Normal-Normal gives Normal posterior).
+
+But in realistic models, especially linear regression with multiple parameters ($\beta_0, \beta_1, \ldots, \beta_p, \sigma^2$), the \textbf{joint posterior distribution} becomes:
+
+\begin{itemize}
+    \item \textbf{High-dimensional:} Many parameters to estimate simultaneously
+    \item \textbf{Complex:} No simple mathematical form
+    \item \textbf{Hard to integrate:} Can't compute means, variances, or credible intervals analytically
+\end{itemize}
+
+\begin{summarybox}
+\textbf{The Solution: Simulation}
+
+Instead of solving for the posterior mathematically, we \textbf{draw thousands of samples} from it. With enough samples, we can approximate any property of the distribution:
+\begin{itemize}
+    \item \textbf{Posterior mean:} Sample average
+    \item \textbf{Credible interval:} Sample percentiles (just like bootstrap!)
+    \item \textbf{Posterior mode:} Requires kernel density estimation (``bump hunting'')
+\end{itemize}
+\end{summarybox}
+
+\subsection{MCMC: Markov Chain Monte Carlo}
+
+\begin{definitionbox}[MCMC]
+\textbf{Markov Chain Monte Carlo} is a family of algorithms for sampling from probability distributions when direct sampling is difficult. The key insight: we don't need to know the entire distribution---we only need to be able to evaluate the \textbf{relative height} (probability density) at any point.
+\end{definitionbox}
+
+\subsubsection{The Normal-Gamma Model}
+
+For Bayesian linear regression with conjugate priors:
+\begin{itemize}
+    \item $\beta | \sigma^2, X \sim \text{Normal}$ (conditional on variance)
+    \item $1/\sigma^2 | X \sim \text{Gamma}$
+\end{itemize}
+
+\textbf{Sampling procedure:}
+\begin{enumerate}
+    \item First sample $\sigma^2$ from its Gamma distribution
+    \item Then sample $\beta$ from its Normal distribution (conditional on the sampled $\sigma^2$)
+    \item Repeat to get pairs $(\sigma^2, \beta)$ from the joint posterior
+\end{enumerate}
+
+\subsubsection{Gibbs Sampling}
+
+\begin{definitionbox}[Gibbs Sampling]
+When we can't sample from the joint distribution directly, but we CAN sample from each parameter's \textbf{conditional distribution} (given the other parameters), we use Gibbs sampling:
+
+\begin{enumerate}
+    \item Initialize all parameters: $\theta_1^{(0)}, \theta_2^{(0)}, \theta_3^{(0)}$
+    \item For iteration $t = 1, 2, \ldots$:
+    \begin{itemize}
+        \item Sample $\theta_1^{(t)}$ from $f(\theta_1 | \theta_2^{(t-1)}, \theta_3^{(t-1)}, X)$
+        \item Sample $\theta_2^{(t)}$ from $f(\theta_2 | \theta_1^{(t)}, \theta_3^{(t-1)}, X)$
+        \item Sample $\theta_3^{(t)}$ from $f(\theta_3 | \theta_1^{(t)}, \theta_2^{(t)}, X)$
+    \end{itemize}
+    \item After a ``burn-in'' period, keep the samples
+\end{enumerate}
+\end{definitionbox}
+
+\subsubsection{Metropolis-Hastings Algorithm}
+
+\begin{examplebox}[The Blindfolded Mountain Climber]
+Imagine the posterior distribution as a \textbf{mountain range}. You're blindfolded but can measure your current altitude (probability density).
+
+\textbf{Algorithm:}
+\begin{enumerate}
+    \item Start at some point $x$ on the mountain
+    \item Propose a random step to point $x^*$
+    \item \textbf{Decide whether to move:}
+    \begin{itemize}
+        \item If $x^*$ is \textbf{higher} (higher probability): Always move there
+        \item If $x^*$ is \textbf{lower}: Move with probability $R = f(x^*)/f(x)$
+        \begin{itemize}
+            \item Gentle downhill ($R = 0.8$): 80\% chance to move
+            \item Steep cliff ($R = 0.01$): Only 1\% chance to move
+        \end{itemize}
+    \end{itemize}
+    \item Repeat thousands of times
+\end{enumerate}
+
+\textbf{Result:} The climber spends more time at high-altitude (high-probability) locations. The path traced becomes a sample from the posterior distribution!
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Burn-in Period}
+
+The first several thousand samples depend heavily on where you started. These are discarded (``burned'') before using the remaining samples for inference.
+\end{warningbox}
+
+%========================================================================================
+\newsection{Big Data and High Dimensionality}
+%========================================================================================
+
+\subsection{What is ``Big Data''?}
+
+When we talk about ``big data,'' we need to distinguish between two very different situations:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Big N} & Many observations (rows) \\
+\textbf{Big P} & Many predictors (columns) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These create \textbf{different problems} and require \textbf{different solutions}.
+
+\subsection{When N is Large}
+
+\textbf{Problems:}
+\begin{itemize}
+    \item \textbf{Computational cost:} Training becomes slow. Simple operations like calculating means take time with billions of observations.
+    \item \textbf{Bias doesn't disappear:} If your data collection is biased, more data can actually make results \textbf{worse}, not better. (``Garbage in, garbage out'' at scale)
+\end{itemize}
+
+\textbf{Solutions:}
+\begin{itemize}
+    \item \textbf{Subsampling:} Randomly select 10\% or 1\% of your data for training. With millions of observations, even a small fraction contains enough information.
+\end{itemize}
+
+\textbf{Interesting observation:}
+When N is extremely large (millions+), statistical inference becomes less meaningful:
+\begin{itemize}
+    \item Standard errors shrink to nearly zero
+    \item Confidence intervals become point estimates
+    \item \textbf{Everything becomes ``statistically significant''} (p < 0.05) even for trivially small effects
+\end{itemize}
+
+\subsection{When P is Large: High Dimensionality}
+
+This is the more challenging situation. When the number of predictors $P$ approaches or exceeds $N$:
+
+\textbf{Problems:}
+\begin{itemize}
+    \item \textbf{Overfitting:} Too many degrees of freedom---the model memorizes noise
+    \item \textbf{Multicollinearity:} High correlation among predictors becomes almost certain
+    \item \textbf{Matrix inversion fails:} Can't compute $(X^TX)^{-1}$ in OLS
+    \item \textbf{Curse of dimensionality:} Fundamental geometric problem
+\end{itemize}
+
+\begin{importantbox}[The Curse of Dimensionality]
+As dimensions increase, the \textbf{volume of space grows exponentially}, causing data to become increasingly \textbf{sparse}.
+
+\textbf{Geometric intuition: The sphere inside the cube}
+\begin{itemize}
+    \item In 2D: A circle inscribed in a square occupies $\pi/4 \approx 78.5\%$ of the area
+    \item In 3D: A sphere inscribed in a cube occupies $\pi/6 \approx 52.4\%$ of the volume
+    \item In 10D: A 10D-sphere in a 10D-cube occupies only $\approx 0.25\%$
+    \item As $d \to \infty$: This ratio approaches 0
+\end{itemize}
+
+\textbf{What this means:}
+\begin{itemize}
+    \item In high dimensions, data points are ``far apart''
+    \item The concept of ``nearest neighbor'' breaks down
+    \item Any two random points are approximately equidistant
+    \item Local estimation (like k-NN) becomes unreliable
+\end{itemize}
+\end{importantbox}
+
+\begin{examplebox}[Distance in High Dimensions]
+Sample two points from independent Normal distributions:
+\begin{itemize}
+    \item In 1 dimension: Average distance is relatively small
+    \item In 10 dimensions: Points are farther apart on average
+    \item In 1000 dimensions: \textbf{All points are approximately equally far from each other}
+\end{itemize}
+
+This makes it very hard to estimate smooth functions, leading to overfitting.
+\end{examplebox}
+
+\subsection{When Does High Dimensionality Occur?}
+
+\begin{itemize}
+    \item \textbf{Polynomial regression:} 100 predictors with degree 20 = 2000+ terms
+    \item \textbf{Interaction terms:} $P$ main effects yields ${P \choose 2}$ two-way interactions
+    \item \textbf{Genomics:} Tens of thousands of genetic markers, but only hundreds of patients
+    \item \textbf{NLP/Text:} Dictionary of 10,000+ words, each becoming a feature
+    \item \textbf{Image data:} Each pixel is a feature (e.g., 784 features for 28$\times$28 images)
+\end{itemize}
+
+\subsection{How sklearn Handles Perfect Collinearity}
+
+When you have perfect collinearity (e.g., two identical columns), sklearn doesn't crash---it \textbf{splits the coefficient}:
+
+\begin{examplebox}[sklearn's Behavior]
+Predicting house price from square footage:
+\begin{itemize}
+    \item Single predictor: $\hat{\beta}_{\text{sqft}} = 588$
+    \item Duplicate predictor (sqft1, sqft2 are identical): $\hat{\beta}_{\text{sqft1}} = 294$, $\hat{\beta}_{\text{sqft2}} = 294$
+\end{itemize}
+
+\textbf{This is problematic for interpretation} (you can't change one without the other), but \textbf{reasonable for prediction} (splits predictive power equally).
+\end{examplebox}
+
+%========================================================================================
+\newsection{Principal Components Analysis (PCA)}
+%========================================================================================
+
+PCA is a powerful technique for \textbf{dimensionality reduction}---transforming high-dimensional data into a lower-dimensional representation while preserving as much information as possible.
+
+\subsection{The Core Idea}
+
+\begin{definitionbox}[Principal Components Analysis]
+PCA finds a \textbf{linear transformation} of your original predictors $X_1, X_2, \ldots, X_P$ into new variables $Z_1, Z_2, \ldots, Z_P$ such that:
+\begin{itemize}
+    \item $Z_1$ (first principal component) captures the \textbf{maximum variance} in the data
+    \item $Z_2$ is \textbf{orthogonal} to $Z_1$ and captures the maximum \textbf{remaining} variance
+    \item Each subsequent $Z_k$ is orthogonal to all previous components
+\end{itemize}
+
+The key insight: if predictors are correlated, the first few $Z$'s can capture most of the ``information'' (variance) in all $P$ original variables.
+\end{definitionbox}
+
+\begin{examplebox}[Rotating the Axes]
+Imagine a 2D scatter plot of $(X_1, X_2)$ that forms an elongated ellipse tilted at 45 degrees.
+
+\begin{itemize}
+    \item \textbf{Original axes:} $X_1$ (horizontal) and $X_2$ (vertical) don't align with the data's natural structure
+    \item \textbf{PCA axes:}
+    \begin{itemize}
+        \item $Z_1$: Points along the ``spine'' of the ellipse (maximum spread)
+        \item $Z_2$: Perpendicular to $Z_1$ (remaining spread)
+    \end{itemize}
+\end{itemize}
+
+If the ellipse is very ``thin,'' then $Z_1$ alone captures almost all the information. We've \textbf{reduced} from 2 dimensions to 1!
+\end{examplebox}
+
+\subsection{Mathematical Foundation}
+
+PCA is mathematically equivalent to finding the \textbf{eigenvectors} of the covariance matrix $X^TX$:
+
+\begin{itemize}
+    \item \textbf{Eigenvectors} determine the \textbf{directions} of the principal components
+    \item \textbf{Eigenvalues} determine the \textbf{importance} (variance explained) of each component
+\end{itemize}
+
+The eigenvector with the largest eigenvalue becomes PC1, the second largest becomes PC2, etc.
+
+\begin{summarybox}
+\textbf{PCA is a Rotation}
+
+PCA performs a \textbf{linear transformation} (rotation) of your coordinate system to align with the directions of maximum variance in the data. The new coordinates are called principal components.
+
+Each principal component $Z_k$ is a \textbf{linear combination} of all original variables:
+\begin{equation}
+Z_k = w_{k1}X_1 + w_{k2}X_2 + \cdots + w_{kP}X_P
+\end{equation}
+
+The weights $w_{ki}$ come from the eigenvectors and tell us how much each original variable contributes to each component.
+\end{summarybox}
+
+\subsection{PCA in sklearn}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.decomposition import PCA
+import numpy as np
+
+# Original data: n observations, p features
+X = data[['sqft', 'beds', 'baths', 'lot_size', 'distance']]
+
+# Fit PCA
+pca = PCA()
+pca.fit(X)
+
+# Transform data to principal components
+X_pca = pca.transform(X)
+
+# Get the component weights (loadings)
+print("Component 1 weights:", pca.components_[0])
+# Output: [ 0.95  0.28  0.08  0.11  0.02]
+# Interpretation: PC1 is mostly sqft and beds
+
+# Variance explained by each component
+print("Variance ratios:", pca.explained_variance_ratio_)
+# Output: [0.91, 0.05, 0.02, 0.01, 0.01]
+# Interpretation: PC1 alone captures 91% of variance
+\end{lstlisting}
+
+\subsection{PCA for Visualization}
+
+One of the most common uses of PCA is \textbf{visualizing high-dimensional data} in 2D:
+
+\begin{enumerate}
+    \item Run PCA on your $P$-dimensional data
+    \item Keep only PC1 and PC2
+    \item Plot each observation as a point with $(Z_1, Z_2)$ coordinates
+    \item Color by class/category to see if groups separate
+\end{enumerate}
+
+\begin{examplebox}[Penguin Species Visualization]
+\textbf{Data:} 4 measurements (bill length, bill depth, flipper length, body mass) for 3 penguin species
+
+\textbf{Problem:} Can't visualize 4D data directly
+
+\textbf{Solution:}
+\begin{itemize}
+    \item Run PCA on the 4 measurements
+    \item Plot penguins using PC1 (x-axis) and PC2 (y-axis)
+    \item Color by species
+\end{itemize}
+
+\textbf{Result:} The three species form distinct clusters in PC space, even though PCA never saw the species labels!
+\end{examplebox}
+
+\begin{examplebox}[Fashion MNIST]
+\textbf{Data:} 28$\times$28 grayscale images of clothing items (784 pixels = 784 features)
+
+\textbf{Categories:} T-shirts, trousers, pullovers, dresses, coats, sandals, shirts, sneakers, bags, ankle boots
+
+\textbf{PCA Visualization:}
+\begin{itemize}
+    \item Run PCA on the 784-dimensional pixel data
+    \item Plot using PC1 and PC2
+    \item Color by clothing category
+\end{itemize}
+
+\textbf{Result:} While there's overlap, items of the same category tend to cluster together. This suggests the pixel features contain information useful for classification.
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{PCA is Unsupervised}
+
+PCA only looks at the predictor variables $X$. It has \textbf{no knowledge of the response} $Y$ (class labels, outcomes, etc.).
+
+If clusters separate well in PCA space, it's a good sign that $X$ contains information predictive of $Y$. But PC1 is NOT guaranteed to be the ``best predictor'' of $Y$---it's just the direction of maximum variance in $X$.
+\end{warningbox}
+
+\subsection{PCA for Regression (PCR)}
+
+Principal Components Regression uses PCA as a \textbf{preprocessing step} to handle high dimensionality:
+
+\begin{enumerate}
+    \item \textbf{Step 1: Run PCA} on all $P$ predictors to get $P$ principal components
+    \item \textbf{Step 2: Select $M$ components} (where $M < P$)
+    \item \textbf{Step 3: Fit regression} using only the selected components:
+    \begin{equation}
+    Y = \beta_0 + \beta_1 Z_1 + \beta_2 Z_2 + \cdots + \beta_M Z_M + \epsilon
+    \end{equation}
+\end{enumerate}
+
+\subsubsection{Choosing the Number of Components (M)}
+
+\textbf{Method 1: Scree Plot / Elbow Method}
+\begin{itemize}
+    \item Plot variance explained by each component
+    \item Look for an ``elbow'' where the curve levels off
+    \item Keep components before the elbow
+\end{itemize}
+
+\textbf{Method 2: Cumulative Variance Threshold}
+\begin{itemize}
+    \item Keep components until you capture X\% of total variance
+    \item Common thresholds: 90\%, 95\%
+    \item Example: ``53 components explain 90\% of variance''
+\end{itemize}
+
+\textbf{Method 3: Cross-Validation}
+\begin{itemize}
+    \item Treat $M$ as a hyperparameter
+    \item For each candidate $M$, compute cross-validation MSE
+    \item Select $M$ that minimizes validation error
+    \item This is the most ``performance-oriented'' approach
+\end{itemize}
+
+\subsection{Pros and Cons of PCA}
+
+\begin{infobox}
+\textbf{Advantages:}
+\begin{itemize}
+    \item \textbf{Reduces overfitting:} Fewer dimensions = less capacity to memorize noise
+    \item \textbf{Eliminates multicollinearity:} Principal components are orthogonal by construction
+    \item \textbf{Enables visualization:} Project any high-dimensional data to 2D/3D
+    \item \textbf{Speeds up computation:} Fewer features = faster training
+\end{itemize}
+\end{infobox}
+
+\begin{warningbox}
+\textbf{Disadvantages:}
+\begin{itemize}
+    \item \textbf{Loss of interpretability:} $Z_1 = 0.5X_1 - 0.3X_2 + 0.2X_3 + \cdots$ is hard to explain to stakeholders
+    \item \textbf{Ignores the response:} PC1 explains most variance in $X$, but might not predict $Y$ well. The ``important'' information for $Y$ could be in PC50!
+    \item \textbf{No guaranteed improvement:} Prediction accuracy might not improve over using original features
+    \item \textbf{Linear only:} PCA finds linear combinations; nonlinear relationships are missed
+\end{itemize}
+\end{warningbox}
+
+%========================================================================================
+\newsection{Midterm Review: Hypothesis Testing}
+%========================================================================================
+
+\subsection{The Framework}
+
+\begin{definitionbox}[Hypothesis Testing]
+Hypothesis testing is a formal procedure to determine whether observed effects in data are ``real'' or could have occurred by random chance.
+
+\textbf{The Five Steps:}
+\begin{enumerate}
+    \item \textbf{State hypotheses:}
+    \begin{itemize}
+        \item $H_0$ (null): ``No effect'' (e.g., $\beta_1 = 0$)
+        \item $H_A$ (alternative): ``There is an effect'' (e.g., $\beta_1 \neq 0$)
+    \end{itemize}
+    \item \textbf{Choose test statistic:} A measure to evaluate the hypothesis (e.g., $t$-statistic)
+    \item \textbf{Calculate test statistic:} Compute it from your data
+    \item \textbf{Compute p-value:} How extreme is this statistic under $H_0$?
+    \item \textbf{Make a decision:}
+    \begin{itemize}
+        \item If $p < \alpha$ (usually 0.05): Reject $H_0$
+        \item If $p \geq \alpha$: Fail to reject $H_0$
+    \end{itemize}
+\end{enumerate}
+\end{definitionbox}
+
+\subsection{Understanding P-values}
+
+\begin{importantbox}[What is a P-value?]
+The p-value is the probability of observing a test statistic \textbf{as extreme or more extreme} than what we calculated, \textbf{assuming $H_0$ is true}.
+
+\textbf{Intuition:}
+\begin{itemize}
+    \item Small p-value (e.g., 0.01): ``If there were truly no effect, there's only a 1\% chance of seeing data this extreme. That's unlikely, so maybe $H_0$ is wrong.''
+    \item Large p-value (e.g., 0.40): ``If there were no effect, we'd see data this extreme 40\% of the time. Not surprising at all.''
+\end{itemize}
+
+\textbf{Mnemonic:} ``If the p-value is low, $H_0$ must go!''
+\end{importantbox}
+
+\subsection{T-Test for Regression Coefficients}
+
+For testing whether $\beta_1 = 0$ in simple linear regression:
+
+\begin{equation}
+t = \frac{\hat{\beta}_1 - 0}{SE(\hat{\beta}_1)} = \frac{\hat{\beta}_1}{SE(\hat{\beta}_1)}
+\end{equation}
+
+Under $H_0$, this follows a $t$-distribution with $n - 2$ degrees of freedom.
+
+\begin{examplebox}[Testing Housing Price Relationship]
+\textbf{Question:} Is there a real relationship between square footage and house price?
+
+\textbf{Data:} 592 homes in Cambridge/Somerville
+
+\textbf{Results from statsmodels:}
+\begin{itemize}
+    \item $\hat{\beta}_1 = 0.589$ (price increases \$589 per additional sqft)
+    \item $SE(\hat{\beta}_1) = 0.023$
+    \item $t = 0.589 / 0.023 = 25.2$
+    \item $p \approx 0$ (reported as 0.000)
+\end{itemize}
+
+\textbf{Conclusion:} With $p < 0.05$, we reject $H_0$. There is statistically significant evidence that square footage is associated with house price.
+
+\textbf{But wait---our assumptions (especially constant variance) are violated!}
+\end{examplebox}
+
+%========================================================================================
+\newsection{Permutation Tests}
+%========================================================================================
+
+\subsection{When Assumptions Fail}
+
+The t-test relies on assumptions:
+\begin{itemize}
+    \item Linearity
+    \item Independence
+    \item \textbf{Normality of residuals}
+    \item \textbf{Constant variance (homoscedasticity)}
+\end{itemize}
+
+When these are violated (especially for small samples), the p-value from a t-test may not be trustworthy.
+
+\subsection{The Permutation Test Idea}
+
+\begin{definitionbox}[Permutation Test]
+A \textbf{permutation test} is a non-parametric method that simulates the null hypothesis ($H_0$: no relationship between $X$ and $Y$) by \textbf{randomly shuffling} the $Y$ values.
+
+\textbf{Key insight:} If $X$ and $Y$ are truly unrelated, then it shouldn't matter which $Y$ value is paired with which $X$ value.
+\end{definitionbox}
+
+\subsection{Permutation Test Procedure}
+
+\begin{enumerate}
+    \item \textbf{Calculate observed statistic:} Compute $\hat{\beta}_1$ from the original data (e.g., 0.589)
+
+    \item \textbf{Simulate $H_0$:} Randomly shuffle (permute) the $Y$ values while keeping $X$ fixed
+
+    \item \textbf{Calculate permuted statistic:} Fit regression on $(X, Y_{\text{shuffled}})$ and get $\hat{\beta}_{\text{perm}}$
+
+    \item \textbf{Repeat:} Do steps 2-3 many times (e.g., 1000 or 10000 iterations)
+
+    \item \textbf{Build null distribution:} The 1000 permuted $\hat{\beta}$ values represent what we'd see if $H_0$ were true
+
+    \item \textbf{Calculate p-value:}
+    \begin{equation}
+    p = \frac{\text{Number of permuted } |\hat{\beta}| \geq \text{observed } |\hat{\beta}|}{\text{Total permutations}}
+    \end{equation}
+\end{enumerate}
+
+\begin{examplebox}[Permutation Test for Housing Data]
+\begin{lstlisting}[style=pythonstyle]
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# Original data
+X = houses['sqft'].values.reshape(-1, 1)
+y = houses['price'].values
+
+# Observed coefficient
+model = LinearRegression().fit(X, y)
+observed_beta = model.coef_[0]  # 0.589
+
+# Permutation test
+n_perms = 10000
+perm_betas = []
+
+for _ in range(n_perms):
+    y_shuffled = np.random.permutation(y)  # Shuffle Y
+    model_perm = LinearRegression().fit(X, y_shuffled)
+    perm_betas.append(model_perm.coef_[0])
+
+# P-value: proportion of permuted betas >= observed
+p_value = np.mean(np.abs(perm_betas) >= np.abs(observed_beta))
+print(f"Permutation p-value: {p_value}")
+# Output: 0.0000 (none of 10000 permutations produced such extreme value)
+\end{lstlisting}
+\end{examplebox}
+
+\subsection{Bootstrap vs. Permutation Tests}
+
+\begin{summarybox}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Bootstrap} & \textbf{Permutation Test} \\
+\midrule
+\textbf{Goal} & Estimation & Hypothesis testing \\
+\textbf{Question} & ``How uncertain is my estimate?'' & ``Is the effect real?'' \\
+\textbf{Output} & Confidence interval & P-value \\
+\textbf{Assumes} & $H_A$ (observed data is representative) & $H_0$ (no relationship) \\
+\textbf{Resampling} & With replacement (from $(x_i, y_i)$ pairs) & Without replacement (shuffle $Y$ only) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{summarybox}
+
+%========================================================================================
+\newsection{Key Concepts Summary}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Bayesian Simulation (MCMC):}
+\begin{itemize}
+    \item When posterior distributions are complex, we \textbf{sample} from them instead of solving analytically
+    \item MCMC algorithms (Gibbs, Metropolis-Hastings) generate samples by exploring the probability landscape
+    \item Use sample statistics (mean, percentiles) to estimate posterior properties
+\end{itemize}
+
+\textbf{High Dimensionality:}
+\begin{itemize}
+    \item Big N (many rows): Computational cost, but more data is generally good
+    \item Big P (many columns): Overfitting, multicollinearity, curse of dimensionality
+    \item Curse of dimensionality: Data becomes sparse; all points become ``far apart''
+\end{itemize}
+
+\textbf{PCA:}
+\begin{itemize}
+    \item Finds linear combinations of predictors that maximize variance
+    \item PC1 captures most variance, PC2 captures most remaining variance, etc.
+    \item Uses: Visualization (plot PC1 vs PC2), Regression (use top M components)
+    \item Limitation: Ignores $Y$; loses interpretability
+\end{itemize}
+
+\textbf{Hypothesis Testing:}
+\begin{itemize}
+    \item P-value = probability of seeing data this extreme if $H_0$ is true
+    \item Reject $H_0$ if p-value < 0.05 (typically)
+    \item T-test requires assumptions; permutation test is the non-parametric alternative
+\end{itemize}
+
+\textbf{Bootstrap vs. Permutation:}
+\begin{itemize}
+    \item Bootstrap: Sample with replacement $\to$ Confidence intervals
+    \item Permutation: Shuffle $Y$ $\to$ P-values under $H_0$
+\end{itemize}
+\end{summarybox}
+
+%========================================================================================
+\newsection{Quick Reference: Key Formulas}
+%========================================================================================
+
+\begin{infobox}
+\textbf{PCA Transformation:}
+\begin{equation}
+Z_k = \sum_{j=1}^{P} w_{kj} X_j \quad \text{(linear combination)}
+\end{equation}
+
+\textbf{Variance Explained:}
+\begin{equation}
+\text{Proportion} = \frac{\lambda_k}{\sum_{j=1}^{P} \lambda_j} \quad \text{(eigenvalue ratio)}
+\end{equation}
+
+\textbf{T-Statistic:}
+\begin{equation}
+t = \frac{\hat{\beta} - \beta_0}{SE(\hat{\beta})} \sim t_{n-p-1}
+\end{equation}
+
+\textbf{Permutation P-value:}
+\begin{equation}
+p = \frac{1}{B}\sum_{b=1}^{B} \mathbf{1}(|\hat{\beta}^{(b)}_{\text{perm}}| \geq |\hat{\beta}_{\text{obs}}|)
+\end{equation}
+
+\textbf{Confidence Interval (Bootstrap):}
+\begin{equation}
+[\hat{\beta}_{2.5\%}, \hat{\beta}_{97.5\%}] \quad \text{(percentile method)}
+\end{equation}
+\end{infobox}
+
+\end{document}

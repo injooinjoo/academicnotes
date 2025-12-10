@@ -1,0 +1,926 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 24: AdaBoost (Adaptive Boosting)
+% English Version - Beginner Friendly
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 24}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. Overview Box
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. Summary Box
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. Info Box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. Warning Box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. Example Box
+\newtcolorbox{examplebox}[1]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 6. Definition Box
+\newtcolorbox{definitionbox}[1]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 7. Important Box
+\newtcolorbox{importantbox}[1]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 8. Caution Box
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Style
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Captions
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 24},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 24: AdaBoost}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understand AdaBoost as a boosting algorithm for classification, learn how it differs from Gradient Boosting, and master the weight update mechanism}
+
+\tableofcontents
+\newpage
+
+%========================================================================================
+\section{Introduction to AdaBoost}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{AdaBoost} (Adaptive Boosting) is a boosting algorithm designed for classification. Its key innovation:
+
+\textbf{Instead of fitting residuals, AdaBoost reweights the training data.}
+
+After each weak learner:
+\begin{itemize}
+    \item Misclassified samples get \textbf{higher weights}
+    \item Correctly classified samples get \textbf{lower weights}
+    \item The next weak learner focuses on the ``hard'' examples
+\end{itemize}
+
+This is like studying for an exam by focusing on the problems you got wrong!
+\end{summarybox}
+
+\subsection{Historical Context}
+
+AdaBoost was introduced by Yoav Freund and Robert Schapire in 1996 and won the prestigious G\"{o}del Prize in 2003. It was one of the first practical boosting algorithms and demonstrated that weak learners could be combined into a strong learner.
+
+\subsection{The ``Error Notebook'' Analogy}
+
+\begin{examplebox}{Studying with an Error Notebook}
+Imagine you're preparing for a difficult exam:
+
+\begin{enumerate}
+    \item \textbf{Practice test 1}: You get some questions right, some wrong
+    \item \textbf{Star the wrong ones}: Mark the problems you missed with a star ($\star$)
+    \item \textbf{Focus your study}: Spend more time on starred problems
+    \item \textbf{Practice test 2}: You might get the starred ones right, but miss some new ones
+    \item \textbf{Update stars}: Star the new mistakes, remove stars from ones you now understand
+    \item \textbf{Repeat}: Keep focusing on your current weaknesses
+    \item \textbf{Final exam}: Combine everything you learned from all practice tests
+\end{enumerate}
+
+This is exactly how AdaBoost works! Each weak learner is like a practice test, and the sample weights are like your star markings.
+\end{examplebox}
+
+%========================================================================================
+\newpage
+\section{Key Concepts}
+%========================================================================================
+
+\subsection{Weak Learners: Stumps}
+
+\begin{definitionbox}{Decision Stump}
+A \textbf{decision stump} is a decision tree with only \textbf{one split}:
+\begin{itemize}
+    \item One root node (asks one question)
+    \item Two leaf nodes (makes two predictions)
+\end{itemize}
+
+A stump is the simplest possible decision tree. It's a ``weak learner''---better than random guessing, but not by much.
+\end{definitionbox}
+
+Why use such a simple model?
+
+\begin{itemize}
+    \item Each stump captures \textbf{one simple pattern}
+    \item Many stumps combined can capture \textbf{complex patterns}
+    \item Simple models are \textbf{less prone to overfitting} individually
+    \item The boosting process handles complexity through \textbf{aggregation}
+\end{itemize}
+
+\subsection{Label Encoding: $-1$ and $+1$}
+
+AdaBoost uses labels $y \in \{-1, +1\}$ instead of $\{0, 1\}$. This makes the math elegant:
+
+\begin{definitionbox}{The Sign Trick}
+When $y, \hat{y} \in \{-1, +1\}$:
+\begin{itemize}
+    \item If \textbf{correct}: $y \cdot \hat{y} = +1$ (both same sign)
+    \item If \textbf{wrong}: $y \cdot \hat{y} = -1$ (opposite signs)
+\end{itemize}
+
+Examples:
+\begin{itemize}
+    \item $y = +1$, $\hat{y} = +1$ $\Rightarrow$ $y \cdot \hat{y} = +1$ (correct)
+    \item $y = -1$, $\hat{y} = -1$ $\Rightarrow$ $y \cdot \hat{y} = +1$ (correct)
+    \item $y = +1$, $\hat{y} = -1$ $\Rightarrow$ $y \cdot \hat{y} = -1$ (wrong)
+    \item $y = -1$, $\hat{y} = +1$ $\Rightarrow$ $y \cdot \hat{y} = -1$ (wrong)
+\end{itemize}
+
+This property is crucial for the weight update formula!
+\end{definitionbox}
+
+\subsection{Sample Weights}
+
+Unlike gradient boosting (which modifies the target), AdaBoost maintains a \textbf{weight for each sample}:
+
+\begin{itemize}
+    \item Initially, all samples have equal weight: $w_i = \frac{1}{N}$
+    \item After each iteration, weights are adjusted:
+    \begin{itemize}
+        \item Misclassified samples: weight \textbf{increases}
+        \item Correctly classified samples: weight \textbf{decreases}
+    \end{itemize}
+    \item Weights always sum to 1 (they form a distribution)
+\end{itemize}
+
+%========================================================================================
+\newpage
+\section{The AdaBoost Algorithm}
+%========================================================================================
+
+\begin{definitionbox}{AdaBoost Algorithm}
+\textbf{Input}: Training data $(x_i, y_i)$ with $y_i \in \{-1, +1\}$, number of iterations $M$
+
+\textbf{Initialize}: $w_i^{(0)} = \frac{1}{N}$ for all samples
+
+\textbf{For $m = 1, 2, \ldots, M$:}
+
+\begin{enumerate}
+    \item \textbf{Fit weak learner} $h_m$ using weights $w^{(m-1)}$
+
+    \item \textbf{Compute weighted error}:
+    \[
+    \epsilon_m = \sum_{i: h_m(x_i) \neq y_i} w_i^{(m-1)}
+    \]
+    (Sum of weights of misclassified samples)
+
+    \item \textbf{Compute learner weight} (how much ``say'' this learner gets):
+    \[
+    \alpha_m = \frac{1}{2} \ln\left(\frac{1 - \epsilon_m}{\epsilon_m}\right)
+    \]
+
+    \item \textbf{Update sample weights}:
+    \[
+    w_i^{(m)} = w_i^{(m-1)} \cdot \exp(-\alpha_m \cdot y_i \cdot h_m(x_i))
+    \]
+    Then normalize so weights sum to 1.
+
+    \item \textbf{Add to ensemble}:
+    \[
+    H_m(x) = H_{m-1}(x) + \alpha_m \cdot h_m(x)
+    \]
+\end{enumerate}
+
+\textbf{Final prediction}: $\hat{y} = \text{sign}(H_M(x))$
+\end{definitionbox}
+
+\subsection{Understanding the Learner Weight $\alpha$}
+
+The formula $\alpha_m = \frac{1}{2} \ln\left(\frac{1 - \epsilon_m}{\epsilon_m}\right)$ determines how much influence each weak learner has:
+
+\begin{table}[h!]
+\centering
+\caption{Learner Weight vs. Error Rate}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Error $\epsilon$} & \textbf{Meaning} & \textbf{Weight $\alpha$} \\
+\midrule
+0.0 & Perfect classifier & $+\infty$ \\
+0.1 & Very good & Large positive \\
+0.3 & Good & Moderate positive \\
+0.5 & Random guessing & 0 (ignored!) \\
+0.7 & Worse than random & Negative (flips!) \\
+1.0 & Perfectly wrong & $-\infty$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{infobox}
+\textbf{Key Insights:}
+\begin{itemize}
+    \item Better classifiers ($\epsilon < 0.5$) get positive weight---their votes count!
+    \item Random classifiers ($\epsilon = 0.5$) get zero weight---ignored
+    \item Worse-than-random classifiers ($\epsilon > 0.5$) get negative weight---their predictions are \textbf{flipped}!
+\end{itemize}
+\end{infobox}
+
+\subsection{Understanding the Weight Update}
+
+The weight update formula is:
+\[
+w_i^{(new)} \propto w_i^{(old)} \cdot \exp(-\alpha \cdot y_i \cdot h(x_i))
+\]
+
+Let's understand this:
+
+\begin{itemize}
+    \item \textbf{If correctly classified}: $y_i \cdot h(x_i) = +1$
+    \begin{itemize}
+        \item Exponent: $-\alpha \cdot (+1) = -\alpha < 0$
+        \item Factor: $e^{-\alpha} < 1$
+        \item Weight \textbf{decreases}
+    \end{itemize}
+
+    \item \textbf{If misclassified}: $y_i \cdot h(x_i) = -1$
+    \begin{itemize}
+        \item Exponent: $-\alpha \cdot (-1) = +\alpha > 0$
+        \item Factor: $e^{+\alpha} > 1$
+        \item Weight \textbf{increases}
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}{Weight Update Example}
+Suppose $\alpha = 0.5$ (a moderately good classifier):
+
+\begin{itemize}
+    \item \textbf{Correctly classified}: Weight multiplied by $e^{-0.5} \approx 0.61$ (decreases by 39\%)
+    \item \textbf{Misclassified}: Weight multiplied by $e^{0.5} \approx 1.65$ (increases by 65\%)
+\end{itemize}
+
+If $\alpha = 2.0$ (a very good classifier):
+
+\begin{itemize}
+    \item \textbf{Correctly classified}: Weight multiplied by $e^{-2} \approx 0.14$ (decreases by 86\%)
+    \item \textbf{Misclassified}: Weight multiplied by $e^{2} \approx 7.4$ (increases by 640\%!)
+\end{itemize}
+
+The better the classifier, the more dramatically we adjust weights!
+\end{examplebox}
+
+%========================================================================================
+\newpage
+\section{How Weak Learners Use Weights}
+%========================================================================================
+
+\subsection{Option 1: Weighted Loss Function}
+
+When training the decision stump, instead of counting misclassifications, we compute the \textbf{weighted error}:
+
+\[
+\text{Weighted Error} = \sum_{i: h(x_i) \neq y_i} w_i
+\]
+
+For decision trees using Gini impurity:
+\[
+\text{Weighted Gini} = \sum_i w_i \cdot \mathbf{1}[\text{sample } i \text{ in this node}] \cdot \text{impurity contribution}
+\]
+
+This makes misclassifying high-weight samples more ``costly,'' so the stump avoids those mistakes.
+
+\subsection{Option 2: Resampling}
+
+Alternatively, we can \textbf{resample} the training data according to the weights:
+
+\begin{enumerate}
+    \item Generate a new training set by sampling with replacement
+    \item Probability of selecting sample $i$ is proportional to $w_i$
+    \item Train a regular (unweighted) stump on this resampled data
+\end{enumerate}
+
+This approach:
+\begin{itemize}
+    \item Implicitly gives high-weight samples more influence
+    \item Works with any base learner (doesn't need to support weights)
+    \item Introduces additional randomness
+\end{itemize}
+
+%========================================================================================
+\newpage
+\section{Visual Example: 2D Classification}
+%========================================================================================
+
+\begin{examplebox}{AdaBoost in Action}
+Consider classifying two groups: orange circles and blue triangles.
+
+\textbf{Round 1:}
+\begin{itemize}
+    \item All 10 samples have weight $w = 0.1$
+    \item First stump: ``Is $x_1 > 4.6$?''
+    \item Correctly classifies 7, misclassifies 3 (all orange circles)
+    \item $\epsilon_1 = 0.1 + 0.1 + 0.1 = 0.3$
+    \item $\alpha_1 = \frac{1}{2}\ln\left(\frac{0.7}{0.3}\right) \approx 0.42$
+\end{itemize}
+
+\textbf{After Round 1 weight update:}
+\begin{itemize}
+    \item Correct samples: weights $\rightarrow 0.1 \times e^{-0.42} \approx 0.066$
+    \item Misclassified samples: weights $\rightarrow 0.1 \times e^{0.42} \approx 0.152$
+    \item After normalization: misclassified samples have $\sim$2.3x the weight
+\end{itemize}
+
+\textbf{Round 2:}
+\begin{itemize}
+    \item Second stump must pay more attention to those 3 orange circles
+    \item Chooses ``Is $x_2 > 8$?'' to separate them
+    \item This might misclassify some previously correct blue triangles
+    \item Process continues...
+\end{itemize}
+
+\textbf{Final result:}
+\begin{itemize}
+    \item 3 simple axis-aligned splits
+    \item Combined: complex decision boundary
+    \item Can separate the groups better than any single stump!
+\end{itemize}
+\end{examplebox}
+
+%========================================================================================
+\newpage
+\section{AdaBoost vs. Gradient Boosting}
+%========================================================================================
+
+Both are boosting methods, but they differ in key ways:
+
+\begin{table}[h!]
+\centering
+\caption{Comparison: AdaBoost vs. Gradient Boosting}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Aspect} & \textbf{AdaBoost} & \textbf{Gradient Boosting} \\
+\midrule
+Loss function & Exponential loss & Any differentiable loss \\
+How it learns & Reweights samples & Fits to residuals/gradients \\
+Learner weight $\alpha$ & Computed from formula & User-specified (learning rate) \\
+Primary use & Classification & Classification and Regression \\
+Sensitivity to outliers & High & Moderate \\
+Overfitting tendency & Moderate & Can be controlled \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{The Connection: AdaBoost IS Gradient Boosting}
+
+\begin{importantbox}{AdaBoost = Gradient Boosting with Exponential Loss}
+AdaBoost can be viewed as a special case of gradient boosting where:
+
+\begin{itemize}
+    \item Loss function: $L(y, f) = \exp(-y \cdot f)$ (exponential loss)
+    \item This loss heavily penalizes confident wrong predictions
+\end{itemize}
+
+The weight update in AdaBoost is actually computing the gradient of exponential loss!
+\end{importantbox}
+
+\subsection{Exponential Loss}
+
+\begin{definitionbox}{Exponential Loss}
+For labels $y \in \{-1, +1\}$ and prediction $f(x)$:
+\[
+L(y, f) = \exp(-y \cdot f(x))
+\]
+
+Properties:
+\begin{itemize}
+    \item Correct confident prediction ($y \cdot f \gg 0$): Loss $\approx 0$
+    \item Wrong confident prediction ($y \cdot f \ll 0$): Loss $\to \infty$
+    \item Serves as an upper bound on 0-1 classification error
+\end{itemize}
+\end{definitionbox}
+
+%========================================================================================
+\newpage
+\section{Overfitting and Hyperparameters}
+%========================================================================================
+
+\subsection{AdaBoost Can Overfit!}
+
+Unlike some claims, boosting methods (including AdaBoost) \textbf{can overfit}:
+
+\begin{warningbox}
+\textbf{Why AdaBoost Overfits:}
+
+\begin{itemize}
+    \item AdaBoost \textbf{obsesses} over misclassified samples
+    \item Some ``hard'' samples might be outliers or noise
+    \item With enough iterations, it memorizes these noise points
+    \item Result: Perfect training accuracy, poor test performance
+\end{itemize}
+
+\textbf{Solution}: Use early stopping based on validation error!
+\end{warningbox}
+
+\subsection{Key Hyperparameters}
+
+\begin{table}[h!]
+\centering
+\caption{AdaBoost Hyperparameters in sklearn}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parameter} & \textbf{Default} & \textbf{Description} \\
+\midrule
+\code{n\_estimators} & 50 & Number of weak learners \\
+\code{learning\_rate} & 1.0 & Shrinkage factor for $\alpha$ \\
+\code{estimator} & DecisionTree(depth=1) & Base weak learner \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Tuning advice:}
+\begin{itemize}
+    \item \code{n\_estimators}: More = more complex. Use validation to find optimal.
+    \item \code{learning\_rate}: Lower values require more estimators but often generalize better.
+    \item \code{estimator}: Stumps (depth 1) are standard; depth 2-3 can help but risk overfitting.
+\end{itemize}
+
+%========================================================================================
+\newpage
+\section{AdaBoost in Python}
+%========================================================================================
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Prepare data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create AdaBoost classifier
+# Note: sklearn uses SAMME algorithm (similar to original AdaBoost)
+ada = AdaBoostClassifier(
+    estimator=DecisionTreeClassifier(max_depth=1),  # Stump
+    n_estimators=50,
+    learning_rate=1.0,
+    algorithm='SAMME',
+    random_state=42
+)
+
+# Train
+ada.fit(X_train, y_train)
+
+# Evaluate
+print(f"Train Accuracy: {ada.score(X_train, y_train):.4f}")
+print(f"Test Accuracy: {ada.score(X_test, y_test):.4f}")
+\end{lstlisting}
+
+\subsection{Visualizing Training Progress}
+
+\begin{lstlisting}[style=pythonstyle]
+# Plot training and test error vs. number of estimators
+train_errors = []
+test_errors = []
+
+for n in range(1, 101):
+    ada = AdaBoostClassifier(
+        estimator=DecisionTreeClassifier(max_depth=1),
+        n_estimators=n,
+        random_state=42
+    )
+    ada.fit(X_train, y_train)
+    train_errors.append(1 - ada.score(X_train, y_train))
+    test_errors.append(1 - ada.score(X_test, y_test))
+
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, 101), train_errors, label='Training Error')
+plt.plot(range(1, 101), test_errors, label='Test Error')
+plt.xlabel('Number of Estimators')
+plt.ylabel('Error Rate')
+plt.title('AdaBoost Learning Curve')
+plt.legend()
+plt.show()
+
+# Find optimal number
+best_n = np.argmin(test_errors) + 1
+print(f"Optimal n_estimators: {best_n}")
+\end{lstlisting}
+
+\subsection{Getting Feature Importance}
+
+\begin{lstlisting}[style=pythonstyle]
+# AdaBoost provides feature importance
+importances = ada.feature_importances_
+
+# Display
+import pandas as pd
+pd.DataFrame({
+    'Feature': feature_names,
+    'Importance': importances
+}).sort_values('Importance', ascending=False)
+\end{lstlisting}
+
+%========================================================================================
+\newpage
+\section{When to Use AdaBoost}
+%========================================================================================
+
+\subsection{Advantages}
+
+\begin{itemize}
+    \item \textbf{Simple to implement}: Algorithm is straightforward
+    \item \textbf{No hyperparameter for $\alpha$}: Learner weights computed automatically
+    \item \textbf{Works with any weak learner}: Not limited to trees
+    \item \textbf{Feature importance}: Built-in interpretation
+    \item \textbf{Historical importance}: Foundation of modern boosting
+\end{itemize}
+
+\subsection{Disadvantages}
+
+\begin{itemize}
+    \item \textbf{Sensitive to outliers}: Keeps increasing weights on hard-to-classify points
+    \item \textbf{Sensitive to noise}: Treats noisy samples as ``important''
+    \item \textbf{Can overfit}: Especially with many iterations
+    \item \textbf{Limited to classification}: Original form; Gradient Boosting is more flexible
+\end{itemize}
+
+\subsection{Modern Alternatives}
+
+In practice, you'll often use:
+
+\begin{itemize}
+    \item \textbf{XGBoost}: Optimized gradient boosting with regularization
+    \item \textbf{LightGBM}: Fast gradient boosting for large datasets
+    \item \textbf{CatBoost}: Handles categorical features well
+\end{itemize}
+
+These are all variants of Gradient Boosting rather than AdaBoost, but understanding AdaBoost helps you understand the foundations.
+
+%========================================================================================
+\newpage
+\section{Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{AdaBoost Core Ideas:}
+\begin{itemize}
+    \item Combines weak learners (stumps) into a strong classifier
+    \item Uses \textbf{sample weights} instead of residuals
+    \item Misclassified samples get higher weights
+    \item Better classifiers get more voting power ($\alpha$)
+\end{itemize}
+
+\textbf{The Algorithm:}
+\begin{enumerate}
+    \item Initialize all sample weights equally: $w_i = 1/N$
+    \item For each iteration:
+    \begin{itemize}
+        \item Train stump on weighted data
+        \item Compute weighted error $\epsilon$
+        \item Compute learner weight $\alpha = \frac{1}{2}\ln\frac{1-\epsilon}{\epsilon}$
+        \item Update sample weights: $w_i \gets w_i \cdot \exp(-\alpha y_i h(x_i))$
+    \end{itemize}
+    \item Final prediction: weighted vote of all stumps
+\end{enumerate}
+
+\textbf{Key Formulas:}
+\begin{itemize}
+    \item Learner weight: $\alpha = \frac{1}{2}\ln\left(\frac{1-\epsilon}{\epsilon}\right)$
+    \item Sample weight update: $w_{new} \propto w_{old} \cdot \exp(-\alpha \cdot y \cdot \hat{y})$
+    \item Final prediction: $\text{sign}\left(\sum_m \alpha_m h_m(x)\right)$
+\end{itemize}
+
+\textbf{Practical Tips:}
+\begin{itemize}
+    \item Use validation data to avoid overfitting
+    \item Monitor both training and test error
+    \item Consider XGBoost/LightGBM for production use
+\end{itemize}
+\end{summarybox}
+
+%========================================================================================
+\newpage
+\section{Practice Questions}
+%========================================================================================
+
+\begin{enumerate}
+    \item \textbf{Conceptual}: Explain why AdaBoost uses labels $\{-1, +1\}$ instead of $\{0, 1\}$. How does this simplify the weight update formula?
+
+    \item \textbf{Calculation}: A weak learner has weighted error $\epsilon = 0.2$. Calculate $\alpha$ and explain what this value means for the learner's influence.
+
+    \item \textbf{Weight Update}: If a sample has current weight $w = 0.1$ and $\alpha = 0.5$, what is the new weight if:
+    \begin{itemize}
+        \item The sample is correctly classified?
+        \item The sample is misclassified?
+    \end{itemize}
+
+    \item \textbf{Edge Cases}: What happens in AdaBoost if a weak learner achieves:
+    \begin{itemize}
+        \item Perfect accuracy ($\epsilon = 0$)?
+        \item Random guessing ($\epsilon = 0.5$)?
+        \item Worse than random ($\epsilon = 0.7$)?
+    \end{itemize}
+
+    \item \textbf{Comparison}: Explain the key difference between how AdaBoost and Gradient Boosting ``learn from mistakes.''
+
+    \item \textbf{Overfitting}: Why can AdaBoost overfit even though each weak learner is simple? How would you detect and prevent this?
+
+    \item \textbf{Code}: Modify the sklearn AdaBoost example to:
+    \begin{itemize}
+        \item Use depth-2 trees instead of stumps
+        \item Implement early stopping based on validation error
+        \item Compare performance to the default configuration
+    \end{itemize}
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,990 @@
+\documentclass[11pt,a4paper]{article}
+
+% ===== Packages =====
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ===== Page Setup =====
+\geometry{margin=25mm}
+\setstretch{1.15}
+
+% ===== Colors =====
+\definecolor{harvardcrimson}{RGB}{165,28,48}
+\definecolor{accentblue}{RGB}{41,128,185}
+\definecolor{boxgray}{RGB}{245,245,245}
+\definecolor{darkgray}{RGB}{60,60,60}
+
+% ===== tcolorbox Setup =====
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{summarybox}[1][]{
+  colback=harvardcrimson!5,
+  colframe=harvardcrimson,
+  fonttitle=\bfseries,
+  title=Summary,
+  breakable,
+  #1
+}
+
+\newtcolorbox{overviewbox}[1][]{
+  colback=accentblue!5,
+  colframe=accentblue,
+  fonttitle=\bfseries,
+  title=Overview,
+  breakable,
+  #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+  colback=orange!5,
+  colframe=orange!80!black,
+  fonttitle=\bfseries,
+  title=Warning,
+  breakable,
+  #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+  colback=green!5,
+  colframe=green!60!black,
+  fonttitle=\bfseries,
+  title=Example,
+  breakable,
+  #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+  colback=purple!5,
+  colframe=purple!70!black,
+  fonttitle=\bfseries,
+  title=Definition,
+  breakable,
+  #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+  colback=red!5,
+  colframe=red!70!black,
+  fonttitle=\bfseries,
+  title=Important,
+  breakable,
+  #1
+}
+
+\newtcolorbox{infobox}[1][]{
+  colback=cyan!5,
+  colframe=cyan!60!black,
+  fonttitle=\bfseries,
+  title=Info,
+  breakable,
+  #1
+}
+
+% ===== Code Style =====
+\lstdefinestyle{pythonstyle}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{accentblue}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{harvardcrimson},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{boxgray}
+}
+
+% ===== Header/Footer =====
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{harvardcrimson}{CSCI E-89B: Introduction to NLP}}
+\fancyhead[R]{\textcolor{harvardcrimson}{Lecture 12}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ===== Document Info =====
+\newcommand{\metainfo}{
+\begin{tcolorbox}[colback=boxgray,colframe=darkgray,title=Lecture Information]
+\begin{tabular}{@{}ll}
+\textbf{Course:} & CSCI E-89B: Introduction to Natural Language Processing \\
+\textbf{Lecture:} & 12 -- Attention Mechanism and Transformers \\
+\textbf{Institution:} & Harvard Extension School \\
+\textbf{Topics:} & Attention Mechanism, Query-Key-Value, Multi-Head Attention, Transformers, BERT, GPT
+\end{tabular}
+\end{tcolorbox}
+}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\textcolor{harvardcrimson}{Attention Mechanism and Transformers}}\\[0.5em]
+{\large CSCI E-89B: Introduction to Natural Language Processing}\\[0.3em]
+{\large Lecture 12}
+\end{center}
+
+\metainfo
+
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction and Quiz Review}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{overviewbox}
+This lecture introduces two revolutionary concepts in modern NLP: the \textbf{attention mechanism} and the \textbf{transformer architecture}. These form the foundation of virtually all state-of-the-art language models including BERT, GPT, and ChatGPT.
+\end{overviewbox}
+
+\subsection{Review of Previous Concepts}
+
+Before diving into attention mechanisms, let's review key concepts from previous lectures:
+
+\begin{importantbox}
+\textbf{Conditional Random Fields vs. Hidden Markov Models:}
+\begin{itemize}
+    \item CRFs can use more complex dependencies---they can look at joint distributions with \textbf{both past and future tokens}
+    \item HMMs assume current state depends \textbf{only on the previous state}
+    \item This is not about discrete vs. continuous variables; it's about the directionality of dependencies
+\end{itemize}
+\end{importantbox}
+
+\textbf{Key Quiz Points:}
+
+\begin{enumerate}
+    \item \textbf{CRF Advantage:} Ability to capture dependencies from both past and future context
+    \item \textbf{LSTM + CRF Benefit:} Enhanced ability to capture both past and future context
+    \item \textbf{Regular Autoencoder Issue:} The encoding space is \textit{not structured}---even slight shifts in encodings can completely destroy the output
+    \item \textbf{Variational Autoencoder:} The mean ($\mu$) is a deterministic function of the input; adding noise makes the output non-deterministic
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Limitations of Recurrent Neural Networks}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The Problem with Sequential Processing}
+
+\begin{definitionbox}
+\textbf{Recurrent Neural Network (RNN) Structure:}
+
+In a standard RNN, we have:
+\begin{itemize}
+    \item Input sequence: $x_1, x_2, \ldots, x_T$
+    \item Hidden states: $h_1, h_2, \ldots, h_T$
+    \item Each hidden state depends on the previous: $h_t = f(h_{t-1}, x_t)$
+\end{itemize}
+\end{definitionbox}
+
+This sequential nature creates several fundamental problems:
+
+\subsubsection{Problem 1: Vanishing Gradients}
+
+\begin{warningbox}
+As sequences get longer, gradients that flow backward through time become increasingly small. This makes it extremely difficult to learn long-range dependencies.
+
+\textbf{Analogy:} Imagine passing a message through a long chain of people, where each person slightly garbles the message. By the end, the original message is nearly unrecognizable.
+\end{warningbox}
+
+Even with LSTM's long-term memory mechanism, the vanishing gradient problem is only \textit{mitigated}, not eliminated.
+
+\subsubsection{Problem 2: No Parallel Computation}
+
+\begin{warningbox}
+Because each hidden state $h_t$ depends on $h_{t-1}$, we \textbf{cannot} compute states in parallel. This makes training extremely slow for long sequences.
+
+\textbf{Impact:} A 1000-word document requires 1000 sequential computations, regardless of how many GPUs you have.
+\end{warningbox}
+
+\subsubsection{Problem 3: Fixed-Size Bottleneck}
+
+In encoder-decoder architectures (like sequence-to-sequence models for translation):
+
+\begin{itemize}
+    \item The entire input sequence is compressed into a \textbf{single fixed-dimension vector}
+    \item Whether your sentence is 5 words or 50 words, it must fit into the same size representation (e.g., 128 dimensions)
+    \item This creates an information bottleneck
+\end{itemize}
+
+\begin{examplebox}
+\textbf{The Compression Problem:}
+
+Consider trying to store different length sentences in a 128-dimensional vector:
+\begin{itemize}
+    \item ``Hello'' $\rightarrow$ 128-dim vector (easy)
+    \item ``The quick brown fox jumps over the lazy dog'' $\rightarrow$ same 128-dim vector
+    \item A 500-word paragraph $\rightarrow$ still the same 128-dim vector!
+\end{itemize}
+
+Mathematically, there IS enough space (128 dimensions is huge), but practically, learning this mapping is extremely difficult.
+\end{examplebox}
+
+\subsubsection{Problem 4: Difficulty with Future Context}
+
+In a standard RNN:
+\begin{align}
+y_2 = f(y_1, x_2) = f(f(y_0, x_1), x_2)
+\end{align}
+
+The prediction at position 2 depends only on positions 0, 1, and 2. But what if position 2's meaning depends on position 4?
+
+\begin{examplebox}
+\textbf{When Future Words Matter:}
+
+``I went to the bank to deposit my check.''
+
+When translating ``bank,'' you need to see ``deposit'' (which comes later) to know it's a financial institution, not a river bank.
+\end{examplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Attention Mechanism}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Core Idea}
+
+\begin{definitionbox}
+\textbf{Attention:} Instead of compressing the entire input into a single vector, attention allows the model to ``look at'' all input positions and dynamically decide which positions are most relevant for each output position.
+
+\textbf{Key Innovation:} Create a \textbf{context vector} $C_t$ for each time step that is a weighted combination of \textit{all} hidden states.
+\end{definitionbox}
+
+\subsection{Historical Context}
+
+The attention mechanism was introduced in the landmark paper:
+
+\begin{infobox}
+\textbf{``Neural Machine Translation by Jointly Learning to Align and Translate''}\\
+Bahdanau, Cho, and Bengio (2015)
+
+This paper showed that attention-based models significantly outperform traditional encoder-decoder models for machine translation.
+\end{infobox}
+
+\subsection{How Attention Works}
+
+\subsubsection{Step 1: Compute Hidden States}
+
+First, we run a bidirectional RNN (or LSTM) to get hidden states that capture both past and future context:
+
+\begin{align}
+\overrightarrow{h_t} &= \text{forward RNN}(x_1, \ldots, x_t) \\
+\overleftarrow{h_t} &= \text{backward RNN}(x_T, \ldots, x_t) \\
+h_t &= [\overrightarrow{h_t}; \overleftarrow{h_t}] \quad \text{(concatenation)}
+\end{align}
+
+\subsubsection{Step 2: Compute Alignment Scores}
+
+For each output position $t$, we compute how much it should ``attend'' to each input position $j$:
+
+\begin{align}
+e_{tj} = a(s_{t-1}, h_j)
+\end{align}
+
+where:
+\begin{itemize}
+    \item $s_{t-1}$ is the previous decoder state
+    \item $h_j$ is the encoder hidden state at position $j$
+    \item $a$ is an \textbf{alignment function} (a small neural network)
+\end{itemize}
+
+The alignment function is typically:
+\begin{align}
+a(s_{t-1}, h_j) = \tanh(W_s \cdot s_{t-1} + W_h \cdot h_j)
+\end{align}
+
+\subsubsection{Step 3: Convert to Probabilities (Attention Weights)}
+
+Apply softmax to get normalized attention weights:
+
+\begin{align}
+\alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k=1}^{T} \exp(e_{tk})}
+\end{align}
+
+\begin{importantbox}
+\textbf{Key Insight:} The $\alpha$ values are \textbf{not learnable parameters}---they are computed dynamically based on the input! This allows the model to adapt to inputs of any length.
+\end{importantbox}
+
+\subsubsection{Step 4: Compute Context Vector}
+
+The context vector is a weighted sum of all hidden states:
+
+\begin{align}
+\boxed{C_t = \sum_{j=1}^{T} \alpha_{tj} \cdot h_j}
+\end{align}
+
+\subsubsection{Step 5: Generate Output}
+
+The decoder uses both the previous state and the context vector:
+
+\begin{align}
+s_t = f(s_{t-1}, y_{t-1}, C_t)
+\end{align}
+
+\subsection{Visualizing Attention}
+
+\begin{examplebox}
+\textbf{Translation Example: English to French}
+
+``The agreement on the European Economic Area was signed in August 1992.''
+
+$\downarrow$ translates to $\downarrow$
+
+``L'accord sur la zone \'{e}conomique europ\'{e}enne a \'{e}t\'{e} sign\'{e} en ao\^{u}t 1992.''
+
+The attention mechanism learns that:
+\begin{itemize}
+    \item ``zone'' (French, position 5) attends strongly to ``Area'' (English, position 7)
+    \item ``1992'' attends to ``1992'' (diagonal alignment)
+    \item ``sign\'{e}'' attends to ``signed''
+\end{itemize}
+
+This is visualized as a matrix where bright squares indicate high attention weights.
+\end{examplebox}
+
+\subsection{Benefits of Attention}
+
+\begin{summarybox}
+\textbf{Advantages of Attention Mechanism:}
+\begin{enumerate}
+    \item \textbf{Dynamic Context:} No more rigid, fixed-size bottleneck
+    \item \textbf{Long-Range Dependencies:} Can directly connect distant positions
+    \item \textbf{Variable-Length Inputs:} Same architecture works for any sequence length
+    \item \textbf{Interpretability:} Attention weights show what the model focuses on
+    \item \textbf{Better Translation:} Handles word reordering across languages
+\end{enumerate}
+\end{summarybox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{From Attention to Transformers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The Key Question}
+
+With attention, we've solved the bottleneck problem. But we still have recurrent connections. A researcher might ask:
+
+\begin{importantbox}
+``If attention is so powerful that we're computing relationships between ALL positions anyway, do we even need the recurrent network?''
+
+Answer: \textbf{NO!} This insight led to the Transformer architecture.
+\end{importantbox}
+
+\subsection{The Transformer Paper}
+
+\begin{infobox}
+\textbf{``Attention Is All You Need''}\\
+Vaswani et al., Google Brain (2017)
+
+This paper introduced the Transformer architecture, which completely removes recurrence and relies solely on attention. It revolutionized NLP and became the foundation for BERT, GPT, and virtually all modern language models.
+\end{infobox}
+
+\subsection{Limitations of RNNs with Attention}
+
+Even with attention, RNN-based models still have issues:
+
+\begin{enumerate}
+    \item \textbf{Sequential Computation:} Still can't parallelize the RNN part
+    \item \textbf{Vanishing Gradients:} Still present in the recurrent connections
+    \item \textbf{Knowledge Transfer:} Difficult to transfer learned representations to new tasks
+\end{enumerate}
+
+\subsection{Training Cost Perspective}
+
+\begin{warningbox}
+\textbf{The Cost of Training:}
+
+Training a large Transformer model (like GPT-3) is estimated to cost around \textbf{\$4.6 million} in compute costs alone!
+
+This is why transfer learning is so important---we want to train once and reuse the knowledge for many downstream tasks.
+\end{warningbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Transformer Architecture}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{High-Level Overview}
+
+The Transformer consists of two main components:
+
+\begin{enumerate}
+    \item \textbf{Encoder:} Processes the input sequence
+    \item \textbf{Decoder:} Generates the output sequence
+\end{enumerate}
+
+\begin{definitionbox}
+\textbf{Transformer Architecture Components:}
+
+\textbf{Encoder:}
+\begin{itemize}
+    \item Input Embeddings
+    \item Positional Encoding
+    \item Multi-Head Self-Attention
+    \item Feed-Forward Network
+    \item Residual Connections + Layer Normalization
+\end{itemize}
+
+\textbf{Decoder:}
+\begin{itemize}
+    \item Output Embeddings (shifted right)
+    \item Positional Encoding
+    \item Masked Multi-Head Self-Attention
+    \item Encoder-Decoder Attention
+    \item Feed-Forward Network
+    \item Linear + Softmax Output
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Query, Key, and Value}
+
+\begin{importantbox}
+The heart of the Transformer is the \textbf{Query-Key-Value (QKV)} attention mechanism. This is fundamentally different from the earlier attention mechanism.
+\end{importantbox}
+
+\subsubsection{The Motivation: Context-Dependent Embeddings}
+
+\begin{examplebox}
+\textbf{The Problem with Static Embeddings:}
+
+Consider the word ``bank'':
+\begin{itemize}
+    \item ``I went to the \underline{bank} to deposit my check.'' $\rightarrow$ Financial institution
+    \item ``I sat by the river \underline{bank}.'' $\rightarrow$ Edge of a river
+\end{itemize}
+
+With traditional embeddings (Word2Vec, GloVe), ``bank'' has the \textbf{same vector} in both cases!
+
+We need \textbf{context-dependent representations}.
+\end{examplebox}
+
+\subsubsection{Defining Q, K, V}
+
+Given input embeddings $H$ (a matrix where each row is a token embedding):
+
+\begin{align}
+Q &= H \cdot W_Q \quad \text{(Query)} \\
+K &= H \cdot W_K \quad \text{(Key)} \\
+V &= H \cdot W_V \quad \text{(Value)}
+\end{align}
+
+where $W_Q$, $W_K$, $W_V$ are learnable weight matrices.
+
+\subsubsection{Intuition for Q, K, V}
+
+\begin{definitionbox}
+\textbf{Understanding Query, Key, Value:}
+
+Think of it like a database lookup:
+\begin{itemize}
+    \item \textbf{Query (Q):} ``What am I looking for?'' --- Represents the current token asking for information
+    \item \textbf{Key (K):} ``What do I have to offer?'' --- Represents each token's identity for matching
+    \item \textbf{Value (V):} ``What information do I carry?'' --- The actual content to be retrieved
+\end{itemize}
+
+\textbf{Analogy:} Searching a library
+\begin{itemize}
+    \item Query: Your search terms
+    \item Key: Book titles/keywords (used for matching)
+    \item Value: Actual book content (what you get back)
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Why Three Different Representations?}
+
+\begin{infobox}
+\textbf{Flexibility Through Different Roles:}
+
+The same token plays different roles in attention:
+\begin{enumerate}
+    \item When it's the \textbf{token being updated}: Use Q
+    \item When it's \textbf{helping to update another token}: Use K (for matching) and V (for content)
+\end{enumerate}
+
+Having separate transformations gives the model more flexibility to learn different aspects for each role.
+\end{infobox}
+
+\subsection{Scaled Dot-Product Attention}
+
+The attention scores are computed as:
+
+\begin{align}
+\boxed{\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right) V}
+\end{align}
+
+\subsubsection{Step-by-Step Computation}
+
+\begin{enumerate}
+    \item \textbf{Compute similarity scores:} $QK^T$ gives a matrix of dot products between all query-key pairs
+    \item \textbf{Scale:} Divide by $\sqrt{d_k}$ (dimension of keys) to prevent extremely large values
+    \item \textbf{Softmax:} Convert to probabilities (rows sum to 1)
+    \item \textbf{Weighted sum:} Multiply by V to get the output
+\end{enumerate}
+
+\begin{examplebox}
+\textbf{Concrete Example: ``Clouds drift across blue sky''}
+
+Let's trace attention for the word ``sky'':
+
+\textbf{Step 1:} Compute Q for ``sky''
+\begin{align}
+Q_{\text{sky}} = H_{\text{sky}} \cdot W_Q = [q_1, q_2, \ldots, q_d]
+\end{align}
+
+\textbf{Step 2:} Compute scores with all keys
+\begin{align}
+\text{score}_{\text{clouds}} &= Q_{\text{sky}} \cdot K_{\text{clouds}}^T / \sqrt{d_k} \\
+\text{score}_{\text{drift}} &= Q_{\text{sky}} \cdot K_{\text{drift}}^T / \sqrt{d_k} \\
+&\vdots \\
+\text{score}_{\text{sky}} &= Q_{\text{sky}} \cdot K_{\text{sky}}^T / \sqrt{d_k}
+\end{align}
+
+\textbf{Step 3:} Apply softmax
+\begin{align}
+[\alpha_{\text{clouds}}, \alpha_{\text{drift}}, \alpha_{\text{across}}, \alpha_{\text{blue}}, \alpha_{\text{sky}}] = \text{softmax}([\text{scores}])
+\end{align}
+
+Example result: $[0.30, 0.10, 0.10, 0.30, 0.20]$
+
+\textbf{Step 4:} Compute new representation
+\begin{align}
+\text{New}_{\text{sky}} = 0.30 \cdot V_{\text{clouds}} + 0.10 \cdot V_{\text{drift}} + \ldots + 0.20 \cdot V_{\text{sky}}
+\end{align}
+
+The new representation of ``sky'' now incorporates context from related words like ``blue'' and ``clouds''!
+\end{examplebox}
+
+\subsubsection{Why Scale by $\sqrt{d_k}$?}
+
+\begin{warningbox}
+\textbf{Numerical Stability:}
+
+For high-dimensional vectors, dot products can become very large. If $d_k = 512$:
+\begin{itemize}
+    \item Expected magnitude of dot product: $\approx \sqrt{512} \approx 22.6$
+    \item Softmax of large values $\rightarrow$ extremely peaked distribution
+    \item Extremely peaked $\rightarrow$ near-zero gradients $\rightarrow$ no learning!
+\end{itemize}
+
+Dividing by $\sqrt{d_k}$ normalizes the variance back to 1.
+\end{warningbox}
+
+\subsection{Multi-Head Attention}
+
+\begin{definitionbox}
+\textbf{Multi-Head Attention:}
+
+Instead of computing attention once, we compute it multiple times in parallel with different projections:
+
+\begin{align}
+\text{MultiHead}(Q, K, V) &= \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O \\
+\text{where head}_i &= \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)
+\end{align}
+
+Typical configurations use $h = 8$ or $h = 16$ heads.
+\end{definitionbox}
+
+\subsubsection{Why Multiple Heads?}
+
+\begin{infobox}
+\textbf{Benefits of Multi-Head Attention:}
+
+\begin{enumerate}
+    \item \textbf{Different Types of Relationships:} One head might learn syntactic relationships, another semantic
+    \item \textbf{Different Positions:} Different heads can focus on nearby vs. distant tokens
+    \item \textbf{Redundancy:} Multiple chances to capture important patterns
+    \item \textbf{Parallel Computation:} All heads can be computed simultaneously
+\end{enumerate}
+
+\textbf{Analogy:} Like having multiple experts look at the same problem from different angles.
+\end{infobox}
+
+\subsection{Positional Encoding}
+
+\begin{warningbox}
+\textbf{The Order Problem:}
+
+Unlike RNNs, Transformers process all positions simultaneously. Without any modification:
+
+``The cat sat on the mat'' and ``mat the on sat cat The''
+
+would produce \textbf{identical representations!}
+\end{warningbox}
+
+\subsubsection{The Solution: Add Position Information}
+
+We add a \textbf{positional encoding} to each embedding:
+
+\begin{align}
+\text{Input}_{\text{final}} = \text{Embedding} + \text{PositionalEncoding}
+\end{align}
+
+The original Transformer uses sinusoidal functions:
+
+\begin{align}
+PE_{(pos, 2i)} &= \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right) \\
+PE_{(pos, 2i+1)} &= \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)
+\end{align}
+
+where:
+\begin{itemize}
+    \item $pos$ = position in the sequence (0, 1, 2, ...)
+    \item $i$ = dimension index
+    \item $d_{model}$ = embedding dimension
+\end{itemize}
+
+\begin{examplebox}
+\textbf{Example: Computing Positional Encoding}
+
+For position 0 with $d_{model} = 4$:
+\begin{align}
+PE_{(0,0)} &= \sin(0) = 0 \\
+PE_{(0,1)} &= \cos(0) = 1 \\
+PE_{(0,2)} &= \sin(0) = 0 \\
+PE_{(0,3)} &= \cos(0) = 1
+\end{align}
+
+For position 1:
+\begin{align}
+PE_{(1,0)} &= \sin(1/10000^0) = \sin(1) \approx 0.84 \\
+PE_{(1,1)} &= \cos(1) \approx 0.54 \\
+&\vdots
+\end{align}
+
+Each position gets a unique encoding!
+\end{examplebox}
+
+\subsubsection{Why Sinusoidal?}
+
+\begin{itemize}
+    \item \textbf{Unique patterns:} Each position has a distinct encoding
+    \item \textbf{Relative positions:} The model can learn to attend to relative positions
+    \item \textbf{Generalization:} Can extrapolate to longer sequences than seen during training
+\end{itemize}
+
+\subsection{Residual Connections (Skip Connections)}
+
+\begin{definitionbox}
+\textbf{Residual Connection:}
+\begin{align}
+\text{Output} = \text{LayerNorm}(x + \text{Sublayer}(x))
+\end{align}
+
+We add the input directly to the output of each sub-layer.
+\end{definitionbox}
+
+\subsubsection{Why Residual Connections?}
+
+\begin{itemize}
+    \item \textbf{Gradient Flow:} Gradients can flow directly through the addition operation
+    \item \textbf{Training Stability:} Prevents weights from diverging to extreme values
+    \item \textbf{Learning Residuals:} Network learns the \textit{difference} from the identity function
+\end{itemize}
+
+\subsection{Masked Attention in the Decoder}
+
+\begin{importantbox}
+\textbf{The Autoregressive Constraint:}
+
+During generation, we can only use information from tokens that have already been generated. We \textbf{cannot} look at future tokens!
+
+\textbf{Solution:} Mask out (set to $-\infty$) attention scores for future positions before softmax.
+\end{importantbox}
+
+\begin{examplebox}
+\textbf{Masking Example:}
+
+For ``clouds drift across blue sky'':
+
+If generating position 3 (``across''):
+\begin{itemize}
+    \item Can attend to: clouds, drift, across (\checkmark)
+    \item Cannot attend to: blue, sky ($\times$)
+\end{itemize}
+
+The attention scores for ``blue'' and ``sky'' are set to $-\infty$, which becomes 0 after softmax.
+\end{examplebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{BERT and GPT: Transformer Applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Splitting the Transformer}
+
+The full Transformer was designed for sequence-to-sequence tasks like translation. But we can use its parts for different purposes:
+
+\begin{definitionbox}
+\textbf{BERT (Bidirectional Encoder Representations from Transformers):}
+\begin{itemize}
+    \item Uses only the \textbf{Encoder} part
+    \item Bidirectional: Can see both past and future context
+    \item Great for: Classification, NER, Question Answering
+    \item Pre-training: Masked Language Model + Next Sentence Prediction
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}
+\textbf{GPT (Generative Pre-trained Transformer):}
+\begin{itemize}
+    \item Uses only the \textbf{Decoder} part
+    \item Unidirectional: Can only see past context (uses masking)
+    \item Great for: Text generation, completion
+    \item Pre-training: Next token prediction
+\end{itemize}
+\end{definitionbox}
+
+\subsection{The Power of Transfer Learning}
+
+\begin{importantbox}
+\textbf{Pre-training + Fine-tuning:}
+
+\begin{enumerate}
+    \item \textbf{Pre-train} on massive text corpora (Wikipedia, books, internet)
+    \item \textbf{Fine-tune} on specific downstream tasks
+\end{enumerate}
+
+The expensive pre-training is done once. Fine-tuning is fast and cheap.
+
+\textbf{Why this works:} The model learns general language understanding during pre-training, which transfers to specific tasks.
+\end{importantbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation Details}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Transformer in Code}
+
+\begin{lstlisting}[style=pythonstyle,caption={Multi-Head Attention Layer}]
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+class MultiHeadAttention(layers.Layer):
+    def __init__(self, d_model, num_heads):
+        super().__init__()
+        self.num_heads = num_heads
+        self.d_model = d_model
+        self.depth = d_model // num_heads
+
+        # Learnable weight matrices
+        self.wq = layers.Dense(d_model)
+        self.wk = layers.Dense(d_model)
+        self.wv = layers.Dense(d_model)
+        self.dense = layers.Dense(d_model)
+
+    def split_heads(self, x, batch_size):
+        # Split last dimension into (num_heads, depth)
+        x = tf.reshape(x, (batch_size, -1, self.num_heads, self.depth))
+        return tf.transpose(x, perm=[0, 2, 1, 3])
+
+    def call(self, q, k, v, mask=None):
+        batch_size = tf.shape(q)[0]
+
+        # Linear projections
+        q = self.wq(q)  # (batch, seq_len, d_model)
+        k = self.wk(k)
+        v = self.wv(v)
+
+        # Split into heads
+        q = self.split_heads(q, batch_size)  # (batch, heads, seq, depth)
+        k = self.split_heads(k, batch_size)
+        v = self.split_heads(v, batch_size)
+
+        # Scaled dot-product attention
+        matmul_qk = tf.matmul(q, k, transpose_b=True)
+        dk = tf.cast(tf.shape(k)[-1], tf.float32)
+        scaled_attention = matmul_qk / tf.math.sqrt(dk)
+
+        if mask is not None:
+            scaled_attention += (mask * -1e9)
+
+        attention_weights = tf.nn.softmax(scaled_attention, axis=-1)
+        output = tf.matmul(attention_weights, v)
+
+        # Concatenate heads
+        output = tf.transpose(output, perm=[0, 2, 1, 3])
+        output = tf.reshape(output, (batch_size, -1, self.d_model))
+
+        return self.dense(output)
+\end{lstlisting}
+
+\subsection{Positional Encoding Implementation}
+
+\begin{lstlisting}[style=pythonstyle,caption={Positional Encoding}]
+import numpy as np
+
+def get_positional_encoding(max_seq_len, d_model):
+    """Generate sinusoidal positional encodings."""
+    position = np.arange(max_seq_len)[:, np.newaxis]
+    div_term = np.exp(np.arange(0, d_model, 2) * -(np.log(10000.0) / d_model))
+
+    pe = np.zeros((max_seq_len, d_model))
+    pe[:, 0::2] = np.sin(position * div_term)
+    pe[:, 1::2] = np.cos(position * div_term)
+
+    return tf.constant(pe, dtype=tf.float32)
+
+# Example usage
+max_len = 100
+d_model = 512
+pos_encoding = get_positional_encoding(max_len, d_model)
+# Add to embeddings: embedded + pos_encoding[:seq_len, :]
+\end{lstlisting}
+
+\subsection{Creating the Attention Mask}
+
+\begin{lstlisting}[style=pythonstyle,caption={Creating Look-Ahead Mask for Decoder}]
+def create_look_ahead_mask(size):
+    """Create mask to prevent attending to future positions."""
+    # Upper triangular matrix with ones above diagonal
+    mask = 1 - tf.linalg.band_part(tf.ones((size, size)), -1, 0)
+    return mask  # (size, size)
+
+# Example: for sequence length 5
+# [[0, 1, 1, 1, 1],
+#  [0, 0, 1, 1, 1],
+#  [0, 0, 0, 1, 1],
+#  [0, 0, 0, 0, 1],
+#  [0, 0, 0, 0, 0]]
+# 1s become -inf after scaling, 0 after softmax
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Comparing Architectures}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}[h]
+\centering
+\caption{Comparison of Sequence Modeling Architectures}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Feature} & \textbf{RNN/LSTM} & \textbf{RNN + Attention} & \textbf{Transformer} \\
+\midrule
+Parallel computation & No & Partial & Yes \\
+Long-range dependencies & Difficult & Better & Excellent \\
+Variable-length inputs & Yes & Yes & Yes \\
+Vanishing gradients & Problem & Problem & Solved \\
+Position awareness & Implicit & Implicit & Explicit (PE) \\
+Training speed & Slow & Slow & Fast \\
+Interpretability & Low & Medium & High \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Practical Considerations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Computational Complexity}
+
+\begin{warningbox}
+\textbf{Attention is Quadratic:}
+
+For sequence length $n$, self-attention requires $O(n^2)$ computation and memory.
+
+\begin{itemize}
+    \item $n = 100$: 10,000 attention scores
+    \item $n = 1000$: 1,000,000 attention scores
+    \item $n = 10000$: 100,000,000 attention scores!
+\end{itemize}
+
+This is why models like GPT have maximum context lengths (e.g., 4096 tokens).
+\end{warningbox}
+
+\subsection{Model Dimensions}
+
+\begin{infobox}
+\textbf{Typical Transformer Sizes:}
+
+\begin{itemize}
+    \item \textbf{Original Transformer:} $d_{model} = 512$, 6 layers, 8 heads
+    \item \textbf{BERT-base:} $d_{model} = 768$, 12 layers, 12 heads
+    \item \textbf{GPT-3:} $d_{model} = 12288$, 96 layers, 96 heads, 175B parameters
+\end{itemize}
+\end{infobox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{One-Page Summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{summarybox}
+\textbf{Key Concepts from Lecture 12:}
+
+\textbf{1. Problems with RNNs:}
+\begin{itemize}
+    \item Vanishing gradients make learning long-range dependencies difficult
+    \item Sequential processing prevents parallelization
+    \item Fixed-size bottleneck loses information
+\end{itemize}
+
+\textbf{2. Attention Mechanism (2015):}
+\begin{itemize}
+    \item Dynamic context vector: $C_t = \sum_j \alpha_{tj} h_j$
+    \item Attention weights $\alpha$ are computed (not learned parameters)
+    \item Allows direct connections between distant positions
+\end{itemize}
+
+\textbf{3. Transformer Architecture (2017):}
+\begin{itemize}
+    \item ``Attention Is All You Need'' --- removes recurrence entirely
+    \item Query, Key, Value: $Q = HW_Q$, $K = HW_K$, $V = HW_V$
+    \item Scaled dot-product: $\text{Attention} = \text{softmax}(QK^T/\sqrt{d_k})V$
+    \item Multi-head attention for richer representations
+    \item Positional encoding for order information
+\end{itemize}
+
+\textbf{4. Key Formulas:}
+\begin{align*}
+\text{Attention}(Q,K,V) &= \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V \\
+PE_{(pos,2i)} &= \sin(pos/10000^{2i/d}) \\
+PE_{(pos,2i+1)} &= \cos(pos/10000^{2i/d})
+\end{align*}
+
+\textbf{5. BERT vs GPT:}
+\begin{itemize}
+    \item BERT = Encoder only (bidirectional, good for understanding)
+    \item GPT = Decoder only (unidirectional, good for generation)
+\end{itemize}
+
+\textbf{6. Why Transformers Dominate:}
+\begin{itemize}
+    \item Fully parallelizable training
+    \item No vanishing gradient problem
+    \item Excellent transfer learning capabilities
+    \item State-of-the-art on virtually all NLP tasks
+\end{itemize}
+\end{summarybox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Glossary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{description}[style=nextline]
+    \item[Attention Mechanism] A technique that allows models to focus on relevant parts of the input when producing each part of the output
+    \item[Query (Q)] The representation of the current token that is ``asking'' for relevant information
+    \item[Key (K)] The representation used to determine relevance/matching with the query
+    \item[Value (V)] The actual content retrieved based on attention weights
+    \item[Multi-Head Attention] Running multiple attention operations in parallel with different projections
+    \item[Positional Encoding] Added signal that provides position information to the model
+    \item[Transformer] Neural architecture using only attention (no recurrence)
+    \item[Self-Attention] Attention where Q, K, V all come from the same sequence
+    \item[Masked Attention] Attention that prevents looking at future positions
+    \item[BERT] Bidirectional Encoder Representations from Transformers
+    \item[GPT] Generative Pre-trained Transformer
+    \item[Residual Connection] Adding the input directly to the output of a layer
+    \item[Layer Normalization] Normalizing activations across features for each sample
+    \item[Context Vector] Weighted combination of hidden states based on attention
+    \item[Alignment Score] Raw similarity between query and key before softmax
+\end{description}
+
+\end{document}

@@ -1,0 +1,1143 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 22: Random Forests and Variable Importance
+% English Version - Beginner Friendly
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 22}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. Overview Box
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. Summary Box
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. Info Box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. Warning Box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. Example Box
+\newtcolorbox{examplebox}[1]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 6. Definition Box
+\newtcolorbox{definitionbox}[1]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 7. Important Box
+\newtcolorbox{importantbox}[1]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 8. Caution Box
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Style
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Captions
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 22},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 22: Random Forests}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understand how Random Forests decorrelate trees, learn variable importance methods, and handle class imbalance and missing data}
+
+\tableofcontents
+\newpage
+
+%========================================================================================
+\section{The Problem with Bagging: Correlated Trees}
+%========================================================================================
+
+\begin{summarybox}
+Random Forest is an enhancement of Bagging that adds \textbf{feature randomization} at each split to reduce correlation between trees. This lecture covers:
+\begin{enumerate}
+    \item Why bagged trees are often correlated and why that's a problem
+    \item How Random Forests decorrelate trees
+    \item Variable importance methods (MDI and Permutation)
+    \item Handling class imbalance
+    \item Missing data with surrogate splits
+\end{enumerate}
+\end{summarybox}
+
+\subsection{Quick Review: Bagging}
+
+Recall from last lecture:
+\begin{itemize}
+    \item \textbf{Bagging} = Bootstrap + Aggregating
+    \item Create $B$ bootstrap samples from your training data
+    \item Train a decision tree on each sample
+    \item Aggregate predictions (majority vote or average)
+    \item Use \textbf{OOB error} for validation
+\end{itemize}
+
+The key insight was that averaging multiple predictions reduces variance by a factor related to $1/\sqrt{n}$.
+
+\subsection{The Correlation Problem}
+
+Here's the issue we discovered: \textbf{Bagged trees often look very similar}.
+
+\begin{examplebox}{Why Trees Are Correlated}
+Imagine you have a dataset with 10 features, and one of them---\texttt{Glucose}---is an extremely strong predictor of diabetes.
+
+When you build Tree 1 on Bootstrap Sample 1:
+\begin{itemize}
+    \item You check all 10 features for the best split
+    \item \texttt{Glucose} wins (it always does---it's the strongest!)
+    \item Tree 1's root node splits on \texttt{Glucose}
+\end{itemize}
+
+When you build Tree 2 on Bootstrap Sample 2:
+\begin{itemize}
+    \item You check all 10 features for the best split
+    \item \texttt{Glucose} wins again!
+    \item Tree 2's root node also splits on \texttt{Glucose}
+\end{itemize}
+
+This pattern continues for all $B$ trees. They all start the same way!
+\end{examplebox}
+
+\begin{importantbox}{Why Correlation Matters}
+The variance reduction formula assumes predictions are \textbf{independent}:
+\[
+\text{Var}(\bar{X}) = \frac{\sigma^2}{n} \quad \text{(if independent)}
+\]
+
+But if predictions are \textbf{correlated}, the variance reduction is weaker:
+\[
+\text{Var}(\bar{X}) = \frac{\sigma^2}{n} + \rho\sigma^2 \cdot \frac{n-1}{n} \approx \rho\sigma^2 \quad \text{(as } n \to \infty)
+\]
+
+where $\rho$ is the correlation. High correlation means less variance reduction---exactly what we don't want!
+\end{importantbox}
+
+\begin{examplebox}{The Doctor Analogy Revisited}
+Remember our analogy of getting multiple medical opinions? If all doctors were trained at the same hospital with the same textbooks, they'd give you the same advice: ``Rest, drink water, come back in 3 days.''
+
+That's not very useful! You want doctors with \textbf{diverse training} and \textbf{different perspectives}.
+
+The same applies to trees---we want them to be diverse, not copies of each other.
+\end{examplebox}
+
+%========================================================================================
+\newpage
+\section{The Random Forest Solution: Feature Randomization}
+%========================================================================================
+
+\begin{definitionbox}{Random Forest}
+A \textbf{Random Forest} is a modification of Bagging where, at \textbf{each split in each tree}, we only consider a \textbf{random subset of features} for splitting.
+
+This forces trees to make different choices, reducing correlation.
+\end{definitionbox}
+
+\subsection{How Random Forests Work}
+
+The algorithm is beautifully simple---just one change from bagging:
+
+\begin{enumerate}
+    \item Create $B$ bootstrap samples (same as bagging)
+    \item For each tree, at \textbf{each split}:
+    \begin{enumerate}
+        \item Randomly select $m$ features from the total $p$ features (where $m < p$)
+        \item Find the best split among \textbf{only these $m$ features}
+        \item Make the split
+    \end{enumerate}
+    \item Repeat until trees are fully grown (or reach stopping criteria)
+    \item Aggregate predictions (same as bagging)
+\end{enumerate}
+
+\begin{importantbox}{The Key Difference}
+\textbf{Bagging:} At each split, consider \textbf{all $p$ features} $\rightarrow$ strong features always win\\
+\textbf{Random Forest:} At each split, consider \textbf{only $m$ features} $\rightarrow$ strong features sometimes excluded
+
+This ``controlled randomness'' forces diversity!
+\end{importantbox}
+
+\begin{examplebox}{Random Forest in Action}
+\textbf{Dataset:} Heart disease prediction with 5 features:\\
+Age, Sex, Max Heart Rate, Cholesterol, Chest Pain
+
+\textbf{Setting:} $m = 3$ (consider 3 random features at each split)
+
+\textbf{Building Tree 1:}
+\begin{itemize}
+    \item \textit{Root split}: Randomly select 3 features $\rightarrow$ \{Age, Sex, Cholesterol\}
+    \item Best split among these 3: \textbf{Sex}
+    \item \textit{Next split (left child)}: Randomly select 3 features $\rightarrow$ \{Age, Max HR, Chest Pain\}
+    \item Best split among these 3: \textbf{Max Heart Rate}
+    \item Continue...
+\end{itemize}
+
+\textbf{Building Tree 2:}
+\begin{itemize}
+    \item \textit{Root split}: Randomly select 3 features $\rightarrow$ \{Cholesterol, Chest Pain, Max HR\}
+    \item Best split among these 3: \textbf{Chest Pain}
+    \item Different root! Trees will be less correlated.
+\end{itemize}
+
+Notice: Tree 1 and Tree 2 start with different splits because they considered different feature subsets!
+\end{examplebox}
+
+\subsection{Choosing $m$: The Number of Features to Consider}
+
+The parameter $m$ (often called \code{max\_features} in sklearn) controls how many features we randomly select at each split.
+
+\begin{definitionbox}{Rules of Thumb for $m$}
+\textbf{For Classification:}
+\[
+m \approx \sqrt{p}
+\]
+where $p$ is the total number of features.
+
+\textbf{For Regression:}
+\[
+m \approx \frac{p}{3}
+\]
+
+These are starting points---tune with cross-validation or OOB error!
+\end{definitionbox}
+
+\begin{examplebox}{Choosing $m$ in Practice}
+If you have 100 features:
+\begin{itemize}
+    \item \textbf{Classification}: Start with $m = \sqrt{100} = 10$
+    \item \textbf{Regression}: Start with $m = 100/3 \approx 33$
+\end{itemize}
+
+If you have 9 features (like the Diabetes dataset):
+\begin{itemize}
+    \item \textbf{Classification}: Start with $m = \sqrt{9} = 3$
+    \item \textbf{Regression}: Start with $m = 9/3 = 3$
+\end{itemize}
+\end{examplebox}
+
+\subsection{Extreme Cases: What Happens with Different $m$?}
+
+Understanding the extremes helps build intuition:
+
+\begin{itemize}
+    \item \textbf{$m = p$ (all features)}: This is just regular Bagging! Trees are highly correlated.
+
+    \item \textbf{$m = 1$ (one feature)}: Completely random trees. Each split is determined by chance. Trees are uncorrelated but individually very weak.
+
+    \item \textbf{$m = \sqrt{p}$ or $m = p/3$}: The sweet spot. Trees are diverse but still make reasonably good splits.
+\end{itemize}
+
+%========================================================================================
+\newpage
+\section{Random Forest Hyperparameters}
+%========================================================================================
+
+Random Forests have more hyperparameters than single trees. Let's organize them:
+
+\subsection{Overview of Hyperparameters}
+
+\begin{table}[h!]
+\centering
+\caption{Random Forest Hyperparameters}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parameter} & \textbf{Controls} & \textbf{Notes} \\
+\midrule
+\code{n\_estimators} & Number of trees ($B$) & More is better, never overfits \\
+\code{max\_features} & Features per split ($m$) & Key decorrelation parameter \\
+\code{max\_depth} & Tree depth & Controls tree complexity \\
+\code{min\_samples\_split} & Min samples to split & Stopping condition \\
+\code{min\_samples\_leaf} & Min samples per leaf & Stopping condition \\
+\code{criterion} & Gini or Entropy & Usually doesn't matter much \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Practical Advice for Tuning}
+
+\begin{infobox}
+\textbf{Expert Tips from the Instructors:}
+
+\begin{enumerate}
+    \item \textbf{Start with defaults}: sklearn's defaults are usually reasonable
+
+    \item \textbf{Focus on the important ones}:
+    \begin{itemize}
+        \item \code{n\_estimators}: Start with 100-500. More is always safe (no overfitting)
+        \item \code{max\_features}: Start with $\sqrt{p}$ for classification, $p/3$ for regression
+        \item \code{max\_depth}: Try None (fully grown) first, then limit if needed
+    \end{itemize}
+
+    \item \textbf{Don't overthink criterion}: Gini and Entropy give similar results. Just pick Gini.
+
+    \item \textbf{Use OOB instead of CV}: Random Forests give you OOB error for free---use it!
+\end{enumerate}
+\end{infobox}
+
+\subsection{The Hyperparameter Explosion Problem}
+
+With multiple hyperparameters, the search space explodes:
+
+\begin{itemize}
+    \item 5 choices for \code{max\_features} $\times$
+    \item 5 choices for \code{max\_depth} $\times$
+    \item 5 choices for \code{n\_estimators} $\times$
+    \item 2 choices for \code{criterion}
+    \item = 250 combinations!
+\end{itemize}
+
+With 5-fold CV, that's 1,250 models to train. This is why:
+\begin{enumerate}
+    \item We use rules of thumb to narrow the search
+    \item We use OOB error instead of CV (no additional training needed)
+    \item We use random search instead of grid search
+\end{enumerate}
+
+%========================================================================================
+\newpage
+\section{Variable Importance}
+%========================================================================================
+
+When we moved from single decision trees to ensembles, we lost \textbf{interpretability}. You can no longer say ``if Glucose $> 120$ and Age $> 50$, then Diabetic'' because you have hundreds of different trees!
+
+\textbf{Variable Importance} is how we get some interpretability back.
+
+\subsection{Why Variable Importance Matters}
+
+\begin{examplebox}{Motivating Example}
+You build a Random Forest to predict customer churn with 50 features. The model achieves 95\% accuracy. Your boss asks:
+
+``Great accuracy, but \textbf{why} are customers leaving? What should we focus on?''
+
+Variable importance answers this: ``The top 3 factors are: Contract Type, Monthly Charges, and Tenure. Customers with month-to-month contracts and high monthly charges who've been with us less than a year are most likely to leave.''
+
+Now you have actionable insights!
+\end{examplebox}
+
+\subsection{Method 1: Mean Decrease in Impurity (MDI)}
+
+\begin{definitionbox}{Mean Decrease in Impurity (MDI)}
+MDI measures how much each feature contributes to reducing impurity (Gini or MSE) across all trees in the forest.
+
+For each feature:
+\begin{enumerate}
+    \item Find all nodes in all trees where that feature is used for splitting
+    \item Sum up the impurity decrease at each of those nodes
+    \item Average across all trees
+\end{enumerate}
+
+Features that cause larger decreases in impurity are more important.
+\end{definitionbox}
+
+\subsubsection{MDI Calculation Step by Step}
+
+\begin{enumerate}
+    \item \textbf{For each node $n$ that uses feature $j$:}
+    \[
+    \Delta I_n = \frac{n_{samples}}{N} \times \left[ I_{before} - \sum_{c \in children} \frac{n_c}{n_{samples}} I_c \right]
+    \]
+    where $I$ is impurity (Gini), $n_{samples}$ is samples at node, $N$ is total samples
+
+    \item \textbf{Sum for feature $j$ in tree $t$:}
+    \[
+    F_j^{(t)} = \sum_{\text{nodes using } j} \Delta I_n
+    \]
+
+    \item \textbf{Normalize within each tree:}
+    \[
+    \hat{F}_j^{(t)} = \frac{F_j^{(t)}}{\sum_k F_k^{(t)}}
+    \]
+
+    \item \textbf{Average across all trees:}
+    \[
+    \text{MDI}_j = \frac{1}{B}\sum_{t=1}^{B} \hat{F}_j^{(t)}
+    \]
+\end{enumerate}
+
+\subsubsection{MDI Pros and Cons}
+
+\begin{itemize}
+    \item[\textbf{+}] \textbf{Fast}: Computed during training, no extra computation
+    \item[\textbf{+}] \textbf{Built into sklearn}: Just access \code{model.feature\_importances\_}
+    \item[\textbf{--}] \textbf{Biased toward high-cardinality features}: Features with many unique values (continuous or categorical with many categories) get artificially inflated importance
+    \item[\textbf{--}] \textbf{Computed on training data}: Can be misleading if model overfits
+\end{itemize}
+
+\subsection{Method 2: Permutation Importance}
+
+\begin{definitionbox}{Permutation Importance}
+Permutation importance measures how much model performance \textbf{decreases} when a feature's values are randomly shuffled.
+
+If shuffling a feature destroys model accuracy, that feature was important!
+\end{definitionbox}
+
+\subsubsection{Permutation Importance Algorithm}
+
+\begin{enumerate}
+    \item \textbf{Baseline}: Compute baseline OOB accuracy $s_{baseline}$
+
+    \item \textbf{For each feature $j$}:
+    \begin{enumerate}
+        \item Randomly shuffle (permute) the values of feature $j$
+        \item Compute OOB accuracy with shuffled feature: $s_j^{(k)}$
+        \item Repeat $K$ times and average: $s_j = \frac{1}{K}\sum_k s_j^{(k)}$
+    \end{enumerate}
+
+    \item \textbf{Calculate importance}:
+    \[
+    \text{Importance}_j = s_{baseline} - s_j
+    \]
+\end{enumerate}
+
+\begin{examplebox}{Permutation Importance Intuition}
+\textbf{Dataset}: Predicting fitness level from height, weight, and age
+
+\textbf{Baseline OOB accuracy}: 88\%
+
+\textbf{Shuffle height}:
+\begin{itemize}
+    \item Original: $[170, 165, 180, 175, 160]$
+    \item Shuffled: $[175, 180, 165, 160, 170]$
+    \item New accuracy: 87\%
+    \item Importance = 88\% - 87\% = 1\% (height matters a little)
+\end{itemize}
+
+\textbf{Shuffle weight}:
+\begin{itemize}
+    \item New accuracy: 72\%
+    \item Importance = 88\% - 72\% = 16\% (weight matters A LOT!)
+\end{itemize}
+
+Conclusion: Weight is much more important than height for predicting fitness.
+\end{examplebox}
+
+\subsubsection{Permutation Importance Pros and Cons}
+
+\begin{itemize}
+    \item[\textbf{+}] \textbf{Not biased}: Works equally well for all feature types
+    \item[\textbf{+}] \textbf{Intuitive}: Directly measures impact on model performance
+    \item[\textbf{+}] \textbf{Uses validation data}: Reflects true generalization, not training fit
+    \item[\textbf{--}] \textbf{Slower}: Requires multiple predictions per feature
+    \item[\textbf{--}] \textbf{Correlated features}: Can underestimate importance when features are correlated
+\end{itemize}
+
+\subsection{MDI vs. Permutation: Which to Use?}
+
+\begin{importantbox}{Recommendation}
+\textbf{Use Permutation Importance when possible.}
+
+MDI is convenient (it's built into sklearn and fast), but it's biased toward high-cardinality features. Permutation importance gives more reliable results.
+
+In practice:
+\begin{itemize}
+    \item Use MDI for quick exploration
+    \item Use Permutation Importance for final analysis and reporting
+\end{itemize}
+\end{importantbox}
+
+\subsection{Comparing Bagging vs. Random Forest Importance}
+
+An interesting observation: variable importance looks different in Bagging vs. Random Forest!
+
+\begin{itemize}
+    \item \textbf{Bagging}: A few features dominate (because trees are correlated)
+    \item \textbf{Random Forest}: Importance is spread across more features (trees are diverse)
+\end{itemize}
+
+This smoother distribution in Random Forest reflects the fact that trees are considering different features, leading to a more complete picture of which features matter.
+
+%========================================================================================
+\newpage
+\section{When Random Forest Doesn't Work Well}
+%========================================================================================
+
+Random Forest is powerful, but not perfect. Here's when it struggles:
+
+\begin{warningbox}
+\textbf{Too Many Irrelevant Features}
+
+If you have 1000 features but only 10 are actually useful, Random Forest may perform poorly.
+
+\textbf{Why?} At each split, we randomly select $m$ features. If most features are junk, there's a high probability that our random subset contains mostly junk features.
+
+\textbf{Solution}: Use feature selection or PCA to reduce dimensionality first. Then apply Random Forest.
+\end{warningbox}
+
+\begin{examplebox}{When Bagging Beats Random Forest}
+You might encounter this surprising result:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Method & OOB Accuracy \\
+\midrule
+Random Forest & 78\% \\
+Bagging & 82\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This often happens when:
+\begin{itemize}
+    \item You have many noisy/irrelevant features
+    \item Only a few features are truly predictive
+    \item Random Forest keeps ``missing'' the good features due to random selection
+\end{itemize}
+
+In this case, remove irrelevant features and try again!
+\end{examplebox}
+
+%========================================================================================
+\newpage
+\section{Handling Class Imbalance}
+%========================================================================================
+
+Class imbalance occurs when one class has far more samples than another. This is extremely common in real-world problems.
+
+\begin{examplebox}{Class Imbalance Examples}
+\begin{itemize}
+    \item \textbf{Fraud detection}: 99.9\% legitimate transactions, 0.1\% fraudulent
+    \item \textbf{Disease diagnosis}: 99\% healthy, 1\% have the disease
+    \item \textbf{Spam detection}: 80\% legitimate emails, 20\% spam
+    \item \textbf{Manufacturing defects}: 99.5\% good products, 0.5\% defective
+\end{itemize}
+\end{examplebox}
+
+\subsection{Why Accuracy is Misleading}
+
+\begin{warningbox}
+\textbf{Accuracy can be useless for imbalanced data!}
+
+If 99\% of emails are not spam, a model that predicts ``not spam'' for everything achieves 99\% accuracy---but catches zero spam.
+
+\textbf{Solution}: Use better metrics like F1-score, AUC-ROC, or precision/recall.
+\end{warningbox}
+
+\subsection{Three Approaches to Handle Imbalance}
+
+\subsubsection{1. Undersampling (Reduce Majority Class)}
+
+\begin{definitionbox}{Undersampling}
+Remove samples from the majority class until classes are balanced.
+\end{definitionbox}
+
+\textbf{Methods:}
+\begin{itemize}
+    \item \textbf{Random Undersampling}: Randomly remove majority class samples
+    \item \textbf{Near Miss}: Remove majority samples that are \textbf{far} from the decision boundary (keep the ``hard'' examples near the boundary)
+\end{itemize}
+
+\textbf{Pros}: Reduces training time\\
+\textbf{Cons}: Throws away potentially useful data
+
+\subsubsection{2. Oversampling (Increase Minority Class)}
+
+\begin{definitionbox}{Oversampling}
+Create more samples of the minority class until classes are balanced.
+\end{definitionbox}
+
+\textbf{Methods:}
+\begin{itemize}
+    \item \textbf{Random Oversampling}: Duplicate minority samples (bootstrap with replacement)
+    \item \textbf{SMOTE} (Synthetic Minority Oversampling Technique): Create \textbf{synthetic} samples by interpolating between existing minority samples
+\end{itemize}
+
+\begin{examplebox}{SMOTE Intuition}
+Instead of just copying minority samples:
+
+\begin{enumerate}
+    \item Pick a minority sample $x_i$
+    \item Find its $k$ nearest neighbors (also minority class)
+    \item Randomly pick one neighbor $x_j$
+    \item Create a new sample along the line between $x_i$ and $x_j$:
+    \[
+    x_{new} = x_i + \lambda \cdot (x_j - x_i) \quad \text{where } \lambda \in [0,1]
+    \]
+\end{enumerate}
+
+This creates new, plausible minority samples that expand the feature space rather than just duplicating existing points.
+\end{examplebox}
+
+\subsubsection{3. Class Weighting}
+
+\begin{definitionbox}{Class Weighting}
+Modify the loss function to penalize errors on the minority class more heavily.
+\end{definitionbox}
+
+Instead of treating all misclassifications equally, we weight them:
+\[
+w_k = \frac{N}{K \times N_k}
+\]
+where:
+\begin{itemize}
+    \item $N$ = total samples
+    \item $K$ = number of classes
+    \item $N_k$ = samples in class $k$
+\end{itemize}
+
+In sklearn, just set \code{class\_weight='balanced'}:
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.ensemble import RandomForestClassifier
+
+# Automatically adjusts weights based on class frequencies
+rf = RandomForestClassifier(
+    n_estimators=100,
+    class_weight='balanced',  # This handles imbalance!
+    random_state=42
+)
+\end{lstlisting}
+
+\subsection{Practical Advice for Imbalanced Data}
+
+\begin{infobox}
+\textbf{When to use which approach:}
+
+\begin{itemize}
+    \item \textbf{Mild imbalance (60/40)}: Class weighting is often enough
+    \item \textbf{Moderate imbalance (90/10)}: Try SMOTE or combination of over/undersampling
+    \item \textbf{Severe imbalance (99/1)}: May need domain-specific techniques or anomaly detection
+\end{itemize}
+
+\textbf{General rule}: Always address imbalance! Even 40/60 splits benefit from handling.
+\end{infobox}
+
+%========================================================================================
+\newpage
+\section{Missing Data: Surrogate Splits}
+%========================================================================================
+
+Decision trees have a unique way of handling missing data called \textbf{surrogate splits}.
+
+\subsection{The Problem}
+
+During prediction, what happens when a test sample has a missing value for the feature used to split a node?
+
+\begin{examplebox}{The Missing Data Problem}
+Your trained tree splits on \texttt{Blood Pressure} at the root. A new patient arrives, but their blood pressure wasn't recorded.
+
+How do you route this patient through the tree?
+\end{examplebox}
+
+\subsection{The Solution: Surrogate Splits}
+
+\begin{definitionbox}{Surrogate Split}
+A \textbf{surrogate split} is a backup split that produces similar results to the primary split.
+
+During training, for each split on feature $X$, we find other features that would split the data similarly. These become surrogates.
+\end{definitionbox}
+
+\subsubsection{How Surrogate Splits Work}
+
+\begin{enumerate}
+    \item \textbf{During Training}:
+    \begin{enumerate}
+        \item Find the best split (e.g., \texttt{Arteries Blocked > 2})
+        \item Record how samples are distributed after this split
+        \item For each other feature, find the split that most closely mimics this distribution
+        \item Rank these alternative splits by similarity
+    \end{enumerate}
+
+    \item \textbf{During Prediction}:
+    \begin{enumerate}
+        \item If the primary feature has a missing value, use the best surrogate
+        \item If that's also missing, try the second surrogate
+        \item Continue down the list
+    \end{enumerate}
+\end{enumerate}
+
+\begin{examplebox}{Surrogate Split Example}
+\textbf{Primary split}: \texttt{Arteries Blocked}
+\begin{itemize}
+    \item FALSE $\rightarrow$ 3 No, 1 Yes (heart disease)
+    \item TRUE $\rightarrow$ 0 No, 2 Yes
+\end{itemize}
+
+\textbf{Finding surrogates---test other features:}
+
+\texttt{Chest Congestion}:
+\begin{itemize}
+    \item FALSE $\rightarrow$ 3 No, 2 Yes
+    \item TRUE $\rightarrow$ 0 No, 1 Yes
+\end{itemize}
+Similarity: Very similar distribution! Only 2 ``flips'' needed.
+
+\texttt{Good Blood Circulation}:
+\begin{itemize}
+    \item FALSE $\rightarrow$ 2 No, 3 Yes
+    \item TRUE $\rightarrow$ 1 No, 0 Yes
+\end{itemize}
+Similarity: Less similar, 6 ``flips'' needed.
+
+\textbf{Result}: \texttt{Chest Congestion} becomes the primary surrogate for \texttt{Arteries Blocked}.
+
+If a patient's \texttt{Arteries Blocked} value is missing, we use their \texttt{Chest Congestion} value instead!
+\end{examplebox}
+
+\subsection{Benefits of Surrogate Splits}
+
+\begin{itemize}
+    \item \textbf{No imputation needed}: Tree handles missing data automatically
+    \item \textbf{Interpretable}: Surrogates show which features are related
+    \item \textbf{Works well with correlated features}: Multicollinearity actually helps find good surrogates!
+\end{itemize}
+
+\begin{warningbox}
+Surrogate splits work best when features are correlated. If features are independent, good surrogates may not exist, and you'll need other imputation methods.
+\end{warningbox}
+
+%========================================================================================
+\newpage
+\section{Random Forests in Python}
+%========================================================================================
+
+\subsection{Basic Implementation}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.inspection import permutation_importance
+import numpy as np
+
+# Load your data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create Random Forest classifier
+rf_clf = RandomForestClassifier(
+    n_estimators=100,        # Number of trees
+    max_features='sqrt',     # Features per split (sqrt for classification)
+    max_depth=None,          # Grow trees fully
+    min_samples_leaf=1,      # Minimum samples per leaf
+    oob_score=True,          # Compute OOB score
+    class_weight='balanced', # Handle class imbalance
+    n_jobs=-1,               # Use all CPU cores
+    random_state=42
+)
+
+# Train
+rf_clf.fit(X_train, y_train)
+
+# Results
+print(f"OOB Score: {rf_clf.oob_score_:.4f}")
+print(f"Test Accuracy: {rf_clf.score(X_test, y_test):.4f}")
+\end{lstlisting}
+
+\subsection{Getting Variable Importance}
+
+\begin{lstlisting}[style=pythonstyle]
+# Method 1: MDI (built-in, but biased)
+mdi_importance = rf_clf.feature_importances_
+
+# Method 2: Permutation Importance (preferred)
+perm_importance = permutation_importance(
+    rf_clf, X_test, y_test,
+    n_repeats=10,
+    random_state=42
+)
+
+# Display results
+import pandas as pd
+
+importance_df = pd.DataFrame({
+    'Feature': feature_names,
+    'MDI': mdi_importance,
+    'Permutation': perm_importance.importances_mean
+}).sort_values('Permutation', ascending=False)
+
+print(importance_df)
+\end{lstlisting}
+
+\subsection{Handling Class Imbalance with SMOTE}
+
+\begin{lstlisting}[style=pythonstyle]
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.pipeline import Pipeline
+
+# Create sampling pipeline
+over = SMOTE(sampling_strategy=0.5)  # Oversample minority to 50%
+under = RandomUnderSampler(sampling_strategy=0.8)  # Then undersample
+
+# Apply to training data
+X_resampled, y_resampled = over.fit_resample(X_train, y_train)
+X_resampled, y_resampled = under.fit_resample(X_resampled, y_resampled)
+
+# Train on balanced data
+rf_clf.fit(X_resampled, y_resampled)
+\end{lstlisting}
+
+%========================================================================================
+\newpage
+\section{Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Random Forest:}
+\begin{itemize}
+    \item Enhancement of Bagging that adds feature randomization at each split
+    \item At each split, randomly select $m$ features and find best split among them
+    \item Rule of thumb: $m = \sqrt{p}$ for classification, $m = p/3$ for regression
+    \item Reduces tree correlation $\rightarrow$ better variance reduction
+\end{itemize}
+
+\textbf{Key Hyperparameters:}
+\begin{itemize}
+    \item \code{n\_estimators}: More is always better (no overfitting risk)
+    \item \code{max\_features}: Controls decorrelation
+    \item Use OOB error for validation
+\end{itemize}
+
+\textbf{Variable Importance:}
+\begin{itemize}
+    \item MDI: Fast but biased toward high-cardinality features
+    \item Permutation: Slower but more reliable
+    \item Use permutation importance for final analysis
+\end{itemize}
+
+\textbf{Class Imbalance:}
+\begin{itemize}
+    \item Don't use accuracy! Use F1-score or AUC
+    \item Options: Undersampling, Oversampling (SMOTE), Class weighting
+    \item Always address imbalance, even for 40/60 splits
+\end{itemize}
+
+\textbf{Missing Data:}
+\begin{itemize}
+    \item Surrogate splits provide automatic handling
+    \item Find backup features that split similarly to primary feature
+    \item Works best with correlated features
+\end{itemize}
+\end{summarybox}
+
+\begin{table}[h!]
+\centering
+\caption{Comparison: Bagging vs. Random Forest}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Aspect} & \textbf{Bagging} & \textbf{Random Forest} \\
+\midrule
+Features per split & All $p$ & Random subset $m$ \\
+Tree correlation & High & Low \\
+Variance reduction & Good & Better \\
+Importance distribution & Concentrated & Spread out \\
+Works with many junk features & Better & May struggle \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%========================================================================================
+\newpage
+\section{Practice Questions}
+%========================================================================================
+
+\begin{enumerate}
+    \item \textbf{Decorrelation}: Explain why selecting a random subset of features at each split reduces correlation between trees.
+
+    \item \textbf{Hyperparameter Impact}: What happens to Random Forest if you set \code{max\_features} equal to the total number of features? How does this compare to Bagging?
+
+    \item \textbf{MDI Bias}: You have two features: ``Age'' (continuous, 80 unique values) and ``Gender'' (binary, 2 values). Using MDI, which feature is likely to appear more important even if they have equal true importance? Why?
+
+    \item \textbf{Class Imbalance}: You're building a fraud detection model where only 0.5\% of transactions are fraudulent. What metric should you use instead of accuracy? What technique(s) would you apply to handle the imbalance?
+
+    \item \textbf{Surrogate Splits}: Explain how surrogate splits help when a test sample has a missing value. When might surrogate splits fail to work well?
+
+    \item \textbf{Practical Scenario}: You build a Random Forest with 100 features, but only 5 are truly predictive. The OOB accuracy is 70\%. You try Bagging and get 82\%. Why might Bagging outperform Random Forest here?
+
+    \item \textbf{Code Question}: Write sklearn code to:
+    \begin{itemize}
+        \item Train a Random Forest Regressor with OOB scoring enabled
+        \item Use $m = p/3$ features per split
+        \item Calculate and display permutation importance
+    \end{itemize}
+\end{enumerate}
+
+\end{document}

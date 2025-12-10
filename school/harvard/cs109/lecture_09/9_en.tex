@@ -1,0 +1,1102 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 09: Probability and Maximum Likelihood Estimation
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages (English - No kotex)
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 09}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 09},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Probability and Maximum Likelihood Estimation}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begin
+%========================================================================================
+
+\title{Lecture 09: Probability and Maximum Likelihood Estimation}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 09}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understanding the probabilistic foundations of linear regression, connecting OLS to MLE, and comparing formula-based inference with bootstrapping}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Introduction and Motivation}
+%========================================================================================
+
+\begin{overviewbox}
+This lecture bridges the gap between machine learning and statistics. We'll discover that our ``loss function'' approach to linear regression has deep connections to probability theory---and this connection will help us understand when to trust our model's estimates.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item \textbf{Probability Foundations}: Random variables, PMF, PDF
+    \item \textbf{Key Distributions}: Normal (Gaussian) and Binomial
+    \item \textbf{The Central Limit Theorem}: Why normal distributions are everywhere
+    \item \textbf{Likelihood and MLE}: A new perspective on model fitting
+    \item \textbf{The Big Connection}: OLS = MLE under normality assumptions
+    \item \textbf{Formula-Based vs. Bootstrap Inference}: When each method shines
+\end{itemize}
+\end{overviewbox}
+
+\subsection{Today's Question: How Much is a House Worth?}
+
+Professor Rader motivates probability theory with a concrete question:
+
+\begin{center}
+\textit{``What determines the selling price of a home in Cambridge/Somerville?''}
+\end{center}
+
+Using data from Redfin.com (592 home sales), we'll explore:
+\begin{itemize}
+    \item Response variable ($Y$): Selling price (in thousands of dollars)
+    \item Predictors ($X$): Type (condo, single-family, etc.), bedrooms, bathrooms, square footage, lot size, year built, distance to Harvard Square T-stop
+\end{itemize}
+
+This real-world example will illustrate why probability theory matters for data science.
+
+%========================================================================================
+\section{Exploratory Data Analysis: The Housing Dataset}
+%========================================================================================
+
+\subsection{Data Cleaning}
+
+Before modeling, we need to address data quality issues:
+
+\begin{infobox}[title=Data Preprocessing Steps]
+\begin{enumerate}
+    \item \textbf{Missing values in lot size}: Mostly condos/townhouses that don't own land
+    \begin{itemize}
+        \item Solution: Impute with 0 (reasonable assumption)
+    \end{itemize}
+
+    \item \textbf{Missing values in HOA fees}: Mostly single-family homes without HOA
+    \begin{itemize}
+        \item Solution: Impute with 0 (no HOA = no fees)
+    \end{itemize}
+
+    \item \textbf{Price scale}: Convert from dollars to thousands of dollars
+    \begin{itemize}
+        \item Makes coefficients easier to interpret
+    \end{itemize}
+
+    \item \textbf{Zip code type}: Convert from numeric to categorical
+    \begin{itemize}
+        \item Zip codes don't have meaningful numerical order!
+    \end{itemize}
+\end{enumerate}
+\end{infobox}
+
+\subsection{Key Observations from EDA}
+
+\subsubsection{Heteroscedasticity}
+
+\begin{definitionbox}[Heteroscedasticity]
+\textbf{Heteroscedasticity} occurs when the variance of residuals is not constant across all values of the predictor.
+
+\textbf{In this dataset}: Smaller homes have less price variability. Larger homes have much more price variability.
+
+This violates the assumption of constant variance in linear regression!
+\end{definitionbox}
+
+\begin{examplebox}[Visualizing Heteroscedasticity]
+When plotting price vs. square footage:
+\begin{itemize}
+    \item Small homes (1000 sqft): Prices cluster tightly, perhaps \$400K-\$600K
+    \item Large homes (3000 sqft): Prices spread widely, perhaps \$800K-\$2M+
+\end{itemize}
+
+The ``funnel'' or ``cone'' shape is a classic sign of heteroscedasticity.
+\end{examplebox}
+
+\subsubsection{Collinearity Strikes Again}
+
+When fitting a multiple regression model, an interesting result emerges:
+
+\begin{verbatim}
+                 coef    std err          t      P>|t|
+Intercept  -1949.0670   745.203     -2.615      0.009
+sqft             0.6411     0.044     14.720      0.000
+beds           -89.9345    23.532     -3.822      0.000  <-- Negative!
+baths          198.4646    31.332      6.334      0.000
+\end{verbatim}
+
+\begin{warningbox}[title=The Negative Bedroom Coefficient]
+\textbf{Why is the coefficient for ``beds'' negative?}
+
+This seems counterintuitive---shouldn't more bedrooms increase price?
+
+\textbf{Interpretation}: ``Holding \textit{square footage constant}, each additional bedroom is associated with a \$89,934 \textit{decrease} in price.''
+
+\textbf{The insight}: If you're cramming another bedroom into the \textit{same} total square footage, you're creating smaller, more cramped rooms. Homes with lots of tiny bedrooms sell for less than homes with fewer, larger rooms (same total sqft).
+
+This is collinearity at work---``beds'' and ``sqft'' are highly correlated, so interpreting one while holding the other constant creates unusual but meaningful interpretations.
+\end{warningbox}
+
+%========================================================================================
+\section{Review: Cross-Validation and Regularization}
+%========================================================================================
+
+Before diving into probability, let's solidify some key concepts from previous lectures.
+
+\subsection{When to Use Cross-Validation}
+
+\begin{summarybox}[title=Cross-Validation is for Model Selection]
+Cross-validation can be used whenever you need to \textbf{choose between models}:
+
+\begin{itemize}
+    \item \textbf{A. Choosing $k$ in k-NN}: Different $k$ values = different models
+    \item \textbf{B. Choosing $\lambda$ in Ridge/Lasso}: Different $\lambda$ values = different models
+    \item \textbf{C. Choosing predictors}: Different feature sets = different models
+    \item \textbf{D. Choosing model families}: k-NN vs. linear regression = different models
+\end{itemize}
+
+\textbf{Answer: ALL OF THE ABOVE!}
+
+Whenever you have a choice between models, cross-validation helps you make that choice objectively.
+\end{summarybox}
+
+\subsection{When to Standardize Predictors}
+
+\begin{infobox}[title=Standardization Guidance]
+Standardize predictors when you want them to be \textbf{treated equally}:
+
+\begin{itemize}
+    \item \textbf{k-NN}: Without standardization, variables on larger scales (price in dollars) dominate distance calculations over variables on smaller scales (number of rooms)
+
+    \item \textbf{Ridge/Lasso}: Regularization penalizes coefficient magnitude. If one variable is measured in inches vs. feet, its coefficient scale changes artificially
+\end{itemize}
+
+\textbf{But not always!} If you have categorical dummies alongside continuous variables, you might \textit{not} want to standardize everything equally. Use judgment!
+\end{infobox}
+
+\subsection{Reading Trajectory Plots}
+
+Trajectory plots show how coefficients change as regularization strength ($\lambda$) increases:
+
+\begin{itemize}
+    \item \textbf{Lasso}: Coefficients can become exactly zero (feature selection!)
+    \item \textbf{Ridge}: Coefficients approach but never reach zero
+\end{itemize}
+
+\begin{warningbox}[title=``Textbook'' vs. Real-World Trajectory Plots]
+\textbf{Textbook plots}: Smooth curves where all coefficients steadily shrink toward zero. These assume predictors are \textbf{independent}---unrealistic!
+
+\textbf{Real-world plots}: Messy curves that may:
+\begin{itemize}
+    \item Cross zero (sign changes!)
+    \item Temporarily \textit{increase} before decreasing
+\end{itemize}
+
+These patterns indicate \textbf{collinearity}: As one variable gets penalized, a correlated variable ``picks up'' its predictive power.
+\end{warningbox}
+
+%========================================================================================
+\section{Probability Fundamentals}
+%========================================================================================
+
+Now we build the probabilistic foundation needed to understand MLE.
+
+\subsection{What is Probability?}
+
+\begin{definitionbox}[Probability]
+\textbf{Probability} is the long-run relative frequency of an event occurring.
+
+\textbf{Range}: 0 (never happens) to 1 (always happens)
+
+\textbf{Why we care in data science}: Our data is a \textbf{random realization} from some underlying data-generating process. Probability gives us the language to reason about uncertainty.
+\end{definitionbox}
+
+\subsection{Random Variables}
+
+\begin{definitionbox}[Random Variable]
+A \textbf{random variable} assigns numeric values to outcomes of a random phenomenon.
+
+\textbf{Example}: Define $X_1 = 1$ if a randomly sampled Harvard student uses a Mac, $X_1 = 0$ otherwise. We don't know $X_1$'s value until we sample---it's ``random.''
+
+We describe random variables by their \textbf{distribution}---the set of possible values and their probabilities.
+\end{definitionbox}
+
+\subsection{Discrete vs. Continuous: PMF vs. PDF}
+
+Random variables come in two flavors:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{Discrete} & \textbf{Continuous} \\
+\midrule
+Values & Countable (0, 1, 2, ...) & Any real number in a range \\
+Function & PMF (Probability Mass Function) & PDF (Probability Density Function) \\
+$P(X = x)$ & Has a specific probability & \textbf{Always equals 0!} \\
+Probabilities & Direct from PMF & Area under PDF curve \\
+Example & Number of bedrooms & House price \\
+\bottomrule
+\end{tabular}
+\caption{Discrete vs. Continuous random variables}
+\end{table}
+
+\begin{warningbox}[title=Continuous Variables: $P(X = x) = 0$]
+For continuous random variables, the probability of any \textit{exact} value is zero.
+
+$P(\text{house price} = \$1,250,000.00) = 0$
+
+Instead, we calculate probabilities over \textbf{intervals}:
+
+$P(\$1,200,000 < \text{price} < \$1,300,000) = \text{area under PDF from 1.2M to 1.3M}$
+\end{warningbox}
+
+%========================================================================================
+\section{Key Probability Distributions}
+%========================================================================================
+
+\subsection{The Bernoulli Distribution}
+
+The simplest distribution---a single coin flip:
+
+\begin{definitionbox}[Bernoulli Distribution]
+$X \sim \text{Bernoulli}(p)$
+
+\begin{itemize}
+    \item $X = 1$ (success) with probability $p$
+    \item $X = 0$ (failure) with probability $1-p$
+\end{itemize}
+
+\textbf{PMF}: $P(X = x) = p^x(1-p)^{1-x}$ for $x \in \{0, 1\}$
+
+\textbf{Example}: $X = 1$ if a student uses Mac, 0 otherwise
+\end{definitionbox}
+
+\subsection{The Binomial Distribution}
+
+Multiple independent Bernoulli trials:
+
+\begin{definitionbox}[Binomial Distribution]
+$X \sim \text{Binomial}(n, p)$
+
+Count of successes in $n$ independent trials, each with success probability $p$.
+
+\textbf{PMF}: $P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}$
+
+where $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ is ``n choose k''---the number of ways to arrange $k$ successes among $n$ trials.
+
+\textbf{Mean}: $\mu = np$
+
+\textbf{Standard Deviation}: $\sigma = \sqrt{np(1-p)}$
+\end{definitionbox}
+
+\begin{examplebox}[Binomial Example]
+20\% of Harvard students are varsity athletes. In a random sample of 200 students:
+
+\textbf{Expected number of athletes}: $np = 200 \times 0.2 = 40$
+
+\textbf{Probability of exactly 50 athletes}:
+\[
+P(X = 50) = \binom{200}{50} (0.2)^{50} (0.8)^{150}
+\]
+
+This can be computed in Python: \texttt{stats.binom.pmf(50, 200, 0.2)}
+\end{examplebox}
+
+\subsection{The Normal (Gaussian) Distribution}
+
+The most important distribution in statistics:
+
+\begin{definitionbox}[Normal Distribution]
+$X \sim N(\mu, \sigma^2)$
+
+A continuous, bell-shaped distribution parameterized by:
+\begin{itemize}
+    \item $\mu$ (mu): The mean (center of the bell)
+    \item $\sigma^2$ (sigma squared): The variance (spread of the bell)
+\end{itemize}
+
+\textbf{PDF}: $f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$
+
+\textbf{Standard Normal}: $Z \sim N(0, 1)$ (mean 0, variance 1)
+
+\textbf{Standardization}: Any $X \sim N(\mu, \sigma^2)$ can be converted to standard normal:
+\[
+Z = \frac{X - \mu}{\sigma}
+\]
+
+$Z$ tells you ``how many standard deviations away from the mean.''
+\end{definitionbox}
+
+\subsection{The Central Limit Theorem (CLT)}
+
+\begin{importantbox}[Why Normal Distributions Are Everywhere]
+\textbf{Central Limit Theorem (CLT)}:
+
+Regardless of the original population distribution, the \textbf{sample mean} $\bar{X}$ of $n$ independent observations approaches a normal distribution as $n$ gets large:
+\[
+\bar{X} \sim N\left(\mu, \frac{\sigma^2}{n}\right)
+\]
+
+\textbf{Key implications}:
+\begin{itemize}
+    \item The mean of $\bar{X}$ equals the population mean $\mu$
+    \item The variance of $\bar{X}$ \textbf{shrinks} as $n$ increases (by factor of $1/n$)
+    \item More data $\rightarrow$ more precise estimates!
+\end{itemize}
+\end{importantbox}
+
+\begin{examplebox}[Why Human Height is Normally Distributed]
+Adult height results from the accumulation of many small factors:
+\begin{itemize}
+    \item Genetics (many genes, each with small effect)
+    \item Nutrition during childhood
+    \item Sleep quality
+    \item Exercise patterns
+    \item And countless other factors...
+\end{itemize}
+
+By CLT, the ``sum'' of many small independent factors tends toward a normal distribution. This is why height histograms look bell-shaped!
+\end{examplebox}
+
+%========================================================================================
+\section{From Probability to Inference: The Likelihood Function}
+%========================================================================================
+
+\subsection{Probability vs. Inference: Two Directions}
+
+\begin{infobox}[title=The Two Directions of Statistical Reasoning]
+\textbf{Probability (Deduction)}: Model $\rightarrow$ Data
+\begin{itemize}
+    \item \textit{Question}: ``Given a fair coin ($p=0.5$), what's the probability of getting 8 heads in 10 flips?''
+    \item We know the model, we predict the data
+\end{itemize}
+
+\textbf{Inference (Induction)}: Data $\rightarrow$ Model
+\begin{itemize}
+    \item \textit{Question}: ``I flipped a coin 10 times and got 8 heads. Is this coin fair ($p=0.5$) or biased?''
+    \item We have data, we infer the model
+\end{itemize}
+
+\textbf{Data science is mostly inference!} We observe data and try to figure out what process generated it.
+\end{infobox}
+
+\subsection{The Likelihood Function}
+
+\begin{definitionbox}[Likelihood Function]
+The \textbf{likelihood function} is mathematically the same as the PMF/PDF, but with a different perspective:
+
+\begin{itemize}
+    \item \textbf{PMF/PDF} $f(x | \theta)$: Fix parameters $\theta$, vary data $x$
+    \begin{itemize}
+        \item ``Given this model, how probable is this data?''
+    \end{itemize}
+
+    \item \textbf{Likelihood} $L(\theta | x)$: Fix data $x$, vary parameters $\theta$
+    \begin{itemize}
+        \item ``Given this data, how plausible is this model?''
+    \end{itemize}
+\end{itemize}
+
+\textbf{For independent observations}:
+\[
+L(\theta | x_1, \ldots, x_n) = \prod_{i=1}^{n} f(x_i | \theta)
+\]
+
+The likelihood is a \textbf{product} of individual likelihoods (under independence).
+\end{definitionbox}
+
+\subsection{Log-Likelihood: Making Life Easier}
+
+Products are mathematically inconvenient. Taking logs converts products to sums:
+
+\begin{definitionbox}[Log-Likelihood]
+The \textbf{log-likelihood} function:
+\[
+\ell(\theta | x_1, \ldots, x_n) = \log L(\theta) = \sum_{i=1}^{n} \log f(x_i | \theta)
+\]
+
+\textbf{Why use log-likelihood?}
+\begin{enumerate}
+    \item Products become sums (much easier to work with!)
+    \item Since $\log$ is monotonically increasing, maximizing $L$ is equivalent to maximizing $\ell$
+    \item Numerical stability (avoids very small numbers from many multiplications)
+\end{enumerate}
+\end{definitionbox}
+
+\subsection{Maximum Likelihood Estimation (MLE)}
+
+\begin{definitionbox}[Maximum Likelihood Estimation]
+\textbf{MLE} finds the parameter value(s) that maximize the likelihood function:
+\[
+\hat{\theta}_{MLE} = \arg\max_\theta L(\theta | \text{data}) = \arg\max_\theta \ell(\theta | \text{data})
+\]
+
+\textbf{Intuition}: ``Find the parameter that makes the observed data most probable.''
+\end{definitionbox}
+
+\begin{examplebox}[MLE for Normal Distribution]
+You observe three values: 3, 5, and 10. Assume they come from $N(\mu, 4)$ (variance = 4, unknown mean).
+
+\textbf{What's the MLE for $\mu$?}
+
+Intuitively: The sample mean! $\hat{\mu}_{MLE} = \bar{x} = \frac{3 + 5 + 10}{3} = 6$
+
+\textbf{Why?} The likelihood function (plotted against $\mu$) is maximized when $\mu = \bar{x}$.
+
+This isn't a coincidence---for normal distributions, the MLE of the mean is always the sample mean.
+\end{examplebox}
+
+\subsection{How to Find the MLE}
+
+Two approaches:
+
+\begin{enumerate}
+    \item \textbf{Analytical (calculus)}: Take derivative of $\ell(\theta)$ with respect to $\theta$, set equal to zero, solve
+    \begin{itemize}
+        \item Works when closed-form solution exists
+        \item Example: Linear regression
+    \end{itemize}
+
+    \item \textbf{Numerical (optimization)}: Use algorithms like gradient descent to minimize \textbf{negative} log-likelihood
+    \begin{itemize}
+        \item Works when no closed-form solution
+        \item Example: Logistic regression (coming soon!)
+    \end{itemize}
+\end{enumerate}
+
+%========================================================================================
+\section{The Big Connection: OLS = MLE}
+%========================================================================================
+
+This is the central insight of the lecture!
+
+\subsection{Setting Up the Probabilistic Model}
+
+Recall our linear regression model:
+\[
+Y_i = \beta_0 + \beta_1 X_i + \epsilon_i
+\]
+
+\textbf{Key assumption}: The residuals $\epsilon_i$ are normally distributed:
+\[
+\epsilon_i \sim N(0, \sigma^2)
+\]
+
+This implies:
+\[
+Y_i | X_i \sim N(\beta_0 + \beta_1 X_i, \sigma^2)
+\]
+
+Each $Y$ value, given its $X$, comes from a normal distribution centered at the regression line.
+
+\subsection{Building the Likelihood}
+
+For $n$ independent observations:
+\[
+L(\beta_0, \beta_1, \sigma^2 | \text{data}) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(Y_i - \beta_0 - \beta_1 X_i)^2}{2\sigma^2}\right)
+\]
+
+\subsection{The Log-Likelihood}
+
+Taking logs:
+\[
+\ell(\beta_0, \beta_1, \sigma^2) = \underbrace{-\frac{n}{2}\log(2\pi\sigma^2)}_{\text{doesn't depend on } \beta} - \underbrace{\frac{1}{2\sigma^2} \sum_{i=1}^{n} (Y_i - \beta_0 - \beta_1 X_i)^2}_{\text{depends on } \beta}
+\]
+
+\subsection{Maximizing the Log-Likelihood}
+
+To find $\hat{\beta}_0, \hat{\beta}_1$ that maximize $\ell$:
+\begin{itemize}
+    \item The first term doesn't involve $\beta$, so it's irrelevant for optimization
+    \item The second term has a negative sign, so maximizing $\ell$ means \textbf{minimizing} the sum
+\end{itemize}
+
+\begin{importantbox}[The Central Result: OLS = MLE]
+Maximizing the likelihood (MLE) with respect to $\beta_0, \beta_1$ is equivalent to minimizing:
+\[
+\sum_{i=1}^{n} (Y_i - \beta_0 - \beta_1 X_i)^2
+\]
+
+\textbf{This is exactly the Sum of Squared Errors (SSE)!}
+
+\textbf{Conclusion}: If residuals are normally distributed, then:
+
+\begin{center}
+\textbf{Ordinary Least Squares (OLS) = Maximum Likelihood Estimation (MLE)}
+\end{center}
+
+This provides the \textbf{probabilistic justification} for why we use MSE as our loss function!
+\end{importantbox}
+
+%========================================================================================
+\section{Statistical Inference: Quantifying Uncertainty}
+%========================================================================================
+
+Now that we have the probabilistic framework, we can quantify uncertainty in our estimates.
+
+\subsection{Point Estimates Are Not Enough}
+
+We computed $\hat{\beta}_1 = 0.5898$ for the square footage coefficient. But:
+\begin{itemize}
+    \item This is based on one sample of 592 homes
+    \item A different sample would give a different $\hat{\beta}_1$
+    \item How confident should we be in this specific value?
+\end{itemize}
+
+We need to quantify this uncertainty.
+
+\subsection{Two Approaches to Inference}
+
+\begin{enumerate}
+    \item \textbf{Bootstrap} (from previous lecture): Resample data, compute estimates, look at distribution
+
+    \item \textbf{Formula-based} (this lecture): Use mathematical formulas derived from probability theory
+\end{enumerate}
+
+\subsection{Formula-Based Confidence Intervals}
+
+Under the linear regression assumptions, we have closed-form formulas for the \textbf{standard error} of $\hat{\beta}_1$:
+
+\begin{definitionbox}[Standard Error of the Slope]
+\[
+\hat{SE}(\hat{\beta}_1) = \sqrt{\frac{\hat{\sigma}^2}{\sum_{i=1}^n (X_i - \bar{X})^2}}
+\]
+
+where $\hat{\sigma}^2 = \frac{\sum (Y_i - \hat{Y}_i)^2}{n - p - 1}$ (corrected MSE)
+
+\textbf{Interpretation}:
+\begin{itemize}
+    \item More data ($n$ larger) $\rightarrow$ smaller SE (more precise!)
+    \item More spread in $X$ (larger $\sum(X_i - \bar{X})^2$) $\rightarrow$ smaller SE
+    \item Better model fit (smaller $\hat{\sigma}^2$) $\rightarrow$ smaller SE
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}[Confidence Interval Formula]
+\[
+\text{95\% CI for } \beta_1 = \hat{\beta}_1 \pm t^* \cdot \hat{SE}(\hat{\beta}_1)
+\]
+
+where $t^* \approx 2$ for 95\% confidence (from the t-distribution).
+
+\textbf{Interpretation}: If we repeated the study many times, approximately 95\% of the intervals we construct would contain the true $\beta_1$.
+\end{definitionbox}
+
+\subsection{Hypothesis Testing}
+
+\begin{summarybox}[title=Hypothesis Testing for Regression Coefficients]
+\textbf{Hypotheses}:
+\begin{itemize}
+    \item $H_0$: $\beta_1 = 0$ (no association between $X$ and $Y$)
+    \item $H_A$: $\beta_1 \neq 0$ (there is an association)
+\end{itemize}
+
+\textbf{Test statistic}:
+\[
+t = \frac{\hat{\beta}_1 - 0}{\hat{SE}(\hat{\beta}_1)} = \frac{\hat{\beta}_1}{\hat{SE}(\hat{\beta}_1)}
+\]
+
+\textbf{Interpretation}: How many standard errors is our estimate from zero?
+
+\textbf{p-value}: Probability of seeing a $|t|$ this large or larger if $H_0$ were true.
+
+\textbf{Decision}: If p-value $< 0.05$, reject $H_0$. Conclude the association is statistically significant.
+\end{summarybox}
+
+%========================================================================================
+\section{Bootstrap vs. Formula-Based Inference}
+%========================================================================================
+
+Let's compare the two approaches on our housing data:
+
+\subsection{The Comparison}
+
+For the square footage coefficient ($\hat{\beta}_1 = 0.5898$):
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{95\% CI} & \textbf{Width} \\
+\midrule
+Bootstrap & [0.487, 0.705] & 0.218 \\
+Formula (statsmodels) & [0.544, 0.636] & 0.092 \\
+\bottomrule
+\end{tabular}
+\caption{Confidence intervals: Bootstrap vs. Formula-based}
+\end{table}
+
+\begin{warningbox}[title=Why the Difference?]
+The formula-based CI is much \textbf{narrower}---it suggests we're more confident than we should be!
+
+\textbf{The problem}: Formula-based inference assumes all linear regression assumptions hold, including \textbf{constant variance (homoscedasticity)}.
+
+But we already identified \textbf{heteroscedasticity} in this data---larger homes have more variable prices!
+
+When assumptions are violated, the formulas give \textbf{incorrect standard errors}, leading to \textbf{overly optimistic} (too narrow) confidence intervals.
+\end{warningbox}
+
+\subsection{When to Use Each Method}
+
+\begin{importantbox}[Choosing Your Inference Method]
+\textbf{Use formula-based inference when}:
+\begin{itemize}
+    \item All regression assumptions are reasonably met
+    \item You want fast computation
+    \item Results are easy to report (standard output in statsmodels)
+\end{itemize}
+
+\textbf{Use bootstrap when}:
+\begin{itemize}
+    \item Assumptions may be violated (especially heteroscedasticity)
+    \item You want robust inference without strong distributional assumptions
+    \item The bootstrap captures the ``true'' variability in your data
+\end{itemize}
+
+\textbf{Bottom line}: Bootstrap is \textbf{safer}---it makes fewer assumptions and reflects the actual data distribution.
+\end{importantbox}
+
+%========================================================================================
+\section{Using statsmodels for Inference}
+%========================================================================================
+
+\begin{lstlisting}[language=Python, caption={Fitting regression with statsmodels}]
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+# Using formula interface (like R!)
+model = smf.ols('price ~ sqft + beds + baths + type', data=df)
+results = model.fit()
+
+# Get full summary with standard errors, t-stats, p-values, CIs
+print(results.summary())
+
+# Extract specific values
+print(f"Coefficient for sqft: {results.params['sqft']:.4f}")
+print(f"Std Error: {results.bse['sqft']:.4f}")
+print(f"p-value: {results.pvalues['sqft']:.4f}")
+print(f"95% CI: {results.conf_int().loc['sqft'].values}")
+\end{lstlisting}
+
+\begin{infobox}[title=statsmodels vs. sklearn]
+\textbf{sklearn}: Great for prediction, cross-validation, pipelines
+\begin{itemize}
+    \item Doesn't provide standard errors, p-values, or confidence intervals
+    \item Focus on predictive performance
+\end{itemize}
+
+\textbf{statsmodels}: Great for inference and interpretation
+\begin{itemize}
+    \item Provides full statistical output
+    \item R-like formula interface for easy model specification
+    \item Automatically creates dummy variables for categorical predictors
+\end{itemize}
+
+\textbf{Use both!} sklearn for prediction tasks, statsmodels for understanding relationships.
+\end{infobox}
+
+%========================================================================================
+\section{Quick Reference Summary}
+%========================================================================================
+
+\begin{tcolorbox}[title=Lecture 09 Quick Reference Card, colback=white]
+
+\begin{tcolorbox}[colback=lightblue, title=\textbf{1. Key Distributions}]
+\begin{itemize}
+    \item \textbf{Bernoulli}: Single binary outcome ($p$)
+    \item \textbf{Binomial}: Count of successes in $n$ trials ($n, p$)
+    \item \textbf{Normal}: Bell-shaped continuous ($\mu, \sigma^2$)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightgreen, title=\textbf{2. Central Limit Theorem}]
+Sample means approach normal distribution as $n$ increases:
+\[
+\bar{X} \sim N\left(\mu, \frac{\sigma^2}{n}\right)
+\]
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightyellow, title=\textbf{3. The Big Connection}]
+Under assumption of normal residuals:
+\[
+\text{OLS (minimize MSE)} \equiv \text{MLE}
+\]
+This justifies using MSE as our loss function!
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpurple, title=\textbf{4. Inference Methods}]
+\begin{itemize}
+    \item \textbf{Formula-based}: Fast, but assumes all assumptions hold
+    \item \textbf{Bootstrap}: Robust, makes fewer assumptions
+    \item When assumptions violated: \textbf{Bootstrap wins!}
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightpink, title=\textbf{5. Confidence Interval Formula}]
+\[
+\hat{\beta}_1 \pm t^* \cdot \hat{SE}(\hat{\beta}_1)
+\]
+where $t^* \approx 2$ for 95\% CI
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+%========================================================================================
+\section{Common Questions and Answers}
+%========================================================================================
+
+\textbf{Q: Why do we care about the probabilistic interpretation of OLS?}
+
+A: It gives us:
+\begin{enumerate}
+    \item Theoretical justification for using MSE
+    \item A framework for statistical inference (standard errors, p-values, CIs)
+    \item Understanding of what assumptions we're making
+\end{enumerate}
+
+\textbf{Q: If bootstrap is more robust, why ever use formulas?}
+
+A: Formulas are much faster (instant computation vs. 1000+ resamples). When assumptions hold, they give the same answer. For quick checks or when you're confident in assumptions, formulas are fine.
+
+\textbf{Q: How do I know if heteroscedasticity is a problem?}
+
+A: Plot residuals vs. fitted values (or vs. $X$). Look for ``funnel'' shapes or patterns. If you see non-constant spread, heteroscedasticity is present. Use bootstrap for inference!
+
+\textbf{Q: Why is the coefficient for ``beds'' negative?}
+
+A: Collinearity with square footage. ``Holding sqft constant, more bedrooms means cramming smaller rooms into the same space''---which decreases value. Always interpret coefficients in the context of ``holding other variables constant.''
+
+\textbf{Q: What percentage of Harvard students use Macs?}
+
+A: Professor Rader's informal estimate: around 75-90\%. This is used as a fun example for binomial distributions!
+
+%========================================================================================
+\section{Looking Ahead}
+%========================================================================================
+
+In the next lectures, we'll:
+\begin{itemize}
+    \item Continue with statistical inference in more detail
+    \item Move to \textbf{classification} problems (predicting categories, not numbers)
+    \item Introduce \textbf{logistic regression}---where MLE doesn't have a closed-form solution
+\end{itemize}
+
+The probability foundation we built today will be essential for understanding logistic regression's likelihood function!
+
+\end{document}

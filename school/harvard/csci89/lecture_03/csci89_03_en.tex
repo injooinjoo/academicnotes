@@ -1,0 +1,1420 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability improvements
+% Last modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: Introduction to Natural Language Processing}}
+\fancyhead[R]{\small\textit{Lecture 03}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Important Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Critical: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-89B: Introduction to NLP - Lecture 03},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Title
+%========================================================================================
+
+\title{CSCI E-89B: Introduction to Natural Language Processing\\Lecture 03: Text Preprocessing and NLP Pipelines}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+%========================================================================================
+% Document Start
+%========================================================================================
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-89B: Introduction to Natural Language Processing}{Lecture 03}{Dmitry Kurochkin}{Master text preprocessing techniques including tokenization, stemming, lemmatization, and embeddings for building NLP classification systems}
+
+\tableofcontents
+
+%========================================================================================
+% SECTION 1: Quiz Review - RNN Parameters
+%========================================================================================
+\newpage
+\section{Quiz Review: RNN Architecture Deep Dive}
+
+\begin{overviewbox}
+This lecture begins with an in-depth review of recurrent neural network architecture, focusing on parameter calculations, LSTM mechanics, and bidirectional networks. Understanding these fundamentals is essential for applying RNNs to natural language processing tasks.
+\end{overviewbox}
+
+\subsection{Simple RNN Parameter Calculation}
+
+Consider a Simple RNN layer defined as:
+\begin{lstlisting}[style=pythonstyle]
+SimpleRNN(2, activation='tanh', input_shape=(20, 4))
+\end{lstlisting}
+
+\begin{infobox}[title=Understanding the Input Shape]
+The input shape \texttt{(20, 4)} means:
+\begin{itemize}
+    \item \textbf{20}: Number of time steps (sequence length)---how many vectors in the sequence
+    \item \textbf{4}: Dimensionality of each input vector---each time step receives a 4-dimensional vector
+\end{itemize}
+The number \textbf{2} specifies 2 hidden neurons in the recurrent layer.
+\end{infobox}
+
+\subsubsection{Time Steps Don't Affect Parameters}
+
+A crucial insight: \textbf{time steps do not affect the number of trainable parameters}. Whether you have 20 or 100 time steps, the weight matrices remain the same size because:
+\begin{itemize}
+    \item The same weights are \textbf{shared across all time steps}
+    \item During training, the network unrolls for $T$ time steps, but uses identical weights at each step
+    \item You can even specify \texttt{None} for time steps during model definition
+\end{itemize}
+
+\begin{examplebox}[RNN Parameter Formula]
+For a Simple RNN with:
+\begin{itemize}
+    \item $n_{in} = 4$ (input dimension)
+    \item $n_h = 2$ (hidden units/neurons)
+\end{itemize}
+
+The number of parameters per neuron:
+\[
+\text{Parameters per neuron} = n_{in} + n_h + 1 = 4 + 2 + 1 = 7
+\]
+
+Total parameters:
+\[
+\text{Total} = 7 \times n_h = 7 \times 2 = \boxed{14}
+\]
+
+The breakdown:
+\begin{itemize}
+    \item $n_{in} = 4$: weights from input vector $x_t$
+    \item $n_h = 2$: weights from previous hidden state $h_{t-1}$ (recurrent connections)
+    \item $1$: bias term
+\end{itemize}
+\end{examplebox}
+
+\subsection{RNN Visual Understanding}
+
+The Simple RNN can be visualized as a network that \textbf{unfolds through time}:
+
+\begin{center}
+\begin{tabular}{c}
+\textbf{Compact View (Memory Cell)} \\
+\hline
+Input: $x_t$ (4-dim) $\rightarrow$ [2 neurons] $\rightarrow$ Output: $y_t$ (2-dim) \\
+$\uparrow$ Recurrent connection from $y_{t-1}$ \\
+\hline
+\end{tabular}
+\end{center}
+
+When unfolded for $T=20$ time steps:
+\begin{itemize}
+    \item Time step 1: $x_1 \rightarrow$ [2 neurons] $\rightarrow y_1$
+    \item Time step 2: $x_2 + y_1 \rightarrow$ [2 neurons] $\rightarrow y_2$
+    \item $\vdots$
+    \item Time step 20: $x_{20} + y_{19} \rightarrow$ [2 neurons] $\rightarrow y_{20}$
+\end{itemize}
+
+\begin{warningbox}[title=The Unfolded View is for Understanding]
+While we draw 20 separate boxes for visualization, the \textbf{weights are shared across all time steps}. This is what makes RNNs efficient for sequence processing---they don't need separate parameters for each position in the sequence.
+\end{warningbox}
+
+%========================================================================================
+% SECTION 2: RNN Output Modes
+%========================================================================================
+\newpage
+\section{RNN Output Architectures}
+
+\begin{summarybox}
+A recurrent neural network can operate in different modes depending on how we use its outputs. The claim ``RNN can only map sequence to sequence'' is \textbf{FALSE}---there are multiple valid architectures.
+\end{summarybox}
+
+\subsection{Many-to-Many (Sequence to Sequence)}
+
+\begin{itemize}
+    \item \textbf{Input}: Sequence of vectors $[x_1, x_2, \ldots, x_T]$
+    \item \textbf{Output}: Sequence of vectors $[y_1, y_2, \ldots, y_T]$
+    \item \textbf{Use case}: Part-of-speech tagging, sequence labeling
+    \item \textbf{Keras setting}: \texttt{return\_sequences=True}
+\end{itemize}
+
+\subsection{Many-to-One}
+
+\begin{itemize}
+    \item \textbf{Input}: Sequence of vectors $[x_1, x_2, \ldots, x_T]$
+    \item \textbf{Output}: Single vector $y_T$ (only the last output)
+    \item \textbf{Use case}: Sentiment analysis, text classification
+    \item \textbf{Keras setting}: \texttt{return\_sequences=False} (default)
+\end{itemize}
+
+\begin{examplebox}[Sentiment Classification]
+Given a movie review as input:
+\begin{itemize}
+    \item Process entire sequence through RNN
+    \item Take only the final hidden state $h_T$
+    \item Pass through dense layer with sigmoid to get positive/negative probability
+\end{itemize}
+We don't need predictions at every word---just a single classification at the end.
+\end{examplebox}
+
+\subsection{One-to-Many}
+
+\begin{itemize}
+    \item \textbf{Input}: Single vector $x$ (or one input followed by zeros)
+    \item \textbf{Output}: Sequence of vectors $[y_1, y_2, \ldots, y_T]$
+    \item \textbf{Use case}: Image captioning---input an image, output a sentence
+\end{itemize}
+
+\begin{infobox}[title=Image Captioning Architecture]
+For generating captions from images:
+\begin{enumerate}
+    \item Process image through CNN to get a feature vector
+    \item Use this vector as initial input to RNN
+    \item Feed zeros (or learned tokens) at subsequent time steps
+    \item RNN generates word sequence describing the image
+\end{enumerate}
+Note: RNN was not great for \textit{generating} images from text. That required transformers and diffusion models.
+\end{infobox}
+
+\subsection{Encoder-Decoder Architecture (Sequence to Sequence)}
+
+A special many-to-many architecture with a \textbf{bottleneck}:
+\begin{enumerate}
+    \item \textbf{Encoder}: Process input sequence, compress into a single ``context'' vector
+    \item \textbf{Bottleneck}: The final encoder hidden state represents the entire input
+    \item \textbf{Decoder}: Generate output sequence from the context vector
+\end{enumerate}
+
+\begin{definitionbox}[Autoencoder for Sequences]
+An autoencoder maps input to itself through a bottleneck:
+\begin{itemize}
+    \item \textbf{Training objective}: Reconstruct input from compressed representation
+    \item \textbf{Bottleneck benefit}: Forces the network to learn the most important features
+    \item \textbf{Application}: The encoder alone can create meaningful sentence embeddings
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[Sentence Compression]
+Consider compressing a sentence into a single vector:
+\begin{itemize}
+    \item Input: Sequence of word vectors representing a sentence
+    \item Process through RNN encoder
+    \item Final hidden state $h_T$ = ``sentence embedding''
+    \item This vector lives in, say, 128-dimensional space
+\end{itemize}
+
+\textbf{Analogy}: We live comfortably in 3D (or 4D with time). Why can't sentences ``live'' in 128D or 1000D space? There's plenty of room for every unique sentence!
+\end{examplebox}
+
+\subsubsection{Applications Beyond Translation}
+
+While translation was a major application of encoder-decoder RNNs (2014--2017), the architecture has other uses:
+
+\begin{itemize}
+    \item \textbf{Denoising autoencoders}: Train on (noisy image, clean image) pairs. The bottleneck learns to ignore noise.
+    \item \textbf{Image restoration}: Scratched or damaged images can be recovered
+    \item \textbf{Compression}: Learn efficient representations of data
+\end{itemize}
+
+\begin{warningbox}[title=Translation Note]
+For translation, even during the RNN era, people didn't typically pretrain on the same language (autoencoder style). They trained directly on (source language, target language) pairs because the nuances of translation require learning from actual parallel data.
+\end{warningbox}
+
+%========================================================================================
+% SECTION 3: LSTM Deep Dive
+%========================================================================================
+\newpage
+\section{LSTM: Long Short-Term Memory}
+
+\subsection{LSTM Cell State and Hidden State Dimensions}
+
+\begin{summarybox}
+\textbf{Quiz Question}: Do the cell state $C$ and hidden state $H$ in an LSTM have the same dimensions?
+
+\textbf{Answer}: \textbf{TRUE}. By the mathematical design of LSTM, $C$ and $H$ must have identical dimensions.
+\end{summarybox}
+
+\subsubsection{Mathematical Proof from LSTM Operations}
+
+Looking at how $H$ is computed from $C$:
+\begin{align}
+H_t &= O_t \odot \tanh(C_t)
+\end{align}
+
+Where:
+\begin{itemize}
+    \item $\odot$ denotes element-wise (Hadamard) multiplication
+    \item $\tanh(C_t)$ is applied element-wise to $C_t$
+    \item $O_t$ is the output gate
+\end{itemize}
+
+\textbf{Key insight}: Element-wise multiplication requires both operands to have the \textbf{same dimension}. Therefore:
+\[
+\dim(H_t) = \dim(O_t) = \dim(C_t)
+\]
+
+\begin{infobox}[title=LSTM Sub-Networks]
+When you specify \texttt{LSTM(5)}, it means:
+\begin{itemize}
+    \item $H$ is 5-dimensional
+    \item $C$ is 5-dimensional
+    \item Each of the 4 sub-networks (forget gate, input gate, candidate, output gate) has 5 neurons
+    \item Total neurons inside: $4 \times 5 = 20$
+\end{itemize}
+\end{infobox}
+
+\subsection{Understanding LSTM Gates}
+
+\begin{definitionbox}[LSTM Components]
+\begin{itemize}
+    \item \textbf{Forget Gate ($f_t$)}: Controls what to remove from cell state
+    \item \textbf{Input Gate ($i_t$)}: Controls what new information to add
+    \item \textbf{Candidate Values ($\tilde{C}_t$)}: New candidate information
+    \item \textbf{Output Gate ($o_t$)}: Controls what to output from cell state
+\end{itemize}
+
+Each gate is a fully connected layer with its own weights, but all produce outputs of dimension $n_h$ (the number of hidden units).
+\end{definitionbox}
+
+\subsubsection{Key Difference from Simple RNN}
+
+\begin{itemize}
+    \item Simple RNN: Inputs enter each neuron directly
+    \item LSTM: Inputs enter each \textbf{sub-network} (4 of them)
+    \item LSTM has two recurrent paths:
+    \begin{itemize}
+        \item $H$ goes to all 4 sub-networks (like Simple RNN's recurrence)
+        \item $C$ flows through the cell state ``highway'' (mostly bypasses sub-networks)
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}[LSTM Parameter Count]
+For \texttt{LSTM(32)} with input dimension 128:
+\begin{align}
+\text{Parameters} &= 4 \times [(n_{in} + n_h + 1) \times n_h] \\
+&= 4 \times [(128 + 32 + 1) \times 32] \\
+&= 4 \times [161 \times 32] \\
+&= 4 \times 5152 = 20608
+\end{align}
+
+The factor of 4 comes from the 4 sub-networks (gates + candidate).
+\end{examplebox}
+
+%========================================================================================
+% SECTION 4: Bidirectional RNNs
+%========================================================================================
+\newpage
+\section{Bidirectional RNNs}
+
+\subsection{Why Bidirectional?}
+
+Sometimes the \textbf{beginning} of a sequence is more important than the end. Sometimes the \textbf{end} is more important. And sometimes \textbf{both matter}.
+
+\begin{examplebox}[German Negation]
+In German, negation often appears at the end of a sentence. To understand if a statement is positive or negative, you need to process the entire sentence, including the end. A forward-only RNN might struggle because by the time it reaches the negation, important early context may have faded.
+\end{examplebox}
+
+\subsection{Bidirectional Architecture}
+
+\begin{definitionbox}[Bidirectional RNN]
+Process the sequence in \textbf{both directions} simultaneously:
+\begin{enumerate}
+    \item \textbf{Forward pass}: Process $[A, B, C, D, E]$ left to right
+    \item \textbf{Backward pass}: Process $[E, D, C, B, A]$ (reversed) left to right
+    \item \textbf{Concatenate}: Combine outputs from both directions
+\end{enumerate}
+
+If each direction has 2 hidden units, the concatenated output has 4 dimensions.
+\end{definitionbox}
+
+\subsection{Parameter Count for Bidirectional Layers}
+
+\begin{importantbox}[Bidirectional Parameter Doubling]
+\textbf{Quiz Question}: If LSTM has 8,320 parameters, how many does Bidirectional LSTM have?
+
+\textbf{Answer}: Exactly \textbf{double} = 16,640 parameters.
+
+The forward and backward LSTMs are \textbf{completely independent} networks with their own weights. They don't share anything except the input data (one gets original, one gets reversed).
+\end{importantbox}
+
+\subsubsection{What About the Next Layer?}
+
+Consider this network:
+\begin{lstlisting}[style=pythonstyle]
+model.add(Bidirectional(LSTM(32)))  # Output: 64 dimensions
+model.add(Dense(1, activation='sigmoid'))  # Input: 64, Output: 1
+\end{lstlisting}
+
+\begin{itemize}
+    \item LSTM(32) produces 32-dimensional output
+    \item Bidirectional concatenates: $32 + 32 = 64$ dimensions
+    \item Dense layer receives 64-dimensional input
+    \item Dense parameters: $64 \times 1 + 1 = 65$ (not 33!)
+\end{itemize}
+
+\begin{warningbox}[title=Not Everything Doubles]
+The bidirectional layer's parameters double because two independent networks run. But the \textbf{next layer's parameters don't double}---they just need to account for the concatenated (doubled) input dimension, plus one shared bias.
+\end{warningbox}
+
+%========================================================================================
+% SECTION 5: Natural Language Processing Overview
+%========================================================================================
+\newpage
+\section{What is Natural Language Processing?}
+
+\begin{overviewbox}
+Natural Language Processing (NLP) is the field of making computers understand, interpret, and generate human language. It sits at the intersection of \textbf{linguistics} and \textbf{artificial intelligence}.
+\end{overviewbox}
+
+\subsection{AI, ML, DL, and NLP: Understanding the Hierarchy}
+
+\begin{definitionbox}[The Nested Relationship]
+\begin{itemize}
+    \item \textbf{Artificial Intelligence (AI)}: The broadest category---any technique that makes computers behave intelligently. Includes rule-based systems where experts hardcode decisions.
+
+    \item \textbf{Machine Learning (ML)}: A subset of AI where computers learn rules from data rather than having rules programmed. Given (data + labels), the algorithm learns the mapping.
+
+    \item \textbf{Deep Learning (DL)}: A subset of ML using multi-layer neural networks. Excels at learning complex patterns from unstructured data.
+
+    \item \textbf{NLP}: An \textit{application domain} that intersects with all the above. NLP uses traditional AI (linguistic rules), ML, and DL to process language.
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[The Key Difference: AI vs ML]
+\textbf{Traditional AI (Rule-Based)}:
+\begin{itemize}
+    \item Input: Data + \textbf{Rules} (hardcoded by experts)
+    \item Output: Predictions/Decisions
+    \item Example: Doctor's decision rules stored in computer, nurse looks up treatment
+\end{itemize}
+
+\textbf{Machine Learning}:
+\begin{itemize}
+    \item Input: Data + \textbf{Labels/Results}
+    \item Output: \textbf{Rules} (learned patterns)
+    \item Example: Linear regression: given $(X, Y)$ pairs, learn coefficients $\beta$
+\end{itemize}
+\end{examplebox}
+
+\subsection{Why NLP Needs More Than Just ML}
+
+NLP problems are so complex that we often need linguistic knowledge \textbf{in addition to} machine learning:
+
+\begin{itemize}
+    \item \textbf{Stemming/Lemmatization}: Linguistic rules that ``run,'' ``ran,'' ``running'' are the same word
+    \item \textbf{Syntax parsing}: Grammar rules for sentence structure
+    \item \textbf{Named Entity Recognition}: Understanding that ``Paris'' is a city, not just a word
+\end{itemize}
+
+This is why NLP is truly \textbf{multidisciplinary}---combining linguistics, statistics, and computer science.
+
+\subsection{NLP Application Areas}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Application} & \textbf{Description} \\
+\midrule
+Text Classification & Spam detection, topic categorization, sentiment analysis \\
+Named Entity Recognition & Identifying names, organizations, locations in text \\
+Sentiment Analysis & Determining emotional tone (positive/negative) \\
+Information Retrieval & Search engines, TF-IDF, BM25 \\
+Optical Character Recognition & Converting images of text to digital text \\
+Machine Translation & Converting text between languages \\
+Text Summarization & Condensing documents to key points \\
+Speech Recognition & Converting audio to text \\
+Question Answering & Providing specific answers to questions \\
+Chatbots & Conversational AI systems \\
+Topic Modeling & Discovering themes in document collections \\
+Language Generation & Creating human-like text \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{NLP Challenges}
+
+\begin{warningbox}[title=Ambiguity is Everywhere]
+Consider the headline: ``Court to try shooting defendant''
+
+What's happening? Is the court:
+\begin{enumerate}
+    \item Going to \textbf{try} (in a legal sense) the defendant who did the shooting?
+    \item Going to \textbf{try shooting} the defendant?
+\end{enumerate}
+
+Humans use world knowledge to disambiguate. Teaching computers this is extremely hard!
+\end{warningbox}
+
+%========================================================================================
+% SECTION 6: Text Preprocessing
+%========================================================================================
+\newpage
+\section{Text Preprocessing: The Foundation of NLP}
+
+\begin{summarybox}
+Before feeding text to any neural network, we must transform it into numbers. This involves multiple preprocessing steps that can significantly impact model performance.
+\end{summarybox}
+
+\subsection{The Preprocessing Pipeline}
+
+\begin{enumerate}
+    \item \textbf{Tokenization}: Split text into units (tokens)
+    \item \textbf{Normalization}: Stemming or lemmatization
+    \item \textbf{Vocabulary Building}: Create word-to-index mapping
+    \item \textbf{Encoding}: Convert tokens to numerical representations
+    \item \textbf{Padding}: Make all sequences same length
+\end{enumerate}
+
+\subsection{Tokenization}
+
+\begin{definitionbox}[Tokenization]
+The process of segmenting text into individual units called \textbf{tokens}. A token can be:
+\begin{itemize}
+    \item A word (most common)
+    \item A subword (for handling unknown words)
+    \item A character
+    \item A sentence
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Word Tokenization Example}
+
+\begin{lstlisting}[style=pythonstyle]
+from nltk.tokenize import word_tokenize
+
+text = "Henry Ford's innovation, the assembly line process."
+tokens = word_tokenize(text)
+# Result: ['Henry', 'Ford', "'s", 'innovation', ',', 'the',
+#          'assembly', 'line', 'process', '.']
+\end{lstlisting}
+
+\begin{infobox}[title=Why Use Libraries?]
+Don't just split on spaces! Libraries like NLTK handle edge cases:
+\begin{itemize}
+    \item Contractions: ``can't'' should stay together
+    \item Punctuation: ``end.'' should separate the period
+    \item Possessives: ``Ford's'' might become [``Ford'', ``'s'']
+\end{itemize}
+\end{infobox}
+
+\subsubsection{Sentence Tokenization}
+
+Useful when sentences are your unit of analysis:
+\begin{lstlisting}[style=pythonstyle]
+from nltk.tokenize import sent_tokenize
+
+text = "He created assembly lines. This revolutionized production."
+sentences = sent_tokenize(text)
+# Result: ['He created assembly lines.', 'This revolutionized production.']
+\end{lstlisting}
+
+\subsection{Stop Words}
+
+\begin{definitionbox}[Stop Words]
+Common words that carry little meaning for analysis: ``the,'' ``a,'' ``is,'' ``are,'' ``in,'' etc.
+
+Removing them:
+\begin{itemize}
+    \item Reduces vocabulary size
+    \item Speeds up training
+    \item May improve classification (removes noise)
+\end{itemize}
+\end{definitionbox}
+
+\begin{warningbox}[title=When NOT to Remove Stop Words]
+For tasks like translation or language modeling, stop words are essential! ``I am \textit{not} happy'' loses crucial meaning without ``not.''
+\end{warningbox}
+
+%========================================================================================
+% SECTION 7: Stemming and Lemmatization
+%========================================================================================
+\newpage
+\section{Stemming and Lemmatization}
+
+\subsection{The Problem of Word Variants}
+
+Consider: ``running,'' ``runs,'' ``ran''---all forms of ``run.'' Should our model treat them as three different words or one?
+
+\textbf{Benefits of reducing to base form}:
+\begin{itemize}
+    \item Smaller vocabulary
+    \item Better generalization (model learns one representation)
+    \item Improved performance on classification tasks
+\end{itemize}
+
+\subsection{Stemming}
+
+\begin{definitionbox}[Stemming]
+Mechanically remove word endings using rules. Fast but imprecise.
+\begin{itemize}
+    \item ``running'' $\rightarrow$ ``run'' (good!)
+    \item ``transportation'' $\rightarrow$ ``transport'' (good!)
+    \item ``electric'' $\rightarrow$ ``electr'' (not a word!)
+    \item ``Henry'' $\rightarrow$ ``henri'' (changed name!)
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Popular Stemmers}
+
+\begin{center}
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Stemmer} & \textbf{Characteristics} \\
+\midrule
+Porter Stemmer & Classic (1979), widely used, moderate aggression \\
+Snowball Stemmer & Porter's improvement, supports multiple languages \\
+Lancaster Stemmer & Most aggressive, cuts more from words \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lstlisting}[style=pythonstyle]
+from nltk.stem import PorterStemmer, SnowballStemmer
+
+porter = PorterStemmer()
+snowball = SnowballStemmer("english")
+
+words = ['running', 'runs', 'profoundly', 'driving']
+
+porter_results = [porter.stem(w) for w in words]
+# ['run', 'run', 'profoundli', 'drive']
+
+snowball_results = [snowball.stem(w) for w in words]
+# ['run', 'run', 'profound', 'drive']
+\end{lstlisting}
+
+\subsection{Lemmatization}
+
+\begin{definitionbox}[Lemmatization]
+Use linguistic knowledge to find the \textbf{dictionary form} (lemma) of a word. Slower but more accurate.
+\begin{itemize}
+    \item ``running'' $\rightarrow$ ``run'' (correct verb lemma)
+    \item ``cars'' $\rightarrow$ ``car'' (correct noun lemma)
+    \item ``driving'' $\rightarrow$ ``drive'' (not ``driv''!)
+    \item ``was'' $\rightarrow$ ``be'' (irregular verb handled correctly)
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Lemmatization Libraries}
+
+\begin{center}
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Library} & \textbf{Characteristics} \\
+\midrule
+NLTK WordNet & Academic standard, requires POS tag, English only \\
+SpaCy & Industry standard, fast, multi-language, handles new words \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lstlisting}[style=pythonstyle]
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+text = "The cars were driving quickly"
+doc = nlp(text)
+
+lemmas = [token.lemma_ for token in doc]
+# ['the', 'car', 'be', 'drive', 'quickly']
+\end{lstlisting}
+
+\subsection{Stemming vs. Lemmatization: When to Use Which?}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Factor} & \textbf{Stemming} & \textbf{Lemmatization} \\
+\midrule
+Speed & Fast & Slower \\
+Accuracy & Lower & Higher \\
+Output & May not be valid word & Always valid word \\
+Language support & Good & Varies \\
+For classification & Often sufficient & May not add much \\
+For translation & Inadequate & Necessary \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{infobox}[title=Practical Recommendation]
+For text classification (sentiment, topic):
+\begin{enumerate}
+    \item Try no stemming/lemmatization first
+    \item Try stemming
+    \item Try lemmatization
+    \item Compare validation accuracy
+\end{enumerate}
+Often stemming is ``good enough'' and faster!
+\end{infobox}
+
+%========================================================================================
+% SECTION 8: Word Embeddings
+%========================================================================================
+\newpage
+\section{From Words to Vectors: Embeddings}
+
+\subsection{The Problem with One-Hot Encoding}
+
+Representing words as one-hot vectors:
+\begin{itemize}
+    \item ``cat'' = [1, 0, 0, 0, ..., 0]
+    \item ``dog'' = [0, 1, 0, 0, ..., 0]
+    \item ``table'' = [0, 0, 1, 0, ..., 0]
+\end{itemize}
+
+\textbf{Problems}:
+\begin{enumerate}
+    \item \textbf{High dimensionality}: 10,000-word vocabulary = 10,000-dimensional vectors
+    \item \textbf{Sparse}: Almost all zeros, wasted computation
+    \item \textbf{No semantic meaning}: ``cat'' and ``dog'' are as different as ``cat'' and ``table''
+\end{enumerate}
+
+\subsection{What is an Embedding?}
+
+\begin{definitionbox}[Word Embedding]
+A mapping from sparse, high-dimensional one-hot vectors to dense, low-dimensional vectors where \textbf{semantic similarity} is captured by \textbf{vector proximity}.
+
+\begin{align*}
+\text{One-hot: } & [0, 0, 1, 0, \ldots, 0] \text{ (10,000 dimensions)} \\
+\text{Embedding: } & [0.23, -1.5, 0.87, \ldots] \text{ (128 dimensions)}
+\end{align*}
+\end{definitionbox}
+
+\subsection{How Embeddings Work}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.layers import Embedding
+
+# Vocabulary size: 10001 (10000 words + 1 OOV token)
+# Embedding dimension: 128
+embedding_layer = Embedding(input_dim=10001, output_dim=128)
+\end{lstlisting}
+
+\textbf{What happens internally}:
+\begin{enumerate}
+    \item Layer has a weight matrix of shape (10001, 128)
+    \item Each row corresponds to one word's embedding
+    \item Input: word index (integer)
+    \item Output: corresponding row from weight matrix
+    \item \textbf{Weights are learned during training}
+\end{enumerate}
+
+\begin{examplebox}[Embedding Lookup]
+Input index: 5 (representing ``cat'')
+
+The embedding layer simply looks up row 5 of its weight matrix:
+\begin{lstlisting}[style=pythonstyle]
+# Conceptually:
+weight_matrix[5] = [0.23, -1.5, 0.87, ...]  # 128 numbers
+\end{lstlisting}
+
+No matrix multiplication needed---just a lookup! This is much faster than multiplying a one-hot vector by a weight matrix.
+\end{examplebox}
+
+\subsection{Why Embeddings are Trainable}
+
+\begin{infobox}[title=Learning Semantics]
+Unlike fixed mappings like [1, 0] for female and [0, 1] for male, embedding values are \textbf{learned from data}.
+
+During training:
+\begin{itemize}
+    \item Words appearing in similar contexts get similar embeddings
+    \item ``king'' - ``man'' + ``woman'' $\approx$ ``queen''
+    \item Relationships are encoded as vector arithmetic!
+\end{itemize}
+\end{infobox}
+
+\subsection{Embedding Layer vs. Dense Layer}
+
+\begin{center}
+\begin{tabular}{lp{6cm}p{6cm}}
+\toprule
+& \textbf{Embedding Layer} & \textbf{Dense Layer} \\
+\midrule
+Input & Integer indices & Continuous vectors \\
+Operation & Table lookup & Matrix multiplication \\
+Bias & No bias & Has bias \\
+Activation & Linear (none) & Any \\
+Efficiency & Very fast & Slower for sparse input \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Mathematically}, an embedding layer is equivalent to a dense layer with:
+\begin{itemize}
+    \item Linear activation
+    \item No bias
+    \item One-hot input
+\end{itemize}
+
+But the lookup implementation is much more efficient!
+
+%========================================================================================
+% SECTION 9: Building a Text Classification Pipeline
+%========================================================================================
+\newpage
+\section{Complete Text Classification Pipeline}
+
+\begin{overviewbox}
+This section walks through building a neural network for text classification, using the 20 Newsgroups dataset to classify posts as either ``hockey'' or ``for sale.''
+\end{overviewbox}
+
+\subsection{Data Preparation}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.datasets import fetch_20newsgroups
+
+# Select two categories for binary classification
+categories = ['rec.sport.hockey', 'misc.forsale']
+
+# Load training and test data
+train_data = fetch_20newsgroups(subset='train', categories=categories)
+test_data = fetch_20newsgroups(subset='test', categories=categories)
+
+# train_data.data: list of text documents
+# train_data.target: list of labels (0 or 1)
+\end{lstlisting}
+
+\subsection{Building the Vocabulary}
+
+\begin{lstlisting}[style=pythonstyle]
+from nltk.tokenize import word_tokenize
+from collections import defaultdict
+
+MAX_FEATURES = 10000  # Keep only top 10,000 words
+
+# Count word frequencies across all training documents
+word_freq = defaultdict(int)
+for text in train_data.data:
+    tokens = word_tokenize(text.lower())
+    for token in tokens:
+        word_freq[token] += 1
+
+# Sort by frequency, keep top MAX_FEATURES
+sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
+word_index = {'<OOV>': 0}  # Index 0 reserved for out-of-vocabulary
+for i, (word, _) in enumerate(sorted_words[:MAX_FEATURES]):
+    word_index[word] = i + 1
+\end{lstlisting}
+
+\subsection{Converting Text to Sequences}
+
+\begin{lstlisting}[style=pythonstyle]
+def text_to_sequence(text, word_index):
+    """Convert text to sequence of word indices."""
+    tokens = word_tokenize(text.lower())
+    sequence = [word_index.get(token, 0) for token in tokens]  # 0 for OOV
+    return sequence
+
+# Convert all documents
+train_sequences = [text_to_sequence(text, word_index)
+                   for text in train_data.data]
+\end{lstlisting}
+
+\subsection{Padding Sequences}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+MAX_LENGTH = 500  # Maximum sequence length
+
+# Pad sequences to same length (truncate if longer, pad if shorter)
+X_train = pad_sequences(train_sequences, maxlen=MAX_LENGTH, padding='post')
+X_test = pad_sequences(test_sequences, maxlen=MAX_LENGTH, padding='post')
+\end{lstlisting}
+
+\subsection{Building the Model}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+
+def build_model():
+    model = Sequential([
+        # Embedding: 10001 words -> 128 dimensions
+        Embedding(input_dim=MAX_FEATURES + 1, output_dim=128),
+
+        # Dropout on embeddings
+        Dropout(0.2),
+
+        # LSTM layer
+        LSTM(128),
+
+        # Dropout before output
+        Dropout(0.2),
+
+        # Binary classification output
+        Dense(1, activation='sigmoid')
+    ])
+
+    model.compile(
+        optimizer='adam',
+        loss='binary_crossentropy',  # For binary classification
+        metrics=['accuracy']
+    )
+    return model
+\end{lstlisting}
+
+\subsection{Why Binary Cross-Entropy?}
+
+\begin{definitionbox}[Binary Cross-Entropy Loss]
+For binary classification with sigmoid output:
+\[
+L = -[y \log(\hat{y}) + (1-y) \log(1-\hat{y})]
+\]
+
+Where:
+\begin{itemize}
+    \item $y \in \{0, 1\}$: true label
+    \item $\hat{y} \in [0, 1]$: predicted probability
+\end{itemize}
+
+Mean Squared Error would have terrible gradients for sigmoid output---cross-entropy is essential!
+\end{definitionbox}
+
+\subsection{Training and Results}
+
+\begin{lstlisting}[style=pythonstyle]
+model = build_model()
+history = model.fit(
+    X_train, y_train,
+    epochs=10,
+    batch_size=32,
+    validation_split=0.1
+)
+
+# Evaluate on test set
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print(f"Test accuracy: {test_acc:.4f}")
+\end{lstlisting}
+
+\textbf{Results with different preprocessing}:
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Preprocessing} & \textbf{Test Accuracy} \\
+\midrule
+Tokenization only & $\sim$93.5\% \\
+Tokenization + Stemming & $\sim$97\% \\
+Tokenization + Lemmatization & $\sim$95--96\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{infobox}[title=Interpreting Results]
+Stemming performed best here, possibly because:
+\begin{itemize}
+    \item Reduced vocabulary helps with limited data
+    \item Word variants unified (``hockey,'' ``Hockey'' become same)
+    \item The classification task doesn't require precise word forms
+\end{itemize}
+
+\textbf{Always experiment!} Different tasks and datasets may favor different preprocessing.
+\end{infobox}
+
+%========================================================================================
+% SECTION 10: Handling OOV and Dropout
+%========================================================================================
+\newpage
+\section{Practical Considerations}
+
+\subsection{Out-of-Vocabulary (OOV) Handling}
+
+\begin{warningbox}[title=The OOV Problem]
+Test data often contains words not seen during training. What do we do?
+
+\textbf{Option 1}: Ignore unknown words (skip them)
+
+\textbf{Option 2}: Map to special OOV token (index 0)
+
+Option 2 is usually better---the model knows ``there was a word here I don't recognize.''
+\end{warningbox}
+
+\begin{infobox}[title=Why Not Use All Words?]
+Q: Why not add all English dictionary words to vocabulary?
+
+A: Because the model only learns representations for words it sees during training! Adding ``elephant'' to vocabulary doesn't help if no training document mentions elephants---the model has no learned embedding for it.
+
+The vocabulary should come from training data, not external dictionaries.
+\end{infobox}
+
+\subsection{Dropout for Regularization}
+
+\begin{definitionbox}[Dropout]
+During training, randomly set a fraction of neurons' outputs to zero. This prevents \textbf{overfitting} by:
+\begin{itemize}
+    \item Preventing co-adaptation of neurons
+    \item Creating an ensemble effect
+    \item Forcing redundant representations
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Dropout in RNN Models}
+
+Three places to apply dropout:
+\begin{enumerate}
+    \item \textbf{Input dropout}: Applied to embedding outputs
+    \item \textbf{Recurrent dropout}: Applied to recurrent connections (special handling)
+    \item \textbf{Output dropout}: Applied to layer outputs
+\end{enumerate}
+
+\begin{lstlisting}[style=pythonstyle]
+# Dropout on inputs/outputs
+Dropout(0.2)  # 20% of values set to 0
+
+# Recurrent dropout inside LSTM
+LSTM(128, dropout=0.2, recurrent_dropout=0.2)
+\end{lstlisting}
+
+\begin{examplebox}[How Dropout Works]
+With \texttt{Dropout(0.2)} on a sequence:
+\begin{lstlisting}
+Original:  [1.7,  0.9, -1.3,  2.1, 0.5]
+After:     [1.7,  0.0, -1.3,  2.1, 0.0]  # 20% zeroed
+\end{lstlisting}
+
+Each mini-batch gets different random zeros. This variability prevents overfitting even with many epochs.
+\end{examplebox}
+
+%========================================================================================
+% SECTION 11: One-Page Summary
+%========================================================================================
+\newpage
+\section{One-Page Summary}
+
+\begin{tcolorbox}[title=RNN Architecture, colback=blue!5]
+\textbf{Parameter Counting}:
+\begin{itemize}
+    \item Simple RNN: $(n_{in} + n_h + 1) \times n_h$
+    \item LSTM: $4 \times (n_{in} + n_h + 1) \times n_h$
+    \item Bidirectional: $2 \times$ base parameters
+\end{itemize}
+
+\textbf{LSTM}: Cell state $C$ and hidden state $H$ have \textbf{same dimensions}.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Text Preprocessing Pipeline, colback=green!5]
+\textbf{Tokenization} $\rightarrow$ \textbf{Normalization} $\rightarrow$ \textbf{Vocabulary} $\rightarrow$ \textbf{Encoding} $\rightarrow$ \textbf{Padding}
+
+\begin{tabular}{ll}
+\textbf{Stemming} & Fast, rule-based, may produce non-words \\
+\textbf{Lemmatization} & Slower, dictionary-based, always valid words \\
+\end{tabular}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Word Embeddings, colback=purple!5]
+\textbf{One-Hot}: Sparse, high-dimensional, no semantics \\
+\textbf{Embedding}: Dense, low-dimensional, learned semantics
+
+Embedding layer = lookup table with trainable weights
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Model Architecture for Text Classification, colback=orange!5]
+\begin{lstlisting}[style=pythonstyle, numbers=none]
+Embedding(vocab_size, embed_dim)
+-> Dropout(0.2)
+-> LSTM(hidden_units)
+-> Dropout(0.2)
+-> Dense(1, activation='sigmoid')
+\end{lstlisting}
+
+Loss: Binary Cross-Entropy | Optimizer: Adam
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Key Formulas, colback=yellow!5]
+\textbf{Sigmoid}: $\sigma(z) = \frac{1}{1 + e^{-z}}$
+
+\textbf{Binary Cross-Entropy}: $L = -[y\log\hat{y} + (1-y)\log(1-\hat{y})]$
+
+\textbf{LSTM Cell Update}:
+\begin{align*}
+f_t &= \sigma(W_f \cdot [h_{t-1}, x_t] + b_f) \quad \text{(forget gate)} \\
+C_t &= f_t \odot C_{t-1} + i_t \odot \tilde{C}_t \quad \text{(cell state)} \\
+h_t &= o_t \odot \tanh(C_t) \quad \text{(hidden state)}
+\end{align*}
+\end{tcolorbox}
+
+%========================================================================================
+% GLOSSARY
+%========================================================================================
+\newpage
+\section{Glossary}
+
+\begin{longtable}{p{4cm}p{11cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+
+Autoencoder & Neural network trained to reconstruct input through a bottleneck, learning compressed representations \\
+
+Bidirectional RNN & RNN that processes sequences in both forward and backward directions, concatenating outputs \\
+
+Binary Cross-Entropy & Loss function for binary classification comparing predicted probabilities to true labels \\
+
+Dropout & Regularization technique that randomly zeros neurons during training to prevent overfitting \\
+
+Embedding & Learned dense vector representation of discrete items (words) capturing semantic relationships \\
+
+Encoder-Decoder & Architecture with two parts: encoder compresses input, decoder generates output \\
+
+Lemmatization & Reducing words to dictionary form using linguistic knowledge (``drove'' $\to$ ``drive'') \\
+
+LSTM & Long Short-Term Memory---RNN variant with gates to control information flow, handling long sequences \\
+
+One-Hot Encoding & Sparse vector with single 1 indicating category, all other positions 0 \\
+
+OOV (Out-of-Vocabulary) & Words not present in the training vocabulary, mapped to special token \\
+
+Padding & Adding zeros to sequences to make them equal length for batch processing \\
+
+Stemming & Reducing words to root form by removing affixes (``running'' $\to$ ``run'') \\
+
+Stop Words & Common words (``the,'' ``is'') often removed as they carry little semantic content \\
+
+Tokenization & Splitting text into individual units (tokens) like words or sentences \\
+
+\bottomrule
+\end{longtable}
+
+\end{document}

@@ -1,0 +1,990 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 23: Gradient Boosting
+% English Version - Beginner Friendly
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 23}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. Overview Box
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. Summary Box
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. Info Box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. Warning Box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. Example Box
+\newtcolorbox{examplebox}[1]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 6. Definition Box
+\newtcolorbox{definitionbox}[1]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 7. Important Box
+\newtcolorbox{importantbox}[1]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 8. Caution Box
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Style
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Captions
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 23},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 23: Gradient Boosting}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understand boosting as an approach to reduce bias, learn how gradient boosting works, and connect it to gradient descent}
+
+\tableofcontents
+\newpage
+
+%========================================================================================
+\section{The Big Picture: A Different Approach to Ensembles}
+%========================================================================================
+
+\begin{summarybox}
+This lecture introduces \textbf{Boosting}, a fundamentally different ensemble approach from Bagging and Random Forests:
+
+\begin{itemize}
+    \item \textbf{Random Forest}: Start with complex trees (low bias, high variance) $\rightarrow$ reduce \textbf{variance} by averaging
+    \item \textbf{Boosting}: Start with simple trees (high bias, low variance) $\rightarrow$ reduce \textbf{bias} by iterative correction
+\end{itemize}
+
+The key insight: \textbf{Learn from your mistakes}. Each new tree corrects the errors of all previous trees.
+\end{summarybox}
+
+\subsection{Where We Are in the Course}
+
+Let's recap our journey through tree-based methods:
+
+\begin{enumerate}
+    \item \textbf{Single Decision Trees}: Simple, interpretable, but prone to overfitting or underfitting
+    \item \textbf{Bagging}: Reduce variance by averaging many deep trees trained on bootstrap samples
+    \item \textbf{Random Forest}: Improve bagging by decorrelating trees (random feature selection)
+    \item \textbf{Boosting}: Take a completely different approach---reduce bias instead of variance
+\end{enumerate}
+
+\subsection{Why Boosting Matters}
+
+\begin{infobox}
+\textbf{The Practical Importance of Boosting:}
+
+For \textbf{tabular data} (spreadsheets, databases---not images or text), tree-based ensemble methods often outperform deep learning:
+
+\begin{itemize}
+    \item On Kaggle competitions with structured data, boosting methods (especially XGBoost, LightGBM, CatBoost) win \textbf{almost every time}
+    \item Random Forests and Boosting are the ``go-to'' methods for tabular problems
+    \item Neural networks excel at images, text, and audio---but for tables, trees reign supreme
+\end{itemize}
+
+This is why understanding boosting is essential for any data scientist!
+\end{infobox}
+
+%========================================================================================
+\newpage
+\section{The Intuition Behind Boosting}
+%========================================================================================
+
+\subsection{The Opposite of Random Forest}
+
+Random Forest and Boosting take opposite approaches to the bias-variance tradeoff:
+
+\begin{table}[h!]
+\centering
+\caption{Random Forest vs. Boosting}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Aspect} & \textbf{Random Forest} & \textbf{Boosting} \\
+\midrule
+Starting point & Deep trees (complex) & Shallow trees (simple) \\
+Initial problem & High variance & High bias \\
+Solution & Average many trees & Add trees sequentially \\
+Goal & Reduce variance & Reduce bias \\
+Training & Parallel (independent) & Sequential (dependent) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Exam Analogy}
+
+\begin{examplebox}{Passing a Hard Exam}
+Imagine you need to pass a very difficult exam (say, you need an A to pass). You could:
+
+\textbf{Option 1 (Bad):} Steal a time machine, go back to 1996, befriend the inventors of boosting, study with them for a decade, return to present. (Not practical!)
+
+\textbf{Option 2 (Good):} Gather simple rules of thumb from different people:
+
+\begin{enumerate}
+    \item \textbf{Last year's student}: ``Never choose option D'' $\rightarrow$ You get 60\%
+    \item \textbf{Teaching Assistant}: ``If 'overfitting' is an option, it's usually correct'' $\rightarrow$ Focus on questions you got wrong, now at 65\%
+    \item \textbf{Professor}: ``Cross-validation is always a good answer'' $\rightarrow$ Focus on remaining mistakes, now at 70\%
+\end{enumerate}
+
+\textbf{Combine the rules with appropriate weights:}
+\begin{itemize}
+    \item Give more weight to more reliable rules
+    \item Each rule is a ``weak learner'' (not great on its own)
+    \item Combined, they form a ``strong learner'' (90\%+ accuracy!)
+\end{itemize}
+
+\textbf{This is boosting!} Simple rules, learned sequentially, each fixing the mistakes of previous ones.
+\end{examplebox}
+
+\subsection{Key Concepts}
+
+\begin{definitionbox}{Weak Learner}
+A \textbf{weak learner} is a model that performs only slightly better than random guessing. In the context of trees, this typically means a \textbf{stump}---a tree with only one split (depth 1).
+
+The remarkable insight: combining many weak learners can create a \textbf{strong learner}!
+\end{definitionbox}
+
+\begin{definitionbox}{Boosting}
+\textbf{Boosting} is an ensemble method that:
+\begin{enumerate}
+    \item Uses \textbf{simple models} (weak learners) as building blocks
+    \item Combines them \textbf{additively}: $T_{final}(x) = \sum_h \lambda_h T_h(x)$
+    \item Builds models \textbf{sequentially}, with each new model correcting previous mistakes
+\end{enumerate}
+\end{definitionbox}
+
+The three keywords to remember:
+\begin{enumerate}
+    \item \textbf{Simple}: Use weak learners (stumps)
+    \item \textbf{Additive}: Add models together
+    \item \textbf{Sequential}: Each model learns from previous mistakes
+\end{enumerate}
+
+%========================================================================================
+\newpage
+\section{How Gradient Boosting Works}
+%========================================================================================
+
+\begin{summarybox}
+The core idea of gradient boosting is beautifully simple:
+
+\textbf{Each new tree predicts the residuals (errors) of the current ensemble.}
+
+If tree 1 predicts ``too low by 5,'' tree 2 learns to predict ``+5'' to correct it.
+\end{summarybox}
+
+\subsection{The Algorithm Step by Step}
+
+\begin{definitionbox}{Gradient Boosting Algorithm (Regression)}
+\textbf{Input}: Training data $(x_i, y_i)$, learning rate $\lambda$, number of iterations $M$
+
+\textbf{Initialize}: $T_0(x) = $ simple model (e.g., predicting the mean of $y$)
+
+\textbf{For $m = 1, 2, \ldots, M$:}
+\begin{enumerate}
+    \item \textbf{Compute residuals}: $r_i^{(m-1)} = y_i - T_{m-1}(x_i)$
+
+    (These are the ``mistakes'' of the current model)
+
+    \item \textbf{Fit new tree to residuals}: Train a simple tree $t_m$ to predict $r^{(m-1)}$
+
+    \item \textbf{Update model}: $T_m(x) = T_{m-1}(x) + \lambda \cdot t_m(x)$
+\end{enumerate}
+
+\textbf{Output}: $T_M(x) = T_0(x) + \lambda t_1(x) + \lambda t_2(x) + \cdots + \lambda t_M(x)$
+\end{definitionbox}
+
+\subsection{A Concrete Example}
+
+\begin{examplebox}{Gradient Boosting on Simple Data}
+\textbf{Data}: 6 points with input $x$ and target $y$
+
+\textbf{Step 1: Fit initial model $T_0$}
+\begin{itemize}
+    \item Use a stump (one split)
+    \item Find the split that minimizes MSE
+    \item Say we split at $x = 6.5$:
+    \begin{itemize}
+        \item Left region ($x < 6.5$): Predict mean $\approx 0$
+        \item Right region ($x \geq 6.5$): Predict mean $\approx 7.5$
+    \end{itemize}
+\end{itemize}
+
+\textbf{Step 2: Compute residuals}
+\begin{itemize}
+    \item $r_i = y_i - T_0(x_i)$
+    \item These show where our model is wrong
+\end{itemize}
+
+\textbf{Step 3: Fit $t_1$ to residuals}
+\begin{itemize}
+    \item Train a stump to predict the residuals
+    \item Say we split at $x = 3.5$:
+    \begin{itemize}
+        \item Left region: Predict mean residual $\approx 2$
+        \item Right region: Predict mean residual $\approx -1.5$
+    \end{itemize}
+\end{itemize}
+
+\textbf{Step 4: Update model}
+\begin{itemize}
+    \item Set $\lambda = 0.5$ (learning rate)
+    \item $T_1(x) = T_0(x) + 0.5 \cdot t_1(x)$
+\end{itemize}
+
+\textbf{Step 5: Repeat}
+\begin{itemize}
+    \item Compute new residuals from $T_1$
+    \item Fit $t_2$ to these residuals
+    \item $T_2(x) = T_1(x) + 0.5 \cdot t_2(x)$
+    \item Continue until stopping criterion
+\end{itemize}
+\end{examplebox}
+
+\subsection{Why the Learning Rate ($\lambda$)?}
+
+A natural question: Why not just add the full residual prediction? Why multiply by $\lambda < 1$?
+
+\begin{importantbox}{The Learning Rate}
+The learning rate $\lambda$ controls \textbf{how much we trust each new tree}.
+
+\textbf{Problem without $\lambda$:}
+\begin{itemize}
+    \item We're fitting residuals with a \textbf{weak learner} (stump)
+    \item The stump's prediction of residuals is \textbf{imperfect}
+    \item If we add the full prediction, we might \textbf{overcorrect}
+    \item This is like playing whack-a-mole: fix one error, create another
+\end{itemize}
+
+\textbf{Solution with $\lambda$:}
+\begin{itemize}
+    \item Take a \textbf{small step} in the right direction
+    \item Don't fully trust any single weak learner
+    \item Gradually converge to the correct answer
+    \item Typical values: $\lambda = 0.01$ to $0.1$
+\end{itemize}
+
+Think of it like this: if you're not sure of the direction, take small steps rather than giant leaps!
+\end{importantbox}
+
+\subsection{Important Implementation Note}
+
+\begin{warningbox}
+\textbf{We don't actually combine trees into one big tree!}
+
+In practice:
+\begin{itemize}
+    \item We store each tree separately: $T_0, t_1, t_2, \ldots, t_M$
+    \item For prediction, we evaluate each tree and sum the results:
+    \[
+    \hat{y} = T_0(x) + \lambda \cdot t_1(x) + \lambda \cdot t_2(x) + \cdots
+    \]
+    \item This is just numerical addition---no tree merging!
+\end{itemize}
+\end{warningbox}
+
+%========================================================================================
+\newpage
+\section{Why Is It Called ``Gradient'' Boosting?}
+%========================================================================================
+
+This is the mathematical heart of the lecture. Understanding this connection reveals why boosting works so well.
+
+\subsection{Review: Gradient Descent}
+
+\begin{definitionbox}{Gradient Descent}
+\textbf{Gradient descent} is an iterative optimization algorithm:
+
+\textbf{Goal}: Find parameters $w$ that minimize a loss function $L(w)$
+
+\textbf{Update rule}:
+\[
+w_{new} = w_{old} - \lambda \cdot \nabla L(w)
+\]
+
+where:
+\begin{itemize}
+    \item $\nabla L(w)$ is the gradient (direction of steepest increase)
+    \item $\lambda$ is the learning rate (step size)
+    \item We move in the \textbf{opposite} direction of the gradient (toward minimum)
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Gradient Descent Intuition}
+Imagine you're blindfolded on a mountain and want to reach the valley:
+
+\begin{enumerate}
+    \item \textbf{Feel the slope}: Figure out which direction is ``up'' (the gradient)
+    \item \textbf{Step downhill}: Move in the opposite direction
+    \item \textbf{Choose step size}: If the slope is steep, take a bigger step; if gentle, take a smaller step
+    \item \textbf{Repeat}: Keep feeling the slope and stepping until you reach the bottom
+\end{enumerate}
+
+The learning rate controls your step size:
+\begin{itemize}
+    \item Too large: You might overstep and end up on the other side
+    \item Too small: You'll get there eventually, but very slowly
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Key Connection: Residuals ARE Gradients}
+
+Here's the magical connection that justifies the name ``gradient boosting.''
+
+Consider the MSE loss function:
+\[
+L(y, \hat{y}) = \frac{1}{2}(y - \hat{y})^2
+\]
+
+Take the derivative with respect to the prediction $\hat{y}$:
+\[
+\frac{\partial L}{\partial \hat{y}} = -(y - \hat{y})
+\]
+
+\begin{importantbox}{The Key Insight}
+The \textbf{negative gradient} of MSE with respect to predictions is exactly the \textbf{residual}:
+\[
+-\frac{\partial L}{\partial \hat{y}} = y - \hat{y} = \text{residual}
+\]
+
+Therefore:
+\begin{itemize}
+    \item When we fit a tree to \textbf{residuals}, we're fitting it to the \textbf{negative gradient}
+    \item Adding $\lambda \times \text{(residual prediction)}$ is exactly gradient descent!
+    \item We're doing gradient descent in \textbf{function space} rather than parameter space
+\end{itemize}
+\end{importantbox}
+
+\subsection{Why This Matters}
+
+Understanding the gradient descent connection gives us:
+
+\begin{enumerate}
+    \item \textbf{Theoretical guarantee}: If the loss is convex and learning rate is small enough, gradient descent converges to the minimum. So our boosting algorithm will converge!
+
+    \item \textbf{Extension to other losses}: We can use ANY differentiable loss function:
+    \begin{itemize}
+        \item MSE for regression
+        \item Log-loss for classification (this gives AdaBoost-like behavior)
+        \item Huber loss for robust regression
+        \item Quantile loss for quantile regression
+    \end{itemize}
+    Just compute the negative gradient and fit trees to that!
+
+    \item \textbf{Understanding the learning rate}: The learning rate in boosting plays the same role as in gradient descent---controlling step size to ensure convergence.
+\end{enumerate}
+
+\subsection{Optimization in Function Space}
+
+\begin{examplebox}{Parameter Space vs. Function Space}
+\textbf{Traditional ML (Linear/Logistic Regression):}
+\begin{itemize}
+    \item We have parameters $\beta_0, \beta_1, \ldots$
+    \item We optimize by adjusting these parameters
+    \item Gradient descent moves in \textbf{parameter space}
+\end{itemize}
+
+\textbf{Gradient Boosting:}
+\begin{itemize}
+    \item Trees don't have fixed parameters (depth can vary)
+    \item We optimize the \textbf{predictions} directly
+    \item Each tree moves us toward better predictions
+    \item Gradient descent moves in \textbf{function/prediction space}
+\end{itemize}
+
+This is a profound shift! Instead of adjusting coefficients, we're directly adjusting predictions by adding corrective models.
+\end{examplebox}
+
+%========================================================================================
+\newpage
+\section{Hyperparameters and Tuning}
+%========================================================================================
+
+Gradient boosting has several important hyperparameters to tune.
+
+\subsection{Learning Rate ($\lambda$)}
+
+\begin{table}[h!]
+\centering
+\caption{Effect of Learning Rate}
+\begin{tabular}{lll}
+\toprule
+\textbf{Learning Rate} & \textbf{Pros} & \textbf{Cons} \\
+\midrule
+Small ($0.01$) & More robust, better generalization & Needs many trees, slow \\
+Medium ($0.1$) & Good balance & Standard choice \\
+Large ($0.3+$) & Faster training & May overshoot, overfit \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Rule of thumb}: Use a small learning rate with many trees for best performance.
+
+\subsection{Number of Trees (Iterations)}
+
+Unlike Random Forest, boosting CAN overfit with too many trees:
+
+\begin{itemize}
+    \item \textbf{Too few}: Underfitting (high bias)
+    \item \textbf{Too many}: Overfitting (memorizing training data)
+    \item \textbf{Solution}: Use early stopping with validation data
+\end{itemize}
+
+\subsection{Tree Complexity}
+
+Each weak learner can have its own complexity:
+
+\begin{itemize}
+    \item \textbf{Depth 1 (stump)}: Very weak, needs many trees
+    \item \textbf{Depth 3-5}: Common choice, captures interactions
+    \item \textbf{Depth 10+}: May overfit, defeats purpose of ``weak'' learners
+\end{itemize}
+
+\subsection{Practical Tuning Strategy}
+
+\begin{infobox}
+\textbf{Recommended Tuning Approach:}
+
+\begin{enumerate}
+    \item Start with:
+    \begin{itemize}
+        \item Learning rate: $0.1$
+        \item Max depth: $3$
+        \item N estimators: $100$
+    \end{itemize}
+
+    \item Watch the learning curve (training vs. validation error)
+
+    \item If overfitting: Decrease learning rate, add regularization
+
+    \item If underfitting: Increase depth or number of trees
+
+    \item Final model: Use small learning rate ($0.01$-$0.05$) with early stopping
+\end{enumerate}
+\end{infobox}
+
+%========================================================================================
+\newpage
+\section{Gradient Boosting in Python}
+%========================================================================================
+
+\subsection{Basic Implementation with sklearn}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create gradient boosting regressor
+gb_reg = GradientBoostingRegressor(
+    n_estimators=100,      # Number of trees
+    learning_rate=0.1,     # Shrinkage parameter
+    max_depth=3,           # Depth of each tree (weak learner)
+    min_samples_split=2,   # Minimum samples to split
+    min_samples_leaf=1,    # Minimum samples per leaf
+    random_state=42
+)
+
+# Train
+gb_reg.fit(X_train, y_train)
+
+# Evaluate
+train_score = gb_reg.score(X_train, y_train)
+test_score = gb_reg.score(X_test, y_test)
+print(f"Train R^2: {train_score:.4f}")
+print(f"Test R^2: {test_score:.4f}")
+\end{lstlisting}
+
+\subsection{Monitoring Training with Staged Predict}
+
+\begin{lstlisting}[style=pythonstyle]
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+# Get staged predictions
+train_errors = []
+test_errors = []
+
+for i, y_pred_train in enumerate(gb_reg.staged_predict(X_train)):
+    train_errors.append(mean_squared_error(y_train, y_pred_train))
+
+for i, y_pred_test in enumerate(gb_reg.staged_predict(X_test)):
+    test_errors.append(mean_squared_error(y_test, y_pred_test))
+
+# Plot learning curve
+plt.figure(figsize=(10, 6))
+plt.plot(train_errors, label='Training Error')
+plt.plot(test_errors, label='Test Error')
+plt.xlabel('Number of Trees')
+plt.ylabel('MSE')
+plt.title('Gradient Boosting Learning Curve')
+plt.legend()
+plt.show()
+
+# Find optimal number of trees
+best_n = np.argmin(test_errors)
+print(f"Optimal number of trees: {best_n}")
+\end{lstlisting}
+
+\subsection{Early Stopping}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.ensemble import GradientBoostingRegressor
+
+# Use validation_fraction and n_iter_no_change for early stopping
+gb_early = GradientBoostingRegressor(
+    n_estimators=500,           # Maximum trees (won't necessarily use all)
+    learning_rate=0.1,
+    max_depth=3,
+    validation_fraction=0.1,    # Use 10% for validation
+    n_iter_no_change=10,        # Stop if no improvement for 10 rounds
+    tol=1e-4,                   # Tolerance for improvement
+    random_state=42
+)
+
+gb_early.fit(X_train, y_train)
+print(f"Trees used: {gb_early.n_estimators_}")
+\end{lstlisting}
+
+\subsection{Feature Importance}
+
+\begin{lstlisting}[style=pythonstyle]
+import pandas as pd
+
+# Get feature importances (based on improvement in criterion)
+importances = gb_reg.feature_importances_
+
+# Display sorted importances
+feature_importance_df = pd.DataFrame({
+    'Feature': feature_names,
+    'Importance': importances
+}).sort_values('Importance', ascending=False)
+
+print(feature_importance_df)
+
+# Plot
+plt.figure(figsize=(10, 6))
+plt.barh(range(len(importances)), importances[importances.argsort()])
+plt.yticks(range(len(importances)),
+           [feature_names[i] for i in importances.argsort()])
+plt.xlabel('Feature Importance')
+plt.title('Gradient Boosting Feature Importance')
+plt.show()
+\end{lstlisting}
+
+%========================================================================================
+\newpage
+\section{Comparing Ensemble Methods}
+%========================================================================================
+
+\begin{table}[h!]
+\centering
+\caption{Comprehensive Comparison of Tree Ensemble Methods}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Aspect} & \textbf{Bagging} & \textbf{Random Forest} & \textbf{Gradient Boosting} \\
+\midrule
+Primary goal & Reduce variance & Reduce variance & Reduce bias \\
+Tree type & Deep, complex & Deep, complex & Shallow, simple \\
+Training & Parallel & Parallel & Sequential \\
+Speed & Fast & Fast & Slower \\
+Overfitting risk & Low & Low & Higher \\
+Tuning difficulty & Easy & Easy & Harder \\
+Feature randomization & No & Yes (at each split) & No \\
+Tree correlation & High & Low & N/A (sequential) \\
+Interpretability & Low & Low (some via importance) & Low (some via importance) \\
+Performance & Good & Better & Often best \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{infobox}
+\textbf{When to Use Which:}
+
+\begin{itemize}
+    \item \textbf{Random Forest}: When you want good results with minimal tuning. Great default choice.
+
+    \item \textbf{Gradient Boosting}: When you need maximum performance and are willing to tune carefully. Especially for competitions.
+
+    \item \textbf{Both}: Always try both! The best method depends on your specific data.
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\newpage
+\section{Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Boosting Philosophy:}
+\begin{itemize}
+    \item Combine many \textbf{weak learners} into one \textbf{strong learner}
+    \item Reduce \textbf{bias} (opposite of Random Forest which reduces variance)
+    \item \textbf{Learn from mistakes}: Each new model corrects previous errors
+\end{itemize}
+
+\textbf{Gradient Boosting Mechanics:}
+\begin{itemize}
+    \item Start with a simple prediction
+    \item Compute residuals (errors)
+    \item Fit new tree to predict residuals
+    \item Add new tree with learning rate: $T_{new} = T_{old} + \lambda \cdot t_{new}$
+    \item Repeat
+\end{itemize}
+
+\textbf{The Gradient Connection:}
+\begin{itemize}
+    \item Residuals ARE the negative gradient of MSE loss
+    \item Fitting trees to residuals = gradient descent in function space
+    \item Learning rate = step size in gradient descent
+    \item This is why it's called ``gradient'' boosting!
+\end{itemize}
+
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Learning rate ($\lambda$): Small values (0.01-0.1) are safer
+    \item Number of trees: Use early stopping to prevent overfitting
+    \item Tree depth: Keep trees shallow (depth 3-5)
+\end{itemize}
+
+\textbf{Practical Advice:}
+\begin{itemize}
+    \item Gradient Boosting often outperforms Random Forest (with tuning)
+    \item For tabular data, tree methods often beat deep learning
+    \item XGBoost, LightGBM, CatBoost are optimized implementations
+\end{itemize}
+\end{summarybox}
+
+%========================================================================================
+\newpage
+\section{Practice Questions}
+%========================================================================================
+
+\begin{enumerate}
+    \item \textbf{Conceptual}: Explain the fundamental difference between how Random Forest and Gradient Boosting reduce prediction error. Which component of error does each target?
+
+    \item \textbf{Algorithm}: In gradient boosting, what is the ``target'' that each new tree is trained to predict? Why is this different from the original target $y$?
+
+    \item \textbf{Mathematical}: Show that for MSE loss $L = \frac{1}{2}(y-\hat{y})^2$, the negative gradient with respect to $\hat{y}$ equals the residual.
+
+    \item \textbf{Learning Rate}: Why do we use a learning rate $\lambda < 1$ instead of adding the full residual prediction? What would happen if $\lambda$ were too large?
+
+    \item \textbf{Overfitting}: Unlike Random Forest, Gradient Boosting can overfit with too many trees. Why is this the case? How does early stopping help?
+
+    \item \textbf{Comparison}: You have a dataset and find that:
+    \begin{itemize}
+        \item Random Forest: Train accuracy 95\%, Test accuracy 88\%
+        \item Gradient Boosting: Train accuracy 99\%, Test accuracy 85\%
+    \end{itemize}
+    What does this suggest about your Gradient Boosting model? What would you adjust?
+
+    \item \textbf{Code}: Write Python code using sklearn to:
+    \begin{itemize}
+        \item Train a GradientBoostingClassifier
+        \item Use early stopping based on validation performance
+        \item Plot the learning curve showing train vs. validation error
+    \end{itemize}
+
+    \item \textbf{Extension}: Gradient boosting works with any differentiable loss function. How would the algorithm change if we used absolute error loss $L = |y - \hat{y}|$ instead of MSE? What would we fit trees to?
+\end{enumerate}
+
+\end{document}

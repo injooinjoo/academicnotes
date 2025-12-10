@@ -1,0 +1,1329 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CS109A: Introduction to Data Science
+% Lecture 11: Bayesian Modeling
+% Version: 1.0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 11}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Important Note,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Critical: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 11},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Bayesian Modeling}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Styling
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+\textbf{Course:} & #1 \\[0.3em]
+\textbf{Lecture:} & #2 \\[0.3em]
+\textbf{Instructors:} & #3 \\[0.3em]
+\textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\begin{document}
+
+\title{Lecture 11: Bayesian Modeling}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 11}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Bayesian inference, Bayes' Rule, Prior and Posterior distributions, Normal-Normal model, Conjugate priors, Connection to Ridge and Lasso regression}
+
+\tableofcontents
+
+%========================================================================================
+\section{Introduction to Bayesian Thinking}
+%========================================================================================
+
+\begin{overviewbox}
+This lecture introduces \textbf{Bayesian modeling}, a fundamentally different approach to statistical inference that treats parameters as random variables with probability distributions. Instead of finding a single ``best estimate,'' Bayesian methods provide a complete probability distribution representing our uncertainty about parameters.
+
+\textbf{Key Learning Objectives:}
+\begin{itemize}
+    \item Understand the difference between Frequentist and Bayesian perspectives
+    \item Master Bayes' Rule and its application to inference
+    \item Learn about prior distributions and their role in modeling
+    \item Understand the Normal-Normal conjugate model
+    \item Discover the deep connection between Bayesian inference and regularization (Ridge/Lasso)
+\end{itemize}
+\end{overviewbox}
+
+\subsection{Two Paradigms of Statistics}
+
+Statistics has two major schools of thought about how to approach inference: the \textbf{Frequentist} approach and the \textbf{Bayesian} approach. Both are valid and useful, but they have fundamentally different philosophies.
+
+\begin{definitionbox}[Frequentist Statistics]
+In the frequentist approach:
+\begin{itemize}
+    \item \textbf{Parameters are fixed but unknown constants.} There exists one ``true'' value of $\theta$ that we're trying to estimate.
+    \item \textbf{Data is random.} Each time we collect data, we get a random sample from some population.
+    \item \textbf{Probability means long-run frequency.} When we say ``95\% confidence,'' we mean that if we repeated the experiment infinitely many times, 95\% of our intervals would contain the true parameter.
+    \item \textbf{Inference is about the sampling distribution.} We reason about what would happen across many hypothetical repetitions of our experiment.
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}[Bayesian Statistics]
+In the Bayesian approach:
+\begin{itemize}
+    \item \textbf{Parameters are random variables.} We express our uncertainty about $\theta$ using probability distributions.
+    \item \textbf{Data is fixed (once observed).} After we collect our data, it's no longer random---it's what we actually observed.
+    \item \textbf{Probability means degree of belief.} When we say ``95\% probability,'' we mean we're 95\% confident that $\theta$ is in a certain range.
+    \item \textbf{Inference is about updating beliefs.} We start with prior beliefs and update them based on observed data.
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[Treasure Hunt Analogy]
+Imagine you're searching for buried treasure.
+
+\textbf{Frequentist Approach:}
+\begin{itemize}
+    \item There is ONE exact location where the treasure is buried (fixed, unknown parameter)
+    \item You collect clues (data) and estimate the location
+    \item Your estimate is a single point: ``The treasure is at coordinates (100, 200)''
+\end{itemize}
+
+\textbf{Bayesian Approach:}
+\begin{itemize}
+    \item You start with a ``probability map'' showing where you think the treasure might be
+    \item As you gather clues (data), you \textbf{update your map}
+    \item Your result is the entire updated map: ``60\% chance it's in region A, 30\% in region B, 10\% in region C''
+\end{itemize}
+\end{examplebox}
+
+\subsection{Why Learn Bayesian Methods?}
+
+Bayesian modeling offers several advantages:
+
+\begin{enumerate}
+    \item \textbf{Intuitive interpretation:} ``There's a 95\% probability that $\theta$ is between 2 and 5'' is more natural than the frequentist confidence interval interpretation.
+
+    \item \textbf{Incorporating prior knowledge:} You can formally include expert opinion, historical data, or physical constraints into your model.
+
+    \item \textbf{Flexibility:} Bayesian methods can handle complex hierarchical models where data is measured at multiple levels.
+
+    \item \textbf{Sequential updating:} As new data arrives, you can update your beliefs continuously without starting from scratch.
+
+    \item \textbf{Connection to regularization:} Ridge and Lasso regression have elegant Bayesian interpretations.
+
+    \item \textbf{Meta-analysis:} Combining results from multiple studies is natural in the Bayesian framework.
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{When to Choose Each Approach}
+
+\textbf{Frequentist methods are often preferred when:}
+\begin{itemize}
+    \item You need quick, computationally efficient solutions
+    \item Classical approaches are well-established in your field
+    \item You want to avoid specifying prior beliefs
+\end{itemize}
+
+\textbf{Bayesian methods are often preferred when:}
+\begin{itemize}
+    \item You have relevant prior information to incorporate
+    \item You need probabilistic statements about parameters
+    \item Your model is hierarchical or complex
+    \item Data arrives sequentially
+\end{itemize}
+
+In practice, \textbf{both methods often give similar results} when the prior is uninformative and the sample size is large.
+\end{warningbox}
+
+%========================================================================================
+\newsection{Bayes' Rule: The Foundation}
+%========================================================================================
+
+Everything in Bayesian inference flows from a single formula: \textbf{Bayes' Rule}.
+
+\subsection{The Formula}
+
+\begin{definitionbox}[Bayes' Rule]
+For parameters $\theta$ and data $X$:
+\begin{equation}
+P(\theta | X) = \frac{P(X | \theta) \cdot P(\theta)}{P(X)}
+\end{equation}
+
+Or in terms of probability density functions (PDFs):
+\begin{equation}
+f(\theta | X) = \frac{f(X | \theta) \cdot f(\theta)}{f(X)}
+\end{equation}
+\end{definitionbox}
+
+Let's understand each term:
+
+\begin{itemize}
+    \item $\mathbf{P(\theta | X)}$ --- \textbf{Posterior Probability}
+    \begin{itemize}
+        \item The probability distribution of $\theta$ \textbf{after} seeing the data $X$
+        \item This is what we want to find---our updated belief about $\theta$
+        \item Read as: ``the probability of theta \textbf{given} the data''
+    \end{itemize}
+
+    \item $\mathbf{P(X | \theta)}$ --- \textbf{Likelihood}
+    \begin{itemize}
+        \item The probability of observing data $X$ \textbf{if} the parameter were $\theta$
+        \item This is the same likelihood we've seen in MLE!
+        \item Read as: ``the probability of the data given theta''
+    \end{itemize}
+
+    \item $\mathbf{P(\theta)}$ --- \textbf{Prior Probability}
+    \begin{itemize}
+        \item The probability distribution of $\theta$ \textbf{before} seeing any data
+        \item Represents our initial belief or background knowledge
+        \item Read as: ``the prior probability of theta''
+    \end{itemize}
+
+    \item $\mathbf{P(X)}$ --- \textbf{Evidence (Marginal Likelihood)}
+    \begin{itemize}
+        \item The total probability of observing the data across all possible values of $\theta$
+        \item Computed as $P(X) = \int P(X|\theta) P(\theta) d\theta$
+        \item Acts as a \textbf{normalizing constant} to ensure probabilities sum to 1
+    \end{itemize}
+\end{itemize}
+
+\subsection{The Proportionality Form}
+
+Since $P(X)$ doesn't depend on $\theta$, we often write:
+
+\begin{summarybox}
+\begin{equation}
+\text{Posterior} \propto \text{Likelihood} \times \text{Prior}
+\end{equation}
+\begin{equation}
+f(\theta | X) \propto f(X | \theta) \cdot f(\theta)
+\end{equation}
+
+The posterior is \textbf{proportional to} the likelihood times the prior. We can always normalize later to get a proper probability distribution.
+\end{summarybox}
+
+\begin{examplebox}[Intuitive Interpretation]
+Think of Bayes' Rule as a belief-updating mechanism:
+
+\begin{enumerate}
+    \item \textbf{Start with your prior belief} $P(\theta)$: What you thought before seeing any data
+    \item \textbf{Observe data and compute likelihood} $P(X|\theta)$: How likely is this data under different values of $\theta$?
+    \item \textbf{Update your belief} $P(\theta|X)$: Combine prior and likelihood to get your new, informed belief
+\end{enumerate}
+
+Values of $\theta$ that:
+\begin{itemize}
+    \item Were believed likely (high prior) AND make the data likely (high likelihood) $\rightarrow$ stay high in posterior
+    \item Were believed unlikely (low prior) OR make the data unlikely (low likelihood) $\rightarrow$ low in posterior
+\end{itemize}
+\end{examplebox}
+
+%========================================================================================
+\newsection{A Discrete Example: Coin Selection}
+%========================================================================================
+
+Let's work through a complete example to solidify these concepts.
+
+\subsection{Problem Setup}
+
+You have three coins in your pocket:
+\begin{itemize}
+    \item \textbf{Coin A:} Biased toward tails with $P(\text{heads}) = 0.1$
+    \item \textbf{Coin B:} Fair coin with $P(\text{heads}) = 0.5$
+    \item \textbf{Coin C:} Biased toward heads with $P(\text{heads}) = 0.9$
+\end{itemize}
+
+You randomly pull out one coin and flip it 4 times, getting \textbf{3 heads and 1 tail}.
+
+\textbf{Question:} What's the probability that you drew each coin?
+
+\subsection{Step-by-Step Solution}
+
+\textbf{Step 1: Define the Prior Distribution}
+
+Before flipping the coin, you have no information about which coin was selected. Since you drew randomly from three coins:
+
+\begin{equation}
+P(\theta = 0.1) = P(\theta = 0.5) = P(\theta = 0.9) = \frac{1}{3}
+\end{equation}
+
+This is a \textbf{discrete uniform prior} over the three possible values.
+
+\textbf{Step 2: Define the Likelihood (Data Model)}
+
+The number of heads in 4 flips follows a \textbf{Binomial distribution}:
+\begin{equation}
+P(X = k | \theta) = \binom{4}{k} \theta^k (1-\theta)^{4-k}
+\end{equation}
+
+We observed $X = 3$ (3 heads out of 4 flips).
+
+\textbf{Step 3: Calculate the Likelihood for Each Coin}
+
+For each possible value of $\theta$, calculate $P(X = 3 | \theta)$:
+
+\begin{align}
+P(X = 3 | \theta = 0.1) &= \binom{4}{3} (0.1)^3 (0.9)^1 = 4 \times 0.001 \times 0.9 = \mathbf{0.0036} \\
+P(X = 3 | \theta = 0.5) &= \binom{4}{3} (0.5)^3 (0.5)^1 = 4 \times 0.125 \times 0.5 = \mathbf{0.25} \\
+P(X = 3 | \theta = 0.9) &= \binom{4}{3} (0.9)^3 (0.1)^1 = 4 \times 0.729 \times 0.1 = \mathbf{0.2916}
+\end{align}
+
+\textbf{Observation:} Coin C ($\theta = 0.9$) makes the data most likely, which makes sense---if a coin is biased toward heads, we're more likely to see 3 heads!
+
+\textbf{Step 4: Apply Bayes' Rule}
+
+Calculate the unnormalized posterior for each value:
+\begin{align}
+P(\theta = 0.1 | X = 3) &\propto 0.0036 \times \frac{1}{3} = 0.0012 \\
+P(\theta = 0.5 | X = 3) &\propto 0.25 \times \frac{1}{3} = 0.0833 \\
+P(\theta = 0.9 | X = 3) &\propto 0.2916 \times \frac{1}{3} = 0.0972
+\end{align}
+
+\textbf{Step 5: Normalize to Get the Posterior}
+
+Sum the unnormalized values: $0.0012 + 0.0833 + 0.0972 = 0.1817$
+
+Divide each by this sum:
+\begin{align}
+P(\theta = 0.1 | X = 3) &= \frac{0.0012}{0.1817} \approx \mathbf{0.7\%} \\
+P(\theta = 0.5 | X = 3) &= \frac{0.0833}{0.1817} \approx \mathbf{45.8\%} \\
+P(\theta = 0.9 | X = 3) &= \frac{0.0972}{0.1817} \approx \mathbf{53.5\%}
+\end{align}
+
+\begin{summarybox}
+\textbf{Results:}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Coin} & \textbf{Prior} & \textbf{Likelihood} & \textbf{Posterior} \\
+\midrule
+A ($\theta = 0.1$) & 33.3\% & 0.0036 & \textbf{0.7\%} \\
+B ($\theta = 0.5$) & 33.3\% & 0.2500 & \textbf{45.8\%} \\
+C ($\theta = 0.9$) & 33.3\% & 0.2916 & \textbf{53.5\%} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Interpretation:} Before seeing the data, each coin was equally likely (33.3\% each). After observing 3 heads in 4 flips, we now believe Coin C (biased toward heads) is most likely (53.5\%), Coin B (fair) is also plausible (45.8\%), and Coin A (biased toward tails) is nearly ruled out (0.7\%).
+\end{summarybox}
+
+\subsection{The Effect of Sample Size}
+
+\begin{warningbox}
+\textbf{What happens if we flip more coins?}
+
+If instead of 4 flips with 3 heads, we had \textbf{40 flips with 30 heads} (same proportion: 75\%):
+
+\begin{itemize}
+    \item The likelihood for Coin A ($\theta = 0.1$) would be \textbf{astronomically small} (essentially 0)
+    \item The likelihoods for Coins B and C would shift even more toward C
+    \item The posterior would show: A $\approx$ 0\%, B $\approx$ 35\%, C $\approx$ 65\%
+\end{itemize}
+
+\textbf{Key Insight:} With more data, the posterior becomes more concentrated. The data ``speaks louder'' than the prior as sample size increases.
+\end{warningbox}
+
+%========================================================================================
+\newsection{Choosing Prior Distributions}
+%========================================================================================
+
+One of the most important (and sometimes controversial) aspects of Bayesian modeling is choosing the \textbf{prior distribution}. There are three main approaches:
+
+\subsection{Informative Priors}
+
+\begin{definitionbox}[Informative Prior]
+A prior distribution that encodes specific knowledge or beliefs about the parameter before seeing data.
+\end{definitionbox}
+
+\textbf{When to use:}
+\begin{itemize}
+    \item You have expert knowledge about reasonable parameter values
+    \item You have data from previous studies
+    \item Physical or logical constraints exist on the parameter
+\end{itemize}
+
+\begin{examplebox}[Temperature Prediction]
+Predicting tomorrow's noon temperature in Boston during October:
+
+\textbf{Prior Information:}
+\begin{itemize}
+    \item Historical average for this date: 60\textdegree F
+    \item Standard deviation of day-to-day variation: 5\textdegree F
+\end{itemize}
+
+\textbf{Informative Prior:}
+\begin{equation}
+\mu \sim \text{Normal}(\mu_0 = 60, \sigma_0^2 = 25)
+\end{equation}
+
+This says: ``I believe the temperature will be around 60\textdegree F, probably within 50--70\textdegree F (95\% of the time within $\pm 2$ standard deviations).''
+\end{examplebox}
+
+\subsection{Uninformative (Vague) Priors}
+
+\begin{definitionbox}[Uninformative Prior]
+A prior distribution designed to have minimal influence on the posterior, letting the data dominate the inference.
+\end{definitionbox}
+
+\textbf{When to use:}
+\begin{itemize}
+    \item You have no prior knowledge about the parameter
+    \item You want to be ``objective'' and let data speak for itself
+    \item You're concerned about prior sensitivity
+\end{itemize}
+
+\begin{examplebox}[Success Probability]
+Estimating the success probability $p$ of a new medical treatment:
+
+\textbf{Uninformative Prior:}
+\begin{equation}
+p \sim \text{Uniform}(0, 1)
+\end{equation}
+
+This says: ``I have no idea what $p$ is. Any value between 0 and 1 is equally plausible before seeing the data.''
+\end{examplebox}
+
+\subsection{Conjugate Priors}
+
+\begin{definitionbox}[Conjugate Prior]
+A prior distribution that, when combined with a particular likelihood function, produces a posterior distribution of the \textbf{same family} as the prior.
+\end{definitionbox}
+
+\textbf{Why use conjugate priors?}
+\begin{itemize}
+    \item \textbf{Mathematical convenience:} The posterior has a known closed-form solution
+    \item \textbf{Interpretability:} Prior parameters often have intuitive meanings
+    \item \textbf{Computational efficiency:} No need for numerical integration or simulation
+\end{itemize}
+
+\begin{summarybox}
+\textbf{Common Conjugate Prior-Likelihood Pairs:}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Likelihood} & \textbf{Parameter} & \textbf{Conjugate Prior} & \textbf{Posterior} \\
+\midrule
+Binomial & $p$ (success probability) & Beta & Beta \\
+Poisson & $\lambda$ (rate) & Gamma & Gamma \\
+Normal (known $\sigma^2$) & $\mu$ (mean) & Normal & Normal \\
+Normal & $1/\sigma^2$ (precision) & Gamma & Gamma \\
+Exponential & $\lambda$ (rate) & Gamma & Gamma \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{summarybox}
+
+%========================================================================================
+\newsection{The Normal-Normal Model}
+%========================================================================================
+
+The most important conjugate model for continuous data is the \textbf{Normal-Normal model}, where both the data likelihood and the prior on the mean are normal distributions.
+
+\subsection{Model Setup}
+
+\textbf{Likelihood (Data Model):}
+\begin{equation}
+X_1, X_2, \ldots, X_n \sim \text{Normal}(\mu, \sigma^2) \quad \text{(i.i.d.)}
+\end{equation}
+\begin{itemize}
+    \item $\mu$ is the unknown population mean (the parameter we want to estimate)
+    \item $\sigma^2$ is the known variance (we assume this is fixed and known for simplicity)
+\end{itemize}
+
+\textbf{Prior Distribution:}
+\begin{equation}
+\mu \sim \text{Normal}(\mu_0, \sigma_0^2)
+\end{equation}
+\begin{itemize}
+    \item $\mu_0$ is the \textbf{prior mean} --- our best guess for $\mu$ before seeing data
+    \item $\sigma_0^2$ is the \textbf{prior variance} --- how uncertain we are about this guess
+    \item These are called \textbf{hyperparameters} (parameters of the prior distribution)
+\end{itemize}
+
+\subsection{The Posterior Distribution}
+
+Because Normal-Normal is a conjugate pair, the posterior is also Normal:
+
+\begin{equation}
+\mu | X \sim \text{Normal}(\mu_n, \sigma_n^2)
+\end{equation}
+
+where the \textbf{posterior mean} is:
+\begin{equation}
+\mu_n = \frac{\sigma^2 \cdot \mu_0 + n \cdot \sigma_0^2 \cdot \bar{X}}{\sigma^2 + n \cdot \sigma_0^2}
+\end{equation}
+
+and the \textbf{posterior variance} is:
+\begin{equation}
+\sigma_n^2 = \frac{\sigma^2 \cdot \sigma_0^2}{\sigma^2 + n \cdot \sigma_0^2}
+\end{equation}
+
+\subsection{Understanding the Posterior}
+
+Let's dissect these formulas to understand what they're telling us:
+
+\begin{infobox}
+\textbf{Posterior Mean as a Weighted Average:}
+
+The posterior mean $\mu_n$ can be rewritten as:
+\begin{equation}
+\mu_n = w \cdot \mu_0 + (1-w) \cdot \bar{X}
+\end{equation}
+where $w = \frac{\sigma^2}{\sigma^2 + n \cdot \sigma_0^2}$
+
+This is a \textbf{weighted average} of:
+\begin{itemize}
+    \item $\mu_0$: the prior mean (what we believed before)
+    \item $\bar{X}$: the sample mean (what the data says)
+\end{itemize}
+
+The weight $w$ depends on:
+\begin{itemize}
+    \item \textbf{Sample size $n$}: More data $\rightarrow$ smaller $w$ $\rightarrow$ more weight on $\bar{X}$
+    \item \textbf{Prior uncertainty $\sigma_0^2$}: Larger $\sigma_0^2$ $\rightarrow$ smaller $w$ $\rightarrow$ more weight on $\bar{X}$
+    \item \textbf{Data variance $\sigma^2$}: Larger $\sigma^2$ $\rightarrow$ larger $w$ $\rightarrow$ more weight on $\mu_0$
+\end{itemize}
+\end{infobox}
+
+\begin{warningbox}
+\textbf{Limiting Cases:}
+
+\begin{enumerate}
+    \item \textbf{As $n \to \infty$} (lots of data):
+    \begin{itemize}
+        \item $\mu_n \to \bar{X}$ (posterior mean approaches sample mean)
+        \item $\sigma_n^2 \to 0$ (posterior variance shrinks to zero)
+        \item \textbf{Data dominates}: With enough data, the prior becomes irrelevant
+    \end{itemize}
+
+    \item \textbf{As $\sigma_0^2 \to 0$} (very confident prior):
+    \begin{itemize}
+        \item $\mu_n \to \mu_0$ (posterior stays at prior mean)
+        \item \textbf{Prior dominates}: A very strong prior can't be overridden by data
+    \end{itemize}
+
+    \item \textbf{As $\sigma_0^2 \to \infty$} (uninformative prior):
+    \begin{itemize}
+        \item $\mu_n \to \bar{X}$ (posterior mean equals sample mean)
+        \item $\sigma_n^2 \to \sigma^2/n$ (same as frequentist standard error!)
+        \item \textbf{Data dominates}: Bayesian results match frequentist results
+    \end{itemize}
+\end{enumerate}
+\end{warningbox}
+
+\begin{examplebox}[Numerical Example]
+\textbf{Setup:}
+\begin{itemize}
+    \item Prior: $\mu \sim \text{Normal}(\mu_0 = 100, \sigma_0^2 = 25)$
+    \item Data: $n = 10$ observations with $\bar{X} = 110$, known $\sigma^2 = 100$
+\end{itemize}
+
+\textbf{Calculate Posterior:}
+\begin{align}
+\mu_n &= \frac{100 \cdot 100 + 10 \cdot 25 \cdot 110}{100 + 10 \cdot 25} = \frac{10000 + 27500}{350} = \frac{37500}{350} = 107.14 \\
+\sigma_n^2 &= \frac{100 \cdot 25}{100 + 250} = \frac{2500}{350} = 7.14
+\end{align}
+
+\textbf{Result:} $\mu | X \sim \text{Normal}(107.14, 7.14)$
+
+\textbf{Interpretation:}
+\begin{itemize}
+    \item Prior mean was 100, data mean was 110
+    \item Posterior mean (107.14) is pulled toward the data but not all the way
+    \item Posterior standard deviation is $\sqrt{7.14} \approx 2.67$
+    \item 95\% Credible Interval: $107.14 \pm 1.96 \times 2.67 = [101.9, 112.4]$
+\end{itemize}
+\end{examplebox}
+
+%========================================================================================
+\newsection{Bayesian Point and Interval Estimation}
+%========================================================================================
+
+Once we have the posterior distribution, we can extract useful summaries.
+
+\subsection{Point Estimates}
+
+The posterior is a full distribution, but sometimes we need a single ``best guess'':
+
+\begin{itemize}
+    \item \textbf{Posterior Mean}: $E[\theta | X]$
+    \begin{itemize}
+        \item The expected value of the posterior distribution
+        \item Minimizes squared error loss
+        \item Most commonly used
+    \end{itemize}
+
+    \item \textbf{Posterior Mode (MAP)}: $\arg\max_\theta f(\theta | X)$
+    \begin{itemize}
+        \item The value where the posterior is highest
+        \item Called \textbf{Maximum A Posteriori (MAP)} estimate
+        \item Connects to Ridge and Lasso (more on this later!)
+    \end{itemize}
+
+    \item \textbf{Posterior Median}: The 50th percentile
+    \begin{itemize}
+        \item The value that splits the posterior in half
+        \item Minimizes absolute error loss
+    \end{itemize}
+\end{itemize}
+
+For a Normal posterior, all three are equal (because the Normal is symmetric).
+
+\subsection{Credible Intervals}
+
+\begin{definitionbox}[Credible Interval]
+A \textbf{$100(1-\alpha)\%$ credible interval} is a range $[a, b]$ such that:
+\begin{equation}
+P(a \leq \theta \leq b | X) = 1 - \alpha
+\end{equation}
+\end{definitionbox}
+
+For a Normal posterior $\mu | X \sim \text{Normal}(\mu_n, \sigma_n^2)$:
+\begin{equation}
+\text{95\% Credible Interval} = \mu_n \pm 1.96 \times \sigma_n
+\end{equation}
+
+\begin{importantbox}[Credible vs. Confidence Intervals]
+This is one of the most important distinctions in statistics!
+
+\textbf{Bayesian 95\% Credible Interval:}
+\begin{itemize}
+    \item \textbf{Interpretation:} ``Given the data we observed, there is a 95\% probability that $\theta$ lies in this interval.''
+    \item The parameter $\theta$ is random, the interval is fixed (once calculated)
+    \item \textbf{This is the intuitive interpretation most people want!}
+\end{itemize}
+
+\textbf{Frequentist 95\% Confidence Interval:}
+\begin{itemize}
+    \item \textbf{Interpretation:} ``If we repeated this experiment many times and computed a confidence interval each time, 95\% of those intervals would contain the true $\theta$.''
+    \item The parameter $\theta$ is fixed, the interval is random (varies across experiments)
+    \item \textbf{Warning:} You CANNOT say ``there's a 95\% probability $\theta$ is in this interval''
+\end{itemize}
+\end{importantbox}
+
+%========================================================================================
+\newsection{Bayesian Linear Regression}
+%========================================================================================
+
+We can apply Bayesian principles to linear regression by placing prior distributions on the regression coefficients.
+
+\subsection{Model Setup}
+
+\textbf{Likelihood (Same as OLS):}
+\begin{equation}
+y_i \sim \text{Normal}(\beta_0 + \beta_1 x_i, \sigma^2)
+\end{equation}
+
+\textbf{Unknown Parameters:} $\beta_0, \beta_1, \sigma^2$
+
+\textbf{Prior Distributions (Conjugate):}
+\begin{align}
+\beta_0 &\sim \text{Normal}(\mu_{\beta_0}, \sigma_{\beta_0}^2) \\
+\beta_1 &\sim \text{Normal}(\mu_{\beta_1}, \sigma_{\beta_1}^2) \\
+1/\sigma^2 &\sim \text{Gamma}(a_0, \lambda_0)
+\end{align}
+
+\subsection{What Bayesian Regression Provides}
+
+Instead of single point estimates, we get \textbf{entire posterior distributions} for each parameter:
+
+\begin{itemize}
+    \item $\beta_0 | X, y$ has a posterior distribution
+    \item $\beta_1 | X, y$ has a posterior distribution
+    \item $\sigma^2 | X, y$ has a posterior distribution
+\end{itemize}
+
+This allows us to make probabilistic statements like:
+\begin{itemize}
+    \item ``There's a 97\% probability that $\beta_1 > 0$''
+    \item ``The 95\% credible interval for $\beta_1$ is [2.1, 4.8]''
+    \item ``Given the data, there's less than 5\% chance that $|\beta_1| > 10$''
+\end{itemize}
+
+%========================================================================================
+\newsection{Connection to Ridge and Lasso}
+%========================================================================================
+
+One of the most beautiful insights in statistics is the connection between Bayesian inference and regularization methods like Ridge and Lasso.
+
+\subsection{Recall: Regularized Loss Functions}
+
+\textbf{Ordinary Least Squares (OLS):}
+\begin{equation}
+\text{Loss}_{OLS} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+\end{equation}
+
+\textbf{Ridge Regression (L2 penalty):}
+\begin{equation}
+\text{Loss}_{Ridge} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} \beta_j^2
+\end{equation}
+
+\textbf{Lasso Regression (L1 penalty):}
+\begin{equation}
+\text{Loss}_{Lasso} = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^{p} |\beta_j|
+\end{equation}
+
+\subsection{The MAP Connection}
+
+In Bayesian inference, the \textbf{MAP (Maximum A Posteriori)} estimate is:
+\begin{equation}
+\hat{\beta}_{MAP} = \arg\max_\beta f(\beta | X) = \arg\max_\beta [f(X | \beta) \cdot f(\beta)]
+\end{equation}
+
+Taking the logarithm (which preserves the maximum):
+\begin{equation}
+\hat{\beta}_{MAP} = \arg\max_\beta [\log f(X | \beta) + \log f(\beta)]
+\end{equation}
+
+Equivalently, minimizing the negative:
+\begin{equation}
+\hat{\beta}_{MAP} = \arg\min_\beta [-\log f(X | \beta) - \log f(\beta)]
+\end{equation}
+
+\textbf{Key observation:}
+\begin{itemize}
+    \item $-\log f(X | \beta)$ is proportional to the \textbf{sum of squared errors} (for Normal likelihood)
+    \item $-\log f(\beta)$ is the \textbf{penalty term} from the prior!
+\end{itemize}
+
+\subsection{Ridge = Normal Prior}
+
+\begin{definitionbox}[Ridge Regression as Bayesian MAP]
+If we place a \textbf{Normal prior centered at zero} on each $\beta_j$:
+\begin{equation}
+\beta_j \sim \text{Normal}(0, \tau^2)
+\end{equation}
+
+Then:
+\begin{equation}
+-\log f(\beta_j) = -\log\left(\frac{1}{\sqrt{2\pi\tau^2}} e^{-\beta_j^2/2\tau^2}\right) = \text{constant} + \frac{\beta_j^2}{2\tau^2}
+\end{equation}
+
+This is proportional to $\beta_j^2$, the \textbf{L2 penalty}!
+\end{definitionbox}
+
+\begin{summarybox}
+\textbf{Ridge Regression is Bayesian MAP with Normal Prior}
+
+\begin{itemize}
+    \item The penalty $\lambda \sum \beta_j^2$ comes from assuming $\beta_j \sim N(0, \tau^2)$
+    \item The regularization parameter $\lambda$ is inversely related to prior variance $\tau^2$
+    \item Larger $\lambda$ = smaller prior variance = stronger belief that $\beta_j$ should be near zero
+\end{itemize}
+
+\textbf{Intuition:} The Normal prior says ``I believe coefficients are probably small (near zero) with a smooth, bell-shaped probability.'' This pulls estimates toward zero but doesn't make them exactly zero.
+\end{summarybox}
+
+\subsection{Lasso = Laplace Prior}
+
+\begin{definitionbox}[Lasso Regression as Bayesian MAP]
+If we place a \textbf{Laplace (Double Exponential) prior} on each $\beta_j$:
+\begin{equation}
+f(\beta_j) = \frac{1}{2b} e^{-|\beta_j|/b}
+\end{equation}
+
+Then:
+\begin{equation}
+-\log f(\beta_j) = \text{constant} + \frac{|\beta_j|}{b}
+\end{equation}
+
+This is proportional to $|\beta_j|$, the \textbf{L1 penalty}!
+\end{definitionbox}
+
+\begin{summarybox}
+\textbf{Lasso Regression is Bayesian MAP with Laplace Prior}
+
+\begin{itemize}
+    \item The penalty $\lambda \sum |\beta_j|$ comes from assuming a Laplace prior on $\beta_j$
+    \item The Laplace distribution has a \textbf{sharp peak at zero}
+    \item This creates \textbf{sparse solutions} where some $\beta_j = 0$ exactly
+\end{itemize}
+
+\textbf{Intuition:} The Laplace prior says ``I strongly believe most coefficients should be exactly zero.'' The sharp peak at zero gives high probability mass to $\beta_j = 0$, encouraging sparsity (feature selection).
+\end{summarybox}
+
+\begin{warningbox}
+\textbf{Visual Comparison: Normal vs. Laplace Priors}
+
+\textbf{Normal Distribution (Ridge):}
+\begin{itemize}
+    \item Smooth, bell-shaped curve
+    \item Gradual decrease away from zero
+    \item Coefficients are pulled toward zero but rarely exactly zero
+\end{itemize}
+
+\textbf{Laplace Distribution (Lasso):}
+\begin{itemize}
+    \item Sharp, peaked curve at zero
+    \item Rapid decrease away from zero
+    \item High probability mass at exactly zero $\rightarrow$ sparse solutions
+\end{itemize}
+\end{warningbox}
+
+\subsection{Summary: Regularization as Bayesian Inference}
+
+\begin{infobox}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & \textbf{Penalty} & \textbf{Bayesian Prior} & \textbf{Effect} \\
+\midrule
+OLS & None & Flat/Improper & No shrinkage \\
+Ridge & $\lambda \sum \beta_j^2$ & Normal$(0, \tau^2)$ & Shrink toward zero \\
+Lasso & $\lambda \sum |\beta_j|$ & Laplace$(0, b)$ & Shrink + Sparsity \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Key Insight:} The choice of regularization is implicitly a choice of prior belief about the coefficients!
+\end{infobox}
+
+%========================================================================================
+\newsection{Computational Methods: MCMC}
+%========================================================================================
+
+When conjugate priors don't apply or models become complex, we need computational methods to approximate the posterior distribution.
+
+\subsection{The Problem}
+
+The posterior is:
+\begin{equation}
+f(\theta | X) = \frac{f(X | \theta) f(\theta)}{f(X)} = \frac{f(X | \theta) f(\theta)}{\int f(X | \theta') f(\theta') d\theta'}
+\end{equation}
+
+The integral in the denominator is often \textbf{intractable} (impossible to compute analytically).
+
+\subsection{The Solution: Simulation}
+
+Instead of computing the posterior exactly, we \textbf{draw samples} from it:
+\begin{equation}
+\theta^{(1)}, \theta^{(2)}, \ldots, \theta^{(N)} \sim f(\theta | X)
+\end{equation}
+
+With enough samples, we can approximate any property of the posterior:
+\begin{itemize}
+    \item Posterior mean: $E[\theta | X] \approx \frac{1}{N} \sum_{i=1}^{N} \theta^{(i)}$
+    \item Posterior variance: $\text{Var}[\theta | X] \approx \frac{1}{N-1} \sum_{i=1}^{N} (\theta^{(i)} - \bar{\theta})^2$
+    \item Credible interval: Sort samples and find the 2.5th and 97.5th percentiles
+\end{itemize}
+
+\subsection{MCMC: Markov Chain Monte Carlo}
+
+\begin{definitionbox}[MCMC]
+\textbf{Markov Chain Monte Carlo} is a class of algorithms that generate samples from a target distribution by constructing a Markov chain whose stationary distribution is the target.
+\end{definitionbox}
+
+\textbf{Intuition:} Imagine a random walker exploring a landscape (the posterior distribution). The walker:
+\begin{itemize}
+    \item Tends to stay in high-probability regions (peaks)
+    \item Occasionally visits low-probability regions (valleys)
+    \item After walking long enough, the proportion of time spent in each region matches the posterior probability
+\end{itemize}
+
+\subsection{Gibbs Sampling}
+
+For multi-parameter models, \textbf{Gibbs Sampling} is a popular MCMC algorithm:
+
+\textbf{Idea:} Instead of sampling all parameters at once, sample each parameter \textbf{one at a time}, conditional on the current values of the others.
+
+\textbf{Algorithm (for 3 parameters $\theta_1, \theta_2, \theta_3$):}
+\begin{enumerate}
+    \item Initialize: $\theta_1^{(0)}, \theta_2^{(0)}, \theta_3^{(0)}$
+    \item For $t = 1, 2, \ldots, N$:
+    \begin{itemize}
+        \item Sample $\theta_1^{(t)}$ from $f(\theta_1 | \theta_2^{(t-1)}, \theta_3^{(t-1)}, X)$
+        \item Sample $\theta_2^{(t)}$ from $f(\theta_2 | \theta_1^{(t)}, \theta_3^{(t-1)}, X)$
+        \item Sample $\theta_3^{(t)}$ from $f(\theta_3 | \theta_1^{(t)}, \theta_2^{(t)}, X)$
+    \end{itemize}
+    \item Discard early samples (burn-in period) to remove initialization effects
+    \item Use remaining samples as draws from the joint posterior
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Burn-in Period}
+
+The initial samples depend heavily on where we started (the initialization). We discard the first several thousand samples (the ``burn-in'' period) to ensure the remaining samples are representative of the posterior.
+\end{warningbox}
+
+%========================================================================================
+\newsection{Quiz Review: Categorical Variables}
+%========================================================================================
+
+Before diving into Bayesian modeling, let's review an important concept from the quiz about interpreting categorical (dummy) variables in regression.
+
+\subsection{Setup}
+
+Consider predicting hours spent on homework based on course registration (4 groups):
+\begin{itemize}
+    \item AC 209 (baseline/reference group)
+    \item CS 1090
+    \item CSCI E-109
+    \item STAT 109
+\end{itemize}
+
+The model produces:
+\begin{equation}
+\hat{y} = 11.0 - 2.0 \cdot x_{CS1090} + 3.5 \cdot x_{CSCIE109} + 5.0 \cdot x_{STAT109}
+\end{equation}
+
+\subsection{Interpretation}
+
+\begin{itemize}
+    \item \textbf{Intercept (11.0):} The predicted hours for the \textbf{baseline group} (AC 209). This is also the sample mean for AC 209 students.
+
+    \item \textbf{Coefficient for CS 1090 (-2.0):} CS 1090 students spend, on average, \textbf{2 fewer hours} than AC 209 students. Predicted hours: $11.0 - 2.0 = 9.0$
+
+    \item \textbf{Coefficient for CSCI E-109 (+3.5):} CSCI E-109 students spend \textbf{3.5 more hours} than AC 209. Predicted hours: $11.0 + 3.5 = 14.5$
+
+    \item \textbf{Coefficient for STAT 109 (+5.0):} STAT 109 students spend \textbf{5 more hours} than AC 209. Predicted hours: $11.0 + 5.0 = 16.0$
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Common Mistake: ``Controlling for other variables''}
+
+When the only predictor is a categorical variable (like course registration), do NOT say ``controlling for other variables'' in your interpretation. There are no other variables to control for! Each coefficient simply represents the difference from the baseline group.
+\end{warningbox}
+
+\subsection{Changing the Baseline Group}
+
+If CS 1090 were the baseline instead of AC 209:
+\begin{itemize}
+    \item New intercept: $11.0 - 2.0 = 9.0$ (mean for CS 1090)
+    \item New coefficient for AC 209: $+2.0$ (now positive, since AC 209 is 2 hours above CS 1090)
+    \item Other coefficients adjust accordingly
+\end{itemize}
+
+%========================================================================================
+\newsection{Quiz Review: Validation Metrics}
+%========================================================================================
+
+\subsection{The Question}
+
+When using Ridge regression with cross-validation, which metric should we use to evaluate model performance on the validation set?
+
+\textbf{Option A:} MSE (Mean Squared Error)
+\begin{equation}
+\text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2
+\end{equation}
+
+\textbf{Option B:} Ridge loss with penalty
+\begin{equation}
+\text{Ridge Loss} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2 + \lambda\sum_{j=1}^{p}\beta_j^2
+\end{equation}
+
+\subsection{The Answer: Option A (MSE)}
+
+\begin{summarybox}
+\textbf{Why use MSE without the penalty for validation?}
+
+\begin{enumerate}
+    \item \textbf{Training vs. Validation have different purposes:}
+    \begin{itemize}
+        \item \textbf{Training:} Find coefficients $\beta$ that balance fit and complexity (use penalty)
+        \item \textbf{Validation:} Assess how well the model predicts new data (use natural error metric)
+    \end{itemize}
+
+    \item \textbf{The penalty is part of the optimization process, not the evaluation:}
+    \begin{itemize}
+        \item The penalty term $\lambda\sum\beta_j^2$ is a regularization tool to prevent overfitting
+        \item It's not a measure of predictive accuracy
+    \end{itemize}
+
+    \item \textbf{We want to compare models fairly:}
+    \begin{itemize}
+        \item Different $\lambda$ values lead to different penalties
+        \item Using penalized loss would unfairly favor models with larger $\lambda$
+        \item MSE measures true prediction error, which is what we care about
+    \end{itemize}
+\end{enumerate}
+\end{summarybox}
+
+%========================================================================================
+\newsection{Chapter Summary}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Key Concepts from Lecture 11:}
+
+\textbf{1. Bayesian vs. Frequentist Thinking}
+\begin{itemize}
+    \item Frequentist: Parameters are fixed, data is random
+    \item Bayesian: Parameters have distributions (representing uncertainty), data is fixed once observed
+\end{itemize}
+
+\textbf{2. Bayes' Rule}
+\begin{equation}
+\text{Posterior} \propto \text{Likelihood} \times \text{Prior}
+\end{equation}
+\begin{equation}
+f(\theta | X) \propto f(X | \theta) \cdot f(\theta)
+\end{equation}
+
+\textbf{3. Types of Priors}
+\begin{itemize}
+    \item \textbf{Informative:} Encode specific prior knowledge
+    \item \textbf{Uninformative:} Let data dominate
+    \item \textbf{Conjugate:} Mathematical convenience (posterior same family as prior)
+\end{itemize}
+
+\textbf{4. Normal-Normal Model}
+\begin{itemize}
+    \item Posterior mean is weighted average of prior mean and sample mean
+    \item With more data, posterior concentrates around sample mean
+    \item With stronger prior, posterior stays near prior mean
+\end{itemize}
+
+\textbf{5. Credible vs. Confidence Intervals}
+\begin{itemize}
+    \item Credible: ``95\% probability parameter is in this interval'' (Bayesian, intuitive)
+    \item Confidence: ``95\% of intervals from repeated experiments contain true value'' (Frequentist)
+\end{itemize}
+
+\textbf{6. Regularization as Bayesian MAP}
+\begin{itemize}
+    \item \textbf{Ridge = Normal prior} on coefficients (shrinkage)
+    \item \textbf{Lasso = Laplace prior} on coefficients (shrinkage + sparsity)
+\end{itemize}
+
+\textbf{7. MCMC for Complex Models}
+\begin{itemize}
+    \item Sample from posterior when analytical solutions don't exist
+    \item Gibbs sampling: Sample parameters one at a time
+    \item Discard burn-in samples, use remaining samples for inference
+\end{itemize}
+\end{summarybox}
+
+%========================================================================================
+\newsection{Key Formulas Reference}
+%========================================================================================
+
+\begin{infobox}
+\textbf{Bayes' Rule:}
+\begin{equation}
+P(\theta | X) = \frac{P(X | \theta) P(\theta)}{P(X)} \quad \text{or} \quad f(\theta | X) \propto f(X | \theta) f(\theta)
+\end{equation}
+
+\textbf{Normal-Normal Posterior:}
+\begin{equation}
+\mu_n = \frac{\sigma^2 \mu_0 + n \sigma_0^2 \bar{X}}{\sigma^2 + n \sigma_0^2}, \quad \sigma_n^2 = \frac{\sigma^2 \sigma_0^2}{\sigma^2 + n \sigma_0^2}
+\end{equation}
+
+\textbf{95\% Credible Interval (Normal):}
+\begin{equation}
+[\mu_n - 1.96\sigma_n, \quad \mu_n + 1.96\sigma_n]
+\end{equation}
+
+\textbf{MAP Estimation:}
+\begin{equation}
+\hat{\theta}_{MAP} = \arg\max_\theta f(\theta | X) = \arg\max_\theta [f(X | \theta) f(\theta)]
+\end{equation}
+
+\textbf{Ridge = Normal Prior:}
+\begin{equation}
+\beta_j \sim N(0, \tau^2) \quad \Rightarrow \quad \text{Penalty} = \lambda \sum \beta_j^2
+\end{equation}
+
+\textbf{Lasso = Laplace Prior:}
+\begin{equation}
+\beta_j \sim \text{Laplace}(0, b) \quad \Rightarrow \quad \text{Penalty} = \lambda \sum |\beta_j|
+\end{equation}
+\end{infobox}
+
+\end{document}

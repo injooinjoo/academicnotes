@@ -1,0 +1,971 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability improvements
+% Last modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Table Related ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Machine Learning}}
+\fancyhead[R]{\small\textit{Lecture 07}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myyellow}{rgb}{1.0, 0.98, 0.9}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Caution,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None, dlt, spark},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, CREATE, STREAMING, TABLE, MATERIALIZED, VIEW},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Tables and Figures
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Reproducible Machine Learning - Lecture 07},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Useful Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Title Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CSCI E-103: Reproducible Machine Learning\\Lecture 07: Operationalizing Data Pipelines}
+\author{Harvard Extension School}
+\date{Fall 2025}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Reproducible Machine Learning}{Lecture 07}{Anindita Mahapatra \& Eric Gieseke}{Learn to transform prototype notebooks into production-ready automated data pipelines with proper requirements, quality assurance, governance, and declarative frameworks like Delta Live Tables (DLT)}
+
+\tableofcontents
+
+\newpage
+
+%==============================
+\section{Lecture Overview}
+%==============================
+
+\begin{summarybox}
+This lecture covers the critical process of \textbf{operationalizing data pipelines}---transforming a data scientist's proof-of-concept notebook into a reliable, automated production system.
+
+\textbf{Core Topics:}
+\begin{itemize}
+    \item \textbf{Requirements Definition} -- Functional vs. Non-functional requirements
+    \item \textbf{Six Guiding Principles} -- Best practices for production pipelines
+    \item \textbf{Data Quality and Validation} -- Handling corrupt records, missing values
+    \item \textbf{Data Governance} -- Access control, lineage, cataloging
+    \item \textbf{Scalability and Elasticity} -- Horizontal vs. vertical scaling
+    \item \textbf{Lakeflow and Delta Live Tables (DLT)} -- Declarative pipeline frameworks
+    \item \textbf{CDC Automation} -- \code{apply\_changes()} for Insert/Update/Delete
+    \item \textbf{Data Quality Expectations} -- Built-in validation with DLT
+\end{itemize}
+\end{summarybox}
+
+\begin{examplebox}{Kitchen Recipe vs. Factory Production}
+\textbf{PoC (Notebook):} A chef's experimental recipe in a kitchen. Tastes great, but makes only one serving at a time. Quality varies with the chef's mood.
+
+\textbf{Production (Operationalized):} The same recipe adapted for a large food factory---producing thousands of units daily with consistent quality, automated processes, and quality control checkpoints.
+\end{examplebox}
+
+\newpage
+
+%==============================
+\section{Key Terminology Reference}
+%==============================
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llp{6cm}}
+\toprule
+\textbf{Term} & \textbf{Full Name} & \textbf{Description} \\
+\midrule
+Operationalizing & - & Transforming a prototype into a production-ready automated system \\
+PoC & Proof of Concept & Initial model validating technical feasibility (e.g., Jupyter notebook) \\
+Functional Req. & Functional Requirements & Defines \textbf{what} the system should do (features) \\
+Non-Functional Req. & Non-Functional Requirements & Defines \textbf{how} the system should perform (quality, performance) \\
+\midrule
+Medallion Arch. & Medallion Architecture & 3-tier data organization: Bronze $\rightarrow$ Silver $\rightarrow$ Gold \\
+Data Governance & - & Policies managing data quality, security, and accessibility \\
+Data Lineage & - & Tracking where data came from and how it was transformed \\
+\midrule
+ETL / ELT & Extract, Transform, Load & Data processing order. ETL: traditional. ELT: modern lakehouse \\
+Lakeflow & - & Databricks' unified pipeline tool (ingest, transform, orchestrate) \\
+DLT & Delta Live Tables & Declarative ETL framework that simplifies complex pipeline building \\
+Declarative Pipeline & - & Define ``what'' you want; engine handles ``how'' \\
+Autoloader & - & Automatic detection and processing of new files in cloud storage \\
+\midrule
+CDC & Change Data Capture & Identifying and tracking changes (Insert, Update, Delete) in source data \\
+Scalability & - & Ability to increase system capacity for growing workloads \\
+Elasticity & - & Ability to dynamically scale resources up/down based on demand \\
+Checkpoint & - & ``Bookmark'' recording where streaming processing left off \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+
+%==============================
+\section{Why ``Operationalize'' Pipelines?}
+%==============================
+
+A data scientist's prototype notebook demonstrates that a problem \textit{can} be solved, but it's not suitable for daily business use. Production pipelines must have:
+
+\begin{itemize}
+    \item \textbf{Reliability:} Consistent, correct results every time
+    \item \textbf{Automation:} No manual intervention required
+    \item \textbf{Scalability:} Handles growing data volumes
+    \item \textbf{Monitoring:} Alerts when something goes wrong
+    \item \textbf{Governance:} Proper access control and data quality
+\end{itemize}
+
+The goal is to take a ``raw notebook'' and turn it into a ``reliable automated data pipeline that continuously produces trusted data for downstream consumers'' (business users, data scientists, ML models).
+
+\newpage
+
+%==============================
+\section{Requirements: The Foundation of Design}
+%==============================
+
+Before designing anything, you must clearly understand what the business wants and expects. Requirements are divided into two categories:
+
+%------------------------------
+\subsection{Functional Requirements (``What'')}
+%------------------------------
+
+\begin{definitionbox}{Functional Requirements}
+Specify the \textbf{specific functions} the system must provide to users.
+\end{definitionbox}
+
+\textbf{Examples:}
+\begin{itemize}
+    \item Business rules (e.g., cancel transactions under certain conditions)
+    \item Authentication and authorization levels
+    \item External interfaces (connect to multiple data sources)
+    \item Reporting requirements (daily sales summary)
+    \item Audit tracking (who modified what data)
+    \item Historical data access requirements
+\end{itemize}
+
+%------------------------------
+\subsection{Non-Functional Requirements (``How'')}
+%------------------------------
+
+\begin{definitionbox}{Non-Functional Requirements}
+Specify the \textbf{quality, performance, and constraints} of the system. Often overlooked but equally critical.
+\end{definitionbox}
+
+\textbf{Examples:}
+\begin{itemize}
+    \item \textbf{Performance:} Latency (response time), Throughput (queries per second)
+    \item \textbf{Scalability:} Handle 10x data growth
+    \item \textbf{Availability:} System uptime percentage (e.g., 99.99\% = ``Four Nines'')
+    \item \textbf{Reliability:} Correct behavior, error recovery
+    \item \textbf{Security:} Access control, compliance (GDPR, HIPAA)
+    \item \textbf{Maintainability:} Ease of updates and modifications
+    \item \textbf{Cost:} Budget constraints for infrastructure
+\end{itemize}
+
+\begin{warningbox}
+\textbf{The Requirements Trap:}
+\begin{itemize}
+    \item \textbf{Over-design:} Building a sub-second real-time system when the business is fine with daily batch updates wastes enormous resources.
+    \item \textbf{Under-design:} Delivering a 10-second response when customers expect under 1 second makes the system useless.
+\end{itemize}
+
+Example: ``Five Nines'' (99.999\%) availability allows only \textbf{5 minutes of downtime per year}---extremely expensive to achieve. Always ask: \textit{Is this actually required?}
+\end{warningbox}
+
+\newpage
+
+%==============================
+\section{Six Guiding Principles for Production Pipelines}
+%==============================
+
+These principles help build efficient, robust data lakehouses:
+
+%------------------------------
+\subsection{1. Curate Data and Offer Trusted Data as Products}
+%------------------------------
+
+Think of your pipeline output as a \textbf{product} that internal consumers (business users, data scientists) can trust and use.
+
+\begin{infobox}
+\textbf{Medallion Architecture:}
+\begin{itemize}
+    \item \textbf{Bronze (Raw):} Source data stored unchanged (ore from the mine)
+    \item \textbf{Silver (Curated):} Cleaned, filtered, enriched data (refined metal)
+    \item \textbf{Gold (Final):} Aggregated, business-ready data (finished jewelry)
+\end{itemize}
+Quality and trust \textbf{increase} as data moves through layers; processing \textbf{cost} also increases.
+\end{infobox}
+
+%------------------------------
+\subsection{2. Remove Data Silos and Minimize Data Movement}
+%------------------------------
+
+Moving and copying data creates cost, latency, quality issues, and isolated ``silos.''
+
+\textbf{Solutions:}
+\begin{itemize}
+    \item \textbf{Shallow Clones:} Copy metadata only, not actual data
+    \item \textbf{Views:} Virtual tables that query underlying data
+    \item \textbf{Delta Time Travel:} Query historical versions without separate backups
+    \item \textbf{Data Sharing:} Share datasets directly rather than copying
+\end{itemize}
+
+%------------------------------
+\subsection{3. Democratize Access Through Self-Service}
+%------------------------------
+
+Enable business users to explore and use data themselves, not just the data team.
+
+\textbf{Critical Prerequisite:} Proper \textbf{guardrails} (governance) must prevent unauthorized changes or access to sensitive data.
+
+%------------------------------
+\subsection{4. Adopt Organization-Wide Data Governance}
+%------------------------------
+
+Governance isn't just security---it's a comprehensive system managing data's entire lifecycle:
+
+\begin{itemize}
+    \item \textbf{Data Quality:} Constraints ensuring accuracy and consistency
+    \item \textbf{Data Catalog \& Lineage:} Metadata definitions, tracking data origin and transformations
+    \item \textbf{Access Control:} Who can access what data (row/column level, PII masking)
+    \item \textbf{Audit Logs:} Recording who accessed or modified data
+\end{itemize}
+
+%------------------------------
+\subsection{5. Use Open Interfaces and Formats}
+%------------------------------
+
+Use open formats (Delta, Parquet) instead of proprietary vendor-locked formats:
+
+\begin{itemize}
+    \item \textbf{No Vendor Lock-in:} Freely migrate to other platforms
+    \item \textbf{Interoperability:} Easy integration with third-party tools
+    \item \textbf{Lower Cost:} Avoid expensive proprietary licenses
+\end{itemize}
+
+%------------------------------
+\subsection{6. Build to Scale and Optimize for Performance and Cost}
+%------------------------------
+
+\begin{importantbox}{Decoupling Storage and Compute}
+The most critical architectural principle:
+
+\textbf{Traditional (Coupled):} Storage and CPU bound together on one server. If data grows 10x, you must buy 10x more expensive CPUs too. (e.g., ElasticSearch)
+
+\textbf{Modern Lakehouse (Decoupled):} Store data in cheap cloud storage (S3, ADLS) infinitely. Only ``rent'' compute clusters when processing is needed.
+\end{importantbox}
+
+\begin{examplebox}{Warehouse vs. Factory Analogy}
+\begin{itemize}
+    \item \textbf{Storage:} A \textbf{warehouse} for storing goods. Cheap to expand infinitely.
+    \item \textbf{Compute:} \textbf{Factory machines} for processing goods. Expensive, but you only pay when machines are running.
+\end{itemize}
+Separating them means you pay only for what you use, when you use it.
+\end{examplebox}
+
+\newpage
+
+%==============================
+\section{Data Quality and Validation}
+%==============================
+
+``Garbage In, Garbage Out (GIGO)''---The entire value of a data pipeline depends on data quality.
+
+%------------------------------
+\subsection{Dimensions of Data Quality}
+%------------------------------
+
+\begin{itemize}
+    \item \textbf{Accuracy:} Does the data match reality?
+    \item \textbf{Consistency:} Is data coherent across the system? (e.g., ``NY'' vs ``New York'')
+    \item \textbf{Completeness:} Is required data missing?
+    \item \textbf{Timeliness:} Is data fresh enough for the use case?
+    \item \textbf{Integrity:} Are relationships (foreign keys) correct?
+\end{itemize}
+
+%------------------------------
+\subsection{Handling Corrupt Records in Spark}
+%------------------------------
+
+Source data can be ``corrupted'' due to schema mismatches, format errors, or missing values. Spark provides three modes:
+
+\begin{warningbox}
+\textbf{Spark's Three Parse Modes:}
+
+\textbf{1. PERMISSIVE (Default):}
+\begin{itemize}
+    \item Stores bad records in a \code{\_corrupt\_record} column
+    \item Fills parseable columns with \code{null}
+    \item Pipeline continues---analyze bad data later
+\end{itemize}
+
+\textbf{2. DROPMALFORMED:}
+\begin{itemize}
+    \item Silently drops (ignores) corrupt records
+    \item Use when some data loss is acceptable (e.g., log analysis)
+\end{itemize}
+
+\textbf{3. FAILFAST:}
+\begin{itemize}
+    \item Immediately stops and throws an exception on any corrupt record
+    \item Use for critical data where no errors are tolerable (e.g., financial transactions)
+\end{itemize}
+
+Additionally, use \code{option("badRecordsPath", "path")} to save corrupt records to a separate location for later analysis.
+\end{warningbox}
+
+%------------------------------
+\subsection{Handling Missing Values and Duplicates}
+%------------------------------
+
+\textbf{Duplicates:}
+\begin{lstlisting}[style=pythonstyle]
+df.dropDuplicates(["id", "color"])  # Remove duplicates based on keys
+\end{lstlisting}
+
+\textbf{Missing Values:}
+\begin{itemize}
+    \item \textbf{Drop:} \code{df.dropna()} --- Remove rows with missing values (risk: data loss)
+    \item \textbf{Placeholder:} Fill with \code{-1} or \code{"N/A"}
+    \item \textbf{Basic Imputing:} \code{df.na.fill(\{"temperature": 68, "wind": 6\})}
+    \item \textbf{Advanced Imputing:} Use ML models to predict missing values
+\end{itemize}
+
+\newpage
+
+%==============================
+\section{Scalability, Elasticity, and Availability}
+%==============================
+
+%------------------------------
+\subsection{Scalability: Handling Growing Workloads}
+%------------------------------
+
+\begin{definitionbox}{Scalability}
+A system is \textbf{scalable} if adding resources proportionally increases its capacity.
+\end{definitionbox}
+
+\textbf{Two Types:}
+\begin{itemize}
+    \item \textbf{Vertical Scaling (Scale Up):} Upgrade to a bigger, more powerful machine
+    \item \textbf{Horizontal Scaling (Scale Out):} Add more machines (preferred for big data)
+\end{itemize}
+
+%------------------------------
+\subsection{Elasticity: Dynamic Resource Adjustment}
+%------------------------------
+
+\begin{definitionbox}{Elasticity}
+The ability to \textbf{automatically} scale resources up or down based on current demand.
+\end{definitionbox}
+
+Databricks Serverless is a perfect example: you pay nothing when not using compute, and it automatically scales up during peak processing, then scales down when done.
+
+%------------------------------
+\subsection{Reliability and Availability}
+%------------------------------
+
+\begin{itemize}
+    \item \textbf{Reliability:} Is the system producing correct results?
+    \item \textbf{Availability:} Is the system accessible when users need it?
+\end{itemize}
+
+Availability is often measured in ``nines'':
+\begin{itemize}
+    \item 99\% (``Two Nines'') = 3.65 days downtime/year
+    \item 99.9\% (``Three Nines'') = 8.76 hours downtime/year
+    \item 99.99\% (``Four Nines'') = 52.6 minutes downtime/year
+    \item 99.999\% (``Five Nines'') = 5.26 minutes downtime/year
+\end{itemize}
+
+\begin{infobox}
+Always clarify availability requirements with the business. Five Nines is extremely expensive to achieve and may not be necessary for all systems.
+\end{infobox}
+
+\newpage
+
+%==============================
+\section{Lakeflow and Delta Live Tables (DLT)}
+%==============================
+
+\textbf{Lakeflow} is Databricks' unified platform for data ingestion, transformation, and orchestration. \textbf{Delta Live Tables (DLT)} is the core feature enabling \textbf{declarative pipelines}.
+
+%------------------------------
+\subsection{Imperative vs. Declarative Pipelines}
+%------------------------------
+
+\begin{examplebox}{Ordering at a Restaurant}
+\textbf{Imperative (Traditional):} Tell the chef step-by-step: ``1. Grill 200g beef, 2. Wash vegetables, 3. Warm the bread...'' You must handle every detail including errors, retries, and scaling.
+
+\textbf{Declarative (DLT):} Order from the menu: ``One steak, please.'' The kitchen (DLT engine) handles recipes, cooking, quality checks, and serving automatically.
+\end{examplebox}
+
+With DLT, developers focus on \textbf{business logic} (transformations), while the engine handles:
+\begin{itemize}
+    \item Error handling and retries
+    \item Scaling and optimization
+    \item State management (checkpoints)
+    \item Dependency management (DAG)
+    \item Monitoring and observability
+\end{itemize}
+
+%------------------------------
+\subsection{DLT Building Blocks}
+%------------------------------
+
+\textbf{1. Streaming Tables:}
+\begin{itemize}
+    \item Process data incrementally (once per record)
+    \item Maintain state (know what's already processed)
+    \item Handle Bronze $\rightarrow$ Silver transformations
+\end{itemize}
+
+\textbf{2. Materialized Views:}
+\begin{itemize}
+    \item Pre-computed aggregations for Gold layer
+    \item Automatically refreshed incrementally
+    \item Great for dashboards and reporting
+\end{itemize}
+
+\begin{lstlisting}[style=sqlstyle, caption={DLT SQL Examples}]
+-- Streaming Table from Autoloader
+CREATE STREAMING TABLE bronze_transactions
+AS SELECT * FROM cloud_files("/path/data", "json");
+
+-- Streaming Table from Kafka
+CREATE STREAMING TABLE kafka_events
+AS SELECT * FROM read_kafka(brokers => "host:9092");
+
+-- Materialized View (auto-refreshed)
+CREATE MATERIALIZED VIEW gold_summary AS
+SELECT category, SUM(amount) as total
+FROM silver_transactions
+GROUP BY category;
+\end{lstlisting}
+
+%------------------------------
+\subsection{CDC Automation with apply\_changes()}
+%------------------------------
+
+The most powerful DLT feature: automatically handling Insert, Update, Delete operations from source data.
+
+\begin{lstlisting}[style=pythonstyle, caption={DLT CDC Pipeline Example}]
+import dlt
+from pyspark.sql.functions import col, expr
+
+# 1. Bronze: Ingest raw data with Autoloader
+@dlt.table(comment="Raw transactions from Autoloader")
+def bronze_transactions():
+    return (
+        spark.readStream
+            .format("cloudFiles")
+            .option("cloudFiles.format", "json")
+            .load("/path/to/source")
+    )
+
+# 2. View: Clean data before applying to Silver
+@dlt.view(comment="Cleaned transactions")
+def clean_transactions():
+    return (
+        dlt.read_stream("bronze_transactions")
+            .selectExpr(
+                "transaction_id",
+                "CAST(amount AS DOUBLE)",
+                "operation_type",  # 'INSERT', 'UPDATE', 'DELETE'
+                "CAST(update_timestamp AS LONG) as sequence"
+            )
+    )
+
+# 3. Silver: Apply CDC changes
+@dlt.table(comment="CDC applied Silver table")
+def silver_transactions():
+    dlt.apply_changes(
+        target = "silver_transactions",
+        source = dlt.read_stream("clean_transactions"),
+        keys = ["transaction_id"],        # Primary key
+        sequence_by = col("sequence"),    # Ordering column
+        apply_as_deletes = expr("operation_type = 'DELETE'")
+    )
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{apply\_changes() Parameters:}
+\begin{itemize}
+    \item \textbf{target:} Final destination table
+    \item \textbf{source:} Streaming DataFrame with changes
+    \item \textbf{keys:} Primary key columns for record identification
+    \item \textbf{sequence\_by:} Column determining change order (latest wins)
+    \item \textbf{apply\_as\_deletes:} Condition for DELETE operations
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%==============================
+\section{Data Quality with DLT Expectations}
+%==============================
+
+DLT allows declaring data quality rules directly in pipeline definitions:
+
+\begin{lstlisting}[style=pythonstyle, caption={DLT Expectations Example}]
+import dlt
+
+# Drop rows that fail this expectation
+@dlt.expect_or_drop("valid_age", "age > 0 AND age < 120")
+
+# Fail entire pipeline if this expectation fails
+@dlt.expect_or_fail("valid_email", "email IS NOT NULL")
+
+# Log but keep rows that fail (for monitoring)
+@dlt.expect("reasonable_score", "score >= 50")
+
+@dlt.table(comment="Quality-controlled Silver table")
+def users_silver():
+    return dlt.read_stream("users_bronze")
+\end{lstlisting}
+
+\textbf{Three Behaviors on Violation:}
+\begin{itemize}
+    \item \textbf{expect\_or\_fail:} Stop pipeline immediately (like FAILFAST)
+    \item \textbf{expect\_or\_drop:} Drop the violating row (like DROPMALFORMED)
+    \item \textbf{expect:} Keep the row but log the violation for monitoring
+\end{itemize}
+
+\begin{infobox}
+\textbf{Quarantining Pattern:}
+Instead of dropping or failing, route bad data to a separate ``quarantine table.'' The main pipeline continues, while bad records are reviewed, fixed, and re-injected later.
+\end{infobox}
+
+%------------------------------
+\subsection{Schema Evolution}
+%------------------------------
+
+DLT provides options for handling schema changes:
+\begin{itemize}
+    \item \textbf{Enforce Schema:} Fail if schema doesn't match (strict)
+    \item \textbf{Merge Schema:} Automatically add new columns
+    \item \textbf{Evolution Strategies:} Various options for handling schema drift
+\end{itemize}
+
+\newpage
+
+%==============================
+\section{Pipeline Execution and Monitoring}
+%==============================
+
+%------------------------------
+\subsection{Running DLT Pipelines}
+%------------------------------
+
+\textbf{Execution Modes:}
+\begin{itemize}
+    \item \textbf{Triggered:} Run once when manually started or scheduled
+    \item \textbf{Continuous:} Always running, processing data as it arrives
+\end{itemize}
+
+\textbf{Refresh Options:}
+\begin{itemize}
+    \item \textbf{Incremental:} Process only new/changed data since last run
+    \item \textbf{Full Refresh:} Reprocess everything from scratch (resets state)
+    \item \textbf{Selective Refresh:} Refresh only specific tables
+\end{itemize}
+
+%------------------------------
+\subsection{Observability}
+%------------------------------
+
+DLT provides comprehensive monitoring:
+\begin{itemize}
+    \item \textbf{Event Logs:} Every action recorded to Delta tables
+    \item \textbf{Query History:} See actual queries executed by the engine
+    \item \textbf{Query Profiles:} Memory usage, rows processed, performance metrics
+    \item \textbf{DAG Visualization:} Visual representation of pipeline dependencies
+\end{itemize}
+
+%------------------------------
+\subsection{Checkpoint Management}
+%------------------------------
+
+\begin{warningbox}
+\textbf{Common Streaming Error: Checkpoint Conflicts}
+
+When running structured streaming (not DLT), you may encounter checkpoint errors when:
+\begin{itemize}
+    \item Running the same query after code changes
+    \item Source data was deleted but checkpoint still exists
+\end{itemize}
+
+\textbf{Manual Solution:}
+\begin{lstlisting}[style=pythonstyle]
+checkpoint_path = "/path/to/checkpoint"
+dbutils.fs.rm(checkpoint_path, recurse=True)  # Delete old checkpoint
+# Then restart your streaming query
+\end{lstlisting}
+
+\textbf{Better Solution:} Use DLT, which manages checkpoints automatically. ``Full Refresh'' resets all state without manual intervention.
+\end{warningbox}
+
+\newpage
+
+%==============================
+\section{One-Page Summary}
+%==============================
+
+\begin{tcolorbox}[title={PoC vs. Production}, colback=blue!5, colframe=blue!60, breakable]
+\textbf{PoC (Prototype):} Manual, unstable, no quality guarantees, one-time analysis \\
+$\downarrow$ \textbf{Operationalizing} $\downarrow$ \\
+\textbf{Production:} Automated, reliable, quality guaranteed, scalable, monitored
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Requirements}, colback=green!5, colframe=green!60, breakable]
+\begin{itemize}
+    \item \textbf{Functional:} What? (features, functions)
+    \item \textbf{Non-Functional:} How? (performance, availability, cost) $\leftarrow$ Often overlooked!
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Medallion Architecture}, colback=orange!5, colframe=orange!60, breakable]
+\textbf{Bronze (Raw)} $\rightarrow$ \textbf{Silver (Cleaned/Validated)} $\rightarrow$ \textbf{Gold (Aggregated/Final Product)}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Six Guiding Principles}, colback=purple!5, colframe=purple!60, breakable]
+\begin{enumerate}
+    \item Data as Products (curated, trusted)
+    \item Remove Silos (minimize data movement)
+    \item Self-Service + Guardrails (governance)
+    \item Organization-Wide Governance
+    \item Open Formats (no vendor lock-in)
+    \item Scale \& Optimize (decouple storage/compute)
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={DLT Core Features}, colback=gray!5, colframe=gray!60, breakable]
+\begin{itemize}
+    \item \textbf{Declarative:} Define ``What'', engine handles ``How''
+    \item \textbf{CDC Automation:} \code{dlt.apply\_changes()}
+    \item \textbf{Quality Automation:} \code{@dlt.expect\_...}
+    \item \textbf{State Management:} Checkpoints, Full Refresh handled automatically
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Scaling}, colback=teal!5, colframe=teal!60, breakable]
+\begin{itemize}
+    \item \textbf{Horizontal (Scale Out):} Add more machines (preferred)
+    \item \textbf{Vertical (Scale Up):} Upgrade to bigger machines
+    \item \textbf{Critical:} Always decouple Storage (cheap) from Compute (expensive)!
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Data Quality Modes}, colback=red!5, colframe=red!60, breakable]
+\begin{itemize}
+    \item \textbf{PERMISSIVE:} Keep bad data in \_corrupt\_record column
+    \item \textbf{DROPMALFORMED:} Silently drop bad records
+    \item \textbf{FAILFAST:} Stop immediately on any error
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

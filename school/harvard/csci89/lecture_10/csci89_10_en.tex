@@ -1,0 +1,970 @@
+% CSCI E-89B: Natural Language Processing
+% Lecture 10: Named Entity Recognition (NER)
+% English Version
+
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ============================================================
+% PAGE SETUP
+% ============================================================
+\geometry{margin=25mm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{CSCI E-89B: Natural Language Processing}
+\fancyhead[R]{Lecture 10}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================
+% COLORS
+% ============================================================
+\definecolor{harvardcrimson}{RGB}{165,28,48}
+\definecolor{codegreen}{RGB}{34,139,34}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codepurple}{RGB}{148,0,211}
+\definecolor{backcolour}{RGB}{248,248,248}
+\definecolor{darkblue}{RGB}{0,0,139}
+
+% ============================================================
+% CODE LISTING STYLE
+% ============================================================
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{harvardcrimson},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+\lstset{style=pythonstyle}
+
+% ============================================================
+% TCOLORBOX ENVIRONMENTS
+% ============================================================
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{summarybox}[1][]{
+    colback=red!5!white,
+    colframe=harvardcrimson,
+    fonttitle=\bfseries,
+    title=Summary,
+    breakable,
+    #1
+}
+
+\newtcolorbox{overviewbox}[1][]{
+    colback=blue!5!white,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Overview,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    colback=cyan!5!white,
+    colframe=cyan!60!black,
+    fonttitle=\bfseries,
+    title=Information,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    colback=yellow!10!white,
+    colframe=orange!80!black,
+    fonttitle=\bfseries,
+    title=Warning,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=Example,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    colback=purple!5!white,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    colback=red!10!white,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important,
+    breakable,
+    #1
+}
+
+% ============================================================
+% CUSTOM COMMANDS
+% ============================================================
+\newcommand{\metainfo}[4]{
+    \begin{tcolorbox}[colback=gray!10, colframe=gray!50, title=Lecture Information]
+    \begin{tabular}{@{}ll}
+    \textbf{Course:} & #1 \\
+    \textbf{Lecture:} & #2 \\
+    \textbf{Topic:} & #3 \\
+    \textbf{Date:} & #4 \\
+    \end{tabular}
+    \end{tcolorbox}
+}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
+\begin{document}
+
+\metainfo{CSCI E-89B: Natural Language Processing}{Lecture 10}{Named Entity Recognition (NER)}{Fall 2024}
+
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Introduction to Named Entity Recognition}
+% ============================================================
+
+\begin{overviewbox}
+Named Entity Recognition (NER) is the task of identifying and classifying named entities in text into predefined categories such as person names, organizations, locations, dates, and more. It's a fundamental NLP task with applications in information extraction, question answering, and machine translation.
+\end{overviewbox}
+
+\subsection{What are Named Entities?}
+
+\begin{definitionbox}[title=Named Entity Categories]
+Common named entity types include:
+\begin{itemize}
+\item \textbf{PERSON}: Names of people (Donald Trump, Marie Curie)
+\item \textbf{ORG}: Organizations, companies, institutions (Tesla, Harvard University)
+\item \textbf{GPE}: Geopolitical entities---countries, cities, states (America, Paris)
+\item \textbf{LOC}: Non-GPE locations (Mount Everest, Pacific Ocean)
+\item \textbf{DATE}: Dates and time periods (November 4, 2024, this year)
+\item \textbf{TIME}: Times (3:00 PM, midnight)
+\item \textbf{MONEY}: Monetary values (\$1 trillion, 50 euros)
+\item \textbf{PERCENT}: Percentages (40\%, two-thirds)
+\item \textbf{CARDINAL}: Numbers not fitting other categories (50, three)
+\item \textbf{ORDINAL}: Ordinal numbers (first, 2nd)
+\item \textbf{NORP}: Nationalities, religious/political groups (Chinese, Republican)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Why is NER Important?}
+
+\begin{importantbox}
+NER is crucial for many downstream tasks:
+\begin{itemize}
+\item \textbf{Machine Translation}: Knowing ``Tesla'' is an organization helps translate correctly
+\item \textbf{Information Extraction}: Extract structured data from unstructured text
+\item \textbf{Question Answering}: Identify entities mentioned in questions
+\item \textbf{Search}: Improve semantic search by understanding entity types
+\item \textbf{Sentiment Analysis}: Attribute sentiment to specific entities
+\end{itemize}
+\end{importantbox}
+
+\begin{examplebox}[title=NER in Action]
+Input text: ``Donald Trump won more than 50 electoral votes this year. Tesla's stock rose 2.4\%.''
+
+NER output:
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Entity} & \textbf{Type} & \textbf{Position} \\
+\midrule
+Donald Trump & PERSON & 0--11 \\
+more than 50 & CARDINAL & 17--29 \\
+this year & DATE & 47--56 \\
+Tesla & ORG & 58--63 \\
+2.4\% & PERCENT & 78--82 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\subsection{NER for Feature Enhancement}
+
+\begin{infobox}[title=Enhancing Classification with NER]
+NER can improve text classification by:
+\begin{enumerate}
+\item \textbf{Adding entity counts}: Concatenate counts of persons, organizations, etc.
+\item \textbf{Entity-based features}: Create binary indicators for entity presence
+\item \textbf{Structured metadata}: Extract entities as document metadata
+\item \textbf{Relationship extraction}: Find connections between entities
+\end{enumerate}
+\end{infobox}
+
+
+% ============================================================
+\section{Two Approaches to NER}
+% ============================================================
+
+\begin{overviewbox}
+NER can be performed using two main approaches: rule-based methods using pattern matching, and statistical/neural methods using machine learning.
+\end{overviewbox}
+
+\subsection{Approach Comparison}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{Rule-Based} & \textbf{Statistical/Neural} \\
+\midrule
+Training Data & Not required & Required (labeled) \\
+Context Awareness & Limited & High \\
+Maintenance & High burden & Lower \\
+Adaptability & Poor & Good \\
+Interpretability & High & Lower \\
+Scalability & Poor & Good \\
+Accuracy & Depends on rules & Generally higher \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+% ============================================================
+\section{Rule-Based NER}
+% ============================================================
+
+\begin{overviewbox}
+Rule-based NER uses handcrafted patterns (regular expressions, dictionaries, linguistic rules) to identify entities. While limited, it's interpretable and requires no training data.
+\end{overviewbox}
+
+\subsection{Regular Expressions for Entity Detection}
+
+\begin{definitionbox}[title=Common Pattern Components]
+\begin{itemize}
+\item \verb|\b| : Word boundary
+\item \verb|\d{n}| : Exactly n digits
+\item \verb|\d{1,2}| : 1 or 2 digits
+\item \verb|\s+| : One or more whitespace characters
+\item \verb|[A-Z]| : One uppercase letter
+\item \verb|[a-z]+| : One or more lowercase letters
+\item \verb|(?:...)| : Non-capturing group
+\item \verb|?| : Makes preceding element optional
+\item \verb|| : OR operator
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Date Pattern Example}
+
+\begin{lstlisting}[caption={Regular Expression for Dates}]
+import re
+
+# Pattern for dates like "11/04/2024" or "November 4, 2024"
+date_pattern = r'''
+    \b                              # Word boundary
+    (?:
+        \d{1,2}/\d{1,2}/\d{4}       # MM/DD/YYYY format
+        |
+        (?:January|February|March|April|May|June|
+           July|August|September|October|November|December)
+        \s+                          # Required space
+        \d{1,2}                      # Day (1-31)
+        (?:,\s*)?                    # Optional comma and space
+        \d{4}                        # Year
+    )
+    \b
+'''
+
+text = "The event is on November 4, 2024 or 11/04/2024."
+dates = re.findall(date_pattern, text, re.VERBOSE)
+print(dates)  # ['November 4, 2024', '11/04/2024']
+\end{lstlisting}
+
+\subsection{Person Name Pattern}
+
+\begin{lstlisting}[caption={Pattern for Names with Titles}]
+# Pattern for names with titles
+person_pattern = r'''
+    \b
+    (?:Mr\.|Mrs\.|Ms\.|Dr\.|Professor)  # Title
+    \s+                                   # Space
+    [A-Z][a-z]+                          # First name (capitalized)
+    (?:\s+[A-Z][a-z]+)?                  # Optional last name
+    \b
+'''
+
+text = "Mr. Trump met with Dr. Smith yesterday."
+persons = re.findall(person_pattern, text, re.VERBOSE)
+print(persons)  # ['Mr. Trump', 'Dr. Smith']
+\end{lstlisting}
+
+\subsection{Organization Pattern}
+
+\begin{lstlisting}[caption={Pattern for Organizations}]
+# Pattern for company names
+org_pattern = r'''
+    \b
+    [A-Z][a-zA-Z\s]+                    # Company name
+    (?:Inc\.|Ltd\.|Corporation|Corp\.)  # Corporate suffix
+    \b
+'''
+
+text = "Apple Inc. announced new products."
+orgs = re.findall(org_pattern, text, re.VERBOSE)
+print(orgs)  # ['Apple Inc.']
+\end{lstlisting}
+
+\subsection{Complete Rule-Based NER System}
+
+\begin{lstlisting}[caption={Simple Rule-Based NER System}]
+import re
+
+def rule_based_ner(text):
+    entities = []
+
+    # Date patterns
+    date_patterns = [
+        r'\b\d{1,2}/\d{1,2}/\d{4}\b',
+        r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s*\d{4}\b'
+    ]
+
+    # Email pattern
+    email_pattern = r'\b[\w.]+@[\w.]+\.\w+\b'
+
+    # Time pattern
+    time_pattern = r'\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?\b'
+
+    # Person pattern (with titles)
+    person_pattern = r'\b(?:Mr\.|Mrs\.|Ms\.|Dr\.)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\b'
+
+    # Organization pattern
+    org_pattern = r'\b[A-Z][a-zA-Z\s]+(?:Inc\.|Ltd\.|Corp\.)\b'
+
+    # Apply patterns
+    for pattern in date_patterns:
+        for match in re.finditer(pattern, text):
+            entities.append(('DATE', match.group(), match.span()))
+
+    for match in re.finditer(email_pattern, text):
+        entities.append(('EMAIL', match.group(), match.span()))
+
+    for match in re.finditer(time_pattern, text):
+        entities.append(('TIME', match.group(), match.span()))
+
+    for match in re.finditer(person_pattern, text):
+        entities.append(('PERSON', match.group(), match.span()))
+
+    for match in re.finditer(org_pattern, text):
+        entities.append(('ORG', match.group(), match.span()))
+
+    return entities
+
+# Test
+text = """
+Meeting with Dr. Smith at 3:00 PM on November 18, 2024.
+Contact: john.doe@company.com. Apple Inc. will attend.
+"""
+entities = rule_based_ner(text)
+for entity_type, entity, span in entities:
+    print(f"{entity_type}: {entity} at {span}")
+\end{lstlisting}
+
+\subsection{Limitations of Rule-Based NER}
+
+\begin{warningbox}[title=Rule-Based Limitations]
+\begin{itemize}
+\item \textbf{No context awareness}: ``Tesla'' could be a person (Nikola Tesla) or company
+\item \textbf{Missing entities}: ``Donald Trump'' without title won't be recognized
+\item \textbf{Language-specific}: Rules must be rewritten for each language
+\item \textbf{Date format variations}: US vs European formats differ
+\item \textbf{Maintenance burden}: Rules must be constantly updated
+\item \textbf{Name variations}: ``La Place'' vs ``Laplace'' requires special handling
+\end{itemize}
+\end{warningbox}
+
+
+% ============================================================
+\section{Statistical and Neural NER}
+% ============================================================
+
+\begin{overviewbox}
+Modern NER systems use machine learning to learn patterns from labeled data. Neural networks, particularly CNNs and transformers, achieve state-of-the-art performance.
+\end{overviewbox}
+
+\subsection{NER as Sequence Labeling}
+
+\begin{definitionbox}[title=BIO Tagging Scheme]
+NER is typically framed as a sequence labeling problem using BIO tags:
+\begin{itemize}
+\item \textbf{B-TYPE}: Beginning of an entity of TYPE
+\item \textbf{I-TYPE}: Inside/continuation of an entity
+\item \textbf{O}: Outside any entity
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=BIO Tagging Example]
+Sentence: ``Donald Trump visited Tesla headquarters.''
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Token} & \textbf{Tag} \\
+\midrule
+Donald & B-PERSON \\
+Trump & I-PERSON \\
+visited & O \\
+Tesla & B-ORG \\
+headquarters & O \\
+. & O \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\subsection{Statistical Methods}
+
+\begin{definitionbox}[title=Traditional ML for NER]
+\textbf{Hidden Markov Models (HMM)}:
+\begin{itemize}
+\item Model sequence of tags as Markov chain
+\item Assume current tag depends only on previous tag
+\item Limited feature representation
+\end{itemize}
+
+\textbf{Conditional Random Fields (CRF)}:
+\begin{itemize}
+\item Discriminative model (directly models $P(\text{tags}|\text{words})$)
+\item Can use arbitrary features
+\item Global normalization (considers entire sequence)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Neural Network Architecture for NER}
+
+\begin{importantbox}
+SpaCy uses a \textbf{Convolutional Neural Network} (CNN) for NER. Here's why:
+\begin{enumerate}
+\item Word embeddings capture semantic meaning
+\item CNN filters capture local context (neighboring words)
+\item Sliding window naturally handles variable-length text
+\item Efficient parallel computation
+\end{enumerate}
+\end{importantbox}
+
+\subsection{How Neural NER Works}
+
+\begin{definitionbox}[title=Neural NER Pipeline]
+\begin{enumerate}
+\item \textbf{Input}: Document text
+\item \textbf{Tokenization}: Split into tokens
+\item \textbf{Embedding}: Convert tokens to vectors (e.g., 4D, 100D)
+\item \textbf{CNN}: Apply filters over embedding sequences
+\item \textbf{Output Layer}: Softmax over entity types for each token
+\end{enumerate}
+\end{definitionbox}
+
+\begin{examplebox}[title=NER as CNN Classification]
+Input: ``The cat sat on mat''
+
+\textbf{Step 1}: Embed each token:
+\begin{center}
+\begin{tabular}{lcccc}
+Token & Dim 1 & Dim 2 & Dim 3 & Dim 4 \\
+\midrule
+The & 0.8 & 0.1 & 0.3 & 0.7 \\
+cat & 0.5 & 0.7 & 0.2 & 0.9 \\
+sat & 0.3 & 0.4 & 0.6 & 0.1 \\
+on & 0.2 & 0.8 & 0.1 & 0.5 \\
+mat & 0.4 & 0.3 & 0.7 & 0.2 \\
+\end{tabular}
+\end{center}
+
+\textbf{Step 2}: CNN filters slide over embeddings (captures context)
+
+\textbf{Step 3}: For each token, output probabilities:
+\begin{center}
+\begin{tabular}{lccccc}
+Token & PERSON & ORG & GPE & DATE & O \\
+\midrule
+The & 0.01 & 0.01 & 0.01 & 0.02 & 0.95 \\
+cat & 0.10 & 0.02 & 0.01 & 0.02 & 0.85 \\
+\ldots & & & & & \\
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+
+% ============================================================
+\section{Using SpaCy for NER}
+% ============================================================
+
+\begin{overviewbox}
+SpaCy provides pre-trained NER models that are easy to use and highly accurate for common entity types.
+\end{overviewbox}
+
+\subsection{Basic SpaCy NER}
+
+\begin{lstlisting}[caption={SpaCy NER Basics}]
+import spacy
+from spacy import displacy
+
+# Load pre-trained model
+nlp = spacy.load("en_core_web_sm")
+
+# Process text
+text = """Donald Trump won more than 50 electoral votes this year.
+Tesla's stock rose 2.4% after the Federal Reserve announcement."""
+
+doc = nlp(text)
+
+# Extract entities
+for ent in doc.ents:
+    print(f"{ent.text:20} {ent.label_:10} {ent.start_char}-{ent.end_char}")
+\end{lstlisting}
+
+Output:
+\begin{verbatim}
+Donald Trump         PERSON     0-12
+more than 50         CARDINAL   17-29
+this year            DATE       47-56
+Tesla                ORG        58-63
+2.4%                 PERCENT    78-82
+Federal Reserve      ORG        94-109
+\end{verbatim}
+
+\subsection{Visualizing Entities}
+
+\begin{lstlisting}[caption={Visualize NER with displacy}]
+# Render in Jupyter notebook
+displacy.render(doc, style="ent", jupyter=True)
+
+# Or save to HTML file
+html = displacy.render(doc, style="ent", page=True)
+with open("ner_visualization.html", "w") as f:
+    f.write(html)
+\end{lstlisting}
+
+\subsection{SpaCy NER Label Reference}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Label} & \textbf{Description} \\
+\midrule
+PERSON & People, including fictional \\
+NORP & Nationalities, religious, political groups \\
+FAC & Facilities (buildings, airports, highways) \\
+ORG & Companies, agencies, institutions \\
+GPE & Countries, cities, states \\
+LOC & Non-GPE locations \\
+PRODUCT & Objects, vehicles, foods \\
+EVENT & Named hurricanes, battles, wars \\
+WORK\_OF\_ART & Titles of books, songs \\
+LAW & Named documents made into laws \\
+DATE & Absolute or relative dates \\
+TIME & Times smaller than a day \\
+PERCENT & Percentage \\
+MONEY & Monetary values \\
+QUANTITY & Measurements \\
+ORDINAL & ``first'', ``second'', etc. \\
+CARDINAL & Numerals not falling into other categories \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+% ============================================================
+\section{Fine-Tuning SpaCy NER}
+% ============================================================
+
+\begin{overviewbox}
+Pre-trained NER models may not recognize domain-specific entities. SpaCy allows fine-tuning on custom data to add new entity types or improve accuracy.
+\end{overviewbox}
+
+\subsection{When to Fine-Tune}
+
+\begin{importantbox}
+Consider fine-tuning when:
+\begin{itemize}
+\item Domain-specific entities (drug names, product codes)
+\item New entity categories not in default model
+\item Improving accuracy for your specific text type
+\item Handling industry jargon or technical terms
+\end{itemize}
+\end{importantbox}
+
+\subsection{Training Data Format}
+
+\begin{lstlisting}[caption={SpaCy Training Data Format}]
+# Training data format: (text, {"entities": [(start, end, label)]})
+train_data = [
+    ("Cars in China are selling well",
+     {"entities": [(0, 4, "VEHICLE")]}),
+
+    ("Tesla has a lot on the line as an electric vehicle maker",
+     {"entities": [(0, 5, "ORG"), (40, 56, "VEHICLE")]}),
+
+    ("My family loves our Honda Civic",
+     {"entities": [(23, 34, "VEHICLE")]}),
+
+    ("This car is the best",
+     {"entities": [(5, 8, "VEHICLE")]})
+]
+\end{lstlisting}
+
+\subsection{Fine-Tuning Process}
+
+\begin{lstlisting}[caption={Fine-Tuning SpaCy NER}]
+import spacy
+from spacy.training import Example
+import random
+
+# Load existing model
+nlp = spacy.load("en_core_web_sm")
+
+# Get the NER component
+ner = nlp.get_pipe("ner")
+
+# Add new entity label
+ner.add_label("VEHICLE")
+
+# Disable other pipes during training
+other_pipes = [pipe for pipe in nlp.pipe_names if pipe != "ner"]
+
+# Training loop
+with nlp.disable_pipes(*other_pipes):
+    optimizer = nlp.resume_training()
+
+    for iteration in range(20):
+        random.shuffle(train_data)
+        losses = {}
+
+        for text, annotations in train_data:
+            doc = nlp.make_doc(text)
+            example = Example.from_dict(doc, annotations)
+            nlp.update([example], drop=0.5, losses=losses)
+
+        print(f"Iteration {iteration}, Losses: {losses}")
+
+# Test the model
+doc = nlp("I bought a Toyota Camry yesterday")
+for ent in doc.ents:
+    print(f"{ent.text}: {ent.label_}")
+\end{lstlisting}
+
+\begin{warningbox}[title=Fine-Tuning Pitfalls]
+\begin{itemize}
+\item \textbf{Catastrophic forgetting}: Model may ``forget'' original entities
+\item \textbf{Insufficient data}: Need many examples per entity type
+\item \textbf{Label consistency}: Annotations must be consistent
+\item Always include some original data in training to prevent forgetting
+\end{itemize}
+\end{warningbox}
+
+
+% ============================================================
+\section{Part-of-Speech Tagging}
+% ============================================================
+
+\begin{overviewbox}
+Part-of-Speech (POS) tagging identifies grammatical categories (noun, verb, adjective, etc.) for each word. It's closely related to NER and often used as a preprocessing step.
+\end{overviewbox}
+
+\subsection{Common POS Tags}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Tag} & \textbf{Description} & \textbf{Example} \\
+\midrule
+NN & Noun, singular & cat, dog, house \\
+NNS & Noun, plural & cats, dogs, houses \\
+NNP & Proper noun, singular & John, London \\
+VB & Verb, base form & run, eat, be \\
+VBD & Verb, past tense & ran, ate, was \\
+VBG & Verb, gerund & running, eating \\
+JJ & Adjective & big, red, beautiful \\
+RB & Adverb & quickly, very, well \\
+IN & Preposition & in, on, at, by \\
+DT & Determiner & the, a, an \\
+CC & Coordinating conjunction & and, but, or \\
+TO & ``to'' & to (as in ``to run'') \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{POS Tagging with NLTK}
+
+\begin{lstlisting}[caption={POS Tagging with NLTK}]
+import nltk
+from nltk import word_tokenize, pos_tag
+
+# Download required data
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('tagsets')
+
+# View tag descriptions
+nltk.help.upenn_tagset('NN')   # Noun
+nltk.help.upenn_tagset('VB')   # Verb
+
+# POS tagging
+text = "The quick brown fox jumps over the lazy dog"
+tokens = word_tokenize(text)
+pos_tags = pos_tag(tokens)
+
+print(pos_tags)
+# [('The', 'DT'), ('quick', 'JJ'), ('brown', 'JJ'),
+#  ('fox', 'NN'), ('jumps', 'VBZ'), ('over', 'IN'),
+#  ('the', 'DT'), ('lazy', 'JJ'), ('dog', 'NN')]
+\end{lstlisting}
+
+\subsection{POS Tagging with SpaCy}
+
+\begin{lstlisting}[caption={POS Tagging with SpaCy}]
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+doc = nlp("The quick brown fox jumps over the lazy dog")
+
+for token in doc:
+    print(f"{token.text:10} {token.pos_:6} {token.tag_}")
+\end{lstlisting}
+
+
+% ============================================================
+\section{Enhancing Classification with NER}
+% ============================================================
+
+\begin{overviewbox}
+NER features can improve text classification by providing structured information about document content.
+\end{overviewbox}
+
+\subsection{Feature Engineering with NER}
+
+\begin{definitionbox}[title=NER-Based Features]
+\textbf{Count-based features}:
+\begin{itemize}
+\item Number of persons mentioned
+\item Number of organizations
+\item Number of locations
+\item Number of dates/times
+\end{itemize}
+
+\textbf{Binary indicators}:
+\begin{itemize}
+\item Contains person name? (0/1)
+\item Contains organization? (0/1)
+\item Contains specific entity (e.g., ``Tesla'')? (0/1)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Implementation Example}
+
+\begin{lstlisting}[caption={NER Feature Enhancement}]
+import spacy
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+import numpy as np
+
+nlp = spacy.load("en_core_web_sm")
+
+def extract_ner_features(text):
+    """Extract NER-based features from text"""
+    doc = nlp(text)
+
+    features = {
+        'n_persons': 0,
+        'n_orgs': 0,
+        'n_gpes': 0,
+        'n_dates': 0,
+        'n_money': 0,
+        'n_percent': 0
+    }
+
+    for ent in doc.ents:
+        if ent.label_ == 'PERSON':
+            features['n_persons'] += 1
+        elif ent.label_ == 'ORG':
+            features['n_orgs'] += 1
+        elif ent.label_ == 'GPE':
+            features['n_gpes'] += 1
+        elif ent.label_ == 'DATE':
+            features['n_dates'] += 1
+        elif ent.label_ == 'MONEY':
+            features['n_money'] += 1
+        elif ent.label_ == 'PERCENT':
+            features['n_percent'] += 1
+
+    return features
+
+# Extract NER features for all documents
+ner_features = [extract_ner_features(text) for text in documents]
+ner_df = pd.DataFrame(ner_features)
+
+# Combine TF-IDF and NER features
+tfidf = TfidfVectorizer(max_features=20)
+X_tfidf = tfidf.fit_transform(documents).toarray()
+X_combined = np.hstack([X_tfidf, ner_df.values])
+
+# Train classifier
+X_train, X_test, y_train, y_test = train_test_split(
+    X_combined, labels, test_size=0.2, random_state=42
+)
+
+clf = MLPClassifier(hidden_layer_sizes=(50,), max_iter=500)
+clf.fit(X_train, y_train)
+accuracy = clf.score(X_test, y_test)
+print(f"Accuracy with NER features: {accuracy:.4f}")
+\end{lstlisting}
+
+\subsection{Entity-Based Binary Features}
+
+\begin{lstlisting}[caption={Binary Entity Indicators}]
+def get_entity_dummies(documents):
+    """Create binary indicators for each unique entity"""
+    all_entities = set()
+
+    # First pass: collect all unique entities
+    for text in documents:
+        doc = nlp(text)
+        for ent in doc.ents:
+            all_entities.add((ent.text, ent.label_))
+
+    # Second pass: create binary features
+    feature_matrix = []
+    for text in documents:
+        doc = nlp(text)
+        doc_entities = set((ent.text, ent.label_) for ent in doc.ents)
+
+        row = [1 if entity in doc_entities else 0
+               for entity in all_entities]
+        feature_matrix.append(row)
+
+    columns = [f"{text}_{label}" for text, label in all_entities]
+    return pd.DataFrame(feature_matrix, columns=columns)
+
+entity_features = get_entity_dummies(documents)
+\end{lstlisting}
+
+
+% ============================================================
+\section{One-Page Summary}
+% ============================================================
+
+\begin{summarybox}
+\textbf{Named Entity Recognition (NER)} identifies and classifies named entities in text.
+
+\textbf{Common Entity Types}:
+\begin{itemize}
+\item PERSON, ORG, GPE, LOC, DATE, TIME, MONEY, PERCENT, CARDINAL
+\end{itemize}
+
+\textbf{Two Approaches}:
+
+\textbf{Rule-Based}:
+\begin{itemize}
+\item Uses regular expressions and dictionaries
+\item No training data needed
+\item Limited by predefined patterns
+\item No context awareness
+\end{itemize}
+
+\textbf{Statistical/Neural}:
+\begin{itemize}
+\item Learns from labeled data
+\item Uses context for disambiguation
+\item CNNs capture local context via filters
+\item SpaCy: \texttt{nlp = spacy.load("en\_core\_web\_sm")}
+\end{itemize}
+
+\textbf{NER as Sequence Labeling}:
+\begin{itemize}
+\item BIO scheme: B-TYPE (begin), I-TYPE (inside), O (outside)
+\item Each token gets a tag
+\item Output: softmax probabilities over entity types
+\end{itemize}
+
+\textbf{SpaCy Usage}:
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+import spacy
+nlp = spacy.load("en_core_web_sm")
+doc = nlp("Donald Trump visited Tesla.")
+for ent in doc.ents:
+    print(ent.text, ent.label_)
+\end{lstlisting}
+
+\textbf{Fine-Tuning}: Add custom entity types with labeled examples. Watch for catastrophic forgetting.
+
+\textbf{Feature Enhancement}:
+\begin{itemize}
+\item Add entity counts to feature vectors
+\item Create binary entity indicators
+\item Combine with TF-IDF for classification
+\end{itemize}
+
+\textbf{Applications}: Translation, information extraction, question answering, sentiment analysis, search.
+\end{summarybox}
+
+
+% ============================================================
+\section{Glossary}
+% ============================================================
+
+\begin{definitionbox}[title=Key Terms]
+\begin{itemize}
+\item \textbf{NER}: Named Entity Recognition---identifying entities in text
+\item \textbf{Named Entity}: Real-world object with a name (person, organization, place)
+\item \textbf{BIO Tagging}: Begin-Inside-Outside scheme for sequence labeling
+\item \textbf{POS Tagging}: Part-of-Speech tagging---grammatical categories
+\item \textbf{Regular Expression}: Pattern matching syntax for text
+\item \textbf{Rule-Based NER}: Pattern-matching approach to entity extraction
+\item \textbf{Statistical NER}: Machine learning approach to entity extraction
+\item \textbf{HMM}: Hidden Markov Model---probabilistic sequence model
+\item \textbf{CRF}: Conditional Random Fields---discriminative sequence model
+\item \textbf{SpaCy}: Industrial-strength NLP library for Python
+\item \textbf{Fine-Tuning}: Continuing training on domain-specific data
+\item \textbf{Catastrophic Forgetting}: Model losing original knowledge during fine-tuning
+\item \textbf{GPE}: Geopolitical Entity (countries, cities, states)
+\item \textbf{NORP}: Nationalities, religious, or political groups
+\item \textbf{displacy}: SpaCy's visualization module
+\item \textbf{NLTK}: Natural Language Toolkit---Python NLP library
+\item \textbf{Context}: Surrounding words that help disambiguate meaning
+\item \textbf{Word Boundary}: \texttt{\textbackslash b} in regex---edges of words
+\end{itemize}
+\end{definitionbox}
+
+\end{document}

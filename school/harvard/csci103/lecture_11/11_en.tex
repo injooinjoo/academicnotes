@@ -1,0 +1,1263 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CSCI E-103: Reproducible Machine Learning - Lecture 11
+% Topic: Developing and Deploying LLMs and Agents
+% Version: 2.1 - English Edition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Table Packages ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Machine Learning}}
+\fancyhead[R]{\small\textit{Lecture 11}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Figures and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Reproducible ML - Lecture 11: Developing and Deploying LLMs and Agents},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Styling
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.72\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CSCI E-103: Reproducible Machine Learning}{Lecture 11}{Anindita Mahapatra \& Eric Gieseke}{Master the fundamentals of Large Language Models (LLMs), Retrieval Augmented Generation (RAG), and AI Agents for enterprise applications}
+
+\tableofcontents
+\newpage
+
+%===============================================================================
+% SECTION 1: Introduction and Executive Summary
+%===============================================================================
+\section{Introduction: The LLM Revolution}
+
+This lecture covers one of the most transformative technologies in modern computing: \textbf{Large Language Models (LLMs)} and \textbf{AI Agents}. We'll explore how these technologies have evolved, how to deploy them effectively in enterprise settings, and how to mitigate their inherent risks.
+
+\begin{overviewbox}
+\textbf{Why This Matters:}
+\begin{itemize}
+    \item LLMs are reaching a \textbf{tipping point} in capability and accessibility
+    \item \textbf{AGI (Artificial General Intelligence)} predictions suggest human-level AI could arrive as soon as 2026
+    \item Every company will become a \textbf{data and AI company} first, with their core business layered on top
+    \item Understanding LLM deployment is now an essential skill for data engineers and ML practitioners
+\end{itemize}
+\end{overviewbox}
+
+\subsection{Learning Objectives}
+
+By the end of this lecture, you will be able to:
+
+\begin{enumerate}
+    \item \textbf{Understand} the evolution from rule-based systems to Generative AI
+    \item \textbf{Explain} key LLM terminology (RAG, Fine-tuning, Embeddings, Hallucination)
+    \item \textbf{Design} LLM deployment strategies based on cost-quality tradeoffs
+    \item \textbf{Implement} RAG systems for enterprise applications
+    \item \textbf{Build} AI agents using Databricks tools (Genie, Agent Bricks, AI Gateway)
+    \item \textbf{Manage} LLM risks including hallucinations, bias, and security vulnerabilities
+\end{enumerate}
+
+%===============================================================================
+% SECTION 2: Evolution of AI
+%===============================================================================
+\section{The Evolution of AI: From Rules to Generation}
+
+\subsection{The AI Technology Stack}
+
+AI technologies form a hierarchical relationship, with each layer building upon the previous:
+
+\begin{center}
+\begin{tabular}{|c|p{10cm}|}
+\hline
+\textbf{Layer} & \textbf{Description} \\
+\hline
+\textbf{Artificial Intelligence} & The broadest category: any system that mimics human intelligence \\
+\hline
+\textbf{Machine Learning} & Systems that learn from data without explicit programming \\
+\hline
+\textbf{Deep Learning} & Neural networks with multiple layers (inspired by the human brain) \\
+\hline
+\textbf{Generative AI} & AI that creates \textit{new} content rather than just classifying existing data \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{infobox}
+\textbf{Key Distinction - Traditional AI vs. Generative AI:}
+\begin{itemize}
+    \item \textbf{Traditional AI:} "Is this email spam or not spam?" (classification)
+    \item \textbf{Generative AI:} "Write me a professional email to decline a meeting" (creation)
+\end{itemize}
+Generative AI goes beyond analysis---it produces \textit{new} data based on patterns learned from existing data.
+\end{infobox}
+
+\subsection{Types of Generative AI Models}
+
+\begin{definitionbox}{LLM (Large Language Model)}
+A neural network trained on vast amounts of text data to understand and generate human language. Examples include GPT-4, Claude, Gemini, and Llama.
+
+\textbf{Analogy:} Think of an LLM as a student who has read every book in the world's largest library and can now discuss any topic or write on any subject.
+\end{definitionbox}
+
+\begin{definitionbox}{GAN (Generative Adversarial Network)}
+A model architecture primarily used for generating images and videos. Used in applications like:
+\begin{itemize}
+    \item \textbf{Deepfakes:} Creating realistic fake videos of people
+    \item \textbf{Style Transfer:} Transforming photos into paintings
+    \item \textbf{Image Generation:} Creating photorealistic images from scratch
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}{Diffusion Models}
+Advanced generative models that create content by gradually removing noise from random data. Powers:
+\begin{itemize}
+    \item \textbf{DALL-E:} Text-to-image generation
+    \item \textbf{Stable Diffusion:} Open-source image generation
+    \item \textbf{Video Generation:} Creating lip-synced avatars
+\end{itemize}
+\end{definitionbox}
+
+%===============================================================================
+% SECTION 3: LLM Capabilities and Use Cases
+%===============================================================================
+\section{LLM Capabilities and Enterprise Use Cases}
+
+\subsection{What Can LLMs Do?}
+
+LLMs have fundamentally changed what's possible with AI:
+
+\begin{enumerate}
+    \item \textbf{Democratize Knowledge Access}
+    \begin{itemize}
+        \item All human knowledge encoded in a single model
+        \item Accessible in any language (multilingual capabilities)
+        \item Available to anyone with internet access
+    \end{itemize}
+
+    \item \textbf{Process Unstructured Data}
+    \begin{itemize}
+        \item Transcribe video/audio to text
+        \item Summarize documents, meeting minutes, patents
+        \item Extract structured data from free-form text
+    \end{itemize}
+
+    \item \textbf{Improve Knowledge Worker Productivity}
+    \begin{itemize}
+        \item Code generation and debugging
+        \item Legal document review
+        \item Customer feedback analysis
+        \item Marketing trend identification
+    \end{itemize}
+
+    \item \textbf{Enable Self-Improvement}
+    \begin{itemize}
+        \item Models can evaluate their own outputs
+        \item Tune product recommendations based on feedback
+        \item Generate training data for other models
+    \end{itemize}
+\end{enumerate}
+
+\begin{examplebox}{Real-World LLM Applications (Demo)}
+The lecture demonstrated a multilingual AI assistant with multiple capabilities:
+
+\textbf{Features Demonstrated:}
+\begin{itemize}
+    \item \textbf{Voice Interaction:} Users speak questions in natural language
+    \item \textbf{Multilingual Response:} System answers in Russian, Spanish, etc.
+    \item \textbf{RAG Integration:} Answers based on specific business knowledge base
+    \item \textbf{Lip-Synced Avatar:} Diffusion model generates realistic speaking animation
+    \item \textbf{E-commerce Search:} "blue sarees" search understands intent despite misspelling
+    \item \textbf{Virtual Try-On:} Diffusion model shows how clothes look on uploaded photos
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Urgency to Adopt LLMs}
+
+\begin{importantbox}{Why Companies Must Move Fast}
+\begin{enumerate}
+    \item \textbf{Competitive Pressure:} Early adopters gain significant advantages
+    \item \textbf{Accessibility:} LLMs are now economical enough for any business
+    \item \textbf{Integration Need:} Must connect LLMs to existing company data
+    \item \textbf{Security Requirements:} Need to customize and secure AI for enterprise use
+\end{enumerate}
+\end{importantbox}
+
+%===============================================================================
+% SECTION 4: Essential LLM Terminology
+%===============================================================================
+\section{Essential LLM Terminology}
+
+Understanding these terms is crucial for working with modern AI systems:
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l p{8cm}}
+\toprule
+\textbf{Term} & \textbf{Definition and Example} \\
+\midrule
+\textbf{Hallucination} & When the model confidently generates false information. \\
+& \textit{Example:} Generating fake URLs that look real but don't exist \\
+\midrule
+\textbf{Temperature} & Controls randomness in outputs (0 = deterministic, 1 = creative) \\
+& Setting to 0 reduces hallucinations but may limit creativity \\
+\midrule
+\textbf{Grounding} & Connecting AI responses to real-world facts and data \\
+& Ensures answers are based on verifiable information \\
+\midrule
+\textbf{Prompt Engineering} & Crafting instructions to get desired behavior from LLMs \\
+& \textit{Example:} "You are a helpful restaurant server..." \\
+\midrule
+\textbf{Zero-Shot Learning} & Asking the model to perform a task with just a prompt \\
+& No examples provided---relies entirely on pre-training \\
+\midrule
+\textbf{Few-Shot Learning} & Providing examples in the prompt to guide the model \\
+& Generally improves accuracy over zero-shot \\
+\midrule
+\textbf{Chain of Thought} & Instructing the model to show its reasoning steps \\
+& Improves accuracy and interpretability \\
+\midrule
+\textbf{Modality} & Type of data: text, image, audio, or video \\
+& \textbf{Multimodal} models handle multiple types (e.g., GPT-4o) \\
+\midrule
+\textbf{Transformer} & Neural network architecture underlying modern LLMs \\
+& Components: Encoder, Decoder, Embeddings \\
+\midrule
+\textbf{RLHF} & Reinforcement Learning from Human Feedback \\
+& Humans rate outputs to improve model behavior \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Essential LLM Terminology}
+\end{table}
+
+%===============================================================================
+% SECTION 5: LLM Deployment Strategies
+%===============================================================================
+\section{LLM Deployment Strategies: The Maturity Curve}
+
+Choosing the right deployment approach depends on your use case, budget, and accuracy requirements.
+
+\subsection{The Four Levels of LLM Customization}
+
+\begin{tcolorbox}[colback=white, colframe=darkblue, title=\textbf{LLM Deployment Strategies (Easy to Hard)}]
+
+\textbf{Level 1: Prompt Engineering}
+\begin{itemize}
+    \item \textbf{What:} Craft careful instructions for existing models
+    \item \textbf{Cost:} Very low (API costs only)
+    \item \textbf{Data Required:} None
+    \item \textbf{Quality:} Basic---limited by model's training cutoff
+    \item \textbf{Best For:} General tasks, quick prototypes
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Level 2: RAG (Retrieval Augmented Generation) --- RECOMMENDED}
+\begin{itemize}
+    \item \textbf{What:} Search your data, feed relevant chunks to the model
+    \item \textbf{Cost:} Low (vector database + slightly more tokens)
+    \item \textbf{Data Required:} Hundreds of thousands of words
+    \item \textbf{Quality:} Good---can include latest information
+    \item \textbf{Best For:} Enterprise knowledge bases, customer support
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Level 3: Fine-Tuning}
+\begin{itemize}
+    \item \textbf{What:} Additional training on domain-specific data
+    \item \textbf{Cost:} Medium (training compute + data preparation)
+    \item \textbf{Data Required:} Millions to billions of tokens
+    \item \textbf{Quality:} High---model becomes domain expert
+    \item \textbf{Best For:} Specialized vocabulary, specific output formats
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Level 4: Pre-Training}
+\begin{itemize}
+    \item \textbf{What:} Building a model from scratch
+    \item \textbf{Cost:} Extremely high (millions of dollars)
+    \item \textbf{Data Required:} Internet-scale (trillions of tokens)
+    \item \textbf{Quality:} Highest---complete control
+    \item \textbf{Best For:} Only Meta, Google, OpenAI-scale companies
+\end{itemize}
+\end{tcolorbox}
+
+\begin{warningbox}
+\textbf{Key Insight:} Most organizations should start with RAG, not fine-tuning or pre-training. RAG provides the best cost-quality tradeoff and allows you to:
+\begin{itemize}
+    \item Include the latest information (no training cutoff)
+    \item Reduce hallucinations (answers grounded in your documents)
+    \item Maintain data privacy (your data stays in your database)
+    \item Update knowledge easily (just update the vector database)
+\end{itemize}
+\end{warningbox}
+
+%===============================================================================
+% SECTION 6: RAG Deep Dive
+%===============================================================================
+\section{RAG: Retrieval Augmented Generation}
+
+RAG is the most cost-effective and practical approach to customizing LLMs for enterprise use.
+
+\subsection{Why RAG Is Necessary}
+
+LLMs have two fundamental limitations:
+
+\begin{enumerate}
+    \item \textbf{Training Cutoff:} Models don't know anything after their training date
+    \begin{itemize}
+        \item GPT-4 doesn't know who won yesterday's election
+        \item Can't answer questions about your company's latest policy
+    \end{itemize}
+
+    \item \textbf{No Access to Private Data:} Models never saw your internal documents
+    \begin{itemize}
+        \item Can't answer "What's our return policy?"
+        \item Can't help with company-specific procedures
+    \end{itemize}
+\end{enumerate}
+
+\begin{infobox}
+\textbf{The RAG Solution:}
+
+RAG gives the LLM an "open book test"---instead of relying solely on memorized knowledge, we search relevant documents and include them in the prompt. The model then answers based on this retrieved context.
+\end{infobox}
+
+\subsection{How RAG Works: The Complete Pipeline}
+
+\begin{definitionbox}{RAG Architecture}
+\textbf{Phase 1: Data Ingestion (Offline, One-Time Setup)}
+\begin{enumerate}
+    \item \textbf{Document Collection:} Gather all relevant documents (PDFs, manuals, policies)
+    \item \textbf{Chunking:} Split documents into smaller pieces (800-1200 characters optimal)
+    \item \textbf{Embedding:} Convert text chunks into numerical vectors (embeddings)
+    \item \textbf{Storage:} Store embeddings in a Vector Database (Pinecone, Chroma, etc.)
+\end{enumerate}
+
+\textbf{Phase 2: Query Processing (Real-Time)}
+\begin{enumerate}
+    \item \textbf{User Query:} User asks a question
+    \item \textbf{Query Embedding:} Convert the question to a vector
+    \item \textbf{Similarity Search:} Find document chunks with similar vectors
+    \item \textbf{Context Augmentation:} Add retrieved chunks to the prompt
+    \item \textbf{LLM Generation:} Model generates answer using retrieved context
+    \item \textbf{Response:} Return answer to user (optionally with source citations)
+\end{enumerate}
+\end{definitionbox}
+
+\begin{examplebox}{RAG Query Flow}
+\textbf{User Question:} "What is our company's remote work policy?"
+
+\textbf{Behind the Scenes:}
+\begin{enumerate}
+    \item Question converted to vector: [0.23, -0.45, 0.67, ...]
+    \item Vector DB searched for similar vectors
+    \item Top 3 most relevant document chunks retrieved:
+    \begin{itemize}
+        \item HR Policy Manual, Section 4.2 (similarity: 0.92)
+        \item Employee Handbook, Chapter 7 (similarity: 0.88)
+        \item COVID-19 Work Guidelines (similarity: 0.85)
+    \end{itemize}
+    \item Prompt sent to LLM:
+    \begin{verbatim}
+Based on the following documents, answer the user's question.
+
+Documents:
+[Retrieved chunks here...]
+
+Question: What is our company's remote work policy?
+    \end{verbatim}
+    \item LLM generates response grounded in the documents
+\end{enumerate}
+\end{examplebox}
+
+\subsection{RAG Best Practices}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l p{8cm}}
+\toprule
+\textbf{Parameter} & \textbf{Recommendation} \\
+\midrule
+Chunk Size & 800-1200 characters (optimal for semantic coherence) \\
+Chunk Overlap & 100-200 characters (ensures context isn't lost at boundaries) \\
+Number of Retrieved Chunks & 3-5 (balance between context and token limits) \\
+Embedding Model & OpenAI Ada, Sentence Transformers, Cohere Embed \\
+Vector Database & Pinecone, Chroma, Milvus, PostgreSQL with pgvector \\
+\bottomrule
+\end{tabular}
+\caption{RAG Configuration Best Practices}
+\end{table}
+
+\begin{importantbox}{Common RAG Pitfall: Version Management}
+\textbf{Problem:} When policies are updated, old versions remain in the vector database. The LLM might retrieve outdated information.
+
+\textbf{Solutions:}
+\begin{itemize}
+    \item Replace entire documents when updating (full CRUD support)
+    \item Add metadata timestamps and filter by date
+    \item Include version numbers in document content
+    \item Periodic reindexing to remove stale content
+\end{itemize}
+\end{importantbox}
+
+%===============================================================================
+% SECTION 7: Databricks AI Tools
+%===============================================================================
+\section{Databricks AI Platform: Tools and Capabilities}
+
+Databricks provides an integrated platform for building, deploying, and managing LLM applications.
+
+\subsection{Platform Architecture Overview}
+
+\begin{center}
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{Component} & \textbf{Purpose} \\
+\hline
+\textbf{Unity Catalog} & Governance for all assets (tables, models, functions, vector indices) \\
+\hline
+\textbf{Delta Sharing} & Zero-copy data sharing without ETL \\
+\hline
+\textbf{Feature Store} & Store and serve ML features \\
+\hline
+\textbf{Model Registry} & Version and manage ML models (part of MLflow) \\
+\hline
+\textbf{Vector Search} & Managed vector database for RAG applications \\
+\hline
+\textbf{AI Gateway} & Central entry point for all models with security, logging, rate limiting \\
+\hline
+\textbf{Lakehouse Apps} & Interactive applications built on top of data and models \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Genie: Natural Language to SQL}
+
+\begin{definitionbox}{Genie}
+Genie is an agentic BI tool that allows users to query structured data using natural language.
+
+\textbf{How It Works:}
+\begin{enumerate}
+    \item User asks: "What were our top 5 products by sales last month?"
+    \item Genie examines table metadata (schemas, column names)
+    \item Generates SQL: \texttt{SELECT name, SUM(sales) FROM products...}
+    \item Executes query and returns results in natural language
+\end{enumerate}
+
+\textbf{Key Advantage:} Because Genie generates SQL from metadata (not data), it hallucinates less than general LLMs. The schema is deterministic---a column either exists or it doesn't.
+\end{definitionbox}
+
+\begin{lstlisting}[style=sqlstyle, caption={Genie-Generated SQL Example}]
+-- User Question: "Show average premium by occupation and risk level"
+-- Genie generates:
+SELECT
+    occupation_type,
+    risk_level,
+    AVG(premium_amount) as avg_premium
+FROM insurance_policies
+GROUP BY occupation_type, risk_level
+ORDER BY avg_premium DESC;
+\end{lstlisting}
+
+\subsection{Agent Bricks: No-Code RAG Agent Builder}
+
+\begin{definitionbox}{Agent Bricks}
+Agent Bricks is like AutoML for RAG agents---build production-ready chatbots without coding.
+
+\textbf{Steps to Create a Knowledge Assistant:}
+\begin{enumerate}
+    \item Upload documents to Unity Catalog Volume
+    \item Select the volume path in Agent Bricks
+    \item Provide a name and description
+    \item Click "Create Agent"
+    \item System automatically: chunks documents, creates embeddings, builds vector index
+\end{enumerate}
+
+\textbf{Use Cases:}
+\begin{itemize}
+    \item Customer support chatbots
+    \item Internal policy assistants
+    \item Technical documentation search
+    \item HR FAQ systems
+\end{itemize}
+\end{definitionbox}
+
+\subsection{AI Functions: SQL-Native AI}
+
+Execute LLM capabilities directly within SQL queries:
+
+\begin{lstlisting}[style=sqlstyle, caption={AI Functions in SQL}]
+-- Analyze sentiment and summarize customer reviews
+SELECT
+    review_id,
+    review_text,
+    ai_analyze_sentiment(review_text) AS sentiment,
+    ai_summarize(review_text, 20) AS summary
+FROM customer_reviews
+WHERE created_date > '2025-01-01';
+
+-- Extract specific information from text
+SELECT
+    ai_extract(contract_text, 'termination_clause') AS termination_clause,
+    ai_extract(contract_text, 'payment_terms') AS payment_terms
+FROM legal_contracts;
+\end{lstlisting}
+
+\subsection{AI Gateway: Central Model Management}
+
+\begin{infobox}
+\textbf{AI Gateway} provides a unified entry point for all model interactions:
+
+\begin{itemize}
+    \item \textbf{Rate Throttling:} Prevent API abuse and control costs
+    \item \textbf{Credential Management:} Centralized API key handling
+    \item \textbf{Payload Logging:} Record all requests/responses for auditing
+    \item \textbf{A/B Testing:} Route traffic between model versions
+    \item \textbf{Guardrails:} Content filtering and safety checks
+\end{itemize}
+
+\textbf{Analogy:} AI Gateway is like Amazon API Gateway, but specifically designed for ML model endpoints.
+\end{infobox}
+
+\subsection{Unity Catalog Functions as Agent Tools}
+
+You can register SQL functions in Unity Catalog and use them as tools for AI agents:
+
+\begin{lstlisting}[style=sqlstyle, caption={UC Function as Agent Tool}]
+-- Create a function that agents can call
+CREATE FUNCTION catalog.schema.get_client_quote(client_name STRING)
+RETURNS TABLE (
+    quote_id STRING,
+    client STRING,
+    coverage DECIMAL,
+    premium_estimate DECIMAL,
+    product_option STRING,
+    health_rating STRING
+)
+COMMENT 'Returns all quote details for a specified client'
+AS
+SELECT
+    quote_id, client, coverage,
+    premium_estimate, product_option, health_rating
+FROM insurance_quotes
+WHERE client = client_name;
+\end{lstlisting}
+
+\begin{examplebox}{Multi-Agent Supervisor}
+The most advanced pattern is a \textbf{Multi-Agent Supervisor} that orchestrates multiple specialized agents:
+
+\textbf{Architecture:}
+\begin{enumerate}
+    \item \textbf{Supervisor Agent:} Understands user intent and routes requests
+    \item \textbf{Genie Agent:} Handles structured data queries (SQL)
+    \item \textbf{Knowledge Assistant:} Handles unstructured data (RAG)
+    \item \textbf{UC Functions:} Execute specific business logic
+    \item \textbf{External MCP Servers:} Connect to external services
+\end{enumerate}
+
+\textbf{Example Flow:}
+\begin{itemize}
+    \item User: "What's the risk score for John Smith and explain our underwriting policy?"
+    \item Supervisor: Routes "risk score" to Genie, "underwriting policy" to Knowledge Assistant
+    \item Both agents execute in parallel
+    \item Responses combined and returned to user
+\end{itemize}
+\end{examplebox}
+
+%===============================================================================
+% SECTION 8: LLM Risks and Mitigation
+%===============================================================================
+\section{LLM Risks, Limitations, and Mitigation}
+
+With great power comes great responsibility. LLMs introduce new categories of risk that must be actively managed.
+
+\subsection{Hallucination: The Confident Liar}
+
+\begin{definitionbox}{Hallucination}
+When an LLM generates plausible-sounding but factually incorrect information with complete confidence.
+
+\textbf{Why It Happens:}
+\begin{itemize}
+    \item LLMs are trained to generate \textit{fluent} responses, not necessarily \textit{true} ones
+    \item Models are rewarded for providing answers, even when they should say "I don't know"
+    \item Pattern matching can produce text that looks correct but isn't
+\end{itemize}
+
+\textbf{Example:} When asked to generate image URLs, ChatGPT confidently produces URLs that look legitimate but lead to 404 errors.
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{Can Hallucination Be Eliminated?}
+
+No---hallucination is intrinsic to the generative nature of LLMs. It's like asking if floating-point rounding errors can be eliminated. However, it can be \textbf{significantly reduced}:
+
+\begin{itemize}
+    \item Set temperature to 0 (most deterministic output)
+    \item Use RAG to ground responses in verified documents
+    \item Implement chain-of-thought prompting for reasoning transparency
+    \item Add guardrail models to verify outputs
+    \item Design prompts that explicitly allow "I don't know" responses
+\end{itemize}
+\end{warningbox}
+
+\subsection{Bias: Reflections of Training Data}
+
+\begin{itemize}
+    \item \textbf{Source:} Models inherit biases present in their training data
+    \item \textbf{Example:} A model trained primarily on US medical data may give incorrect recommendations for diseases more prevalent in other regions
+    \item \textbf{Impact:} Can perpetuate discrimination, exclusion, and unfair treatment
+\end{itemize}
+
+\textbf{Mitigation Strategies:}
+\begin{enumerate}
+    \item Ensure training data diversity
+    \item Explicitly document known limitations
+    \item Implement fairness testing and auditing
+    \item Use human review for high-stakes decisions
+\end{enumerate}
+
+\subsection{Security Threats}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l p{5cm} p{5cm}}
+\toprule
+\textbf{Threat} & \textbf{Description} & \textbf{Mitigation} \\
+\midrule
+Prompt Injection & Malicious inputs that trick the model into ignoring instructions & Input validation, prompt sanitization \\
+\midrule
+Jailbreaking & Bypassing safety guardrails to generate harmful content & Multiple layers of content filtering \\
+\midrule
+Data Exfiltration & Model reveals sensitive training data & Data sanitization, PII masking \\
+\midrule
+Multilingual Attacks & Using non-English prompts to bypass safety filters & Multilingual safety testing \\
+\bottomrule
+\end{tabular}
+\caption{LLM Security Threats and Mitigations}
+\end{table}
+
+\subsection{Privacy and Regulatory Compliance}
+
+\begin{importantbox}{EU AI Act}
+Europe's \textbf{EU AI Act} mandates disclosure of:
+\begin{itemize}
+    \item Training data sources
+    \item Compute resources used
+    \item Model deployment details
+    \item Known limitations and biases
+\end{itemize}
+
+\textbf{Implication:} Significant documentation overhead, but ensures responsible AI development.
+\end{importantbox}
+
+\subsection{Ethical Considerations and ESG}
+
+\begin{definitionbox}{ESG (Environmental, Social, Governance)}
+Companies are increasingly evaluated on their ESG scores:
+
+\begin{itemize}
+    \item \textbf{Environmental (E):} LLM training consumes enormous energy. A single GPT-4 training run can emit hundreds of tons of CO2.
+    \item \textbf{Social (S):} AI systems that discriminate or generate toxic content harm society.
+    \item \textbf{Governance (G):} Proper oversight, audit trails, and accountability mechanisms.
+\end{itemize}
+
+\textbf{Key Insight:} Laws can be enforced, but ethics must be culturally adopted. As AI practitioners, we have a collective moral responsibility.
+\end{definitionbox}
+
+%===============================================================================
+% SECTION 9: The Future of AI
+%===============================================================================
+\section{The Future: AGI, Superintelligence, and Societal Impact}
+
+\subsection{The Path to AGI}
+
+\begin{definitionbox}{AGI and Superintelligence}
+\begin{itemize}
+    \item \textbf{AGI (Artificial General Intelligence):} AI as capable as humans across all cognitive tasks. Predictions suggest this could arrive as early as 2026.
+    \item \textbf{Superintelligence:} AI that surpasses human intelligence by orders of magnitude. Once achieved, could rapidly self-improve.
+\end{itemize}
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{Book Recommendation: "Superintelligence" by Nick Bostrom}
+
+This book explores what happens when AI becomes smarter than humans:
+\begin{itemize}
+    \item The "alignment problem": ensuring AI goals match human values
+    \item Existential risks from uncontrolled AI development
+    \item The importance of safety research before capability research
+\end{itemize}
+
+As practitioners building these systems, we have a responsibility to understand these risks.
+\end{warningbox}
+
+\subsection{Impact on Employment}
+
+\begin{infobox}
+\textbf{The Changing Job Landscape:}
+\begin{itemize}
+    \item \textbf{Entry-level jobs:} Most at risk---routine cognitive tasks easily automated
+    \item \textbf{Experienced practitioners:} Demand increasing---someone must build and maintain AI systems
+    \item \textbf{New roles emerging:} Prompt engineers, AI ethics officers, AI trainers
+\end{itemize}
+
+\textbf{The Paradox:} If entry-level jobs disappear, how do workers gain experience to become senior practitioners? This is a fundamental societal challenge we must address.
+\end{infobox}
+
+\subsection{AI as a Democratizing Force}
+
+Despite risks, LLMs also offer tremendous positive potential:
+
+\begin{enumerate}
+    \item \textbf{Education:} AI tutors available 24/7, personalized to each student (Khan Academy's vision)
+    \item \textbf{Knowledge Transfer:} Bridging the gap between retiring domain experts and new workers
+    \item \textbf{Global Access:} Multilingual capabilities enable knowledge access regardless of native language
+    \item \textbf{Government Efficiency:} Albania using LLMs to reduce corruption in government contracting
+    \item \textbf{Healthcare:} Democratizing access to medical knowledge in underserved regions
+\end{enumerate}
+
+%===============================================================================
+% SECTION 10: AI Maturity Curve for Enterprises
+%===============================================================================
+\section{AI Maturity Curve: Building Enterprise AI Capability}
+
+\subsection{The Progression from BI to AI}
+
+\begin{center}
+\begin{tabular}{|c|p{7cm}|c|}
+\hline
+\textbf{Stage} & \textbf{Description} & \textbf{Complexity} \\
+\hline
+\textbf{BI/Dashboards} & Traditional reporting: what happened? & Low \\
+\hline
+\textbf{AI Functions} & SQL-native AI: sentiment, summarization & Medium-Low \\
+\hline
+\textbf{Knowledge Agents} & RAG-based Q\&A on documents & Medium \\
+\hline
+\textbf{Multi-Tool Agents} & Agents that call multiple functions/APIs & Medium-High \\
+\hline
+\textbf{Multi-Agent Orchestration} & Supervisor routing to specialized agents & High \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Use Case Selection: Start Smart}
+
+\begin{importantbox}{Selecting Your First LLM Use Case}
+Your first LLM project determines organizational adoption momentum. Choose wisely:
+
+\textbf{Ideal First Use Case:}
+\begin{itemize}
+    \item \textbf{High Feasibility:} Technical complexity is manageable
+    \item \textbf{High Value:} Clear ROI that stakeholders can see
+    \item \textbf{Low Risk:} Mistakes don't cause major harm
+    \item \textbf{Reusable:} Learnings apply to future projects
+\end{itemize}
+
+\textbf{Bad First Use Case:}
+\begin{itemize}
+    \item The "hottest" or most ambitious idea
+    \item Customer-facing without extensive testing
+    \item Mission-critical with no fallback
+\end{itemize}
+\end{importantbox}
+
+\subsection{Key Principles for Enterprise AI}
+
+\begin{enumerate}
+    \item \textbf{Every company will be a data and AI company first}---core business becomes secondary
+    \item \textbf{Differentiation comes from your data}, not the model---everyone can use ChatGPT
+    \item \textbf{Many small, purpose-built models} often beat one giant model
+    \item \textbf{Models are improving and getting cheaper}---what's impossible today may be trivial tomorrow
+    \item \textbf{Benefits outweigh risks}, but only with proper guardrails
+\end{enumerate}
+
+%===============================================================================
+% SECTION 11: Practical Lab Guide
+%===============================================================================
+\section{Practical Lab Guide: Building Agents in Databricks}
+
+\subsection{Lab Overview}
+
+The lecture included hands-on demonstrations of building three types of agents:
+
+\begin{enumerate}
+    \item \textbf{Genie Space:} Natural language queries on structured insurance data
+    \item \textbf{Knowledge Assistant:} RAG agent for underwriting guidelines PDF
+    \item \textbf{Multi-Agent Supervisor:} Orchestrating multiple specialized agents
+\end{enumerate}
+
+\subsection{Step-by-Step: Creating a Knowledge Assistant}
+
+\begin{lstlisting}[style=pythonstyle, caption={Setting Up the Data}]
+# Step 1: Get catalog and schema from widgets
+catalog_name = dbutils.widgets.get("catalog_name")
+schema_name = dbutils.widgets.get("schema_name")
+
+# Step 2: Create schema if not exists
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.{schema_name}")
+
+# Step 3: Upload documents to Volume
+# Documents should be in: /Volumes/{catalog}/{schema}/{volume_name}/
+
+# Step 4: Create tables and functions
+spark.sql(f"""
+CREATE TABLE IF NOT EXISTS {catalog_name}.{schema_name}.insurance_quotes (
+    quote_id STRING,
+    client STRING,
+    coverage DECIMAL(10,2),
+    premium_estimate DECIMAL(10,2),
+    product_option STRING,
+    health_rating STRING
+)
+""")
+\end{lstlisting}
+
+\subsection{Agent Testing in Playground}
+
+Once your agent is created, use the Playground for testing:
+
+\begin{enumerate}
+    \item Navigate to the agent in the Databricks UI
+    \item Click "Open in Playground"
+    \item Enter test questions
+    \item Review:
+    \begin{itemize}
+        \item Response content and accuracy
+        \item Token usage and latency
+        \item Source citations (for RAG)
+        \item Chain of thought reasoning (if enabled)
+    \end{itemize}
+    \item Enable "AI Judge" for automated evaluation
+    \item Compare responses across different models
+\end{enumerate}
+
+\begin{examplebox}{Playground Testing}
+\textbf{Question:} "How are applications categorized into preferred plus, preferred, standard, or substandard?"
+
+\textbf{Agent Response:} "The system uses a multi-tier risk classification system to categorize applicants based on their overall risk profile..."
+
+\textbf{Citations:}
+\begin{itemize}
+    \item Page 1: Risk Classification Criteria
+    \item Page 1: Underwriting Process Flow
+\end{itemize}
+
+\textbf{Metrics:}
+\begin{itemize}
+    \item Tokens used: 847
+    \item Latency: 2.3 seconds
+    \item AI Judge score: 4.5/5
+\end{itemize}
+\end{examplebox}
+
+%===============================================================================
+% SECTION 12: Quick Summary
+%===============================================================================
+\section{Quick Summary: One-Page Review}
+
+\begin{summarybox}
+\textbf{Key Takeaways from Lecture 11:}
+
+\begin{enumerate}
+    \item \textbf{AI Evolution:} Rule-based $\to$ ML $\to$ Deep Learning $\to$ \textbf{Generative AI (LLMs)}
+
+    \item \textbf{LLM Deployment Strategy:} Start with \textbf{RAG} (not fine-tuning or pre-training)
+    \begin{itemize}
+        \item Most cost-effective approach
+        \item Grounds responses in your data
+        \item Reduces hallucinations
+        \item Easy to update knowledge
+    \end{itemize}
+
+    \item \textbf{RAG Pipeline:} Chunk $\to$ Embed $\to$ Store in Vector DB $\to$ Retrieve $\to$ Generate
+
+    \item \textbf{Databricks Tools:}
+    \begin{itemize}
+        \item \textbf{Genie:} Structured data (SQL), high accuracy
+        \item \textbf{Agent Bricks:} Unstructured data (PDF), rapid prototyping
+        \item \textbf{AI Gateway:} Security, logging, rate limiting
+        \item \textbf{AI Functions:} SQL-native AI capabilities
+        \item \textbf{UC Functions:} Custom tools for agents
+    \end{itemize}
+
+    \item \textbf{Critical Risks:}
+    \begin{itemize}
+        \item Hallucination (false confidence)
+        \item Bias (discriminatory outputs)
+        \item Security (prompt injection, data leakage)
+        \item Privacy (PII exposure)
+    \end{itemize}
+
+    \item \textbf{Mitigation Strategies:}
+    \begin{itemize}
+        \item RAG for grounding
+        \item Temperature = 0 for determinism
+        \item Guardrail models for verification
+        \item Human-in-the-loop for high stakes
+        \item RLHF for continuous improvement
+    \end{itemize}
+
+    \item \textbf{Future Outlook:}
+    \begin{itemize}
+        \item AGI potentially by 2026
+        \item Every company becomes AI-first
+        \item Differentiation through proprietary data
+        \item Ethical AI is mandatory, not optional
+    \end{itemize}
+\end{enumerate}
+\end{summarybox}
+
+%===============================================================================
+% SECTION 13: FAQ and Class Discussions
+%===============================================================================
+\section{Frequently Asked Questions (From Class Discussion)}
+
+\textbf{Q: Are hallucinations intrinsic to LLMs, or can they be eliminated?}
+
+A: Hallucinations are inherent to the generative nature of LLMs. The models are trained to produce fluent outputs, not necessarily true ones. While they can be significantly reduced (RAG, temperature=0, careful prompting), they likely cannot be completely eliminated. Think of it like irreducible error in traditional ML---some error will always remain.
+
+\vspace{1em}
+
+\textbf{Q: How do we handle document versioning in RAG?}
+
+A: This is a complex problem. If you have Policy v1, v2, and v3 all indexed, the model might retrieve outdated information. Solutions:
+\begin{itemize}
+    \item Replace entire documents when updating (full CRUD)
+    \item Add timestamp metadata and filter by recency
+    \item Use relationship graphs to link document versions
+    \item Explicitly include version numbers in your documents
+\end{itemize}
+
+\vspace{1em}
+
+\textbf{Q: Why does ChatGPT seem to "remember" me across sessions?}
+
+A: Modern LLMs like ChatGPT store conversation histories and can summarize past interactions. They don't have true memory, but they can retrieve and reference previous conversations to provide more personalized responses. This feels like memory but is actually sophisticated context retrieval.
+
+\vspace{1em}
+
+\textbf{Q: What are we doing to prevent prompt injection and jailbreaks?}
+
+A: This is the "alignment problem"---ensuring models behave as intended. Current approaches include:
+\begin{itemize}
+    \item Guardrails and content filtering
+    \item Input validation and sanitization
+    \item Using larger models as judges/guards
+    \item RLHF to train models to refuse malicious requests
+    \item Regulatory frameworks (EU AI Act)
+\end{itemize}
+
+As practitioners, we have a responsibility to implement these safeguards and advocate for responsible AI development.
+
+\end{document}

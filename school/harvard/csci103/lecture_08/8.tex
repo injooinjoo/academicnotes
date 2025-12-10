@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Harvard Academic Notes - 통합 마스터 템플릿
 % 모든 강의 노트에 적용되는 통일된 스타일
-% 버전: 2.0
-% 최종 수정일: 2025-10-26
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[11pt,a4paper]{article}
@@ -15,10 +15,10 @@
 \usepackage{kotex}
 
 % --- 페이지 레이아웃 ---
-\usepackage[margin=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing                      % 1.5배 줄간격
-\setlength{\parskip}{0.6em}          % 문단 간격
+\setlength{\parskip}{0.5em}          % 문단 간격
 \setlength{\parindent}{0pt}          % 들여쓰기 없음
 
 % --- 표 관련 ---
@@ -26,7 +26,7 @@
 \usepackage{tabularx}              % 자동 너비 조절 표
 \usepackage{array}                 % 표 컬럼 확장
 \usepackage{longtable}             % 여러 페이지 표
-\renewcommand{\arraystretch}{1.2}  % 표 행간 조절
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
 
 %========================================================================================
 % 헤더 및 푸터
@@ -388,35 +388,12 @@
 
 \begin{document}
 
-\begin{titlepage}
-  \centering
-  \vspace*{\stretch{1.0}}
-  
-  {\Huge\bfseries CSCI E-103\\[0.5em] 재현 가능한 머신러닝\par}
-  \vspace{0.5cm}
-  {\LARGE\itshape Lecture 08: Towards Reproducible Machine Learning\par}
-  
-  \vspace{1.5cm}
-  
-  {\Large 강의 내용 통합 및 해설 노트\par}
-  
-  \vspace*{\stretch{2.0}}
-  
-  {\large \today\par}
-\end{titlepage}
+\maketitle
 \thispagestyle{firstpage}
 
 \metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 08}{Anindita Mahapatra & Eric Gieseke}{Lecture 08의 핵심 개념 학습}
 
 
-\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 08}{Anindita Mahapatra & Eric Gieseke}{Lecture 08의 핵심 개념 학습}
-
-
-% 메인 제목 페이지에는 헤더/푸터 없음
-
-\newpage
-
-% --- 목차 ---
 \tableofcontents
 
 \newpage
@@ -662,36 +639,21 @@ ML 프로젝트는 여러 전문가의 협업으로 이루어집니다. 각자�
 
 모든 ML 프로젝트는 다음과 같은 단계를 반복하는 순환 고리(Loop)입니다.
 
-\begin{tcolorbox}[
-  title={ML 프로젝트의 6단계 수명 주기},
-  colframe=blue!75!black,
-  colback=blue!5!white,
-  fonttitle=\bfseries,
-  breakable,
-  enhanced,
-  overlay={\draw[->,line width=1pt,blue!60!black] (tcb.north west) -- (tcb.north east);},
-  overlay unbroken and first={
-    \draw[->,line width=2pt,blue!60!black,opacity=0.7]
-      ([xshift=1cm]frame.west) -- node[right,black,opacity=1] {\textbf{1. 원본 데이터 (Raw Data)}} ([xshift=4cm]frame.west);
-    \draw[->,line width=2pt,blue!60!black,opacity=0.7]
-      ([xshift=5cm]frame.west) -- node[right,black,opacity=1] {\textbf{2. ETL (정제)}} ([xshift=7cm]frame.west);
-    \draw[->,line width=2pt,blue!60!black,opacity=0.7]
-      ([xshift=8cm]frame.west) -- node[right,black,opacity=1] {\textbf{3. 피처화 (Featurize)}} ([xshift=11cm]frame.west);
-    
-    \draw[->,line width=2pt,blue!60!black,opacity=0.7]
-      ([yshift=-1.5cm]frame.west) -- node[right,black,opacity=1] {\textbf{6. 모니터링 (Monitor)}} ([xshift=4cm,yshift=-1.5cm]frame.west);
-    \draw[<-,line width=2pt,blue!60!black,opacity=0.7]
-      ([xshift=5cm,yshift=-1.5cm]frame.west) -- node[right,black,opacity=1] {\textbf{5. 서빙/추론 (Serve)}} ([xshift=7cm,yshift=-1.5cm]frame.west);
-    \draw[<-,line width=2pt,blue!60!black,opacity=0.7]
-      ([xshift=8cm,yshift=-1.5cm]frame.west) -- node[right,black,opacity=1] {\textbf{4. 훈련 (Train)}} ([xshift=11cm,yshift=-1.5cm]frame.west);
-      
-    % Feedback Loop
-    \draw[->,line width=1.5pt,red!70!black,dashed]
-      ([xshift=3cm,yshift=-1.5cm]frame.west) .. controls ([xshift=-1cm,yshift=-3cm]frame.west) and ([xshift=-1cm,yshift=0cm]frame.west) .. node[left,black,opacity=1, pos=0.8] {\textbf{피드백 (Drift 감지)}} ([xshift=2cm]frame.west);
-  }
-]
-\vspace{2.5cm}
-\end{tcolorbox}
+\begin{infobox}
+\textbf{ML 프로젝트의 6단계 수명 주기}
+
+\textbf{순방향 프로세스:}
+\begin{enumerate}[itemsep=0pt]
+    \item \textbf{원본 데이터 (Raw Data)} $\rightarrow$
+    \item \textbf{ETL (정제)} $\rightarrow$
+    \item \textbf{피처화 (Featurize)} $\rightarrow$
+    \item \textbf{훈련 (Train)} $\rightarrow$
+    \item \textbf{서빙/추론 (Serve)} $\rightarrow$
+    \item \textbf{모니터링 (Monitor)}
+\end{enumerate}
+
+\textbf{피드백 루프:} 모니터링 결과 성능 저하 감지 시 $\rightarrow$ 1단계로 돌아가 재훈련
+\end{infobox}
 
 \begin{enumerate}
     \item \textbf{데이터 준비 (Raw Data $\to$ ETL)}: 원본 데이터를 수집하고 정제합니다.

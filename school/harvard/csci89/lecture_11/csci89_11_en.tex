@@ -1,0 +1,760 @@
+% CSCI E-89B: Natural Language Processing
+% Lecture 11: Sequence Models - HMMs, CRFs, and Beyond
+% English Version
+
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning}
+
+% ============================================================
+% PAGE SETUP
+% ============================================================
+\geometry{margin=25mm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{CSCI E-89B: Natural Language Processing}
+\fancyhead[R]{Lecture 11}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================
+% COLORS
+% ============================================================
+\definecolor{harvardcrimson}{RGB}{165,28,48}
+\definecolor{codegreen}{RGB}{34,139,34}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codepurple}{RGB}{148,0,211}
+\definecolor{backcolour}{RGB}{248,248,248}
+\definecolor{darkblue}{RGB}{0,0,139}
+
+% ============================================================
+% CODE LISTING STYLE
+% ============================================================
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{harvardcrimson},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+\lstset{style=pythonstyle}
+
+% ============================================================
+% TCOLORBOX ENVIRONMENTS
+% ============================================================
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{summarybox}[1][]{
+    colback=red!5!white,
+    colframe=harvardcrimson,
+    fonttitle=\bfseries,
+    title=Summary,
+    breakable,
+    #1
+}
+
+\newtcolorbox{overviewbox}[1][]{
+    colback=blue!5!white,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Overview,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    colback=cyan!5!white,
+    colframe=cyan!60!black,
+    fonttitle=\bfseries,
+    title=Information,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    colback=yellow!10!white,
+    colframe=orange!80!black,
+    fonttitle=\bfseries,
+    title=Warning,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=Example,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    colback=purple!5!white,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    colback=red!10!white,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important,
+    breakable,
+    #1
+}
+
+% ============================================================
+% CUSTOM COMMANDS
+% ============================================================
+\newcommand{\metainfo}[4]{
+    \begin{tcolorbox}[colback=gray!10, colframe=gray!50, title=Lecture Information]
+    \begin{tabular}{@{}ll}
+    \textbf{Course:} & #1 \\
+    \textbf{Lecture:} & #2 \\
+    \textbf{Topic:} & #3 \\
+    \textbf{Date:} & #4 \\
+    \end{tabular}
+    \end{tcolorbox}
+}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
+\begin{document}
+
+\metainfo{CSCI E-89B: Natural Language Processing}{Lecture 11}{Sequence Models: HMMs, CRFs, and Generative Models}{Fall 2024}
+
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Introduction to Sequence Models}
+% ============================================================
+
+\begin{overviewbox}
+This lecture covers probabilistic sequence models used in NLP: Markov Chains, Hidden Markov Models (HMMs), and Conditional Random Fields (CRFs). We also explore how to combine these with neural networks (BiLSTM-CRF) and introduce generative models like VAEs and GANs.
+\end{overviewbox}
+
+
+% ============================================================
+\section{Markov Chains}
+% ============================================================
+
+\begin{overviewbox}
+Markov chains model sequences where the probability of each element depends only on the previous element. This ``memoryless'' property, called the Markov property, simplifies modeling but limits expressiveness.
+\end{overviewbox}
+
+\subsection{Definition and Structure}
+
+\begin{definitionbox}[title=Markov Chain]
+A \textbf{Markov chain} is a sequence of random variables $X_1, X_2, \ldots, X_T$ satisfying the \textbf{Markov property}:
+\[
+P(X_{t+1} | X_t, X_{t-1}, \ldots, X_1) = P(X_{t+1} | X_t)
+\]
+
+The future depends only on the present, not on the past.
+\end{definitionbox}
+
+\begin{examplebox}[title=Weather as Markov Chain]
+States: \{Sunny, Rainy, Cloudy\}
+
+Transition probabilities:
+\begin{center}
+\begin{tabular}{l|ccc}
+From/To & Sunny & Rainy & Cloudy \\
+\hline
+Sunny & 0.7 & 0.1 & 0.2 \\
+Rainy & 0.2 & 0.5 & 0.3 \\
+Cloudy & 0.3 & 0.3 & 0.4 \\
+\end{tabular}
+\end{center}
+
+Each row sums to 1 (must transition somewhere).
+\end{examplebox}
+
+\subsection{Transition Probabilities}
+
+\begin{definitionbox}[title=Transition Matrix]
+For states $\{1, 2, \ldots, N\}$, the \textbf{transition probability} from state $i$ to state $j$ is:
+\[
+P_{ij} = P(X_{t+1} = j | X_t = i)
+\]
+
+Constraints:
+\begin{itemize}
+\item $P_{ij} \geq 0$ (non-negative)
+\item $\sum_{j=1}^{N} P_{ij} = 1$ (rows sum to 1)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{NLP Application: Language Modeling}
+
+\begin{examplebox}[title=Bigram Language Model]
+Treat words as states. Transition probabilities model word sequences:
+\[
+P(\text{``sat''} | \text{``cat''}) = 0.15
+\]
+
+A sentence's probability:
+\[
+P(\text{``the cat sat''}) = P(\text{the}) \cdot P(\text{cat}|\text{the}) \cdot P(\text{sat}|\text{cat})
+\]
+\end{examplebox}
+
+\subsection{Limitations of Markov Chains}
+
+\begin{warningbox}[title=The Markov Assumption is Limiting]
+\begin{itemize}
+\item Only previous word matters---ignores long-range dependencies
+\item ``The cat that I saw yesterday \underline{sat}'' vs ``The cats that I saw yesterday \underline{sat}''
+\item Solution: Use n-grams (state = last n-1 words) or neural models
+\end{itemize}
+\end{warningbox}
+
+
+% ============================================================
+\section{Hidden Markov Models (HMMs)}
+% ============================================================
+
+\begin{overviewbox}
+HMMs extend Markov chains by introducing \textbf{hidden states} that generate \textbf{observations}. We observe the outputs but not the underlying state sequence.
+\end{overviewbox}
+
+\subsection{Motivation}
+
+\begin{infobox}[title=Why Hidden States?]
+In language, we observe words but not their underlying structure:
+\begin{itemize}
+\item \textbf{Observed}: ``The cat sat on the mat''
+\item \textbf{Hidden}: DET NOUN VERB PREP DET NOUN (part-of-speech tags)
+\end{itemize}
+
+The hidden states (POS tags) follow Markov dynamics, and each state ``emits'' an observed word.
+\end{infobox}
+
+\subsection{HMM Structure}
+
+\begin{definitionbox}[title=Hidden Markov Model Components]
+An HMM consists of:
+\begin{enumerate}
+\item \textbf{Hidden states}: $Y_1, Y_2, \ldots, Y_T$ (e.g., POS tags)
+\item \textbf{Observations}: $X_1, X_2, \ldots, X_T$ (e.g., words)
+\item \textbf{Transition probabilities}: $P(Y_{t+1} = j | Y_t = i) = A_{ij}$
+\item \textbf{Emission probabilities}: $P(X_t = x | Y_t = j) = B_{jx}$
+\item \textbf{Initial state distribution}: $\pi_i = P(Y_1 = i)$
+\end{enumerate}
+\end{definitionbox}
+
+\begin{examplebox}[title=POS Tagging as HMM]
+\textbf{Hidden states}: \{NOUN, VERB, DET, ADJ, PREP, ...\}
+
+\textbf{Observations}: \{the, cat, sat, on, mat, ...\}
+
+\textbf{Transitions} (e.g.):
+\begin{itemize}
+\item $P(\text{VERB}|\text{NOUN}) = 0.35$ (nouns often followed by verbs)
+\item $P(\text{NOUN}|\text{DET}) = 0.60$ (determiners often followed by nouns)
+\end{itemize}
+
+\textbf{Emissions} (e.g.):
+\begin{itemize}
+\item $P(\text{``cat''}|\text{NOUN}) = 0.002$
+\item $P(\text{``sat''}|\text{VERB}) = 0.001$
+\end{itemize}
+\end{examplebox}
+
+\subsection{HMM Parameters}
+
+\begin{definitionbox}[title=HMM Parameter Summary]
+\[
+\lambda = (A, B, \pi)
+\]
+where:
+\begin{itemize}
+\item $A$: Transition matrix ($N \times N$ for $N$ hidden states)
+\item $B$: Emission matrix ($N \times V$ for vocabulary size $V$)
+\item $\pi$: Initial state distribution (length $N$)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Training HMMs}
+
+\begin{importantbox}
+\textbf{If hidden states are observed} (supervised training):
+\begin{itemize}
+\item Count transitions and emissions directly
+\item Estimate probabilities via maximum likelihood
+\end{itemize}
+
+\textbf{If hidden states are NOT observed} (unsupervised):
+\begin{itemize}
+\item Use \textbf{Baum-Welch algorithm} (a form of EM)
+\item E-step: Estimate expected counts of transitions/emissions
+\item M-step: Update parameters from expected counts
+\end{itemize}
+\end{importantbox}
+
+\subsection{Decoding: Finding Hidden States}
+
+\begin{definitionbox}[title=Viterbi Algorithm]
+Given observations $X_1, \ldots, X_T$, find the most likely hidden state sequence:
+\[
+\hat{Y}_{1:T} = \arg\max_{Y_{1:T}} P(Y_{1:T} | X_{1:T})
+\]
+
+The \textbf{Viterbi algorithm} uses dynamic programming to find this efficiently in $O(T \cdot N^2)$ time.
+\end{definitionbox}
+
+\subsection{HMM Limitations}
+
+\begin{warningbox}[title=HMM Limitations]
+\begin{enumerate}
+\item \textbf{Markov assumption}: Hidden state depends only on previous state
+\item \textbf{Independence assumption}: Observation depends only on current hidden state
+\item \textbf{No future context}: Can't use future words to help label current word
+\end{enumerate}
+\end{warningbox}
+
+
+% ============================================================
+\section{Conditional Random Fields (CRFs)}
+% ============================================================
+
+\begin{overviewbox}
+CRFs address HMM limitations by modeling $P(Y|X)$ directly (discriminative) rather than the joint $P(X,Y)$ (generative). They allow arbitrary features and bidirectional dependencies.
+\end{overviewbox}
+
+\subsection{From HMMs to CRFs}
+
+\begin{definitionbox}[title=Key Differences: HMM vs CRF]
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{HMM} & \textbf{CRF} \\
+\midrule
+Model type & Generative & Discriminative \\
+Models & $P(X, Y)$ & $P(Y | X)$ \\
+Direction & Forward only & Bidirectional \\
+Features & Emissions only & Arbitrary features \\
+Independence & Strong assumptions & Flexible \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{definitionbox}
+
+\subsection{CRF Model}
+
+\begin{definitionbox}[title=Linear-Chain CRF]
+\[
+P(Y | X) = \frac{1}{Z(X)} \exp\left( \sum_{t=1}^{T} \sum_{k} \lambda_k f_k(y_{t-1}, y_t, X, t) \right)
+\]
+
+where:
+\begin{itemize}
+\item $f_k$: Feature functions (manually designed)
+\item $\lambda_k$: Feature weights (learned)
+\item $Z(X)$: Normalization constant (partition function)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Feature Functions}
+
+\begin{definitionbox}[title=CRF Feature Functions]
+Feature functions $f_k(y_{t-1}, y_t, X, t)$ encode patterns. They typically return 0 or 1:
+
+\textbf{Example features for NER}:
+\begin{itemize}
+\item $f_1 = 1$ if $y_t$ = PERSON and $x_{t-1}$ = ``Mr.''
+\item $f_2 = 1$ if $y_t$ = PERSON and $x_t$ starts with capital letter
+\item $f_3 = 1$ if $y_t$ = ORG and $x_t$ ends with ``Inc.''
+\item $f_4 = 1$ if $y_{t-1}$ = B-PERSON and $y_t$ = I-PERSON
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=Concrete Feature Example]
+For the input ``Mr. Smith works at Apple Inc.'':
+
+Feature: ``If previous word is 'Mr.' and current word is capitalized, likely PERSON''
+\[
+f_1(y_{t-1}, y_t, X, t) = \mathbf{1}[x_{t-1} = \text{``Mr.''} \land x_t[0] \in \text{A-Z} \land y_t = \text{PERSON}]
+\]
+
+The weight $\lambda_1$ is learned from data---higher weight means this pattern is more predictive.
+\end{examplebox}
+
+\subsection{Advantages of CRFs}
+
+\begin{importantbox}
+\textbf{CRF Advantages}:
+\begin{enumerate}
+\item \textbf{Arbitrary features}: Include any information about entire input
+\item \textbf{Global normalization}: Avoids label bias problem
+\item \textbf{Bidirectional context}: Feature can look at future words
+\item \textbf{No independence assumptions}: Features can overlap
+\end{enumerate}
+\end{importantbox}
+
+\subsection{Disadvantages of CRFs}
+
+\begin{warningbox}[title=CRF Disadvantages]
+\begin{enumerate}
+\item \textbf{Manual feature engineering}: Must design features by hand
+\item \textbf{Computational cost}: Training can be expensive
+\item \textbf{Feature explosion}: Many features needed for good performance
+\end{enumerate}
+\end{warningbox}
+
+
+% ============================================================
+\section{BiLSTM-CRF}
+% ============================================================
+
+\begin{overviewbox}
+BiLSTM-CRF combines the automatic feature learning of neural networks with the sequence modeling of CRFs. The BiLSTM replaces hand-crafted features; the CRF layer captures label dependencies.
+\end{overviewbox}
+
+\subsection{Architecture}
+
+\begin{definitionbox}[title=BiLSTM-CRF Architecture]
+\begin{enumerate}
+\item \textbf{Embedding Layer}: Words $\rightarrow$ dense vectors
+\item \textbf{BiLSTM Layer}: Captures bidirectional context
+\item \textbf{Linear Layer}: Maps hidden states to ``emission scores''
+\item \textbf{CRF Layer}: Models label transitions, outputs final labels
+\end{enumerate}
+\end{definitionbox}
+
+\subsection{How It Works}
+
+\begin{importantbox}
+\textbf{Step 1: Embeddings}
+
+Each word $x_t$ is mapped to an embedding vector $e_t$.
+
+\textbf{Step 2: BiLSTM}
+
+Forward and backward LSTMs process the sequence:
+\[
+\overrightarrow{h_t} = \text{LSTM}_{\rightarrow}(e_t, \overrightarrow{h_{t-1}})
+\]
+\[
+\overleftarrow{h_t} = \text{LSTM}_{\leftarrow}(e_t, \overleftarrow{h_{t+1}})
+\]
+\[
+h_t = [\overrightarrow{h_t}; \overleftarrow{h_t}]
+\]
+
+\textbf{Step 3: Emission Scores}
+
+Linear transformation produces scores for each label:
+\[
+E_t = W \cdot h_t + b
+\]
+
+$E_t$ has dimension equal to number of labels (e.g., B-PER, I-PER, O, ...).
+
+\textbf{Step 4: CRF Layer}
+
+CRF uses emission scores $E$ and learns transition matrix $T$ (label-to-label scores). Final prediction maximizes:
+\[
+\text{score}(X, Y) = \sum_{t=1}^{T} E_{t,y_t} + \sum_{t=1}^{T-1} T_{y_t, y_{t+1}}
+\]
+\end{importantbox}
+
+\subsection{Why CRF on Top of BiLSTM?}
+
+\begin{infobox}[title=CRF Layer Benefits]
+Without CRF, BiLSTM predicts each label independently. This can produce invalid sequences like:
+\begin{itemize}
+\item I-PER following O (invalid---can't continue without begin)
+\item B-LOC immediately after B-PER (missing I-PER)
+\end{itemize}
+
+The CRF layer learns that certain transitions are unlikely (e.g., $T_{\text{O}, \text{I-PER}} \ll 0$), enforcing valid sequences.
+\end{infobox}
+
+\subsection{Implementation Sketch}
+
+\begin{lstlisting}[caption={BiLSTM-CRF in PyTorch (Simplified)}]
+import torch
+import torch.nn as nn
+from torchcrf import CRF
+
+class BiLSTM_CRF(nn.Module):
+    def __init__(self, vocab_size, tag_size, embed_dim, hidden_dim):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.lstm = nn.LSTM(embed_dim, hidden_dim // 2,
+                           bidirectional=True, batch_first=True)
+        self.linear = nn.Linear(hidden_dim, tag_size)
+        self.crf = CRF(tag_size, batch_first=True)
+
+    def forward(self, x):
+        embeds = self.embedding(x)
+        lstm_out, _ = self.lstm(embeds)
+        emissions = self.linear(lstm_out)
+        return emissions
+
+    def loss(self, x, tags):
+        emissions = self.forward(x)
+        return -self.crf(emissions, tags)  # Negative log-likelihood
+
+    def predict(self, x):
+        emissions = self.forward(x)
+        return self.crf.decode(emissions)  # Viterbi decoding
+\end{lstlisting}
+
+
+% ============================================================
+\section{Variational Autoencoders (VAEs)}
+% ============================================================
+
+\begin{overviewbox}
+VAEs are generative models that learn a structured latent space. Unlike regular autoencoders, VAEs can generate new, realistic samples by sampling from the latent space.
+\end{overviewbox}
+
+\subsection{Regular Autoencoder Problem}
+
+\begin{warningbox}[title=Unstructured Latent Space]
+In a regular autoencoder:
+\begin{itemize}
+\item Encoder compresses input to latent code $z$
+\item Decoder reconstructs input from $z$
+\item Problem: Latent space is \textbf{unstructured}
+\end{itemize}
+
+If you move slightly away from a learned encoding, the decoder produces garbage---no smooth interpolation between points.
+\end{warningbox}
+
+\subsection{VAE Solution}
+
+\begin{definitionbox}[title=VAE Key Idea]
+Instead of encoding to a point, encode to a \textbf{distribution}:
+\begin{enumerate}
+\item Encoder outputs $\mu$ (mean) and $\sigma$ (standard deviation)
+\item Sample $z \sim \mathcal{N}(\mu, \sigma^2)$
+\item Decoder reconstructs from sampled $z$
+\end{enumerate}
+
+This forces nearby points in latent space to also decode to realistic outputs.
+\end{definitionbox}
+
+\subsection{VAE Loss Function}
+
+\begin{definitionbox}[title=VAE Loss]
+\[
+\mathcal{L} = \underbrace{\|x - \hat{x}\|^2}_{\text{Reconstruction loss}} + \underbrace{D_{KL}(\mathcal{N}(\mu, \sigma^2) \| \mathcal{N}(0, 1))}_{\text{KL divergence (regularization)}}
+\]
+
+The KL term forces distributions to stay close to standard normal $\mathcal{N}(0,1)$.
+\end{definitionbox}
+
+\subsection{Why KL Divergence?}
+
+\begin{importantbox}
+Without KL regularization:
+\begin{itemize}
+\item Network minimizes reconstruction by shrinking $\sigma \rightarrow 0$
+\item Returns to point encoding---loses structure
+\end{itemize}
+
+With KL regularization:
+\begin{itemize}
+\item Forces $\mu \rightarrow 0$ and $\sigma \rightarrow 1$
+\item Distributions overlap, creating smooth latent space
+\item Can interpolate between encodings
+\end{itemize}
+\end{importantbox}
+
+
+% ============================================================
+\section{Generative Adversarial Networks (GANs)}
+% ============================================================
+
+\begin{overviewbox}
+GANs learn to generate realistic data through adversarial training: a generator tries to fool a discriminator, while the discriminator tries to distinguish real from fake data.
+\end{overviewbox}
+
+\subsection{The Chess Analogy}
+
+\begin{infobox}[title=Learning Without a Teacher]
+\textbf{Problem}: Train children to play chess without an expert teacher.
+
+\textbf{Solution}: Have them play against each other! Both improve through competition.
+
+GANs work similarly: two networks compete, both improving without labeled data.
+\end{infobox}
+
+\subsection{GAN Architecture}
+
+\begin{definitionbox}[title=GAN Components]
+\textbf{Generator} $G$:
+\begin{itemize}
+\item Input: Random noise $z \sim \mathcal{N}(0, 1)$
+\item Output: Fake sample $G(z)$
+\item Goal: Generate samples indistinguishable from real data
+\end{itemize}
+
+\textbf{Discriminator} $D$:
+\begin{itemize}
+\item Input: Real sample $x$ or fake sample $G(z)$
+\item Output: Probability that input is real
+\item Goal: Correctly classify real vs fake
+\end{itemize}
+\end{definitionbox}
+
+\subsection{GAN Training}
+
+\begin{definitionbox}[title=GAN Objective (Minimax Game)]
+\[
+\min_G \max_D \mathbb{E}_{x \sim p_{data}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))]
+\]
+
+\begin{itemize}
+\item $D$ maximizes: classify real as real, fake as fake
+\item $G$ minimizes: fool $D$ into thinking fake is real
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Training Procedure}
+
+\begin{importantbox}
+\textbf{Alternating optimization}:
+\begin{enumerate}
+\item \textbf{Train D}: Fix G, update D to better distinguish real/fake
+\item \textbf{Train G}: Fix D, update G to better fool D
+\item Repeat until equilibrium
+\end{enumerate}
+
+At equilibrium: $D$ outputs 0.5 for everything (can't tell real from fake), $G$ generates perfect samples.
+\end{importantbox}
+
+\subsection{Mode Collapse Problem}
+
+\begin{warningbox}[title=Mode Collapse]
+GANs can suffer from \textbf{mode collapse}:
+\begin{itemize}
+\item Generator finds one output that fools discriminator
+\item Keeps producing only that output (e.g., only shoes)
+\item Discriminator adapts, generator switches to another mode
+\item Cycle continues without learning diversity
+\end{itemize}
+
+\textbf{Solutions}: Experience replay, progressive growing, StyleGAN architecture
+\end{warningbox}
+
+
+% ============================================================
+\section{One-Page Summary}
+% ============================================================
+
+\begin{summarybox}
+\textbf{Markov Chains}: Sequence model where $P(X_{t+1}|X_t, \ldots) = P(X_{t+1}|X_t)$. Simple but limited---no long-range dependencies.
+
+\textbf{Hidden Markov Models (HMMs)}:
+\begin{itemize}
+\item Hidden states $Y$ generate observations $X$
+\item Parameters: transitions $A$, emissions $B$, initial $\pi$
+\item Training: Baum-Welch (EM) if hidden states unknown
+\item Decoding: Viterbi algorithm
+\item Limitation: Only uses past context
+\end{itemize}
+
+\textbf{Conditional Random Fields (CRFs)}:
+\begin{itemize}
+\item Discriminative: models $P(Y|X)$ directly
+\item Feature functions $f_k(y_{t-1}, y_t, X, t)$ encode patterns
+\item Bidirectional context, no independence assumptions
+\item Disadvantage: Manual feature engineering
+\end{itemize}
+
+\textbf{BiLSTM-CRF}:
+\begin{itemize}
+\item BiLSTM provides automatic feature learning
+\item CRF layer captures label dependencies
+\item State-of-the-art for NER, POS tagging before transformers
+\item No manual features needed
+\end{itemize}
+
+\textbf{Variational Autoencoders (VAEs)}:
+\begin{itemize}
+\item Encode to distribution $(\mu, \sigma)$, sample, decode
+\item KL divergence regularization prevents collapse
+\item Creates structured, interpolatable latent space
+\end{itemize}
+
+\textbf{GANs}:
+\begin{itemize}
+\item Generator vs Discriminator adversarial game
+\item No labeled data needed---self-supervised
+\item Mode collapse is common challenge
+\item Can generate highly realistic images/text
+\end{itemize}
+\end{summarybox}
+
+
+% ============================================================
+\section{Glossary}
+% ============================================================
+
+\begin{definitionbox}[title=Key Terms]
+\begin{itemize}
+\item \textbf{Markov Property}: Future depends only on present, not past
+\item \textbf{HMM}: Hidden Markov Model---hidden states emit observations
+\item \textbf{Transition Probabilities}: $P(Y_{t+1}|Y_t)$
+\item \textbf{Emission Probabilities}: $P(X_t|Y_t)$
+\item \textbf{Viterbi Algorithm}: Dynamic programming for most likely path
+\item \textbf{Baum-Welch}: EM algorithm for HMM parameter estimation
+\item \textbf{CRF}: Conditional Random Field---discriminative sequence model
+\item \textbf{Feature Function}: Pattern indicator in CRF
+\item \textbf{Partition Function}: Normalization constant $Z(X)$
+\item \textbf{BiLSTM}: Bidirectional LSTM---forward and backward context
+\item \textbf{Emission Scores}: BiLSTM output before CRF layer
+\item \textbf{VAE}: Variational Autoencoder---generative with structured latent space
+\item \textbf{KL Divergence}: Measures distribution similarity
+\item \textbf{Latent Space}: Compressed representation space
+\item \textbf{GAN}: Generative Adversarial Network
+\item \textbf{Generator}: Creates fake samples from noise
+\item \textbf{Discriminator}: Classifies real vs fake
+\item \textbf{Mode Collapse}: GAN failure mode---limited diversity
+\item \textbf{Discriminative Model}: Models $P(Y|X)$
+\item \textbf{Generative Model}: Models $P(X,Y)$ or $P(X)$
+\end{itemize}
+\end{definitionbox}
+
+\end{document}

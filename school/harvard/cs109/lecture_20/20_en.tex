@@ -1,0 +1,876 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 20: Missing Data and Model Visualization
+% English Version - Comprehensive Notes for Beginners
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 20}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 20},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Missing Data and Model Visualization}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 20: Missing Data and Model Visualization}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 20}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Missing Data, MCAR/MAR/MNAR, Imputation Methods, Model Visualization, Partial Dependence Plots}
+
+\begin{overviewbox}
+This lecture covers two important practical topics in data science:
+
+\begin{enumerate}
+    \item \textbf{Missing Data:} Real datasets almost always have missing values. Understanding \textit{why} data is missing and handling it properly is crucial to avoid biased models.
+
+    \item \textbf{Model Visualization:} For ``black-box'' models like KNN and decision trees, we can't simply look at coefficients. Partial Dependence Plots (PDPs) help us understand how features affect predictions.
+\end{enumerate}
+
+\textbf{Key Insight:} Both topics are about dealing with the messiness of real-world data science---incomplete data and complex models that resist simple interpretation.
+\end{overviewbox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{What is Missing Data?}
+%========================================================================================
+
+\subsection{The Problem}
+
+\begin{definitionbox}{Missing Data}
+\textbf{Missing data} (or \textbf{missingness}) refers to values that should exist in a dataset but are absent. In Python/Pandas, these appear as \code{NaN} (Not a Number) or \code{NA}.
+\end{definitionbox}
+
+Missing data creates two problems:
+
+\begin{enumerate}
+    \item \textbf{Technical:} Most ML libraries (including sklearn) throw errors when they encounter NaN values
+    \item \textbf{Statistical:} Improper handling can introduce \textbf{bias} into predictions and estimates
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{What is Bias?}
+
+Bias means your estimates or predictions are \textbf{systematically wrong}---not just randomly off, but consistently wrong in a particular direction.
+
+\textbf{Analogy:} A scale that always reads 2 lbs too high is biased. No matter how many times you weigh yourself, you'll always be 2 lbs over your true weight.
+
+In modeling:
+\begin{itemize}
+    \item \textbf{Biased prediction:} Your $\hat{y}$ systematically over- or under-estimates the true $y$
+    \item \textbf{Biased estimation:} Your $\hat{\beta}$ systematically differs from the true $\beta$
+\end{itemize}
+\end{warningbox}
+
+\subsection{Why Does Missing Data Occur?}
+
+Missing data can arise for many reasons:
+
+\begin{itemize}
+    \item \textbf{Data entry errors:} Someone accidentally skipped a field
+    \item \textbf{Non-response:} Survey respondent chose not to answer a question
+    \item \textbf{New variable collection:} You started measuring something new midway through data collection
+    \item \textbf{Measurement limits:} Sensor couldn't detect values below a threshold
+    \item \textbf{Study dropout:} Participant left a clinical trial
+\end{itemize}
+
+\begin{importantbox}{The Million-Dollar Question}
+\textbf{Why} is the data missing? The answer determines:
+\begin{itemize}
+    \item Whether simple approaches will work
+    \item How much bias you might introduce
+    \item What imputation strategy to use
+\end{itemize}
+
+The reason for missingness is the key to proper handling.
+\end{importantbox}
+
+\subsection{Simple (But Problematic) Approaches}
+
+Before taking this class, you might have done:
+
+\textbf{Option 1: Drop rows with missing values}
+\begin{lstlisting}[style=pythonstyle]
+df_clean = df.dropna()  # Remove any row with NaN
+\end{lstlisting}
+
+\textbf{Option 2: Fill with mean/median/mode}
+\begin{lstlisting}[style=pythonstyle]
+df['X'].fillna(df['X'].mean(), inplace=True)
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Problems with Simple Approaches:}
+
+\textbf{Dropping rows:}
+\begin{itemize}
+    \item Loses valuable data
+    \item If missingness is related to outcome, introduces bias
+    \item If 30\% of rows have missing values, you lose 30\% of data!
+\end{itemize}
+
+\textbf{Mean imputation:}
+\begin{itemize}
+    \item Artificially reduces variance (all missing values become the same)
+    \item Weakens relationships between variables
+    \item Doesn't account for uncertainty in imputed values
+\end{itemize}
+\end{warningbox}
+
+%========================================================================================
+\newsection{Types of Missing Data: MCAR, MAR, MNAR}
+%========================================================================================
+
+Understanding \textit{why} data is missing is crucial. Statisticians classify missing data into three types:
+
+\subsection{MCAR: Missing Completely at Random}
+
+\begin{definitionbox}{MCAR}
+Data is \textbf{Missing Completely at Random} if the probability of missingness is unrelated to:
+\begin{itemize}
+    \item The missing value itself
+    \item Any other observed variable
+\end{itemize}
+
+Missingness is purely random---like someone randomly punched holes in your spreadsheet.
+\end{definitionbox}
+
+\textbf{Example:} While entering survey data into Excel, the data entry person randomly skipped some values due to fatigue. The skipping had nothing to do with what the values were or who the respondents were.
+
+\textbf{Good news:} With MCAR, dropping rows or simple imputation won't introduce bias (though you may lose statistical power).
+
+\textbf{Bad news:} True MCAR is rare in practice.
+
+\subsection{MAR: Missing at Random}
+
+\begin{definitionbox}{MAR}
+Data is \textbf{Missing at Random} if the probability of missingness can be fully explained by \textbf{other observed variables}---but not by the missing value itself.
+\end{definitionbox}
+
+\textbf{Example:} In a survey about workplace harassment, people may choose not to answer based on their gender (which you observed), not based on whether they were actually harassed.
+
+\textbf{Key point:} ``Random'' here is misleading. It means ``random \textit{conditional on observed data}.'' If you know gender, the missingness becomes random.
+
+\textbf{Good news:} With MAR, we can use other observed variables to model and correct for missingness.
+
+\subsection{MNAR: Missing Not at Random}
+
+\begin{definitionbox}{MNAR}
+Data is \textbf{Missing Not at Random} if the probability of missingness depends on:
+\begin{itemize}
+    \item The unobserved (missing) value itself, OR
+    \item Some unobserved variable
+\end{itemize}
+\end{definitionbox}
+
+\textbf{Example 1:} High-income people are less likely to report their income \textit{because} it's high. The missing value itself affects missingness.
+
+\textbf{Example 2:} Patients drop out of a clinical trial because they experienced severe side effects. The side effect severity (unmeasured) causes both dropout and likely worse outcomes.
+
+\textbf{Bad news:} MNAR is the hardest case. No statistical method can fully correct for bias because the information needed is... missing!
+
+\begin{table}[h!]
+\caption{Summary of Missing Data Types}
+\begin{adjustbox}{width=\textwidth, center}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Type} & \textbf{Missingness Depends On} & \textbf{Example} & \textbf{Handling Difficulty} \\
+\midrule
+MCAR & Nothing (pure random) & Data entry error & Easiest \\
+MAR & Observed variables only & Gender affects response rate & Moderate \\
+MNAR & Missing value or unobserved variables & High earners hide income & Hardest \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{importantbox}{The Fundamental Problem}
+\textbf{Can you ever know which type you have?}
+
+\textbf{No.} You cannot definitively determine from the data alone whether missingness is MCAR, MAR, or MNAR. MNAR involves unmeasured variables---by definition, you can't see them.
+
+\textbf{Practical approach:} Assume MAR and use the best imputation methods available. This at least handles the recoverable bias.
+\end{importantbox}
+
+%========================================================================================
+\newsection{Imputation Methods}
+%========================================================================================
+
+\subsection{Important Considerations}
+
+Before choosing an imputation method, consider:
+
+\begin{enumerate}
+    \item \textbf{Where is the missingness?}
+    \begin{itemize}
+        \item In predictors (X): Most imputation methods handle this
+        \item In response (Y): Much harder---often just drop these rows
+    \end{itemize}
+
+    \item \textbf{Variable type:} Numeric vs categorical (different methods apply)
+
+    \item \textbf{Amount of missingness:}
+    \begin{itemize}
+        \item $<10\%$: Usually safe to impute
+        \item $10-50\%$: Be careful; imputation may add noise
+        \item $>50\%$: Consider dropping the variable entirely
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Method 1: Missingness Indicator Variable}
+
+This simple method treats ``missing'' as \textbf{information itself}:
+
+\begin{enumerate}
+    \item For variable $X_1$ with missing values:
+    \item Create $X_1^*$: Impute missing values with 0 (or mean)
+    \item Create $X_1^{miss}$: Binary indicator (1 if was missing, 0 otherwise)
+    \item Use \textbf{both} $X_1^*$ and $X_1^{miss}$ in your model
+\end{enumerate}
+
+\begin{examplebox}{Missingness Indicator}
+\begin{center}
+\begin{tabular}{cc|cc|cc}
+\toprule
+\multicolumn{2}{c|}{\textbf{Original}} & \multicolumn{2}{c|}{\textbf{Imputed}} & \multicolumn{2}{c}{\textbf{Indicators}} \\
+X1 & X2 & X1* & X2* & X1\_miss & X2\_miss \\
+\midrule
+10 & 0 & 10 & 0 & 0 & 0 \\
+5 & 1 & 5 & 1 & 0 & 0 \\
+21 & NaN & 21 & \textbf{0} & 0 & \textbf{1} \\
+NaN & 0 & \textbf{0} & 0 & \textbf{1} & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Now the model can learn: ``When X2\_miss=1, treat X2*=0 differently than when X2\_miss=0''
+\end{examplebox}
+
+\begin{infobox}
+\textbf{Why This Works:}
+
+This creates a ``did not respond'' category. The model can estimate separate effects for:
+\begin{itemize}
+    \item Observed zeros
+    \item Imputed zeros (actually missing)
+\end{itemize}
+
+This is especially useful when MNAR is suspected---the fact that someone didn't respond might itself be predictive!
+\end{infobox}
+
+\subsection{Method 2: Model-Based Imputation}
+
+Treat imputation as a \textbf{prediction problem}:
+
+\begin{enumerate}
+    \item Identify variable $X_j$ with missing values
+    \item \textbf{Training set:} Rows where $X_j$ is observed
+    \item \textbf{Test set:} Rows where $X_j$ is missing
+    \item Fit a model: $X_j \sim X_1, X_2, ..., X_{j-1}, X_{j+1}, ..., X_p$
+    \item Predict $\hat{X}_j$ for the test set
+    \item Fill in the missing values with $\hat{X}_j$
+\end{enumerate}
+
+\textbf{Models you can use:}
+\begin{itemize}
+    \item \textbf{Linear regression} (for numeric $X_j$)
+    \item \textbf{Logistic regression} (for binary $X_j$)
+    \item \textbf{KNN} (for any type)
+    \item \textbf{Decision trees} (for any type)
+\end{itemize}
+
+\begin{examplebox}{KNN Imputation}
+Variable Y (numeric) has missing values. Variable X (color) is fully observed.
+
+Using KNN with K=2:
+
+For a missing value at color = ``medium red'':
+\begin{itemize}
+    \item Find 2 nearest neighbors: ``dark red'' (Y=1) and ``light red'' (Y=0.5)
+    \item Impute: $\hat{Y} = \frac{1 + 0.5}{2} = 0.75$
+\end{itemize}
+
+For a missing value at color = ``yellow'':
+\begin{itemize}
+    \item Find 2 nearest neighbors: ``orange'' (Y=0.1) and ``green'' (Y=10)
+    \item Impute: $\hat{Y} = \frac{0.1 + 10}{2} = 5.05$
+\end{itemize}
+\end{examplebox}
+
+\subsection{Method 3: Imputation with Uncertainty}
+
+The problem with Method 2: \textbf{imputed values are too perfect}.
+
+If you use linear regression to impute, all imputed values fall exactly on the regression line. But real data has scatter!
+
+\begin{warningbox}
+\textbf{The Problem with Deterministic Imputation:}
+
+If you impute with $\hat{y}$ (the prediction), your imputed values have \textbf{no variance around the prediction}. This:
+\begin{itemize}
+    \item Artificially strengthens relationships
+    \item Makes your model overconfident
+    \item Underestimates uncertainty in downstream analyses
+\end{itemize}
+\end{warningbox}
+
+\textbf{Solution: Add randomness!}
+
+\textbf{For linear regression:}
+\begin{enumerate}
+    \item Predict $\hat{y}$
+    \item Randomly sample a residual $\epsilon$ from training data (or from $N(0, \hat{\sigma}^2)$)
+    \item Impute: $\hat{y} + \epsilon$
+\end{enumerate}
+
+\textbf{For KNN:}
+\begin{enumerate}
+    \item Find K neighbors
+    \item Instead of averaging, \textbf{randomly sample one} of the K values
+    \item Impute that sampled value
+\end{enumerate}
+
+\textbf{For decision trees:}
+\begin{enumerate}
+    \item Traverse to the leaf node
+    \item Instead of using the leaf mean, \textbf{randomly sample one} observation from that leaf
+    \item Impute that sampled value
+\end{enumerate}
+
+\textbf{For classification:}
+\begin{enumerate}
+    \item Get predicted probability $\hat{p}$
+    \item \textbf{Flip a coin} with probability $\hat{p}$ to determine class
+    \item Don't just use the majority class!
+\end{enumerate}
+
+\subsection{Method 4: Iterative Imputation (Multiple Variables)}
+
+What if \textbf{multiple} variables have missing values?
+
+You can't impute $X_1$ from $X_2, X_3$ if $X_2$ and $X_3$ also have missing values!
+
+\textbf{Solution: Iterate!}
+
+\begin{enumerate}
+    \item Initialize: Fill all missing values with simple imputation (mean/median)
+    \item Round 1: Use current $X_2, X_3$ to impute $X_1$
+    \item Round 1: Use current $X_1, X_3$ to impute $X_2$
+    \item Round 1: Use current $X_1, X_2$ to impute $X_3$
+    \item Repeat rounds until values converge (stop changing significantly)
+\end{enumerate}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.impute import IterativeImputer
+
+# Iteratively imputes using all other features
+imputer = IterativeImputer(max_iter=10, random_state=42)
+X_imputed = imputer.fit_transform(X)
+\end{lstlisting}
+
+\subsection{Sklearn Imputation Tools}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer
+from sklearn.impute import MissingIndicator
+
+# 1. Simple imputation (mean, median, most_frequent, constant)
+simple = SimpleImputer(strategy='mean')
+
+# 2. KNN imputation
+knn = KNNImputer(n_neighbors=5)
+
+# 3. Iterative imputation (most sophisticated)
+iterative = IterativeImputer(max_iter=10, random_state=0)
+
+# 4. Create missingness indicators
+indicator = MissingIndicator()
+
+# Usage
+X_imputed = simple.fit_transform(X)
+X_indicator = indicator.fit_transform(X)
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Visualizing Black-Box Models}
+%========================================================================================
+
+\subsection{The Interpretation Problem}
+
+For \textbf{parametric models} (linear/logistic regression):
+\begin{itemize}
+    \item We have coefficients $\beta_j$
+    \item Interpretation: ``One unit increase in $X_j$ leads to $\beta_j$ change in $Y$''
+    \item These are ``white-box'' models---we can see inside
+\end{itemize}
+
+For \textbf{non-parametric models} (KNN, decision trees, random forests):
+\begin{itemize}
+    \item No simple coefficients to interpret
+    \item Complex decision rules or distance calculations
+    \item These are ``black-box'' models---hard to see inside
+\end{itemize}
+
+\begin{infobox}
+\textbf{Why Do We Need Interpretation?}
+
+Even with black-box models, we need to:
+\begin{itemize}
+    \item Understand what the model learned
+    \item Check if relationships make domain sense
+    \item Communicate findings to stakeholders
+    \item Debug unexpected behavior
+\end{itemize}
+
+\textbf{Solution: Plot the predictions!}
+\end{infobox}
+
+\subsection{Partial Dependence Plots (PDPs)}
+
+\begin{definitionbox}{Partial Dependence Plot}
+A \textbf{Partial Dependence Plot (PDP)} shows the relationship between a feature $X_j$ and the predicted outcome $\hat{Y}$, while holding all other features at fixed values (typically their medians).
+
+It answers: ``How does changing $X_j$ affect predictions, controlling for everything else?''
+\end{definitionbox}
+
+\textbf{How to create a PDP:}
+
+\begin{enumerate}
+    \item Choose the feature of interest, $X_j$
+    \item Fix all other features at their median values
+    \item Create a sequence of $X_j$ values: $X_j = \{x_1, x_2, ..., x_n\}$
+    \item For each $x_i$, predict $\hat{Y}$ using the model
+    \item Plot $X_j$ vs $\hat{Y}$
+\end{enumerate}
+
+\begin{examplebox}{PDP for Heart Disease Prediction}
+Model: KNN (K=50) predicting heart disease from max heart rate and other variables.
+
+\textbf{Create PDP for max heart rate:}
+\begin{enumerate}
+    \item Fix Age, Sex, RestBP, etc. at their medians
+    \item Vary MaxHR from 70 to 200
+    \item For each MaxHR value, predict probability of heart disease
+    \item Plot MaxHR vs predicted probability
+\end{enumerate}
+
+\textbf{Result:} A curve showing that higher max heart rate $\rightarrow$ lower probability of heart disease (negative relationship).
+\end{examplebox}
+
+\begin{lstlisting}[style=pythonstyle]
+import numpy as np
+import pandas as pd
+from sklearn.neighbors import KNeighborsClassifier
+
+# Fit model
+knn = KNeighborsClassifier(n_neighbors=50)
+knn.fit(X_train, y_train)
+
+# Create synthetic X values for max heart rate
+maxhr_range = np.linspace(X['MaxHR'].min(), X['MaxHR'].max(), 100)
+
+# Hold other variables at their medians
+other_medians = X.drop('MaxHR', axis=1).median()
+
+# Create prediction data
+pred_data = pd.DataFrame({
+    'MaxHR': maxhr_range,
+    **{col: [val]*100 for col, val in other_medians.items()}
+})
+
+# Predict probabilities
+probs = knn.predict_proba(pred_data)[:, 1]
+
+# Plot PDP
+import matplotlib.pyplot as plt
+plt.plot(maxhr_range, probs)
+plt.xlabel('Max Heart Rate')
+plt.ylabel('Predicted P(Heart Disease)')
+plt.title('Partial Dependence Plot')
+\end{lstlisting}
+
+\subsection{Using PDPs to Detect Interactions}
+
+The power of PDPs comes from comparing them across different subgroups:
+
+\textbf{Key insight:} If the PDP shape changes when you vary another feature, there's an \textbf{interaction}.
+
+\begin{examplebox}{Detecting Age x MaxHR Interaction}
+Create three PDPs for MaxHR:
+\begin{enumerate}
+    \item Age = minimum (29 years)
+    \item Age = median (55 years)
+    \item Age = maximum (77 years)
+\end{enumerate}
+
+\textbf{If the three curves are different}, it means the effect of MaxHR on heart disease depends on Age---an interaction!
+
+\textbf{Typical finding:}
+\begin{itemize}
+    \item At low MaxHR: All ages have high disease probability
+    \item At high MaxHR: Young people benefit more (lower probability) than older people
+\end{itemize}
+
+\textbf{Interpretation:} High max heart rate (fitness) is more protective for younger patients.
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Limitations of PDPs:}
+
+\begin{itemize}
+    \item Assumes features are independent (can be misleading if features are correlated)
+    \item Shows average effect; may hide heterogeneity
+    \item Doesn't show uncertainty in the relationship
+\end{itemize}
+
+For more sophisticated interpretation, consider SHAP values or ICE plots.
+\end{warningbox}
+
+%========================================================================================
+\newsection{Summary and Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Missing Data:}
+\begin{itemize}
+    \item Missing data causes both technical problems (sklearn errors) and statistical problems (bias)
+    \item Three types: MCAR (random), MAR (explained by observed data), MNAR (depends on missing value itself)
+    \item You can never know for sure which type you have
+    \item Simple approaches (drop rows, mean imputation) can introduce bias
+\end{itemize}
+
+\textbf{Imputation Methods:}
+\begin{itemize}
+    \item \textbf{Missingness indicator:} Create binary flag for ``was missing''
+    \item \textbf{Model-based:} Predict missing values from other features
+    \item \textbf{With uncertainty:} Add randomness to imputed values
+    \item \textbf{Iterative:} For multiple variables with missingness
+\end{itemize}
+
+\textbf{Model Visualization:}
+\begin{itemize}
+    \item Black-box models (KNN, trees) need visualization for interpretation
+    \item \textbf{Partial Dependence Plots:} Show feature effect while holding others constant
+    \item Compare PDPs across subgroups to detect interactions
+\end{itemize}
+\end{summarybox}
+
+\section{Learning Checklist}
+
+\begin{itemize}[label=$\square$]
+    \item Can you explain what bias means in the context of estimation and prediction?
+    \item Do you understand the three types of missing data (MCAR, MAR, MNAR)?
+    \item Can you explain why you can never definitively know which type of missingness you have?
+    \item Do you understand the problems with simple approaches (dropping rows, mean imputation)?
+    \item Can you implement the missingness indicator variable approach?
+    \item Do you understand model-based imputation and how to add uncertainty?
+    \item Can you explain iterative imputation for multiple variables?
+    \item Do you understand what a Partial Dependence Plot shows?
+    \item Can you use PDPs to detect interactions between features?
+\end{itemize}
+
+\section{Looking Ahead}
+
+Next lectures cover \textbf{ensemble methods}:
+\begin{itemize}
+    \item \textbf{Bagging:} Bootstrap aggregating---averaging many trees
+    \item \textbf{Random Forests:} Bagging + random feature selection
+    \item \textbf{Boosting:} Sequential models that correct previous errors
+    \item \textbf{Gradient Boosting:} XGBoost, LightGBM---top performers on tabular data
+\end{itemize}
+
+\end{document}

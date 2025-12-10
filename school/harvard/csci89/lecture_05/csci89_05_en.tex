@@ -1,0 +1,1087 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability improvements
+% Last modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: Introduction to Natural Language Processing}}
+\fancyhead[R]{\small\textit{Lecture 05}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Important Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Critical: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-89B: Introduction to NLP - Lecture 05},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Title
+%========================================================================================
+
+\title{CSCI E-89B: Introduction to Natural Language Processing\\Lecture 05: TF-IDF and Word Embeddings}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+%========================================================================================
+% Document Start
+%========================================================================================
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-89B: Introduction to Natural Language Processing}{Lecture 05}{Dmitry Kurochkin}{Master TF-IDF representation for text analysis and understand word embedding techniques including Word2Vec and GloVe}
+
+\tableofcontents
+
+%========================================================================================
+% SECTION 1: Quiz Review - Weight Sharing
+%========================================================================================
+\newpage
+\section{Quiz Review: Weight Sharing in Neural Networks}
+
+\begin{overviewbox}
+This lecture covers TF-IDF (Term Frequency-Inverse Document Frequency) as an improvement over bag-of-words, introduces the concept of word embeddings, and explores Word2Vec and GloVe as advanced embedding techniques that capture semantic relationships.
+\end{overviewbox}
+
+\subsection{Where Does Weight Sharing Occur?}
+
+\begin{summarybox}
+Weight sharing is a key technique to reduce parameters in neural networks. It occurs in:
+\begin{itemize}
+    \item \textbf{Recurrent Neural Networks (RNNs)}: Same weights across all time steps
+    \item \textbf{Convolutional Neural Networks (CNNs)}: Same filter weights at all spatial positions
+    \item \textbf{NOT in Fully Connected Networks}: Each connection has unique weights
+\end{itemize}
+\end{summarybox}
+
+\subsubsection{Fully Connected Networks}
+
+In a fully connected (dense) network:
+\begin{itemize}
+    \item Every neuron is connected to every neuron in adjacent layers
+    \item Each connection has its \textbf{own unique weight} $w_{ij}$
+    \item No weight sharing---maximum flexibility, maximum parameters
+\end{itemize}
+
+\subsubsection{Recurrent Neural Networks}
+
+When unrolled through time, RNNs use the same weights:
+\begin{itemize}
+    \item Time step 1: Uses $W$
+    \item Time step 2: Uses \textbf{same} $W$
+    \item Time step $T$: Uses \textbf{same} $W$
+\end{itemize}
+
+\begin{infobox}[title=Why Weight Sharing in RNNs?]
+We assume that the relationship between signals is \textbf{independent of time}. The way we process word 1 should be the same as how we process word 100. This reduces parameters dramatically and enables processing of variable-length sequences.
+\end{infobox}
+
+\subsubsection{Convolutional Neural Networks}
+
+CNNs share weights across \textbf{spatial positions}:
+\begin{itemize}
+    \item Filter applied at position (0,0): Uses weights $W$
+    \item Filter applied at position (1,1): Uses \textbf{same} $W$
+    \item Filter ``slides'' across the image with identical weights
+\end{itemize}
+
+\begin{examplebox}[Analogy: Using the Same Eyes]
+When you look at the upper-left corner of an image, you use the same eyes as when you look at the lower-right corner. Similarly, CNNs use the same filter (same ``eyes'') at every position.
+\end{examplebox}
+
+\subsection{N-gram Counting}
+
+\begin{importantbox}[N-grams are Overlapping]
+When computing bigrams, tokens \textbf{overlap}:
+\begin{itemize}
+    \item Text: ``port assembly line reduced costs''
+    \item Bigrams: (port, assembly), (assembly, line), (line, reduced), (reduced, costs)
+    \item Count: $n - 1$ bigrams for $n$ words
+\end{itemize}
+\end{importantbox}
+
+\begin{warningbox}[title=Bigram Vocabulary Explosion]
+In practice, the number of bigrams is \textbf{much larger} than unigrams:
+\begin{itemize}
+    \item ``Computer'' appears once as a unigram
+    \item But ``computer is,'' ``computer was,'' ``computer does,'' etc. are all different bigrams
+    \item Vocabulary grows dramatically, increasing sparsity and computation
+\end{itemize}
+\end{warningbox}
+
+\subsection{CNN Padding and Strides}
+
+\begin{definitionbox}[Preserving Dimensions]
+To preserve input dimensions in a CNN:
+\begin{itemize}
+    \item \textbf{Padding}: Must be \texttt{same} (add zeros around input)
+    \item \textbf{Strides}: Must be 1 (move one position at a time)
+\end{itemize}
+
+If strides $> 1$, dimensions will be reduced even with \texttt{same} padding.
+\end{definitionbox}
+
+%========================================================================================
+% SECTION 2: TF-IDF
+%========================================================================================
+\newpage
+\section{TF-IDF: Term Frequency-Inverse Document Frequency}
+
+\subsection{Motivation: Beyond Bag of Words}
+
+Bag of words treats all words equally by just counting occurrences. But consider:
+\begin{itemize}
+    \item In Boston local news, ``Boston'' appears everywhere---it's not informative
+    \item A rare word like ``hurricane'' only appears in certain documents---very informative
+\end{itemize}
+
+\begin{summarybox}
+TF-IDF addresses this by:
+\begin{enumerate}
+    \item Counting how often a term appears in a document (TF)
+    \item Discounting terms that appear in many documents (IDF)
+    \item Multiplying: TF $\times$ IDF
+\end{enumerate}
+\end{summarybox}
+
+\subsection{Term Frequency (TF)}
+
+\begin{definitionbox}[Term Frequency]
+\[
+\text{TF}(t, d) = \frac{\text{Number of times term } t \text{ appears in document } d}{\text{Total number of terms in document } d}
+\]
+
+\textbf{Note}: This is a \textit{frequency} (ratio), not just a count. It normalizes by document length.
+\end{definitionbox}
+
+\begin{examplebox}[TF Calculation]
+Document 1: ``cat cat dog'' (3 terms)
+
+\begin{tabular}{ll}
+TF(cat, doc1) & = 2/3 = 0.67 \\
+TF(dog, doc1) & = 1/3 = 0.33 \\
+TF(mouse, doc1) & = 0/3 = 0.00 \\
+\end{tabular}
+\end{examplebox}
+
+\subsection{Inverse Document Frequency (IDF)}
+
+\begin{definitionbox}[Inverse Document Frequency]
+\[
+\text{IDF}(t) = \ln\left(\frac{\text{Total number of documents}}{\text{Number of documents containing term } t}\right)
+\]
+
+\textbf{Key insight}: IDF is computed from the \textbf{training corpus} and remains fixed, even when processing test documents.
+\end{definitionbox}
+
+\subsubsection{IDF Properties}
+
+\begin{itemize}
+    \item Term in \textbf{every} document: IDF = $\ln(N/N) = \ln(1) = 0$
+    \item Term in \textbf{half} documents: IDF = $\ln(N/(N/2)) = \ln(2) \approx 0.69$
+    \item Term in \textbf{one} document: IDF = $\ln(N/1) = \ln(N)$ (large!)
+\end{itemize}
+
+\begin{examplebox}[IDF Calculation]
+Corpus with 4 documents:
+\begin{itemize}
+    \item Cat appears in 2 documents: IDF = $\ln(4/2) = 0.69$
+    \item Dog appears in 4 documents: IDF = $\ln(4/4) = 0$ (useless!)
+    \item Mouse appears in 3 documents: IDF = $\ln(4/3) = 0.29$
+\end{itemize}
+
+\textbf{Interpretation}: Cat is a good discriminator (occurs sometimes), dog is useless (occurs everywhere).
+\end{examplebox}
+
+\subsection{TF-IDF Computation}
+
+\begin{definitionbox}[TF-IDF]
+\[
+\text{TF-IDF}(t, d) = \text{TF}(t, d) \times \text{IDF}(t)
+\]
+
+High TF-IDF means: term appears frequently in this document but rarely across the corpus.
+\end{definitionbox}
+
+\begin{importantbox}[Train vs Test Data]
+When computing TF-IDF for test documents:
+\begin{itemize}
+    \item \textbf{TF}: Computed from the test document itself
+    \item \textbf{IDF}: Always uses the training corpus values (pre-computed)
+\end{itemize}
+
+\textbf{Rationale}: IDF measures how discriminative a term is across the corpus. We can't use test data to compute this---that would be data leakage!
+\end{importantbox}
+
+\subsection{TF-IDF Variations}
+
+\subsubsection{Smoothed IDF (sklearn default)}
+
+\[
+\text{IDF}_{\text{smooth}}(t) = \ln\left(\frac{N + 1}{df(t) + 1}\right) + 1
+\]
+
+\begin{itemize}
+    \item $+1$ in denominator: Prevents division by zero
+    \item $+1$ added to result: Ensures even common words have \textbf{some} weight
+\end{itemize}
+
+\subsubsection{Why Add +1 to the Result?}
+
+Without the $+1$, words appearing everywhere get IDF = 0, making their TF-IDF = 0. Adding 1 ensures:
+\begin{itemize}
+    \item Common words still contribute (just less than rare words)
+    \item No term is completely ignored
+\end{itemize}
+
+\subsection{L2 Normalization}
+
+\begin{definitionbox}[L2 Normalization]
+After computing TF-IDF values, normalize the vector to unit length:
+\[
+\tilde{v} = \frac{v}{\|v\|_2} = \frac{v}{\sqrt{\sum_i v_i^2}}
+\]
+
+This places all document vectors on a \textbf{unit hypersphere}.
+\end{definitionbox}
+
+\subsubsection{Why Normalize?}
+
+\begin{enumerate}
+    \item \textbf{Cosine similarity becomes dot product}: For unit vectors, $\cos(\theta) = a \cdot b$
+    \item \textbf{Scale invariance}: Long documents don't dominate short ones
+    \item \textbf{Numerical stability}: All values in similar range
+\end{enumerate}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Default: lowercase=True, L2 normalization
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(documents)
+
+# Check: each row has L2 norm of 1
+import numpy as np
+print(np.linalg.norm(X[0].toarray()))  # Should be ~1.0
+\end{lstlisting}
+
+\subsection{Document Similarity with Cosine}
+
+\begin{definitionbox}[Cosine Similarity]
+\[
+\text{similarity}(d_1, d_2) = \cos(\theta) = \frac{d_1 \cdot d_2}{\|d_1\| \|d_2\|}
+\]
+
+For L2-normalized vectors: $\text{similarity} = d_1 \cdot d_2$ (just dot product!)
+\end{definitionbox}
+
+\begin{infobox}[title=Interpreting Cosine Similarity]
+\begin{tabular}{ll}
+$\cos(\theta) = 1$ & Identical direction (very similar) \\
+$\cos(\theta) = 0$ & Orthogonal (no common terms) \\
+$\cos(\theta) = -1$ & Opposite direction (rare in TF-IDF since values $\geq 0$) \\
+\end{tabular}
+\end{infobox}
+
+%========================================================================================
+% SECTION 3: Word Embeddings
+%========================================================================================
+\newpage
+\section{Word Embeddings: Dense Representations}
+
+\subsection{Limitations of One-Hot Encoding}
+
+One-hot encoding represents each word as a sparse vector:
+\begin{itemize}
+    \item ``cat'' = [0, 0, 1, 0, 0, ..., 0] (10,000 dimensions)
+    \item ``dog'' = [0, 0, 0, 1, 0, ..., 0] (10,000 dimensions)
+\end{itemize}
+
+\textbf{Problems}:
+\begin{enumerate}
+    \item \textbf{High dimensionality}: Vector size = vocabulary size
+    \item \textbf{Sparse}: Mostly zeros, computationally wasteful
+    \item \textbf{No semantics}: ``cat'' and ``dog'' are as different as ``cat'' and ``table''
+\end{enumerate}
+
+\subsection{What is an Embedding?}
+
+\begin{definitionbox}[Word Embedding]
+A learned mapping from discrete words to dense, continuous vectors in low-dimensional space:
+\[
+\text{embed}: \{1, 2, \ldots, V\} \rightarrow \mathbb{R}^d
+\]
+where $V$ = vocabulary size, $d$ = embedding dimension (typically 50--300).
+\end{definitionbox}
+
+\subsection{Embedding as a Neural Network Layer}
+
+\begin{examplebox}[Embedding Layer Mechanics]
+Consider vocabulary size 3, embedding dimension 2:
+
+\textbf{Embedding matrix} $W$ (learnable parameters):
+\[
+W = \begin{bmatrix}
+w_{11} & w_{12} \\
+w_{21} & w_{22} \\
+w_{31} & w_{32}
+\end{bmatrix}
+\]
+
+\textbf{One-hot input for word 2}: $x = [0, 1, 0]$
+
+\textbf{Embedding output}: $x \cdot W = [w_{21}, w_{22}]$ (just row 2!)
+
+\textbf{Efficient implementation}: Instead of matrix multiplication, just look up row by index.
+\end{examplebox}
+
+\begin{infobox}[title=Embedding Layer = Lookup Table]
+The embedding layer is mathematically a linear layer without bias. But because input is one-hot:
+\begin{itemize}
+    \item Matrix multiplication with one-hot = selecting one row
+    \item Implementation: Direct lookup by index (much faster)
+    \item Parameters: $V \times d$ (vocabulary size $\times$ embedding dimension)
+\end{itemize}
+\end{infobox}
+
+\subsection{Training Embeddings}
+
+Two approaches:
+\begin{enumerate}
+    \item \textbf{Task-specific}: Train embedding layer as part of your model (classification, etc.)
+    \item \textbf{Pre-trained}: Use Word2Vec, GloVe, etc. trained on large corpora
+\end{enumerate}
+
+\begin{warningbox}[title=Task-Specific vs Pre-trained Tradeoffs]
+\textbf{Task-specific embeddings}:
+\begin{itemize}
+    \item Optimized for your specific task
+    \item May not capture general semantics
+    \item Synonyms might not be similar if task doesn't require it
+\end{itemize}
+
+\textbf{Pre-trained embeddings (Word2Vec, GloVe)}:
+\begin{itemize}
+    \item Capture general semantic relationships
+    \item Transfer learning: works even with limited data
+    \item May include biases from training corpus
+\end{itemize}
+\end{warningbox}
+
+%========================================================================================
+% SECTION 4: Word2Vec
+%========================================================================================
+\newpage
+\section{Word2Vec: Learning from Context}
+
+\subsection{The Key Idea}
+
+\begin{summarybox}
+``You shall know a word by the company it keeps.'' ---J.R. Firth (1957)
+
+Word2Vec learns embeddings by predicting words from their context (or vice versa).
+\end{summarybox}
+
+\subsection{Two Architectures}
+
+\subsubsection{Skip-gram: Predict Context from Word}
+
+\begin{itemize}
+    \item \textbf{Input}: Current word
+    \item \textbf{Output}: Surrounding context words
+    \item \textbf{Example}: Given ``cat,'' predict [``the'', ``sat'', ``on'', ``mat'']
+\end{itemize}
+
+\subsubsection{CBOW (Continuous Bag of Words): Predict Word from Context}
+
+\begin{itemize}
+    \item \textbf{Input}: Surrounding context words
+    \item \textbf{Output}: Current word
+    \item \textbf{Example}: Given [``the'', ``sat'', ``on'', ``mat''], predict ``cat''
+\end{itemize}
+
+\begin{examplebox}[Window Size]
+With window size 5:
+\begin{itemize}
+    \item Consider 5 words before and 5 words after
+    \item Total context: up to 10 words (plus target)
+    \item Larger window = broader context, slower training
+\end{itemize}
+\end{examplebox}
+
+\subsection{Why Word2Vec Captures Semantics}
+
+Because embeddings are trained to predict context:
+\begin{itemize}
+    \item Words appearing in similar contexts get similar embeddings
+    \item ``king'' and ``queen'' appear in similar contexts $\Rightarrow$ similar vectors
+    \item Synonyms naturally cluster together
+\end{itemize}
+
+\subsection{Word Analogies}
+
+\begin{definitionbox}[Vector Arithmetic]
+Word2Vec embeddings enable semantic arithmetic:
+\[
+\vec{\text{king}} - \vec{\text{man}} + \vec{\text{woman}} \approx \vec{\text{queen}}
+\]
+
+The vector $\vec{\text{man}} - \vec{\text{woman}}$ encodes the concept of ``gender.''
+\end{definitionbox}
+
+\begin{lstlisting}[style=pythonstyle]
+from gensim.models import Word2Vec
+
+# Train model
+model = Word2Vec(sentences, vector_size=100, window=5)
+
+# Word analogy
+result = model.wv.most_similar(
+    positive=['king', 'woman'],
+    negative=['man'],
+    topn=1
+)
+print(result)  # [('queen', 0.85)]
+\end{lstlisting}
+
+\subsection{Finding Similar Words}
+
+\begin{lstlisting}[style=pythonstyle]
+# Find words most similar to "destruction"
+similar = model.wv.most_similar('destruction', topn=5)
+# Might return: [('flood', 0.91), ('damage', 0.87), ...]
+
+# Similarity is cosine of angle between vectors
+similarity = model.wv.similarity('cat', 'dog')
+# Returns value between -1 and 1
+\end{lstlisting}
+
+%========================================================================================
+% SECTION 5: GloVe
+%========================================================================================
+\newpage
+\section{GloVe: Global Vectors for Word Representation}
+
+\subsection{Motivation}
+
+Word2Vec only looks at \textbf{local} context windows. GloVe uses \textbf{global} co-occurrence statistics from the entire corpus.
+
+\begin{definitionbox}[Co-occurrence Matrix]
+Build a matrix $X$ where $X_{ij}$ = number of times word $i$ appears near word $j$ across the entire corpus.
+\end{definitionbox}
+
+\subsection{The GloVe Objective}
+
+GloVe learns embeddings such that:
+\[
+\vec{w_i} \cdot \vec{w_j} + b_i + b_j = \log(X_{ij})
+\]
+
+\textbf{Interpretation}: The dot product of word vectors should approximate the log of their co-occurrence count.
+
+\begin{infobox}[title=Why Log Co-occurrence?]
+\begin{itemize}
+    \item Raw counts vary wildly (some pairs co-occur millions of times)
+    \item Log compresses the range
+    \item Dot product naturally represents similarity
+\end{itemize}
+\end{infobox}
+
+\subsection{Word2Vec vs GloVe}
+
+\begin{center}
+\begin{tabular}{lp{5.5cm}p{5.5cm}}
+\toprule
+\textbf{Aspect} & \textbf{Word2Vec} & \textbf{GloVe} \\
+\midrule
+Training & Local context windows & Global co-occurrence matrix \\
+Approach & Predictive (neural network) & Count-based (matrix factorization) \\
+Memory & Streams through corpus & Needs entire co-occurrence matrix \\
+Speed & Slower per epoch & Faster convergence \\
+Results & Very similar quality & Very similar quality \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Using Pre-trained Embeddings}
+
+\begin{lstlisting}[style=pythonstyle]
+# Load pre-trained GloVe
+import gensim.downloader as api
+glove = api.load('glove-wiki-gigaword-100')
+
+# Use like Word2Vec
+similar = glove.most_similar('computer', topn=5)
+vector = glove['computer']  # 100-dimensional vector
+\end{lstlisting}
+
+%========================================================================================
+% SECTION 6: Practical Considerations
+%========================================================================================
+\newpage
+\section{Practical Considerations}
+
+\subsection{Embedding Dimension}
+
+\begin{infobox}[title=Choosing Embedding Dimension]
+\begin{itemize}
+    \item \textbf{Too small (e.g., 10)}: Can't capture rich semantics
+    \item \textbf{Too large (e.g., 1000)}: Overfitting, slow training
+    \item \textbf{Common choices}: 50, 100, 200, 300
+    \item \textbf{Rule of thumb}: Try 100--300 for most applications
+\end{itemize}
+\end{infobox}
+
+\subsection{Out-of-Vocabulary (OOV) Words}
+
+\begin{warningbox}[title=OOV Problem]
+Pre-trained embeddings only cover words in their training vocabulary:
+\begin{itemize}
+    \item New words (``ChatGPT'') won't have embeddings
+    \item Misspellings won't be recognized
+    \item Rare technical terms may be missing
+\end{itemize}
+
+\textbf{Solutions}:
+\begin{itemize}
+    \item Use subword embeddings (FastText, BPE)
+    \item Map unknown words to special ``UNK'' token
+    \item Train domain-specific embeddings
+\end{itemize}
+\end{warningbox}
+
+\subsection{Bias in Embeddings}
+
+\begin{warningbox}[title=Societal Biases]
+Embeddings learn from text, including biases:
+\begin{itemize}
+    \item ``doctor'' may be closer to ``man'' than ``woman''
+    \item Historical texts contain outdated stereotypes
+    \item These biases affect downstream applications
+\end{itemize}
+
+\textbf{Mitigation}: Debiasing techniques, careful data curation, bias auditing.
+\end{warningbox}
+
+\subsection{Aggregating Word Embeddings}
+
+For classification without sequence models:
+
+\begin{lstlisting}[style=pythonstyle]
+def document_embedding(doc, model):
+    """Average word embeddings for document."""
+    vectors = [model[word] for word in doc if word in model]
+    if vectors:
+        return np.mean(vectors, axis=0)
+    return np.zeros(model.vector_size)
+\end{lstlisting}
+
+\begin{infobox}[title=Averaging Embeddings]
+Simple averaging:
+\begin{itemize}
+    \item Loses word order (like bag of words)
+    \item Works surprisingly well for classification
+    \item Fast and simple baseline
+\end{itemize}
+
+Better approaches: TF-IDF weighted averaging, use RNN/Transformer instead.
+\end{infobox}
+
+%========================================================================================
+% SECTION 7: TF-IDF Implementation
+%========================================================================================
+\newpage
+\section{TF-IDF Implementation Guide}
+
+\subsection{Basic TF-IDF with sklearn}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+corpus = [
+    "The cat sat on the mat",
+    "The dog sat on the log",
+    "Cats and dogs are friends"
+]
+
+# Create and fit vectorizer
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(corpus)
+
+# View vocabulary
+print(vectorizer.get_feature_names_out())
+# ['and', 'are', 'cat', 'cats', 'dog', 'dogs', 'friends', ...]
+
+# View TF-IDF matrix
+print(X.toarray())
+\end{lstlisting}
+
+\subsection{Customizing TfidfVectorizer}
+
+\begin{lstlisting}[style=pythonstyle]
+vectorizer = TfidfVectorizer(
+    lowercase=True,           # Convert to lowercase
+    stop_words='english',     # Remove English stop words
+    ngram_range=(1, 2),       # Unigrams and bigrams
+    max_features=10000,       # Top 10k features only
+    min_df=2,                 # Ignore terms in < 2 docs
+    max_df=0.95,              # Ignore terms in > 95% docs
+    norm='l2'                 # L2 normalization (default)
+)
+\end{lstlisting}
+
+\subsection{Using with Preprocessing}
+
+\begin{lstlisting}[style=pythonstyle]
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+
+stemmer = PorterStemmer()
+
+def preprocess(text):
+    tokens = word_tokenize(text.lower())
+    stems = [stemmer.stem(t) for t in tokens]
+    return ' '.join(stems)
+
+# Preprocess documents
+processed = [preprocess(doc) for doc in corpus]
+
+# Then apply TF-IDF
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(processed)
+\end{lstlisting}
+
+%========================================================================================
+% SECTION 8: One-Page Summary
+%========================================================================================
+\newpage
+\section{One-Page Summary}
+
+\begin{tcolorbox}[title=TF-IDF, colback=blue!5]
+\textbf{Term Frequency}: $\text{TF}(t,d) = \frac{\text{count}(t,d)}{\text{len}(d)}$
+
+\textbf{Inverse Document Frequency}: $\text{IDF}(t) = \ln\left(\frac{N}{df(t)}\right)$
+
+\textbf{TF-IDF}: $\text{TF}(t,d) \times \text{IDF}(t)$
+
+\textbf{Key insight}: High TF-IDF = frequent in document, rare in corpus
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Word Embeddings, colback=green!5]
+\textbf{One-hot}: Sparse, high-dimensional, no semantics
+
+\textbf{Embedding}: Dense, low-dimensional, captures meaning
+
+\textbf{Parameters}: vocabulary\_size $\times$ embedding\_dim
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Word2Vec, colback=purple!5]
+\textbf{Skip-gram}: Predict context from word
+
+\textbf{CBOW}: Predict word from context
+
+\textbf{Key property}: $\vec{\text{king}} - \vec{\text{man}} + \vec{\text{woman}} \approx \vec{\text{queen}}$
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=GloVe, colback=orange!5]
+\textbf{Approach}: Learn from global co-occurrence matrix
+
+\textbf{Objective}: $\vec{w_i} \cdot \vec{w_j} \approx \log(\text{co-occurrence})$
+
+\textbf{Result}: Similar quality to Word2Vec
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Cosine Similarity, colback=yellow!5]
+$\cos(\theta) = \frac{a \cdot b}{\|a\| \|b\|}$
+
+For unit vectors: $\cos(\theta) = a \cdot b$
+
+Used to measure word/document similarity
+\end{tcolorbox}
+
+%========================================================================================
+% GLOSSARY
+%========================================================================================
+\newpage
+\section{Glossary}
+
+\begin{longtable}{p{4cm}p{11cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+
+CBOW & Continuous Bag of Words: Word2Vec variant predicting word from context \\
+
+Co-occurrence Matrix & Matrix counting how often word pairs appear together \\
+
+Cosine Similarity & Similarity measure based on angle between vectors \\
+
+Document Frequency & Number of documents containing a term \\
+
+Embedding & Dense vector representation of discrete items \\
+
+GloVe & Global Vectors: embedding method using co-occurrence statistics \\
+
+IDF & Inverse Document Frequency: log(total docs / docs with term) \\
+
+L2 Normalization & Scaling vector to unit length using Euclidean norm \\
+
+One-hot Encoding & Sparse vector with single 1 indicating category \\
+
+Skip-gram & Word2Vec variant predicting context from word \\
+
+TF & Term Frequency: count of term / document length \\
+
+TF-IDF & Term Frequency-Inverse Document Frequency \\
+
+Weight Sharing & Using same weights at different positions (RNN, CNN) \\
+
+Window Size & Number of context words considered around target \\
+
+Word2Vec & Neural embedding method learning from local context \\
+
+\bottomrule
+\end{longtable}
+
+\end{document}

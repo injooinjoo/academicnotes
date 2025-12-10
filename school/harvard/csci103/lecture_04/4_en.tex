@@ -1,0 +1,903 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Data Engineering for Analytics
+% Lecture 04: Data Transformations, Design Patterns, and Compliance
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Data Engineering for Analytics}}
+\fancyhead[R]{\small\textit{Lecture 04}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, CREATE, TABLE, PARTITIONED, OPTIMIZE, ZORDER, MERGE, WHEN, MATCHED, THEN, UPDATE, INSERT, DELETE},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Data Engineering - Lecture 04},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Data Transformations and Design Patterns}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Settings
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\title{CSCI E-103: Data Engineering for Analytics\\Lecture 04: Data Transformations, Design Patterns, and Compliance}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Data Engineering for Analytics}{Lecture 04: Transformations \& Patterns}{Anindita Mahapatra \& Eric Gieseke}{Master data engineering design patterns, understand compliance (GDPR/CCPA), Spark internals (partitions, joins), and CDC/SCD concepts}
+
+\begin{summarybox}
+This lecture covers essential data transformation concepts. We explore \textbf{design patterns} for big data (Lambda, Kappa, CQRS, Data Mesh), understand \textbf{compliance requirements} (GDPR, CCPA) and their engineering implications, dive into \textbf{Spark internals} (jobs/stages/tasks, table vs Spark partitions, Z-ordering, join strategies), and learn about \textbf{CDC (Change Data Capture)} and \textbf{SCD (Slowly Changing Dimensions)} for tracking data changes over time.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{What Are Design Patterns?}
+%========================================================================================
+
+\begin{definitionbox}{Design Pattern}
+A design pattern is a \textbf{reusable, proven solution template} for common problems in software or data engineering. Patterns provide tested approaches that you can adapt to your specific context.
+\end{definitionbox}
+
+\subsection{Why Use Design Patterns?}
+
+\begin{enumerate}
+    \item \textbf{Embody Good Design Principles}: Patterns naturally incorporate principles like abstraction, separation of concerns, and divide-and-conquer
+    \item \textbf{Common Vocabulary}: Instead of explaining complex designs every time, say "let's use Lambda architecture" and everyone understands
+    \item \textbf{Proven Solutions}: These patterns have been battle-tested in production systems
+    \item \textbf{Faster Development}: Don't reinvent the wheel—use established templates
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Apply Judiciously}
+
+"When you have a hammer, everything looks like a nail." Don't force-fit patterns. Always evaluate whether a pattern actually fits your problem context (data volume, latency requirements, cost constraints).
+\end{warningbox}
+
+\newpage
+
+%========================================================================================
+\section{Big Data Design Patterns}
+%========================================================================================
+
+Big data patterns differ from traditional software patterns (Gang of Four). They focus on scale, velocity, volume, and distributed processing challenges.
+
+\subsection{Patterns by Pipeline Stage}
+
+\begin{table}[h!]
+\centering
+\caption{Design Patterns by Pipeline Stage}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Stage} & \textbf{Pattern} & \textbf{Purpose} \\
+\midrule
+\textbf{Modeling} & Star/Snowflake Schema & Analytical data warehouse structure \\
+& Vault Modeling & Preserve all change history \\
+\midrule
+\textbf{Ingestion} & Connector Pattern & Uniform interface to diverse sources \\
+& Lambda/Kappa & Handle batch + streaming \\
+& Compute/Storage Separation & Scale independently \\
+\midrule
+\textbf{Transform} & Schema on Read/Write & When to define schema \\
+& ACID Transactions & Data integrity at scale \\
+& Multi-Hop Pipeline & Progressive data refinement \\
+\midrule
+\textbf{Storage} & Columnar Storage & Fast analytical queries \\
+& Denormalized Tables & Avoid expensive joins \\
+\midrule
+\textbf{Analytics} & In-Stream Analytics & Real-time processing before storage \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Architecture Patterns}
+
+\subsubsection{Lambda Architecture}
+
+Splits data flow into two paths:
+\begin{itemize}
+    \item \textbf{Batch Layer}: Slow but accurate—processes all historical data
+    \item \textbf{Speed Layer}: Fast but approximate—processes real-time data
+    \item \textbf{Serving Layer}: Merges results from both layers
+\end{itemize}
+
+\textbf{Use case}: When you need both real-time insights AND historically accurate analysis.
+
+\subsubsection{Kappa Architecture}
+
+Single streaming pipeline handles everything:
+\begin{itemize}
+    \item All data treated as a stream
+    \item For "batch" needs, replay the stream from beginning
+    \item Simpler than Lambda (one codebase)
+\end{itemize}
+
+\textbf{Use case}: Real-time processing, event-driven systems, IoT.
+
+\subsubsection{Event-Driven Architecture (EDA)}
+
+System reacts to events (state changes):
+\begin{itemize}
+    \item \textbf{Event Producers}: Generate events
+    \item \textbf{Event Streaming}: Kafka, Event Hubs
+    \item \textbf{Event Consumers}: React to events
+\end{itemize}
+
+\textbf{Use case}: Microservices, e-commerce transaction processing.
+
+\subsection{Storage Patterns}
+
+\subsubsection{CQRS (Command Query Responsibility Segregation)}
+
+\begin{definitionbox}{CQRS}
+Separate the system's \textbf{write operations} (commands) from \textbf{read operations} (queries) into different models that can be scaled independently.
+\end{definitionbox}
+
+\textbf{Why?} Write-heavy workloads and read-heavy workloads have different requirements. Separating them allows optimal scaling for each.
+
+\subsubsection{Polyglot Persistence}
+
+\begin{definitionbox}{Polyglot Persistence}
+"Use the right database for the job." Instead of forcing all data into one database type, use multiple specialized databases:
+\begin{itemize}
+    \item Relational DB for transactional data
+    \item Document store for unstructured data
+    \item Graph DB for relationship-centric data
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Data Lake Pattern}
+
+Store all data (structured, semi-structured, unstructured) in its \textbf{raw form}:
+\begin{itemize}
+    \item "Store now, figure out how to use later"
+    \item Preserves original data for future unknown use cases
+    \item Uses Schema-on-Read (define schema when reading)
+\end{itemize}
+
+\subsection{Processing Patterns}
+
+\subsubsection{Micro-batch Processing}
+
+Process streaming data in small, regular intervals:
+\begin{itemize}
+    \item Not true streaming, but "near real-time"
+    \item Batch interval defines processing frequency
+    \item Spark Structured Streaming default mode
+\end{itemize}
+
+\subsubsection{Multi-Hop (Medallion) Architecture}
+
+Progressive data refinement through stages:
+
+\begin{itemize}
+    \item \textbf{Bronze (Landing)}: Raw data, minimal transformation
+    \item \textbf{Silver (Refined)}: Cleaned, validated, business logic applied
+    \item \textbf{Gold (Aggregated)}: Analytics-ready, pre-computed aggregations
+\end{itemize}
+
+\textbf{Key insight}: As you move toward Gold, data quality increases but data availability decreases (Bronze is available immediately).
+
+\subsubsection{Minimize Data Movement}
+
+Moving petabytes is expensive. Use:
+
+\begin{itemize}
+    \item \textbf{Time Travel}: Version data—access historical states without copying
+    \item \textbf{Zero-Copy Clone}: Clone tables by copying only metadata, not data
+    \item \textbf{Delta Share}: Share data access without physical transfer
+\end{itemize}
+
+\subsection{Other Notable Patterns}
+
+\begin{itemize}
+    \item \textbf{CAP Theorem Selection}: Choose CP (consistency) or AP (availability) based on needs
+    \item \textbf{Data Mesh}: Decentralized data ownership—each domain team owns their data as a "product"
+    \item \textbf{Connector/Bridge Pattern}: Uniform API across diverse data sources (e.g., JDBC)
+\end{itemize}
+
+\newpage
+
+%========================================================================================
+\section{Data Compliance: GDPR and CCPA}
+%========================================================================================
+
+Data engineers have legal and ethical responsibilities when handling personal data.
+
+\subsection{Key Regulations}
+
+\begin{definitionbox}{GDPR (General Data Protection Regulation)}
+EU regulation protecting personal data of EU citizens. Applies to ANY company processing EU citizen data, regardless of location. Heavy fines for violations (up to 4\% of global revenue).
+\end{definitionbox}
+
+\begin{definitionbox}{CCPA (California Consumer Privacy Act)}
+California law providing similar protections for California residents.
+\end{definitionbox}
+
+\subsection{Engineering Implications}
+
+Two key rights create engineering challenges:
+
+\subsubsection{1. Right of Erasure (Right to be Forgotten)}
+
+Users can request deletion of their personal data.
+
+\begin{warningbox}
+\textbf{The Challenge}
+
+In a data lake with petabytes of data across millions of files, how do you find and delete one user's records? Traditional formats like Parquet are immutable—you can't just delete a row.
+
+\textbf{Solution}: Delta Lake, Hudi, Iceberg support fine-grained deletes.
+\end{warningbox}
+
+\subsubsection{2. Right of Portability}
+
+Users can request their data be exported and transferred to another service.
+
+\subsection{Technical Solutions}
+
+\begin{itemize}
+    \item \textbf{Fine-grained Updates/Deletes}: Use Delta Lake for row-level operations
+    \item \textbf{Pseudonymization}: Replace identifiers with tokens
+    \begin{itemize}
+        \item Store [User ID $\leftrightarrow$ Token] mapping separately
+        \item All analytics use tokens only
+        \item For erasure: just delete the mapping—data becomes unlinkable
+    \end{itemize}
+\end{itemize}
+
+\newpage
+
+%========================================================================================
+\section{Spark Execution: Jobs, Stages, Tasks}
+%========================================================================================
+
+Understanding how Spark executes your code helps you write more efficient pipelines.
+
+\subsection{Execution Hierarchy}
+
+\begin{summarybox}
+\textbf{Job $\to$ Stages $\to$ Tasks}
+
+\begin{enumerate}
+    \item \textbf{Job}: Created for each \textbf{action} (e.g., \code{save()}, \code{collect()})
+    \item \textbf{Stage}: Jobs split at \textbf{shuffle} boundaries (data redistribution points)
+    \item \textbf{Task}: Smallest unit—one task per partition, runs on executor cores in parallel
+\end{enumerate}
+\end{summarybox}
+
+\subsection{Shuffle Operations}
+
+\begin{definitionbox}{Shuffle}
+The process of redistributing data across cluster nodes. Required for operations like \code{groupBy()}, \code{join()}, \code{reduceByKey()} where data from different partitions must be combined.
+\end{definitionbox}
+
+\textbf{Why expensive?}
+\begin{itemize}
+    \item Data transferred over network between executors
+    \item Disk I/O for intermediate data
+    \item Synchronization overhead
+\end{itemize}
+
+\textbf{Minimize shuffles when possible!}
+
+\newpage
+
+%========================================================================================
+\section{Table Partitions vs Spark Partitions}
+%========================================================================================
+
+These are two completely different concepts that beginners often confuse.
+
+\begin{importantbox}{Library Analogy}
+\begin{itemize}
+    \item \textbf{Table Partitions} = Physical bookshelves organized by category (reduces disk I/O)
+    \item \textbf{Spark Partitions} = Number of librarians working in parallel (increases CPU parallelism)
+\end{itemize}
+\end{importantbox}
+
+\subsection{Comparison Table}
+
+\begin{table}[h!]
+\centering
+\caption{Table Partitions vs Spark Partitions}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Aspect} & \textbf{Table Partitioning} & \textbf{Spark Partitioning} \\
+\midrule
+\textbf{Level} & Database/Table & Processing/Runtime \\
+\textbf{What it is} & Physical organization on disk by column values & Logical distribution across cluster nodes \\
+\textbf{Purpose} & Minimize data scans (disk I/O) & Maximize parallelism (CPU) \\
+\textbf{Controlled by} & User (explicit DDL) & Spark (dynamic, based on data/config) \\
+\textbf{Optimization} & Partition Pruning & Shuffle optimization \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Table Partitioning Best Practices}
+
+\begin{itemize}
+    \item Choose columns frequently used in \code{WHERE} clauses (date, country, region)
+    \item Avoid high-cardinality columns (user\_id)—creates millions of tiny partitions
+    \item Target at least 1GB per partition
+    \item \textbf{Modern advice}: For data $<$ 1TB, don't partition—let Delta Lake optimize
+\end{itemize}
+
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Partitioned Table}]
+CREATE TABLE sales (
+    id INT,
+    amount DECIMAL,
+    sale_date DATE,
+    country STRING
+)
+PARTITIONED BY (country, sale_date);
+\end{lstlisting}
+
+\subsection{Z-Ordering}
+
+\begin{definitionbox}{Z-Ordering}
+A Delta Lake optimization that co-locates related data on disk based on multiple columns. Improves query performance through data skipping.
+\end{definitionbox}
+
+\textbf{When to use}: Columns frequently filtered together but not suitable as partition keys.
+
+\begin{lstlisting}[style=sqlstyle, caption={OPTIMIZE with Z-Ordering}]
+-- Compact files and organize by ip_address, port
+OPTIMIZE network_logs
+ZORDER BY (ip_address, port);
+\end{lstlisting}
+
+\newpage
+
+%========================================================================================
+\section{Spark Join Strategies}
+%========================================================================================
+
+Spark automatically selects the most efficient join strategy based on data characteristics.
+
+\subsection{Broadcast Hash Join}
+
+\begin{itemize}
+    \item \textbf{Condition}: One table is small (fits in memory)
+    \item \textbf{Mechanism}: Broadcast small table to all executors
+    \item \textbf{Pros}: No shuffle, no sort—very fast
+    \item \textbf{Cons}: Only works with small tables
+\end{itemize}
+
+\begin{lstlisting}[style=pythonstyle, caption={Forcing Broadcast Join}]
+from pyspark.sql.functions import broadcast
+
+# Explicitly broadcast the small table
+df_result = df_large.join(broadcast(df_small), "key")
+\end{lstlisting}
+
+\subsection{Shuffle Hash Join}
+
+\begin{itemize}
+    \item \textbf{Condition}: One side is 3x+ smaller, partition fits in memory
+    \item \textbf{Mechanism}: Shuffle data, build hash table on smaller side
+    \item \textbf{Pros}: Handles larger tables than broadcast
+    \item \textbf{Cons}: Requires shuffle (no sort)
+\end{itemize}
+
+\subsection{Sort Merge Join}
+
+\begin{itemize}
+    \item \textbf{Condition}: Default for large tables
+    \item \textbf{Mechanism}: Shuffle both sides, sort, then merge
+    \item \textbf{Pros}: Handles any data size, very robust
+    \item \textbf{Cons}: Requires shuffle AND sort—slowest
+\end{itemize}
+
+\begin{summarybox}
+\textbf{Join Strategy Selection}
+
+\begin{enumerate}
+    \item \textbf{Small table?} $\to$ Broadcast Hash Join (fastest)
+    \item \textbf{Medium asymmetry?} $\to$ Shuffle Hash Join
+    \item \textbf{Both large?} $\to$ Sort Merge Join (default)
+\end{enumerate}
+\end{summarybox}
+
+\newpage
+
+%========================================================================================
+\section{CDC and SCD: Tracking Data Changes}
+%========================================================================================
+
+\subsection{CDC: Change Data Capture}
+
+\begin{definitionbox}{CDC (Change Data Capture)}
+A technique for identifying and capturing changes (inserts, updates, deletes) in source data so they can be replicated to target systems incrementally.
+\end{definitionbox}
+
+\textbf{Why CDC?}
+\begin{itemize}
+    \item Full table reloads are expensive and slow
+    \item Only process what changed since last sync
+    \item Near real-time data synchronization
+\end{itemize}
+
+\textbf{Common CDC approaches}:
+\begin{itemize}
+    \item \textbf{Log-based}: Read database transaction logs (most accurate)
+    \item \textbf{Timestamp-based}: Query records modified after last sync
+    \item \textbf{Trigger-based}: Database triggers capture changes
+\end{itemize}
+
+\subsection{SCD: Slowly Changing Dimensions}
+
+\begin{definitionbox}{SCD (Slowly Changing Dimension)}
+A dimension table attribute that changes over time (e.g., customer address). SCD defines how to handle historical values when changes occur.
+\end{definitionbox}
+
+\subsubsection{SCD Type 1: Overwrite}
+
+\begin{itemize}
+    \item Simply update the record—no history kept
+    \item \textbf{Use case}: Corrections, when history doesn't matter
+\end{itemize}
+
+\begin{lstlisting}[style=sqlstyle, caption={SCD Type 1: Simple Update}]
+UPDATE customers
+SET address = 'New Address'
+WHERE customer_id = 123;
+\end{lstlisting}
+
+\subsubsection{SCD Type 2: Add New Row}
+
+\begin{itemize}
+    \item Keep all historical versions as separate rows
+    \item Add columns: \code{effective\_date}, \code{end\_date}, \code{is\_current}
+    \item \textbf{Use case}: Full audit trail, historical analysis
+\end{itemize}
+
+\begin{lstlisting}[style=sqlstyle, caption={SCD Type 2: Historical Record}]
+-- Old record
+| customer_id | address     | effective | end_date   | current |
+|-------------|-------------|-----------|------------|---------|
+| 123         | Old Address | 2020-01-01| 2024-01-15 | false   |
+| 123         | New Address | 2024-01-15| 9999-12-31 | true    |
+\end{lstlisting}
+
+\subsection{MERGE Statement for CDC/SCD}
+
+Delta Lake's MERGE handles upserts (update or insert) efficiently:
+
+\begin{lstlisting}[style=sqlstyle, caption={MERGE for Upsert Operations}]
+MERGE INTO target_table t
+USING source_table s
+ON t.id = s.id
+WHEN MATCHED THEN
+    UPDATE SET t.value = s.value
+WHEN NOT MATCHED THEN
+    INSERT (id, value) VALUES (s.id, s.value)
+WHEN NOT MATCHED BY SOURCE THEN
+    DELETE;
+\end{lstlisting}
+
+\newpage
+
+%========================================================================================
+\section{Delta Lake Operations}
+%========================================================================================
+
+\subsection{OPTIMIZE: File Compaction}
+
+\begin{lstlisting}[style=sqlstyle, caption={OPTIMIZE Command}]
+-- Compact small files into larger ones
+OPTIMIZE my_table;
+
+-- Compact and Z-order
+OPTIMIZE my_table ZORDER BY (column1, column2);
+\end{lstlisting}
+
+\textbf{Why?} Small files hurt query performance due to file listing overhead.
+
+\subsection{VACUUM: Clean Old Versions}
+
+\begin{lstlisting}[style=sqlstyle, caption={VACUUM Command}]
+-- Remove files older than retention period (default 7 days)
+VACUUM my_table;
+
+-- Custom retention (requires safety flag)
+VACUUM my_table RETAIN 168 HOURS;  -- 7 days
+\end{lstlisting}
+
+\textbf{Warning}: After VACUUM, time travel to cleaned versions is impossible.
+
+\subsection{Time Travel}
+
+\begin{lstlisting}[style=sqlstyle, caption={Time Travel Queries}]
+-- Query specific version
+SELECT * FROM my_table VERSION AS OF 10;
+
+-- Query by timestamp
+SELECT * FROM my_table TIMESTAMP AS OF '2024-01-01';
+
+-- Restore to previous version
+RESTORE TABLE my_table TO VERSION AS OF 5;
+\end{lstlisting}
+
+\subsection{Clone: Zero-Copy Duplication}
+
+\begin{lstlisting}[style=sqlstyle, caption={Clone Operations}]
+-- Shallow clone (metadata only)
+CREATE TABLE my_table_clone SHALLOW CLONE my_table;
+
+-- Deep clone (full copy)
+CREATE TABLE my_table_copy DEEP CLONE my_table;
+\end{lstlisting}
+
+\newpage
+
+%========================================================================================
+\section{Summary and Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Key Takeaways}
+
+\begin{enumerate}
+    \item \textbf{Design Patterns} provide proven solutions for common data engineering problems. Use them judiciously—match pattern to problem.
+
+    \item \textbf{Key Architecture Patterns}:
+    \begin{itemize}
+        \item Lambda: Separate batch + streaming layers
+        \item Kappa: Unified streaming layer
+        \item CQRS: Separate read and write models
+        \item Data Mesh: Decentralized data ownership
+    \end{itemize}
+
+    \item \textbf{Compliance (GDPR/CCPA)}: Right to erasure and portability require fine-grained data operations. Use Delta Lake + pseudonymization.
+
+    \item \textbf{Spark Execution}: Job $\to$ Stages (shuffle boundary) $\to$ Tasks (partition)
+
+    \item \textbf{Two Types of Partitions}:
+    \begin{itemize}
+        \item Table Partitions: Physical organization, minimize disk I/O
+        \item Spark Partitions: Logical distribution, maximize parallelism
+    \end{itemize}
+
+    \item \textbf{Z-Ordering}: Co-locate related data for multi-column filtering
+
+    \item \textbf{Join Strategies}: Broadcast (small table) $>$ Shuffle Hash $>$ Sort Merge (default)
+
+    \item \textbf{CDC}: Capture incremental changes from source systems
+
+    \item \textbf{SCD}: Handle dimension changes—Type 1 (overwrite) vs Type 2 (history)
+
+    \item \textbf{Delta Lake Operations}: OPTIMIZE (compact), VACUUM (clean), Time Travel, Clone
+\end{enumerate}
+\end{summarybox}
+
+\begin{warningbox}
+\textbf{Practical Advice}
+
+\begin{itemize}
+    \item[$\square$] For data $<$ 1TB, skip table partitioning—let Delta optimize
+    \item[$\square$] Minimize shuffles in Spark—they're expensive
+    \item[$\square$] Use MERGE for CDC/SCD operations
+    \item[$\square$] Set up regular OPTIMIZE jobs for frequently updated tables
+    \item[$\square$] Always consider compliance early—retrofitting is painful
+\end{itemize}
+\end{warningbox}
+
+\end{document}

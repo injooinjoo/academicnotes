@@ -1,0 +1,878 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 16: Hierarchical Models and Bayesian Logistic Regression
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 16}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 16},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 16: Hierarchical Models and Bayesian Logistic Regression}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 16}{Pavlos Protopapas, Kevin Rader, Chris Tanner}{Logistic Regression Review, Log-Scale Regression, Beta-Binomial Model, Hierarchical Models, Bayesian Logistic Regression, Posterior Predictive Distribution}
+
+\begin{summarybox}
+This lecture applies Bayesian thinking to logistic regression and introduces hierarchical models---one of the most powerful tools for handling structured data with groups.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item Review: Interpreting logistic regression coefficients (NBA shooting example)
+    \item Log-log regression for multiplicative relationships (housing prices)
+    \item Review of the Beta-Binomial model and conjugacy
+    \item Hierarchical models: Why and how to model grouped data
+    \item The shrinkage effect: Borrowing strength across groups
+    \item Bayesian logistic regression: Priors on $\beta$ coefficients
+    \item Posterior predictive distributions for forecasting
+    \item Preview: When conjugacy fails, we need simulation (MCMC)
+\end{itemize}
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%================================================================================
+\section{Review: Interpreting Logistic Regression}
+%================================================================================
+
+Before diving into new material, let's solidify our ability to interpret logistic regression models through a concrete example.
+
+\subsection{NBA Shooting Example}
+
+\textbf{Data}: All NBA field goal attempts from the previous season.
+
+\textbf{Response}: $Y = 1$ if shot is successful, $Y = 0$ if missed.
+
+\textbf{Predictor}: Distance from the hoop (in feet).
+
+After fitting a logistic regression model:
+$$\log\left(\frac{p}{1-p}\right) = 0.796 - 0.0474 \times \text{Distance}$$
+
+\subsection{Step-by-Step Interpretation}
+
+\textbf{1. Interpreting the Intercept (0.796):}
+
+The intercept represents the log-odds when Distance = 0 (a layup right at the basket).
+
+\begin{itemize}
+    \item Log-odds = 0.796
+    \item Odds = $e^{0.796} = 2.22$
+    \item Probability = $\frac{2.22}{1 + 2.22} = \frac{e^{0.796}}{1 + e^{0.796}} \approx 0.69$
+\end{itemize}
+
+\textbf{Interpretation}: A shot from 0 feet has approximately a 69\% probability of success.
+
+\textbf{2. Interpreting the Slope (-0.0474):}
+
+The slope represents the change in log-odds for each additional foot of distance.
+
+\begin{itemize}
+    \item For each 1-foot increase in distance, log-odds \textbf{decreases} by 0.0474
+    \item Odds ratio = $e^{-0.0474} \approx 0.954$
+    \item Each additional foot \textbf{multiplies} the odds by 0.954 (a 4.6\% decrease)
+\end{itemize}
+
+\textbf{Interpretation}: Longer shots are harder---makes sense!
+
+\textbf{3. Finding the Classification Boundary:}
+
+Where does the predicted probability equal 0.5?
+
+At $P = 0.5$: Log-odds = 0
+
+$$0 = 0.796 - 0.0474 \times \text{Distance}$$
+$$\text{Distance} = \frac{0.796}{0.0474} \approx 16.8 \text{ feet}$$
+
+\textbf{Interpretation}: Shots from less than ~17 feet are predicted as makes; shots from beyond ~17 feet are predicted as misses.
+
+\begin{infobox}
+\textbf{The Complete Interpretation Recipe}
+\begin{enumerate}
+    \item Write out the model equation
+    \item Interpret intercept: Log-odds when all predictors = 0
+    \item Convert to probability: $p = \frac{e^{\text{log-odds}}}{1 + e^{\text{log-odds}}}$
+    \item Interpret slopes: Change in log-odds per unit change
+    \item Convert to odds ratio: $e^{\beta}$ = multiplicative change in odds
+    \item Find decision boundary: Set log-odds = 0, solve for X
+\end{enumerate}
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{Log-Log Regression: Multiplicative Models}
+%================================================================================
+
+Sometimes the relationship between X and Y is \textbf{multiplicative} rather than additive. This is common in financial and economic data.
+
+\subsection{The Problem with Standard Linear Regression}
+
+Consider predicting house prices from square footage. Both variables:
+\begin{itemize}
+    \item Are strictly positive
+    \item Have right-skewed distributions
+    \item Show heteroscedasticity (variance increases with the mean)
+\end{itemize}
+
+\subsection{The Solution: Log-Transform Both Variables}
+
+If we take the logarithm of both $X$ and $Y$:
+$$\log_2(Y) = \beta_0 + \beta_1 \log_2(X)$$
+
+\begin{examplebox}{Housing Price Example}
+Model on log-log scale:
+$$\log_2(\text{Price}) = 12.46 + 0.722 \times \log_2(\text{SqFt})$$
+
+\textbf{Interpreting the slope (0.722):}
+
+What does a 1-unit change in $\log_2(\text{SqFt})$ mean?
+\begin{itemize}
+    \item A 1-unit increase in $\log_2(X)$ means $X$ \textbf{doubles}
+    \item This produces a 0.722-unit increase in $\log_2(Y)$
+    \item A 0.722 increase in $\log_2(Y)$ means $Y$ is multiplied by $2^{0.722} \approx 1.65$
+\end{itemize}
+
+\textbf{Final interpretation}: When you \textbf{double} the square footage, the price increases by approximately \textbf{65\%}.
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Why Base 2?}
+
+Using $\log_2$ makes interpretation intuitive:
+\begin{itemize}
+    \item 1 unit change = \textbf{doubling}
+    \item Easy to conceptualize
+\end{itemize}
+
+If you use $\ln$ (natural log), a 1-unit change means multiplying by $e \approx 2.718$, which is harder to interpret.
+
+\textbf{Alternative interpretation} (for natural log): For small $\beta_1$, approximately $\beta_1 \times 100\%$ change in $Y$ per 1\% change in $X$.
+\end{warningbox}
+
+\newpage
+
+%================================================================================
+\section{Review: Beta-Binomial Model}
+%================================================================================
+
+The Beta-Binomial model is the foundation for understanding Bayesian approaches to classification.
+
+\subsection{The Setup}
+
+\textbf{Data}: $n$ independent trials, $\sum y_i$ successes, $n - \sum y_i$ failures.
+
+\textbf{Likelihood}: Bernoulli (or Binomial)
+$$Y_i | p \sim \text{Bernoulli}(p)$$
+
+\textbf{Prior}: Beta distribution on $p$
+$$p \sim \text{Beta}(a_0, b_0)$$
+
+\textbf{Hyperparameters}: $a_0$ and $b_0$ encode our prior belief about $p$.
+
+\subsection{Conjugacy: Why Beta is Special}
+
+When we multiply the prior and likelihood:
+
+\begin{align*}
+\text{Posterior} &\propto \text{Likelihood} \times \text{Prior} \\
+f(p | Y) &\propto p^{\sum y_i}(1-p)^{n - \sum y_i} \times p^{a_0 - 1}(1-p)^{b_0 - 1} \\
+&= p^{(a_0 + \sum y_i) - 1}(1-p)^{(b_0 + n - \sum y_i) - 1}
+\end{align*}
+
+This is exactly a Beta distribution!
+
+\begin{importantbox}{Beta-Binomial Conjugacy}
+$$\text{Prior: } p \sim \text{Beta}(a_0, b_0)$$
+$$\text{Posterior: } p | Y \sim \text{Beta}(a_0 + \sum y_i, b_0 + n - \sum y_i)$$
+
+The posterior is just the prior with successes and failures ``added in.''
+\end{importantbox}
+
+\subsection{Posterior Mean: A Weighted Average}
+
+The posterior mean is:
+$$E[p | Y] = \frac{a_0 + \sum y_i}{a_0 + b_0 + n}$$
+
+This is a \textbf{weighted average} of:
+\begin{itemize}
+    \item The prior mean: $\frac{a_0}{a_0 + b_0}$
+    \item The MLE (sample proportion): $\frac{\sum y_i}{n}$
+\end{itemize}
+
+\textbf{Key insight}: As $n$ (data) increases, the posterior mean approaches the MLE. The prior matters less with more data.
+
+\newpage
+
+%================================================================================
+\section{Why Hierarchical Models?}
+%================================================================================
+
+Hierarchical models address a fundamental problem: data often has \textbf{natural grouping structure}.
+
+\subsection{Examples of Hierarchically Structured Data}
+
+\begin{itemize}
+    \item \textbf{Government}: Individual voters within counties within states within regions
+    \item \textbf{Education}: Students within classrooms within schools within districts
+    \item \textbf{Medicine}: Repeated measurements within patients within hospitals
+    \item \textbf{Biology}: Cells within tissues within organs within organisms
+    \item \textbf{Sports}: Shots within players within teams within leagues
+\end{itemize}
+
+\subsection{The NBA Shooting Problem}
+
+\textbf{Goal}: Predict shot success based on distance, accounting for player ability.
+
+\textbf{Data structure}:
+\begin{itemize}
+    \item Response: $Y_{ij}$ = success/failure of shot $i$ by player $j$
+    \item Predictor: $X_{ij}$ = distance of shot $i$ by player $j$
+    \item Grouping: ~600 different players, varying number of shots each
+\end{itemize}
+
+\subsection{Three Approaches}
+
+\textbf{Approach 1: Complete Pooling (Ignore Players)}
+$$\log\left(\frac{p_{ij}}{1-p_{ij}}\right) = \beta_0 + \beta_1 \times \text{Distance}_{ij}$$
+
+\textbf{Problem}: Assumes all players are identical. Ignores obvious differences (LeBron vs a rookie).
+
+\textbf{Approach 2: No Pooling (One-Hot Encoding)}
+$$\log\left(\frac{p_{ij}}{1-p_{ij}}\right) = \beta_0 + \beta_1 \times \text{Distance}_{ij} + \sum_{j} \gamma_j \times \mathbf{1}[\text{Player} = j]$$
+
+\textbf{Problem}: 600+ parameters! Severe overfitting, especially for players with few shots.
+
+\textbf{Approach 3: Hierarchical Model (Partial Pooling)}
+
+The best of both worlds!
+
+\newpage
+
+%================================================================================
+\section{Hierarchical Models: The Setup}
+%================================================================================
+
+\subsection{The Model}
+
+\textbf{Level 1 (Shots within Players):}
+$$\log\left(\frac{p_{ij}}{1-p_{ij}}\right) = \alpha_j + \beta_1 \times \text{Distance}_{ij}$$
+
+Each player $j$ has their own intercept $\alpha_j$ (baseline shooting ability).
+
+\textbf{Level 2 (Players within League):}
+$$\alpha_j \sim N(\alpha_0, \sigma^2_\alpha)$$
+
+The player intercepts are drawn from a common distribution:
+\begin{itemize}
+    \item $\alpha_0$ = league-average baseline ability
+    \item $\sigma^2_\alpha$ = variance of abilities across players
+\end{itemize}
+
+\begin{definitionbox}{Hierarchical Model}
+In a hierarchical model, \textbf{parameters} at one level are treated as \textbf{random variables} drawn from a distribution defined at a higher level.
+
+This creates ``partial pooling''---each group's estimate is informed by:
+\begin{enumerate}
+    \item Its own data
+    \item The overall distribution of all groups
+\end{enumerate}
+\end{definitionbox}
+
+\subsection{What Are We Estimating?}
+
+\textbf{Fixed effects} (same for everyone):
+\begin{itemize}
+    \item $\beta_1$: Effect of distance on log-odds (assumed same for all players)
+\end{itemize}
+
+\textbf{Hyperparameters} (describe the population):
+\begin{itemize}
+    \item $\alpha_0$: Mean player ability
+    \item $\sigma^2_\alpha$: Variance of player abilities
+\end{itemize}
+
+\textbf{Random effects} (vary by group):
+\begin{itemize}
+    \item $\alpha_j$ for each player $j$: Individual player abilities
+\end{itemize}
+
+\newpage
+
+%================================================================================
+\section{The Shrinkage Effect}
+%================================================================================
+
+The magic of hierarchical models lies in \textbf{shrinkage}---pulling extreme estimates toward the group mean.
+
+\subsection{The Problem with OLS}
+
+Consider two players:
+\begin{itemize}
+    \item \textbf{Alandis Williams}: 1 shot, 1 made (100\% in sample)
+    \item \textbf{Mac McClung}: 2 shots, 0 made (0\% in sample)
+\end{itemize}
+
+With standard OLS (no pooling):
+\begin{itemize}
+    \item Williams gets coefficient $\to +\infty$ (predicted 100\% from any distance!)
+    \item McClung gets coefficient $\to -\infty$ (predicted 0\% from any distance!)
+\end{itemize}
+
+\textbf{These are terrible estimates} based on almost no data.
+
+\subsection{The Hierarchical Solution}
+
+With hierarchical modeling:
+\begin{itemize}
+    \item Players with many shots: Estimates based mostly on their own data
+    \item Players with few shots: Estimates \textbf{shrunk} toward the league average
+\end{itemize}
+
+\begin{examplebox}{Shrinkage in Action}
+\textbf{Top 5 players (OLS estimates):}
+\begin{itemize}
+    \item Alandis Williams (never heard of): Coefficient $\approx +10$ (100\% predicted!)
+    \item [Other unknowns with very few shots]
+\end{itemize}
+
+\textbf{Top 5 players (Hierarchical estimates):}
+\begin{itemize}
+    \item Jarrett Allen, SGA, Damian Lillard... (famous, high-volume shooters!)
+\end{itemize}
+
+The hierarchical model \textbf{automatically discounts} estimates based on small samples and gives appropriate credit to players with substantial evidence.
+\end{examplebox}
+
+\begin{infobox}
+\textbf{How Does Sample Size Enter the Model?}
+
+The $\alpha_j$ distribution connects each player's shots to the overall population. A player with:
+\begin{itemize}
+    \item \textbf{Many shots}: Strong evidence from their Bernoulli trials pulls $\alpha_j$ toward their sample mean
+    \item \textbf{Few shots}: Weak evidence, so $\alpha_j$ is dominated by the prior (population mean $\alpha_0$)
+\end{itemize}
+
+The math automatically handles this trade-off!
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{Extending Hierarchical Models}
+%================================================================================
+
+\subsection{Random Slopes}
+
+In our current model, $\beta_1$ (distance effect) is the same for all players. But maybe:
+\begin{itemize}
+    \item Steph Curry is \textbf{better} at long-range shots
+    \item Other players are \textbf{worse} from distance
+\end{itemize}
+
+We can let the slope vary too:
+$$\log\left(\frac{p_{ij}}{1-p_{ij}}\right) = \alpha_j + \beta_{1j} \times \text{Distance}_{ij}$$
+
+where both $\alpha_j$ and $\beta_{1j}$ are drawn from distributions.
+
+\subsection{Hyperpriors: Priors on Hyperparameters}
+
+What if we're uncertain about $\alpha_0$ and $\sigma^2_\alpha$?
+
+We can add another layer:
+\begin{itemize}
+    \item $\alpha_0 \sim N(\mu_0, \tau^2)$ (hyperprior on mean)
+    \item $\sigma^2_\alpha \sim \text{Inverse-Gamma}(\ldots)$ (hyperprior on variance)
+\end{itemize}
+
+\textbf{It's turtles all the way down!}
+
+In practice, we usually stop at 2-3 levels.
+
+\subsection{Fully Bayesian vs Empirical Bayes}
+
+\textbf{Fully Bayesian}: Put priors on ALL unknown parameters ($\alpha_0, \sigma^2_\alpha, \beta_1$)
+
+\textbf{Empirical Bayes}: Estimate hyperparameters from the data (like treating $\alpha_0, \sigma^2_\alpha$ as fixed unknowns)
+
+The hierarchical model we discussed is often fit in an ``empirical Bayes'' spirit, which is a blend of frequentist and Bayesian thinking.
+
+\newpage
+
+%================================================================================
+\section{Bayesian Logistic Regression}
+%================================================================================
+
+Now let's apply full Bayesian thinking to logistic regression parameters.
+
+\subsection{Why Not Use Beta Priors?}
+
+In the Beta-Binomial model, we put a Beta prior on $p$.
+
+\textbf{Can we do the same for logistic regression?}
+
+\textbf{NO!} Here's why:
+\begin{itemize}
+    \item The Beta distribution has support $[0, 1]$
+    \item In logistic regression, our parameters are $\beta_0, \beta_1, \ldots$ (the coefficients)
+    \item These coefficients are on the \textbf{log-odds scale}, which is $(-\infty, +\infty)$
+    \item A Beta prior would be inappropriate!
+\end{itemize}
+
+\subsection{Normal Priors on $\beta$}
+
+Instead, we use \textbf{Normal priors}:
+$$\beta_j \sim N(\mu_j, \sigma^2_j)$$
+
+Common choices:
+\begin{itemize}
+    \item $\mu_j = 0$: We expect coefficients to be near zero (conservative)
+    \item $\sigma^2_j$ controls how strongly we believe this
+\end{itemize}
+
+\begin{infobox}
+\textbf{Connection to Ridge Regression}
+
+A Normal prior centered at 0 is the Bayesian interpretation of Ridge (L2) regularization!
+
+\begin{itemize}
+    \item Strong prior ($\sigma^2$ small) = Strong regularization
+    \item Weak prior ($\sigma^2$ large) = Weak regularization
+\end{itemize}
+\end{infobox}
+
+\subsection{The Loss of Conjugacy}
+
+\textbf{Problem}: Normal prior $\times$ Bernoulli likelihood $\neq$ Nice closed form!
+
+The posterior distribution doesn't have a recognizable form. We can't write down:
+$$E[\beta_j | \text{data}] = \text{simple formula}$$
+
+\textbf{Solution}: Simulation! (MCMC, covered in next lecture)
+
+\newpage
+
+%================================================================================
+\section{Posterior Predictive Distribution}
+%================================================================================
+
+Once we have a model, we want to predict future observations.
+
+\subsection{Frequentist Prediction}
+
+In standard regression, prediction is simple:
+$$\hat{y}_{\text{new}} = \hat{\beta}_0 + \hat{\beta}_1 x_{\text{new}}$$
+
+Plug in point estimates and get a point prediction.
+
+\subsection{Bayesian Prediction}
+
+In Bayesian inference, parameters are random variables! We can't just ``plug in'' single values.
+
+\textbf{The posterior predictive distribution} accounts for:
+\begin{enumerate}
+    \item Uncertainty in the parameters (posterior distribution)
+    \item Inherent randomness in the outcome (likelihood)
+\end{enumerate}
+
+\begin{definitionbox}{Posterior Predictive Distribution}
+$$f(\tilde{y} | \text{data}) = \int f(\tilde{y} | \theta) f(\theta | \text{data}) d\theta$$
+
+This marginalizes out the uncertainty in $\theta$ by integrating over all possible parameter values, weighted by their posterior probability.
+\end{definitionbox}
+
+\subsection{Intuition}
+
+To predict a new shot for an NBA player:
+\begin{enumerate}
+    \item Draw a value of $\alpha_j, \beta_1$ from their posterior distribution
+    \item Use those values to compute $p$ for the new shot
+    \item Draw a success/failure from Bernoulli($p$)
+    \item Repeat many times to get the full distribution of predictions
+\end{enumerate}
+
+This gives us not just a point prediction, but a \textbf{distribution} capturing all our uncertainty.
+
+\newpage
+
+%================================================================================
+\section{Preview: When We Can't Solve Analytically}
+%================================================================================
+
+\subsection{The Challenge}
+
+For many realistic Bayesian models:
+\begin{itemize}
+    \item No conjugacy (posterior doesn't have nice form)
+    \item High-dimensional parameter space
+    \item Complex hierarchical structure
+\end{itemize}
+
+We cannot:
+\begin{itemize}
+    \item Write down $f(\theta | \text{data})$ in closed form
+    \item Compute $E[\theta | \text{data}]$ analytically
+    \item Integrate to get posterior predictive distributions
+\end{itemize}
+
+\subsection{The Solution: MCMC}
+
+\textbf{Markov Chain Monte Carlo (MCMC)} is a family of algorithms that:
+\begin{enumerate}
+    \item Generate samples from the posterior distribution
+    \item Without needing to know its exact form
+    \item Use those samples to estimate quantities of interest
+\end{enumerate}
+
+\textbf{Key insight}: If we can evaluate the posterior \textit{up to a constant} (i.e., we know likelihood $\times$ prior), we can still sample from it!
+
+\subsection{Coming Up Next}
+
+In the next lecture, we'll cover:
+\begin{itemize}
+    \item Monte Carlo integration
+    \item The Metropolis-Hastings algorithm
+    \item Practical considerations for MCMC
+\end{itemize}
+
+\newpage
+
+%================================================================================
+\section{Summary}
+%================================================================================
+
+\begin{tcolorbox}[title={Logistic Regression Interpretation}]
+\begin{enumerate}
+    \item Write out: $\log(p/(1-p)) = \beta_0 + \beta_1 X$
+    \item Intercept: Log-odds when $X=0$; convert to probability with $\frac{e^{\beta_0}}{1+e^{\beta_0}}$
+    \item Slope: Change in log-odds per unit $X$; odds ratio = $e^{\beta_1}$
+    \item Decision boundary: Solve $\beta_0 + \beta_1 X = 0$ for $X$
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Log-Log Regression}]
+$$\log(Y) = \beta_0 + \beta_1 \log(X)$$
+\begin{itemize}
+    \item Doubling $X$ multiplies $Y$ by $2^{\beta_1}$
+    \item Useful for multiplicative/financial relationships
+    \item Often fixes heteroscedasticity
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Hierarchical Models}]
+\begin{itemize}
+    \item \textbf{Problem}: Grouped data (players, students, patients)
+    \item \textbf{Solution}: Parameters vary by group, drawn from common distribution
+    \item \textbf{Effect}: Shrinkage---extreme estimates pulled toward mean
+    \item \textbf{Benefit}: Better estimates for groups with little data
+\end{itemize}
+
+Model: $y_{ij} \sim f(\alpha_j + \beta X_{ij})$, where $\alpha_j \sim N(\alpha_0, \sigma^2_\alpha)$
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Bayesian Logistic Regression}]
+\begin{itemize}
+    \item Put Normal priors on $\beta$ coefficients (not Beta---wrong support!)
+    \item Normal prior centered at 0 $\Leftrightarrow$ Ridge regularization
+    \item No conjugacy: posterior doesn't have nice form
+    \item Solution: MCMC simulation
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Key Concepts}]
+\begin{itemize}
+    \item \textbf{Conjugacy}: Prior + Likelihood = Same family posterior
+    \item \textbf{Shrinkage}: Pulling estimates toward the mean
+    \item \textbf{Hyperparameters}: Parameters of the prior distribution
+    \item \textbf{Posterior predictive}: $\int f(\tilde{y}|\theta)f(\theta|\text{data})d\theta$
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

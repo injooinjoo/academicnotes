@@ -1,0 +1,1171 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-89B: Introduction to Natural Language Processing
+% Lecture 01: Neural Networks Foundations
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Table Related ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.2}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: Introduction to Natural Language Processing}}
+\fancyhead[R]{\small\textit{Lecture 01}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-89B: Introduction to NLP - Lecture 01},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Neural Networks Foundations}
+}
+
+%========================================================================================
+% Other Useful Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Title Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+\begin{document}
+%========================================================================================
+
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-89B: Introduction to Natural Language Processing}
+    {Lecture 01 -- Neural Networks Foundations}
+    {Dmitry Kurochkin}
+    {Understand the fundamentals of neural networks including architecture, activation functions, loss functions, cost functions, and optimization algorithms for NLP applications}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Introduction: Course Overview and Learning Roadmap}
+%========================================================================================
+
+\begin{overviewbox}
+Welcome to CSCI E-89B: Introduction to Natural Language Processing. This course covers the intersection of deep learning and language processing. Before diving into NLP-specific techniques, we must first establish a strong foundation in neural networks.
+
+\textbf{Key Learning Objectives:}
+\begin{itemize}
+    \item Understand the fundamental architecture of neural networks
+    \item Learn about activation functions and their role in introducing non-linearity
+    \item Distinguish between loss functions (individual error) and cost functions (aggregate error)
+    \item Master gradient descent and its variants for optimization
+    \item Apply these concepts using Keras/TensorFlow
+\end{itemize}
+\end{overviewbox}
+
+\subsection{Why Neural Networks for NLP?}
+
+\begin{infobox}
+\textbf{The Feature Engineering Problem}
+
+Traditional machine learning requires \textbf{manual feature engineering}---humans must design the features that the model uses.
+
+\textbf{Example: Polynomial Regression}
+\begin{equation}
+\hat{y} = w_0 + w_1 \cdot x + w_2 \cdot x^2 + w_3 \cdot x^3
+\end{equation}
+
+Here, $x$, $x^2$, and $x^3$ are features we \textit{manually} created. This works for simple problems, but:
+\begin{itemize}
+    \item Images have millions of pixels with complex relationships
+    \item Text has sequences of words with semantic meaning
+    \item How do you manually design features for ``the meaning of a sentence''?
+\end{itemize}
+
+\textbf{Neural networks solve this by learning features automatically from data.}
+\end{infobox}
+
+\subsection{Course Communication Channels}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Channel} & \textbf{Purpose} & \textbf{Notes} \\
+\midrule
+\textbf{Piazza} & Official Q\&A forum & Instructors monitor and respond; share with class \\
+\textbf{WhatsApp} & Informal student discussions & Not officially monitored; for peer support \\
+\textbf{Canvas Inbox} & Private communication & For personal matters with instructors/TAs \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Course Communication Channels}
+\end{table}
+
+\subsection{Weekly Schedule}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{4cm}p{3cm}p{6cm}}
+\toprule
+\textbf{Session} & \textbf{Day} & \textbf{Focus} \\
+\midrule
+Lecture & Tuesday & Theory and core concepts \\
+TA Session 1 & Wed/Thursday & Theory review, problem solving \\
+Instructor's Section & Friday & Python implementations, code examples \\
+TA Session 2 & Sat/Sunday & Additional problems (different content from Session 1) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Weekly Session Schedule}
+\end{table}
+
+\begin{warningbox}
+\textbf{Important Policy Notes:}
+\begin{itemize}
+    \item \textbf{Quizzes}: No late submissions allowed. Solutions are discussed immediately after the deadline.
+    \item \textbf{Assignments}: Due Sundays 11:59 PM Boston time. Late penalty: 10\% per day.
+    \item \textbf{Final Project}: Strict deadline---extensions require official Extension School paperwork.
+    \item \textbf{No dropping}: Unlike some courses, the lowest quiz/assignment is NOT dropped.
+\end{itemize}
+\end{warningbox}
+
+\subsection{Grading Breakdown}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lr}
+\toprule
+\textbf{Component} & \textbf{Weight} \\
+\midrule
+Weekly Assignments & 65\% \\
+Weekly Quizzes & 20\% \\
+Final Project & 15\% \\
+\bottomrule
+\end{tabular}
+\caption{Grade Distribution}
+\end{table}
+
+%========================================================================================
+\newsection{From Linear Regression to Neural Networks}
+%========================================================================================
+
+\subsection{The Limitations of Linear Models}
+
+\begin{definitionbox}{Linear Regression}
+\textbf{Linear regression} fits a model that is \textit{linear in its parameters}:
+\begin{equation}
+\hat{y} = w_0 + w_1 \cdot u_1 + w_2 \cdot u_2 + w_3 \cdot u_3
+\end{equation}
+where $u_1, u_2, u_3$ can be transformed versions of the input (e.g., $u_1 = x$, $u_2 = x^2$, $u_3 = x^3$).
+\end{definitionbox}
+
+\textbf{The Problem:}
+\begin{itemize}
+    \item Features ($u_1$, $u_2$, $u_3$) must be \textbf{manually designed}
+    \item Works for simple data where you can visualize and understand relationships
+    \item Fails for high-dimensional data (images, text, audio)
+\end{itemize}
+
+\textbf{Why not make the powers learnable?}
+
+You might think: ``Let's learn the optimal power $p$ in $x^p$''
+\begin{equation}
+\hat{y} = w_0 + w_1 \cdot x^{p_1} + w_2 \cdot x^{p_2} + w_3 \cdot x^{p_3}
+\end{equation}
+
+This is a \textit{terrible idea} because:
+\begin{itemize}
+    \item The function becomes highly non-linear in parameters
+    \item Optimization becomes extremely difficult (many bad local minima)
+    \item Derivatives with respect to $p$ are complex
+\end{itemize}
+
+\subsection{The Neural Network Solution}
+
+\begin{importantbox}{The Key Insight}
+Neural networks introduce non-linearity through \textbf{activation functions} applied to \textbf{linear combinations}.
+
+\begin{equation}
+u_1 = f(w_0 + w_1 x_1 + w_2 x_2)
+\end{equation}
+
+\textbf{Why this specific form?}
+\begin{itemize}
+    \item Linear combinations are easy to differentiate
+    \item Chain rule applies cleanly
+    \item We can use gradient descent efficiently
+\end{itemize}
+
+The derivative:
+\begin{equation}
+\frac{\partial u_1}{\partial w} = f'(\cdot) \cdot \frac{\partial}{\partial w}(w_0 + w_1 x_1 + w_2 x_2)
+\end{equation}
+
+The derivative of the linear part is trivial, and $f'$ is usually simple too.
+\end{importantbox}
+
+%========================================================================================
+\newsection{Feedforward Neural Networks}
+%========================================================================================
+
+\begin{definitionbox}{Feedforward Neural Network (FNN)}
+A \textbf{feedforward neural network} is a composition of functions where information flows in one direction---from input to output. Mathematically:
+\begin{equation}
+\hat{y} = f^{(L)}\left(f^{(L-1)}\left(\ldots f^{(1)}(x)\right)\right)
+\end{equation}
+Each function $f^{(l)}$ typically consists of a linear transformation followed by a non-linear activation.
+\end{definitionbox}
+
+\subsection{A Simple Two-Layer Network}
+
+Consider a network with:
+\begin{itemize}
+    \item 2 inputs: $x_1$, $x_2$
+    \item 2 hidden neurons: $u_1$, $u_2$
+    \item 1 output: $\hat{y}$
+\end{itemize}
+
+\textbf{Hidden Layer Computation:}
+\begin{align}
+u_1 &= f\left(w_{01}^{(1)} + w_{11}^{(1)} x_1 + w_{21}^{(1)} x_2\right) \\
+u_2 &= f\left(w_{02}^{(1)} + w_{12}^{(1)} x_1 + w_{22}^{(1)} x_2\right)
+\end{align}
+
+\textbf{Output Layer Computation:}
+\begin{equation}
+\hat{y} = f\left(w_0^{(2)} + w_1^{(2)} u_1 + w_2^{(2)} u_2\right)
+\end{equation}
+
+\begin{infobox}
+\textbf{Understanding the Notation:}
+\begin{itemize}
+    \item $w_{ij}^{(l)}$: Weight connecting input $i$ to neuron $j$ in layer $l$
+    \item $w_{0j}^{(l)}$: Bias term for neuron $j$ in layer $l$
+    \item $f$: Activation function
+\end{itemize}
+\end{infobox}
+
+\subsection{The Role of the Bias Term}
+
+\begin{examplebox}{Why Do We Need Bias?}
+The bias term $w_0$ acts as a \textbf{threshold shifter}.
+
+Consider a biological analogy: A neuron ``fires'' when the cumulative input exceeds a threshold. Without bias, this threshold is fixed at zero. With bias, we can adjust where the activation ``turns on.''
+
+Mathematically, instead of:
+\begin{equation}
+f(w_1 x_1 + w_2 x_2) \quad \text{(threshold at 0)}
+\end{equation}
+
+We have:
+\begin{equation}
+f(w_0 + w_1 x_1 + w_2 x_2) \quad \text{(adjustable threshold)}
+\end{equation}
+
+The bias allows the decision boundary to shift away from the origin.
+\end{examplebox}
+
+\subsection{Universal Approximation Theorem}
+
+\begin{theorem}[Universal Approximation]
+A feedforward neural network with a single hidden layer containing a finite number of neurons can approximate any continuous function on a compact subset of $\mathbb{R}^n$, given an appropriate activation function.
+\end{theorem}
+
+\textbf{Implications:}
+\begin{itemize}
+    \item Theoretically, one layer is ``enough'' for any function
+    \item In practice, deeper networks learn more efficiently
+    \item The choice of activation function matters less theoretically, but significantly in practice
+\end{itemize}
+
+%========================================================================================
+\newsection{Activation Functions}
+%========================================================================================
+
+\begin{definitionbox}{Activation Function}
+An \textbf{activation function} is a non-linear function applied to the output of a neuron. Without activation functions, stacking linear layers would result in just another linear transformation---unable to learn complex patterns.
+\end{definitionbox}
+
+\subsection{Why Non-linearity is Essential}
+
+If we had no activation function:
+\begin{align}
+u &= W^{(1)} x + b^{(1)} \\
+\hat{y} &= W^{(2)} u + b^{(2)} = W^{(2)}(W^{(1)} x + b^{(1)}) + b^{(2)}
+\end{align}
+
+This collapses to:
+\begin{equation}
+\hat{y} = \underbrace{W^{(2)} W^{(1)}}_{W'} x + \underbrace{W^{(2)} b^{(1)} + b^{(2)}}_{b'}
+\end{equation}
+
+A single linear transformation! No matter how many layers, without non-linearity, we cannot learn complex patterns.
+
+\subsection{Biological Inspiration: The Step Function}
+
+\begin{warningbox}
+\textbf{Historical Note: The Step Function}
+
+Early neural networks mimicked biological neurons using the \textbf{Heaviside step function}:
+\begin{equation}
+f(z) = \begin{cases} 1 & \text{if } z \geq 0 \\ 0 & \text{if } z < 0 \end{cases}
+\end{equation}
+
+\textbf{Problem:} The derivative is zero everywhere (except at $z=0$ where it's undefined).
+
+This means the cost function becomes \textbf{piecewise constant}---gradient descent doesn't know which direction to move! This activation is NOT used in practice.
+\end{warningbox}
+
+\subsection{Common Activation Functions}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{4cm}p{3cm}p{4cm}}
+\toprule
+\textbf{Function} & \textbf{Formula} & \textbf{Range} & \textbf{Use Case} \\
+\midrule
+\textbf{ReLU} & $f(z) = \max(0, z)$ & $[0, \infty)$ & Hidden layers (most common) \\
+\textbf{Leaky ReLU} & $f(z) = \max(\alpha z, z)$ & $(-\infty, \infty)$ & Hidden layers (avoids dead neurons) \\
+\textbf{Sigmoid} & $f(z) = \frac{1}{1 + e^{-z}}$ & $(0, 1)$ & Binary classification output \\
+\textbf{Softmax} & $f(z_i) = \frac{e^{z_i}}{\sum_j e^{z_j}}$ & $(0, 1)$, sum = 1 & Multi-class classification output \\
+\textbf{Tanh} & $f(z) = \tanh(z)$ & $(-1, 1)$ & Hidden layers, RNNs \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Common Activation Functions}
+\end{table}
+
+\subsubsection{ReLU (Rectified Linear Unit)}
+
+\begin{equation}
+f(z) = \max(0, z) = \begin{cases} z & \text{if } z > 0 \\ 0 & \text{if } z \leq 0 \end{cases}
+\end{equation}
+
+\textbf{Advantages:}
+\begin{itemize}
+    \item Computationally efficient
+    \item Doesn't saturate for positive values
+    \item Widely used and well-studied
+\end{itemize}
+
+\textbf{Disadvantage:}
+\begin{itemize}
+    \item ``Dead neurons'': If $z < 0$, gradient is 0, neuron stops learning
+\end{itemize}
+
+\subsubsection{Leaky ReLU}
+
+\begin{equation}
+f(z) = \max(\alpha z, z) \quad \text{where } \alpha \approx 0.01-0.1
+\end{equation}
+
+The small slope for negative values prevents dead neurons. However, $\alpha$ is a \textbf{hyperparameter} that must be chosen.
+
+\subsubsection{Softmax for Classification}
+
+\begin{definitionbox}{Softmax Function}
+For a vector $\mathbf{z} = [z_1, z_2, \ldots, z_M]$:
+\begin{equation}
+\text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{M} e^{z_j}}
+\end{equation}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Each output is in $(0, 1)$
+    \item All outputs sum to exactly 1
+    \item Outputs can be interpreted as probabilities
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Softmax Calculation}
+Given logits $\mathbf{z} = [11, 10]$:
+\begin{align}
+\text{softmax}(z_1) &= \frac{e^{11}}{e^{11} + e^{10}} = \frac{e^{11}}{e^{11}(1 + e^{-1})} \approx 0.73 \\
+\text{softmax}(z_2) &= \frac{e^{10}}{e^{11} + e^{10}} \approx 0.27
+\end{align}
+
+The larger input gets the higher probability. The ``winning'' class is amplified.
+\end{examplebox}
+
+\subsection{Keras Implementation}
+
+\begin{lstlisting}[style=pythonstyle, caption={Building a Neural Network in Keras}]
+import keras
+from keras import models, layers
+
+model = models.Sequential()
+
+# Hidden layer: 16 neurons with ReLU activation
+# Input shape: 900 features
+model.add(layers.Dense(16, activation='relu', input_shape=(900,)))
+
+# Output layer: 2 neurons with Softmax (for binary classification)
+model.add(layers.Dense(2, activation='softmax'))
+
+model.summary()
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Loss Functions and Cost Functions}
+%========================================================================================
+
+\begin{definitionbox}{Loss vs Cost}
+\textbf{Loss Function $L^{(i)}(w)$}: Measures the error for a \textbf{single} data point $(x^{(i)}, y^{(i)})$.
+
+\textbf{Cost Function $J(w)$}: The \textbf{average} loss over the entire dataset:
+\begin{equation}
+J(w) = \frac{1}{m} \sum_{i=1}^{m} L^{(i)}(w)
+\end{equation}
+
+\textbf{Analogy:}
+\begin{itemize}
+    \item Loss = How rotten is \textit{one} apple?
+    \item Cost = On average, how rotten is the entire box of apples?
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Loss Functions for Regression}
+
+When predicting continuous values:
+
+\subsubsection{Squared Error (SE)}
+\begin{equation}
+L(\hat{y}, y) = (\hat{y} - y)^2
+\end{equation}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Penalizes large errors more heavily
+    \item Differentiable everywhere
+    \item Sensitive to outliers
+\end{itemize}
+
+When averaged: \textbf{Mean Squared Error (MSE)}:
+\begin{equation}
+J(w) = \frac{1}{m} \sum_{i=1}^{m} (\hat{y}^{(i)} - y^{(i)})^2
+\end{equation}
+
+\subsubsection{Absolute Error (AE)}
+\begin{equation}
+L(\hat{y}, y) = |\hat{y} - y|
+\end{equation}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Less sensitive to outliers
+    \item Not differentiable at $\hat{y} = y$
+    \item Constant gradient magnitude
+\end{itemize}
+
+When averaged: \textbf{Mean Absolute Error (MAE)}
+
+\begin{infobox}
+\textbf{MSE vs MAE: When to Use Which?}
+
+Both have the same minimum (the correct prediction), but their \textbf{gradients behave differently}:
+\begin{itemize}
+    \item \textbf{MSE}: Gradient gets smaller as you approach the minimum (self-adjusting step sizes)
+    \item \textbf{MAE}: Constant gradient (fixed step size regardless of distance to minimum)
+\end{itemize}
+
+The shape of the cost function affects which local minimum you converge to!
+\end{infobox}
+
+\subsection{Loss Functions for Classification}
+
+\subsubsection{Why Not Use MSE for Classification?}
+
+\begin{warningbox}
+\textbf{MSE is Terrible for Classification!}
+
+Consider classifying images as Cat (1,0) or Dog (0,1):
+\begin{itemize}
+    \item True label: $y = [1, 0]$ (Cat)
+    \item Prediction: $\hat{y} = [0.9, 0.1]$
+\end{itemize}
+
+MSE computes: $(0.9-1)^2 + (0.1-0)^2 = 0.01 + 0.01 = 0.02$
+
+\textbf{The Problem:}
+\begin{itemize}
+    \item $y$ lives in a discrete space: $\{[1,0], [0,1]\}$
+    \item $\hat{y}$ lives on a continuous line (probabilities summing to 1)
+    \item Computing distance between discrete and continuous spaces creates a highly non-convex cost function
+    \item Result: You get stuck in bad local minima and fail to converge
+\end{itemize}
+\end{warningbox}
+
+\subsubsection{Cross-Entropy Loss}
+
+\begin{definitionbox}{Cross-Entropy}
+For a classification problem with $M$ classes:
+\begin{equation}
+L(\hat{y}, y) = -\sum_{j=1}^{M} y_j \log(\hat{y}_j)
+\end{equation}
+
+For binary classification (with one-hot encoding):
+\begin{equation}
+L = -y_1 \log(\hat{y}_1) - y_2 \log(\hat{y}_2)
+\end{equation}
+
+Since $y$ is one-hot encoded (e.g., $[1, 0]$), only one term contributes.
+\end{definitionbox}
+
+\begin{examplebox}{Cross-Entropy Calculation}
+\textbf{Case 1: Good Prediction}
+\begin{itemize}
+    \item True: $y = [1, 0]$ (Cat)
+    \item Predicted: $\hat{y} = [0.99, 0.01]$
+    \item Loss: $-1 \cdot \log(0.99) - 0 \cdot \log(0.01) \approx 0.01$
+\end{itemize}
+
+\textbf{Case 2: Bad Prediction}
+\begin{itemize}
+    \item True: $y = [1, 0]$ (Cat)
+    \item Predicted: $\hat{y} = [0.01, 0.99]$
+    \item Loss: $-1 \cdot \log(0.01) - 0 \cdot \log(0.99) \approx 4.6$
+\end{itemize}
+
+Cross-entropy heavily penalizes confident wrong predictions!
+\end{examplebox}
+
+\begin{infobox}
+\textbf{Why Cross-Entropy Works:}
+\begin{itemize}
+    \item When prediction matches truth: $\log(1) = 0$ (zero loss)
+    \item When prediction is wrong: $\log(\epsilon)$ becomes very negative (high loss)
+    \item The cost function has a much nicer shape for optimization
+    \item Softmax ensures predictions are never exactly 0, avoiding $\log(0)$
+\end{itemize}
+\end{infobox}
+
+\subsection{Keras Implementation}
+
+\begin{lstlisting}[style=pythonstyle, caption={Specifying Loss and Optimizer in Keras}]
+model.compile(
+    optimizer='adam',                    # Optimization algorithm
+    loss='categorical_crossentropy',     # Cross-entropy for multi-class
+    metrics=['accuracy']                 # What to display during training
+)
+
+# For binary classification with sigmoid output:
+# loss='binary_crossentropy'
+
+# For regression:
+# loss='mse' or loss='mae'
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Optimization: Gradient Descent}
+%========================================================================================
+
+\begin{definitionbox}{Gradient Descent}
+\textbf{Gradient descent} is an iterative algorithm to find the minimum of a function by repeatedly moving in the direction of steepest descent (negative gradient).
+
+\textbf{Update Rule:}
+\begin{equation}
+w_{\text{new}} = w_{\text{old}} - \alpha \nabla J(w_{\text{old}})
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $\alpha$: Learning rate (step size)
+    \item $\nabla J$: Gradient of the cost function
+\end{itemize}
+\end{definitionbox}
+
+\subsection{The Gradient}
+
+\begin{definitionbox}{Gradient}
+The \textbf{gradient} $\nabla J$ is a vector of partial derivatives:
+\begin{equation}
+\nabla J = \left[ \frac{\partial J}{\partial w_1}, \frac{\partial J}{\partial w_2}, \ldots, \frac{\partial J}{\partial w_d} \right]
+\end{equation}
+
+It points in the direction of \textbf{steepest increase} of $J$. We move in the \textbf{opposite} direction to minimize.
+\end{definitionbox}
+
+\subsection{Variants of Gradient Descent}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{4cm}p{3cm}p{4cm}p{3cm}}
+\toprule
+\textbf{Variant} & \textbf{Batch Size} & \textbf{Pros} & \textbf{Cons} \\
+\midrule
+\textbf{Gradient Descent (GD)} & All $m$ samples & Stable, true gradient & Very slow for large datasets \\
+\textbf{Stochastic GD (SGD)} & 1 sample & Fast updates, escapes local minima & Very noisy, slow convergence \\
+\textbf{Mini-batch GD} & $n$ samples (e.g., 32) & Best of both worlds & Requires tuning batch size \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Gradient Descent Variants}
+\end{table}
+
+\subsubsection{Batch Gradient Descent}
+
+\begin{equation}
+\nabla J = \frac{1}{m} \sum_{i=1}^{m} \nabla L^{(i)}
+\end{equation}
+
+\textbf{Issues:}
+\begin{itemize}
+    \item Must compute gradient over ALL data points before one update
+    \item Very expensive for large datasets
+    \item Deterministic---no randomness to escape local minima
+\end{itemize}
+
+\subsubsection{Stochastic Gradient Descent (SGD)}
+
+\begin{equation}
+\nabla J \approx \nabla L^{(i)} \quad \text{(single random sample)}
+\end{equation}
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Very fast per update
+    \item Highly stochastic---helps escape local minima
+    \item Too noisy---bounces around a lot
+    \item Cannot be easily parallelized (each step depends on previous)
+\end{itemize}
+
+\subsubsection{Mini-batch Gradient Descent}
+
+\begin{equation}
+\nabla J \approx \frac{1}{n} \sum_{i \in \text{batch}} \nabla L^{(i)}
+\end{equation}
+
+\textbf{The Sweet Spot:}
+\begin{itemize}
+    \item Typical batch sizes: 32, 64, 128, 256
+    \item Still stochastic (can escape local minima)
+    \item Parallelizable (all samples in batch use same weights)
+    \item The ``soup and spoon'' analogy: You don't need a bigger spoon for a bigger pot
+\end{itemize}
+
+\begin{infobox}
+\textbf{The Soup and Spoon Analogy}
+
+To check if soup is salty enough:
+\begin{itemize}
+    \item You don't need to drink the entire pot
+    \item A small spoon gives you a good estimate
+    \item The spoon size doesn't need to scale with pot size
+\end{itemize}
+
+Similarly, a mini-batch of 32-64 samples is enough to estimate the gradient, regardless of whether your dataset has 10,000 or 10 million samples!
+\end{infobox}
+
+\subsection{The Non-Convex Optimization Challenge}
+
+\begin{importantbox}{Why Deep Learning Optimization is Hard}
+Neural network cost functions are \textbf{highly non-convex}:
+\begin{itemize}
+    \item Many local minima (not just one global minimum)
+    \item Saddle points (flat regions with zero gradient)
+    \item The landscape depends on architecture, data, and loss function
+\end{itemize}
+
+\textbf{Implications:}
+\begin{itemize}
+    \item Different random initializations $\rightarrow$ different solutions
+    \item Different students solving the same problem may get different results
+    \item This is why we share student solutions---to see what different approaches find!
+\end{itemize}
+\end{importantbox}
+
+\subsection{Learning Rate Considerations}
+
+\begin{warningbox}
+\textbf{Choosing the Learning Rate $\alpha$:}
+\begin{itemize}
+    \item \textbf{Too large}: Algorithm diverges (overshoots the minimum)
+    \item \textbf{Too small}: Convergence is extremely slow
+    \item \textbf{Just right}: Fast convergence to a good minimum
+\end{itemize}
+
+\textbf{MSE has a nice property:}
+As you approach the minimum, the gradient gets smaller, so steps automatically become smaller. This is ``self-adjusting.''
+
+\textbf{MAE is trickier:}
+The gradient magnitude is constant, so step sizes don't decrease near the minimum.
+\end{warningbox}
+
+\subsection{Advanced Optimizers}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{10cm}}
+\toprule
+\textbf{Optimizer} & \textbf{Description} \\
+\midrule
+\textbf{SGD} & Basic stochastic gradient descent \\
+\textbf{SGD + Momentum} & Accumulates past gradients for smoother updates \\
+\textbf{Adagrad} & Adapts learning rate per parameter based on history \\
+\textbf{RMSprop} & Improves Adagrad by using moving average \\
+\textbf{Adam} & Combines momentum + adaptive learning rates; default choice \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Common Optimizers}
+\end{table}
+
+\begin{lstlisting}[style=pythonstyle, caption={Using Different Optimizers in Keras}]
+from keras.optimizers import SGD, Adam
+
+# Basic SGD
+model.compile(optimizer=SGD(learning_rate=0.01), loss='mse')
+
+# SGD with momentum
+model.compile(optimizer=SGD(learning_rate=0.01, momentum=0.9), loss='mse')
+
+# Adam (recommended default)
+model.compile(optimizer=Adam(learning_rate=0.001), loss='categorical_crossentropy')
+
+# Training with mini-batch
+history = model.fit(
+    X_train, y_train,
+    batch_size=64,      # Mini-batch size
+    epochs=50,          # Number of full passes through data
+    validation_data=(X_val, y_val)
+)
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Putting It All Together: Training a Neural Network}
+%========================================================================================
+
+\subsection{The Complete Training Pipeline}
+
+\begin{enumerate}
+    \item \textbf{Initialize weights} randomly
+    \item \textbf{Forward pass}: Compute predictions $\hat{y}$
+    \item \textbf{Compute loss}: Measure error using loss function
+    \item \textbf{Backward pass}: Compute gradients via backpropagation
+    \item \textbf{Update weights}: Apply optimizer (e.g., Adam)
+    \item \textbf{Repeat} until convergence or max epochs
+\end{enumerate}
+
+\subsection{Complete Keras Example}
+
+\begin{lstlisting}[style=pythonstyle, caption={Complete Neural Network Training Example}]
+import keras
+from keras import models, layers
+from keras.optimizers import Adam
+
+# 1. Build the model
+model = models.Sequential([
+    layers.Dense(16, activation='relu', input_shape=(900,)),  # Hidden layer
+    layers.Dense(2, activation='softmax')                      # Output layer
+])
+
+# 2. Compile with loss, optimizer, and metrics
+model.compile(
+    optimizer=Adam(learning_rate=0.001),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# 3. Train the model
+history = model.fit(
+    X_train, y_train,
+    batch_size=128,
+    epochs=35,
+    validation_data=(X_test, y_test)
+)
+
+# 4. Evaluate
+test_loss, test_accuracy = model.evaluate(X_test, y_test)
+print(f"Test Accuracy: {test_accuracy:.4f}")
+\end{lstlisting}
+
+\subsection{Understanding the Output}
+
+\begin{itemize}
+    \item \textbf{Training Loss}: Should decrease over epochs
+    \item \textbf{Validation Loss}: Should also decrease; if it increases, you're overfitting
+    \item \textbf{Accuracy}: Metric for monitoring, not for optimization
+\end{itemize}
+
+%========================================================================================
+\section*{Glossary}
+%========================================================================================
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{4cm}p{10cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{Neural Network} & A model inspired by biological neurons that learns features from data \\
+\textbf{Activation Function} & Non-linear function applied to neuron outputs (e.g., ReLU, Softmax) \\
+\textbf{Loss Function} & Measures error for a single data point \\
+\textbf{Cost Function} & Average loss over the entire dataset \\
+\textbf{Gradient Descent} & Optimization algorithm that follows the negative gradient \\
+\textbf{Learning Rate} & Step size for weight updates ($\alpha$) \\
+\textbf{Mini-batch} & Subset of data used for each gradient update \\
+\textbf{Epoch} & One complete pass through the training data \\
+\textbf{One-Hot Encoding} & Representing categories as binary vectors (e.g., Cat $\rightarrow$ [1,0]) \\
+\textbf{Hyperparameter} & Parameters set before training (e.g., learning rate, batch size) \\
+\textbf{Cross-Entropy} & Loss function for classification problems \\
+\textbf{Softmax} & Activation that converts logits to probabilities \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+%========================================================================================
+\section*{One-Page Summary}
+%========================================================================================
+
+\begin{tcolorbox}[
+    colback=lightblue,
+    colframe=darkblue,
+    title=\textbf{CSCI E-89B Lecture 01: Neural Networks Foundations},
+    fonttitle=\bfseries\large
+]
+
+\textbf{1. Why Neural Networks?}
+\begin{itemize}[noitemsep]
+    \item Manual feature engineering doesn't scale to complex data (images, text)
+    \item NNs learn features automatically through nested non-linear transformations
+\end{itemize}
+
+\textbf{2. Architecture}
+\begin{itemize}[noitemsep]
+    \item Layers of neurons: Input $\rightarrow$ Hidden $\rightarrow$ Output
+    \item Each neuron: $u = f(w_0 + w_1 x_1 + w_2 x_2 + \ldots)$
+    \item Linear combination + non-linear activation
+\end{itemize}
+
+\textbf{3. Activation Functions}
+\begin{itemize}[noitemsep]
+    \item Hidden layers: ReLU $\max(0, z)$ or Leaky ReLU
+    \item Binary classification output: Sigmoid $\frac{1}{1+e^{-z}}$
+    \item Multi-class output: Softmax $\frac{e^{z_i}}{\sum e^{z_j}}$
+\end{itemize}
+
+\textbf{4. Loss Functions}
+\begin{itemize}[noitemsep]
+    \item Regression: MSE $(y - \hat{y})^2$ or MAE $|y - \hat{y}|$
+    \item Classification: Cross-Entropy $-\sum y_j \log(\hat{y}_j)$
+    \item Never use MSE for classification!
+\end{itemize}
+
+\textbf{5. Optimization}
+\begin{itemize}[noitemsep]
+    \item Gradient Descent: $w_{\text{new}} = w_{\text{old}} - \alpha \nabla J$
+    \item Mini-batch GD: Best balance of speed and stability (batch size 32-64)
+    \item Default optimizer: Adam
+\end{itemize}
+
+\textbf{6. Key Formulas}
+\begin{align*}
+\text{Cost Function:} \quad J(w) &= \frac{1}{m} \sum_{i=1}^{m} L^{(i)}(w) \\
+\text{Cross-Entropy:} \quad L &= -\sum_{j=1}^{M} y_j \log(\hat{y}_j) \\
+\text{Softmax:} \quad \hat{y}_i &= \frac{e^{z_i}}{\sum_{j} e^{z_j}}
+\end{align*}
+
+\end{tcolorbox}
+
+%========================================================================================
+\end{document}
+%========================================================================================

@@ -1,0 +1,998 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability improvements
+% Last modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Table Related ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Machine Learning}}
+\fancyhead[R]{\small\textit{Lecture 06}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myyellow}{rgb}{1.0, 0.98, 0.9}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Caution,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, AS, CREATE, STREAMING, TABLE, MATERIALIZED, VIEW, ai_query, ai_analyze_sentiment, ai_classify, ai_extract, ai_fix_grammar, ai_mask},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Tables and Figures
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Reproducible Machine Learning - Lecture 06},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Useful Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Title Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CSCI E-103: Reproducible Machine Learning\\Lecture 06: Business Intelligence and Data Visualization}
+\author{Harvard Extension School}
+\date{Fall 2025}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Reproducible Machine Learning}{Lecture 06}{Anindita Mahapatra \& Eric Gieseke}{Understand Business Intelligence (BI) fundamentals, the Lakehouse architecture for BI, and practical Databricks SQL features including AI functions, Lakeview dashboards, and Genie}
+
+\tableofcontents
+
+\newpage
+
+%==============================
+\section{Lecture Overview}
+%==============================
+
+\begin{summarybox}
+This lecture focuses on Business Intelligence (BI) analytics and data visualization within the context of modern data platforms:
+
+\textbf{Core Topics:}
+\begin{itemize}
+    \item \textbf{Data Lake vs. Data Warehouse} -- Understanding the trade-offs
+    \item \textbf{Lakehouse Architecture} -- Combining the best of both worlds
+    \item \textbf{Business Intelligence (BI)} -- Definition, purpose, and comparison with BA
+    \item \textbf{BI Personas} -- The BI Analyst and their primary skill (SQL)
+    \item \textbf{Data Modeling for BI} -- Star Schema and dimensional modeling
+    \item \textbf{ETL vs. Data Federation} -- When to move data vs. query in place
+    \item \textbf{Databricks SQL Features} -- Serverless, Materialized Views, Streaming Tables
+    \item \textbf{AI Functions in SQL} -- Embedding LLMs directly in queries
+    \item \textbf{Lakeview Dashboards and Genie} -- Self-service BI and natural language analytics
+\end{itemize}
+\end{summarybox}
+
+\begin{examplebox}{The Crystal Ball Analogy}
+Think of BI as the business executive's ``crystal ball.'' Businesses want to use data to clearly see what's happening today (insight) and, more importantly, predict what will happen tomorrow (foresight) to gain competitive advantage.
+\end{examplebox}
+
+\newpage
+
+%==============================
+\section{Key Terminology Reference}
+%==============================
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lp{5.5cm}ll}
+\toprule
+\textbf{Term} & \textbf{Description} & \textbf{Full Name} & \textbf{Notes} \\
+\midrule
+\textbf{BI} & Technology to collect, analyze, and visualize data for better business decisions (What happened? How?) & Business Intelligence & Reports, dashboards \\
+\textbf{BA} & Uses past data to explain present and predict future (Why? What's next?) & Business Analytics & Statistics, predictive modeling \\
+\textbf{Data Warehouse} & Fast, expensive ``data library'' storing only structured data with predefined schema & Data Warehouse (DW) & Schema-on-Write \\
+\textbf{Data Lake} & Cheap, massive ``data garage'' storing all data types in raw format & Data Lake (DL) & Schema-on-Read \\
+\textbf{Lakehouse} & Unified architecture: DW performance/reliability on DL's cheap storage & Lakehouse & DW + DL combined \\
+\textbf{Medallion Arch.} & 3-tier data organization: Bronze (raw) $\rightarrow$ Silver (cleaned) $\rightarrow$ Gold (aggregated) & Medallion Architecture & \\
+\textbf{Data Federation} & Querying remote data sources without physically moving data & Data Federation & No ownership \\
+\textbf{View} & Virtual table defined by a query; executed on access (no storage) & View & \\
+\textbf{Materialized View} & Pre-computed query results stored physically for fast access & Materialized View (MV) & \\
+\textbf{Concurrency} & How many simultaneous queries/operations the system can handle & Concurrency & KPI for BI \\
+\textbf{Latency} & Time from query request to result delivery (delay) & Latency & KPI for BI \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+
+%==============================
+\section{Evolution of Data Storage}
+%==============================
+
+%------------------------------
+\subsection{Data Warehouse vs. Data Lake}
+%------------------------------
+
+\begin{examplebox}{Library vs. Garage Analogy}
+\textbf{Data Warehouse (DW) = Well-organized library}
+\begin{itemize}
+    \item Only accepts ``books'' (structured data)
+    \item Librarian immediately catalogs and shelves everything (Schema-on-Write)
+    \item Finding a specific book (BI query) is very fast and accurate
+    \item Cannot store videotapes or photos (unstructured data)
+    \item Expensive to build and maintain
+\end{itemize}
+
+\textbf{Data Lake (DL) = Garage that stores everything}
+\begin{itemize}
+    \item Accepts books, photos, videos, broken bicycles... everything (all data types)
+    \item Just throw things in raw (Schema-on-Read)
+    \item Storage is very cheap
+    \item Finding something later takes time (slower queries)
+    \item Without management, becomes a \textbf{Data Swamp}
+\end{itemize}
+\end{examplebox}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{l|ll|ll}
+\toprule
+\multirow{2}{*}{\textbf{Dimension}} & \multicolumn{2}{c|}{\textbf{Data Lake}} & \multicolumn{2}{c}{\textbf{Data Warehouse}} \\
+& \textbf{Pros} & \textbf{Cons} & \textbf{Pros} & \textbf{Cons} \\
+\midrule
+\textbf{Storage} &
+All file types (open format) &
+Lower data quality; file-level access &
+High reliability; fine-grained access &
+Structured only; proprietary formats \\
+\midrule
+\textbf{Compute} &
+Very economical (storage/compute separated) &
+Operational complexity &
+Easy to use; high concurrency, low latency &
+Expensive to scale (coupled) \\
+\midrule
+\textbf{Consumption} &
+Rich tool ecosystem (ML, AI, DS) &
+Not optimized for BI &
+SQL-optimized (BI) &
+Limited ML/streaming support \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+%------------------------------
+\subsection{The Two-Tier Problem and Lakehouse Solution}
+%------------------------------
+
+Historically, organizations used both systems together:
+\begin{enumerate}
+    \item \textbf{First Generation (DW Only):} Only structured data via ETL into DW. BI only.
+    \item \textbf{Second Generation (Two-tier: Lake + DW):} All data stored in DL. Then ETL again to copy BI-relevant data into a separate DW. ML/DS uses DL; BI uses DW.
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Problems with Two-Tier Architecture:}
+\begin{itemize}
+    \item \textbf{Data Duplication:} Same data stored in both Lake and Warehouse, wasting cost
+    \item \textbf{Increased Complexity:} Managing and synchronizing two separate systems
+    \item \textbf{Data Freshness Issues:} ETL from Lake to DW takes time; BI users may not see latest data
+\end{itemize}
+\end{warningbox}
+
+\begin{definitionbox}{Lakehouse}
+A \textbf{Lakehouse} is a unified architecture that provides Data Warehouse capabilities (ACID transactions, governance, fast queries) on top of Data Lake's cheap, flexible, open storage (S3, ADLS). Example: Databricks with Delta Lake.
+\end{definitionbox}
+
+\textbf{Lakehouse Advantages:}
+\begin{itemize}
+    \item \textbf{Single System:} No data duplication or separate system management
+    \item \textbf{All Workloads:} BI, reporting, Data Science, ML from the \textbf{same single data source}
+    \item \textbf{Cost Efficiency:} Warehouse performance at Lake costs
+    \item \textbf{Freshness:} Data in one place = single source of truth; BI always queries latest data
+\end{itemize}
+
+%------------------------------
+\subsection{Historical Evolution of Data Storage}
+%------------------------------
+
+\begin{enumerate}
+    \item \textbf{Spreadsheets:} Most primitive (CSV files)
+    \item \textbf{Data Warehouses:}
+    \begin{itemize}
+        \item Bill Inmon: ER model-based, normalized (3NF) central DW
+        \item Ralph Kimball: Business-user focused, denormalized dimensional models (Star/Snowflake)
+    \end{itemize}
+    \item \textbf{MPP Databases:} Teradata, Greenplum -- distributed data and compute across nodes; TB-scale but expensive
+    \item \textbf{NoSQL / BigTable:} Google's PB-scale columnar storage
+    \item \textbf{Hadoop / Data Lakes:} Horizontal scaling on commodity hardware; separated storage from compute
+    \item \textbf{Data Mesh / Fabric:} Decentralized ownership (Mesh) and unified access layers (Fabric)
+    \item \textbf{Lakehouse:} Current architecture combining DL + DW capabilities
+\end{enumerate}
+
+\begin{infobox}
+\textbf{The Journey Continues:}
+Technology keeps evolving. AI and LLMs are already transforming the field further. What comes after Lakehouse? Hard to say, but change is constant.
+\end{infobox}
+
+\newpage
+
+%==============================
+\section{Business Intelligence (BI) Fundamentals}
+%==============================
+
+%------------------------------
+\subsection{What is Business Intelligence?}
+%------------------------------
+
+\begin{definitionbox}{Business Intelligence (BI)}
+\textbf{Business Intelligence} encompasses all technologies, applications, and processes used to collect, integrate, analyze, and present business information to support \textbf{better business decision-making}.
+\end{definitionbox}
+
+\begin{tcolorbox}[title={Core Philosophy of BI}, colback=gray!5, colframe=gray!50!black]
+``Data is what you need to do analytics. \\
+Information is what you need to do business.''
+\end{tcolorbox}
+
+BI transforms raw data into actionable \textbf{information} that business leaders can use.
+
+\textbf{BI Components:}
+\begin{itemize}
+    \item \textbf{Data Analysis:} Data exploration and querying
+    \item \textbf{Visual Analytics:} Charts, graphs, dashboards
+    \item \textbf{Advanced Analytics:} Predictions, statistics (overlaps with BA)
+    \item \textbf{Data Governance:} Quality, security, access control
+    \item \textbf{Strategy Documentation:} Business mission and strategy
+\end{itemize}
+
+%------------------------------
+\subsection{BI vs. BA: What's the Difference?}
+%------------------------------
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.45\textwidth}|p{0.45\textwidth}}
+\toprule
+\textbf{Business Intelligence (BI)} & \textbf{Business Analytics (BA)} \\
+\midrule
+Uses \textbf{past and present} data & Uses \textbf{past} data \\
+\midrule
+Focuses on \textbf{``What''} and \textbf{``How''} happened (Descriptive) & Explains \textbf{``Why''} and predicts \textbf{``What will happen''} (Explanatory, Predictive) \\
+\midrule
+\textbf{Example Questions:}
+\begin{itemize}
+    \item ``What was last quarter's revenue?'' (What)
+    \item ``Which product sold most?'' (Who)
+    \item ``When did sales peak?'' (When)
+\end{itemize} &
+\textbf{Example Questions:}
+\begin{itemize}
+    \item ``Why did that product sell well?'' (Why)
+    \item ``Will this trend continue?'' (Prediction)
+    \item ``What if we raise prices 10\%?'' (What-if)
+\end{itemize} \\
+\midrule
+\textbf{Key Techniques:} Reporting, Dashboards, OLAP, Ad-hoc queries & \textbf{Key Techniques:} Statistical analysis, Data mining, Predictive modeling, A/B testing \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{infobox}
+\textbf{BI Trend:}
+Modern BI is evolving from purely ``descriptive'' analysis (past reporting) toward ``prescriptive'' analysis (recommending what actions to take).
+\end{infobox}
+
+%------------------------------
+\subsection{The BI Process (5 Steps)}
+%------------------------------
+
+\begin{enumerate}
+    \item \textbf{Collect:} Integrate data from source systems (CRM, ERP, etc.) into warehouse/lakehouse via ETL
+    \item \textbf{Organize:} Structure data in analysis-friendly models (OLAP cubes, Star Schema)
+    \item \textbf{Analyze:} BI analysts query data using \textbf{SQL}
+    \item \textbf{Visualize:} Present results as charts, dashboards, reports
+    \item \textbf{Decide:} Executives and teams use visualized information for strategic decisions
+\end{enumerate}
+
+\newpage
+
+%==============================
+\section{BI Personas and Data Modeling}
+%==============================
+
+%------------------------------
+\subsection{The BI Analyst Persona}
+%------------------------------
+
+While many roles exist in the BI workflow (Data Engineers, Data Scientists), the core \textbf{consumer} of BI is the \textbf{BI Analyst}.
+
+\begin{itemize}
+    \item \textbf{Primary Skill: SQL}
+    The BI Analyst's main tool is \textbf{SQL}. They use it to explore data, answer business questions, and extract data for dashboards.
+
+    \item \textbf{Data Consumed: Curated Data}
+    BI Analysts don't work with raw Bronze data. They primarily use data that Data Engineers have cleaned (Silver) and aggregated for business use (Gold).
+
+    \item \textbf{Role: Analytics Engineering}
+    Increasingly, BI Analysts are expected to model data and curate Gold tables themselves using SQL---this is called ``Analytics Engineering.''
+\end{itemize}
+
+%------------------------------
+\subsection{Data Modeling for BI: Star Schema}
+%------------------------------
+
+BI queries must be very fast (low latency), so data must be structured optimally. The most popular approach is \textbf{Dimensional Modeling}, specifically the \textbf{Star Schema}.
+
+\begin{definitionbox}{Star Schema}
+A \textbf{Star Schema} looks like a ``star'':
+\begin{itemize}
+    \item \textbf{Fact Table (Center):} Contains business event measurements (numeric data): sales\_amount, quantity\_sold
+    \item \textbf{Dimension Tables (Points):} Surround the fact table, providing context: dim\_customer, dim\_product, dim\_time
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Star Schema for Online Store Sales}
+\begin{itemize}
+    \item \textbf{Fact\_Sales:} \{date\_key, product\_key, customer\_key, sales\_amount, quantity\}
+    \item \textbf{Dim\_Time:} \{date\_key, date, month, year, quarter, day\_of\_week\}
+    \item \textbf{Dim\_Product:} \{product\_key, product\_name, category, brand\}
+    \item \textbf{Dim\_Customer:} \{customer\_key, customer\_name, city, country\}
+\end{itemize}
+
+Query: ``Q1 2025 sales by category for Seoul customers?'' --- Fast, simple JOINs!
+\end{examplebox}
+
+\textbf{Snowflake Schema:} A variation where dimension tables are further normalized and linked to additional tables.
+
+\begin{warningbox}
+\textbf{Data Vault Model:}
+Data Vault uses Hubs (core business keys), Links (relationships), and Satellites (descriptive attributes). It's flexible for the Silver layer, but the \textbf{Gold layer for BI typically still uses Star Schema} for query performance.
+\end{warningbox}
+
+\newpage
+
+%==============================
+\section{ETL vs. Data Federation}
+%==============================
+
+\begin{definitionbox}{Data Federation}
+\textbf{Data Federation} queries external data sources (Oracle, Redshift, Snowflake) \textbf{without physically moving the data}. It's \textbf{read-only} access where you don't ``own'' the data.
+\end{definitionbox}
+
+\begin{importantbox}{Key Difference: Ownership}
+\textbf{ETL:} You extract, transform, and load data into your lakehouse. The lakehouse \textbf{owns} that data. Significant compute is spent curating through Bronze $\rightarrow$ Silver $\rightarrow$ Gold.
+
+\textbf{Federation:} You query data where it lives (external system). \textbf{No ownership}. Good for modest, reference/lookup data. Query pushdown translates your SQL to the remote system's native query.
+\end{importantbox}
+
+\textbf{When to Use Each:}
+\begin{itemize}
+    \item \textbf{Federation:} Small data volumes, reference/lookup data, one-off joins
+    \item \textbf{ETL:} Large data volumes, performance-critical queries, when you need low latency
+\end{itemize}
+
+\begin{examplebox}{Federation Use Case}
+Your core transactional data is in the lakehouse, but you need to join with a reference table from an on-prem Oracle system. Rather than ETL the entire Oracle table, you federate: write one SQL query that joins your lakehouse table with the Oracle table. The system translates the WHERE clause and does a ``push down'' to Oracle, bringing back only the needed rows.
+\end{examplebox}
+
+\newpage
+
+%==============================
+\section{Databricks SQL for BI}
+%==============================
+
+Databricks provides comprehensive BI and data warehousing capabilities through \textbf{Databricks SQL (DBSQL)}.
+
+%------------------------------
+\subsection{Platform Architecture}
+%------------------------------
+
+\begin{description}
+    \item[Source:] All data types (structured, unstructured, streaming)
+    \item[Ingest:] ETL (data moves in) or Federation (query in place)
+    \item[Transform:] Medallion Architecture (Bronze $\rightarrow$ Silver $\rightarrow$ Gold)
+    \item[Query and Process:] DBSQL for BI; Spark/ML for Data Science
+    \item[Governance:] Unity Catalog for access control, lineage, audit
+    \item[Engine:] Photon (C++ rewrite of Spark for vectorized performance)
+    \item[Serve/Analysis:] Lakeview Dashboards, BI tool integrations, Lakehouse Apps
+\end{description}
+
+%------------------------------
+\subsection{Key BI Features in DBSQL}
+%------------------------------
+
+\textbf{1. Serverless Compute:}
+\begin{itemize}
+    \item Instant compute allocation---no waiting 3-6 minutes for VMs to spin up
+    \item Auto-scaling based on workload
+    \item Auto-termination after inactivity (saves cost)
+\end{itemize}
+
+\textbf{2. Streaming Tables:}
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Streaming Table from Cloud Storage}]
+CREATE STREAMING TABLE my_streaming_table
+AS SELECT * FROM cloud_files('/path/to/data', 'json');
+\end{lstlisting}
+No complex code---just SQL to process streaming data automatically.
+
+\textbf{3. Materialized Views (MV):}
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Materialized View}]
+CREATE MATERIALIZED VIEW revenue_by_route AS
+SELECT route_id, SUM(fare_amount) as total_revenue
+FROM trips
+GROUP BY route_id;
+\end{lstlisting}
+Pre-computed results stored physically. Dashboards query MVs for instant response. MVs auto-update incrementally when source data changes.
+
+\textbf{4. Concurrency and Scaling:}
+\begin{itemize}
+    \item \textbf{Concurrency:} How many simultaneous queries can run without slowdown
+    \item \textbf{Scaling:} Can the system handle growing data volumes?
+    \item Ideal: Queries execute (green) without being queued (yellow)
+\end{itemize}
+
+\textbf{5. Additional Features:}
+\begin{itemize}
+    \item SQL Editor with intelligent autocomplete
+    \item Parameterized queries (different users see different data based on parameters)
+    \item Query history and profiling
+    \item Row-level security and column masking
+    \item Geospatial support (H3)
+    \item Workflow integration (dashboards as workflow tasks)
+\end{itemize}
+
+\newpage
+
+%==============================
+\section{AI Functions in SQL}
+%==============================
+
+Databricks SQL allows embedding LLMs directly within SQL queries---a revolutionary capability.
+
+%------------------------------
+\subsection{ai\_query(): External LLM Calls}
+%------------------------------
+
+\begin{lstlisting}[style=sqlstyle, caption={Using ai\_query() for Product Marketing}]
+SELECT
+  sku_id,
+  product_name,
+  ai_query(
+    "my-openai-endpoint",  -- Pre-registered model endpoint
+    "You are a marketing expert. Generate a 30-word
+     promotional text for product: " || product_name
+  ) AS promotional_text
+FROM retail_products;
+\end{lstlisting}
+
+This embeds an LLM call within your SELECT statement, enriching your data with AI-generated content.
+
+%------------------------------
+\subsection{Built-in AI Functions}
+%------------------------------
+
+Databricks provides pre-built AI functions for common tasks---no external model setup needed:
+
+\begin{lstlisting}[style=sqlstyle, caption={Built-in AI Functions}]
+-- Sentiment Analysis
+SELECT ai_analyze_sentiment('I am happy');
+-- Returns: 'positive'
+
+-- Classification
+SELECT ai_classify('My password is leaked',
+                   ARRAY('urgent', 'not urgent'));
+-- Returns: 'urgent'
+
+-- Information Extraction
+SELECT ai_extract('John Doe lives in New York',
+                  ARRAY('person', 'location'));
+-- Returns: {"person": "John Doe", "location": "New York"}
+
+-- Grammar Correction
+SELECT ai_fix_grammar('This sentence have some mistake');
+-- Returns: 'This sentence has some mistakes'
+
+-- Sensitive Data Masking
+SELECT ai_mask('My email is john@example.com', ARRAY('email'));
+-- Returns: 'My email is [MASKED]'
+\end{lstlisting}
+
+There are approximately 15-20 built-in AI functions covering sentiment, classification, extraction, summarization, masking, similarity, and more.
+
+\newpage
+
+%==============================
+\section{Lakeview Dashboards and Genie}
+%==============================
+
+%------------------------------
+\subsection{Lakeview Dashboards}
+%------------------------------
+
+\begin{definitionbox}{Lakeview}
+Databricks' built-in dashboard tool for data visualization directly within the platform.
+\end{definitionbox}
+
+\textbf{Components:}
+\begin{itemize}
+    \item \textbf{Data Tab:} Define datasets that power the dashboard
+    \item \textbf{Visualization Widgets:} Charts, graphs (bar, scatter, line, etc.)
+    \item \textbf{Text Boxes:} Documentation and labels
+    \item \textbf{Filters:} Interactive controls (dropdowns, date pickers)
+\end{itemize}
+
+\textbf{Natural Language Creation:}
+The built-in \textbf{Assistant} lets you create charts using natural language:
+\begin{quote}
+``Show me number of trips by pickup zip code''
+\end{quote}
+The assistant generates the visualization, which you can then customize.
+
+\begin{warningbox}
+\textbf{When to Use Lakeview vs. PowerBI/Tableau:}
+\begin{itemize}
+    \item \textbf{Lakeview:} No additional licensing cost. Quick, operational dashboards for data engineers and analysts.
+    \item \textbf{PowerBI/Tableau:} Sophisticated, polished dashboards for C-level executives with specific branding requirements.
+\end{itemize}
+\end{warningbox}
+
+%------------------------------
+\subsection{Publishing and Sharing}
+%------------------------------
+
+\textbf{Share (Internal):} Grant view/edit access to other Databricks users in your organization.
+
+\textbf{Publish (External):} Share with users who \textbf{don't have} Databricks accounts.
+\begin{itemize}
+    \item Use ``Embed credentials'' option
+    \item \important{Cost Warning:} When external users view a published dashboard and results aren't cached, compute costs are charged to the \textbf{publisher's account}
+    \item Results are cached for 24 hours by default
+\end{itemize}
+
+%------------------------------
+\subsection{Databricks Genie: Conversational AI Analytics}
+%------------------------------
+
+\begin{definitionbox}{Genie}
+\textbf{Genie} is a conversational AI assistant available on published dashboards that allows users to ask questions in natural language.
+\end{definitionbox}
+
+\textbf{Use Case Scenario:}
+A marketing manager is viewing a dashboard created by the BI team. They wonder: ``What if I filter to only male customers in their 20s?''
+
+Previously, this would require a request to the BI team and weeks of waiting. Now, they simply ask Genie in natural language and get an instant answer.
+
+\textbf{How It Works:}
+\begin{enumerate}
+    \item \textbf{User Question:} ``What is the average trip duration?''
+    \item \textbf{Genie Response:} ``The average is 13.7 minutes.''
+    \item \textbf{Transparency:} Genie shows the SQL query it generated:
+    \begin{lstlisting}[style=sqlstyle]
+SELECT AVG(dropoff_time - pickup_time)
+FROM trips
+WHERE pickup_time IS NOT NULL
+  AND dropoff_time IS NOT NULL;
+    \end{lstlisting}
+\end{enumerate}
+
+\begin{importantbox}{Why Genie Doesn't Hallucinate}
+Unlike ChatGPT which tries to please users by answering any question (potentially making things up), Genie's scope is \textbf{strictly limited to the metadata of the specific tables} defined in the dashboard.
+
+If you ask ``What's the weather like?''---Genie will respond: ``Sorry, I can only answer questions about the data available.''
+
+Genie generates \textbf{pure SQL} based on table schemas. No LLM creativity involved in the answer---just SQL execution.
+\end{importantbox}
+
+\textbf{Customizing Genie:}
+You can provide instructions and example queries to improve Genie's understanding:
+\begin{itemize}
+    \item ``By trip duration, I mean duration in seconds, not minutes''
+    \item Pre-written SQL for complex calculations
+\end{itemize}
+
+\newpage
+
+%==============================
+\section{Databricks Platform Integration}
+%==============================
+
+%------------------------------
+\subsection{SQL Warehouse Connectivity}
+%------------------------------
+
+Databricks SQL Warehouses can connect to many external tools:
+\begin{itemize}
+    \item \textbf{BI Tools:} Tableau, PowerBI, Looker
+    \item \textbf{Development:} dbt, Python, Java, NodeJS, Go
+    \item \textbf{JDBC/ODBC:} Standard database connectivity
+\end{itemize}
+
+Connection details are available in the warehouse settings, including JDBC URLs.
+
+%------------------------------
+\subsection{Monitoring and Query History}
+%------------------------------
+
+\textbf{Query History:} Every query is logged with:
+\begin{itemize}
+    \item Who ran it
+    \item Duration (execution time vs. queue time)
+    \item Status (success/failed)
+    \item Query profile (memory usage, rows returned, scan details)
+\end{itemize}
+
+\textbf{Warehouse Monitoring:}
+\begin{itemize}
+    \item Blue bars = queries running
+    \item Orange bars = queries queued
+    \item Ideal: mostly blue, minimal orange
+\end{itemize}
+
+Administrators use this to:
+\begin{itemize}
+    \item Identify heavy users
+    \item Debug failed queries
+    \item Plan chargeback policies
+    \item Optimize performance
+\end{itemize}
+
+%------------------------------
+\subsection{Workflow Integration}
+%------------------------------
+
+Dashboards can be tasks in workflows:
+\begin{itemize}
+    \item As new data arrives via pipeline, the dashboard auto-refreshes
+    \item Combine Data Engineering, ML, and BI tasks in a single workflow
+    \item Set up alerts if data volume drops (pipeline health monitoring)
+\end{itemize}
+
+\newpage
+
+%==============================
+\section{One-Page Summary}
+%==============================
+
+\begin{tcolorbox}[title={Storage Comparison: Warehouse vs. Lake}, colback=blue!5, colframe=blue!60, breakable]
+\begin{itemize}
+    \item \textbf{Warehouse (DW):} Strict library (structured data, Schema-on-Write, BI/SQL optimized, high cost, high performance)
+    \item \textbf{Lake (DL):} Everything garage (all data types, Schema-on-Read, ML/DS optimized, low cost, lower performance)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Lakehouse: Unified Architecture}, colback=green!5, colframe=green!60, breakable]
+\textbf{Lake's cheap storage + Warehouse's performance/reliability/governance}
+\begin{itemize}
+    \item Single system for both BI and ML/DS workloads
+    \item Eliminates data duplication and ETL complexity
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={BI vs. BA: Different Questions}, colback=orange!5, colframe=orange!60, breakable]
+\begin{itemize}
+    \item \textbf{BI:} ``What happened?'' (past/present reporting, dashboards)
+    \item \textbf{BA:} ``Why did it happen? What will happen?'' (statistics, predictive modeling)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={BI Analyst and Data Modeling}, colback=purple!5, colframe=purple!60, breakable]
+\begin{itemize}
+    \item \textbf{BI Persona:} Core skill is \textbf{SQL}
+    \item \textbf{Data Modeling:} \textbf{Star Schema} (central Fact table + surrounding Dimension tables) is most efficient for BI queries (Kimball approach)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Databricks SQL Key Features}, colback=gray!5, colframe=gray!60, breakable]
+\begin{itemize}
+    \item \textbf{Serverless Compute:} No cluster boot wait time
+    \item \textbf{Materialized Views:} Pre-computed queries for fast dashboards
+    \item \textbf{Streaming Tables:} SQL-only streaming data processing
+    \item \textbf{AI Functions:} LLMs embedded directly in SQL
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={SQL + AI: Intelligent Queries}, colback=red!5, colframe=red!60, breakable]
+\begin{itemize}
+    \item \textbf{ai\_query():} Call external LLMs (GPT, etc.) from SQL
+    \item \textbf{ai\_analyze\_sentiment(), ai\_classify()...}: Built-in AI functions for instant sentiment, classification, extraction
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Dashboards and AI Assistant: Lakeview and Genie}, colback=teal!5, colframe=teal!60, breakable]
+\begin{itemize}
+    \item \textbf{Lakeview:} Built-in Databricks dashboards (operational, free)
+    \item \textbf{Genie:} Conversational AI on published dashboards. Natural language $\rightarrow$ SQL
+    \item \textbf{Genie's Strength:} No hallucination---only references specified table metadata
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

@@ -1,0 +1,1286 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability improvements
+% Last modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Table Related ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Machine Learning}}
+\fancyhead[R]{\small\textit{Lecture 05}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myyellow}{rgb}{1.0, 0.98, 0.9}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Caution,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Very Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, MERGE, INTO, USING, WHEN, MATCHED, THEN, UPDATE, INSERT, DELETE, VERSION, AS, OF, TIMESTAMP},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Tables and Figures
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Reproducible Machine Learning - Lecture 05},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Useful Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Title Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CSCI E-103: Reproducible Machine Learning\\Lecture 05: Data Lakes, Lakehouses, and Delta Lake}
+\author{Harvard Extension School}
+\date{Fall 2025}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Reproducible Machine Learning}{Lecture 05}{Anindita Mahapatra \& Eric Gieseke}{Master the evolution from data silos to data lakehouses, understand Delta Lake's role in providing reliability, and learn job orchestration fundamentals}
+
+\tableofcontents
+
+\newpage
+
+%==============================
+\section{Lecture Overview}
+%==============================
+
+\begin{summarybox}
+This lecture covers the evolution of data storage paradigms and introduces the Data Lakehouse architecture:
+
+\textbf{Core Topics:}
+\begin{itemize}
+    \item \textbf{Data Silos} -- The problem of isolated, compartmentalized data
+    \item \textbf{Data Lakes} -- Centralized storage for all data types (Schema on Read)
+    \item \textbf{Data Swamps} -- The danger of ungoverned data lakes
+    \item \textbf{Data Lakehouses} -- Combining lake flexibility with warehouse reliability
+    \item \textbf{Delta Lake} -- The protocol that enables ACID transactions on data lakes
+    \item \textbf{Medallion Architecture} -- Bronze/Silver/Gold data organization
+    \item \textbf{Job Orchestration} -- Managing multi-task data pipelines
+    \item \textbf{Data Mesh vs. Data Fabric} -- Organizational vs. technical paradigms
+\end{itemize}
+\end{summarybox}
+
+The central theme of this lecture is understanding how to ``hydrate'' a data lake properly so it doesn't become a data swamp. This means not just pushing data in, but ensuring you can effectively pull data out with reliability and governance.
+
+\newpage
+
+%==============================
+\section{Key Terminology Reference}
+%==============================
+
+Before diving into the details, here is a comprehensive reference table of the key concepts covered in this lecture:
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lp{5.5cm}p{4cm}l}
+\toprule
+\textbf{Term} & \textbf{Core Description (Analogy)} & \textbf{Key Characteristics} & \textbf{Relationship} \\
+\midrule
+\textbf{Data Silo} &
+Isolated ``data islands'' per department. \newline
+(e.g., Finance's Excel, Marketing's CRM) &
+- Data isolation and duplication \newline
+- Cross-functional analysis impossible &
+The \textbf{problem} Data Lake solves \\
+\midrule
+\textbf{Data Lake} &
+Giant ``lake'' storing all data in raw format. &
+- All data types (structured/unstructured) \newline
+- \textbf{Schema on Read} \newline
+- Low storage cost &
+Solves silos. \newline
+Can become a swamp. \\
+\midrule
+\textbf{Data Swamp} &
+Ungoverned lake where nobody knows \newline
+what data exists or where. &
+- No governance \newline
+- Missing metadata \newline
+- Lost data trust &
+\textbf{Failed} Data Lake \\
+\midrule
+\textbf{Data Warehouse} &
+``Department store'' for cleaned, \newline
+structured data only. &
+- Structured data only \newline
+- \textbf{Schema on Write} \newline
+- BI/Reports, high performance &
+Complementary to Lake. \newline
+(Analogy: Ferrari) \\
+\midrule
+\textbf{Data Lakehouse} &
+\textbf{Hybrid} combining Lake flexibility \newline
+with Warehouse reliability. &
+- Lake + Warehouse \newline
+- Single platform for BI and AI &
+Evolution of Data Lake. \newline
+Delta Lake enables this. \\
+\midrule
+\textbf{Delta Lake} &
+``Management protocol'' making \newline
+Data Lakes reliable. &
+- Parquet-based + Transaction Log \newline
+- \textbf{ACID, Time Travel} support &
+\textbf{Core technology} for Lakehouses \\
+\midrule
+\textbf{Medallion Arch.} &
+3-tier data refinement pipeline: \newline
+Bronze $\rightarrow$ Silver $\rightarrow$ Gold &
+- \textbf{Bronze}: Raw data \newline
+- \textbf{Silver}: Cleaned, filtered \newline
+- \textbf{Gold}: Aggregated, business-ready &
+\textbf{Methodology} for managing \newline
+Lakehouse data \\
+\midrule
+\textbf{DAG} &
+``Directed Acyclic Graph'' -- \newline
+represents task dependencies. &
+- Direction: execution order \newline
+- Acyclic: no circular dependencies &
+\textbf{Operating principle} of \newline
+Spark and workflows \\
+\midrule
+\textbf{Data Mesh} &
+\textbf{Organizational culture} where each \newline
+business domain owns its data. &
+- Decentralized ownership \newline
+- Data as a Product &
+\textbf{Organizational/culture} strategy \newline
+applicable with Lakehouses \\
+\midrule
+\textbf{Data Fabric} &
+\textbf{Technical architecture} connecting \newline
+data across environments. &
+- Hybrid/multi-cloud integration \newline
+- Metadata-driven automation &
+\textbf{Technology/architecture} focused \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+
+%==============================
+\section{Evolution of Data Storage: From Silos to Lakehouses}
+%==============================
+
+Data storage and utilization approaches have evolved in response to changing business requirements. Understanding this evolution helps explain why modern architectures like the Lakehouse exist.
+
+%------------------------------
+\subsection{Data Silos: Isolated Islands}
+%------------------------------
+
+\begin{definitionbox}{Data Silo}
+A \textbf{Data Silo} is a state where data is isolated across different departments or systems within an organization, preventing cross-functional analysis and creating inefficiencies.
+\end{definitionbox}
+
+\begin{examplebox}{The Isolated Islands Analogy}
+Consider Company A: The Finance team stores revenue data in their Excel files, while Marketing stores customer click data in a separate marketing platform. Because these two data sources aren't connected, answering the question ``Which marketing activities actually drove sales?'' becomes nearly impossible.
+
+Each department is trapped on its own ``data island'' with no bridge to the others.
+\end{examplebox}
+
+\textbf{Why do Data Silos form?}
+
+\begin{itemize}
+    \item \textbf{Structural Issues:} Systems were designed without data sharing in mind
+    \item \textbf{Political Issues:} Departments treat data as ``property'' and refuse to share
+    \item \textbf{Growth Issues:} New systems introduced during expansion don't integrate with existing ones
+    \item \textbf{Vendor Lock-in:} SaaS solutions make data export difficult
+\end{itemize}
+
+\begin{warningbox}
+Data silos lead to:
+\begin{itemize}
+    \item Duplicate data maintenance costs
+    \item Inconsistent ``versions of truth''
+    \item Inability to get a holistic view of customers (the ``Customer 360'' problem)
+    \item Lost business opportunities due to fragmented insights
+\end{itemize}
+\end{warningbox}
+
+%------------------------------
+\subsection{Data Lakes: The Great Unifier}
+%------------------------------
+
+\begin{definitionbox}{Data Lake}
+A \textbf{Data Lake} is a centralized repository that stores all types of data (structured, semi-structured, unstructured) in their original raw format at any scale.
+\end{definitionbox}
+
+The Data Lake emerged to solve the silo problem with a simple philosophy: ``Store everything in one place, figure out how to use it later.''
+
+\textbf{Key Characteristics:}
+\begin{itemize}
+    \item \textbf{All Data Types:} Handles structured (tables), semi-structured (JSON, XML), and unstructured (images, videos, logs)
+    \item \textbf{Raw Storage:} Data is stored as-is without transformation
+    \item \textbf{Low Cost:} Built on cheap cloud storage (S3, ADLS, GCS)
+    \item \textbf{Schema on Read:} No schema required at write time
+\end{itemize}
+
+\begin{importantbox}{Schema on Read vs. Schema on Write}
+\begin{tabular}{p{0.45\textwidth}|p{0.45\textwidth}}
+\textbf{Schema on Read} (Data Lake) & \textbf{Schema on Write} (Database/DW) \\
+\hline
+1. \textbf{Write:} Dump anything, no schema check & 1. \textbf{Write:} Strict schema validation required \\
+2. \textbf{Read:} Define/interpret schema at query time & 2. \textbf{Read:} Fast reads using pre-defined schema \\
+\hline
+\textbf{Pros:} Fast ingestion, flexible & \textbf{Pros:} Data quality guaranteed, fast queries \\
+\textbf{Cons:} Complex reads, quality issues & \textbf{Cons:} Rigid, can't store unstructured data \\
+\end{tabular}
+\end{importantbox}
+
+%------------------------------
+\subsection{Data Swamps: When Lakes Go Wrong}
+%------------------------------
+
+The flexibility of Data Lakes comes with a dangerous catch: without proper governance, they become \textbf{Data Swamps}.
+
+\begin{definitionbox}{Data Swamp}
+A \textbf{Data Swamp} is a Data Lake that has devolved into an unusable state due to lack of metadata management and governance. Nobody knows what data exists, where it is, or whether it can be trusted.
+\end{definitionbox}
+
+\begin{examplebox}{Warehouse vs. Junkyard Analogy}
+\textbf{Well-governed Data Lake} = Amazon's fulfillment center
+\begin{itemize}
+    \item Every item has a label and barcode
+    \item Exact location is tracked in the system
+    \item Can find anything in seconds
+\end{itemize}
+
+\textbf{Data Swamp} = Municipal junkyard
+\begin{itemize}
+    \item Items dumped randomly
+    \item No inventory or organization
+    \item Something valuable might be there, but good luck finding it!
+\end{itemize}
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{The Pendulum Metaphor}
+
+Think of data management as a pendulum swinging between two extremes:
+
+\begin{center}
+\textbf{Data Silos} $\longleftrightarrow$ \textbf{Data Swamps}
+
+(Too rigid, can't use data) $\longleftrightarrow$ (Too loose, can't trust data)
+\end{center}
+
+The goal is to find the \textbf{middle ground}: a \textbf{Governed Data Lake} that provides flexibility while maintaining quality and discoverability.
+\end{warningbox}
+
+%------------------------------
+\subsection{Data Warehouses: The Structured Alternative}
+%------------------------------
+
+\begin{definitionbox}{Data Warehouse (DW)}
+A \textbf{Data Warehouse} is a system designed for Business Intelligence (BI) and reporting that stores only cleaned, structured, and processed data with strict schema enforcement.
+\end{definitionbox}
+
+\textbf{Key Characteristics:}
+\begin{itemize}
+    \item \textbf{Schema on Write:} Data must conform to predefined structure
+    \item \textbf{Primary Users:} Business Analysts, SQL users
+    \item \textbf{Strengths:} Reliable data, very fast queries
+    \item \textbf{Weaknesses:} Expensive, can't handle unstructured data, limited for ML use cases
+\end{itemize}
+
+%------------------------------
+\subsection{Data Lake vs. Data Warehouse Comparison}
+%------------------------------
+
+\begin{examplebox}{Ferrari vs. Tractor Trailer Analogy}
+\textbf{Data Warehouse (Ferrari):}
+\begin{itemize}
+    \item Incredibly fast and sleek (high-performance queries)
+    \item But can only carry 2 passengers (structured data only)
+    \item No cargo space (limited flexibility)
+\end{itemize}
+
+\textbf{Data Lake (Tractor Trailer):}
+\begin{itemize}
+    \item Not quite as fast as the Ferrari
+    \item But can haul any type of cargo (all data types)
+    \item Unlimited capacity (petabyte scale)
+\end{itemize}
+\end{examplebox}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Characteristic} & \textbf{Data Lake} & \textbf{Data Warehouse} \\
+\midrule
+\textbf{Data Types} & All (structured, semi, unstructured) & Structured only \\
+\textbf{Data State} & Raw and processed & Processed only \\
+\textbf{Schema} & Schema on Read & Schema on Write \\
+\textbf{Process} & ELT (Extract, Load $\rightarrow$ Transform) & ETL (Extract, Transform $\rightarrow$ Load) \\
+\textbf{Primary Users} & Data Scientists, ML Engineers & Business Analysts, SQL users \\
+\textbf{Main Use Cases} & AI/ML modeling, data exploration & BI reports, dashboards \\
+\textbf{Cost Model} & Low (storage/compute separated) & High (storage/compute coupled) \\
+\textbf{Data Format} & Open formats (Parquet, Delta) & Proprietary formats \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+%------------------------------
+\subsection{Data Lakehouse: Best of Both Worlds}
+%------------------------------
+
+Historically, organizations had to maintain both a Data Warehouse (for BI) and a Data Lake (for AI/ML). This created:
+\begin{itemize}
+    \item Data duplication between systems
+    \item DW/DL silos (ironic, given lakes were meant to eliminate silos!)
+    \item Double infrastructure costs
+    \item Data synchronization nightmares
+\end{itemize}
+
+\begin{definitionbox}{Data Lakehouse}
+A \textbf{Data Lakehouse} is a unified platform that combines the \textbf{low cost and flexibility} of Data Lakes with the \textbf{reliability, governance, and performance} of Data Warehouses.
+\end{definitionbox}
+
+\textbf{How is this achieved?} Through technologies like \textbf{Delta Lake} that add data warehouse capabilities on top of data lake storage.
+
+\begin{infobox}
+\textbf{Why Lakehouses Matter:}
+\begin{itemize}
+    \item Single platform for both BI and AI workloads
+    \item No data duplication or sync issues
+    \item Reduced infrastructure costs
+    \item Open formats prevent vendor lock-in
+    \item ACID transactions ensure reliability
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%==============================
+\section{Delta Lake: The Foundation of Reliable Lakehouses}
+%==============================
+
+%------------------------------
+\subsection{What is Delta Lake? (A Protocol, Not a Format)}
+%------------------------------
+
+\begin{importantbox}{Common Misconception}
+\textbf{Delta Lake is NOT a file format!}
+
+Delta Lake is a \textbf{storage protocol} or \textbf{management layer}. The actual data files are still stored as efficient \textbf{Parquet} files.
+
+Delta Lake adds a \textbf{\_delta\_log} folder containing transaction logs on top of Parquet files, enabling powerful capabilities that raw Parquet cannot provide.
+\end{importantbox}
+
+\textbf{Why was Delta Lake needed?}
+
+Traditional Data Lake files (Parquet, CSV in Hadoop/S3) were immutable and had critical limitations:
+
+\begin{itemize}
+    \item \textbf{No Updates/Deletes:} Modifying a single row required rewriting entire files
+    \item \textbf{No Transaction Safety:} Failed jobs could corrupt data (duplicates, partial writes)
+    \item \textbf{No Concurrency:} Multiple readers/writers caused inconsistency
+    \item \textbf{No Quality Guarantees:} No schema enforcement after initial write
+\end{itemize}
+
+Delta Lake solves all these problems, making data lakes as reliable as databases.
+
+\begin{infobox}
+\textbf{Delta Lake Alternatives:}
+
+Delta Lake is not the only solution. Similar technologies include:
+\begin{itemize}
+    \item \textbf{Apache Iceberg} -- Created by Netflix, now widely adopted
+    \item \textbf{Apache Hudi} -- Created by Uber
+\end{itemize}
+
+All three provide similar ACID guarantees. Delta and Iceberg are working on interoperability.
+\end{infobox}
+
+%------------------------------
+\subsection{Delta Lake Core Capabilities}
+%------------------------------
+
+\begin{enumerate}
+    \item \textbf{ACID Transactions:}
+    Like traditional databases, Delta Lake guarantees:
+    \begin{itemize}
+        \item \textbf{Atomicity:} Operations either complete fully or not at all
+        \item \textbf{Consistency:} Data remains valid before and after transactions
+        \item \textbf{Isolation:} Concurrent operations don't interfere with each other
+        \item \textbf{Durability:} Committed changes persist
+    \end{itemize}
+
+    \item \textbf{Schema Management:}
+    \begin{itemize}
+        \item \textbf{Schema Enforcement:} Rejects data that doesn't match table schema
+        \item \textbf{Schema Evolution:} Allows intentional schema changes (adding columns)
+    \end{itemize}
+
+    \item \textbf{Time Travel:}
+    Every change is logged in \_delta\_log, enabling queries like:
+    \begin{lstlisting}[style=sqlstyle]
+-- Query data as it was at version 5
+SELECT * FROM my_table VERSION AS OF 5;
+
+-- Query data as it was at a specific time
+SELECT * FROM my_table TIMESTAMP AS OF '2025-10-26 03:00:00';
+    \end{lstlisting}
+
+    \item \textbf{DML Operations:}
+    Direct SQL operations on lake files:
+    \begin{lstlisting}[style=sqlstyle]
+UPDATE my_table SET column = 'value' WHERE condition;
+DELETE FROM my_table WHERE condition;
+MERGE INTO target USING source ON condition
+  WHEN MATCHED THEN UPDATE ...
+  WHEN NOT MATCHED THEN INSERT ...;
+    \end{lstlisting}
+
+    \item \textbf{Performance Optimization:}
+    \begin{itemize}
+        \item \textbf{Data Skipping:} Statistics-based file filtering
+        \item \textbf{Z-Ordering:} Multi-dimensional data clustering
+        \item \textbf{OPTIMIZE:} Compacts small files into larger ones
+    \end{itemize}
+\end{enumerate}
+
+\newpage
+
+%==============================
+\section{Data Architecture Principles}
+%==============================
+
+%------------------------------
+\subsection{Medallion Architecture}
+%------------------------------
+
+The Medallion Architecture is the most widely used pattern for organizing data in a Lakehouse. It separates data into three layers based on quality and refinement level.
+
+\begin{examplebox}{Ore Refinery Analogy}
+Think of data processing like refining ore:
+
+\textbf{Bronze (Raw Ore):} Fresh from the mine, unprocessed. Contains impurities but preserves everything.
+
+\textbf{Silver (Refined Metal):} Impurities removed, standardized form. Ready for manufacturing.
+
+\textbf{Gold (Finished Product):} Shaped into specific products for end consumers.
+\end{examplebox}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Layer} & \textbf{Bronze} & \textbf{Silver} & \textbf{Gold} \\
+\midrule
+\textbf{Data State} & Raw (as received) & Cleaned, filtered & Aggregated, business-ready \\
+\textbf{Key Operations} &
+- Ingest all source data \newline
+- Preserve original format \newline
+- Add ingestion metadata &
+- Remove nulls/duplicates \newline
+- Standardize types \newline
+- Join multiple sources \newline
+- Convert to Delta format &
+- Business aggregations \newline
+- KPI calculations \newline
+- ML feature tables \newline
+- Dashboard-ready views \\
+\textbf{Data Structure} & Same as source system & 3NF or similar & Denormalized, Star Schema \\
+\textbf{Primary Users} & Data Engineers & Data Engineers, Scientists & Business Analysts, Scientists \\
+\textbf{Update Frequency} & Real-time or batch & Batch (Bronze $\rightarrow$ Silver) & Batch (Silver $\rightarrow$ Gold) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{infobox}
+\textbf{Why Medallion Architecture Works:}
+\begin{itemize}
+    \item \textbf{Reprocessing:} If transformation logic changes, reprocess from Bronze
+    \item \textbf{Debugging:} Compare Bronze vs. Silver to trace data issues
+    \item \textbf{Multiple Uses:} One Silver table can feed multiple Gold tables
+    \item \textbf{Clear Ownership:} Each layer has defined responsibilities
+\end{itemize}
+\end{infobox}
+
+%------------------------------
+\subsection{Six Guiding Principles for Lakehouses}
+%------------------------------
+
+\begin{enumerate}
+    \item \textbf{Treat Data as Products:}
+    Don't just accumulate data—curate it into trusted, well-documented ``data products'' that internal customers can rely on.
+
+    \item \textbf{Eliminate Data Silos, Minimize Data Movement:}
+    Keep data in one place (the Lake) and let systems access it directly. Every copy creates sync issues and stale data risks.
+
+    \item \textbf{Democratize Value Creation Through Self-Service:}
+    Enable business users to access and analyze data themselves, under proper governance. Don't bottleneck everything through the data team.
+
+    \item \textbf{Adopt Organization-Wide Data Governance:}
+    Implement centralized access control, quality management, and cataloging (e.g., Unity Catalog). Without governance, you get a swamp.
+
+    \item \textbf{Use Open Interfaces and Formats:}
+    Avoid vendor lock-in by using open formats like Parquet and Delta Lake. This preserves flexibility and enables ecosystem tools.
+
+    \item \textbf{Build for Scale, Optimize for Performance and Cost:}
+    Design for growth from the start. Balance performance needs against cost constraints—don't over-provision, but don't bottleneck either.
+\end{enumerate}
+
+%------------------------------
+\subsection{Data Mesh vs. Data Fabric}
+%------------------------------
+
+Two concepts frequently discussed alongside Lakehouses are Data Mesh and Data Fabric. Despite similar-sounding names, they address different concerns.
+
+\begin{importantbox}{Core Difference: Organization vs. Technology}
+\textbf{Data Mesh:} An \textbf{organizational/cultural} approach. ``Decentralize data ownership to domain teams who understand their data best.''
+
+\textbf{Data Fabric:} A \textbf{technological/architectural} approach. ``Create a unified layer that connects data across all environments (cloud, on-prem, hybrid).''
+\end{importantbox}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Dimension} & \textbf{Data Mesh} & \textbf{Data Fabric} \\
+\midrule
+\textbf{Core Idea} & Decentralization & Integration and connection \\
+\textbf{Primary Focus} & Organization, people, process & Technology, architecture, automation \\
+\textbf{Data Ownership} & Domain teams (business units) & Central IT team (or delegated) \\
+\textbf{Governance Model} & Federated (local rules under global standards) & Centralized (embedded via metadata) \\
+\textbf{Data Treatment} & Data = Product (discoverable, trustworthy) & Data = Accessible Asset \\
+\textbf{Best Fit} & Large enterprises with complex org structure & Enterprises with hybrid/multi-cloud complexity \\
+\textbf{Analogy} & Federation of cities, each managing its own infrastructure & Highway system connecting all cities \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{Four Pillars of Data Mesh:}
+\begin{enumerate}
+    \item \textbf{Domain Ownership:} Each business domain owns and manages its data
+    \item \textbf{Data as a Product:} Data must be discoverable, addressable, and trustworthy
+    \item \textbf{Self-Service Infrastructure:} Teams can create resources on demand
+    \item \textbf{Federated Computational Governance:} Global standards, local implementation
+\end{enumerate}
+
+\newpage
+
+%==============================
+\section{Data Pipeline Operations and Debugging}
+%==============================
+
+%------------------------------
+\subsection{Data Consolidation Tools}
+%------------------------------
+
+Getting data into the Data Lake requires ingestion tools. Here are the primary methods in Databricks:
+
+\begin{enumerate}
+    \item \textbf{AutoLoader:}
+    \begin{itemize}
+        \item Purpose: Continuous, incremental ingestion
+        \item Monitors cloud storage folders for new files
+        \item Automatically detects and processes new arrivals
+        \item Uses \code{cloudFiles} format (streaming-based)
+        \item Scales to billions of files
+    \end{itemize}
+
+    \item \textbf{COPY INTO:}
+    \begin{itemize}
+        \item Purpose: One-time bulk batch ingestion
+        \item SQL command for loading data
+        \item \textbf{Idempotent:} Running multiple times doesn't create duplicates
+        \item Simpler than AutoLoader for single-load scenarios
+    \end{itemize}
+
+    \item \textbf{Delta Live Tables (DLT):}
+    \begin{itemize}
+        \item Next-generation declarative ETL
+        \item Define ``what'' you want, system handles ``how''
+        \item Built-in data quality constraints
+        \item Automatic error handling and recovery
+    \end{itemize}
+
+    \item \textbf{Local File Upload:}
+    \begin{itemize}
+        \item Upload small files directly via Databricks UI
+        \item Limit: 10 files, 2GB total
+        \item Supports: CSV, TSV, JSON, Avro, Parquet, TXT, XML
+    \end{itemize}
+\end{enumerate}
+
+%------------------------------
+\subsection{Job Orchestration}
+%------------------------------
+
+Complex data pipelines involve multiple interconnected tasks. Managing these is called \textbf{Job Orchestration}.
+
+\begin{definitionbox}{Workflow/Job}
+A \textbf{Workflow} (or Job) is a collection of tasks with defined dependencies, schedules, and failure handling. Tasks can be notebooks, SQL scripts, Python files, or other executables.
+\end{definitionbox}
+
+\textbf{Key Orchestration Concepts:}
+
+\begin{itemize}
+    \item \textbf{Dependencies (DAG):}
+    Tasks form a Directed Acyclic Graph:
+    \begin{itemize}
+        \item \textbf{Parallel:} Independent tasks run simultaneously
+        \item \textbf{Sequential:} Dependent tasks wait for predecessors
+    \end{itemize}
+
+    \item \textbf{Scheduling:}
+    \begin{itemize}
+        \item Cron expressions for time-based triggers (``every day at 3 AM'')
+        \item Event triggers (``when new file arrives'')
+        \item Continuous mode (always running)
+    \end{itemize}
+
+    \item \textbf{Failure Handling:}
+    \begin{itemize}
+        \item Automatic retries for transient failures
+        \item Timeouts for hung jobs
+        \item Alert notifications to pipeline owners
+    \end{itemize}
+
+    \item \textbf{Repair and Run:}
+    If a 10-task pipeline fails at task 8, you can ``repair'' from task 8 onwards, reusing results from tasks 1-7. This saves time and compute costs.
+\end{itemize}
+
+%------------------------------
+\subsection{The 4 S's of Job Performance Issues}
+%------------------------------
+
+When Spark jobs run slowly, investigate these four common causes:
+
+\begin{examplebox}{Understanding Performance Issues Through Analogies}
+
+\textbf{1. Spill:}
+\begin{itemize}
+    \item \textbf{Symptom:} Memory (RAM) insufficient, data written to disk temporarily
+    \item \textbf{Analogy:} Cooking on a tiny counter—you have to put ingredients on the floor and keep picking them up
+    \item \textbf{Solution:} Use nodes with more memory, increase T-shirt size (serverless)
+\end{itemize}
+
+\textbf{2. Shuffle:}
+\begin{itemize}
+    \item \textbf{Symptom:} Large data exchange between nodes during sorts or joins
+    \item \textbf{Analogy:} Team project where everyone needs materials from each other, spending all time sending Slack messages
+    \item \textbf{Solution:} Optimize partitioning strategy to minimize cross-node movement
+\end{itemize}
+
+\textbf{3. Skew/Stragglers:}
+\begin{itemize}
+    \item \textbf{Symptom:} Data distributed unevenly; one node does most work while others idle
+    \item \textbf{Analogy:} 5-person team project where 1 person gets 80\% of the work—everyone waits for that one person to finish
+    \item \textbf{Solution:} Change partition keys for even distribution (e.g., ``country + city'' instead of just ``country'')
+\end{itemize}
+
+\textbf{4. Small Files:}
+\begin{itemize}
+    \item \textbf{Symptom:} Millions of tiny files create more I/O overhead than actual processing
+    \item \textbf{Analogy:} Reading a book split into 1 million single-page files—opening/closing files takes longer than reading
+    \item \textbf{Solution:} Use OPTIMIZE command to compact small files into larger ones
+\end{itemize}
+\end{examplebox}
+
+%------------------------------
+\subsection{Monitoring Approaches}
+%------------------------------
+
+\textbf{Traditional Compute (Ganglia Metrics):}
+\begin{itemize}
+    \item Visual dashboards for CPU, memory, network usage
+    \item Click on individual nodes to see detailed graphs
+    \item Useful for diagnosing spill (high memory + disk I/O) or I/O-bound operations
+\end{itemize}
+
+\textbf{Serverless:}
+\begin{itemize}
+    \item No Ganglia-level metrics available
+    \item Uses T-shirt sizing (Small, Medium, Large, X-Large)
+    \item Simplified management but less fine-grained tuning
+    \item Check query history for statistics and performance data
+\end{itemize}
+
+\newpage
+
+%==============================
+\section{Lab: Delta Lake Features}
+%==============================
+
+This section covers hands-on Delta Lake operations from the lab.
+
+%------------------------------
+\subsection{Converting Parquet to Delta}
+%------------------------------
+
+Converting existing Parquet data to Delta Lake format is straightforward:
+
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Delta table from Parquet data}]
+-- Create a Delta table from existing Parquet data
+CREATE TABLE IF NOT EXISTS loans_by_state_delta
+USING delta
+LOCATION '/path/to/delta/table'
+AS SELECT * FROM parquet_table_view;
+
+-- Verify the table format
+DESCRIBE DETAIL loans_by_state_delta;
+-- Result shows: format: delta
+\end{lstlisting}
+
+%------------------------------
+\subsection{Concurrent Streaming and Batch Operations}
+%------------------------------
+
+One of Delta Lake's powerful features is allowing simultaneous streaming reads and batch writes:
+
+\begin{lstlisting}[style=pythonstyle, caption={Reading Delta table as a stream}]
+# Start a streaming read from the Delta table
+streaming_query = (
+    spark.readStream
+        .format("delta")
+        .load("/path/to/delta/table")
+        .writeStream
+        .format("console")
+        .start()
+)
+\end{lstlisting}
+
+\begin{lstlisting}[style=sqlstyle, caption={Batch inserts while streaming is active}]
+-- Insert batch data while streaming is running
+INSERT INTO loans_by_state_delta VALUES ('IA', 450);
+INSERT INTO loans_by_state_delta VALUES ('IA', 450);
+-- ... repeat for more inserts
+-- The streaming query will automatically pick up these changes
+\end{lstlisting}
+
+%------------------------------
+\subsection{DML Operations (DELETE, UPDATE)}
+%------------------------------
+
+Operations impossible on raw Parquet files work seamlessly on Delta tables:
+
+\begin{lstlisting}[style=sqlstyle, caption={Row-level delete operation}]
+-- Delete specific rows (impossible on plain Parquet!)
+DELETE FROM loans_by_state_delta WHERE state = 'IA';
+\end{lstlisting}
+
+%------------------------------
+\subsection{MERGE (Upsert)}
+%------------------------------
+
+The MERGE command provides atomic ``upsert'' (update or insert) functionality:
+
+\begin{lstlisting}[style=sqlstyle, caption={MERGE operation for upserting data}]
+MERGE INTO loans_by_state_delta AS target
+USING new_updates_table AS source
+ON target.state = source.state
+
+WHEN MATCHED THEN
+  -- State exists: update the count
+  UPDATE SET target.count = source.new_count
+
+WHEN NOT MATCHED THEN
+  -- State doesn't exist: insert new row
+  INSERT (state, count) VALUES (source.state, source.new_count);
+\end{lstlisting}
+
+%------------------------------
+\subsection{Schema Evolution}
+%------------------------------
+
+Delta Lake enforces schema by default but allows intentional evolution:
+
+\begin{lstlisting}[style=pythonstyle, caption={Enabling schema evolution during write}]
+# Without mergeSchema, this fails if 'amount' column is new
+df.write \
+    .format("delta") \
+    .mode("append") \
+    .option("mergeSchema", "true") \  # Allow new columns
+    .save("/path/to/delta/table")
+\end{lstlisting}
+
+%------------------------------
+\subsection{Time Travel}
+%------------------------------
+
+Every change is recorded, enabling historical queries:
+
+\begin{lstlisting}[style=sqlstyle, caption={Viewing table history and time travel}]
+-- View all changes to the table
+DESCRIBE HISTORY loans_by_state_delta;
+-- Shows: version, timestamp, operation, operationParameters
+
+-- Query specific version
+SELECT * FROM loans_by_state_delta VERSION AS OF 0;
+-- Returns data as it was initially created (Iowa missing)
+
+SELECT * FROM loans_by_state_delta VERSION AS OF 9;
+-- Returns data after all modifications (Iowa = 10)
+
+-- Query by timestamp
+SELECT * FROM loans_by_state_delta
+TIMESTAMP AS OF '2025-10-26 03:00:00';
+\end{lstlisting}
+
+\newpage
+
+%==============================
+\section{Lab: Databricks Workflows}
+%==============================
+
+%------------------------------
+\subsection{Creating a Job}
+%------------------------------
+
+\textbf{Steps to create a workflow:}
+
+\begin{enumerate}
+    \item Navigate to \textbf{Jobs \& Pipelines} in Databricks
+    \item Click \textbf{Create Job}
+    \item Add tasks (notebooks, SQL, Python files, etc.)
+    \item Configure dependencies between tasks
+    \item Set scheduling (cron, file arrival, continuous)
+    \item Configure alerts and retry policies
+\end{enumerate}
+
+%------------------------------
+\subsection{Task Dependencies}
+%------------------------------
+
+\begin{itemize}
+    \item Tasks with \textbf{no dependencies} run in parallel
+    \item Tasks with \textbf{dependencies} wait for predecessors to complete
+    \item Removing a dependency makes tasks parallel
+    \item The visual DAG editor shows the execution flow
+\end{itemize}
+
+%------------------------------
+\subsection{Parameters}
+%------------------------------
+
+Workflows support two types of parameters:
+
+\textbf{Job Parameters:} Global to the entire workflow
+\begin{lstlisting}[style=pythonstyle]
+# Access job parameter in notebook
+job_param = dbutils.widgets.get("job_param1")
+\end{lstlisting}
+
+\textbf{Task Parameters:} Specific to individual tasks
+\begin{lstlisting}[style=pythonstyle]
+# Access task parameter in notebook
+task_param = dbutils.widgets.get("param1")
+\end{lstlisting}
+
+%------------------------------
+\subsection{Scheduling Options}
+%------------------------------
+
+\begin{itemize}
+    \item \textbf{Scheduled:} Use cron syntax (e.g., ``0 9 * * 1'' = every Monday at 9 AM)
+    \item \textbf{File Arrival:} Trigger on new files in a location
+    \item \textbf{Continuous:} Always running (expensive, use for real-time needs)
+\end{itemize}
+
+\newpage
+
+%==============================
+\section{Industry Adoption and Maturity}
+%==============================
+
+%------------------------------
+\subsection{Lakehouse in the Gartner Hype Cycle}
+%------------------------------
+
+According to Gartner's analysis:
+
+\textbf{2021:} Lakehouses were on the ``Innovation Trigger'' upslope—gaining attention but not yet proven.
+
+\textbf{2025:} Lakehouses have passed through the ``Trough of Disillusionment'' and are climbing the ``Slope of Enlightenment.'' Expected to reach the ``Plateau of Productivity'' within 2 years.
+
+\begin{infobox}
+\textbf{MIT Report Finding:}
+
+Approximately 70\% of CIOs surveyed reported that their organizations have adopted Lakehouse architecture. This indicates strong enterprise acceptance of the paradigm.
+\end{infobox}
+
+%------------------------------
+\subsection{Why Lakehouses Are Succeeding}
+%------------------------------
+
+Before Lakehouses, organizations maintained separate platforms for:
+\begin{itemize}
+    \item Streaming (Kafka, Flink)
+    \item Batch processing (Spark)
+    \item Machine Learning (separate ML platforms)
+    \item BI/Analytics (Data Warehouse)
+    \item Data Storage (Data Lake)
+\end{itemize}
+
+Keeping 4-5 systems synchronized, reconciled, and operational was a nightmare.
+
+\textbf{The Lakehouse Promise:}
+
+``Data gravity is the most important thing. Once you've massaged, cleansed, curated, and governed your data in one place—that's it. All use cases should run from there because specialized engines can access it.''
+
+\textbf{Key enabling technologies:}
+\begin{enumerate}
+    \item \textbf{Delta Lake:} ACID transactions, time travel, DML operations
+    \item \textbf{Unity Catalog:} Centralized governance and metadata
+    \item \textbf{Photon Engine:} Rewritten Spark for warehouse-level performance
+    \item \textbf{Serverless Compute:} Simplified infrastructure management
+\end{enumerate}
+
+\newpage
+
+%==============================
+\section{One-Page Summary}
+%==============================
+
+\begin{tcolorbox}[title={Evolution of Data Storage}, breakable]
+\textbf{1. Data Silos (Problem):} Isolated data islands. Departments can't share or integrate data. \\
+$\downarrow$ \\
+\textbf{2. Data Lake (Solution):} All data in one place, raw format, Schema on Read. \\
+$\downarrow$ \\
+\textbf{3. Data Swamp (Risk):} Lake without governance becomes unusable mess. \\
+$\downarrow$ \\
+\textbf{4. Data Lakehouse (Evolution):} Lake flexibility + Warehouse reliability in one platform.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Delta Lake: The Foundation}, breakable]
+\textbf{What it is:} A protocol (not format!) adding transaction logs to Parquet files.
+
+\textbf{Key Capabilities:}
+\begin{itemize}
+    \item \textbf{ACID Transactions:} Reliable reads/writes
+    \item \textbf{Time Travel:} Query historical data
+    \item \textbf{DML Support:} UPDATE, DELETE, MERGE on lake files
+    \item \textbf{Schema Evolution:} Controlled schema changes
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Medallion Architecture}, breakable]
+\textbf{Bronze $\rightarrow$ Silver $\rightarrow$ Gold}
+\begin{itemize}
+    \item \textbf{Bronze:} Raw data as ingested (preserve everything)
+    \item \textbf{Silver:} Cleaned, validated, joined (the work happens here)
+    \item \textbf{Gold:} Aggregated, business-ready (what users consume)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={The 4 S's of Performance Issues}, colback=myyellow, colframe=yellow!75!black, breakable]
+\begin{itemize}
+    \item \textbf{Spill:} Memory overflow $\rightarrow$ disk usage (slow I/O)
+    \item \textbf{Shuffle:} Cross-node data exchange (network bottleneck)
+    \item \textbf{Skew:} Uneven data distribution $\rightarrow$ straggler nodes
+    \item \textbf{Small Files:} Too many tiny files $\rightarrow$ I/O overhead
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Data Mesh vs. Data Fabric}, breakable]
+\textbf{Data Mesh:} Organizational culture. Decentralize data ownership to domain teams. \\
+\textbf{Data Fabric:} Technical architecture. Unified access layer across all environments.
+
+Both can be built on top of a Lakehouse platform!
+\end{tcolorbox}
+
+\end{document}

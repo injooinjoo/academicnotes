@@ -1,0 +1,1150 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability Optimized
+% Last Modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5 line spacing
+\setlength{\parskip}{0.5em}          % Paragraph spacing
+\setlength{\parindent}{0pt}          % No indentation
+
+% --- Table Related ---
+\usepackage{booktabs}              % Professional tables
+\usepackage{tabularx}              % Auto-width tables
+\usepackage{array}                 % Table column extensions
+\usepackage{longtable}             % Multi-page tables
+\renewcommand{\arraystretch}{1.1}  % Table row spacing
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 01}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% First page has no header
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions (Pastel + Dark Mode Compatible)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% Light background pastel colors
+\definecolor{lightblue}{RGB}{220, 235, 255}      % Soft blue
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % Soft green
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % Soft yellow
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % Soft purple
+\definecolor{lightgray}{gray}{0.95}              % Light gray
+\definecolor{lightpink}{RGB}{255, 235, 245}      % Soft pink
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% Dark colors (for borders/titles)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox) - 8 Types
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. Overview Box (lecture start)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. Summary Box
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. Key Information Box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. Warning Box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. Example Box
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. Definition Box
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. Important Box
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. Caution Box (same as warning)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python code style
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL code style
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Tables and Figures
+%========================================================================================
+
+\usepackage{graphicx}              % Images
+\usepackage{adjustbox}             % Table/box sizing
+
+% Table caption style
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% Theorem environments
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF metadata set in each document
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 01},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Useful Packages
+%========================================================================================
+
+\usepackage{enumitem}              % List customization
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % Typography improvement
+\usepackage{footnote}              % Footnote improvement
+\usepackage{url}                   % URL line breaking
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+% Emphasis text
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Term definition (inline)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% Page break before section
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Title Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CS109A: Introduction to Data Science\\Lecture 01: What is Data Science?}
+\author{Harvard University}
+\date{Fall 2024}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 01: Course Introduction}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Understand the definition, history, and process of data science; learn course policies and expectations}
+
+
+\begin{summarybox}
+This document is a comprehensive guide to the first lecture of CS109A ``Introduction to Data Science'' at Harvard University. It covers the fundamental definition of data science, its historical development from ancient times to the modern era, the five-step data science process, and the three core components that make up this interdisciplinary field. Additionally, it provides detailed course logistics including grading policies, the critical attendance requirements, and important prerequisites. The lecture concludes with an introduction to web scraping as the first practical skill students will learn.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================
+\section{Course Overview}
+%========================================
+
+\subsection{What This Course Is About}
+
+Welcome to CS109A, also known as AC209A, STAT 109A, and CSCI E-109A for Extension School students. This course is the \textbf{beginning of your journey} into data science and artificial intelligence---not the destination.
+
+\begin{warningbox}
+\textbf{Setting Realistic Expectations}
+
+You will \textbf{not} become an expert in AI and data science by taking this course alone. Think of this course as laying the foundation. There are many more things to learn after this, including:
+\begin{itemize}
+    \item CS109B: Advanced Topics in Data Science (Spring semester)
+    \item AC215: Advanced Practical Data Science
+    \item Machine Learning, NLP, and Deep Learning courses
+\end{itemize}
+\end{warningbox}
+
+\subsection{The ``Wax On, Wax Off'' Philosophy}
+
+Professor Protopapas describes the teaching philosophy using a famous scene from the movie ``The Karate Kid.'' In this movie, the teacher (Mr. Miyagi) makes his student repeatedly wax cars with specific motions---``wax on, wax off''---before teaching any actual karate. The student is frustrated, but later discovers that these motions became the foundation for perfect defensive moves.
+
+\begin{examplebox}{The Karate Kid Analogy}
+\textbf{The Modern Temptation:} Students often want to jump straight to running large language models (LLMs), building AI bots, and starting companies.
+
+\textbf{The Old-Fashioned Approach:} This course insists on understanding the fundamentals first. You will:
+\begin{itemize}
+    \item Train models and validate them repeatedly
+    \item Understand \textit{what} is happening inside models
+    \item Learn \textit{why} models work the way they do
+    \item Avoid the ``dot fit pandemic''---blindly calling \code{model.fit()} without understanding
+\end{itemize}
+\end{examplebox}
+
+\subsection{Learning Roadmap}
+
+The course follows a logical progression through the data science workflow:
+
+\begin{enumerate}
+    \item \textbf{Weeks 1-2: Data Collection \& Exploration}
+    \begin{itemize}
+        \item Web scraping and data wrangling
+        \item Exploratory Data Analysis (EDA)
+        \item Data visualization
+    \end{itemize}
+
+    \item \textbf{Weeks 3-5: Regression}
+    \begin{itemize}
+        \item K-Nearest Neighbors (KNN) for regression
+        \item Simple and multiple linear regression
+        \item Model selection with cross-validation
+        \item Regularization (Ridge, Lasso)
+    \end{itemize}
+
+    \item \textbf{Week 6: Bayesian Modeling} (New this year!)
+    \begin{itemize}
+        \item Bayesian inference framework
+        \item Bayesian linear regression
+    \end{itemize}
+
+    \item \textbf{Weeks 7-9: Classification}
+    \begin{itemize}
+        \item KNN for classification
+        \item Logistic regression
+        \item \textbf{Midterm exam} during this period
+    \end{itemize}
+
+    \item \textbf{Week 10: Data Issues}
+    \begin{itemize}
+        \item Missing data (Missingness)
+        \item Causal inference
+        \item Bias and ethics in data science
+    \end{itemize}
+
+    \item \textbf{Weeks 11-14: Tree-Based Models}
+    \begin{itemize}
+        \item Decision trees
+        \item Bagging and Random Forests
+        \item Boosting methods
+    \end{itemize}
+\end{enumerate}
+
+\newpage
+
+%========================================
+\section{What is Data Science?}
+%========================================
+
+\subsection{The Simple Answer}
+
+At its core, \textbf{data science is the process of extracting meaningful insights and value from data}. But to truly understand what this means, let's look at it from multiple perspectives.
+
+\begin{definitionbox}{Data Science}
+\textbf{Data Science} is an interdisciplinary field that combines:
+\begin{itemize}
+    \item \textbf{Mathematics \& Statistics}: For modeling, hypothesis testing, and prediction
+    \item \textbf{Computer Science \& IT}: For data collection, storage, processing, and software development
+    \item \textbf{Domain Knowledge}: Expert understanding of the specific field being studied (medicine, astronomy, finance, etc.)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{A Historical Perspective: Four Stages of Understanding the World}
+
+To understand where data science fits in human history, consider how humanity has approached understanding the world:
+
+\subsubsection{Stage 1: Empirical Observation (Ancient Times)}
+
+Long ago, humans learned by direct observation and recording:
+\begin{itemize}
+    \item \textbf{Counting stars}: Ancient astronomers looked at the night sky and counted stars in different regions
+    \item \textbf{Recording crops}: Farmers tracked harvests to predict yields
+    \item \textbf{The Antikythera mechanism}: An ancient Greek computer (found at the bottom of the sea in Greece) that calculated planetary orbits using gears
+\end{itemize}
+
+This was essentially \textbf{early statistics}---collecting data and making observations.
+
+\subsubsection{Stage 2: First Principles and Equations (Modern Science)}
+
+Scientists like Newton, Einstein, Maxwell, and Schrödinger developed \textbf{fundamental equations} that describe how the universe works:
+
+\begin{itemize}
+    \item Newton's Laws: $F = ma$ (Force equals mass times acceleration)
+    \item Einstein's equation: $E = mc^2$ (Energy equals mass times the speed of light squared)
+    \item Maxwell's equations: Describe electromagnetism
+    \item Navier-Stokes equations: Describe fluid dynamics
+    \item Schrödinger's equation: Describes quantum mechanics
+\end{itemize}
+
+This represented a shift from just \textit{observing} to \textit{understanding from first principles}.
+
+\subsubsection{Stage 3: Computation (20th Century)}
+
+A problem emerged: many of these fundamental equations are \textbf{too complex to solve analytically}. Mathematicians couldn't provide closed-form solutions to many differential equations.
+
+Solution: Use \textbf{computers} to numerically simulate and approximate solutions. This gave birth to computational science.
+
+\subsubsection{Stage 4: Data Science (Modern Era)}
+
+\begin{infobox}
+\textbf{The Key Insight of Data Science}
+
+Data science represents a paradigm shift: instead of requiring complete understanding of first principles (Stage 2), we can use \textbf{massive amounts of data (Stage 1)} combined with \textbf{powerful computing (Stage 3)} to approximate or predict how the world works.
+
+In other words, data science sometimes ``skips'' the equation stage, focusing instead on patterns in data.
+\end{infobox}
+
+This can feel \textbf{unsettling for mathematically-oriented students}. Professor Protopapas acknowledges: ``It bothers me too, but first step---let's learn how to do it, and then we'll learn how to do more than that.''
+
+\subsection{The Three Pillars of Data Science}
+
+Data science exists at the intersection of three domains:
+
+\begin{table}[h!]
+\centering
+\caption{The Three Pillars of Data Science}
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Pillar} & \textbf{Description} \\
+\midrule
+\textbf{Math \& Statistics} & Probability, statistical inference, linear algebra, calculus---the mathematical foundation for modeling and prediction \\
+\textbf{Computer Science} & Programming, algorithms, data structures, databases---the tools for handling and processing data \\
+\textbf{Domain Knowledge} & Understanding of the specific field (astronomy, medicine, finance)---essential for asking the right questions \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}
+\textbf{The Critical Importance of Domain Knowledge}
+
+Professor Protopapas shares a personal story: As an astronomer, he once gave a research problem to a computer scientist friend. A month later, the friend said ``Everything is solved!'' But it turned out they solved the \textbf{wrong problem} because they didn't understand the astronomical context.
+
+\textbf{Lesson}: Data science is \textbf{not} like taking your car to a mechanic. You can't just hand over your data and say ``Find something interesting.'' You must:
+\begin{itemize}
+    \item Stay involved with the analysis
+    \item Understand at least the basics of the domain
+    \item Collaborate closely with domain experts
+\end{itemize}
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{The Potential and Risks of Data Science}
+%========================================
+
+\subsection{Amazing Applications}
+
+Data science and AI have tremendous potential for positive impact:
+
+\begin{tcolorbox}[colback=green!5, colframe=green!50!black, title=Positive Applications]
+\begin{enumerate}
+    \item \textbf{Medical Diagnosis}: Detecting malaria from blood smear images automatically
+    \item \textbf{Drug Discovery}: Using language models to discover new drug combinations
+    \item \textbf{Autonomous Vehicles}: Self-driving trucks for safe night shipping
+    \item \textbf{Generative AI}: Creating images from text prompts (e.g., ``a Greek-American professor with glasses and a beard'')
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{Critical Risks and Ethical Concerns}
+
+\begin{tcolorbox}[colback=red!5, colframe=red!50!black, title=Serious Risks and Biases]
+\begin{enumerate}
+    \item \textbf{Gender Bias}: Hiring algorithms that favor male candidates for engineering roles because they were trained on historical data that reflected past discrimination
+    \item \textbf{Racial Bias}: Recidivism prediction models (like COMPAS used in US courts) that unfairly predict higher risk for people of color
+    \item \textbf{Misinformation}: AI-generated content that's indistinguishable from reality
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{importantbox}{Being a Critical Thinker}
+AI models are trained on data that contains human biases. As Harvard students, you must:
+\begin{itemize}
+    \item Question the data: Where did it come from? Who collected it? What biases might exist?
+    \item Question the model: Is it fair? Does it work equally well for all groups?
+    \item Question the application: Should this model be used at all? What are the consequences?
+\end{itemize}
+
+Don't just accept AI results because a computer produced them. \textbf{Be critical thinkers.}
+\end{importantbox}
+
+\subsection{Career Advice for Uncertain Times}
+
+Professor Protopapas acknowledges that students today face unprecedented uncertainty:
+\begin{itemize}
+    \item AI might replace jobs
+    \item It's hard to distinguish real from fake information
+    \item Career paths that existed yesterday might disappear tomorrow
+\end{itemize}
+
+\begin{infobox}
+\textbf{Simple Advice}
+
+``Don't try to over-optimize for every trend. Things change so fast. Instead: \textbf{Learn things very well, become good at them, and lead.} Don't ignore trends---they are there---but don't let them control your life either.''
+
+--- Professor Protopapas
+\end{infobox}
+
+\newpage
+
+%========================================
+\section{The Five-Step Data Science Process}
+%========================================
+
+Data science projects typically follow a cyclical process with five key stages:
+
+\subsection{Step 1: Ask an Interesting Question}
+
+This is the \textbf{most important and first step}. Many projects fail because they start with ``Here's some data, find something interesting'' rather than a clear hypothesis.
+
+\begin{definitionbox}{Good Questions in Data Science}
+Good data science questions are:
+\begin{itemize}
+    \item \textbf{Specific}: ``Can we predict hospital readmission rates within 30 days?'' rather than ``Tell me something about hospitals''
+    \item \textbf{Measurable}: There must be data that can address the question
+    \item \textbf{Actionable}: The answer should lead to meaningful action
+    \item \textbf{Scientific}: Based on hypotheses that can be tested
+\end{itemize}
+
+Key questions to ask yourself:
+\begin{itemize}
+    \item What are we trying to predict or estimate?
+    \item If we had all the data in the world, what would we do with it?
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Step 2: Get the Data}
+
+Once you have a question, you need data to answer it.
+
+\begin{warningbox}
+\textbf{Data Collection Considerations}
+\begin{itemize}
+    \item \textbf{How was the data sampled?} Random? Convenience? This affects what conclusions you can draw
+    \item \textbf{What data is relevant?} More data isn't always better---irrelevant data adds noise
+    \item \textbf{Are there privacy concerns?} Just because data is ``available'' doesn't mean it's ethical or legal to use
+    \item \textbf{What is the license?} Always read the terms of service and data licenses
+\end{itemize}
+\end{warningbox}
+
+\subsection{Step 3: Explore the Data (EDA)}
+
+\textbf{Exploratory Data Analysis (EDA)} is often undervalued but critically important. Professor Protopapas emphasizes: ``Trust me on this---I'm old enough to have seen so many attempts to do modeling without data exploration. You're wasting your time.''
+
+Why EDA matters:
+\begin{itemize}
+    \item Sometimes the answer is immediately obvious from visualization
+    \item Sometimes a simple filter or rule works better than a complex model
+    \item Sometimes the data is garbage, and no model can help
+\end{itemize}
+
+Key EDA questions:
+\begin{itemize}
+    \item Have you plotted the data?
+    \item Are there outliers or anomalies?
+    \item Are there obvious patterns?
+    \item Is there missing data?
+\end{itemize}
+
+\subsection{Step 4: Model the Data}
+
+This is ``where the fun is''---building, fitting, and validating models. The course will spend significant time on this step, covering:
+
+\begin{enumerate}
+    \item \textbf{Build}: Choose an appropriate model type
+    \item \textbf{Fit}: Train the model on your data
+    \item \textbf{Validate}: Test the model on held-out data
+\end{enumerate}
+
+\subsection{Step 5: Communicate/Visualize the Results}
+
+Data science is an \textbf{interdisciplinary field}, which means you'll often communicate with people who don't know your technical terminology.
+
+\begin{infobox}
+\textbf{The Art of Storytelling}
+
+Professor Protopapas shares: ``I love telling stories---for me it's natural.'' But for many data scientists, this is the hardest part.
+
+A student submitted a project proposal with \textbf{three jargon terms in the first title}. The response: ``Rewrite.''
+
+Key questions for communication:
+\begin{itemize}
+    \item What did we learn?
+    \item Does it make sense?
+    \item Can we tell the story effectively to non-experts?
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%========================================
+\section{Why Choose Data Science?}
+%========================================
+
+\subsection{It's Fun}
+
+If you're in this class, you probably enjoy problem-solving. Data science is fundamentally about solving problems with data.
+
+\subsection{It's at the Cutting Edge}
+
+You'll work with the latest technologies and methods.
+
+\subsection{Career Prospects}
+
+\begin{table}[h!]
+\centering
+\caption{Data Science Career Statistics}
+\begin{tabular}{ll}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Average Salary & High (varies by location and experience) \\
+Job Satisfaction & Among the highest in tech careers \\
+Job Availability & Consistently ranked among ``Best Jobs in America'' \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{It's Accessible}
+
+The barrier to entry is lower than many technical fields. With dedication, you can learn the skills needed to start working in data science.
+
+\begin{summarybox}
+\textbf{Professor Protopapas's Life Philosophy}
+
+``In principle, if you learn these things, you get decent jobs and you enjoy it. I think that's the secret of life---doing something you like and not lacking money. I do believe lack of money brings unhappiness, but money may not bring happiness. So at least you eliminate that.''
+\end{summarybox}
+
+\newpage
+
+%========================================
+\section{Course Logistics and Policies}
+%========================================
+
+\subsection{The Teaching Team}
+
+\subsubsection{Pavlos Protopapas}
+\begin{itemize}
+    \item Scientific Director for Data Science and CSC programs
+    \item Research focus: Astronomy + Machine Learning + AI + Statistics (Lab: Stellar DNN)
+    \item Fun facts: Certified chef (trained at Le Cordon Bleu), classical music enthusiast, self-proclaimed ``worst soldier in NATO'' during Greek army service
+\end{itemize}
+
+\subsubsection{Kevin Rader}
+\begin{itemize}
+    \item Senior Preceptor in the Statistics Department, Associate DUS
+    \item Research focus: Medicine and sports analytics
+    \item Fun facts: Philadelphia Eagles superfan (``Go Birds!''), passionate about growing and cooking food, first-time girls' soccer coach (currently 0-1)
+\end{itemize}
+
+\subsubsection{Chris Gumb}
+\begin{itemize}
+    \item Preceptor in Computer Science
+    \item Helps coordinate the teaching staff and approximately 30 Teaching Fellows (TFs)
+    \item Fun fact: Big movie fan (Homework 1 involves movie theater data)
+\end{itemize}
+
+\subsection{Two Perspectives on Data Science}
+
+The course intentionally brings together two viewpoints:
+
+\begin{tcolorbox}[colback=lightblue, colframe=darkblue, title=Professor Protopapas: The CS/ML Perspective]
+Focus on:
+\begin{itemize}
+    \item Machine learning and optimization
+    \item Getting better models (higher $R^2$, lower MSE)
+    \item Improving prediction accuracy
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=lightgreen, colframe=darkgreen, title=Professor Rader: The Statistical Perspective]
+Focus on:
+\begin{itemize}
+    \item Understanding \textbf{relationships} between variables
+    \item Quantifying \textbf{uncertainty} in predictions
+    \item Examining whether relationships differ for different groups
+    \item Considering \textbf{data issues, biases, and ethics}
+\end{itemize}
+
+``I don't care how accurate your model is---it could still be trash if you don't understand the relationships and uncertainty.''
+\end{tcolorbox}
+
+\newpage
+
+\subsection{Grading Components}
+
+\begin{table}[h!]
+\centering
+\caption{CS109A Grading Breakdown}
+\begin{tabular}{lcp{9cm}}
+\toprule
+\textbf{Component} & \textbf{Weight} & \textbf{Details} \\
+\midrule
+\textbf{Homework} & 30\% & HW0 (1\%) + HW1-5 (29\%). Pair work recommended for HW1-5. \\
+\textbf{Section Quizzes} & 10\% & Two 30-minute quizzes during section (5\% each) \\
+\textbf{Midterm} & 18\% & Conceptual portion in section + take-home coding portion \\
+\textbf{Final Exam} & 22\% & 3-hour seated exam with conceptual and coding portions \\
+\textbf{Project} & 20\% & Group project (3-5 students), open-ended data science project \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The Critical Attendance Policy}
+
+\begin{importantbox}{Attendance Directly Affects Your Maximum Possible Grade}
+Attendance in CS109A is \textbf{required} and directly impacts your grade ceiling:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Minimum Attendance} & \textbf{Maximum Possible Grade} \\
+\midrule
+$\geq$ 66\% (two-thirds) & A \\
+$\geq$ 50\% (one-half) & A- \\
+$\geq$ 33\% (one-third) & B+ \\
+$<$ 33\% & B or below \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Important}: Meeting the attendance threshold doesn't \textit{guarantee} that grade---it only \textit{qualifies} you for it. You still need to earn the grade through your work.
+
+\textbf{Flexibility}: 66\% means you can miss one-third of classes. You could attend all lectures and skip most sections (except for quizzes/midterm), or attend all sections and skip half of lectures.
+\end{importantbox}
+
+\subsection{Late Days}
+
+\begin{itemize}
+    \item \textbf{Earning Late Days}: For every \textbf{4 sessions} you attend (lecture or section), you earn \textbf{1 late day}
+    \item \textbf{Using Late Days}: Maximum of \textbf{2 late days} per assignment
+    \item \textbf{DCE Students}: Automatically receive \textbf{4 late days} (attendance can't be tracked remotely)
+    \item \textbf{48-hour limit}: After the deadline plus your late days, assignments cannot be submitted (grading must begin)
+\end{itemize}
+
+\newpage
+
+\subsection{Prerequisites}
+
+\begin{table}[h!]
+\centering
+\caption{CS109A Prerequisites}
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Area} & \textbf{Requirements} \\
+\midrule
+\textbf{Python Programming} & \textbf{Critical}. If you have never programmed before, this course will be very challenging. CS50 or equivalent experience required. \\
+\textbf{Calculus} & Basic calculus (Math 1B equivalent). Occasional linear algebra and multivariable calculus concepts appear but won't be tested heavily. \\
+\textbf{Statistics/Probability} & Stat 104 (data-focused) is ideal. Stat 110 (theory-focused) is good for probability but may lack practical data experience. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}
+\textbf{Self-Assessment with Homework Zero}
+
+HW0 is designed to test whether you meet the prerequisites.
+\begin{itemize}
+    \item If you struggle in \textbf{all three areas} (coding, math, stats): seriously consider taking the course next year
+    \item If you struggle in \textbf{one area}: you can probably catch up with help from TFs
+    \item \textbf{Coding experience is the most critical}: Math and stats gaps can be filled, but lack of coding experience is a ``little bit more problematic''
+\end{itemize}
+\end{warningbox}
+
+\subsection{Course Platforms}
+
+\begin{itemize}
+    \item \textbf{Ed (Edstem)}: Lecture slides, section materials, announcements, \textbf{discussion forum} (primary Q\&A platform)
+    \item \textbf{Canvas}: Video recordings, assignment submissions, official schedules, \textbf{grades}
+\end{itemize}
+
+\subsection{Getting Help}
+
+In order of preference:
+\begin{enumerate}
+    \item \textbf{Ed Discussion Forum}: Fastest response; classmates and TFs can help
+    \item \textbf{Office Hours}: Best for in-depth conceptual help or assignment debugging
+    \item \textbf{Course Helpline Email}: Administrative questions (e.g., section changes)
+    \item \textbf{Direct Email to Professors}: Personal or sensitive matters only
+\end{enumerate}
+
+\newpage
+
+%========================================
+\section{Introduction to Web Scraping}
+%========================================
+
+The first practical skill you'll learn in this course is \textbf{web scraping}---the automated extraction of data from websites.
+
+\subsection{What is Web Scraping?}
+
+Web scraping is a technique that allows you to programmatically collect data from websites. Instead of manually copying information, you write code that:
+\begin{enumerate}
+    \item Fetches the HTML source code of a webpage
+    \item Parses the HTML to find specific elements
+    \item Extracts the data you need
+    \item Stores it in a structured format (like a spreadsheet or database)
+\end{enumerate}
+
+\subsection{Key Libraries}
+
+\begin{itemize}
+    \item \textbf{requests}: Makes HTTP requests to fetch webpage content
+    \item \textbf{BeautifulSoup}: Parses HTML and makes it easy to navigate and search
+    \item \textbf{pandas}: Organizes extracted data into DataFrames for analysis
+    \item \textbf{matplotlib}: Visualizes the collected data
+\end{itemize}
+
+\subsection{Ethical Considerations}
+
+\begin{warningbox}
+\textbf{Before You Scrape}
+
+Not all websites allow scraping. Always check:
+\begin{itemize}
+    \item \textbf{robots.txt}: Visit \code{website.com/robots.txt} to see what's allowed/disallowed
+    \item \textbf{Terms of Service}: Read the website's ToS for data collection policies
+    \item \textbf{Rate Limiting}: Don't overwhelm servers with too many requests too quickly
+    \item \textbf{Personal Data}: Be especially careful with data that might contain personal information
+\end{itemize}
+
+Just because data is ``publicly available'' doesn't mean it's okay to scrape and use it.
+\end{warningbox}
+
+\subsection{Basic HTML Concepts}
+
+Websites are written in \textbf{HTML (HyperText Markup Language)}. Understanding basic HTML helps you scrape effectively:
+
+\begin{itemize}
+    \item \textbf{Elements}: Everything in HTML is organized into elements, marked by tags
+    \item \textbf{Tags}: Define the type of content: \code{<h1>} (heading), \code{<p>} (paragraph), \code{<a>} (link), \code{<div>} (division/container)
+    \item \textbf{Attributes}: Provide additional information: \code{href} (link destination), \code{class} (styling identifier), \code{id} (unique identifier)
+\end{itemize}
+
+\begin{examplebox}{Using Browser Developer Tools}
+The easiest way to understand a webpage's structure:
+\begin{enumerate}
+    \item Right-click on the element you're interested in
+    \item Select ``Inspect'' or ``Inspect Element''
+    \item The Developer Tools panel opens, highlighting the HTML for that element
+    \item Use the picker tool (arrow icon) to click on different elements and see their HTML
+\end{enumerate}
+This is essential for figuring out which tags and classes to target in your scraping code.
+\end{examplebox}
+
+\subsection{Step-by-Step Web Scraping Example}
+
+\subsubsection{Step 1: Fetch the Webpage}
+
+\begin{lstlisting}[language=Python, caption={Fetching HTML with requests}]
+import requests
+
+# URL of the webpage we want to scrape
+url = "https://www.nobelprize.org/all-nobel-prizes/"
+
+# Send an HTTP GET request
+response = requests.get(url)
+
+# Check if request was successful (status code 200 = OK)
+print(f"Status Code: {response.status_code}")
+
+# Get the HTML content as text
+html_text = response.text
+print(html_text[:200])  # Print first 200 characters
+\end{lstlisting}
+
+\textbf{Status Codes to Know:}
+\begin{itemize}
+    \item \textbf{200}: Success (OK)
+    \item \textbf{404}: Page not found
+    \item \textbf{403}: Forbidden (you're not allowed to access)
+    \item \textbf{429}: Too many requests (you're being rate-limited)
+\end{itemize}
+
+\subsubsection{Step 2: Parse the HTML}
+
+\begin{lstlisting}[language=Python, caption={Parsing HTML with BeautifulSoup}]
+from bs4 import BeautifulSoup
+
+# Create a BeautifulSoup object
+soup = BeautifulSoup(html_text, 'html.parser')
+
+# Find the page title
+page_title = soup.title.get_text()
+print(f"Page Title: {page_title}")
+
+# Find all elements with a specific class using CSS selectors
+prize_blocks = soup.select('div.card-prize')
+print(f"Found {len(prize_blocks)} prize blocks")
+
+# Get text from the first block
+first_block = prize_blocks[0]
+block_text = first_block.get_text().strip()
+print(block_text)
+\end{lstlisting}
+
+\subsubsection{Step 3: Extract and Structure the Data}
+
+\begin{lstlisting}[language=Python, caption={Extracting data into a structured format}]
+import re  # Regular expressions library
+
+# Helper functions using lambda
+get_title = lambda block: block.select_one('h3').get_text().strip()
+get_year = lambda block: re.search(r'(\d{4})',
+                         block.select_one('h3').get_text()).group(1)
+get_description = lambda block: block.select_one('blockquote').get_text().strip()
+
+# List to store our data
+nobel_data = []
+
+# Loop through all prize blocks
+for block in prize_blocks:
+    try:
+        nobel_data.append({
+            'title': get_title(block),
+            'year': int(get_year(block)),
+            'description': get_description(block)
+        })
+    except Exception as e:
+        print(f"Error extracting data: {e}")
+
+# Example analysis: Find unique prize categories
+unique_titles = set(item['title'] for item in nobel_data)
+print(f"Unique categories: {unique_titles}")
+\end{lstlisting}
+
+\subsubsection{Step 4: Convert to pandas DataFrame}
+
+\begin{lstlisting}[language=Python, caption={Creating a DataFrame}]
+import pandas as pd
+
+# Convert list of dictionaries to DataFrame
+df = pd.DataFrame(nobel_data)
+
+# View the first few rows
+print(df.head())
+
+# Save to CSV file
+df.to_csv('nobel_prizes.csv', index=False)
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Frequently Asked Questions}
+%========================================
+
+\begin{itemize}
+    \item \textbf{Q: Can I audit this course?}
+    \item A: Yes, but if you audit, you cannot take the course for credit later.
+
+    \item \textbf{Q: Can I take the course asynchronously (watching recordings only)?}
+    \item A: \textbf{College students}: No. \textbf{Graduate students}: Not recommended. With less than 33\% attendance, your maximum grade is B.
+
+    \item \textbf{Q: I'm missing some prerequisites. Should I still take this course?}
+    \item A: Complete HW0 and see how you do. Math/stats gaps can be addressed with TF help. However, if you have \textbf{zero programming experience}, strongly consider postponing to next year.
+
+    \item \textbf{Q: Can I reschedule the midterm for travel?}
+    \item A: No. The midterm (week of Oct 22-24) and final exam (Dec 11) dates are fixed. Plan accordingly.
+
+    \item \textbf{Q: Can I use my own project idea?}
+    \item A: Yes, but the data must be \textbf{public} (shareable with your group), and you must work in a group of 3-5 students.
+
+    \item \textbf{Q: What if I miss a class?}
+    \item A: All lectures are recorded and available on Canvas. Missing one class won't affect your grade. Just maintain at least 66\% attendance to be eligible for an A.
+\end{itemize}
+
+\newpage
+
+%========================================
+\section{Key Takeaways}
+%========================================
+
+\begin{summarybox}
+\textbf{Summary of Lecture 01}
+
+\textbf{What is Data Science?}
+\begin{itemize}
+    \item An interdisciplinary field combining math/statistics, computer science, and domain knowledge
+    \item Represents a paradigm shift: using data + computing to understand the world, sometimes bypassing traditional equations
+    \item Has tremendous potential (medical diagnosis, drug discovery) but also serious risks (bias, ethics)
+\end{itemize}
+
+\textbf{The Data Science Process:}
+\begin{enumerate}
+    \item Ask an interesting question (hypothesis-driven)
+    \item Get the data (ethically and legally)
+    \item Explore the data (EDA---don't skip this!)
+    \item Model the data (build, fit, validate)
+    \item Communicate results (tell the story)
+\end{enumerate}
+
+\textbf{Course Philosophy:}
+\begin{itemize}
+    \item ``Wax on, wax off''---master the fundamentals before building complex systems
+    \item Don't just use \code{.fit()}---understand what's happening inside
+    \item Balance ML optimization with statistical understanding
+\end{itemize}
+
+\textbf{Critical Logistics:}
+\begin{itemize}
+    \item Attendance is required: 66\% minimum for A eligibility
+    \item Prerequisites: Programming experience is essential; math/stats gaps can be filled
+    \item Pair work encouraged for homeworks
+\end{itemize}
+\end{summarybox}
+
+\end{document}

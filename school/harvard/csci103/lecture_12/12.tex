@@ -1,0 +1,661 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: 재현 가능한 머신러닝}}
+\fancyhead[R]{\small\textit{Lecture 12}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-103: 재현 가능한 머신러닝 - Lecture 12},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 12}{Anindita Mahapatra & Eric Gieseke}{Lecture 12의 핵심 개념 학습}
+
+\tableofcontents
+\newpage
+
+
+% -------------------------------------------------------------------
+% 1. 개요
+% -------------------------------------------------------------------
+\section{개요 (Overview)}
+
+이 문서는 **Data \& AI Governance(데이터 및 AI 거버넌스)**의 핵심 이론과 이를 구현하는 기술(Databricks Unity Catalog 등)을 다룹니다.
+
+\begin{summarybox}{핵심 요약}
+\begin{itemize}
+    \item \textbf{목표:} 데이터의 가치를 최대화하면서 동시에 보안 및 규제 리스크를 최소화하는 것.
+    \item \textbf{변화:} 과거에는 데이터만 관리했지만, 이제는 AI 모델과 그 결과물까지 관리 범위가 확장됨.
+    \item \textbf{도구:} Databricks의 \textbf{Unity Catalog}를 중심으로 중앙화된 접근 제어, 감사(Audit), 혈통(Lineage) 추적을 구현.
+    \item \textbf{핵심 기능:} 데이터를 자동으로 분류(Tagging)하고, 속성 기반 접근 제어(ABAC)를 통해 민감 정보를 마스킹하며, 외부 데이터베이스까지 통합 관리(Federation)함.
+\end{itemize}
+\end{summarybox}
+
+\vspace{1em}
+\textbf{왜 이 내용을 배워야 하나요?} \\
+데이터는 '새로운 원유'라고 불릴 만큼 가치가 큽니다. 하지만 관리가 안 된 데이터는 유출 사고 시 기업에 막대한 벌금과 신뢰 하락을 초래합니다. 데이터를 안전하게 지키면서도 필요할 때 바로 꺼내 쓸 수 있게 만드는 '규칙'과 '시스템'을 배우는 것이 이 강의의 목표입니다.
+
+\newpage
+
+% -------------------------------------------------------------------
+% 2. 용어 정리
+% -------------------------------------------------------------------
+\section{용어 정리 (Terminology)}
+
+초심자가 혼동하기 쉬운 핵심 용어를 정리했습니다.
+
+\begin{table}[h]
+\centering
+\caption{거버넌스 핵심 용어 비교표}
+\label{tab:terminology}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{|l|l|l|}
+\hline
+\rowcolor{gray!20} \textbf{용어 (한글/영문)} & \textbf{쉬운 설명 (비유)} & \textbf{기술적 의미} \\ \hline
+\textbf{거버넌스 (Governance)} & \textbf{교통 법규}: 사고 안 나게 정한 규칙 & 정책, 표준, 절차를 수립하여 조직을 통제하는 프레임워크 \\ \hline
+\textbf{관리 (Management)} & \textbf{운전 행위}: 법규를 지키며 실제 운전함 & 거버넌스에서 정한 규칙을 매일 실행하는 운영 활동 \\ \hline
+\textbf{메타스토어 (Metastore)} & \textbf{도서관 목록 카드}: 책 위치 정보 저장소 & 데이터의 구조(스키마), 위치, 권한 정보를 저장하는 최상위 컨테이너 \\ \hline
+\textbf{Unity Catalog (UC)} & \textbf{통합 신분증}: 어디서든 통하는 ID 카드 & Databricks에서 파일, 테이블, 모델 등 모든 자산을 통합 관리하는 계층 \\ \hline
+\textbf{ABAC} & \textbf{꼬리표 검사}: "빨간 딱지 붙은 건 못 봐" & 속성(Attribute) 기반 접근 제어. 태그(Tag)를 통해 권한을 자동화함 \\ \hline
+\textbf{리니지 (Lineage)} & \textbf{족보/가계도}: 이 데이터의 조상은 누구? & 데이터가 어디서 생성되어 어떻게 변환되고 어디로 흘러갔는지 추적 \\ \hline
+\textbf{Federation} & \textbf{대사관}: 남의 땅에 있지만 우리 법 적용 & 외부 DB(Snowflake 등)의 데이터를 복사하지 않고 연결하여 조회/관리 \\ \hline
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+
+% -------------------------------------------------------------------
+% 3. 핵심 개념 및 원리
+% -------------------------------------------------------------------
+\section{핵심 개념과 원리}
+
+\subsection{1. 정보 거버넌스 vs 데이터 거버넌스 vs AI 거버넌스}
+
+거버넌스는 범위에 따라 크게 세 가지 층위로 나뉩니다. 가장 큰 우산이 '정보 거버넌스'입니다.
+
+\begin{description}
+    \item[정보 거버넌스 (Information Governance)] \hfill \\
+    조직의 모든 정보(종이 서류, 디지털 파일, 지식 등)를 관리하는 가장 큰 개념입니다.
+    \begin{itemize}
+        \item 예: "퇴근할 때 책상 위 기밀 서류 치우기", "노트북 잠금 화면 설정하기"
+    \end{itemize}
+    
+    \item[데이터 거버넌스 (Data Governance)] \hfill \\
+    디지털 데이터의 품질, 보안, 수명 주기를 관리합니다.
+    \begin{itemize}
+        \item 목표: 데이터의 정확성, 일관성, 신뢰성 확보.
+        \item 예: "고객 테이블에 접근할 수 있는 사람은 누구인가?", "이 데이터는 암호화되었는가?"
+    \end{itemize}
+
+    \item[AI 거버넌스 (AI Governance)] \hfill \\
+    AI 모델의 개발, 배포, 윤리적 사용을 관리합니다. 데이터 거버넌스 없이는 불가능합니다.
+    \begin{itemize}
+        \item 목표: 편향성(Bias) 방지, 설명 가능성(Explainability), 모델의 투명성.
+        \item 예: "이 AI 모델이 특정 인종에게 불리한 대출 심사를 하지는 않는가?", "학습 데이터에 저작권 위반 데이터가 포함되었는가?"
+    \end{itemize}
+\end{description}
+
+\begin{alertbox}{주의: AI 거버넌스는 데이터 거버넌스 위에 쌓입니다}
+"걷기도 전에 뛸 수 없다"는 말처럼, 데이터가 엉망인 상태(데이터 거버넌스 부재)에서는 안전하고 공정한 AI(AI 거버넌스)를 만들 수 없습니다.
+\end{alertbox}
+
+\subsection{2. 성숙도 모델 (Maturity Models)}
+조직이 거버넌스를 얼마나 잘하고 있는지 5단계로 평가합니다. 단계를 건너뛰는 것(Skip)은 보통 실패합니다. 차근차근 밟아 올라가야 합니다.
+
+\begin{enumerate}
+    \item \textbf{초기/인지 (Initial/Aware):} 규칙 없음. 스타트업 초기 단계. 각자 알아서 함.
+    \item \textbf{반응형 (Managed/Reactive):} 문제가 터지면 수습함. 부분적인 규칙 존재.
+    \item \textbf{정의됨 (Defined/Proactive):} 전사적인 표준과 프레임워크가 잡힘. (대부분의 기업 목표)
+    \item \textbf{정량화 (Quantified):} 거버넌스 성과를 수치로 측정 가능함.
+    \item \textbf{최적화 (Optimized):} AI가 자동으로 위반 사항을 감지하고 조치함. 지속적 개선.
+\end{enumerate}
+
+\subsection{3. 거버넌스와 민첩성의 균형 (Trade-off)}
+모든 데이터를 금고에 가두면 안전하지만 아무도 일을 못 합니다(민첩성 저하). 반대로 다 풀어주면 빠르지만 위험합니다.
+
+\begin{itemize}
+    \item \textbf{고위험 데이터 (개인정보, 금융정보):} 엄격한 통제 (Strict Governance). 접근 절차가 까다로움.
+    \item \textbf{저위험 데이터 (공개 데이터, 실험용 데이터):} 느슨한 통제 (Permissive Governance). 혁신을 위해 빠르게 접근 허용.
+\end{itemize}
+
+\newpage
+
+% -------------------------------------------------------------------
+% 4. 기술적 구현: Databricks Unity Catalog
+% -------------------------------------------------------------------
+\section{기술적 구현: Databricks Unity Catalog (UC)}
+
+이론을 실제 시스템으로 구현하는 도구입니다. Databricks는 \textbf{Unity Catalog}라는 단일 계층을 통해 모든 데이터와 AI 자산을 관리합니다.
+
+\subsection{1. 계층 구조 (Hierarchy)}
+UC는 3단계 구조로 데이터를 정리합니다. (파일 시스템의 폴더 구조와 비슷합니다.)
+
+\begin{equation*}
+    \text{Metastore} \xrightarrow{\text{포함}} \text{Catalog} \xrightarrow{\text{포함}} \text{Schema (Database)} \xrightarrow{\text{포함}} \text{Table / Volume / Model}
+\end{equation*}
+
+\begin{itemize}
+    \item \textbf{Metastore:} 최상위 컨테이너. 보통 리전(Region) 당 하나.
+    \item \textbf{Catalog:} 데이터 자산의 가장 큰 그룹. (예: `prod`, `dev`, `hr_data`)
+    \item \textbf{Schema:} 테이블과 뷰를 담는 논리적 그룹.
+    \item \textbf{Table/Volume:} 실제 데이터. (Table은 정형 데이터, Volume은 비정형 파일)
+\end{itemize}
+
+\subsection{2. 관리형 테이블 vs 외부 테이블 (Managed vs External)}
+\begin{itemize}
+    \item \textbf{Managed Table:} Databricks가 데이터 파일의 위치와 수명 주기를 직접 관리합니다. 테이블을 지우면 실제 파일도 지워집니다. (가장 추천됨)
+    \item \textbf{External Table:} 데이터 파일은 내 클라우드 스토리지(S3 등)에 있고, Databricks는 그 위치만 참조합니다. 테이블을 지워도 원본 파일은 남습니다.
+\end{itemize}
+
+\subsection{3. Lakehouse Federation (연합)}
+외부 데이터베이스(MySQL, Snowflake, Postgres 등)를 데이터를 복사해오지 않고(No Copy), 마치 로컬 테이블처럼 조회하는 기능입니다.
+
+\begin{examplebox}{비유: 대사관}
+Databricks 안에 있는 'Snowflake Catalog'는 대사관과 같습니다. 
+실제 영토(데이터)는 Snowflake에 있지만, Databricks의 법(거버넌스 규칙)을 적용하여 조회할 수 있습니다. 
+쿼리를 날리면 Databricks가 처리하는 게 아니라 원본 DB(Snowflake)로 쿼리를 보내서 결과만 받습니다(Pushdown).
+\end{examplebox}
+
+\subsection{4. Delta Sharing (공유)}
+서로 다른 플랫폼 간에 데이터를 안전하게 공유하는 개방형 프로토콜입니다.
+\begin{itemize}
+    \item 데이터를 복제해서 이메일로 보내거나 FTP로 전송할 필요가 없습니다.
+    \item 받는 사람이 Databricks를 안 써도 됩니다(Pandas, Tableau, PowerBI 등으로 직접 접속 가능).
+\end{itemize}
+
+\newpage
+
+% -------------------------------------------------------------------
+% 5. 고급 기능: 보안과 자동화
+% -------------------------------------------------------------------
+\section{고급 기능: 보안과 자동화 (Security \& Automation)}
+
+\subsection{1. 데이터 분류 (Data Classification)}
+시스템이 자동으로 데이터를 스캔하여 이메일, 신용카드 번호 같은 \textbf{민감 정보(PII)}를 찾아냅니다. 찾으면 자동으로 태그(Tag)를 붙입니다.
+
+\subsection{2. 속성 기반 접근 제어 (ABAC)}
+과거에는 "철수에게 A 테이블 권한 주기" 식(RBAC)이었다면, 이제는 "‘기밀’ 태그가 붙은 건 관리자만 보기" 식으로 규칙을 만듭니다.
+
+\begin{itemize}
+    \item \textbf{Row Level Filtering:} 특정 조건을 만족하는 행(Row)만 보여줌. (예: 내 부서 데이터만 보기)
+    \item \textbf{Column Level Masking:} 특정 열(Column)의 데이터를 가림. (예: 주민번호 뒷자리 별표 처리)
+\end{itemize}
+
+\begin{lstlisting}[caption={SQL을 이용한 마스킹 정책 생성 예시}, label={lst:abac}]
+-- 1. 마스킹 함수 정의 (관리자가 아니면 별표로 표시)
+CREATE FUNCTION ssn_mask(ssn STRING)
+RETURN IF(
+    is_account_group_member('admin'), -- 관리자 그룹인지 확인
+    ssn,                              -- 관리자면 원본 노출
+    '****'                            -- 아니면 별표 표시
+);
+
+-- 2. 테이블의 특정 컬럼에 마스킹 함수 적용
+ALTER TABLE users 
+ALTER COLUMN social_security_number 
+SET MASK ssn_mask;
+\end{lstlisting}
+
+\subsection{3. 데이터 품질 모니터링 (Data Quality Monitoring)}
+데이터가 썩지 않았는지 감시합니다.
+\begin{itemize}
+    \item \textbf{Freshness (최신성):} 데이터가 제때 들어왔는가?
+    \item \textbf{Completeness (완전성):} 데이터 양이 갑자기 줄지 않았는가? (어제는 1000행이었는데 오늘은 0행?)
+    \item 별도 설정 없이 버튼 클릭 한 번으로 자동 감시가 가능합니다.
+\end{itemize}
+
+\subsection{4. 리니지 (Lineage)}
+데이터의 가계도입니다. "이 차트의 숫자가 왜 이상하지?"라는 질문이 나왔을 때, 그 데이터가 어떤 원천 테이블에서 와서 어떤 변환 과정을 거쳤는지 시각적으로 보여줍니다. (Source $\to$ Transform $\to$ Dashboard)
+
+\newpage
+
+% -------------------------------------------------------------------
+% 6. 운영 모델
+% -------------------------------------------------------------------
+\section{거버넌스 운영 모델 (Operational Model)}
+
+조직의 크기와 문화에 따라 거버넌스를 누가 주도할지 결정해야 합니다. 정답은 없으며, 조직 상황에 맞춰 선택합니다.
+
+\begin{table}[h]
+\centering
+\caption{거버넌스 운영 모델 비교}
+\label{tab:op_model}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\rowcolor{gray!20} \textbf{모델} & \textbf{특징} & \textbf{장점} & \textbf{단점/적합 조직} \\ \hline
+\textbf{중앙 집중형} & 중앙 팀이 모든 규칙 결정 & 일관성 높음, 보안 강력 & 느림, 병목 현상 발생 (규제 산업) \\ \hline
+\textbf{분산형} & 각 부서가 알아서 관리 & 혁신 속도 빠름, 유연함 & 표준 없음, 중복 발생 (스타트업) \\ \hline
+\textbf{연합형 (Federated)} & 중앙 가이드 + 부서 실행 & 자율성과 통제의 균형 & 조율이 어려울 수 있음 (대기업) \\ \hline
+\textbf{하이브리드} & 핵심 데이터는 중앙, 나머지는 분산 & 중요 정보 보호 + 업무 효율 & 구조가 복잡함 \\ \hline
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+% -------------------------------------------------------------------
+% 7. FAQ
+% -------------------------------------------------------------------
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q. 클라우드(AWS/Azure)의 IAM 역할만 쓰면 안 되나요? 왜 Unity Catalog가 필요한가요?] \hfill \\
+    A. 클라우드 IAM은 '파일'이나 '폴더' 단위의 접근은 제어할 수 있지만, '테이블의 특정 컬럼'이나 '행' 단위의 정교한 제어는 어렵습니다. UC는 데이터 내용에 기반한 세밀한(Fine-grained) 제어를 가능하게 합니다.
+
+    \item[Q. 데이터 거버넌스를 도입하면 업무 속도가 느려지지 않나요?] \hfill \\
+    A. 초기에는 규칙 설정 때문에 느려 보일 수 있습니다. 하지만 장기적으로는 '데이터를 찾는 시간', '데이터 품질을 의심하고 검증하는 시간', '보안 사고 수습 시간'을 줄여주어 전체적인 속도는 빨라집니다.
+
+    \item[Q. ABAC과 RBAC의 차이는 무엇인가요?] \hfill \\
+    A. \textbf{RBAC(Role-Based)}은 "팀장님은 다 볼 수 있어"처럼 역할에 권한을 줍니다. \textbf{ABAC(Attribute-Based)}은 "누구든 '기밀' 태그가 붙은 건 못 봐"처럼 데이터의 속성(태그)에 따라 동적으로 권한을 줍니다. ABAC이 더 유연하고 확장성이 좋습니다.
+\end{description}
+
+\newpage
+
+% -------------------------------------------------------------------
+% 8. 체크리스트 및 요약
+% -------------------------------------------------------------------
+\section{마무리 요약 및 체크리스트}
+
+이 문서를 통해 학습한 내용을 점검해 보세요.
+
+\begin{tcolorbox}[colback=yellow!10!white, colframe=orange!80!black, title=학습 체크리스트]
+\begin{itemize}[label=$\square$]
+    \item 정보, 데이터, AI 거버넌스의 포함 관계를 이해했는가?
+    \item 성숙도 모델 5단계를 순서대로 나열할 수 있는가?
+    \item Unity Catalog의 3계층 구조(Metastore-Catalog-Schema)를 그릴 수 있는가?
+    \item ABAC의 개념과 왜 태깅(Tagging)이 중요한지 설명할 수 있는가?
+    \item Lakehouse Federation이 데이터를 복사하지 않고(No Copy) 조회한다는 의미를 아는가?
+    \item 데이터 품질 모니터링의 두 가지 핵심 지표(Freshness, Completeness)를 이해했는가?
+\end{itemize}
+\end{tcolorbox}
+
+\vspace{2em}
+
+\begin{summarybox}{1페이지 요약}
+\textbf{1. 거버넌스는 전략이다:} 단순한 제약이 아니라, 데이터를 자산으로 만들기 위한 필수 전략입니다. \\
+\textbf{2. 통합 관리:} Unity Catalog를 통해 파일, 테이블, 모델을 한 곳에서 관리합니다. \\
+\textbf{3. 자동화:} AI를 활용해 민감 정보를 자동 분류하고, 품질을 모니터링합니다. \\
+\textbf{4. 연결성:} Federation과 Sharing을 통해 데이터 사일로(고립)를 제거하고 외부와 연결합니다. \\
+\textbf{5. 균형:} 보안(Security)과 민첩성(Agility) 사이에서 조직에 맞는 적절한 운영 모델을 선택해야 합니다.
+\end{summarybox}
+
+\end{document}

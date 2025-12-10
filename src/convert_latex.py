@@ -23,6 +23,10 @@ COURSE_META = {
     "csci89": {
         "name": "CSCI E-89B: 자연어 처리 입문",
         "prof": "Dmitry Kurochkin"
+    },
+    "fin-574": {
+        "name": "FIN 574: 기업 수준 경제학",
+        "prof": "UIUC Faculty"
     }
 }
 
@@ -79,7 +83,7 @@ def detect_course_and_lecture(filepath):
     lecture_num = None
 
     for part in path_parts:
-        if part in ['cs109', 'csci103', 'csci89']:
+        if part in ['cs109', 'csci103', 'csci89', 'fin-574']:
             course = part
         if part.startswith('lecture_'):
             lecture_num = part.replace('lecture_', '')
@@ -203,9 +207,9 @@ def convert_file(input_path, output_path=None):
     print(f"  ✓ Converted: {output_path}")
     return True
 
-def convert_all_harvard_files():
-    """harvard 폴더 내 모든 .tex 파일 변환"""
-    base_path = Path("school/harvard")
+def convert_all_files():
+    """school 폴더 내 모든 .tex 파일 변환 (Harvard + UIUC)"""
+    base_path = Path("school")
 
     if not base_path.exists():
         print(f"Error: {base_path} not found")
@@ -225,6 +229,8 @@ def convert_all_harvard_files():
             success_count += 1
         except Exception as e:
             print(f"  ✗ Error: {e}")
+            import traceback
+            traceback.print_exc()
             fail_count += 1
 
     print(f"\n" + "="*60)
@@ -239,4 +245,4 @@ if __name__ == "__main__":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
     print("LaTeX 문서 통합 템플릿 변환 시작...\n")
-    convert_all_harvard_files()
+    convert_all_files()

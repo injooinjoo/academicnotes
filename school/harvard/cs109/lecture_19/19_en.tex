@@ -1,0 +1,920 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CS109A: Introduction to Data Science
+% Lecture 19: Regression Trees and Pruning
+% English Version - Comprehensive Notes for Beginners
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 19}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 19},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Regression Trees and Pruning}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 19: Regression Trees and Pruning}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 19}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Regression Trees, MSE as Splitting Criterion, Categorical Variables, Pruning, Cost Complexity}
+
+\begin{overviewbox}
+This lecture extends decision trees from classification to \textbf{regression} and introduces \textbf{pruning} as a powerful technique for controlling overfitting.
+
+\textbf{Key Topics:}
+\begin{enumerate}
+    \item \textbf{Regression Trees:} Using decision trees to predict continuous outcomes (instead of class labels)
+    \item \textbf{Categorical Variables:} Handling non-numeric features in decision trees
+    \item \textbf{Pruning:} A post-hoc approach to reducing tree complexity and preventing overfitting
+\end{enumerate}
+
+\textbf{Key Insight:} The core ideas from classification trees carry over directly---we just swap impurity measures (Gini, Entropy) for \textbf{MSE}, and swap majority voting for \textbf{averaging}.
+\end{overviewbox}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Regression Trees: From Classification to Prediction}
+%========================================================================================
+
+\subsection{Recap: Classification Trees}
+
+In classification trees, we learned:
+\begin{itemize}
+    \item \textbf{Goal:} Predict a categorical outcome (e.g., ``lemon'' or ``orange'')
+    \item \textbf{Splitting criterion:} Minimize impurity (Gini index or Entropy)
+    \item \textbf{Prediction:} Majority vote---predict the most common class in the leaf node
+\end{itemize}
+
+\subsection{What Changes for Regression?}
+
+For \keyword{regression trees}, we want to predict a \textbf{continuous} outcome (e.g., house price, temperature, stock return).
+
+\begin{definitionbox}{Regression Tree}
+A \textbf{regression tree} is a decision tree where:
+\begin{itemize}
+    \item The target variable $y$ is \textbf{continuous} (not categorical)
+    \item Each leaf node predicts the \textbf{mean} of the training samples in that region
+    \item Splits are chosen to minimize \textbf{MSE} (Mean Squared Error) instead of impurity
+\end{itemize}
+\end{definitionbox}
+
+\begin{table}[h!]
+\caption{Classification vs Regression Trees}
+\begin{adjustbox}{width=\textwidth, center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspect} & \textbf{Classification Tree} & \textbf{Regression Tree} \\
+\midrule
+Target variable & Categorical (classes) & Continuous (numbers) \\
+Splitting criterion & Gini impurity or Entropy & MSE (Mean Squared Error) \\
+Prediction at leaf & Majority class & Mean of samples \\
+Example prediction & ``Survived'' or ``Did not survive'' & ``\$450,000'' or ``25.3 degrees'' \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{The Splitting Criterion: Minimizing MSE}
+
+In classification, we wanted each region to be ``pure''---containing mostly one class.
+
+In regression, we want each region to have \textbf{low variance}---containing samples with similar $y$ values.
+
+\begin{definitionbox}{MSE as Splitting Criterion}
+For a region $R$ with $n$ samples, the MSE is:
+
+\begin{equation}
+\text{MSE}(R) = \frac{1}{n} \sum_{i \in R} (y_i - \bar{y}_R)^2
+\end{equation}
+
+Where $\bar{y}_R$ is the mean of all $y$ values in region $R$.
+
+This is simply the \textbf{variance} of $y$ in that region!
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Why MSE Makes Sense:}
+
+If all samples in a region have similar $y$ values:
+\begin{itemize}
+    \item The mean $\bar{y}_R$ represents them well
+    \item MSE is low (samples are close to the mean)
+    \item Predicting $\bar{y}_R$ for new samples will be accurate
+\end{itemize}
+
+If samples have very different $y$ values:
+\begin{itemize}
+    \item The mean doesn't represent any sample well
+    \item MSE is high (samples are far from the mean)
+    \item Predicting $\bar{y}_R$ will have large errors
+\end{itemize}
+\end{infobox}
+
+\subsection{Finding the Best Split}
+
+Just like classification trees, we search for the best split by:
+
+\begin{enumerate}
+    \item For each feature $p$
+    \item For each possible threshold $t$
+    \item Calculate the \textbf{weighted average MSE} of the two resulting regions:
+
+    \begin{equation}
+    \text{Split MSE} = \frac{N_1}{N} \cdot \text{MSE}(R_1) + \frac{N_2}{N} \cdot \text{MSE}(R_2)
+    \end{equation}
+
+    \item Choose $(p^*, t^*)$ that minimizes this weighted MSE
+\end{enumerate}
+
+\begin{examplebox}{Simple Regression Tree Split}
+Consider 1D data with $X$ values from 0 to 10 and continuous $Y$ values.
+
+\textbf{Try split at $X = 6.5$:}
+\begin{itemize}
+    \item Region 1 ($X \leq 6.5$): Contains samples with $\bar{y}_{R_1} = -0.008$
+    \item Region 2 ($X > 6.5$): Contains samples with $\bar{y}_{R_2} = 0.697$
+\end{itemize}
+
+Calculate MSE for each region and their weighted average.
+
+The algorithm tries \textbf{every possible split point} (every unique $X$ value) and picks the one with lowest weighted MSE.
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Computational Cost:}
+
+For each predictor with $n$ unique values, we try $n$ possible splits. With $p$ predictors, that's potentially $n \times p$ calculations at each node.
+
+For 1000 data points and 5 predictors: 5000 split evaluations per node!
+\end{warningbox}
+
+\subsection{Making Predictions}
+
+Once the tree is built:
+
+\begin{enumerate}
+    \item A new data point traverses the tree (same as classification)
+    \item It lands in some leaf node
+    \item The prediction is the \textbf{mean} of training samples in that leaf
+\end{enumerate}
+
+\begin{examplebox}{Regression Tree Prediction}
+A trained tree has leaf node $L_3$ containing training samples with $y$ values: \{2.1, 2.3, 2.5, 2.0, 2.4\}
+
+The stored prediction for $L_3$ is: $\bar{y}_{L_3} = \frac{2.1 + 2.3 + 2.5 + 2.0 + 2.4}{5} = 2.26$
+
+Any new sample that reaches $L_3$ gets prediction $\hat{y} = 2.26$
+\end{examplebox}
+
+\subsection{Visualizing Regression Trees}
+
+In 1D (one predictor):
+\begin{itemize}
+    \item The predicted function is a \textbf{step function}
+    \item Each step corresponds to a leaf node's mean
+    \item More splits = more steps = more complex function
+\end{itemize}
+
+In 2D (two predictors):
+\begin{itemize}
+    \item Feature space is partitioned into rectangles
+    \item Each rectangle has a constant predicted value (the mean)
+    \item It's like a ``terraced landscape'' with flat regions at different heights
+\end{itemize}
+
+\subsection{Stopping Conditions}
+
+The same stopping conditions from classification trees apply:
+
+\begin{itemize}
+    \item \code{max\_depth}: Maximum tree depth
+    \item \code{min\_samples\_leaf}: Minimum samples required in a leaf
+    \item \code{max\_leaf\_nodes}: Maximum number of leaf nodes
+    \item \textbf{MSE Gain Threshold}: Stop if MSE reduction from split is below threshold
+\end{itemize}
+
+\begin{definitionbox}{Accuracy Gain (MSE Reduction)}
+The ``accuracy gain'' or MSE reduction from a split is:
+
+\begin{equation}
+\text{Gain} = \text{MSE}(\text{parent}) - \left[\frac{N_1}{N} \cdot \text{MSE}(R_1) + \frac{N_2}{N} \cdot \text{MSE}(R_2)\right]
+\end{equation}
+
+If Gain $<$ threshold, don't split (the improvement isn't worth the added complexity).
+\end{definitionbox}
+
+\subsection{Cross-Validation for Regression Trees}
+
+How do we choose the right stopping condition values?
+
+\textbf{Cross-validation!} But with a different metric:
+\begin{itemize}
+    \item Classification: Use accuracy, F1-score, or AUC
+    \item Regression: Use MSE (or $R^2$) on the validation set
+\end{itemize}
+
+\begin{infobox}
+\textbf{MSE vs $R^2$ for Model Selection:}
+
+The instructor prefers using MSE over $R^2$ for cross-validation because:
+\begin{itemize}
+    \item MSE is consistent across validation folds
+    \item $R^2$ can vary because the mean $\bar{y}$ changes with different validation sets
+    \item This introduces extra randomness in $R^2$ comparisons
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\newsection{Handling Categorical Variables}
+%========================================================================================
+
+\subsection{The Problem}
+
+Decision trees make splits based on comparisons: ``Is $X > t$?''
+
+For \textbf{numerical} features, this makes sense: ``Is height $> 178$ cm?''
+
+For \textbf{categorical} features, it doesn't: ``Is color $>$ Red?'' has no meaning!
+
+\subsection{Bad Approach: Ordinal Encoding}
+
+You might think: ``Just assign numbers! Yellow=0, Red=1, Purple=2''
+
+\begin{warningbox}
+\textbf{Why Ordinal Encoding Fails:}
+
+This creates an \textbf{artificial ordering} that doesn't exist in the data.
+
+With Yellow=0, Red=1, Purple=2:
+\begin{itemize}
+    \item Split at ``Color $\geq 1$'' separates \{Yellow\} from \{Red, Purple\}
+\end{itemize}
+
+With Yellow=2, Red=0, Purple=1:
+\begin{itemize}
+    \item Split at ``Color $\geq 1$'' separates \{Red\} from \{Yellow, Purple\}
+\end{itemize}
+
+The tree structure depends on an arbitrary encoding choice!
+\end{warningbox}
+
+\subsection{Good Approach: One-Hot Encoding}
+
+\begin{definitionbox}{One-Hot Encoding (OHE)}
+Convert each categorical variable into multiple binary (0/1) columns---one for each category.
+
+Original: \code{Color} $\in$ \{Yellow, Red, Purple\}
+
+After OHE:
+\begin{itemize}
+    \item \code{Color\_Yellow}: 1 if Yellow, 0 otherwise
+    \item \code{Color\_Red}: 1 if Red, 0 otherwise
+    \item \code{Color\_Purple}: 1 if Purple, 0 otherwise
+\end{itemize}
+\end{definitionbox}
+
+Now splits make sense: ``Is Color\_Red $\geq 1$?'' means ``Is the color Red?''
+
+\begin{examplebox}{One-Hot Encoding Example}
+\textbf{Before:}
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Sepal Width & Color \\
+\midrule
+3.0 & Yellow \\
+3.5 & Red \\
+3.7 & Purple \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{After One-Hot Encoding:}
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+Sepal Width & Color\_Yellow & Color\_Red & Color\_Purple \\
+\midrule
+3.0 & 1 & 0 & 0 \\
+3.5 & 0 & 1 & 0 \\
+3.7 & 0 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Sklearn Warning:}
+
+Scikit-learn's \code{DecisionTreeClassifier} and \code{DecisionTreeRegressor} do \textbf{NOT} automatically handle categorical variables.
+
+You must apply one-hot encoding \textbf{before} fitting the model:
+
+\begin{lstlisting}[style=pythonstyle]
+import pandas as pd
+
+# Method 1: Pandas get_dummies
+X_encoded = pd.get_dummies(X, columns=['Color'])
+
+# Method 2: sklearn OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
+encoder = OneHotEncoder(sparse=False)
+\end{lstlisting}
+
+Note: Libraries like XGBoost, LightGBM, and CatBoost can handle categoricals natively.
+\end{warningbox}
+
+\begin{infobox}
+\textbf{Dropping One Column:}
+
+With 3 categories, you only need 2 binary columns (the third is determined).
+
+If Color\_Yellow=0 and Color\_Red=0, then it must be Purple.
+
+However, for trees this redundancy usually doesn't matter much.
+\end{infobox}
+
+%========================================================================================
+\newsection{Pruning: A Better Way to Prevent Overfitting}
+%========================================================================================
+
+\subsection{The Problem with Stopping Conditions}
+
+We've seen stopping conditions like \code{max\_depth}. But there's a problem:
+
+\begin{itemize}
+    \item \textbf{Too restrictive:} Stop too early $\rightarrow$ underfitting
+    \item \textbf{Too lenient:} Stop too late $\rightarrow$ overfitting
+    \item \textbf{Hard to know in advance:} The optimal stopping point depends on the data
+\end{itemize}
+
+\subsection{The Pruning Philosophy}
+
+\begin{definitionbox}{Pruning}
+\textbf{Pruning} is a post-hoc technique where we:
+\begin{enumerate}
+    \item First, grow the tree \textbf{fully} (or very deep)
+    \item Then, \textbf{remove} branches that don't improve performance
+\end{enumerate}
+
+It's like letting the tree grow wild, then trimming it back carefully.
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Analogy: Pruning Real Trees}
+
+When pruning a real tree:
+\begin{itemize}
+    \item Let it grow
+    \item Cut back ``dry, dead, or diseased'' branches
+    \item Result: A healthier, better-shaped tree
+\end{itemize}
+
+When pruning a decision tree:
+\begin{itemize}
+    \item Let it grow (overfit)
+    \item Cut back ``useless'' branches (that don't help on validation data)
+    \item Result: A simpler, better-generalizing model
+\end{itemize}
+\end{infobox}
+
+\subsection{Cost Complexity Pruning (CCP)}
+
+The standard approach to pruning is \keyword{Cost Complexity Pruning}, which adds a penalty for tree size.
+
+\begin{definitionbox}{Cost Complexity}
+The \textbf{cost complexity} of a tree $T$ is:
+
+\begin{equation}
+C_\alpha(T) = \text{Error}(T) + \alpha \cdot |T|
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $\text{Error}(T)$ = Classification error (or MSE for regression) on training data
+    \item $|T|$ = Number of \textbf{leaf nodes} (terminal nodes)
+    \item $\alpha$ = Complexity parameter (hyperparameter, $\alpha \geq 0$)
+\end{itemize}
+\end{definitionbox}
+
+This is \textbf{regularization} applied to trees!
+
+\begin{itemize}
+    \item Like Ridge regression adds $\lambda \sum \beta_j^2$ to penalize large coefficients
+    \item CCP adds $\alpha \cdot |T|$ to penalize large trees
+\end{itemize}
+
+\subsection{The Role of Alpha ($\alpha$)}
+
+The complexity parameter $\alpha$ controls the trade-off:
+
+\begin{itemize}
+    \item \textbf{$\alpha = 0$:} No penalty for tree size $\rightarrow$ favor large trees (full tree)
+    \item \textbf{$\alpha \rightarrow \infty$:} Huge penalty $\rightarrow$ favor tiny trees (just the root)
+    \item \textbf{$0 < \alpha < \infty$:} Balance between error and simplicity
+\end{itemize}
+
+\begin{examplebox}{Cost Complexity Comparison}
+Let $\alpha = 0.2$
+
+\textbf{Full Tree $T$:}
+\begin{itemize}
+    \item Error$(T) = 0.32$
+    \item $|T| = 8$ leaves
+    \item $C_\alpha(T) = 0.32 + 0.2 \times 8 = \mathbf{1.92}$
+\end{itemize}
+
+\textbf{Pruned Tree $T'$:}
+\begin{itemize}
+    \item Error$(T') = 0.33$ (slightly worse training error)
+    \item $|T'| = 7$ leaves
+    \item $C_\alpha(T') = 0.33 + 0.2 \times 7 = \mathbf{1.73}$
+\end{itemize}
+
+Even though $T'$ has higher training error, it has \textbf{lower cost complexity}!
+
+The regularization favors $T'$ because the added complexity of $T$ isn't worth the small error reduction.
+\end{examplebox}
+
+\subsection{The Pruning Algorithm}
+
+\textbf{Step 1: Generate Candidate Trees}
+
+Start with the full tree $T_0$. Iteratively remove the ``weakest link''---the subtree whose removal \textbf{increases cost complexity the least} (or decreases it most).
+
+This generates a sequence: $T_0 \rightarrow T_1 \rightarrow T_2 \rightarrow \ldots \rightarrow T_L$ (root only)
+
+\textbf{Step 2: Find Optimal Tree for Given $\alpha$}
+
+For a fixed $\alpha$, calculate $C_\alpha(T)$ for each candidate tree. Select the one with minimum cost complexity.
+
+\textbf{Step 3: Find Optimal $\alpha$ via Cross-Validation}
+
+Try different $\alpha$ values and use cross-validation to find which gives best validation performance.
+
+\begin{infobox}
+\textbf{Nested Cross-Validation:}
+
+This is a two-level process:
+\begin{enumerate}
+    \item \textbf{Inner loop:} For fixed $\alpha$, find best pruned tree
+    \item \textbf{Outer loop:} Try different $\alpha$ values, select best via CV
+\end{enumerate}
+
+This is computationally expensive but gives more robust model selection.
+\end{infobox}
+
+\subsection{Pruning in Practice}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.tree import DecisionTreeRegressor
+
+# Train a full tree
+tree = DecisionTreeRegressor(random_state=42)
+tree.fit(X_train, y_train)
+
+# Get the cost complexity pruning path
+path = tree.cost_complexity_pruning_path(X_train, y_train)
+ccp_alphas = path.ccp_alphas  # Array of alpha values
+
+# Train trees for each alpha value
+trees = []
+for alpha in ccp_alphas:
+    t = DecisionTreeRegressor(ccp_alpha=alpha, random_state=42)
+    t.fit(X_train, y_train)
+    trees.append(t)
+
+# Evaluate on validation set to choose best alpha
+val_scores = [t.score(X_val, y_val) for t in trees]
+best_alpha = ccp_alphas[np.argmax(val_scores)]
+
+# Final model
+final_tree = DecisionTreeRegressor(ccp_alpha=best_alpha)
+final_tree.fit(X_train, y_train)
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Important Details and Edge Cases}
+%========================================================================================
+
+\subsection{Can the Same Feature Be Used Multiple Times?}
+
+\textbf{Yes!} A feature can appear in multiple splits throughout the tree.
+
+\begin{examplebox}{Multiple Splits on Same Feature}
+Consider predicting income based on work experience:
+
+\begin{itemize}
+    \item Root: ``Work experience $> 2$ years?''
+    \item Left child: ``Work experience $> 0.5$ years?''
+    \item Right child: ``Work experience $> 5$ years?''
+\end{itemize}
+
+The same feature (work experience) is split at different thresholds at different levels. This allows the tree to capture non-linear relationships!
+\end{examplebox}
+
+\subsection{What Metrics for Cross-Validation?}
+
+\textbf{For Classification:}
+\begin{itemize}
+    \item Accuracy (for balanced data)
+    \item F1-score (for imbalanced data)
+    \item AUC-ROC (for general performance)
+    \item Custom utility function (if you care more about certain errors)
+\end{itemize}
+
+\textbf{For Regression:}
+\begin{itemize}
+    \item MSE (preferred---consistent across folds)
+    \item $R^2$ (works but less stable)
+    \item MAE (if you want robustness to outliers)
+\end{itemize}
+
+\subsection{Decision Boundary Shape}
+
+\begin{importantbox}{Linear vs Non-Linear Boundaries}
+\textbf{max\_depth=1:} Only one split $\rightarrow$ \textbf{Linear} decision boundary (single line/hyperplane)
+
+\textbf{max\_depth$\geq$2:} Multiple splits $\rightarrow$ \textbf{Non-linear} boundaries (staircase pattern)
+
+The deeper the tree, the more complex (more ``wiggly'') the boundary.
+\end{importantbox}
+
+\subsection{Total MSE of a Regression Tree}
+
+The overall MSE of a tree with multiple leaves is the \textbf{weighted average} of leaf MSEs:
+
+\begin{equation}
+\text{Total MSE} = \sum_{l=1}^{L} \frac{N_l}{N} \cdot \text{MSE}(R_l)
+\end{equation}
+
+\begin{examplebox}{Computing Total MSE}
+A tree has 4 leaf nodes:
+\begin{itemize}
+    \item $R_1$: 90 samples, MSE = 0.2
+    \item $R_2$: 5 samples, MSE = 1.2
+    \item $R_3$: 3 samples, MSE = 1.5
+    \item $R_4$: 2 samples, MSE = 1.8
+\end{itemize}
+
+Total samples: $N = 90 + 5 + 3 + 2 = 100$
+
+Total MSE $= \frac{90}{100}(0.2) + \frac{5}{100}(1.2) + \frac{3}{100}(1.5) + \frac{2}{100}(1.8)$
+
+$= 0.18 + 0.06 + 0.045 + 0.036 = \mathbf{0.321}$
+
+Note: The total is dominated by $R_1$ because it contains 90\% of samples!
+\end{examplebox}
+
+%========================================================================================
+\newsection{Summary and Key Takeaways}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Regression Trees:}
+\begin{itemize}
+    \item Same structure as classification trees, different criterion
+    \item Splitting criterion: Minimize \textbf{weighted average MSE}
+    \item Prediction: \textbf{Mean} of training samples in leaf node
+    \item Stopping conditions: Same as classification (max\_depth, min\_samples\_leaf, etc.)
+\end{itemize}
+
+\textbf{Categorical Variables:}
+\begin{itemize}
+    \item Cannot use ordinal encoding (creates artificial order)
+    \item Use \textbf{One-Hot Encoding} to create binary columns
+    \item Sklearn requires manual OHE before fitting
+\end{itemize}
+
+\textbf{Pruning:}
+\begin{itemize}
+    \item Alternative to pre-defined stopping conditions
+    \item ``Grow full, then cut back''
+    \item Cost complexity: $C_\alpha(T) = \text{Error}(T) + \alpha |T|$
+    \item $\alpha$ controls trade-off between error and simplicity
+    \item Find optimal $\alpha$ via cross-validation
+\end{itemize}
+\end{summarybox}
+
+\section{Learning Checklist}
+
+\begin{itemize}[label=$\square$]
+    \item Can you explain the difference between classification and regression trees?
+    \item Do you understand why MSE is used as the splitting criterion for regression?
+    \item Can you explain what the prediction at a leaf node represents in regression trees?
+    \item Do you know why ordinal encoding is problematic for categorical variables?
+    \item Can you apply one-hot encoding to categorical features?
+    \item Do you understand the cost complexity formula: $C_\alpha(T) = \text{Error}(T) + \alpha |T|$?
+    \item Can you explain how $\alpha$ affects the complexity of the pruned tree?
+    \item Do you know the two-level cross-validation process for finding optimal $\alpha$?
+    \item Can you compute the total MSE of a tree from its leaf node MSEs?
+    \item Do you understand why \code{max\_depth=1} gives a linear decision boundary?
+\end{itemize}
+
+\section{Looking Ahead}
+
+Next lectures will cover \textbf{ensemble methods}:
+\begin{itemize}
+    \item \textbf{Bagging:} Building many trees on bootstrap samples
+    \item \textbf{Random Forests:} Bagging + random feature selection
+    \item \textbf{Boosting:} Building trees sequentially to correct errors
+    \item \textbf{Gradient Boosting:} XGBoost, LightGBM---state-of-the-art methods
+\end{itemize}
+
+These methods combine multiple trees to create more powerful and robust models!
+
+\end{document}

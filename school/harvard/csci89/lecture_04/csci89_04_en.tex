@@ -1,0 +1,1122 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% Unified style for all lecture notes
+% Version: 2.1 - Readability improvements
+% Last modified: 2025-12-10
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: Introduction to Natural Language Processing}}
+\fancyhead[R]{\small\textit{Lecture 04}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Important Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Critical: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-89B: Introduction to NLP - Lecture 04},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Title
+%========================================================================================
+
+\title{CSCI E-89B: Introduction to Natural Language Processing\\Lecture 04: Bag of Words, N-grams, and Convolutional Neural Networks}
+\author{Harvard Extension School}
+\date{Fall 2024}
+
+%========================================================================================
+% Document Start
+%========================================================================================
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-89B: Introduction to Natural Language Processing}{Lecture 04}{Dmitry Kurochkin}{Master bag of words representations, n-gram features, embedding mechanics, and introduction to Convolutional Neural Networks for NLP}
+
+\tableofcontents
+
+%========================================================================================
+% SECTION 1: Quiz Review
+%========================================================================================
+\newpage
+\section{Quiz Review: Text Processing Fundamentals}
+
+\begin{overviewbox}
+This lecture covers key concepts in text representation for NLP, including bag of words, n-grams, and embeddings. We also introduce Convolutional Neural Networks (CNNs) as an alternative to RNNs for capturing local context in text.
+\end{overviewbox}
+
+\subsection{Tokenization}
+
+\begin{definitionbox}[Tokenization]
+Tokenization is the process of splitting text into specific units of information called \textbf{tokens}. These can be:
+\begin{itemize}
+    \item \textbf{Words}: Most common choice
+    \item \textbf{Subwords}: For handling unknown words and knowledge transfer
+    \item \textbf{Characters}: Maximum flexibility, requires more data
+\end{itemize}
+\end{definitionbox}
+
+\begin{infobox}[title=When to Use Which Token Type]
+\begin{itemize}
+    \item \textbf{Words}: Best for specific tasks on your own dataset (classification, sentiment)
+    \item \textbf{Characters}: Better for knowledge transfer between datasets; more data needed
+    \item \textbf{Subwords}: Balance between vocabulary size and handling unknown words
+\end{itemize}
+\end{infobox}
+
+\begin{examplebox}[NLTK Smart Tokenization]
+NLTK recognizes initials and keeps them together:
+\begin{lstlisting}[style=pythonstyle]
+from nltk.tokenize import word_tokenize
+text = "J. Wright in 1903"
+tokens = word_tokenize(text)
+# Result: ['J.', 'Wright', 'in', '1903']
+# Note: 'J.' stays together because NLTK recognizes it as an initial!
+\end{lstlisting}
+NLTK doesn't just split on spaces and punctuation---it understands linguistic patterns.
+\end{examplebox}
+
+\subsection{Stemming vs. Lemmatization}
+
+\begin{center}
+\begin{tabular}{lp{6cm}p{6cm}}
+\toprule
+\textbf{Aspect} & \textbf{Stemming} & \textbf{Lemmatization} \\
+\midrule
+Definition & Remove prefixes and suffixes & Reduce to dictionary base form \\
+Speed & Very fast (rule-based) & Slower (requires POS tagging) \\
+Output & May not be a real word & Always a real word \\
+Example & ``octopus'' $\to$ ``octop'' & ``octopus'' $\to$ ``octopus'' \\
+Use case & Classification, sentiment & Translation, text generation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warningbox}[title=Stemming Produces Non-Words]
+The main disadvantage of stemming: it doesn't produce real dictionary words. ``Octopuses'' becomes ``octop,'' which isn't a word. For tasks like translation or caption generation where you need valid words, use lemmatization.
+\end{warningbox}
+
+%========================================================================================
+% SECTION 2: Bag of Words
+%========================================================================================
+\newpage
+\section{Bag of Words Representation}
+
+\subsection{What is Bag of Words?}
+
+\begin{definitionbox}[Bag of Words (BoW)]
+A text representation where each document is converted to a fixed-length vector. Each position corresponds to a word in the vocabulary, and the value is the word's frequency (or binary presence) in that document.
+
+\textbf{Key characteristic}: Word order is completely discarded---only frequency matters.
+\end{definitionbox}
+
+\subsection{Creating Bag of Words}
+
+\begin{enumerate}
+    \item \textbf{Tokenize}: Split all documents into tokens
+    \item \textbf{Build vocabulary}: Collect unique tokens from training corpus
+    \item \textbf{Count}: For each document, count occurrences of each vocabulary word
+    \item \textbf{Create vector}: Vector length = vocabulary size
+\end{enumerate}
+
+\begin{examplebox}[Bag of Words Construction]
+\textbf{Corpus}:
+\begin{itemize}
+    \item Doc 1: ``Henry Ford introduced Model T''
+    \item Doc 2: ``Ford T was revolutionary''
+\end{itemize}
+
+\textbf{Vocabulary} (order of first occurrence): [Henry, Ford, introduced, Model, T, was, revolutionary]
+
+\textbf{Vectors}:
+\begin{itemize}
+    \item Doc 1: [1, 1, 1, 1, 1, 0, 0] (Ford=1, T=1, etc.)
+    \item Doc 2: [0, 1, 0, 0, 1, 1, 1] (no Henry, Ford=1, T=1, was=1)
+\end{itemize}
+
+If ``Ford'' appeared twice in Doc 2, its value would be 2 (frequency count).
+\end{examplebox}
+
+\subsection{Bag of Words with sklearn}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.feature_extraction.text import CountVectorizer
+
+corpus = [
+    "Henry Ford introduced Model T",
+    "Ford T was revolutionary"
+]
+
+# Create and fit vectorizer
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(corpus)
+
+# View vocabulary
+print(vectorizer.get_feature_names_out())
+# ['ford', 'henry', 'introduced', 'model', 'revolutionary', 't', 'was']
+
+# View bag of words representation
+print(X.toarray())
+# [[1 1 1 1 0 1 0]
+#  [1 0 0 0 1 1 1]]
+\end{lstlisting}
+
+\subsection{Handling New Documents}
+
+\begin{importantbox}[Vocabulary is Fixed]
+When processing new documents (test data):
+\begin{itemize}
+    \item The vocabulary is \textbf{fixed} from training
+    \item New words not in vocabulary become \textbf{Out-of-Vocabulary (OOV)}
+    \item OOV words can be ignored or counted in a special OOV position
+\end{itemize}
+
+\textbf{Never add new words to vocabulary during testing!}
+\end{importantbox}
+
+\begin{lstlisting}[style=pythonstyle]
+# Transform new document using trained vectorizer
+new_doc = ["The impact of self-driving cars"]
+X_new = vectorizer.transform(new_doc)
+print(X_new.toarray())
+# Mostly zeros because new words aren't in vocabulary!
+\end{lstlisting}
+
+\subsection{Limitations of Bag of Words}
+
+\begin{warningbox}[title=Critical Limitations]
+\begin{enumerate}
+    \item \textbf{Order is lost}: ``dog bites man'' = ``man bites dog''
+    \item \textbf{Sparse representations}: Large vocabulary $\Rightarrow$ many zeros
+    \item \textbf{No semantic meaning}: Words are independent features
+    \item \textbf{Storage/computation}: Large vocabularies are expensive
+\end{enumerate}
+\end{warningbox}
+
+\subsection{Applications}
+
+Despite limitations, bag of words is effective for:
+\begin{itemize}
+    \item \textbf{Text classification}: Topic categorization
+    \item \textbf{Sentiment analysis}: When word presence matters more than order
+    \item \textbf{Document similarity}: Comparing document content
+    \item \textbf{Baseline models}: Quick prototyping
+\end{itemize}
+
+\begin{infobox}[title=When BoW Works Well]
+Bag of words is surprisingly effective for classification tasks where the mere presence of certain words strongly indicates the class. For example, a movie review containing ``boring,'' ``waste,'' ``terrible'' is likely negative, regardless of word order.
+\end{infobox}
+
+%========================================================================================
+% SECTION 3: Embeddings Deep Dive
+%========================================================================================
+\newpage
+\section{Understanding Embeddings}
+
+\subsection{The Problem with Sparse Representations}
+
+Consider a vocabulary of 10,000 words. With one-hot encoding:
+\begin{itemize}
+    \item Each word is a 10,000-dimensional vector
+    \item Only one position is 1, rest are 0
+    \item Enormous storage and computation waste
+    \item No semantic relationships captured
+\end{itemize}
+
+\subsection{What Embeddings Really Do}
+
+\begin{definitionbox}[Embedding]
+An embedding is a learned mapping from sparse, high-dimensional space to dense, low-dimensional space:
+\[
+\text{Embedding}: \mathbb{R}^{V} \rightarrow \mathbb{R}^{d}
+\]
+where $V$ = vocabulary size (e.g., 10,000) and $d$ = embedding dimension (e.g., 128).
+\end{definitionbox}
+
+\begin{examplebox}[Geometric Intuition]
+Consider mapping 2 classes (male/female) to 1D:
+\begin{itemize}
+    \item One-hot: female = [1, 0], male = [0, 1] (2D space)
+    \item Embedding: female = 1, male = 0 (1D space)
+\end{itemize}
+
+For 3 classes with one-hot [1,0,0], [0,1,0], [0,0,1]:
+\begin{itemize}
+    \item We can map to 1D: class 1 $\to w_1$, class 2 $\to w_2$, class 3 $\to w_3$
+    \item These $w$ values are \textbf{learned during training}!
+\end{itemize}
+\end{examplebox}
+
+\subsection{Why Index-Based Input Works}
+
+\begin{summarybox}
+Key insight: When input is one-hot encoded (e.g., [0, 1, 0, 0]):
+\begin{itemize}
+    \item Matrix multiplication with one-hot vector just \textbf{selects one row}
+    \item No need to store the full one-hot vector
+    \item Just use the index directly to look up the corresponding row
+\end{itemize}
+
+This is why embedding layers take integer indices, not one-hot vectors!
+\end{summarybox}
+
+\subsubsection{Mathematical Equivalence}
+
+For vocabulary size 3, embedding dimension 2:
+\begin{align*}
+\text{Weight matrix } W &= \begin{bmatrix} w_{11} & w_{12} \\ w_{21} & w_{22} \\ w_{31} & w_{32} \end{bmatrix} \\
+\text{One-hot for word 2: } [0, 1, 0] \times W &= [w_{21}, w_{22}] \\
+\text{Index lookup: } W[1] &= [w_{21}, w_{22}] \quad \text{(same result!)}
+\end{align*}
+
+\begin{infobox}[title=Embedding vs Dense Layer]
+An embedding layer is mathematically equivalent to a dense layer with:
+\begin{itemize}
+    \item Linear activation (no non-linearity)
+    \item No bias term
+    \item One-hot input
+\end{itemize}
+But embedding uses efficient lookup instead of matrix multiplication!
+\end{infobox}
+
+\subsection{Embedding Layer Parameters}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.layers import Embedding
+
+# Embedding(input_dim, output_dim)
+# input_dim = vocabulary size (how many unique indices)
+# output_dim = embedding dimension
+
+embedding = Embedding(input_dim=10001, output_dim=128)
+# Parameters: 10001 * 128 = 1,280,128
+\end{lstlisting}
+
+\begin{examplebox}[Parameter Calculation]
+For \texttt{Embedding(200, 3)}:
+\begin{itemize}
+    \item Input: index from 0 to 199 (200 possible words)
+    \item Output: 3-dimensional dense vector
+    \item Parameters: $200 \times 3 = 600$ (the weight matrix)
+\end{itemize}
+\end{examplebox}
+
+\subsection{Embedding vs Bag of Words}
+
+\begin{center}
+\begin{tabular}{lp{5.5cm}p{5.5cm}}
+\toprule
+\textbf{Aspect} & \textbf{Bag of Words} & \textbf{Embedding + Sequence} \\
+\midrule
+Time/Order & Lost completely & Preserved \\
+Representation & Sparse (many zeros) & Dense (meaningful values) \\
+Repeated words & Counted (frequency) & Each occurrence kept \\
+Downstream model & Dense layers (no RNN) & RNN, LSTM, Transformer \\
+Memory & High for large vocab & Lower (embedding dimension) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%========================================================================================
+% SECTION 4: N-grams
+%========================================================================================
+\newpage
+\section{N-grams: Capturing Local Context}
+
+\subsection{What are N-grams?}
+
+\begin{definitionbox}[N-gram]
+An n-gram is a contiguous sequence of $n$ tokens from text:
+\begin{itemize}
+    \item \textbf{Unigram} (n=1): Single words (standard tokenization)
+    \item \textbf{Bigram} (n=2): Two consecutive words
+    \item \textbf{Trigram} (n=3): Three consecutive words
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Why N-grams Matter}
+
+\begin{examplebox}[Sentiment Analysis]
+Consider the sentence: ``This movie was not funny''
+
+\textbf{Unigrams}: [This, movie, was, not, funny]
+\begin{itemize}
+    \item ``funny'' suggests positive sentiment
+    \item Completely misses the negation!
+\end{itemize}
+
+\textbf{Bigrams}: [This movie, movie was, was not, not funny]
+\begin{itemize}
+    \item ``not funny'' captures the negation
+    \item Much better for sentiment analysis!
+\end{itemize}
+\end{examplebox}
+
+\subsection{Creating N-grams}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.feature_extraction.text import CountVectorizer
+
+corpus = ["Henry Ford introduced the Model T"]
+
+# Bigrams only
+vectorizer_2gram = CountVectorizer(ngram_range=(2, 2))
+X = vectorizer_2gram.fit_transform(corpus)
+print(vectorizer_2gram.get_feature_names_out())
+# ['ford introduced', 'henry ford', 'introduced the',
+#  'model t', 'the model']
+
+# Both bigrams and trigrams
+vectorizer_mixed = CountVectorizer(ngram_range=(2, 3))
+# Includes all 2-grams AND all 3-grams
+\end{lstlisting}
+
+\subsection{N-gram Trade-offs}
+
+\begin{warningbox}[title=Vocabulary Explosion]
+As $n$ increases, vocabulary size grows dramatically:
+\begin{itemize}
+    \item Unigrams: $V$ words
+    \item Bigrams: Up to $V^2$ possible combinations
+    \item Trigrams: Up to $V^3$ possible combinations
+\end{itemize}
+
+In practice, most combinations don't appear, but vocabulary still grows significantly.
+\end{warningbox}
+
+\begin{infobox}[title=Practical Recommendations for Sentiment Analysis]
+\begin{itemize}
+    \item Unigrams alone: Often insufficient (misses negation)
+    \item Bigrams + Trigrams: Usually best performance
+    \item Beyond 3-grams: Vocabulary becomes too large, diminishing returns
+\end{itemize}
+
+\textbf{Recommended}: Use \texttt{ngram\_range=(2, 3)} for sentiment analysis.
+\end{infobox}
+
+\subsection{Limitations of N-grams}
+
+\begin{enumerate}
+    \item \textbf{Only local context}: Cannot capture long-range dependencies
+    \item \textbf{Increased sparsity}: Even more zeros in representation
+    \item \textbf{Storage}: Larger vocabulary requires more memory
+    \item \textbf{Still loses global order}: Bag of n-grams is still a ``bag''
+\end{enumerate}
+
+%========================================================================================
+% SECTION 5: Convolutional Neural Networks for NLP
+%========================================================================================
+\newpage
+\section{Convolutional Neural Networks (CNNs)}
+
+\subsection{From Images to Text}
+
+CNNs were originally designed for images but work well on any array-structured data:
+
+\begin{infobox}[title=Text as an Array]
+A sentence represented as embeddings becomes a 2D array:
+\begin{itemize}
+    \item Rows: Time steps (words in sequence)
+    \item Columns: Embedding dimensions
+\end{itemize}
+
+This array structure is similar to a single-channel image!
+\end{infobox}
+
+\subsection{Key CNN Concepts}
+
+\subsubsection{1. Filters (Kernels)}
+
+\begin{definitionbox}[Filter/Kernel]
+A small matrix of learnable weights that slides across the input, computing a weighted sum at each position. The filter learns to detect specific patterns.
+
+For text: A filter of size $(3, d)$ looks at 3 consecutive word embeddings at a time---similar to trigrams but with learned weights!
+\end{definitionbox}
+
+\subsubsection{2. Convolution Operation}
+
+\begin{examplebox}[2D Convolution]
+Input: $3 \times 3$ array, Filter: $2 \times 2$
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+1 & 2 & 3 \\
+\hline
+4 & 5 & 6 \\
+\hline
+7 & 8 & 9 \\
+\hline
+\end{tabular}
+$\ast$
+\begin{tabular}{|c|c|}
+\hline
+1 & 1 \\
+\hline
+2 & 2 \\
+\hline
+\end{tabular}
+$+$ bias 100
+\end{center}
+
+Top-left position: $1 \times 1 + 2 \times 1 + 4 \times 2 + 5 \times 2 + 100 = 121$
+\end{examplebox}
+
+\subsubsection{3. Weight Sharing}
+
+\begin{importantbox}[CNN Weight Sharing]
+Unlike fully connected layers, CNNs use the \textbf{same weights} for every position:
+\begin{itemize}
+    \item Dramatically reduces parameters
+    \item Position-invariant feature detection
+    \item Same pattern detected anywhere in input
+\end{itemize}
+
+Similar to how RNNs share weights across time, CNNs share weights across space.
+\end{importantbox}
+
+\subsection{CNN Architecture Components}
+
+\subsubsection{Padding}
+
+\begin{center}
+\begin{tabular}{lp{10cm}}
+\toprule
+\textbf{Padding} & \textbf{Effect} \\
+\midrule
+\texttt{valid} & No padding; output smaller than input \\
+\texttt{same} & Zero padding added; output same size as input (if stride=1) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Output size formula} (no padding): $\text{output} = \text{input} - \text{filter} + 1$
+
+Example: Input 28, filter 3: Output = $28 - 3 + 1 = 26$
+
+\subsubsection{Strides}
+
+Stride determines how many positions the filter moves at each step:
+\begin{itemize}
+    \item Stride 1: Move one pixel at a time (default)
+    \item Stride 2: Skip every other position (reduces output size)
+\end{itemize}
+
+\subsubsection{Max Pooling}
+
+\begin{definitionbox}[Max Pooling]
+Downsampling operation that takes the maximum value from each region:
+\begin{itemize}
+    \item Reduces spatial dimensions
+    \item Provides slight translation invariance
+    \item No learnable parameters
+\end{itemize}
+
+$2 \times 2$ max pooling with stride 2 halves each dimension.
+\end{definitionbox}
+
+\begin{examplebox}[Max Pooling]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+5 & 3 & 2 & 1 \\
+\hline
+1 & 7 & 4 & 6 \\
+\hline
+9 & 2 & 8 & 3 \\
+\hline
+4 & 5 & 1 & 2 \\
+\hline
+\end{tabular}
+$\xrightarrow{2 \times 2 \text{ max pool}}$
+\begin{tabular}{|c|c|}
+\hline
+7 & 6 \\
+\hline
+9 & 8 \\
+\hline
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\subsection{Complete CNN Example}
+
+\begin{lstlisting}[style=pythonstyle]
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+
+model = Sequential([
+    # Input: 32x32x3 (RGB image)
+    Conv2D(32, (3,3), activation='relu', input_shape=(32,32,3)),
+    # Output: 30x30x32 (lost 2 pixels, gained 32 feature maps)
+
+    MaxPooling2D((2,2)),
+    # Output: 15x15x32 (halved dimensions)
+
+    Conv2D(64, (3,3), activation='relu'),
+    # Output: 13x13x64
+
+    MaxPooling2D((2,2)),
+    # Output: 6x6x64
+
+    Conv2D(64, (3,3), activation='relu'),
+    # Output: 4x4x64
+
+    Flatten(),
+    # Output: 1024 (4*4*64 = 1024)
+
+    Dense(64, activation='relu'),
+    Dense(10, activation='softmax')  # 10-class classification
+])
+\end{lstlisting}
+
+\subsection{Understanding Feature Maps}
+
+\begin{infobox}[title=Multiple Filters Create Depth]
+\begin{itemize}
+    \item Each filter produces one \textbf{feature map}
+    \item \texttt{Conv2D(32, ...)} means 32 filters $\Rightarrow$ 32 feature maps
+    \item Next layer's filters have depth matching previous output
+    \item Example: After Conv2D(32), next filter is $(3, 3, 32)$---32 sub-filters
+\end{itemize}
+\end{infobox}
+
+\subsection{Flatten Layer}
+
+\begin{definitionbox}[Flatten]
+Reshape multi-dimensional array to 1D vector for dense layers:
+\begin{itemize}
+    \item $(4, 4, 64) \rightarrow 1024$
+    \item No learnable parameters
+    \item Just reshaping, not computation
+\end{itemize}
+\end{definitionbox}
+
+\subsection{CNN vs RNN for NLP}
+
+\begin{center}
+\begin{tabular}{lp{5.5cm}p{5.5cm}}
+\toprule
+\textbf{Aspect} & \textbf{CNN} & \textbf{RNN/LSTM} \\
+\midrule
+Context & Local (filter size) & Sequential (can be long) \\
+Parallelization & Highly parallelizable & Sequential processing \\
+Training speed & Faster & Slower \\
+Long dependencies & Limited by filter size & Better (LSTM) \\
+Common use in NLP & Text classification & Sequence generation \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Special Filter: 1$\times$1 Convolution}
+
+\begin{infobox}[title=What Does 1$\times$1 Convolution Do?]
+A $1 \times 1$ filter doesn't look at spatial neighbors---it only:
+\begin{itemize}
+    \item Collapses channels/colors together (weighted average per pixel)
+    \item Reduces dimensionality without losing spatial resolution
+    \item Used in inception modules to reduce computation
+\end{itemize}
+
+Think of it as: applying a dense layer to each spatial position independently.
+\end{infobox}
+
+%========================================================================================
+% SECTION 6: Practical Considerations
+%========================================================================================
+\newpage
+\section{Practical Considerations}
+
+\subsection{The Sigmoid Loss Explosion Problem}
+
+\begin{warningbox}[title=Log of Zero Problem]
+When using sigmoid output with cross-entropy loss:
+\begin{itemize}
+    \item If model is very confident but wrong: $\hat{y} \approx 0$ or $\hat{y} \approx 1$
+    \item Loss = $-\log(\hat{y})$ or $-\log(1-\hat{y})$
+    \item $\log(0.0001) \approx -9.2$, $\log(0.00001) \approx -11.5$
+    \item Loss explodes to infinity!
+\end{itemize}
+
+\textbf{Solution}: Add dropout to prevent overconfident predictions.
+\end{warningbox}
+
+\subsection{Stop Words}
+
+\begin{definitionbox}[Stop Words]
+Common words with little semantic value: ``the,'' ``a,'' ``is,'' ``are,'' ``in,'' etc.
+
+Removing them:
+\begin{itemize}
+    \item Reduces vocabulary size
+    \item Speeds up training
+    \item May improve classification (less noise)
+\end{itemize}
+\end{definitionbox}
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Remove English stop words
+vectorizer = CountVectorizer(stop_words='english')
+
+# Or provide custom list
+custom_stops = ['the', 'a', 'an', 'is', 'are']
+vectorizer = CountVectorizer(stop_words=custom_stops)
+\end{lstlisting}
+
+\subsection{When to Use Deep Learning}
+
+\begin{infobox}[title=Data Size Matters]
+\begin{itemize}
+    \item \textbf{< 1000 samples}: Classical ML (logistic regression, random forest)
+    \item \textbf{1000--10,000 samples}: Consider simple neural networks
+    \item \textbf{> 10,000 samples}: Deep learning becomes viable
+    \item \textbf{> 100,000 samples}: Deep learning often outperforms
+\end{itemize}
+
+Deep learning has many parameters---needs sufficient data to train properly.
+\end{infobox}
+
+%========================================================================================
+% SECTION 7: One-Page Summary
+%========================================================================================
+\newpage
+\section{One-Page Summary}
+
+\begin{tcolorbox}[title=Bag of Words, colback=blue!5]
+\textbf{Concept}: Count word frequencies, ignore order
+
+\textbf{Steps}: Tokenize $\to$ Build vocabulary $\to$ Count $\to$ Create vector
+
+\textbf{Limitations}: Loses order, sparse, no semantics
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=N-grams, colback=green!5]
+\textbf{Concept}: Token = n consecutive words
+
+\textbf{Benefit}: Captures local context (``not funny'' vs ``funny'')
+
+\textbf{Cost}: Vocabulary explosion
+
+\textbf{Recommendation}: Use (2,3) for sentiment analysis
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Embeddings, colback=purple!5]
+\textbf{What}: Learned mapping from sparse to dense vectors
+
+\textbf{Why index works}: One-hot $\times$ matrix = row selection
+
+\textbf{Parameters}: vocab\_size $\times$ embedding\_dim
+
+\textbf{Key insight}: Same as dense layer but uses efficient lookup
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=CNN Key Concepts, colback=orange!5]
+\begin{tabular}{ll}
+\textbf{Filter} & Sliding window of learnable weights \\
+\textbf{Stride} & How many positions to move \\
+\textbf{Padding} & valid (shrinks) or same (maintains size) \\
+\textbf{Max Pool} & Take max from each region \\
+\textbf{Flatten} & Reshape to 1D for dense layers \\
+\end{tabular}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=CNN Architecture Flow, colback=yellow!5]
+Input $\to$ [Conv $\to$ ReLU $\to$ Pool] $\times N$ $\to$ Flatten $\to$ Dense $\to$ Output
+
+\textbf{Weight sharing}: Same filter weights at all positions
+
+\textbf{Feature maps}: Number of filters = depth of output
+\end{tcolorbox}
+
+%========================================================================================
+% GLOSSARY
+%========================================================================================
+\newpage
+\section{Glossary}
+
+\begin{longtable}{p{4cm}p{11cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\endhead
+
+Bag of Words & Text representation counting word frequencies without order \\
+
+Bigram & Two consecutive tokens from text \\
+
+Convolution & Operation sliding a filter across input, computing weighted sums \\
+
+Embedding & Learned mapping from sparse indices to dense vectors \\
+
+Feature Map & Output of applying one filter to entire input \\
+
+Filter/Kernel & Small matrix of learnable weights in CNN \\
+
+Flatten & Reshape multi-dimensional array to 1D vector \\
+
+Max Pooling & Downsampling by taking maximum in each region \\
+
+N-gram & Sequence of n consecutive tokens \\
+
+One-hot Encoding & Sparse vector with single 1 indicating category \\
+
+Padding & Adding zeros around input to control output size \\
+
+Sparse & Vector with mostly zeros \\
+
+Stop Words & Common words removed before analysis (the, a, is) \\
+
+Stride & Step size when sliding filter across input \\
+
+Trigram & Three consecutive tokens from text \\
+
+Unigram & Single token (standard word) \\
+
+Vocabulary & Set of unique tokens from training corpus \\
+
+Weight Sharing & Using same weights at different positions (CNN, RNN) \\
+
+\bottomrule
+\end{longtable}
+
+\end{document}

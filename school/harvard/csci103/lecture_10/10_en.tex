@@ -1,0 +1,1052 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Reproducible Data Science and Machine Learning
+% Lecture 10: Model Bias, Data Imbalance, and Real-World Fraud Detection
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Data Science}}
+\fancyhead[R]{\small\textit{Lecture 10}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Model Bias and Fraud Detection - Lecture 10},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Info Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 10: Model Bias, Data Imbalance, and Real-World Fraud Detection}
+\author{CSCI E-103: Reproducible Data Science and Machine Learning}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Reproducible Data Science}{Lecture 10}{Anindita Mahapatra \& Eric Gieseke}{Understand model errors, handle imbalanced data, and learn from a real-world fraud detection system at scale}
+
+\tableofcontents
+
+\newpage
+
+%===================================================================================
+\section{The Central Theme: Data Problems Lead to Model Problems}
+%===================================================================================
+
+\begin{overviewbox}
+This lecture explores the critical relationship between data quality and model performance. Poor data doesn't just affect accuracy---it can create biased, unfair, and even harmful models.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item Machine Learning Errors: Bias, Variance, and Irreducible Error
+    \item The Bias-Variance Tradeoff
+    \item Model Bias: Why models can be unfair
+    \item Class Imbalance: When your data is 99\% one thing
+    \item SMOTE: Synthetic Minority Oversampling Technique
+    \item AutoML: Blackbox vs. Glassbox approaches
+    \item Data Classification for PII detection
+    \item Real-World Case Study: Fraud Detection at 15ms latency
+\end{itemize}
+\end{overviewbox}
+
+\newpage
+
+%===================================================================================
+\section{Machine Learning Errors: The Three Components}
+%===================================================================================
+
+Every ML model makes errors. Understanding \textbf{why} models err is crucial to improving them.
+
+\begin{summarybox}[title={The Total Prediction Error}]
+\textbf{Total Error = Bias$^2$ + Variance + Irreducible Error}
+\end{summarybox}
+
+\subsection{1. Bias (Underfitting)}
+
+\begin{definitionbox}[Bias]
+\textbf{Bias} is the error introduced by approximating a real-world problem (which may be extremely complicated) with a too-simple model.
+
+\textbf{Symptom:} The model fails to capture the true relationship between features and target.
+
+\textbf{Result:} Poor performance on \textbf{both} training AND test data.
+\end{definitionbox}
+
+\begin{examplebox}[High Bias Model]
+Imagine you're trying to predict house prices, which depend on many factors in complex, non-linear ways.
+
+If you use simple linear regression (a straight line), you might get:
+\begin{itemize}
+    \item Training accuracy: 60\%
+    \item Test accuracy: 58\%
+\end{itemize}
+
+Both are bad! The model is too simple to capture reality.
+
+\textbf{Analogy:} Trying to describe a curvy mountain road as ``mostly flat.''
+\end{examplebox}
+
+\subsection{2. Variance (Overfitting)}
+
+\begin{definitionbox}[Variance]
+\textbf{Variance} is the error introduced when a model is too sensitive to small fluctuations (noise) in the training data.
+
+\textbf{Symptom:} The model memorizes the training data instead of learning general patterns.
+
+\textbf{Result:} Excellent performance on training data, \textbf{terrible} performance on test data.
+\end{definitionbox}
+
+\begin{examplebox}[High Variance Model]
+Using an extremely complex model (like a deep neural network with no regularization) on limited data:
+\begin{itemize}
+    \item Training accuracy: 99.5\%
+    \item Test accuracy: 62\%
+\end{itemize}
+
+The model ``cheated'' by memorizing answers instead of learning rules.
+
+\textbf{Analogy:} A student who memorizes all practice exam answers but can't solve new problems.
+\end{examplebox}
+
+\subsection{3. Irreducible Error}
+
+\begin{definitionbox}[Irreducible Error]
+\textbf{Irreducible Error} is the inherent noise in the data that cannot be reduced regardless of the model. It represents the randomness in real-world phenomena.
+
+This is the floor---no model can be more accurate than the noise allows.
+\end{definitionbox}
+
+\subsection{The Bias-Variance Tradeoff}
+
+\begin{importantbox}[The Fundamental Tradeoff]
+Bias and variance are \textbf{inversely related}:
+
+\begin{itemize}
+    \item \textbf{Simple model} (fewer parameters) $\rightarrow$ High Bias, Low Variance
+    \item \textbf{Complex model} (more parameters) $\rightarrow$ Low Bias, High Variance
+\end{itemize}
+
+The goal of ML is to find the \textbf{``sweet spot''}---a model complex enough to capture the true patterns (low bias) but not so complex that it fits noise (low variance).
+\end{importantbox}
+
+\begin{table}[htbp]
+\centering
+\caption{Bias vs. Variance Characteristics}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Characteristic} & \textbf{High Bias (Underfitting)} & \textbf{High Variance (Overfitting)} \\
+\midrule
+Model complexity & Too simple & Too complex \\
+Training error & High & Very low \\
+Test error & High & High (much higher than training) \\
+Cause & Not enough learning & Too much learning (noise included) \\
+Fix & More complex model, more features & Regularization, more data, simpler model \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+%===================================================================================
+\section{Model Bias: When AI Becomes Unfair}
+%===================================================================================
+
+This is a different kind of ``bias''---not underfitting, but \textbf{unfairness}. When models systematically disadvantage certain groups of people.
+
+\subsection{Why Does Model Bias Happen?}
+
+\subsubsection{1. Human Cognitive Bias in Data}
+
+Models learn from data. If data reflects human prejudices, the model learns those prejudices.
+
+\begin{examplebox}[Facial Recognition Accuracy Disparity]
+A NIST study found that facial recognition systems from major companies (Microsoft, IBM, etc.) had dramatically different accuracy rates:
+
+\begin{itemize}
+    \item \textbf{Light-skinned males:} 90\%+ accuracy
+    \item \textbf{Dark-skinned females:} 60-70\% accuracy
+\end{itemize}
+
+\textbf{Root Cause:} The training datasets were \textbf{under-represented} in dark-skinned faces, especially females. The model simply didn't have enough examples to learn from.
+
+\textbf{Key Insight:} This isn't an algorithm problem---it's a \textbf{data collection} problem. The humans who created the dataset inadvertently (or sometimes systematically) included fewer examples of certain groups.
+\end{examplebox}
+
+\begin{examplebox}[Microsoft's Tay Chatbot]
+In 2016, Microsoft released a chatbot named ``Tay'' that learned from Twitter conversations.
+
+Within 24 hours, malicious users taught it to say racist, sexist, and Holocaust-denying statements.
+
+\textbf{Lesson:} Models are only as good as their training data. Garbage in, garbage out---but magnified.
+\end{examplebox}
+
+\subsubsection{2. Poor Quality Training Data}
+
+\begin{itemize}
+    \item \textbf{Low resolution:} Images too blurry to distinguish (like the dog vs. arctic fox example)
+    \item \textbf{Mislabeled data:} Human labelers may have their own biases (e.g., associating ``evil'' with dark colors)
+    \item \textbf{Incomplete coverage:} Data missing important edge cases or scenarios
+\end{itemize}
+
+\subsection{How to Reduce Model Bias}
+
+\begin{infobox}[title={Strategies for Reducing Bias}]
+\begin{enumerate}
+    \item \textbf{Ensure Representative Data (Most Important!):}
+    \begin{itemize}
+        \item Audit your training data for demographic representation
+        \item Actively collect more data from underrepresented groups
+        \item Consider the source of your data and its inherent biases
+    \end{itemize}
+
+    \item \textbf{Use Appropriate Models:}
+    \begin{itemize}
+        \item Don't use linear models for non-linear relationships
+        \item Tree-based algorithms are often better at handling bias
+    \end{itemize}
+
+    \item \textbf{Apply Weighting or Penalized Models:}
+    \begin{itemize}
+        \item Give more weight to underrepresented groups
+        \item Use class weights in your loss function
+    \end{itemize}
+
+    \item \textbf{Extensive Hyperparameter Tuning:}
+    \begin{itemize}
+        \item Don't just use defaults---optimize for fairness metrics
+    \end{itemize}
+
+    \item \textbf{Ensemble Methods (for reducing variance):}
+    \begin{itemize}
+        \item Combine weak and strong learners
+        \item Random forests, boosting, etc.
+    \end{itemize}
+\end{enumerate}
+\end{infobox}
+
+\newpage
+
+%===================================================================================
+\section{Class Imbalance: The 99-1 Problem}
+%===================================================================================
+
+A special and extremely common case of data problems.
+
+\begin{definitionbox}[Class Imbalance]
+\textbf{Class Imbalance} occurs when one class (label) in your training data is much more frequent than another.
+
+\textbf{Examples:}
+\begin{itemize}
+    \item Fraud detection: 99.9\% legitimate, 0.1\% fraud
+    \item Cancer diagnosis: 98\% healthy, 2\% cancer
+    \item Anomaly detection in manufacturing
+    \item Network intrusion detection
+\end{itemize}
+\end{definitionbox}
+
+\subsection{The Accuracy Trap}
+
+Most ML algorithms optimize for \textbf{accuracy}---the percentage of correct predictions.
+
+\begin{warningbox}[title={Why Accuracy is Misleading}]
+Consider a fraud detection dataset with 99.9\% legitimate transactions.
+
+A model that \textbf{always predicts ``legitimate''} will have:
+
+\textbf{Accuracy = 99.9\%}
+
+Sounds great, right? But this model catches \textbf{zero fraud}. It's completely useless for its intended purpose.
+
+The lesson: \textbf{Accuracy is a terrible metric for imbalanced data.}
+\end{warningbox}
+
+\subsection{Better Metrics: Precision, Recall, and F1}
+
+\begin{definitionbox}[Confusion Matrix Terminology]
+\begin{itemize}
+    \item \textbf{True Positive (TP):} Model predicted Fraud, actually was Fraud
+    \item \textbf{True Negative (TN):} Model predicted Legitimate, actually was Legitimate
+    \item \textbf{False Positive (FP):} Model predicted Fraud, but was actually Legitimate (Type I Error)
+    \item \textbf{False Negative (FN):} Model predicted Legitimate, but was actually Fraud (Type II Error)
+\end{itemize}
+\end{definitionbox}
+
+\begin{table}[htbp]
+\centering
+\caption{Key Metrics for Imbalanced Data}
+\begin{tabular}{@{}p{0.15\textwidth}p{0.35\textwidth}p{0.45\textwidth}@{}}
+\toprule
+\textbf{Metric} & \textbf{Formula} & \textbf{When to Prioritize} \\
+\midrule
+\textbf{Precision}
+& $\frac{TP}{TP + FP}$
+& ``Of things I flagged as fraud, how many were actually fraud?''
+\newline Prioritize when \textbf{false positives are costly} (blocking legitimate customers)
+\\ \addlinespace
+
+\textbf{Recall}
+& $\frac{TP}{TP + FN}$
+& ``Of all actual frauds, how many did I catch?''
+\newline Prioritize when \textbf{false negatives are costly} (missing actual fraud/cancer)
+\\ \addlinespace
+
+\textbf{F1 Score}
+& $2 \times \frac{Precision \times Recall}{Precision + Recall}$
+& Harmonic mean of precision and recall.
+\newline Use when \textbf{both matter}---the primary metric for imbalanced data
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{examplebox}[Cancer Screening]
+In cancer diagnosis, \textbf{recall is critical}. Missing an actual cancer case (false negative) can be fatal.
+
+A model with:
+\begin{itemize}
+    \item Precision: 90\% (some false alarms)
+    \item Recall: 99\% (catches almost all cancers)
+\end{itemize}
+
+is far better than:
+\begin{itemize}
+    \item Precision: 99\% (rarely wrong when it says cancer)
+    \item Recall: 70\% (misses 30\% of cancers!)
+\end{itemize}
+\end{examplebox}
+
+\subsection{Resampling Techniques}
+
+\begin{table}[htbp]
+\centering
+\caption{Resampling Strategies}
+\begin{tabular}{@{}p{0.2\textwidth}p{0.4\textwidth}p{0.35\textwidth}@{}}
+\toprule
+\textbf{Technique} & \textbf{How It Works} & \textbf{Pros/Cons} \\
+\midrule
+\textbf{Undersampling}
+& Remove samples from the majority class until balanced
+& Simple, but \textbf{loses valuable data}
+\\ \addlinespace
+
+\textbf{Oversampling}
+& Duplicate samples from the minority class
+& Simple, but can cause \textbf{overfitting} (memorizing duplicates)
+\\ \addlinespace
+
+\textbf{SMOTE}
+& Generate \textbf{synthetic} minority samples
+& Best of both worlds---creates new data points
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{SMOTE: Synthetic Minority Oversampling Technique}
+
+\begin{infobox}[title={How SMOTE Works}]
+SMOTE doesn't just copy existing minority samples---it \textbf{creates new synthetic ones}.
+
+\textbf{Algorithm:}
+\begin{enumerate}
+    \item Pick a minority class sample $x_i$
+    \item Find its $k$ nearest neighbors (also minority class)
+    \item Randomly select one neighbor $x_j$
+    \item Create a new synthetic point \textbf{along the line} between $x_i$ and $x_j$:
+    \[
+    x_{new} = x_i + \lambda \cdot (x_j - x_i), \quad \text{where } \lambda \in [0, 1]
+    \]
+\end{enumerate}
+
+This effectively ``fills in'' the feature space around minority samples, giving the model a richer understanding of the minority class.
+\end{infobox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Using SMOTE in Python}]
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+
+# CRITICAL: Split BEFORE applying SMOTE!
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Apply SMOTE only to training data
+smote = SMOTE(random_state=42)
+X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+
+# Now train your model
+model.fit(X_train_resampled, y_train_resampled)
+
+# Evaluate on original (non-resampled) test data
+model.score(X_test, y_test)
+\end{lstlisting}
+
+\begin{warningbox}[title={Critical SMOTE Warning}]
+\textbf{NEVER apply SMOTE before train/test split!}
+
+If you SMOTE the entire dataset first, then split, synthetic data may leak between train and test sets, causing artificially inflated test performance (data leakage).
+
+\textbf{Correct order:}
+\begin{enumerate}
+    \item Split data into train/test
+    \item Apply SMOTE to training set only
+    \item Evaluate on original (un-SMOTEd) test set
+\end{enumerate}
+\end{warningbox}
+
+\newpage
+
+%===================================================================================
+\section{AutoML: Blackbox vs. Glassbox}
+%===================================================================================
+
+\begin{definitionbox}[AutoML]
+\textbf{AutoML (Automated Machine Learning)} automates the process of:
+\begin{itemize}
+    \item Feature engineering
+    \item Model selection
+    \item Hyperparameter tuning
+    \item Model evaluation
+\end{itemize}
+
+You provide data, it provides a trained model.
+\end{definitionbox}
+
+\subsection{Blackbox AutoML}
+
+\begin{itemize}
+    \item \textbf{How it works:} Upload data, click ``train,'' get a model
+    \item \textbf{Examples:} DataRobot, some commercial tools
+    \item \textbf{Problem:} You can't see how the model was built. When things go wrong (and they will), you can't diagnose or fix them. For enterprise use cases requiring auditability, this is a dealbreaker.
+\end{itemize}
+
+\subsection{Glassbox AutoML (Databricks Approach)}
+
+\begin{itemize}
+    \item \textbf{How it works:} Same automation, but every step is exposed as a \textbf{notebook}
+    \item \textbf{What you get:}
+    \begin{enumerate}
+        \item \textbf{Data Exploration Notebook:} Automatic EDA with profiling
+        \item \textbf{Best Model Notebook:} Full source code for the winning model
+        \item \textbf{MLflow Integration:} All experiments tracked
+        \item \textbf{SHAP Explanations:} Feature importance built in
+    \end{enumerate}
+    \item \textbf{Advantage:} ``Citizen data scientists'' can start quickly, but experts can take over and customize
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{Models Available in Databricks AutoML}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Classification} & \textbf{Regression} & \textbf{Forecasting} \\
+\midrule
+Decision Trees & Decision Trees & Prophet \\
+Random Forests & Random Forests & Auto-ARIMA \\
+Logistic Regression & Linear Regression & DeepAR \\
+XGBoost & XGBoost & \\
+LightGBM & LightGBM & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{examplebox}[AutoML Demo Walkthrough]
+\textbf{Scenario:} Customer churn prediction
+
+\textbf{Steps:}
+\begin{enumerate}
+    \item Select dataset (churn table from Unity Catalog)
+    \item Choose target column (``Churn'')
+    \item Set evaluation metric (F1 Score---because churn is imbalanced!)
+    \item Set timeout (15 minutes)
+    \item Click ``Start AutoML''
+\end{enumerate}
+
+\textbf{Results:}
+\begin{itemize}
+    \item AutoML runs Decision Trees, Random Forest, XGBoost, LightGBM in parallel
+    \item \textbf{Best model:} LightGBM (based on F1 score)
+    \item Click ``View notebook for best model'' to see full source code
+    \item All experiments logged to MLflow
+    \item SHAP analysis shows which features matter most
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+%===================================================================================
+\section{Data Classification: Protecting Sensitive Information}
+%===================================================================================
+
+Models can inadvertently leak sensitive information (PII). If your training data contains social security numbers and someone asks the model about them...
+
+\begin{definitionbox}[PII - Personally Identifiable Information]
+Information that can identify an individual:
+\begin{itemize}
+    \item Name, phone number, email address
+    \item Social Security Number, driver's license
+    \item IP address, location data
+    \item Bank account numbers
+\end{itemize}
+
+PII must be detected and removed before model training.
+\end{definitionbox}
+
+\subsection{Automated Data Classification in Databricks}
+
+Unity Catalog can automatically scan tables and detect sensitive columns:
+
+\begin{enumerate}
+    \item Enable ``Data Classification'' at the catalog level
+    \item System scans all tables (takes about 15 minutes)
+    \item Results show which columns contain: Name, Phone, Email, SSN, IP Address, etc.
+    \item Tags are automatically applied for governance
+\end{enumerate}
+
+This prevents accidentally feeding PII into models, which could create both legal liability and privacy leaks.
+
+\newpage
+
+%===================================================================================
+\section{Real-World Case Study: Fraud Detection at Scale}
+%===================================================================================
+
+Eric Gieseke shares a real production fraud detection system he built. This is where all the theory meets hard engineering constraints.
+
+\subsection{Business Requirements}
+
+\begin{table}[htbp]
+\centering
+\caption{Fraud Detection System Requirements}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Requirement} & \textbf{Target} \\
+\midrule
+\textbf{Accuracy} & High confidence---catch real fraud, don't block legitimate transactions \\
+\textbf{Latency} & \textbf{15 milliseconds} (ms) response time \\
+\textbf{Throughput} & 50,000+ transactions per second (TPS) \\
+\textbf{Maintainability} & Easy to add/modify features and rules \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{examplebox}[Why 15ms is Incredibly Hard]
+For context:
+\begin{itemize}
+    \item A typical hard disk seek time: 10-15ms
+    \item A network round-trip: 1-100ms depending on distance
+    \item Human blink: 100-400ms
+\end{itemize}
+
+The entire fraud decision---load customer history, compute features, run ML model, apply rules, return decision---must happen in the time it takes a hard disk to \textbf{find} data, let alone read it.
+\end{examplebox}
+
+\subsection{Features for Fraud Detection}
+
+The data science team developed hundreds of features:
+
+\begin{table}[htbp]
+\centering
+\caption{Example Fraud Detection Features}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Feature Type} & \textbf{Examples} \\
+\midrule
+\textbf{Transaction-based}
+& Distance from customer's home address \\
+& Difference from average transaction amount \\
+& Number of transactions today \\
+& Time since last transaction \\
+\midrule
+\textbf{Dimension-based}
+& Merchant's average transaction amount \\
+& Customer's transaction frequency \\
+& Terminal's fraud history \\
+& Geographic region risk score \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Architecture: Lambda Architecture}
+
+To meet both 15ms real-time AND large-scale batch requirements, they used \textbf{Lambda Architecture}.
+
+\begin{infobox}[title={Lambda Architecture Overview}]
+Lambda Architecture splits data processing into three layers:
+
+\textbf{1. Batch Layer (Slow but Complete):}
+\begin{itemize}
+    \item Stores all historical data (immutable)
+    \item Runs nightly/hourly batch jobs (Hadoop/Spark)
+    \item Computes features on entire dataset (e.g., ``customer's average transaction over 1 year'')
+    \item Results stored in Feature Store
+\end{itemize}
+
+\textbf{2. Speed Layer (Fast but Incremental):}
+\begin{itemize}
+    \item Processes real-time events as they arrive
+    \item Uses Complex Event Processing (CEP)
+    \item Computes real-time features (e.g., ``transactions in last 10 minutes'')
+\end{itemize}
+
+\textbf{3. Serving Layer (Query Layer):}
+\begin{itemize}
+    \item Combines batch and speed results
+    \item Serves queries with low latency
+    \item Cassandra used for this layer
+\end{itemize}
+\end{infobox}
+
+\subsection{Key Innovation 1: Metadata-Driven Code Generation}
+
+\begin{itemize}
+    \item \textbf{Problem:} Hundreds of features need code for both batch (SQL) AND real-time (CEP language). Writing and maintaining both is error-prone.
+
+    \item \textbf{Solution:} Define features as \textbf{metadata}, not code.
+    \begin{lstlisting}[basicstyle=\ttfamily\small]
+Feature: customer_avg_transaction_30d
+Type: Average
+Field: transaction_amount
+Window: 30 days
+Dimension: customer_id
+    \end{lstlisting}
+
+    \item \textbf{Code Generator} reads metadata and automatically produces:
+    \begin{itemize}
+        \item SQL for batch processing (Spark)
+        \item EPL for real-time processing (CEP)
+    \end{itemize}
+
+    \item \textbf{Benefit:} Add a new feature by editing metadata, not writing two sets of code
+\end{itemize}
+
+\subsection{Key Innovation 2: Circular Buffer (Ring Buffer)}
+
+\begin{examplebox}[The Problem]
+To compute ``customer's average transaction amount over last 7 days,'' you'd normally:
+\begin{enumerate}
+    \item Query database for all transactions in last 7 days
+    \item Sum them up
+    \item Divide by count
+\end{enumerate}
+
+For millions of customers, this is \textbf{impossible in 15ms}.
+\end{examplebox}
+
+\begin{infobox}[title={Circular Buffer Solution}]
+Instead of storing individual transactions, store \textbf{aggregates per time bucket}.
+
+\textbf{Structure (7-day buffer):}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+Sun & Mon & Tue & Wed & Thu & Fri & Sat \\
+\hline
+(count, sum) & (count, sum) & (count, sum) & (count, sum) & (count, sum) & (count, sum) & (count, sum) \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Example:}
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+Sun: (3, $150)   Mon: (5, $280)   Tue: (2, $90)   ...
+\end{lstlisting}
+
+\textbf{To compute 7-day average:}
+\[
+\text{Average} = \frac{\sum \text{sums}}{\sum \text{counts}} = \frac{150 + 280 + 90 + ...}{3 + 5 + 2 + ...}
+\]
+
+\textbf{Memory footprint:} Just 14 numbers per customer per feature (2 numbers × 7 days)
+
+\textbf{When day changes:} Overwrite oldest bucket with zeros, start fresh
+
+This was novel enough that the company \textbf{patented} it.
+\end{infobox}
+
+\subsection{Key Innovation 3: Cassandra as Feature Store}
+
+\begin{itemize}
+    \item \textbf{Why Cassandra?}
+    \begin{itemize}
+        \item Write speed: Extremely fast (writes are ``fire and forget'')
+        \item \textbf{Read speed: 2.3ms achieved}---critical for 15ms budget
+        \item Scalable to petabytes
+        \item Supports wide rows (billions of columns per row)
+    \end{itemize}
+
+    \item \textbf{Data Model:}
+    \begin{itemize}
+        \item Only 2 tables: \textbf{Events} (fact table) and \textbf{Dimensions}
+        \item New features = new columns (schema-less flexibility)
+        \item Sparse data handled efficiently
+    \end{itemize}
+\end{itemize}
+
+\subsection{System Flow Summary}
+
+\begin{enumerate}
+    \item \textbf{Fraud Analyst} defines new feature in Metadata Service
+    \item \textbf{Batch Processing} (nightly) computes historical feature values $\rightarrow$ stores in Cassandra
+    \item \textbf{Code Generator} creates real-time CEP code
+    \item \textbf{Customer} swipes card at merchant
+    \item \textbf{Payment Service} calls Fraud Detection Service
+    \item \textbf{Fraud Detection} (within 15ms):
+    \begin{enumerate}
+        \item Retrieves pre-computed features from Cassandra (2.3ms)
+        \item Computes real-time features using Circular Buffers (in-memory)
+        \item Runs ML model + rules
+        \item Returns ``Approve'' or ``Decline''
+    \end{enumerate}
+    \item \textbf{Customer} completes purchase (or doesn't)
+\end{enumerate}
+
+\subsection{Disaster Recovery}
+
+For mission-critical payment systems:
+\begin{itemize}
+    \item Two data centers (US and Europe)
+    \item If US fails, traffic automatically routes to Europe
+    \item Slightly higher latency acceptable vs. complete outage
+    \item Data replication between centers
+\end{itemize}
+
+\newpage
+
+%===================================================================================
+\section{Summary: One-Page Quick Reference}
+%===================================================================================
+
+\begin{tcolorbox}[
+  title={ML Errors: Bias vs. Variance},
+  colframe=blue!75!black, colback=blue!5!white, fonttitle=\bfseries
+]
+\begin{itemize}
+    \item \textbf{Bias (Underfitting):} Model too simple. Both train and test error high.
+    \item \textbf{Variance (Overfitting):} Model too complex. Train error low, test error high.
+    \item \textbf{Tradeoff:} Simple $\leftrightarrow$ Complex. Find the sweet spot.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Model Bias (Fairness)},
+  colframe=red!60!black, colback=red!5!white, fonttitle=\bfseries
+]
+\begin{itemize}
+    \item \textbf{Cause 1:} Human bias in data (under-representation of groups)
+    \item \textbf{Cause 2:} Poor quality labels, mislabeled data
+    \item \textbf{Fix:} Ensure representative, diverse training data (most important!)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Class Imbalance (99-1 Problem)},
+  colframe=purple!60!black, colback=purple!5!white, fonttitle=\bfseries
+]
+\begin{itemize}
+    \item \textbf{Problem:} Accuracy is meaningless (99\% by always predicting majority)
+    \item \textbf{Metrics:} Use \textbf{F1 Score} (harmonic mean of Precision and Recall)
+    \item \textbf{Fix:} \textbf{SMOTE} (create synthetic minority samples)
+    \item \textbf{Warning:} Apply SMOTE to training set \textbf{only}, after train/test split!
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={AutoML: Blackbox vs. Glassbox},
+  colframe=green!60!black, colback=green!5!white, fonttitle=\bfseries
+]
+\begin{itemize}
+    \item \textbf{Blackbox:} Magic model, no visibility (enterprise unfriendly)
+    \item \textbf{Glassbox:} Full notebooks, MLflow tracking, SHAP explanations
+    \item \textbf{Use case:} Quick baseline, data validation, citizen data scientists
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Fraud Detection at 15ms},
+  colframe=orange!60!black, colback=orange!5!white, fonttitle=\bfseries
+]
+\begin{itemize}
+    \item \textbf{Architecture:} Lambda (Batch + Speed + Serving layers)
+    \item \textbf{Key 1:} \textbf{Circular Buffer} - Store (count, sum) per time bucket, not individual records
+    \item \textbf{Key 2:} \textbf{Cassandra} - 2.3ms reads for feature retrieval
+    \item \textbf{Key 3:} \textbf{Code Generation} - Define features as metadata, auto-generate SQL/CEP
+    \item \textbf{Lesson:} The difference between 15ms and 100ms is the difference between possible and impossible
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

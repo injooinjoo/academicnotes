@@ -1,0 +1,1001 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CSCI E-103: Reproducible Machine Learning - Lecture 13
+% Topic: Continuous Improvement, CI/CD, IaC, and Observability
+% Version: 2.1 - English Edition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Machine Learning}}
+\fancyhead[R]{\small\textit{Lecture 13}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced, colback=lightpurple, colframe=darkpurple,
+    fonttitle=\bfseries\large, title=Lecture Overview,
+    arc=3mm, boxrule=1pt, left=8pt, right=8pt, top=8pt, bottom=8pt, breakable, #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced, colback=lightblue, colframe=darkblue,
+    fonttitle=\bfseries, title=Key Summary,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced, colback=lightgreen, colframe=darkgreen,
+    fonttitle=\bfseries, title=Key Information,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced, colback=lightyellow, colframe=darkorange,
+    fonttitle=\bfseries, title=Warning,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced, colback=lightgray, colframe=black!60,
+    fonttitle=\bfseries, title=Example: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced, colback=lightpink, colframe=purple!70!black,
+    fonttitle=\bfseries, title=Definition: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced, colback=boxred, colframe=red!70!black,
+    fonttitle=\bfseries, title=Important: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left, numbersep=8pt, breaklines=true,
+    frame=single, frameround=tttt, rulecolor=\color{black!30},
+    captionpos=b, showstringspaces=false, tabsize=2,
+    xleftmargin=15pt, xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{language=Python, morekeywords={self, True, False, None}}
+\lstdefinestyle{sqlstyle}{language=SQL, morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY}}
+\lstdefinestyle{bashstyle}{language=bash, morekeywords={databricks, bundle, deploy, validate, run}}
+\lstdefinestyle{yamlstyle}{basicstyle=\ttfamily\small, morekeywords={bundle, resources, targets, variables}}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[colorlinks=true, linkcolor=blue!80!black, urlcolor=blue!80!black]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Lecture 13 - CI/CD, IaC, and Observability},
+    pdfauthor={Lecture Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+\usepackage{microtype}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+%========================================================================================
+% Title and Section Styling
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[colback=lightpurple, colframe=darkpurple, boxrule=1pt, arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.72\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CSCI E-103: Reproducible Machine Learning}{Lecture 13}{Eric Gieseke \& Ram Sriharsha}{Master the continuous improvement cycle: CI/CD pipelines, Infrastructure as Code (IaC), observability, data quality monitoring, and Databricks Asset Bundles (DABs)}
+
+\tableofcontents
+\newpage
+
+%===============================================================================
+% SECTION 1: Introduction
+%===============================================================================
+\section{Introduction: Beyond "Working Code"}
+
+Building a data pipeline that "works" is just the beginning. In enterprise environments, the real challenge is:
+
+\begin{itemize}
+    \item How do you \textbf{deploy reliably} across environments (dev, staging, production)?
+    \item How do you \textbf{automate testing} so bugs are caught early?
+    \item How do you \textbf{monitor quality} so bad data doesn't corrupt downstream systems?
+    \item How do you \textbf{manage costs} so your cluster doesn't run up a \$100,000 bill?
+\end{itemize}
+
+This lecture bridges the gap between "data science" and "data engineering operations."
+
+\begin{overviewbox}
+\textbf{Key Topics:}
+\begin{enumerate}
+    \item \textbf{Software Development Lifecycle (SDLC):} Dev $\rightarrow$ Staging $\rightarrow$ Production
+    \item \textbf{Infrastructure as Code (IaC):} Terraform for reproducible infrastructure
+    \item \textbf{CI/CD Pipelines:} Automated testing and deployment
+    \item \textbf{Observability:} System tables, cost monitoring, data quality
+    \item \textbf{Databricks Asset Bundles (DABs):} Modern deployment packaging
+\end{enumerate}
+\end{overviewbox}
+
+%===============================================================================
+% SECTION 2: Software Development Lifecycle
+%===============================================================================
+\section{Software Development Lifecycle (SDLC)}
+
+\subsection{The Three-Environment Model}
+
+Never deploy code directly to production. Instead, code travels through three environments:
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{|l|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Aspect} & \textbf{Development} & \textbf{Staging} & \textbf{Production} \\
+\hline
+\textbf{Purpose} & Experiment and implement & Test with realistic data & Serve real users \\
+\hline
+\textbf{Data} & Fake/sample data & Near-production volume & Real data \\
+\hline
+\textbf{Compute} & Single node, spot instances & Larger clusters & High-availability clusters \\
+\hline
+\textbf{Credentials} & Developer accounts & Service principals begin & \textbf{Only service principals} \\
+\hline
+\textbf{Execution} & Interactive (notebooks) & Transitioning to automated & \textbf{Fully automated} \\
+\hline
+\textbf{Cost Focus} & Minimize (use spot) & Balance cost/realism & Prioritize reliability \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{SDLC Environment Comparison}
+\end{table}
+
+\begin{definitionbox}{Service Principal}
+A \textbf{Service Principal} is a "robot account"---an identity used by automated processes, not humans. In production, pipelines should never run under a developer's personal credentials.
+
+\textbf{Why?} If a developer leaves the company and their account is deactivated, any pipeline running under their credentials will break.
+\end{definitionbox}
+
+\subsection{Best Practices for Building Data Products}
+
+\begin{enumerate}
+    \item \textbf{Understand the Use Case}
+    \begin{itemize}
+        \item Document business requirements and domain-specific challenges
+        \item Define functional requirements (what it does) and non-functional requirements (performance, scale)
+        \item Establish Service Level Agreements (SLAs) upfront
+    \end{itemize}
+
+    \item \textbf{Build for Scale from Day One}
+    \begin{itemize}
+        \item A pipeline that works on 1GB will often fail on 1TB
+        \item Test with production-scale data in staging
+    \end{itemize}
+
+    \item \textbf{Use Repeatable Patterns}
+    \begin{itemize}
+        \item Configuration-driven pipelines (not hardcoded values)
+        \item Document best practices for your team
+    \end{itemize}
+
+    \item \textbf{Optimize Early}
+    \begin{itemize}
+        \item Prefer DataFrame APIs over custom UDFs (much faster)
+        \item Use binary formats (Delta, Parquet) over CSV
+        \item Enable caching during ML training
+    \end{itemize}
+
+    \item \textbf{Control Costs}
+    \begin{itemize}
+        \item Enable auto-termination (clusters shut down after inactivity)
+        \item Use autoscaling (scale up when needed, scale down when idle)
+        \item Use spot instances for development and training
+        \item Tag resources for chargeback analysis
+    \end{itemize}
+\end{enumerate}
+
+%===============================================================================
+% SECTION 3: Service Level Agreements
+%===============================================================================
+\section{Service Level Agreements (SLAs)}
+
+\subsection{SLA Types by Workload}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Workload Type} & \textbf{Key SLA Metric} \\
+\hline
+\textbf{Batch Processing} & Volume of data + Total processing time (e.g., "Process 1TB in 2 hours") \\
+\hline
+\textbf{Streaming} & Transactions Per Second (TPS) (e.g., "Sustain 10,000 TPS") \\
+\hline
+\textbf{Business Intelligence} & Query latency (e.g., "Dashboard loads in < 1 second") \\
+\hline
+\textbf{Concurrency} & Number of simultaneous users (e.g., "Support 1,000 concurrent analysts") \\
+\hline
+\end{tabular}
+\caption{SLA Metrics by Workload Type}
+\end{table}
+
+\subsection{Availability and Disaster Recovery}
+
+\begin{definitionbox}{Availability (Uptime)}
+\[
+\text{Availability} = \frac{\text{Total Uptime}}{\text{Total Uptime} + \text{Total Downtime}} \times 100\%
+\]
+
+\textbf{Common Targets:}
+\begin{itemize}
+    \item \textbf{Five 9s (99.999\%):} Only 5 minutes downtime per year (extremely demanding)
+    \item \textbf{Four 9s (99.99\%):} About 52 minutes downtime per year
+    \item \textbf{Three 9s (99.9\%):} About 8.7 hours downtime per year
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}{RTO and RPO}
+\textbf{RTO (Recovery Time Objective):} How quickly must the system be restored after failure?
+\begin{itemize}
+    \item Example: "RTO = 15 minutes" means system must be back online within 15 minutes of an outage
+\end{itemize}
+
+\textbf{RPO (Recovery Point Objective):} How much data can you afford to lose?
+\begin{itemize}
+    \item Example: "RPO = 1 hour" means backups every hour; you might lose up to 1 hour of data
+\end{itemize}
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Multi-Region Deployment:}
+
+For high availability, deploy across multiple cloud regions. If one data center goes down, traffic fails over to another region. This is expensive but essential for mission-critical applications.
+\end{infobox}
+
+%===============================================================================
+% SECTION 4: Infrastructure as Code
+%===============================================================================
+\section{Infrastructure as Code (IaC)}
+
+\subsection{Why Infrastructure as Code?}
+
+\begin{examplebox}{The Problem Without IaC}
+\textbf{Scenario:} Your team needs 50 identical Databricks workspaces, each with specific network configurations, security groups, and cluster policies.
+
+\textbf{Manual Approach:} Click through the AWS/Azure console 50 times. Hope you don't make mistakes. Document nothing. When someone asks "why is workspace 37 different?" you have no idea.
+
+\textbf{IaC Approach:} Write code that describes the workspace. Run it 50 times. Every workspace is identical. Changes are version-controlled in Git.
+\end{examplebox}
+
+\subsection{IaC Principles}
+
+\begin{enumerate}
+    \item \textbf{Define Everything as Code:} Networks, storage, workspaces, clusters---all defined in configuration files
+    \item \textbf{Version Control:} Infrastructure code lives in Git, with full history
+    \item \textbf{Continuous Testing:} Validate infrastructure changes before applying
+    \item \textbf{Small, Independent Pieces:} Change one component without affecting others
+\end{enumerate}
+
+\subsection{Provisioning vs Configuration Management}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Aspect} & \textbf{Provisioning} & \textbf{Configuration Management} \\
+\hline
+\textbf{Purpose} & Create infrastructure from scratch & Modify existing infrastructure \\
+\hline
+\textbf{Philosophy} & Immutable (replace, don't modify) & Mutable (update in place) \\
+\hline
+\textbf{Tools} & Terraform, CloudFormation, Bicep & Ansible, Chef, Puppet \\
+\hline
+\textbf{Example} & "Create a VPC with these subnets" & "Update Python to 3.11 on all servers" \\
+\hline
+\textbf{Agent Required?} & No (uses APIs) & Yes (agents on each server) \\
+\hline
+\end{tabular}
+\caption{Provisioning vs Configuration Management}
+\end{table}
+
+\subsection{Terraform for Databricks}
+
+Terraform is the dominant provisioning tool, with strong Databricks support.
+
+\begin{lstlisting}[style=yamlstyle, caption={Terraform Example: Databricks Workspace}]
+# Define the cloud provider
+provider "azurerm" {
+  features {}
+}
+
+# Create a resource group
+resource "azurerm_resource_group" "rg" {
+  name     = "databricks-rg"
+  location = "East US"
+}
+
+# Create Databricks workspace
+resource "azurerm_databricks_workspace" "workspace" {
+  name                = "my-databricks"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "premium"
+}
+
+# Output the workspace URL
+output "workspace_url" {
+  value = azurerm_databricks_workspace.workspace.workspace_url
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=bashstyle, caption={Terraform Workflow}]
+# Initialize Terraform (download providers)
+terraform init
+
+# Preview what will be created (dry run)
+terraform plan
+
+# Apply changes (actually create resources)
+terraform apply
+
+# Destroy everything (clean up)
+terraform destroy
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{Terraform State:}
+
+Terraform maintains a \textbf{state file} that tracks what resources exist. When you run \texttt{terraform apply}, it compares desired state (your code) vs. actual state (state file) and only changes what's different.
+\end{infobox}
+
+%===============================================================================
+% SECTION 5: CI/CD Pipelines
+%===============================================================================
+\section{CI/CD: Continuous Integration and Continuous Delivery}
+
+\subsection{What Is CI/CD?}
+
+\begin{definitionbox}{CI (Continuous Integration)}
+Every time a developer commits code:
+\begin{enumerate}
+    \item Code is automatically pulled from the repository
+    \item Build process runs (compile code, build packages)
+    \item Unit tests execute automatically
+    \item If tests fail, the developer is notified immediately
+\end{enumerate}
+\end{definitionbox}
+
+\begin{definitionbox}{CD (Continuous Delivery/Deployment)}
+After CI passes:
+\begin{enumerate}
+    \item Code is automatically deployed to staging
+    \item Integration tests run against staging
+    \item If approved (automatically or manually), deploy to production
+\end{enumerate}
+
+\textbf{Continuous Delivery:} Requires manual approval before production deploy \\
+\textbf{Continuous Deployment:} Fully automated to production (riskier but faster)
+\end{definitionbox}
+
+\subsection{The CI/CD Pipeline Flow}
+
+\begin{center}
+\texttt{Commit} $\rightarrow$ \texttt{Build} $\rightarrow$ \texttt{Unit Test} $\rightarrow$ \texttt{Deploy to Staging} $\rightarrow$ \texttt{Integration Test} $\rightarrow$ \texttt{Deploy to Prod}
+\end{center}
+
+\begin{warningbox}
+\textbf{Always Have a Rollback Plan:}
+
+When deploying to production, have an automated way to roll back to the previous version if something goes wrong. This could be:
+\begin{itemize}
+    \item Blue-green deployment (instant switch between versions)
+    \item Canary deployment (gradually shift traffic to new version)
+    \item Simple rollback script
+\end{itemize}
+\end{warningbox}
+
+\subsection{CI/CD Tools}
+
+\begin{itemize}
+    \item \textbf{Source Control:} GitHub, GitLab, Bitbucket
+    \item \textbf{CI/CD Servers:} Azure DevOps, Jenkins, GitHub Actions, GitLab CI
+    \item \textbf{For Databricks:} Use Databricks REST APIs + Databricks Asset Bundles
+\end{itemize}
+
+%===============================================================================
+% SECTION 6: Workspace Organization and Data Mesh
+%===============================================================================
+\section{Workspace Organization and Data Mesh}
+
+\subsection{Workspace as Isolation Boundary}
+
+In Databricks, a \textbf{workspace} is the smallest isolation boundary:
+\begin{itemize}
+    \item Own set of clusters, jobs, notebooks
+    \item Own folder structure
+    \item Own security perimeter
+\end{itemize}
+
+\subsection{Workspace Organization Strategies}
+
+\begin{enumerate}
+    \item \textbf{Traditional (Simple):} Dev workspace, Staging workspace, Production workspace
+    \item \textbf{By Line of Business:} Marketing workspace, Sales workspace, Finance workspace
+    \item \textbf{By Project:} Each major project gets its own workspace
+    \item \textbf{Hybrid:} Core data in shared workspace, domain-specific in dedicated workspaces
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Enterprise Scale:}
+
+Mature organizations may have \textbf{hundreds to thousands} of workspaces. This is why IaC and standardized provisioning become essential---you can't manually configure 1,000 workspaces.
+\end{infobox}
+
+\subsection{Data Mesh Architecture}
+
+\begin{definitionbox}{Data Mesh}
+A decentralized approach to data architecture where:
+\begin{enumerate}
+    \item \textbf{Domain Ownership:} Each business domain (Marketing, Sales) owns its data
+    \item \textbf{Data as Product:} Data is treated as a product with SLAs and documentation
+    \item \textbf{Self-Service Platform:} Domains can provision their own infrastructure
+    \item \textbf{Federated Governance:} Central policies, decentralized execution
+\end{enumerate}
+\end{definitionbox}
+
+\textbf{Unity Catalog's Role:} Even with decentralized domains, Unity Catalog provides the "glue" that enables data discovery, lineage tracking, and consistent governance across all domains.
+
+%===============================================================================
+% SECTION 7: Observability and Monitoring
+%===============================================================================
+\section{Observability and Monitoring}
+
+\subsection{System Tables for Platform Monitoring}
+
+Databricks provides \textbf{system tables} in a special \texttt{system} catalog that contain:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Schema} & \textbf{Contents} \\
+\hline
+\texttt{system.billing} & Cost and usage data (SKUs, usage quantities, custom tags) \\
+\hline
+\texttt{system.compute} & Cluster information (who owns it, instance types, CPU usage) \\
+\hline
+\texttt{system.access} & Audit logs (who accessed what data, when) \\
+\hline
+\end{tabular}
+\caption{Key System Tables}
+\end{table}
+
+\begin{lstlisting}[style=sqlstyle, caption={Querying System Tables for Cost Analysis}]
+-- Find top 10 most expensive jobs this month
+SELECT
+    custom_tags:project AS project,
+    SUM(usage_quantity) AS total_dbus,
+    SUM(usage_quantity * list_price) AS estimated_cost
+FROM system.billing.usage
+WHERE usage_date >= DATE_TRUNC('month', CURRENT_DATE())
+GROUP BY custom_tags:project
+ORDER BY estimated_cost DESC
+LIMIT 10;
+\end{lstlisting}
+
+\begin{importantbox}{Tag Your Resources!}
+Custom tags are essential for cost allocation. Tag all clusters and jobs with:
+\begin{itemize}
+    \item Project name
+    \item Team/department
+    \item Environment (dev/staging/prod)
+    \item Cost center
+\end{itemize}
+
+Without tags, you cannot answer "Which project is costing us the most?"
+\end{importantbox}
+
+\subsection{Data Quality Monitoring}
+
+Data teams often have SLAs on \textbf{delivery} (get data by 8 AM) but users expect \textbf{quality}. When quality issues arise, teams are reactive rather than proactive.
+
+\subsubsection{Anomaly Detection}
+
+One-click setup that uses AI to detect:
+\begin{itemize}
+    \item \textbf{Freshness:} Data hasn't been updated when expected
+    \item \textbf{Completeness:} Sudden drops in row counts
+\end{itemize}
+
+The system learns patterns automatically and alerts when deviations occur.
+
+\subsubsection{Lakehouse Monitoring}
+
+More detailed monitoring at the table level:
+\begin{itemize}
+    \item \textbf{Profile Metrics:} Min, max, mean, nulls, distinct counts
+    \item \textbf{Drift Detection:} Statistical tests (KS test, chi-square) to detect distribution changes
+    \item \textbf{Automatic Dashboards:} Visual representation of data quality over time
+\end{itemize}
+
+\begin{examplebox}{Drift Detection Use Case}
+\textbf{Scenario:} A column \texttt{preferred\_payment\_method} suddenly has 90\% NULL values (normally 5\%).
+
+\textbf{Without Monitoring:} You discover this 2 weeks later when a downstream ML model starts making bad predictions.
+
+\textbf{With Lakehouse Monitoring:} Alert fires within hours. Investigation reveals an upstream API change that stopped sending payment data. Fix deployed before ML model is affected.
+\end{examplebox}
+
+\subsection{Lineage for Root Cause Analysis}
+
+When something breaks, lineage helps you answer:
+\begin{itemize}
+    \item \textbf{What upstream process caused this?} (trace back to source)
+    \item \textbf{What downstream systems are affected?} (impact analysis)
+\end{itemize}
+
+\begin{lstlisting}[style=sqlstyle, caption={Using Lineage for Impact Analysis}]
+-- This table is used by these downstream tables/dashboards
+-- Visible in Unity Catalog UI under "Lineage" tab
+-- Shows: source tables -> transformations -> target tables -> dashboards
+\end{lstlisting}
+
+\subsection{DQX: Code-Based Quality Rules}
+
+For more explicit quality rules, use DQX (Data Quality X):
+
+\begin{lstlisting}[style=pythonstyle, caption={DQX Quality Rules Example}]
+# Define quality rules in YAML
+rules = """
+checks:
+  - column: id
+    rule: not_null_and_not_empty
+    criticality: error
+  - column: age
+    rule: value_in_range
+    params: {min: 18, max: 120}
+    criticality: warning
+  - column: country
+    rule: is_in_list
+    params: {allowed: [Germany, France, USA]}
+    criticality: warning
+"""
+
+# Apply rules to DataFrame
+from dqx import DQEngine
+engine = DQEngine()
+valid_df, invalid_df, errors = engine.apply_checks(df, rules)
+
+# valid_df contains rows passing all checks
+# invalid_df contains rows that failed
+# errors contains detailed failure information
+\end{lstlisting}
+
+%===============================================================================
+% SECTION 8: Databricks Asset Bundles (DABs)
+%===============================================================================
+\section{Databricks Asset Bundles (DABs)}
+
+\subsection{The Problem DABs Solve}
+
+Moving projects between environments traditionally required:
+\begin{itemize}
+    \item Manual export/import of notebooks
+    \item Recreating jobs with different configurations
+    \item Updating cluster references
+    \item Lots of API scripting
+\end{itemize}
+
+DABs package everything together in a single, portable bundle.
+
+\begin{definitionbox}{Databricks Asset Bundle}
+A \textbf{DAB} is a project-level packaging format that includes:
+\begin{itemize}
+    \item Notebooks and Python files
+    \item Job definitions
+    \item Cluster configurations
+    \item Variables that differ by environment
+    \item Target environments (dev, staging, prod)
+\end{itemize}
+
+One command deploys everything: \texttt{databricks bundle deploy}
+\end{definitionbox}
+
+\subsection{DAB Structure}
+
+\begin{lstlisting}[style=yamlstyle, caption={Example databricks.yml}]
+bundle:
+  name: my_project
+
+variables:
+  catalog:
+    default: dev_catalog
+  cluster_id:
+    lookup:
+      cluster: my-cluster
+
+resources:
+  jobs:
+    etl_pipeline:
+      name: "ETL Pipeline"
+      tasks:
+        - task_key: bronze
+          notebook_task:
+            notebook_path: ./src/create_bronze.py
+        - task_key: silver
+          depends_on:
+            - task_key: bronze
+          notebook_task:
+            notebook_path: ./src/create_silver.py
+
+targets:
+  development:
+    mode: development
+    default: true
+    workspace:
+      host: https://dev.cloud.databricks.com
+
+  production:
+    mode: production
+    workspace:
+      host: https://prod.cloud.databricks.com
+    variables:
+      catalog: prod_catalog
+    resources:
+      jobs:
+        etl_pipeline:
+          name: "Production ETL Pipeline"
+\end{lstlisting}
+
+\subsection{DAB Commands}
+
+\begin{lstlisting}[style=bashstyle, caption={DAB CLI Commands}]
+# Initialize a new bundle from template
+databricks bundle init
+
+# Validate bundle configuration (catch errors before deploy)
+databricks bundle validate
+
+# Deploy to development environment
+databricks bundle deploy -t development
+
+# Run a job in development
+databricks bundle run -t development etl_pipeline
+
+# Deploy to production (uses production overrides)
+databricks bundle deploy -t production
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{DAB vs Terraform:}
+\begin{itemize}
+    \item \textbf{Terraform:} Creates the \textit{infrastructure} (workspace, networks, storage)
+    \item \textbf{DAB:} Deploys your \textit{project} within that infrastructure (notebooks, jobs, pipelines)
+\end{itemize}
+
+Both are complementary. Use Terraform to create workspaces, then DAB to deploy code to them.
+\end{infobox}
+
+\subsection{DAB in CI/CD Pipelines}
+
+DABs integrate seamlessly into CI/CD:
+
+\begin{lstlisting}[style=yamlstyle, caption={Azure DevOps Pipeline with DABs}]
+# .azure-pipelines.yml
+trigger:
+  - main
+
+stages:
+  - stage: Test
+    jobs:
+      - job: ValidateBundle
+        steps:
+          - script: pip install databricks-cli
+          - script: databricks bundle validate
+
+  - stage: DeployDev
+    jobs:
+      - job: DeployToDevEnvironment
+        steps:
+          - script: databricks bundle deploy -t development
+          - script: databricks bundle run -t development etl_pipeline
+
+  - stage: DeployProd
+    condition: succeeded()
+    jobs:
+      - deployment: DeployToProduction
+        environment: production
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: databricks bundle deploy -t production
+\end{lstlisting}
+
+%===============================================================================
+% SECTION 9: MLOps Considerations
+%===============================================================================
+\section{MLOps: Special Considerations for Machine Learning}
+
+\subsection{Deploy Model vs Deploy Code}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Approach} & \textbf{Deploy Model} & \textbf{Deploy Code} \\
+\hline
+\textbf{What Moves} & Trained model artifact & Training code \\
+\hline
+\textbf{Training Location} & Development environment & Each environment \\
+\hline
+\textbf{Data Used} & Dev data & Environment-specific data \\
+\hline
+\textbf{Best For} & Simple models, same data everywhere & Models that need environment-specific training \\
+\hline
+\end{tabular}
+\caption{MLOps Deployment Strategies}
+\end{table}
+
+\begin{warningbox}
+\textbf{Data Differences Matter:}
+
+A model trained on development data (which may be sampled or anonymized) might perform differently on production data. Consider retraining in production with full data.
+\end{warningbox}
+
+%===============================================================================
+% SECTION 10: Cost Optimization
+%===============================================================================
+\section{Cost Optimization Strategies}
+
+\begin{enumerate}
+    \item \textbf{Use Spot Instances for Development}
+    \begin{itemize}
+        \item 60-90\% cheaper than on-demand
+        \item May be reclaimed by cloud provider
+        \item Never use for production-critical workloads
+    \end{itemize}
+
+    \item \textbf{Enable Auto-Termination}
+    \begin{itemize}
+        \item Clusters shut down after N minutes of inactivity (e.g., 30 minutes)
+        \item Prevents "weekend clusters" that run unused for 48 hours
+    \end{itemize}
+
+    \item \textbf{Use Autoscaling}
+    \begin{itemize}
+        \item Scale up when workload increases
+        \item Scale down (even to 0) when idle
+    \end{itemize}
+
+    \item \textbf{Move to Serverless}
+    \begin{itemize}
+        \item Pay only for what you use
+        \item No cluster management overhead
+        \item Faster startup (seconds vs minutes)
+    \end{itemize}
+
+    \item \textbf{Write Efficient Code}
+    \begin{itemize}
+        \item Use DataFrame APIs over UDFs
+        \item Use binary formats (Delta/Parquet) over CSV
+        \item Leverage caching appropriately
+    \end{itemize}
+
+    \item \textbf{Monitor and Alert}
+    \begin{itemize}
+        \item Set up alerts for unusual spending
+        \item Review system tables weekly
+        \item Tag resources for attribution
+    \end{itemize}
+\end{enumerate}
+
+%===============================================================================
+% SECTION 11: Quick Summary
+%===============================================================================
+\section{Quick Summary: One-Page Review}
+
+\begin{summarybox}
+\textbf{Key Takeaways from Lecture 13:}
+
+\begin{enumerate}
+    \item \textbf{SDLC Environments:}
+    \begin{itemize}
+        \item Development $\rightarrow$ Staging $\rightarrow$ Production
+        \item Use service principals (not personal accounts) in production
+        \item Production should be fully automated
+    \end{itemize}
+
+    \item \textbf{Infrastructure as Code (IaC):}
+    \begin{itemize}
+        \item Use Terraform for reproducible infrastructure
+        \item Version control all infrastructure code
+        \item Immutable infrastructure: replace, don't modify
+    \end{itemize}
+
+    \item \textbf{CI/CD:}
+    \begin{itemize}
+        \item Automate testing on every commit
+        \item Deploy through pipelines, not manually
+        \item Always have a rollback plan
+    \end{itemize}
+
+    \item \textbf{Observability:}
+    \begin{itemize}
+        \item System tables for cost and audit monitoring
+        \item Anomaly detection for freshness/completeness
+        \item Lakehouse monitoring for detailed quality metrics
+        \item Lineage for root cause and impact analysis
+    \end{itemize}
+
+    \item \textbf{Databricks Asset Bundles:}
+    \begin{itemize}
+        \item Package entire projects (notebooks, jobs, configs)
+        \item Environment-specific overrides via targets
+        \item \texttt{databricks bundle deploy} for one-command deployment
+    \end{itemize}
+
+    \item \textbf{Cost Optimization:}
+    \begin{itemize}
+        \item Spot instances for dev, auto-termination, autoscaling
+        \item Tag everything for chargeback
+        \item Consider serverless for variable workloads
+    \end{itemize}
+\end{enumerate}
+\end{summarybox}
+
+%===============================================================================
+% SECTION 12: Glossary
+%===============================================================================
+\section{Glossary}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l p{10cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+Service Principal & A "robot account" for automated processes \\
+Spot Instance & Discounted compute that can be reclaimed by the cloud provider \\
+RTO & Recovery Time Objective: how quickly to restore after failure \\
+RPO & Recovery Point Objective: maximum acceptable data loss \\
+IaC & Infrastructure as Code: defining infrastructure in version-controlled files \\
+CI/CD & Continuous Integration / Continuous Delivery: automated testing and deployment \\
+DAB & Databricks Asset Bundle: project packaging for cross-environment deployment \\
+Data Mesh & Decentralized data architecture with domain ownership \\
+Drift & Changes in data distributions over time \\
+Lineage & Tracking data's journey from source to destination \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Key Terms}
+\end{table}
+
+\end{document}

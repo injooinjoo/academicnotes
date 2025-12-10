@@ -1,0 +1,1133 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Reproducible Data Science and Machine Learning
+% Lecture 09: MLOps and The Importance of Good Data
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Data Science}}
+\fancyhead[R]{\small\textit{Lecture 09}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: MLOps and Good Data - Lecture 09},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Info Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 09: MLOps and The Importance of Good Data}
+\author{CSCI E-103: Reproducible Data Science and Machine Learning}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Reproducible Data Science}{Lecture 09}{Anindita Mahapatra \& Eric Gieseke}{Master MLOps workflows, understand the roles involved, and learn why data quality matters more than model complexity}
+
+\tableofcontents
+
+\newpage
+
+%===================================================================================
+\section{What is MLOps and Why Does It Matter?}
+%===================================================================================
+
+\begin{overviewbox}
+This lecture focuses on the \textbf{operational} side of machine learning: how to take a model from a Jupyter notebook to a production system that reliably delivers value.
+
+\textbf{Key Topics:}
+\begin{itemize}
+    \item The definition and importance of MLOps
+    \item The five key personas in ML projects
+    \item The three core pipelines: Training, Inferencing, Monitoring
+    \item Model-Centric vs. Data-Centric AI
+    \item Deployment strategies: Deploy Models vs. Deploy Code
+    \item Hyperparameter tuning and model selection
+    \item End-to-end MLOps lab walkthrough (Customer Churn Prediction)
+\end{itemize}
+\end{overviewbox}
+
+\subsection{From DevOps to MLOps}
+
+In traditional software, \textbf{DevOps} (Development + Operations) revolutionized how we build and deploy applications by automating builds, tests, and deployments.
+
+But AI systems are fundamentally different:
+
+\begin{itemize}
+    \item \textbf{Traditional Software} = \textbf{Code}
+    \item \textbf{AI Systems} = \textbf{Code (Model/Algorithm)} + \textbf{Data}
+\end{itemize}
+
+Because AI systems depend on \textbf{both} code and data, they are sensitive to changes in either. A model trained on last year's data might perform poorly on this year's data, even if the code hasn't changed.
+
+\begin{definitionbox}[MLOps]
+\textbf{MLOps (Machine Learning Operations)} is the set of standards, tools, processes, and methodologies that aim to:
+\begin{itemize}
+    \item \textbf{Optimize time and efficiency} in ML development
+    \item \textbf{Ensure quality} of models in production
+    \item \textbf{Guarantee governance} (security, compliance, auditability)
+\end{itemize}
+
+It's the intersection of \textbf{Machine Learning}, \textbf{Data Engineering}, and \textbf{DevOps}.
+\end{definitionbox}
+
+\subsection{Business Context: Customer Churn Prediction}
+
+Every ML project starts with a business problem. Let's use \textbf{customer churn prediction} as our running example.
+
+\begin{examplebox}[The Business Case for Churn Prediction]
+\textbf{The Problem:}
+\begin{itemize}
+    \item Customers sign up for a service, use it for a while, then leave (``churn'')
+    \item Acquiring a new customer costs 5-10x more than retaining an existing one
+    \item The business wants to \textbf{predict} which customers are about to leave \textbf{before} they do
+\end{itemize}
+
+\textbf{The ML Solution:}
+\begin{itemize}
+    \item Build a model that scores each customer's ``churn risk''
+    \item When a customer is flagged as high-risk, offer them a discount or incentive to stay
+    \item Result: Reduced churn, saved revenue, happier customers
+\end{itemize}
+
+\textbf{Why MLOps?}
+\begin{itemize}
+    \item The model needs to be trained on historical data
+    \item It needs to be deployed so the marketing team can act on predictions
+    \item It needs to be monitored---customer behavior changes over time!
+    \item If performance degrades, it needs to be automatically retrained
+\end{itemize}
+
+MLOps is the system that makes all of this happen reliably and repeatedly.
+\end{examplebox}
+
+\newpage
+
+%===================================================================================
+\section{The Five Key Personas in MLOps}
+%===================================================================================
+
+MLOps is not a solo endeavor. It requires collaboration between specialists with different skills.
+
+\subsection{1. Business Stakeholder / Business Analyst}
+
+\begin{itemize}
+    \item \textbf{Primary Mission:} Translate vague business goals into clear, measurable ML problems
+    \item \textbf{Key Responsibilities:}
+    \begin{itemize}
+        \item \textbf{Define the problem:} ``What is churn?'' $\rightarrow$ ``A customer who hasn't purchased in 90 days OR cancelled their subscription within 30 days''
+        \item \textbf{Set KPIs:} How will success be measured? (e.g., reduction in churn rate, ROI of interventions)
+        \item \textbf{Stakeholder alignment:} Work with marketing, sales, product, and finance to ensure the model serves real business needs
+        \item \textbf{Validate results:} After deployment, verify that the model is actually reducing churn
+    \end{itemize}
+    \item \textbf{Deliverables:} Problem statement, data requirements, evaluation criteria, business impact analysis
+\end{itemize}
+
+\subsection{2. Data Engineer (DE)}
+
+\begin{itemize}
+    \item \textbf{Primary Mission:} Build and maintain the data infrastructure
+    \item \textbf{Key Responsibilities:}
+    \begin{itemize}
+        \item \textbf{Data collection:} Pull data from CRM systems, web logs, billing, support tickets
+        \item \textbf{ETL/ELT pipelines:} Extract, Transform, Load data into usable formats
+        \item \textbf{Data quality:} Handle missing values, duplicates, inconsistencies, schema validation
+        \item \textbf{Infrastructure:} Manage scalable storage on AWS, Azure, or GCP
+        \item \textbf{Lineage \& versioning:} Track where data came from and which version was used
+    \end{itemize}
+    \item \textbf{Deliverables:} Production-grade, trusted datasets ready for analysis and modeling
+\end{itemize}
+
+\subsection{3. Data Scientist (DS)}
+
+\begin{itemize}
+    \item \textbf{Primary Mission:} Transform data into predictive insights (build the model)
+    \item \textbf{Key Responsibilities:}
+    \begin{itemize}
+        \item \textbf{Exploratory Data Analysis (EDA):} Understand patterns in the data
+        \item \textbf{Feature Engineering:} Create meaningful variables (e.g., ``number of support tickets in last 30 days'')
+        \item \textbf{Model Selection \& Training:} Experiment with algorithms (Logistic Regression, Random Forest, XGBoost)
+        \item \textbf{Evaluation:} Measure performance using accuracy, precision, recall, F1
+        \item \textbf{Interpretation:} Understand which factors drive churn (feature importance)
+        \item \textbf{Collaboration:} Work with business stakeholders to validate that the model makes sense
+    \end{itemize}
+    \item \textbf{Deliverables:} Trained models, feature sets, validation reports, insights
+\end{itemize}
+
+\subsection{4. Machine Learning Engineer (MLE)}
+
+\begin{itemize}
+    \item \textbf{Primary Mission:} Take the model from prototype to production and keep it running
+    \item \textbf{Key Responsibilities:}
+    \begin{itemize}
+        \item \textbf{Deployment:} Expose the model via APIs or batch scoring pipelines
+        \item \textbf{CI/CD:} Automate retraining, testing, version control, and deployment
+        \item \textbf{Monitoring:} Track model performance, data drift, latency, and bias
+        \item \textbf{Scaling:} Ensure the model can handle production traffic
+        \item \textbf{Feedback integration:} Incorporate new data and trigger retraining when needed
+    \end{itemize}
+    \item \textbf{Deliverables:} Production churn prediction service, monitoring dashboards, automated retraining workflows
+\end{itemize}
+
+\subsection{5. Data Governance Officer}
+
+\begin{itemize}
+    \item \textbf{Primary Mission:} Ensure compliance and security across the entire pipeline
+    \item \textbf{Key Responsibilities:}
+    \begin{itemize}
+        \item Data security and access controls
+        \item PII (Personally Identifiable Information) anonymization
+        \item Regulatory compliance (GDPR, HIPAA, etc.)
+        \item Audit trails and documentation
+    \end{itemize}
+\end{itemize}
+
+\begin{summarybox}[title={Role Overlap in the ML Pipeline}]
+Different stages of the pipeline require collaboration:
+
+\begin{tabular}{@{}ll@{}}
+\textbf{Stage} & \textbf{Primary Owners} \\
+\midrule
+Data Prep & Data Engineer \\
+EDA \& Feature Engineering & Data Scientist \\
+Model Training \& Validation & Data Scientist + ML Engineer \\
+Deployment & ML Engineer \\
+Monitoring & ML Engineer \\
+Business Validation & Business Analyst + Data Scientist \\
+Governance & Data Governance (all stages) \\
+\end{tabular}
+\end{summarybox}
+
+\newpage
+
+%===================================================================================
+\section{The Three Core Pipelines of MLOps}
+%===================================================================================
+
+MLOps consists of three interconnected pipelines that form a continuous cycle.
+
+\subsection{Pipeline 1: Model Training}
+
+\begin{infobox}[title={Training Pipeline Goal}]
+Transform raw data into a trained model artifact that generalizes well (doesn't overfit).
+\end{infobox}
+
+\textbf{Key Steps:}
+\begin{enumerate}
+    \item \textbf{Data Preparation:} Split data into Train / Validation / Test sets
+    \item \textbf{Feature Engineering:} Create meaningful features from raw variables
+    \item \textbf{Model Selection:} Choose appropriate algorithms
+    \item \textbf{Hyperparameter Tuning:} Optimize model settings to improve accuracy and reduce overfitting
+    \item \textbf{Evaluation:} Measure performance (Accuracy, Precision, Recall, F1, AUC-ROC)
+    \item \textbf{Artifact Storage:} Save the trained model and log metadata to MLflow
+\end{enumerate}
+
+\subsection{Pipeline 2: Model Inferencing (Serving)}
+
+\begin{infobox}[title={Inferencing Pipeline Goal}]
+Use the trained model to generate predictions on new data and support business decisions.
+\end{infobox}
+
+\textbf{Two Main Approaches:}
+
+\begin{table}[htbp]
+\centering
+\caption{Batch vs. Real-time Inferencing}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspect} & \textbf{Batch Inferencing} & \textbf{Real-time Inferencing} \\
+\midrule
+\textbf{How it works}
+& Process large datasets periodically
+& Return predictions instantly per request
+\\ \addlinespace
+
+\textbf{Latency}
+& Minutes to hours
+& Milliseconds to seconds
+\\ \addlinespace
+
+\textbf{Example}
+& \begin{tabular}[t]{@{}l@{}}
+  ``Every night, score all \\
+  customers for churn risk''
+  \end{tabular}
+& \begin{tabular}[t]{@{}l@{}}
+  ``When customer hovers over \\
+  cancel button, show discount popup''
+  \end{tabular}
+\\ \addlinespace
+
+\textbf{Infrastructure}
+& Scheduled jobs (Airflow, Databricks)
+& REST APIs, streaming (Kafka)
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key Considerations:} Latency, throughput, scalability, security
+
+\subsection{Pipeline 3: Model Monitoring}
+
+\begin{infobox}[title={Monitoring Pipeline Goal}]
+Continuously track model performance in production and detect issues before they cause business harm.
+\end{infobox}
+
+\textbf{What to Monitor:}
+
+\begin{table}[htbp]
+\centering
+\caption{Types of Drift to Monitor}
+\begin{tabular}{@{}p{0.2\textwidth}p{0.45\textwidth}p{0.3\textwidth}@{}}
+\toprule
+\textbf{Drift Type} & \textbf{What Changed?} & \textbf{How to Detect} \\
+\midrule
+\textbf{Data Drift}
+& The statistical distribution of \textbf{input features} changed
+\newline \textit{Example: New marketing campaign brings in customers from a different demographic}
+& Compare input data statistics (mean, variance, distribution) against baseline
+\\ \addlinespace
+
+\textbf{Concept Drift}
+& The \textbf{relationship} between inputs and target changed
+\newline \textit{Example: Customers now churn due to poor service, not price}
+& Most difficult. Monitor business KPIs even when data drift is absent
+\\ \addlinespace
+
+\textbf{Model Decay}
+& Overall model performance degradation
+& Track accuracy, F1, precision, recall against ground truth when available
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Actions on Detection:}
+\begin{itemize}
+    \item Send alerts to data scientists
+    \item Trigger automatic retraining pipeline
+    \item Roll back to a previous model version
+\end{itemize}
+
+\begin{examplebox}[How is Drift Detected Automatically?]
+\textbf{Data Drift:}
+\begin{enumerate}
+    \item During training, save statistical profiles (mean, std, distribution) of each feature as a \textbf{baseline}
+    \item In production, periodically compute the same statistics on incoming data
+    \item Use statistical tests (KS test, Jensen-Shannon divergence) to compare
+    \item If difference exceeds threshold $\rightarrow$ alert!
+\end{enumerate}
+
+\textbf{Model Drift:}
+\begin{enumerate}
+    \item When ground truth becomes available (e.g., did the customer actually churn?), compare predictions to reality
+    \item Track metrics over time (e.g., F1 score by week)
+    \item If metrics drop below threshold $\rightarrow$ trigger retraining
+\end{enumerate}
+
+\textbf{Concept Drift:}
+\begin{itemize}
+    \item Hardest to detect automatically
+    \item Often manifests as: ``Data looks the same, model metrics look okay, but business KPIs are declining''
+    \item Requires human investigation and domain expertise
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+%===================================================================================
+\section{Deployment Strategies: Models vs. Code}
+%===================================================================================
+
+When promoting a model from Dev $\rightarrow$ Staging $\rightarrow$ Production, there are two main strategies.
+
+\subsection{Strategy 1: Deploy Models}
+
+\begin{itemize}
+    \item \textbf{How it works:} Train the model in Dev. Take the resulting \textbf{model artifact (file)} and copy it to Staging, then to Production.
+    \item \textbf{Flow:} [Train in Dev] $\rightarrow$ [Model file] $\rightarrow$ [Copy to Staging] $\rightarrow$ [Copy to Prod]
+    \item \textbf{Pros:} Faster (no retraining), less compute cost
+    \item \textbf{Cons:} Model was trained on Dev data, which may not represent Production data
+\end{itemize}
+
+\subsection{Strategy 2: Deploy Code}
+
+\begin{itemize}
+    \item \textbf{How it works:} Develop the \textbf{training code} in Dev. Copy the code to Staging and Production. \textbf{Retrain the model in each environment using that environment's data.}
+    \item \textbf{Flow:} [Develop code in Dev] $\rightarrow$ [Copy code to Staging] $\rightarrow$ [Retrain with Staging data] $\rightarrow$ [Copy code to Prod] $\rightarrow$ [Retrain with Prod data]
+\end{itemize}
+
+\subsection{Why Deploy Code is Often Preferred}
+
+\begin{table}[htbp]
+\centering
+\caption{Benefits of Deploy Code Strategy}
+\begin{tabular}{@{}p{0.25\textwidth}p{0.7\textwidth}@{}}
+\toprule
+\textbf{Benefit} & \textbf{Explanation} \\
+\midrule
+\textbf{Data Access Control}
+& \textbf{The biggest advantage.} Sensitive production data never needs to leave the production environment. Each environment trains only on its own data.
+\\ \addlinespace
+
+\textbf{Reproducibility}
+& Engineering controls the training environment in each stage, making reproduction easier
+\\ \addlinespace
+
+\textbf{Real Data Issues}
+& Production data has skews and volumes that Dev data doesn't. Training in Prod catches issues that only appear at scale.
+\\ \addlinespace
+
+\textbf{Modular Code}
+& Forces data scientists to write clean, modular, testable code instead of handing off notebooks
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}[title={Downsides of Deploy Code}]
+\begin{itemize}
+    \item \textbf{More compute cost:} Model is retrained in every environment
+    \item \textbf{Infrastructure requirements:} Requires CI/CD setup with unit/integration testing
+    \item \textbf{Skill requirements:} Data scientists must write production-quality code, not just notebooks
+\end{itemize}
+\end{warningbox}
+
+\newpage
+
+%===================================================================================
+\section{Data-Centric AI: The Key Insight}
+%===================================================================================
+
+This is one of the most important concepts in modern MLOps.
+
+\subsection{Two Ways to Improve AI}
+
+\begin{enumerate}
+    \item \textbf{Model-Centric AI:} ``How can I improve the model/algorithm/code to get better performance?''
+    \item \textbf{Data-Centric AI:} ``How can I systematically improve the \textbf{data} to get better performance?''
+\end{enumerate}
+
+\begin{definitionbox}[Data-Centric AI]
+\textbf{Data-Centric AI} is the approach of improving AI system performance by focusing on the quality, consistency, and coverage of the \textbf{data} rather than tweaking the model architecture or hyperparameters.
+\end{definitionbox}
+
+\subsection{Big Data vs. Good Data}
+
+Having more data (Big Data) doesn't guarantee better models. \textbf{Bad data in, bad predictions out.}
+
+\begin{summarybox}[title={What is ``Good Data''?}]
+\begin{itemize}
+    \item \textbf{Unambiguous labels:} Ground truth is consistent and correct
+    \item \textbf{Good coverage:} Includes important edge cases and scenarios (e.g., if predicting for all states, don't train only on Massachusetts)
+    \item \textbf{Timely feedback:} Fresh data from production is quickly incorporated
+    \item \textbf{Appropriately sized:} Not too small (underfitting), not unnecessarily large
+\end{itemize}
+\end{summarybox}
+
+\subsection{Why Data-Centric AI Wins}
+
+\begin{examplebox}[The Cooking Analogy]
+\textbf{Data is the ingredients. The model is the recipe.}
+
+Even the best chef (model) can't make a great dish with rotten ingredients (bad data).
+
+\textbf{Model-Centric:} ``Let's adjust the cooking time from 15 minutes to 16 minutes.'' $\rightarrow$ Minor improvement
+
+\textbf{Data-Centric:} ``Let's source fresher, higher-quality ingredients.'' $\rightarrow$ Major improvement
+\end{examplebox}
+
+\textbf{Real-World Evidence:}
+
+In industrial case studies (steel defect detection, solar panel inspection), improving data quality led to \textbf{10-16\% improvement} in model performance, while tweaking the model algorithm led to only \textbf{0-4\% improvement}.
+
+\begin{table}[htbp]
+\centering
+\caption{Model-Centric vs. Data-Centric Results (Example)}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Use Case} & \textbf{Model-Centric Improvement} & \textbf{Data-Centric Improvement} \\
+\midrule
+Steel Defect Detection & +0\% & +16.9\% \\
+Solar Panel Inspection & +0.4\% & +3.1\% \\
+Surface Inspection & +0.3\% & +4.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{The takeaway:} MLOps should prioritize processes that ensure high-quality, consistent data flowing into your models.
+
+\newpage
+
+%===================================================================================
+\section{Hyperparameter Tuning and Model Selection}
+%===================================================================================
+
+A critical part of the Training Pipeline is finding the best model configuration.
+
+\subsection{What are Hyperparameters?}
+
+\begin{definitionbox}[Hyperparameters]
+\textbf{Hyperparameters} are model settings that the developer chooses \textbf{before} training, as opposed to \textbf{parameters} which the model learns during training.
+
+\textbf{Examples:}
+\begin{itemize}
+    \item Learning rate
+    \item Number of trees in a forest
+    \item Maximum tree depth
+    \item Regularization strength
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Tuning Methods}
+
+\begin{table}[htbp]
+\centering
+\caption{Hyperparameter Tuning Methods}
+\begin{tabular}{@{}p{0.2\textwidth}p{0.35\textwidth}p{0.4\textwidth}@{}}
+\toprule
+\textbf{Method} & \textbf{How It Works} & \textbf{Pros / Cons} \\
+\midrule
+\textbf{Grid Search}
+& Try \textbf{all combinations} of specified parameter values
+& Simple but expensive (exponential growth: $O(n^k)$)
+\\ \addlinespace
+
+\textbf{Random Search}
+& Randomly sample from parameter space
+& Often more efficient than grid search for the same compute budget
+\\ \addlinespace
+
+\textbf{Bayesian Search}
+& Use past results to intelligently choose next combination
+& Converges faster to optimal; used by Optuna, Hyperopt
+\\ \addlinespace
+
+\textbf{Genetic Algorithms}
+& Combine ``good'' and ``bad'' parameter sets like breeding
+& Good for very large search spaces (deep learning)
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Tools:} \texttt{Optuna}, \texttt{Hyperopt} (covered in Lecture 08)
+
+\subsection{K-Fold Cross Validation}
+
+\begin{definitionbox}[K-Fold Cross Validation]
+A technique to evaluate model performance without ``cheating'' by using the test set.
+
+\textbf{Process (K=3):}
+\begin{enumerate}
+    \item Split training data into 3 ``folds'': [Fold 1], [Fold 2], [Fold 3]
+    \item \textbf{Round 1:} Train on [1, 2], validate on [3]
+    \item \textbf{Round 2:} Train on [1, 3], validate on [2]
+    \item \textbf{Round 3:} Train on [2, 3], validate on [1]
+    \item Final score = \textbf{average} of 3 validation scores
+\end{enumerate}
+
+\textbf{Benefit:} The test set (holdout) remains untouched until final evaluation, preventing overfitting to the validation set.
+\end{definitionbox}
+
+\newpage
+
+%===================================================================================
+\section{MLOps Maturity Model}
+%===================================================================================
+
+Organizations don't achieve full MLOps maturity overnight. There's a progression:
+
+\begin{table}[htbp]
+\centering
+\caption{MLOps Maturity Levels}
+\begin{tabular}{@{}p{0.15\textwidth}p{0.4\textwidth}p{0.4\textwidth}@{}}
+\toprule
+\textbf{Level} & \textbf{Characteristics} & \textbf{Example} \\
+\midrule
+\textbf{Level 1: Beginner}
+& Use familiar tools; manual processes; plan for more complex workloads
+& Data scientist trains model manually, emails pickle file to engineering
+\\ \addlinespace
+
+\textbf{Level 2: Intermediate}
+& Scale data and workloads; focus on \textbf{automation and reproducibility}; unify data teams
+& Automated retraining on schedule; MLflow tracking in place
+\\ \addlinespace
+
+\textbf{Level 3: Advanced}
+& \textbf{Faster production cycles} (deploy multiple times daily); end-to-end automation; \textbf{resilience testing} (Chaos Monkey); robust rollback
+& Netflix-style: intentionally break production to test recovery time
+\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{examplebox}[Netflix's Chaos Monkey]
+Netflix intentionally introduces failures into their production systems to test how quickly the system can recover. This philosophy extends to MLOps: if a model deployment fails, how quickly can you roll back? How fast can you retrain?
+
+The goal is to not fear failure, but to build systems that recover gracefully.
+\end{examplebox}
+
+\newpage
+
+%===================================================================================
+\section{Champion-Challenger Pattern}
+%===================================================================================
+
+When deploying a new model, you don't immediately replace the production model. Instead, you use a \textbf{Champion-Challenger} approach.
+
+\begin{definitionbox}[Champion-Challenger]
+\begin{itemize}
+    \item \textbf{Champion:} The current production model (proven performance)
+    \item \textbf{Challenger:} The new candidate model (potentially better, but unproven)
+\end{itemize}
+
+\textbf{Process:}
+\begin{enumerate}
+    \item Train a new model (Challenger)
+    \item Compare Challenger's metrics (F1, accuracy) against Champion's
+    \item If Challenger is better $\rightarrow$ promote Challenger to Champion
+    \item Archive the old Champion
+\end{enumerate}
+\end{definitionbox}
+
+In MLflow, this is implemented using \textbf{Model Aliases}:
+\begin{lstlisting}[style=pythonstyle]
+# Set new model as challenger
+client.set_registered_model_alias("churn_model", "challenger", version)
+
+# After validation, promote to champion
+client.set_registered_model_alias("churn_model", "champion", version)
+
+# Load model by alias for inference
+model = mlflow.pyfunc.load_model("models:/churn_model@champion")
+\end{lstlisting}
+
+\newpage
+
+%===================================================================================
+\section{End-to-End MLOps Lab Walkthrough}
+%===================================================================================
+
+The lab demonstrates a complete MLOps pipeline for customer churn prediction using Databricks, MLflow, and Unity Catalog.
+
+\subsection{Lab Architecture}
+
+\begin{itemize}
+    \item \textbf{Data Layer:} Delta Lake tables in Unity Catalog
+    \item \textbf{ML Lifecycle:} MLflow for tracking, models, and registry
+    \item \textbf{Governance:} Unity Catalog for data and model governance
+    \item \textbf{Algorithm:} LightGBM classifier
+\end{itemize}
+
+\subsection{Step 1: Data Preparation \& Feature Engineering}
+
+\begin{lstlisting}[style=pythonstyle, caption={Feature Engineering}]
+# Read raw customer data
+telco_df = spark.table("mlops_churn_bronze_customer")
+
+# Create new feature: number of optional services
+def add_optional_services(df):
+    service_cols = ['online_security', 'online_backup',
+                    'device_protection', 'tech_support']
+    df['num_optional_services'] = (
+        df[service_cols].apply(lambda x: (x == 'Yes').sum(), axis=1)
+    )
+    return df
+
+# Save to Delta table for training
+cleaned_df.write.format("delta").saveAsTable("mlops_churn_training")
+\end{lstlisting}
+
+\subsection{Step 2: Model Training with Data Lineage}
+
+The key insight: \textbf{Log which data was used to train the model.}
+
+\begin{lstlisting}[style=pythonstyle, caption={Logging Data Lineage (Critical!)}]
+import mlflow
+
+# Load and log the SOURCE DATA
+source_dataset = mlflow.data.load_delta(
+    table_name="catalog.schema.mlops_churn_training",
+    version=latest_version  # Track exact version!
+)
+mlflow.log_input(source_dataset, context="training")
+
+# Now train model
+with mlflow.start_run():
+    mlflow.autolog()  # Automatically log params, metrics, model
+
+    model = LGBMClassifier(**params)
+    model.fit(X_train, y_train)
+
+    # Model + data lineage now tracked together!
+\end{lstlisting}
+
+\begin{importantbox}[Why Log Data Lineage?]
+When something goes wrong in production, you need to answer: ``Which data and which code produced this model?''
+
+Without data lineage, you can't reproduce the model. MLflow's \texttt{log\_input()} stores \textbf{metadata} (not a copy) linking the model to the exact data version used.
+\end{importantbox}
+
+\subsection{Step 3: Register to Model Registry}
+
+\begin{lstlisting}[style=pythonstyle, caption={Finding Best Model and Registering}]
+# Search for best run by F1 score
+best_run = mlflow.search_runs(
+    experiment_ids=[exp_id],
+    filter_string="status = 'FINISHED'",
+    order_by=["metrics.f1_score DESC"],
+    max_results=1
+).iloc[0]
+
+# Register to Unity Catalog
+model_uri = f"runs:/{best_run.run_id}/model"
+mlflow.register_model(model_uri, "catalog.schema.mlops_churn")
+
+# Set alias
+client.set_registered_model_alias("mlops_churn", "challenger", 1)
+\end{lstlisting}
+
+\subsection{Step 4: Champion-Challenger Validation}
+
+\begin{lstlisting}[style=pythonstyle, caption={Promoting Challenger to Champion}]
+# Load challenger model
+challenger = mlflow.pyfunc.load_model("models:/mlops_churn@challenger")
+challenger_f1 = get_metric(challenger, "f1_score")
+
+# Try to load champion (may not exist yet)
+try:
+    champion = mlflow.pyfunc.load_model("models:/mlops_churn@champion")
+    champion_f1 = get_metric(champion, "f1_score")
+
+    if challenger_f1 > champion_f1:
+        print("Challenger wins! Promoting...")
+        client.set_registered_model_alias("mlops_churn", "champion", version)
+except:
+    print("No champion found. Challenger becomes champion.")
+    client.set_registered_model_alias("mlops_churn", "champion", version)
+\end{lstlisting}
+
+\subsection{Step 5: Batch Inference}
+
+\begin{lstlisting}[style=pythonstyle, caption={Scoring New Data}]
+# Load champion model
+champion_model = mlflow.pyfunc.load_model("models:/mlops_churn@champion")
+
+# Create Spark UDF for distributed scoring
+predict_udf = mlflow.pyfunc.spark_udf(spark, "models:/mlops_churn@champion")
+
+# Score new customer data
+inference_df = spark.table("mlops_churn_inference")
+scored_df = inference_df.withColumn(
+    "prediction",
+    predict_udf(*feature_columns)
+)
+
+# Result: DataFrame with 'prediction' column (1=churn, 0=stay)
+scored_df.write.format("delta").saveAsTable("churn_predictions")
+\end{lstlisting}
+
+\newpage
+
+%===================================================================================
+\section{Web Hooks and Automation}
+%===================================================================================
+
+MLOps pipelines can be automated using \textbf{webhooks}---HTTP callbacks that trigger actions when events occur.
+
+\begin{examplebox}[Webhook Use Cases]
+\begin{itemize}
+    \item \textbf{Model registered:} Send Slack notification to ML team
+    \item \textbf{Model promoted to staging:} Trigger automated testing pipeline
+    \item \textbf{Drift detected:} Trigger retraining job
+    \item \textbf{Model promoted to production:} Update documentation
+\end{itemize}
+\end{examplebox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Webhook Example (Conceptual)}]
+# When a model is registered, trigger testing
+@webhook.on("model_registered")
+def run_tests(event):
+    model_name = event["model_name"]
+    version = event["version"]
+
+    # Trigger Databricks job
+    databricks_api.run_job(
+        job_id="test_model_job",
+        parameters={"model": model_name, "version": version}
+    )
+
+    # Send Slack notification
+    slack.send(f"New model {model_name} v{version} registered!")
+\end{lstlisting}
+
+\newpage
+
+%===================================================================================
+\section{Summary: One-Page Quick Reference}
+%===================================================================================
+
+\begin{tcolorbox}[
+  title={MLOps = ML + Dev + Ops},
+  colframe=blue!75!black, colback=blue!5!white, fonttitle=\bfseries
+]
+The practice of reliably and repeatedly developing, deploying, and monitoring ML models in production.
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={The 5 Personas},
+  colframe=green!60!black, colback=green!5!white, fonttitle=\bfseries
+]
+\begin{itemize}
+    \item \textbf{Business Analyst}: Define the problem, set KPIs
+    \item \textbf{Data Engineer}: Build data pipelines, ensure quality
+    \item \textbf{Data Scientist}: Build and validate models
+    \item \textbf{ML Engineer}: Deploy, monitor, scale
+    \item \textbf{Governance Officer}: Security and compliance
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={The 3 Pipelines},
+  colframe=purple!60!black, colback=purple!5!white, fonttitle=\bfseries
+]
+\begin{itemize}
+    \item \textbf{Training}: Data $\rightarrow$ Model artifact
+    \item \textbf{Inferencing}: Model + New data $\rightarrow$ Predictions
+    \item \textbf{Monitoring}: Track drift, trigger retraining
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Data-Centric AI},
+  colframe=orange!60!black, colback=orange!5!white, fonttitle=\bfseries
+]
+Improving \textbf{data quality} yields more performance gain than tweaking model algorithms.
+
+\textbf{Good Data} = Unambiguous labels + Good coverage + Timely feedback + Right size
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Deploy Strategy},
+  colframe=red!60!black, colback=red!5!white, fonttitle=\bfseries
+]
+\textbf{Deploy Code} (preferred): Copy training code to each environment, retrain with that environment's data
+\begin{itemize}
+    \item Better data access control (Prod data stays in Prod)
+    \item Catches production data issues
+    \item Forces modular code
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Champion-Challenger Pattern},
+  colframe=cyan!60!black, colback=cyan!5!white, fonttitle=\bfseries
+]
+Don't blindly replace production models. Compare:
+\begin{itemize}
+    \item Champion = current production model
+    \item Challenger = new candidate model
+    \item If Challenger F1 $>$ Champion F1 $\rightarrow$ Promote Challenger
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[
+  title={Key MLflow Commands},
+  colframe=gray!60!black, colback=gray!5!white, fonttitle=\bfseries
+]
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+mlflow.log_input(dataset, context="training")  # Data lineage
+mlflow.autolog()                                # Auto-log everything
+mlflow.register_model(uri, "model_name")        # Register to registry
+client.set_registered_model_alias(name, alias, version)  # Set alias
+mlflow.pyfunc.load_model("models:/name@alias")  # Load by alias
+mlflow.pyfunc.spark_udf(spark, uri)             # Batch scoring
+\end{lstlisting}
+\end{tcolorbox}
+
+\end{document}

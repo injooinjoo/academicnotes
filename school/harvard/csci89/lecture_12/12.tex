@@ -1,0 +1,648 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: 자연어 처리 입문}}
+\fancyhead[R]{\small\textit{Lecture 12}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-89B: 자연어 처리 입문 - Lecture 12},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 12}{Dmitry Kurochkin}{Lecture 12의 핵심 개념 학습}
+
+\tableofcontents
+\newpage
+
+
+% 제목
+\begin{center}
+    {\LARGE \textbf{Lecture 12: Attention Mechanism \& Transformers}} \\
+    \vspace{0.5em}
+    {\large 자연어 처리의 혁명: 어텐션 메커니즘과 트랜스포머 아키텍처 완전 정복}
+\end{center}
+
+\vspace{1em}
+
+% 1. 개요
+\section*{개요 (Overview)}
+이번 강의는 현대 자연어 처리(NLP)의 가장 중요한 분기점인 **Attention Mechanism(어텐션 메커니즘)**과 이를 기반으로 한 **Transformer(트랜스포머)** 모델을 다룹니다.
+
+기존 순환 신경망(RNN/LSTM)이 가진 한계점(병목 현상, 기울기 소실, 병렬화 불가)을 극복하기 위해 어텐션이 어떻게 등장했는지 살펴보고, 나아가 "순환(Recurrence)을 완전히 제거한" 트랜스포머 아키텍처의 작동 원리(Self-Attention, Multi-Head Attention, Positional Encoding)를 학습합니다. 마지막으로 이 구조가 어떻게 BERT와 GPT로 발전했는지 이해합니다.
+
+\begin{summarybox}{핵심 목표}
+\begin{itemize}
+    \item RNN 기반 Seq2Seq 모델의 한계점(정보 병목, 장기 의존성 문제) 이해
+    \item 어텐션(Attention)의 기본 원리: "중요한 부분에 집중한다"는 개념
+    \item 트랜스포머(Transformer)의 구조: Encoder-Decoder, Self-Attention (Q, K, V)
+    \item BERT(인코더 기반)와 GPT(디코더 기반)의 차이점
+\end{itemize}
+\end{summarybox}
+
+\vspace{1em}
+
+% 2. 용어 정리
+\section{필수 용어 정리}
+
+본격적인 학습에 앞서, 낯설 수 있는 핵심 용어를 미리 정리합니다.
+
+\begin{table}[h!]
+\centering
+\caption{Lecture 12 핵심 용어 사전}
+\label{tab:terminology}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llp{8cm}@{}}
+\toprule
+\textbf{용어 (Term)} & \textbf{한국어} & \textbf{쉬운 설명} \\ \midrule
+\textbf{Seq2Seq} & 시퀀스 투 시퀀스 & 입력 문장을 받아 출력 문장을 만드는 구조 (예: 번역). 인코더와 디코더로 구성됨. \\
+\textbf{Bottleneck} & 병목 현상 & 긴 문장의 모든 정보를 하나의 고정된 크기 벡터에 억지로 구겨 넣을 때 발생하는 정보 손실. \\
+\textbf{Context Vector} & 문맥 벡터 & 입력 문장의 정보를 요약한 벡터. 어텐션에서는 매 시점마다 동적으로 변함. \\
+\textbf{Attention} & 어텐션(주목) & 출력 단어를 만들 때, 입력 문장의 어느 단어를 더 '주의 깊게' 볼지 결정하는 기술. \\
+\textbf{Self-Attention} & 셀프 어텐션 & 문장 내의 단어들이 서로 어떤 관계가 있는지 파악하는 것 (예: '그것'이 가리키는 단어 찾기). \\
+\textbf{Query (Q)} & 쿼리 & "내가 지금 찾고자 하는 정보는?" (질문자 역할) \\
+\textbf{Key (K)} & 키 & "나는 누구인가?" (정보의 식별자 역할) \\
+\textbf{Value (V)} & 밸류 & "내가 가진 실제 내용은 무엇인가?" (정보의 내용물 역할) \\
+\textbf{Transformer} & 트랜스포머 & RNN 없이 오직 어텐션만으로 구성된 딥러닝 모델 아키텍처. \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\newpage
+
+% 3. RNN과 어텐션의 등장 배경
+\section{RNN의 한계와 어텐션의 등장}
+
+\subsection{기존 RNN/LSTM의 문제점}
+과거 번역 모델(Encoder-Decoder)은 RNN을 사용했습니다. 입력 문장을 인코더가 읽어서 하나의 **고정된 크기의 벡터(Context Vector)**로 압축하고, 디코더가 이를 풀어서 번역문을 만들었습니다.
+
+\begin{itemize}
+    \item \textbf{정보 병목(Information Bottleneck):} 100단어짜리 긴 문장을 겨우 128차원 벡터 하나에 압축해야 합니다. 정보 손실이 발생할 수밖에 없습니다.
+    \item \textbf{장기 의존성(Long-Term Dependency):} 문장이 길어지면 앞부분의 내용이 뒷부분까지 전달되지 못하고 희석됩니다(Vanishing Gradient).
+    \item \textbf{순차적 처리(Sequential Processing):} 단어를 하나씩 순서대로 처리해야 하므로 병렬 계산(GPU 활용)이 어렵고 속도가 느립니다.
+\end{itemize}
+
+\subsection{어텐션(Attention)의 아이디어}
+\begin{conceptbox}{직관적 이해: 통역사의 비유}
+RNN이 "문장 전체를 외운 뒤 한 번에 번역하는 통역사"라면, \\
+어텐션은 \textbf{"번역할 때마다 원문을 다시 힐끔힐끔 쳐다보는 통역사"}입니다.
+\end{conceptbox}
+
+어텐션 메커니즘은 디코더가 단어를 출력할 때마다 인코더의 **모든 입력 단어**를 다시 참고합니다. 단, 그냥 보는 것이 아니라 **"지금 번역할 단어와 관련된 부분"**에 가중치(Attention Weight)를 두어 봅니다.
+
+\subsection{수식 없는 어텐션 작동 원리}
+1. **스코어 계산(Alignment Score):** 현재 디코더의 상태와 인코더의 각 단어가 얼마나 관련 있는지 계산합니다.
+2. **확률 변환(Softmax):** 스코어를 0~1 사이의 확률값(합이 1)으로 바꿉니다. 이것이 '어텐션 가중치'입니다.
+   \begin{itemize}
+       \item 예: "Zone(프랑스어)"을 번역할 때, "Area(영어)"에 0.7, "Economic"에 0.2의 가중치를 둠.
+   \end{itemize}
+3. **가중합(Weighted Sum):** 인코더의 정보들에 가중치를 곱해 더합니다. 이것이 새로운 동적 문맥 벡터(Dynamic Context Vector)가 됩니다.
+
+\begin{figure}[h!]
+    \centering
+    \begin{tcolorbox}[colback=white, colframe=gray]
+    \centering
+    \textbf{[시각화: 어텐션 맵]} \\
+    프랑스어 "Zone"이 출력될 때 $\rightarrow$ 영어 "Area" 부분의 픽셀이 밝게 빛남. \\
+    즉, 모델이 번역 시점에 'Area'라는 단어에 집중(Attend)하고 있음을 시각적으로 확인 가능.
+    \end{tcolorbox}
+    \caption{어텐션 가중치를 시각화하면 단어 간의 연관성을 알 수 있습니다.}
+\end{figure}
+
+\newpage
+
+% 4. 트랜스포머 아키텍처
+\section{트랜스포머 (Transformer)}
+
+2017년 구글은 \textit{"Attention Is All You Need"}라는 논문을 통해 **RNN을 완전히 제거한** 모델인 트랜스포머를 제안합니다.
+
+\subsection{왜 RNN을 버렸는가?}
+RNN은 순서대로 계산해야 하므로 느립니다. 트랜스포머는 문장 전체를 한 번에 행렬로 입력받아 병렬 처리가 가능합니다. 이를 통해 학습 속도를 비약적으로 높이고, 더 많은 데이터를 학습할 수 있게 되었습니다(GPT, BERT의 탄생 배경).
+
+\subsection{핵심 1: 포지셔널 인코딩 (Positional Encoding)}
+RNN이 없으면 단어의 **순서 정보**가 사라집니다. "I love you"와 "You love I"를 구별할 수 없게 됩니다.
+따라서, 단어 벡터에 **위치 정보(Positional Encoding)**를 더해줍니다.
+\begin{itemize}
+    \item 사인(sin)과 코사인(cos) 함수를 이용해 각 위치마다 고유한 패턴의 값을 더해줍니다.
+    \item 이를 통해 모델은 단어의 상대적/절대적 위치를 파악할 수 있습니다.
+\end{itemize}
+
+\subsection{핵심 2: 셀프 어텐션 (Self-Attention)과 Q, K, V}
+트랜스포머의 심장입니다. 문장 내의 단어들이 서로 어떤 관계인지 파악합니다. 이를 위해 각 단어를 세 가지 역할로 나눕니다.
+
+\begin{conceptbox}{Q, K, V 비유: 파일 검색 시스템}
+\begin{itemize}
+    \item \textbf{Query (Q):} 검색창에 입력한 검색어 ("Sky에 대해 알고 싶어")
+    \item \textbf{Key (K):} 파일의 제목/태그 ("이 파일은 Cloud에 관한 것임")
+    \item \textbf{Value (V):} 파일의 실제 내용 ("구름은 흰색이고 하늘에 떠 있다...")
+\end{itemize}
+\end{conceptbox}
+
+\textbf{작동 과정:}
+1. 나의 $Q$와 상대방들의 $K$를 내적(Dot Product)하여 유사도를 구합니다. (Sky와 Cloud는 관련성이 높으므로 점수가 높음)
+2. 점수를 $\sqrt{d_k}$로 나누고(스케일링), Softmax를 취해 확률로 만듭니다.
+3. 이 확률을 상대방들의 $V$에 곱해서 더합니다.
+4. 결과: "Sky"라는 단어 벡터는 "Cloud", "Blue" 등의 문맥 정보를 흡수하여 더 풍부한 의미를 갖게 됩니다.
+
+\paragraph{Scaled Dot-Product Attention 공식}
+\[
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\]
+\begin{itemize}
+    \item $\sqrt{d_k}$로 나누는 이유: 벡터 차원($d_k$)이 커지면 내적 값이 너무 커져서, Softmax의 기울기(Gradient)가 소실되는 것을 방지하기 위함(학습 안정화).
+\end{itemize}
+
+\subsection{핵심 3: 멀티 헤드 어텐션 (Multi-Head Attention)}
+한 번만 어텐션을 수행하는 것이 아니라, 여러 개의 헤드(Head)로 나누어 병렬로 수행합니다.
+\begin{itemize}
+    \item **비유:** 같은 문장을 읽을 때, 한 명은 문법을 보고, 한 명은 의미를 보고, 한 명은 대명사 지칭을 봅니다. 나중에 이들의 통찰을 합칩니다.
+    \item 이를 통해 모델은 다양한 관점(Representation Subspaces)에서 문장을 이해할 수 있습니다.
+\end{itemize}
+
+\newpage
+
+\subsection{핵심 4: 마스킹 (Masking)}
+트랜스포머의 디코더(Decoder) 학습 시 사용됩니다.
+\begin{itemize}
+    \item **문제:** 디코더는 정답 문장을 생성해야 하는데, 학습 시 정답 전체를 한 번에 입력받습니다. 모델이 뒤에 올 정답 단어를 미리 "컨닝(Cheating)"하면 안 됩니다.
+    \item **해결:** 현재 위치보다 뒤에 있는 단어들의 점수를 $-\infty$(음의 무한대)로 만들어 Softmax 결과가 0이 되게 합니다. 이를 **Look-ahead Mask**라고 합니다.
+\end{itemize}
+
+% 5. 실습 코드 설명
+\section{실습 코드 분석 (Keras)}
+
+다음은 Keras를 이용한 어텐션 레이어 구현의 핵심 로직입니다.
+
+\begin{lstlisting}[caption={사용자 정의 Attention Layer 핵심 로직}, label={lst:attention}]
+class AttentionLayer(Layer):
+    def call(self, inputs):
+        # 1. 스코어 계산 (tanh 사용)
+        # inputs와 가중치 W를 내적하고 bias를 더한 뒤 tanh 통과
+        v = tf.tanh(tf.tensordot(inputs, self.W, axes=1) + self.b)
+        
+        # 2. Alignment Score 계산
+        # 벡터 u와 내적하여 스칼라 점수(vu) 생성
+        vu = tf.tensordot(v, self.u, axes=1, name='vu')
+        
+        # 3. 어텐션 가중치(alpha) 계산 (Softmax)
+        alphas = tf.nn.softmax(vu, axis=1)
+        
+        # 4. 문맥 벡터(Context Vector) 생성
+        # 입력(inputs)에 가중치(alphas)를 곱해서 합침(reduce_sum)
+        output = tf.reduce_sum(inputs * tf.expand_dims(alphas, -1), axis=1)
+        
+        return output
+\end{lstlisting}
+
+\begin{itemize}
+    \item 위 코드는 RNN 기반 어텐션 구조입니다. 트랜스포머의 $QK^T$ 방식과는 약간 다르지만(여기선 $tanh$ 사용), "가중치를 계산해서 입력의 가중합을 구한다"는 핵심 원리는 같습니다.
+\end{itemize}
+
+% 6. BERT vs GPT
+\section{BERT와 GPT: 트랜스포머의 자식들}
+
+트랜스포머 구조를 반으로 쪼개서 각각 발전시킨 것이 현재의 최신 모델들입니다.
+
+\begin{table}[h!]
+\centering
+\caption{BERT와 GPT의 비교}
+\label{tab:bert_gpt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{구분} & \textbf{BERT (Encoder 기반)} & \textbf{GPT (Decoder 기반)} \\ \midrule
+\textbf{기반 구조} & 트랜스포머의 \textbf{인코더(Encoder)} & 트랜스포머의 \textbf{디코더(Decoder)} \\
+\textbf{방향성} & 양방향 (Bidirectional) & 단방향 (Unidirectional, 왼쪽$\rightarrow$오른쪽) \\
+\textbf{주특기} & 문장의 의미 파악, 빈칸 채우기, 분류 & 문장 생성, 다음 단어 예측 \\
+\textbf{비유} & 문장 전체를 보고 해석하는 독해 전문가 & 앞 단어만 보고 뒷말 잇는 작가 \\
+\textbf{활용 예} & 감성 분석, 질의응답(QA), 개체명 인식 & 챗봇, 소설 쓰기, 코드 생성 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{itemize}
+    \item **BERT (Bidirectional Encoder Representations from Transformers):** 문맥을 양쪽에서 파악하므로 "이해(Understanding)" 능력이 뛰어납니다.
+    \item **GPT (Generative Pre-trained Transformer):** 다음 단어를 예측하는 방식으로 학습하므로 "생성(Generation)" 능력이 뛰어납니다.
+\end{itemize}
+
+\newpage
+
+% 7. 체크리스트 및 FAQ
+\section{학습 점검 체크리스트 \& FAQ}
+
+\subsection{체크리스트}
+\begin{itemize}
+    \item[\unexpanded{\textbf{[ ]}}] RNN의 장기 의존성 문제와 병목 현상이 무엇인지 설명할 수 있는가?
+    \item[\unexpanded{\textbf{[ ]}}] 어텐션이 입력 데이터의 가중합(Weighted Sum)을 구하는 과정임을 이해했는가?
+    \item[\unexpanded{\textbf{[ ]}}] 트랜스포머가 RNN을 사용하지 않고도 순서 정보를 아는 방법(Positional Encoding)을 아는가?
+    \item[\unexpanded{\textbf{[ ]}}] Self-Attention에서 Q, K, V가 각각 어떤 역할을 하는지 비유를 들어 설명할 수 있는가?
+    \item[\unexpanded{\textbf{[ ]}}] 트랜스포머의 인코더 부분(BERT)과 디코더 부분(GPT)의 차이를 구분할 수 있는가?
+\end{itemize}
+
+\subsection{자주 묻는 질문 (FAQ)}
+
+\textbf{Q1. 어텐션(Attention)과 셀프 어텐션(Self-Attention)은 다른 건가요?} \\
+A. 원리는 같지만 **대상**이 다릅니다. 일반 어텐션(Seq2Seq)은 디코더가 인코더를 보는 것이고(서로 다른 문장 간 관계), 셀프 어텐션은 문장 내에서 자기 자신 안의 단어들끼리의 관계를 보는 것입니다(예: 'I'와 'am'의 관계).
+
+\textbf{Q2. 왜 Q, K, V를 따로 만드나요? 그냥 단어 벡터 그대로 쓰면 안 되나요?} \\
+A. 가능은 하지만, 유연성(Flexibility)이 떨어집니다. 같은 단어라도 "질문할 때의 나(Query)", "비교 대상으로서의 나(Key)", "정보 제공자로서의 나(Value)"의 역할에 따라 다르게 표현될 수 있도록 별도의 가중치 행렬($W^Q, W^K, W^V$)을 학습시키는 것이 성능이 훨씬 좋습니다.
+
+\textbf{Q3. 마스킹(Masking)은 왜 디코더에만 있나요?} \\
+A. 인코더는 이미 주어진 문장을 분석하는 것이라 미래 단어를 봐도 상관없습니다(오히려 다 봐야 문맥을 압니다). 하지만 디코더는 문장을 생성하는 과정이므로, 아직 생성하지 않은 미래의 단어를 미리 보고 예측하면 학습이 제대로 되지 않기 때문입니다.
+
+\textbf{Q4. 강의 초반 퀴즈 내용 중 CRF가 HMM보다 좋은 점은?} \\
+A. HMM은 바로 이전 상태(State)에만 의존한다고 가정하지만, CRF(Conditional Random Field)는 문맥 전체(과거와 미래)의 특성을 동시에 고려할 수 있어 더 복잡한 의존성을 모델링할 수 있습니다.
+
+\section*{빠르게 훑어보기 (1분 요약)}
+\begin{tcolorbox}[colback=white, colframe=black, title=Summary]
+\begin{itemize}
+    \item **문제:** RNN은 느리고, 긴 문장을 까먹음.
+    \item **해결 1 (Attention):** 문장을 요약하지 말고, 필요할 때마다 원문을 다시 보자.
+    \item **해결 2 (Transformer):** RNN을 버리고 어텐션만 쓰자. 병렬 처리로 속도 UP.
+    \item **Self-Attention:** $Attention(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V$
+    \item **BERT:** 인코더 사용, 문맥 이해(양방향).
+    \item **GPT:** 디코더 사용, 문장 생성(단방향).
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

@@ -1,0 +1,1056 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 15: Multiclass Classification, ROC/AUC, and Bayesian Introduction
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 15}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Colors
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 15},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Topics:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\title{Lecture 15: Multiclass Classification, ROC/AUC, and Introduction to Bayesian Inference}
+\author{CS109A: Introduction to Data Science}
+\date{Harvard University}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 15}{Pavlos Protopapas, Kevin Rader, Chris Tanner}{Multinomial Logistic Regression, One-vs-Rest, Softmax, Confusion Matrix, ROC Curves, AUC, Bayesian Inference, Beta Distribution, Beta-Binomial Model}
+
+\begin{summarybox}
+This lecture extends classification to the multiclass setting and introduces tools for evaluating classifier performance. We then transition to Bayesian statistics, laying groundwork for Bayesian approaches to regression.
+
+\textbf{Part 1 - Multiclass Classification:}
+\begin{itemize}
+    \item Multinomial Logistic Regression: Using a reference class
+    \item One-vs-Rest (OvR): Building K separate binary classifiers
+    \item Softmax function: Converting scores to proper probabilities
+    \item Making predictions when K > 2
+\end{itemize}
+
+\textbf{Part 2 - Classification Evaluation:}
+\begin{itemize}
+    \item Confusion matrices: TP, FP, TN, FN
+    \item Threshold selection and trade-offs
+    \item ROC curves and AUC for model comparison
+\end{itemize}
+
+\textbf{Part 3 - Bayesian Introduction:}
+\begin{itemize}
+    \item Bayes' Rule for parameter estimation
+    \item The Beta distribution as a conjugate prior
+    \item The Beta-Binomial model
+    \item Preview of hierarchical models
+\end{itemize}
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%================================================================================
+\section{Review: From Binary to Multiclass}
+%================================================================================
+
+In the previous lectures, we focused on \textbf{binary classification}: predicting whether $Y = 0$ or $Y = 1$. Logistic regression models the probability of success:
+$$P(Y=1|X) = \frac{e^{\beta_0 + \beta_1 X}}{1 + e^{\beta_0 + \beta_1 X}}$$
+
+But what if $Y$ can take on \textbf{more than two values}?
+
+\begin{examplebox}{Real-World Multiclass Problems}
+\begin{itemize}
+    \item \textbf{Student major prediction}: CS, Statistics, or Other
+    \item \textbf{NFL play type}: Pass, Run, or Special Teams
+    \item \textbf{Email classification}: Primary, Social, Promotions, or Spam
+    \item \textbf{Medical diagnosis}: Healthy, Condition A, Condition B, Condition C
+\end{itemize}
+\end{examplebox}
+
+We need to extend logistic regression to handle $K > 2$ classes. There are two main approaches:
+\begin{enumerate}
+    \item \textbf{Multinomial Logistic Regression}: Compare each class to a reference class
+    \item \textbf{One-vs-Rest (OvR)}: Build K separate binary classifiers
+\end{enumerate}
+
+\newpage
+
+%================================================================================
+\section{Multinomial Logistic Regression}
+%================================================================================
+
+\subsection{The Setup}
+
+Suppose we have $K$ classes labeled $0, 1, 2, \ldots, K-1$. Multinomial logistic regression:
+\begin{enumerate}
+    \item Designates one class as the \textbf{reference group} (typically class $K-1$ or class 0)
+    \item Fits $K-1$ separate log-odds models comparing each other class to the reference
+\end{enumerate}
+
+\begin{examplebox}{NFL Play Prediction}
+We want to predict play type with $K = 3$ classes:
+\begin{itemize}
+    \item Class 0: Special Teams (punt, field goal, etc.)
+    \item Class 1: Pass play
+    \item Class 2: Run play
+\end{itemize}
+
+Using \textbf{Class 0 as reference}, we fit two models:
+
+\textbf{Model 1 (Pass vs Special Teams):}
+$$\log\left(\frac{P(Y=1)}{P(Y=0)}\right) = \beta_0^{(1)} + \beta_1^{(1)} \cdot \text{Down} + \beta_2^{(1)} \cdot \text{Distance}$$
+
+\textbf{Model 2 (Run vs Special Teams):}
+$$\log\left(\frac{P(Y=2)}{P(Y=0)}\right) = \beta_0^{(2)} + \beta_1^{(2)} \cdot \text{Down} + \beta_2^{(2)} \cdot \text{Distance}$$
+\end{examplebox}
+
+\subsection{From Two Models to Three Probabilities}
+
+We have two equations but need three probabilities: $P(Y=0), P(Y=1), P(Y=2)$.
+
+The key insight: \textbf{Probabilities must sum to 1}!
+
+$$P(Y=0) + P(Y=1) + P(Y=2) = 1$$
+
+With this third equation, we can solve for all three probabilities:
+\begin{enumerate}
+    \item From Model 1: $P(Y=1) = P(Y=0) \cdot e^{\beta^{(1)} X}$
+    \item From Model 2: $P(Y=2) = P(Y=0) \cdot e^{\beta^{(2)} X}$
+    \item Sum constraint: $P(Y=0) + P(Y=0) \cdot e^{\beta^{(1)} X} + P(Y=0) \cdot e^{\beta^{(2)} X} = 1$
+\end{enumerate}
+
+Solving for $P(Y=0)$:
+$$P(Y=0) = \frac{1}{1 + e^{\beta^{(1)} X} + e^{\beta^{(2)} X}}$$
+
+And then:
+$$P(Y=k) = \frac{e^{\beta^{(k)} X}}{1 + e^{\beta^{(1)} X} + e^{\beta^{(2)} X}} \quad \text{for } k \in \{1, 2\}$$
+
+\subsection{Interpreting the Output}
+
+\begin{examplebox}{Reading sklearn's Multinomial Output}
+sklearn reports coefficients for \textbf{all K classes} (not just K-1):
+
+\begin{lstlisting}[style=pythonstyle]
+model = LogisticRegression(multi_class='multinomial')
+model.fit(X, y)
+print(model.coef_)  # Shape: (3, 2) for 3 classes, 2 features
+\end{lstlisting}
+
+Output might look like:
+\begin{verbatim}
+[[-6.22,  1.67,  0.10],   # Class 0 coefficients
+ [ 1.86, -0.04, -0.02],   # Class 1 coefficients
+ [-1.64, -0.63, -0.08]]   # Class 2 coefficients
+\end{verbatim}
+
+\textbf{Why 3 sets of coefficients when theory says K-1?}
+
+sklearn internally \textbf{renormalizes} the coefficients so that each can be interpreted as ``Class k vs Not Class k'' rather than ``Class k vs Reference.'' This makes predictions easier to compute but changes the interpretation slightly.
+
+For the first class (Special Teams):
+$$\log\left(\frac{P(Y=0)}{P(Y \neq 0)}\right) = -6.22 + 1.67 \cdot \text{Down} + 0.10 \cdot \text{Distance}$$
+
+\textbf{Interpretation}: As ``Down'' increases (approaching 4th down), the probability of a special teams play increases. As ``Distance'' increases, special teams also becomes more likely (punting on 4th and long).
+\end{examplebox}
+
+\newpage
+
+%================================================================================
+\section{One-vs-Rest (OvR) Classification}
+%================================================================================
+
+\subsection{The Approach}
+
+One-vs-Rest takes a different strategy: instead of comparing to a reference group, we build \textbf{K completely separate binary classifiers}, one for each class.
+
+\begin{itemize}
+    \item \textbf{Classifier 1}: Class 0 vs (Classes 1, 2, ..., K-1)
+    \item \textbf{Classifier 2}: Class 1 vs (Classes 0, 2, ..., K-1)
+    \item $\vdots$
+    \item \textbf{Classifier K}: Class K-1 vs (Classes 0, 1, ..., K-2)
+\end{itemize}
+
+\begin{examplebox}{OvR for NFL Plays}
+\textbf{Classifier 1 (Special Teams vs Everything Else):}
+\begin{itemize}
+    \item Positive class: Special Teams (Class 0)
+    \item Negative class: Pass + Run (Classes 1, 2 combined)
+\end{itemize}
+
+\textbf{Classifier 2 (Pass vs Everything Else):}
+\begin{itemize}
+    \item Positive class: Pass (Class 1)
+    \item Negative class: Special Teams + Run (Classes 0, 2 combined)
+\end{itemize}
+
+\textbf{Classifier 3 (Run vs Everything Else):}
+\begin{itemize}
+    \item Positive class: Run (Class 2)
+    \item Negative class: Special Teams + Pass (Classes 0, 1 combined)
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Problem: Probabilities Don't Sum to 1}
+
+Each classifier outputs its own probability:
+\begin{itemize}
+    \item $p_0 = P(\text{Special Teams vs Others})$
+    \item $p_1 = P(\text{Pass vs Others})$
+    \item $p_2 = P(\text{Run vs Others})$
+\end{itemize}
+
+But these three probabilities typically \textbf{do not sum to 1}! They come from independent models, each trained on slightly different data configurations.
+
+\subsection{Solution: The Softmax Function}
+
+To convert these scores into proper probabilities, we use the \textbf{Softmax function}:
+
+\begin{definitionbox}{Softmax Function}
+Given scores $(s_1, s_2, \ldots, s_K)$ for $K$ classes, the softmax function converts them to probabilities:
+
+$$P(Y = k) = \frac{e^{s_k}}{\sum_{j=1}^{K} e^{s_j}}$$
+
+\textbf{Properties}:
+\begin{itemize}
+    \item All outputs are positive (due to exponential)
+    \item All outputs are between 0 and 1
+    \item All outputs \textbf{sum to exactly 1}
+    \item Larger scores get larger probabilities (monotonic)
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Softmax in Action}
+Suppose our three classifiers output log-odds (scores):
+\begin{itemize}
+    \item $s_0 = -2$ (Special Teams)
+    \item $s_1 = 1.5$ (Pass)
+    \item $s_2 = 0.8$ (Run)
+\end{itemize}
+
+Apply softmax:
+$$\sum e^{s_j} = e^{-2} + e^{1.5} + e^{0.8} = 0.135 + 4.48 + 2.23 = 6.84$$
+
+\begin{align*}
+P(Y=0) &= \frac{0.135}{6.84} = 0.02 \\
+P(Y=1) &= \frac{4.48}{6.84} = 0.66 \\
+P(Y=2) &= \frac{2.23}{6.84} = 0.33
+\end{align*}
+
+Now the probabilities sum to 1, and we'd predict \textbf{Pass} (Class 1).
+\end{examplebox}
+
+\subsection{Multinomial vs OvR: Which to Use?}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Aspect} & \textbf{Multinomial} & \textbf{OvR} \\
+\midrule
+Number of models & $K-1$ & $K$ \\
+Training & Joint optimization & Independent classifiers \\
+Data usage & All data, structured & May discard some structure \\
+Decision boundaries & One per pair (vs reference) & One per class (vs all) \\
+Performance & Often similar & Often similar \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{infobox}
+\textbf{How to Choose?}
+
+In practice, both methods often give very similar results. The best approach:
+\begin{enumerate}
+    \item Try both methods
+    \item Compare using \textbf{cross-validation}
+    \item Choose based on test set performance (not training performance!)
+\end{enumerate}
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{Making Predictions with K > 2 Classes}
+%================================================================================
+
+\subsection{From Probabilities to Classifications}
+
+In binary classification, we used the threshold $P(Y=1) > 0.5$ to predict class 1.
+
+With $K > 2$ classes, no single class is guaranteed to have probability $> 0.5$. Instead, we use the \textbf{plurality rule}:
+
+$$\hat{Y} = \arg\max_k P(Y = k | X)$$
+
+Simply predict the class with the highest probability, even if that probability is below 0.5.
+
+\begin{examplebox}{Plurality Prediction}
+Suppose our model predicts:
+\begin{itemize}
+    \item $P(\text{Special Teams}) = 0.05$
+    \item $P(\text{Pass}) = 0.55$
+    \item $P(\text{Run}) = 0.40$
+\end{itemize}
+
+\textbf{Prediction}: Pass (highest probability)
+
+Another example:
+\begin{itemize}
+    \item $P(\text{Special Teams}) = 0.10$
+    \item $P(\text{Pass}) = 0.45$
+    \item $P(\text{Run}) = 0.45$
+\end{itemize}
+
+\textbf{Prediction}: Either Pass or Run (tie---implementation dependent)
+\end{examplebox}
+
+\subsection{Class Imbalance Problems}
+
+\begin{warningbox}
+\textbf{When Classification Always Predicts the Same Class}
+
+If one class dominates the data (e.g., 66\% of NFL plays are passes), the model might predict ``Pass'' for almost every observation---and still achieve 66\% accuracy!
+
+\textbf{The cocaine example from lecture}: If you're predicting whether someone is currently high on cocaine, you'd predict ``No'' for everyone and be right 99.9\%+ of the time.
+
+\textbf{Key insight}: The model might still capture meaningful relationships through the \textbf{probabilities}, even if the pure \textbf{classifications} are all the same. Always examine predicted probabilities, not just classifications.
+\end{warningbox}
+
+\subsection{Loss Function for Multiclass}
+
+Binary classification uses \textbf{Binary Cross-Entropy}:
+$$\text{Loss} = -\sum_{i=1}^{n} \left[ y_i \log(p_i) + (1-y_i)\log(1-p_i) \right]$$
+
+Multiclass classification generalizes this to \textbf{Cross-Entropy} (or Multinomial Logistic Loss):
+$$\text{Loss} = -\sum_{i=1}^{n} \sum_{k=1}^{K} \mathbf{1}_{[y_i = k]} \log(p_{ik})$$
+
+where $p_{ik}$ is the predicted probability that observation $i$ belongs to class $k$.
+
+Regularization (L1/Lasso or L2/Ridge) can still be applied to this loss function to prevent overfitting.
+
+\newpage
+
+%================================================================================
+\section{Review: The Confusion Matrix}
+%================================================================================
+
+The \textbf{confusion matrix} is the foundation of classification evaluation. For binary classification:
+
+\begin{center}
+\begin{tabular}{cc|cc}
+\multicolumn{2}{c}{} & \multicolumn{2}{c}{\textbf{Predicted}} \\
+\multicolumn{2}{c}{} & Negative (0) & Positive (1) \\ \hline
+\textbf{Actual} & Negative (0) & TN & FP \\
+& Positive (1) & FN & TP \\
+\end{tabular}
+\end{center}
+
+\begin{definitionbox}{Confusion Matrix Elements}
+\begin{itemize}
+    \item \textbf{True Positive (TP)}: Actually positive, predicted positive. \textcolor{darkgreen}{Correct!}
+    \item \textbf{True Negative (TN)}: Actually negative, predicted negative. \textcolor{darkgreen}{Correct!}
+    \item \textbf{False Positive (FP)}: Actually negative, predicted positive. \textcolor{red}{Type I Error.}
+    \item \textbf{False Negative (FN)}: Actually positive, predicted negative. \textcolor{red}{Type II Error.}
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}{Heart Disease Example}
+From the lecture, predicting heart disease using age, sex, and their interaction:
+
+\begin{center}
+\begin{tabular}{c|cc}
+& Predicted: No & Predicted: Yes \\ \hline
+Actual: No & 110 (TN) & 54 (FP) \\
+Actual: Yes & 53 (FN) & 86 (TP) \\
+\end{tabular}
+\end{center}
+
+\textbf{Is this a useful model?}
+\begin{itemize}
+    \item Among actual negatives (110 + 54 = 164): 110/164 = 67\% correctly identified
+    \item Among actual positives (53 + 86 = 139): 86/139 = 62\% correctly identified
+    \item Better than random chance (which would be 50/50)
+    \item Not perfect, but has discriminatory power
+\end{itemize}
+\end{examplebox}
+
+\newpage
+
+%================================================================================
+\section{The Threshold Trade-off}
+%================================================================================
+
+Logistic regression outputs \textbf{probabilities}, not classifications. We convert to classifications using a \textbf{threshold}:
+
+$$\hat{Y} = \begin{cases} 1 & \text{if } \hat{p} \geq \text{threshold} \\ 0 & \text{otherwise} \end{cases}$$
+
+The default threshold is 0.5, but this can be changed!
+
+\subsection{Effect of Changing the Threshold}
+
+\textbf{Lowering the threshold (e.g., 0.5 $\to$ 0.4):}
+\begin{itemize}
+    \item Model predicts ``positive'' more easily
+    \item \textbf{TP increases} (good), \textbf{FN decreases} (good)
+    \item \textbf{FP increases} (bad), \textbf{TN decreases} (bad)
+    \item \textbf{Use case}: Medical screening---we don't want to miss sick patients (minimize FN)
+\end{itemize}
+
+\textbf{Raising the threshold (e.g., 0.5 $\to$ 0.6):}
+\begin{itemize}
+    \item Model predicts ``positive'' more conservatively
+    \item \textbf{FP decreases} (good), \textbf{TN increases} (good)
+    \item \textbf{TP decreases} (bad), \textbf{FN increases} (bad)
+    \item \textbf{Use case}: Spam filtering---we don't want to lose important emails (minimize FP)
+\end{itemize}
+
+\begin{importantbox}{The Fundamental Trade-off}
+\textbf{You cannot simultaneously minimize both FP and FN.}
+
+Reducing one type of error inevitably increases the other. The optimal threshold depends on the \textbf{relative costs} of each type of error in your specific application.
+\end{importantbox}
+
+\newpage
+
+%================================================================================
+\section{ROC Curves}
+%================================================================================
+
+The \textbf{ROC Curve} (Receiver Operating Characteristic) visualizes classifier performance across \textbf{all possible thresholds}.
+
+\subsection{Key Metrics}
+
+\begin{definitionbox}{TPR and FPR}
+\textbf{True Positive Rate (TPR)} = Sensitivity = Recall:
+$$\text{TPR} = \frac{TP}{TP + FN} = P(\hat{Y}=1 | Y=1)$$
+``Of all actual positives, what fraction did we catch?''
+
+\textbf{False Positive Rate (FPR)} = 1 - Specificity:
+$$\text{FPR} = \frac{FP}{FP + TN} = P(\hat{Y}=1 | Y=0)$$
+``Of all actual negatives, what fraction did we falsely classify as positive?''
+\end{definitionbox}
+
+\subsection{Constructing the ROC Curve}
+
+\begin{enumerate}
+    \item For each possible threshold (from 0 to 1):
+    \begin{itemize}
+        \item Classify all observations using that threshold
+        \item Calculate the resulting TPR and FPR
+        \item Plot the point (FPR, TPR)
+    \end{itemize}
+    \item Connect all points to form the curve
+\end{enumerate}
+
+\subsection{Interpreting the ROC Curve}
+
+\textbf{Key Reference Points:}
+\begin{itemize}
+    \item \textbf{(0, 0)}: Threshold = 1 (predict everyone negative)
+    \item \textbf{(1, 1)}: Threshold = 0 (predict everyone positive)
+    \item \textbf{(0, 1)}: Perfect classifier (100\% TPR, 0\% FPR)
+\end{itemize}
+
+\textbf{Key Reference Lines:}
+\begin{itemize}
+    \item \textbf{Diagonal (y = x)}: Random classifier. A coin flip with probability $p$ gives point $(p, p)$.
+    \item \textbf{Upper-left corner}: Ideal. We want the curve to hug this corner.
+\end{itemize}
+
+\begin{examplebox}{Reading ROC Curves}
+If you see three curves:
+\begin{itemize}
+    \item \textbf{Blue curve}: Hugs upper-left corner tightly
+    \item \textbf{Green curve}: Moderately above the diagonal
+    \item \textbf{Red dashed line}: The diagonal (random baseline)
+\end{itemize}
+
+The blue model is best---for any given FPR, it achieves higher TPR than the others.
+\end{examplebox}
+
+\newpage
+
+%================================================================================
+\section{AUC: Area Under the Curve}
+%================================================================================
+
+Comparing ROC curves visually can be difficult, especially when curves cross. The \textbf{AUC} (Area Under the Curve) summarizes performance in a single number.
+
+\subsection{Computing AUC}
+
+AUC is literally the area under the ROC curve:
+$$\text{AUC} = \int_0^1 \text{ROC}(x) \, dx$$
+
+In practice, we approximate this using the trapezoidal rule over the discrete threshold points.
+
+\subsection{Interpreting AUC}
+
+\begin{itemize}
+    \item \textbf{AUC = 1.0}: Perfect classifier
+    \item \textbf{AUC = 0.5}: Random classifier (no better than coin flip)
+    \item \textbf{AUC < 0.5}: Worse than random (predictions are inverted)
+\end{itemize}
+
+\begin{infobox}
+\textbf{Probabilistic Interpretation of AUC}
+
+AUC equals the probability that a randomly chosen positive example is ranked higher (assigned higher predicted probability) than a randomly chosen negative example.
+
+\textbf{AUC = 0.8} means: If you pick one positive and one negative case at random, there's an 80\% chance the model assigns higher probability to the positive case.
+\end{infobox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Computing ROC and AUC in sklearn}]
+from sklearn.metrics import roc_curve, roc_auc_score
+
+# Get predicted probabilities
+y_proba = model.predict_proba(X_test)[:, 1]
+
+# Calculate ROC curve points
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+
+# Calculate AUC
+auc_score = roc_auc_score(y_test, y_proba)
+print(f"AUC: {auc_score:.3f}")
+\end{lstlisting}
+
+\newpage
+
+%================================================================================
+\section{Introduction to Bayesian Inference}
+%================================================================================
+
+So far, we've used the \textbf{frequentist} approach:
+\begin{itemize}
+    \item Parameters ($\beta$) are fixed but unknown constants
+    \item We estimate them using data (MLE, OLS)
+    \item Uncertainty is expressed through confidence intervals
+\end{itemize}
+
+The \textbf{Bayesian} approach takes a fundamentally different view:
+
+\begin{definitionbox}{Bayesian Philosophy}
+In Bayesian statistics, parameters are \textbf{random variables} with probability distributions.
+
+We start with a \textbf{prior belief} about the parameter, observe data, and update our belief to obtain a \textbf{posterior distribution}.
+\end{definitionbox}
+
+\subsection{Bayes' Rule for Parameter Estimation}
+
+$$\underbrace{f(\theta | X)}_{\text{Posterior}} = \frac{\overbrace{f(X | \theta)}^{\text{Likelihood}} \cdot \overbrace{f(\theta)}^{\text{Prior}}}{\underbrace{f(X)}_{\text{Normalizing constant}}}$$
+
+In practice, we often ignore the normalizing constant and write:
+
+$$\text{Posterior} \propto \text{Likelihood} \times \text{Prior}$$
+
+\textbf{The components:}
+\begin{itemize}
+    \item \textbf{Prior $f(\theta)$}: Our belief about $\theta$ \textit{before} seeing the data
+    \item \textbf{Likelihood $f(X | \theta)$}: Probability of observing data $X$ if $\theta$ is the true value
+    \item \textbf{Posterior $f(\theta | X)$}: Our updated belief about $\theta$ \textit{after} seeing the data
+\end{itemize}
+
+\begin{summarybox}
+\textbf{Bayesian Inference in One Sentence:}
+
+Prior belief $\times$ Evidence from data $\to$ Updated belief
+\end{summarybox}
+
+\newpage
+
+%================================================================================
+\section{The Beta Distribution}
+%================================================================================
+
+Before we can do Bayesian inference for classification, we need a distribution for modeling probabilities. Enter the \textbf{Beta distribution}.
+
+\subsection{Why Beta?}
+
+We need a distribution that:
+\begin{enumerate}
+    \item Is defined on $[0, 1]$ (since probabilities are between 0 and 1)
+    \item Is flexible enough to represent different prior beliefs
+    \item Works nicely with Bernoulli/Binomial likelihoods
+\end{enumerate}
+
+The Beta distribution satisfies all three!
+
+\subsection{The Beta Distribution}
+
+\begin{definitionbox}{Beta Distribution}
+A random variable $X \sim \text{Beta}(\alpha, \beta)$ has PDF:
+$$f(x | \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)} x^{\alpha-1}(1-x)^{\beta-1}, \quad x \in [0, 1]$$
+
+where $\Gamma(\cdot)$ is the gamma function (generalization of factorial: $\Gamma(n) = (n-1)!$ for integers).
+
+\textbf{Key properties:}
+\begin{itemize}
+    \item Mean: $E[X] = \frac{\alpha}{\alpha + \beta}$
+    \item Mode: $\frac{\alpha - 1}{\alpha + \beta - 2}$ (for $\alpha, \beta > 1$)
+    \item Variance: $\frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Shape of Beta Distributions}
+
+\begin{itemize}
+    \item \textbf{$\text{Beta}(1, 1)$}: Uniform distribution on $[0, 1]$. ``I have no prior information.''
+    \item \textbf{$\text{Beta}(10, 10)$}: Symmetric, peaked at 0.5. ``I believe $p \approx 0.5$.''
+    \item \textbf{$\text{Beta}(2, 5)$}: Skewed left, mean $\approx 0.29$. ``I believe $p$ is small.''
+    \item \textbf{$\text{Beta}(5, 2)$}: Skewed right, mean $\approx 0.71$. ``I believe $p$ is large.''
+    \item \textbf{$\text{Beta}(0.5, 0.5)$}: U-shaped. ``I believe $p$ is either very small or very large.''
+\end{itemize}
+
+\begin{infobox}
+\textbf{Intuitive Interpretation}
+
+Think of $\alpha - 1$ as ``prior successes'' and $\beta - 1$ as ``prior failures'' you've imagined before seeing real data.
+
+$\text{Beta}(1, 1)$ = 0 prior successes, 0 prior failures (no information)
+
+$\text{Beta}(10, 10)$ = 9 prior successes, 9 prior failures (believe coin is fair)
+\end{infobox}
+
+\newpage
+
+%================================================================================
+\section{The Beta-Binomial Model}
+%================================================================================
+
+Now we put it all together: using the Beta distribution as a prior for a Binomial likelihood.
+
+\subsection{The Setup}
+
+\textbf{Goal}: Estimate the probability $p$ of success (e.g., probability a coin lands heads).
+
+\textbf{Data}: $n$ independent trials with $k$ successes and $n-k$ failures.
+
+\textbf{Model}:
+\begin{itemize}
+    \item \textbf{Likelihood}: $X | p \sim \text{Binomial}(n, p)$
+    \item \textbf{Prior}: $p \sim \text{Beta}(\alpha_0, \beta_0)$
+\end{itemize}
+
+\subsection{Computing the Posterior}
+
+Using Bayes' rule:
+$$f(p | X) \propto f(X | p) \cdot f(p)$$
+
+\textbf{Likelihood} (ignoring constants not involving $p$):
+$$f(X | p) \propto p^k (1-p)^{n-k}$$
+
+\textbf{Prior}:
+$$f(p) \propto p^{\alpha_0 - 1} (1-p)^{\beta_0 - 1}$$
+
+\textbf{Posterior}:
+$$f(p | X) \propto p^k (1-p)^{n-k} \cdot p^{\alpha_0 - 1} (1-p)^{\beta_0 - 1}$$
+$$= p^{(\alpha_0 + k) - 1} (1-p)^{(\beta_0 + n - k) - 1}$$
+
+This is a \textbf{Beta distribution}!
+
+\begin{importantbox}{Beta-Binomial Update Rule}
+\begin{align*}
+\text{Prior}: \quad & p \sim \text{Beta}(\alpha_0, \beta_0) \\
+\text{Data}: \quad & k \text{ successes, } n-k \text{ failures} \\
+\text{Posterior}: \quad & p | X \sim \text{Beta}(\alpha_0 + k, \beta_0 + n - k)
+\end{align*}
+
+The posterior is just the prior with successes and failures added!
+\end{importantbox}
+
+\subsection{Conjugate Priors}
+
+When the prior and posterior belong to the \textbf{same family of distributions}, the prior is called a \textbf{conjugate prior} for that likelihood.
+
+The Beta distribution is the conjugate prior for the Bernoulli/Binomial likelihood. This is mathematically convenient---the posterior has a known, closed-form distribution.
+
+\begin{examplebox}{Coin Flipping}
+\textbf{Prior}: I have no strong belief, so I use $\text{Beta}(1, 1)$ (uniform).
+$$E[p] = \frac{1}{2} = 0.5$$
+
+\textbf{Data}: I flip the coin 10 times and get 7 heads, 3 tails.
+
+\textbf{Posterior}: $\text{Beta}(1 + 7, 1 + 3) = \text{Beta}(8, 4)$
+$$E[p | \text{data}] = \frac{8}{12} = 0.67$$
+
+My belief shifted from 0.5 to 0.67 based on the evidence!
+\end{examplebox}
+
+\newpage
+
+%================================================================================
+\section{Preview: Hierarchical Models}
+%================================================================================
+
+What if we have \textbf{grouped data}? For example, estimating shooting percentages for multiple NBA players?
+
+\subsection{The Problem}
+
+\textbf{Option 1 (Pooled)}: Assume all players have the same $p$. Too restrictive---LeBron James is different from a rookie.
+
+\textbf{Option 2 (Separate)}: Estimate each player's $p$ independently. Problem: A rookie with 5 shots has very uncertain estimate.
+
+\textbf{Option 3 (Hierarchical)}: The best of both worlds!
+
+\subsection{The Hierarchical Approach}
+
+\begin{enumerate}
+    \item \textbf{Level 1 (Data)}: Each player $j$'s shots follow their own probability $p_j$
+    \item \textbf{Level 2 (Players)}: The $p_j$'s themselves come from a common distribution
+    $$p_j \sim \text{Beta}(\alpha, \beta)$$
+    \item \textbf{Level 3 (League)}: The hyperparameters $\alpha, \beta$ might have their own prior (hyperprior)
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Why Hierarchical Models Work}
+
+Hierarchical models \textbf{share information} across groups.
+
+\begin{itemize}
+    \item LeBron James (1000 shots): His $p_j$ is mostly determined by his own data
+    \item Rookie (10 shots): His $p_j$ is \textbf{shrunk toward the league average}, borrowing strength from other players
+\end{itemize}
+
+This ``shrinkage'' produces better estimates for players with limited data!
+\end{infobox}
+
+\begin{warningbox}
+\textbf{Bayesian Logistic Regression: Not Beta!}
+
+Can we use Beta as a prior for logistic regression? \textbf{No!}
+
+\begin{itemize}
+    \item Beta is for probabilities $p \in [0, 1]$
+    \item Logistic regression parameters $\beta$ can be any real number $(-\infty, \infty)$
+\end{itemize}
+
+For logistic regression, we typically use \textbf{Normal distributions} as priors for $\beta$:
+$$\beta_j \sim N(0, \sigma^2)$$
+
+A prior centered at 0 means ``I expect this coefficient to be small''---similar to Ridge regularization!
+\end{warningbox}
+
+\newpage
+
+%================================================================================
+\section{Summary}
+%================================================================================
+
+\begin{tcolorbox}[title={Multiclass Classification}]
+\begin{itemize}
+    \item \textbf{Multinomial}: $K-1$ models comparing each class to a reference
+    \item \textbf{OvR}: $K$ separate ``class vs others'' classifiers
+    \item \textbf{Softmax}: Converts scores to probabilities summing to 1
+    \item \textbf{Prediction}: Choose class with highest probability (plurality)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Classification Evaluation}]
+\begin{itemize}
+    \item \textbf{Confusion Matrix}: TP, FP, TN, FN
+    \item \textbf{TPR (Sensitivity)}: $\frac{TP}{TP+FN}$ --- catching positives
+    \item \textbf{FPR}: $\frac{FP}{FP+TN}$ --- false alarms
+    \item \textbf{ROC Curve}: TPR vs FPR across all thresholds
+    \item \textbf{AUC}: Area under ROC; 1 = perfect, 0.5 = random
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Bayesian Inference}]
+\begin{itemize}
+    \item \textbf{Bayes' Rule}: Posterior $\propto$ Likelihood $\times$ Prior
+    \item \textbf{Beta Distribution}: Prior for probabilities, $p \in [0,1]$
+    \item \textbf{Beta-Binomial}: $\text{Beta}(\alpha, \beta) \to \text{Beta}(\alpha + k, \beta + n - k)$
+    \item \textbf{Conjugate Prior}: Prior and posterior same family
+    \item \textbf{Hierarchical Models}: Share information across groups
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={Key Formulas}]
+\textbf{Softmax:} $P(Y=k) = \frac{e^{s_k}}{\sum_j e^{s_j}}$
+
+\textbf{TPR:} $\frac{TP}{TP + FN}$ \quad \textbf{FPR:} $\frac{FP}{FP + TN}$
+
+\textbf{Beta Mean:} $E[X] = \frac{\alpha}{\alpha + \beta}$
+
+\textbf{Beta-Binomial Update:} $\text{Beta}(\alpha_0 + k, \beta_0 + n - k)$
+\end{tcolorbox}
+
+\end{document}

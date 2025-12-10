@@ -1,0 +1,990 @@
+% CSCI E-89B: Natural Language Processing
+% Lecture 8: Structural Topic Modeling (STM)
+% English Version
+
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ============================================================
+% PAGE SETUP
+% ============================================================
+\geometry{margin=25mm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{CSCI E-89B: Natural Language Processing}
+\fancyhead[R]{Lecture 8}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================
+% COLORS
+% ============================================================
+\definecolor{harvardcrimson}{RGB}{165,28,48}
+\definecolor{codegreen}{RGB}{34,139,34}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codepurple}{RGB}{148,0,211}
+\definecolor{backcolour}{RGB}{248,248,248}
+\definecolor{darkblue}{RGB}{0,0,139}
+
+% ============================================================
+% CODE LISTING STYLE
+% ============================================================
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{harvardcrimson},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+
+\lstdefinestyle{rstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{darkblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{harvardcrimson},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=R
+}
+\lstset{style=pythonstyle}
+
+% ============================================================
+% TCOLORBOX ENVIRONMENTS
+% ============================================================
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{summarybox}[1][]{
+    colback=red!5!white,
+    colframe=harvardcrimson,
+    fonttitle=\bfseries,
+    title=Summary,
+    breakable,
+    #1
+}
+
+\newtcolorbox{overviewbox}[1][]{
+    colback=blue!5!white,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Overview,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    colback=cyan!5!white,
+    colframe=cyan!60!black,
+    fonttitle=\bfseries,
+    title=Information,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    colback=yellow!10!white,
+    colframe=orange!80!black,
+    fonttitle=\bfseries,
+    title=Warning,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=Example,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    colback=purple!5!white,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    colback=red!10!white,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important,
+    breakable,
+    #1
+}
+
+% ============================================================
+% CUSTOM COMMANDS
+% ============================================================
+\newcommand{\metainfo}[4]{
+    \begin{tcolorbox}[colback=gray!10, colframe=gray!50, title=Lecture Information]
+    \begin{tabular}{@{}ll}
+    \textbf{Course:} & #1 \\
+    \textbf{Lecture:} & #2 \\
+    \textbf{Topic:} & #3 \\
+    \textbf{Date:} & #4 \\
+    \end{tabular}
+    \end{tcolorbox}
+}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
+\begin{document}
+
+\metainfo{CSCI E-89B: Natural Language Processing}{Lecture 8}{Structural Topic Modeling (STM)}{Fall 2024}
+
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Quiz Review: LDA and Topic Modeling}
+% ============================================================
+
+\begin{overviewbox}
+This lecture extends LDA to Structural Topic Modeling (STM), which incorporates document-level metadata (covariates) into topic modeling. We begin with a review of LDA concepts.
+\end{overviewbox}
+
+\subsection{LDA Quiz Questions}
+
+\begin{definitionbox}[title=What LDA Does]
+\textbf{Question}: Which statement best describes what LDA does?
+
+\textbf{Correct Answer}: LDA assumes each document is a \textbf{mixture of topics}.
+
+\textbf{Why other options are wrong}:
+\begin{itemize}
+\item ``Assigns a single topic to each document'' --- No, LDA assigns \textbf{probability distributions} over topics
+\item ``Supervised algorithm requiring labels'' --- No, LDA is \textbf{unsupervised}
+\item ``Uses K-means'' --- No, LDA uses probabilistic inference, not K-means
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Determining Optimal Number of Topics}
+
+\begin{warningbox}[title=Key Challenge in LDA]
+Determining the optimal number of topics is a significant challenge:
+\begin{itemize}
+\item \textbf{Too many topics}: Different topics become similar (redundancy)
+\item \textbf{Too few topics}: Unrelated concepts get combined
+\item Number of topics is a \textbf{hyperparameter} chosen before training
+\end{itemize}
+\end{warningbox}
+
+\textbf{Methods for choosing K}:
+\begin{enumerate}
+\item Maximize coherence and exclusivity (balance both)
+\item Maximize held-out likelihood (test set likelihood)
+\item Domain knowledge and interpretability
+\end{enumerate}
+
+\subsection{Role of the Dirichlet Distribution}
+
+\begin{definitionbox}[title=Dirichlet Distribution in LDA]
+The Dirichlet distribution generates \textbf{topic proportions} (prevalence) for each document:
+\[
+\theta_d \sim \text{Dirichlet}(\alpha)
+\]
+
+$\theta_d$ is a vector of probabilities summing to 1, representing how much each topic contributes to document $d$.
+\end{definitionbox}
+
+\subsection{LDA vs NMF}
+
+\begin{importantbox}
+\textbf{Key Difference}:
+\begin{itemize}
+\item \textbf{LDA}: Probabilistic model using maximum likelihood estimation
+\item \textbf{NMF}: Deterministic matrix algebra ($V \approx W \cdot H$)
+\end{itemize}
+
+NMF does \textbf{not} ``break down documents into additive parts''---it decomposes a matrix into a \textbf{product} (multiplication) of two non-negative matrices.
+\end{importantbox}
+
+
+% ============================================================
+\section{Challenges with Sequence Autoencoders}
+% ============================================================
+
+\begin{overviewbox}
+Before diving into STM, we address a common challenge students face: building autoencoders for text sequences. This is significantly harder than image autoencoders.
+\end{overviewbox}
+
+\subsection{Why Sequence Autoencoders Are Difficult}
+
+\begin{warningbox}[title=The Bottleneck Problem]
+When building a sequence autoencoder:
+\begin{itemize}
+\item You compress an entire sequence (many vectors) into a \textbf{single vector}
+\item This bottleneck loses the \textbf{time component}
+\item Reconstruction becomes extremely difficult without sufficient data
+\end{itemize}
+\end{warningbox}
+
+\begin{examplebox}[title=Comparison: Images vs Text]
+\textbf{Image Autoencoders}:
+\begin{itemize}
+\item Easier because spatial relationships are preserved through convolutions
+\item Even with compression, local structure remains
+\end{itemize}
+
+\textbf{Text Autoencoders}:
+\begin{itemize}
+\item Entire sentence compressed to single vector
+\item All word order and sequence information must be encoded
+\item Requires \textbf{enormous} amounts of training data
+\end{itemize}
+\end{examplebox}
+
+\subsection{Practical Solutions}
+
+\begin{infobox}[title=Strategies for Better Results]
+\begin{enumerate}
+\item \textbf{Increase bottleneck dimension}: If reconstruction fails, try larger latent representations
+\item \textbf{Data augmentation}: Create artificial training samples
+    \begin{itemize}
+    \item Replace words with synonyms
+    \item Drop or shuffle words
+    \item Vary sentence structure
+    \end{itemize}
+\item \textbf{Alternative architecture}: Skip the bottleneck entirely
+    \begin{itemize}
+    \item Use sequence-to-sequence without compression
+    \item Train embeddings without the ``encoding'' constraint
+    \end{itemize}
+\end{enumerate}
+\end{infobox}
+
+\begin{warningbox}[title=Historical Note]
+Early machine translation systems tried this bottleneck approach---compress source sentence to a vector, then decode to target language. This was state-of-the-art briefly, but was abandoned because of the exact difficulties described above. Modern systems (Transformers) avoid hard bottlenecks.
+\end{warningbox}
+
+
+% ============================================================
+\section{Maximum Likelihood Estimation Revisited}
+% ============================================================
+
+\begin{overviewbox}
+Understanding MLE is crucial for topic modeling. We use an intuitive analogy before applying it to STM.
+\end{overviewbox}
+
+\subsection{The Wet Cat Analogy}
+
+\begin{examplebox}[title=Intuitive MLE Example]
+Your cat comes home wet. What happened?
+
+\textbf{Possible explanations}:
+\begin{itemize}
+\item It's raining outside $\Rightarrow P(\text{cat wet} | \text{rain}) \approx 1$
+\item Someone deliberately sprayed the cat $\Rightarrow P(\text{cat wet} | \text{sprayed}) < 1$
+\end{itemize}
+
+\textbf{MLE conclusion}: Most likely it was raining, because that explanation maximizes the probability of observing a wet cat.
+
+\textbf{Caveat}: MLE finds the most likely explanation given the model, but isn't always ``correct''---the model could be wrong!
+\end{examplebox}
+
+\subsection{Non-uniqueness in Topic Models}
+
+\begin{warningbox}[title=LDA Results Vary Between Runs]
+LDA/STM may produce different results each time because:
+\begin{enumerate}
+\item \textbf{Label switching}: Topic 1 and Topic 2 could swap
+\item \textbf{Different local optima}: Multiple valid topic configurations exist
+\item \textbf{Random initialization}: Starting point affects final solution
+\end{enumerate}
+\end{warningbox}
+
+\begin{examplebox}[title=Multiple Valid Topic Configurations]
+Given documents:
+\begin{itemize}
+\item Doc 1: ``excellent but difficult''
+\item Doc 2: ``interesting but fast''
+\item Doc 3: ``difficult but interesting''
+\end{itemize}
+
+\textbf{Option A}: Topic 1 = \{excellent, difficult\}, Topic 2 = \{interesting, fast\}
+\begin{itemize}
+\item Doc 1: 100\% Topic 1
+\item Doc 2: 100\% Topic 2
+\item Doc 3: 50\% each
+\end{itemize}
+
+\textbf{Option B}: Topic 1 = \{interesting, fast\}, Topic 2 = \{difficult, interesting\}
+\begin{itemize}
+\item Doc 1: 100\% Topic 2
+\item Doc 2: 100\% Topic 1
+\item Doc 3: 50\% each (different composition!)
+\end{itemize}
+
+Both are valid MLE solutions! That's why we run multiple times and select the best.
+\end{examplebox}
+
+
+% ============================================================
+\section{Limitations of LDA}
+% ============================================================
+
+\begin{overviewbox}
+LDA is powerful but has limitations that motivate Structural Topic Modeling (STM).
+\end{overviewbox}
+
+\subsection{The Metadata Problem}
+
+\begin{definitionbox}[title=Metadata (Covariates)]
+\textbf{Metadata} is information \textbf{about} documents, not the text itself:
+\begin{itemize}
+\item Author name, gender, age
+\item Publication date
+\item Source (New York Times, Financial Times, etc.)
+\item Department or category
+\item Any other document-level attributes
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=Metadata Structure]
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Document} & \textbf{Gender} & \textbf{Author} & \textbf{Year} \\
+\midrule
+``Cats sat...'' & Female & Amanda Smith & 2024 \\
+``Dog ran away...'' & Male & Douglas Parker & 2025 \\
+\bottomrule
+\end{tabular}
+\end{center}
+This metadata could help predict topic distributions but LDA ignores it.
+\end{examplebox}
+
+\begin{warningbox}[title=Why Ignoring Metadata is Wasteful]
+If you know:
+\begin{itemize}
+\item An author's typical writing topics
+\item A publication's editorial focus
+\item Time periods when certain topics were trending
+\end{itemize}
+Ignoring this information makes topic assignment less accurate!
+\end{warningbox}
+
+
+% ============================================================
+\section{Structural Topic Modeling (STM)}
+% ============================================================
+
+\begin{overviewbox}
+STM extends LDA by incorporating document-level metadata (covariates) directly into the model, improving topic assignment accuracy and enabling hypothesis testing about how covariates affect topic prevalence.
+\end{overviewbox}
+
+\subsection{The STM Model}
+
+\begin{definitionbox}[title=STM vs LDA]
+\begin{itemize}
+\item \textbf{LDA}: $\theta_d \sim \text{Dirichlet}(\alpha)$ (same for all documents)
+\item \textbf{STM}: $\theta_d \sim \text{Logistic-Normal}(\mu_d, \Sigma)$ where $\mu_d$ depends on covariates
+\end{itemize}
+\end{definitionbox}
+
+\subsection{The Logistic Normal Distribution}
+
+\begin{definitionbox}[title=Logistic Normal for Topic Proportions]
+In STM, topic proportions are generated as:
+\[
+\theta_d | X_d \sim \text{Logistic-Normal}(X_d \gamma, \Sigma)
+\]
+
+where:
+\begin{itemize}
+\item $X_d$: Covariate vector for document $d$ (metadata)
+\item $\gamma$: Coefficient matrix (to be estimated)
+\item $\Sigma$: Covariance matrix (to be estimated)
+\end{itemize}
+\end{definitionbox}
+
+\textbf{How it works}:
+\begin{enumerate}
+\item Compute $\mu_d = X_d \gamma = \gamma_0 + \gamma_1 x_{d,1} + \gamma_2 x_{d,2} + \ldots$
+\item Draw $\eta_d \sim \mathcal{N}(\mu_d, \Sigma)$ (multivariate normal)
+\item Apply softmax: $\theta_d = \text{softmax}(\eta_d)$
+\end{enumerate}
+
+\begin{examplebox}[title=Concrete Example]
+If metadata is \texttt{Gender} (0 = Male, 1 = Female):
+\[
+\mu_d = \gamma_0 + \gamma_1 \cdot \text{Gender}_d
+\]
+
+For a female author ($\text{Gender}_d = 1$):
+\[
+\mu_d = \gamma_0 + \gamma_1
+\]
+
+The coefficient $\gamma_1$ captures how gender affects expected topic proportions!
+\end{examplebox}
+
+\subsection{Categorical Variables as Covariates}
+
+\begin{infobox}[title=One-Hot Encoding for Covariates]
+When covariates are categorical (like author name), they become multiple coefficients:
+\[
+X_d \gamma = \gamma_0 + \underbrace{\gamma_1 \cdot \mathbf{1}[\text{Amanda}] + \gamma_2 \cdot \mathbf{1}[\text{Douglas}] + \ldots}_{\text{One-hot encoded author}}
+\]
+
+Each category gets its own coefficient in $\gamma$.
+\end{infobox}
+
+\subsection{The Covariance Matrix}
+
+\begin{definitionbox}[title=Topic Correlations]
+The covariance matrix $\Sigma$ captures correlations between topics:
+\[
+\Sigma = \begin{pmatrix}
+\sigma_1^2 & \sigma_{12} & \cdots \\
+\sigma_{12} & \sigma_2^2 & \cdots \\
+\vdots & \vdots & \ddots
+\end{pmatrix}
+\]
+
+\begin{itemize}
+\item Diagonal: Variance of each topic's prevalence
+\item Off-diagonal: Correlations between topics
+\end{itemize}
+
+These are \textbf{estimated from data}, not hyperparameters.
+\end{definitionbox}
+
+
+% ============================================================
+\section{STM Estimation: The EM Algorithm}
+% ============================================================
+
+\begin{overviewbox}
+STM uses the Expectation-Maximization (EM) algorithm because topic assignments are latent (unobserved) variables.
+\end{overviewbox}
+
+\subsection{Why EM is Needed}
+
+\begin{importantbox}
+We observe documents but \textbf{not}:
+\begin{itemize}
+\item Which topic generated each word ($z_n$)
+\item True topic proportions ($\theta_d$)
+\item Topic-word distributions ($\beta_k$)
+\end{itemize}
+
+Since $z_n$ is unobserved, we can't directly compute the likelihood.
+\end{importantbox}
+
+\subsection{EM Algorithm Steps}
+
+\begin{definitionbox}[title=EM Algorithm]
+\textbf{E-step (Expectation)}:
+\begin{itemize}
+\item Given current parameters, compute expected values of latent variables
+\item Calculate $E[\log P(\text{data}, z | \theta)]$
+\end{itemize}
+
+\textbf{M-step (Maximization)}:
+\begin{itemize}
+\item Maximize expected log-likelihood with respect to parameters
+\item Update $\gamma$, $\Sigma$, $\beta$
+\end{itemize}
+
+\textbf{Iterate} until convergence.
+\end{definitionbox}
+
+\begin{warningbox}[title=Non-uniqueness and Multiple Runs]
+EM may converge to different local optima. \textbf{Best practice}:
+\begin{enumerate}
+\item Run STM multiple times with different initializations
+\item Compare coherence and exclusivity for each run
+\item Select the best model
+\end{enumerate}
+
+The STM package does this automatically by default.
+\end{warningbox}
+
+
+% ============================================================
+\section{STM Implementation in R}
+% ============================================================
+
+\begin{overviewbox}
+STM is primarily implemented in R. The \texttt{stm} package is highly reliable and widely used in social science research.
+\end{overviewbox}
+
+\subsection{Basic Workflow}
+
+\begin{lstlisting}[style=rstyle, caption={STM Workflow in R}]
+# Install and load
+install.packages("stm")
+library(stm)
+
+# Create documents and metadata
+documents <- c(
+  "cats are wonderful pets",
+  "cats enjoy climbing trees",
+  # ... more documents by author 1
+  "dogs love running outside",
+  "dogs are loyal companions"
+  # ... more documents by author 2
+)
+
+meta <- data.frame(
+  author = c(rep("author1", 8), rep("author2", 8))
+)
+
+# Preprocess text
+processed <- textProcessor(
+  documents,
+  metadata = meta,
+  lowercase = TRUE,
+  removestopwords = TRUE,
+  removenumbers = TRUE,
+  removepunctuation = TRUE,
+  stem = TRUE
+)
+
+# Prepare documents
+out <- prepDocuments(
+  processed$documents,
+  processed$vocab,
+  processed$meta
+)
+
+# Fit STM
+stm_model <- stm(
+  documents = out$documents,
+  vocab = out$vocab,
+  K = 5,                          # Number of topics
+  prevalence = ~ author,          # Covariates
+  data = out$meta,
+  max.em.its = 100,
+  init.type = "Spectral"
+)
+\end{lstlisting}
+
+\subsection{The Formula Interface}
+
+\begin{definitionbox}[title=R Formula Notation]
+The \texttt{prevalence} formula specifies covariates:
+\begin{itemize}
+\item \texttt{$\sim$ author}: Intercept + author effect
+\item \texttt{$\sim$ author + date}: Multiple covariates
+\item \texttt{$\sim$ author * date}: Interaction effects
+\end{itemize}
+
+The tilde ($\sim$) notation is standard R regression syntax.
+\end{definitionbox}
+
+\subsection{Preprocessing Details}
+
+\begin{warningbox}[title=Document Removal During Preprocessing]
+\texttt{textProcessor} may remove:
+\begin{itemize}
+\item Stop words
+\item Numbers
+\item Punctuation
+\item Infrequent terms
+\end{itemize}
+
+If a document becomes \textbf{empty} after preprocessing, it's removed along with its metadata row. That's why we use \texttt{out\$meta} instead of the original metadata!
+\end{warningbox}
+
+
+% ============================================================
+\section{Analyzing STM Results}
+% ============================================================
+
+\subsection{Viewing Topic Summaries}
+
+\begin{lstlisting}[style=rstyle, caption={Summarize and plot topics}]
+# Summary of topics
+summary(stm_model)
+
+# Plot expected topic proportions
+plot(stm_model, type = "summary", n = 5)
+\end{lstlisting}
+
+\subsection{Interpreting Topics}
+
+\begin{importantbox}
+\textbf{Best Practice}: Don't rely solely on top words to interpret topics. Instead, examine \textbf{documents with highest topic prevalence}.
+
+Top words may be:
+\begin{itemize}
+\item Common across many topics (e.g., ``Australia'' in Australian news)
+\item Stemmed and hard to interpret
+\item Ambiguous out of context
+\end{itemize}
+\end{importantbox}
+
+\begin{lstlisting}[style=rstyle, caption={Find representative documents}]
+# Find documents most associated with each topic
+findThoughts(stm_model, texts = documents, n = 3, topics = 1:5)
+\end{lstlisting}
+
+\subsection{Estimating Covariate Effects}
+
+\begin{definitionbox}[title=estimate Effect Function]
+To understand how covariates affect topic prevalence, use \texttt{estimateEffect}:
+\begin{enumerate}
+\item Sample from posterior distribution of $\theta$
+\item Regress sampled prevalences on covariates
+\item Compute confidence intervals
+\end{enumerate}
+\end{definitionbox}
+
+\begin{lstlisting}[style=rstyle, caption={Estimate and plot effects}]
+# Estimate effects for all topics
+effects <- estimateEffect(
+  1:5 ~ author,                   # Topics ~ covariates
+  stmobj = stm_model,
+  metadata = out$meta,
+  uncertainty = "Global"
+)
+
+# Plot difference between authors
+plot(effects,
+  covariate = "author",
+  topics = 1:5,
+  model = stm_model,
+  method = "difference",
+  cov.value1 = "author2",         # On the right
+  cov.value2 = "author1",         # Subtracted
+  main = "Effect of Author on Topic Prevalence"
+)
+\end{lstlisting}
+
+\subsection{Time Series of Topic Prevalence}
+
+\begin{lstlisting}[style=rstyle, caption={Topic prevalence over time}]
+# If date is a covariate
+effects_time <- estimateEffect(
+  1:5 ~ date,
+  stmobj = stm_model,
+  metadata = out$meta
+)
+
+plot(effects_time,
+  covariate = "date",
+  topics = 1:5,
+  model = stm_model,
+  method = "continuous",
+  xlab = "Date",
+  main = "Topic Prevalence Over Time"
+)
+\end{lstlisting}
+
+\begin{infobox}[title=Interpreting Time Plots]
+The plot shows:
+\begin{itemize}
+\item Expected topic prevalence (line)
+\item Confidence intervals (shaded region)
+\item Upward trend: topic becoming more prevalent
+\item Downward trend: topic becoming less prevalent
+\end{itemize}
+
+This assumes a \textbf{linear} trend. For non-linear patterns, use date as categorical or add polynomial terms.
+\end{infobox}
+
+
+% ============================================================
+\section{Selecting the Number of Topics}
+% ============================================================
+
+\begin{overviewbox}
+Choosing K (number of topics) requires running STM multiple times and comparing performance metrics.
+\end{overviewbox}
+
+\subsection{Using searchK}
+
+\begin{lstlisting}[style=rstyle, caption={Search for optimal K}]
+# Search across different numbers of topics
+k_search <- searchK(
+  documents = out$documents,
+  vocab = out$vocab,
+  K = 2:10,                       # Range of K to try
+  prevalence = ~ author,
+  data = out$meta,
+  init.type = "Spectral"
+)
+
+# Plot diagnostics
+plot(k_search)
+\end{lstlisting}
+
+\subsection{Coherence vs Exclusivity Trade-off}
+
+\begin{definitionbox}[title=Model Selection Criteria]
+\textbf{Semantic Coherence}: Are top words within a topic co-occurring in documents?
+
+\textbf{Exclusivity}: Are top words unique to each topic?
+
+These often trade off:
+\begin{itemize}
+\item More topics $\Rightarrow$ Higher exclusivity, lower coherence
+\item Fewer topics $\Rightarrow$ Higher coherence, lower exclusivity
+\end{itemize}
+\end{definitionbox}
+
+\begin{lstlisting}[style=rstyle, caption={Extract and plot coherence/exclusivity}]
+# Extract metrics
+coherence <- k_search$results$semcoh
+exclusivity <- k_search$results$exclus
+
+# Create comparison data frame
+metrics <- data.frame(
+  K = 2:10,
+  coherence = coherence,
+  exclusivity = exclusivity
+)
+
+# Plot
+library(ggplot2)
+ggplot(metrics, aes(x = exclusivity, y = coherence, label = K)) +
+  geom_point() +
+  geom_text(nudge_x = 0.01) +
+  labs(x = "Exclusivity", y = "Semantic Coherence",
+       title = "Coherence vs Exclusivity by Number of Topics") +
+  theme_minimal()
+\end{lstlisting}
+
+\begin{importantbox}
+\textbf{Selection Strategy}:
+\begin{enumerate}
+\item Rescale both metrics to $[0, 1]$
+\item Compute average of rescaled metrics
+\item Choose K that maximizes the average
+\item Alternatively: visual inspection---pick the point closest to the upper-right corner
+\end{enumerate}
+\end{importantbox}
+
+
+% ============================================================
+\section{Real-World Application: Student Evaluations}
+% ============================================================
+
+\begin{overviewbox}
+A published study analyzed 11 years of student evaluations at Harvard using STM, discovering how topic prevalence varies with instructor gender and department.
+\end{overviewbox}
+
+\subsection{Study Design}
+
+\begin{examplebox}[title=Student Evaluation Study]
+\textbf{Data}: ~1 million student evaluations
+
+\textbf{Covariates}:
+\begin{itemize}
+\item Instructor gender
+\item Instructor age
+\item Academic division
+\item Course type
+\end{itemize}
+
+\textbf{Number of topics}: 11 (selected via coherence/exclusivity)
+\end{examplebox}
+
+\subsection{Key Findings}
+
+\begin{importantbox}
+\textbf{Gender Differences in Topic Prevalence}:
+
+When students discuss \textbf{female} instructors, they more often mention:
+\begin{itemize}
+\item ``Caring, enthusiastic instructor''
+\item ``Facilitates effective discussion''
+\item ``Nice feedback''
+\end{itemize}
+
+When students discuss \textbf{male} instructors, they more often mention:
+\begin{itemize}
+\item ``Lectures are interesting and relevant''
+\item ``Uses humor effectively''
+\end{itemize}
+
+These patterns persisted even after controlling for department and course type---suggesting potential \textbf{student bias}.
+\end{importantbox}
+
+\subsection{Division-Level Patterns}
+
+\begin{examplebox}[title=Topic Variation by Academic Division]
+\textbf{Sciences}: ``Explains complex concepts effectively'' (high prevalence)
+
+\textbf{Humanities}: ``Facilitates effective discussions'' (high prevalence)
+
+\textbf{Freshman Seminars}: ``Positive timely feedback'' (high prevalence)
+
+These differences reflect genuine pedagogical differences across disciplines.
+\end{examplebox}
+
+\subsection{Practical Implications}
+
+\begin{warningbox}[title=Why This Matters]
+If student evaluations show systematic biases:
+\begin{itemize}
+\item Promotion decisions may be affected
+\item Tenure reviews could be biased
+\item Adjustments might be needed when interpreting evaluations
+\end{itemize}
+
+STM allows researchers to \textbf{quantify} these effects and test their significance.
+\end{warningbox}
+
+
+% ============================================================
+\section{Advanced STM Features}
+% ============================================================
+
+\subsection{Topic Correlations}
+
+\begin{lstlisting}[style=rstyle, caption={Visualize topic correlations}]
+# Plot topic correlations
+topicCorr(stm_model, method = "simple")
+\end{lstlisting}
+
+This shows which topics tend to co-occur within documents.
+
+\subsection{Selecting Among Multiple Runs}
+
+\begin{lstlisting}[style=rstyle, caption={Select best model from multiple runs}]
+# searchK already runs multiple times internally
+# To manually select the best model:
+best_model <- selectModel(
+  documents = out$documents,
+  vocab = out$vocab,
+  K = 5,
+  prevalence = ~ author,
+  data = out$meta,
+  runs = 20                       # Number of runs
+)
+
+# Select based on exclusivity/coherence
+plotModels(best_model)
+\end{lstlisting}
+
+
+% ============================================================
+\section{One-Page Summary}
+% ============================================================
+
+\begin{summarybox}
+\textbf{Structural Topic Modeling (STM)} extends LDA by incorporating document metadata.
+
+\textbf{Key Differences from LDA}:
+\begin{itemize}
+\item LDA: $\theta_d \sim \text{Dirichlet}(\alpha)$
+\item STM: $\theta_d \sim \text{Logistic-Normal}(X_d\gamma, \Sigma)$
+\end{itemize}
+
+\textbf{STM Generation Process}:
+\begin{enumerate}
+\item Compute $\mu_d = X_d \gamma$ (linear function of covariates)
+\item Draw $\eta_d \sim \mathcal{N}(\mu_d, \Sigma)$
+\item Apply softmax: $\theta_d = \text{softmax}(\eta_d)$
+\item Generate words as in LDA
+\end{enumerate}
+
+\textbf{Why Use STM?}:
+\begin{itemize}
+\item Incorporates metadata (author, date, source)
+\item More accurate topic assignments
+\item Test hypotheses about covariate effects
+\item Track topic prevalence over time
+\end{itemize}
+
+\textbf{R Implementation}:
+\begin{enumerate}
+\item \texttt{textProcessor()}: Preprocess documents
+\item \texttt{prepDocuments()}: Prepare for modeling
+\item \texttt{stm()}: Fit the model
+\item \texttt{estimateEffect()}: Analyze covariate effects
+\item \texttt{searchK()}: Find optimal number of topics
+\end{enumerate}
+
+\textbf{Model Selection}:
+\begin{itemize}
+\item Balance \textbf{coherence} (words co-occur) and \textbf{exclusivity} (topics distinct)
+\item Run multiple times, select best via metrics
+\item Rescale metrics to $[0,1]$, maximize average
+\end{itemize}
+
+\textbf{Best Practices}:
+\begin{itemize}
+\item Interpret topics via representative documents, not just top words
+\item Use \texttt{out\$meta} after preprocessing (some rows removed)
+\item Multiple runs are essential due to non-uniqueness
+\end{itemize}
+\end{summarybox}
+
+
+% ============================================================
+\section{Glossary}
+% ============================================================
+
+\begin{definitionbox}[title=Key Terms]
+\begin{itemize}
+\item \textbf{STM}: Structural Topic Modeling---LDA extension with covariates
+\item \textbf{Metadata/Covariates}: Document-level information (author, date, source)
+\item \textbf{Logistic Normal}: Distribution for generating topic proportions in STM
+\item \textbf{Prevalence}: Expected proportion of a topic in documents
+\item \textbf{EM Algorithm}: Expectation-Maximization for latent variable models
+\item \textbf{E-step}: Compute expected log-likelihood given current parameters
+\item \textbf{M-step}: Maximize expected log-likelihood to update parameters
+\item \textbf{Posterior distribution}: Distribution of parameters after observing data
+\item \textbf{estimateEffect}: STM function to analyze covariate effects
+\item \textbf{searchK}: STM function to find optimal number of topics
+\item \textbf{selectModel}: STM function to choose best run
+\item \textbf{findThoughts}: STM function to find representative documents
+\item \textbf{Coherence}: Metric for within-topic word co-occurrence
+\item \textbf{Exclusivity}: Metric for between-topic word distinctiveness
+\item \textbf{textProcessor}: STM preprocessing function
+\item \textbf{prepDocuments}: STM document preparation function
+\end{itemize}
+\end{definitionbox}
+
+\end{document}

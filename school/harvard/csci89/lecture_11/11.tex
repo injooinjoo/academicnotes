@@ -1,0 +1,1011 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-89B: 자연어 처리 입문}}
+\fancyhead[R]{\small\textit{Lecture 11}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-89B: 자연어 처리 입문 - Lecture 11},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 11}{Dmitry Kurochkin}{Lecture 11의 핵심 개념 학습}
+
+
+%========================================================================================
+\begin{summarybox}
+이 문서는 자연어 처리(NLP)의 고급 모델들을 다룹니다. 문장의 순서와 구조를 이해하는 **순차 레이블링 모델**(HMM, CRF, BiLSTM-CRF)부터, 새로운 데이터(텍스트나 이미지)를 생성하는 **생성 모델**(VAE, GAN)까지의 핵심 원리를 다룹니다.
+
+각 모델이 \textbf{왜 등장했는지} (이전 모델의 한계), \textbf{어떻게 작동하는지} (핵심 아이디어), 그리고 \textbf{어떤 단점이 있는지} (다음 모델의 등장 배경)를 중심으로 설명합니다. 이 문서 하나만으로 각 모델의 개념을 잡고 서로 비교할 수 있도록 구성되었습니다.
+\end{summarybox}
+%========================================================================================
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{용어 정리}
+%========================================================================================
+
+본격적인 학습에 앞서, 이 문서에서 다룰 주요 용어들을 정리합니다.
+
+\begin{table}[h!]
+\centering
+\caption{주요 NLP 모델 및 개념 용어}
+\label{tab:terms}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lp{6cm}lp{4cm}}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고 (핵심 키워드)} \\
+\midrule
+마코프 속성 & "미래는 오직 현재에만 의존한다." (과거는 불필요) & Markov Property & HMM의 기본 가정 \\
+HMM & '숨겨진 상태'가 '관찰된 결과'를 만든다고 보는 모델 & Hidden Markov Model & 생성 모델, POS 태깅 \\
+CRF & '전체 관찰 결과'를 보고 '가장 확률 높은 상태'를 맞히는 모델 & Conditional Random Fields & 판별 모델, NER, HMM의 한계 극복 \\
+특징 함수 & CRF가 특정 패턴(예: 대문자, 이전 단어)을 감지하는 규칙 & Feature Function & CRF의 핵심. (수동 정의 필요) \\
+BiLSTM & 문장을 양방향으로 읽어 문맥을 파악하는 똑똑한 RNN & Bidirectional LSTM & 자동 특징 추출기 \\
+오토인코더 & 데이터를 압축(인코더)했다가 복원(디코더)하는 모델 & Autoencoder (AE) & 차원 축소, 특징 학습 \\
+VAE & 잠재 공간을 '확률 분포'로 만들어 부드럽게 연결한 AE & Variational AE & 생성 모델, 잠재 공간 구조화 \\
+잠재 손실 & VAE가 잠재 공간을 구조화하도록 강제하는 패널티 & Latent Loss (KL Div.) & $\mu$는 0으로, $\sigma$는 1로 유도 \\
+GAN & 위조범(생성자)과 경찰(판별자)이 경쟁하며 학습하는 모델 & Generative Adversarial Network & 생성 모델, 고품질 이미지 생성 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+
+%========================================================================================
+\section{핵심 개념 1: Hidden Markov Models (HMM)}
+%========================================================================================
+
+HMM(은닉 마코프 모델)은 순차적인 데이터(예: 문장)를 이해하기 위한 고전적이면서도 중요한 통계 모델입니다.
+
+\subsection{시작하기: 마코프 체인 (Markov Chains)}
+
+HMM을 이해하려면 먼저 마코프 체인을 알아야 합니다.
+
+\begin{infobox}
+\textbf{마코프 체인(Markov Chain)}은 여러 '상태'(State)가 존재하고, 한 상태에서 다음 상태로 이동할 확률(전이 확률)이 정해져 있는 모델입니다.
+
+\textbf{핵심 가정: 마코프 속성 (Markov Property)}
+\begin{itemize}
+    \item "미래의 상태는 오직 \textbf{현재 상태}에만 의존한다."
+    \item 즉, 내가 '상태 2'에 도달하기까지 '상태 0 $\rightarrow$ 상태 1'을 거쳤든, '상태 3 $\rightarrow$ 상태 1'을 거쳤든 상관없이, '상태 1'에 있다는 \textbf{현재 사실}만이 다음 상태(예: '상태 2')로 갈 확률에 영향을 줍니다.
+    \item (비유) 주사위 굴리기: 이전에 1이 10번 연속 나왔다고 해서, 다음번에 1이 나올 확률(1/6)이 변하지 않는 것과 비슷합니다.
+\end{itemize}
+\end{infobox}
+
+\begin{examplebox}
+\textbf{예시: 날씨 마코프 체인}
+세 가지 날씨 상태가 있다고 가정합니다: (1) 맑음, (2) 흐림, (3) 비
+
+\begin{itemize}
+    \item 오늘 '맑음'일 때, 내일 '맑음'일 확률 (P(맑음|맑음)) = 0.7
+    \item 오늘 '맑음'일 때, 내일 '흐림'일 확률 (P(흐림|맑음)) = 0.2
+    \item 오늘 '맑음'일 때, 내일 '비'일 확률 (P(비|맑음)) = 0.1
+    \item (이 확률들의 합은 1이 되어야 합니다: 0.7 + 0.2 + 0.1 = 1.0)
+\end{itemize}
+이처럼 '흐림'일 때와 '비'일 때의 다음 날 날씨 확률도 모두 정의해 놓은 것이 마코프 체인입니다.
+\end{examplebox}
+
+\subsection{HMM: 숨겨진 상태와 관찰된 결과}
+
+HMM은 마코프 체인에서 한 단계 더 나아갑니다. 우리가 '상태'를 직접 볼 수 없고, '상태'가 만들어낸 '결과물'만 볼 수 있다고 가정합니다.
+
+\begin{infobox}
+\textbf{HMM(Hidden Markov Model)}은 두 가지 층위로 구성됩니다.
+\begin{enumerate}
+    \item \textbf{숨겨진 상태 (Hidden States, Y)}:
+    \begin{itemize}
+        \item 우리는 직접 볼 수 없습니다. (예: 실제 날씨, 단어의 품사)
+        \item 이 숨겨진 상태들은 마코프 속성을 따르며 서로 이동합니다. (예: 명사 다음에는 동사가 올 확률이 높다)
+        \item 이 이동 확률을 \textbf{전이 확률 (Transition Probability)}이라고 부릅니다.
+    \end{itemize}
+    \item \textbf{관찰된 결과 (Observations, X)}:
+    \begin{itemize}
+        \item 숨겨진 상태가 만들어낸 결과물이며, 우리가 실제로 보는 데이터입니다.
+        \item (예: 아이스크림 판매량, 실제 단어 'study')
+        \item 특정 숨겨진 상태가 특정 관찰 결과를 만들어낼 확률을 \textbf{방출 확률 (Emission Probability)}이라고 부릅니다.
+    \end{itemize}
+\end{enumerate}
+이 외에, 문장이 어떤 상태에서 시작할지 정하는 \textbf{초기 상태 확률}이 있습니다.
+\end{infobox}
+
+\begin{examplebox}
+\textbf{예시: 품사 판별 (Part-of-Speech Tagging)}
+우리의 목표는 "I study"라는 문장(관찰 X)을 보고, "대명사, 동사"라는 품사(숨겨진 상태 Y)를 맞히는 것입니다.
+
+\begin{itemize}
+    \item \textbf{관찰 (X)}: "I", "study" (우리가 보는 단어)
+    \item \textbf{숨겨진 상태 (Y)}: "대명사(PRP)", "동사(VBP)" (우리가 맞혀야 하는 품사)
+    \item \textbf{초기 확률}: 문장은 '대명사'로 시작할 확률이 높다. (P(Y_1=PRP))
+    \item \textbf{전이 확률}: '대명사' 상태(Y\_t) 다음에는 '동사' 상태(Y\_t+1)가 올 확률이 높다. (P(VBP|PRP))
+    \item \textbf{방출 확률}: '대명사' 상태(Y)는 "I"라는 단어(X)를 방출(생성)할 확률이 높다. (P("I"|PRP)) / '동사' 상태(Y)는 "study"라는 단어(X)를 방출할 확률이 높다. (P("study"|VBP))
+\end{itemize}
+HMM은 이 확률들을 조합하여 "I study"라는 관찰이 주어졌을 때, 가장 그럴듯한(확률 높은) 숨겨진 상태의 연속(즉, 품사 태그)이 "대명사 $\rightarrow$ 동사"임을 계산해냅니다.
+\end{examplebox}
+
+\subsection{HMM의 한계}
+
+HMM은 강력하지만 치명적인 한계를 가집니다.
+
+\begin{cautionbox}
+\textbf{한계: 너무 단순한 의존성 가정}
+
+\begin{itemize}
+    \item \textbf{마코프 속성의 한계}: HMM은 $t+1$ 시점의 상태(Y\_t+1)가 \textbf{오직 $t$ 시점의 상태(Y\_t)에만} 의존한다고 가정합니다.
+    \item (예시) "I study"에서 "study"의 품사는 "I"(대명사)에만 영향을 받습니다.
+    \item \textbf{관찰 독립성의 한계}: HMM은 $t$ 시점의 관찰(X\_t)이 \textbf{오직 $t$ 시점의 상태(Y\_t)에만} 의존한다고 가정합니다.
+    \item (예시) "study"라는 단어는 "동사"라는 현재 품사에만 영향을 받습니다.
+\end{itemize}
+\textbf{문제점:} 실제 언어는 그렇지 않습니다! "study"가 동사인지 명사인지 판단하려면 "I"라는 단어뿐만 아니라 "I \textbf{will} study..."나 "A \textbf{recent} study..."처럼 문장 \textbf{전체}의 다른 단어들(X)을 모두 참고해야 합니다.
+
+HMM은 현재 상태(Y\_t) 외에는 \textbf{그 어떤 정보(다른 시점의 Y나 X)도 보지 못하는} 근시안적인 모델입니다.
+\end{cautionbox}
+
+\newpage
+
+%========================================================================================
+\section{핵심 개념 2: Conditional Random Fields (CRFs)}
+%========================================================================================
+
+CRF(조건부 랜덤 필드)는 HMM의 '근시안적인' 한계를 극복하기 위해 등장한 강력한 순차 레이블링 모델입니다.
+
+\subsection{HMM의 한계를 극복하다}
+
+HMM이 "현재 상태(Y\_t)는 오직 이전 상태(Y\_t-1)에만 의존한다"고 가정한 반면, CRF는 이 가정을 완전히 버립니다.
+
+\begin{infobox}
+\textbf{CRF(Conditional Random Field)}의 핵심 아이디어:
+
+"레이블(Y)을 맞힐 때, HMM처럼 쪼개서 보지 말고, \textbf{관찰(X) 시퀀스 전체를 한꺼번에} 조건으로 사용하자!"
+
+\begin{itemize}
+    \item \textbf{HMM (생성 모델)}: $P(X, Y)$를 모델링. (상태가 관찰을 '생성'한다고 봄)
+        \begin{itemize}
+            \item "어떤 품사(Y)가 어떤 단어(X)를 생성할까?" (날씨가 아이스크림 판매량을 생성)
+            \item $P(X, Y) = P(Y) \times P(X|Y)$
+        \end{itemize}
+    \item \textbf{CRF (판별 모델)}: $P(Y | X)$를 직접 모델링. (관찰을 보고 상태를 '판별'함)
+        \begin{itemize}
+            \item "이 단어들(X)이 주어졌을 때, 가장 적절한 품사(Y)는 무엇일까?"
+            \item (비유) 로지스틱 회귀가 선형 회귀보다 분류에 더 직접적이듯, CRF는 HMM보다 순차 레이블링에 더 직접적입니다. (CRF는 로지스틱 회귀의 시퀀스 버전이라 불림)
+        \end{itemize}
+\end{itemize}
+이 '판별' 접근 방식 덕분에, CRF는 HMM이 할 수 없었던 \textbf{문장 전체의 다양한 특징}을 자유롭게 활용할 수 있습니다.
+\end{infobox}
+
+\subsection{CRF의 핵심: 특징 함수 (Feature Functions)}
+
+CRF가 문장 전체의 특징을 활용하는 방법은 '특징 함수'를 사용하는 것입니다.
+
+\begin{infobox}
+\textbf{특징 함수 ($f_k$)}는 우리가 모델에게 알려주는 "규칙" 또는 "패턴"입니다. 이 함수는 (이전 레이블 $Y_{t-1}$, 현재 레이블 $Y_t$, 관찰 시퀀스 $X$, 현재 시점 $t$)를 입력받아 0 또는 1을 반환합니다.
+
+\textbf{가중치 ($\lambda_k$)}는 각 특징 함수($f_k$)가 얼마나 중요한지 나타내는 점수입니다. (이 값은 모델이 학습을 통해 스스로 찾습니다.)
+
+CRF는 이 (특징 함수 $\times$ 가중치)의 합을 기반으로 가장 점수가 높은 레이블 시퀀스를 선택합니다.
+\end{infobox}
+
+\begin{examplebox}
+\textbf{예시: 이름 인식 (Named Entity Recognition, NER)}
+문장 "Mr. Smith..."에서 "Smith"가 사람 이름(B-PERSON)임을 맞히고 싶습니다.
+
+\textbf{1. 우리가 직접 '특징 함수'($f_k$)를 설계합니다: (수동 공학)}
+\begin{itemize}
+    \item $f_1 = 1$ \textbf{if} (현재 단어($X_t$)가 "Smith" AND 현재 레이블($Y_t$)이 "B-PERSON") \textbf{else} 0
+    \item $f_2 = 1$ \textbf{if} (현재 단어($X_t$)가 대문자로 시작 AND 현재 레이블($Y_t$)이 "B-PERSON") \textbf{else} 0
+    \item $f_3 = 1$ \textbf{if} (\textbf{이전 단어($X_{t-1}$)가 "Mr."} AND 현재 레이블($Y_t$)이 "B-PERSON") \textbf{else} 0
+    \item $f_4 = 1$ \textbf{if} (이전 레이블($Y_{t-1}$)이 "O" AND 현재 레이블($Y_t$)이 "B-PERSON") \textbf{else} 0
+    \item $f_5 = 1$ \textbf{if} (\textbf{다음 단어($X_{t+1}$)가 쉼표(,)
+} AND 현재 레이블($Y_t$)이 "B-PERSON") \textbf{else} 0
+\end{itemize}
+\textbf{2. 모델이 $\lambda_k$ (가중치)를 학습합니다:}
+\begin{itemize}
+    \item 학습 데이터에서 $f_2, f_3, f_4$ 같은 패턴이 이름 인식에 매우 유용하다는 것을 발견하면,
+    \item 모델은 $\lambda_2, \lambda_3, \lambda_4$에 높은 양수 값을 할당합니다.
+\end{itemize}
+\textbf{3. 예측:}
+"Mr. Smith"가 입력되면, $f_2, f_3, f_4$가 모두 활성화(1)되면서, "Smith"의 레이블로 "B-PERSON"을 선택할 때 전체 점수가 가장 높아지게 됩니다. HMM과 달리 \textbf{과거("Mr.")와 미래("," - 만약 있다면)}의 관찰(X)을 모두 활용할 수 있습니다.
+\end{examplebox}
+
+\subsection{CRF의 장점과 단점}
+
+\begin{cautionbox}
+\textbf{장점:}
+\begin{itemize}
+    \item \textbf{유연한 특징 활용}: HMM과 달리 문장 전체의 어떤 특징(예: 현재 단어, 이전/다음 단어, 접두사, 접미사, 대소문자 여부 등)이든 자유롭게 가져와 사용할 수 있습니다.
+    \item \textbf{판별 모델}: $P(Y|X)$를 직접 모델링하여 순차 레이블링 작업에 더 적합합니다.
+\end{itemize}
+\textbf{치명적인 단점:}
+\begin{itemize}
+    \item \textbf{수동 특징 공학 (Intensive Feature Engineering)}:
+    \item 위 예시처럼, 어떤 특징($f_k$)이 유용한지는 \textbf{사람이 직접} 생각해서 코드로 구현해야 합니다.
+    \item 이는 엄청난 시간과 노력이 필요하며, 도메인 전문가의 지식이 요구됩니다.
+    \item 만약 우리가 $f_3$ (이전 단어가 "Mr.") 같은 중요한 특징을 빠뜨리면, 모델의 성능은 급격히 저하됩니다.
+\end{itemize}
+\end{cautionbox}
+
+\newpage
+
+%========================================================================================
+\section{핵심 개념 3: BiLSTM-CRF (자동 특징 공학)}
+%========================================================================================
+
+CRF는 강력했지만 '수동 특징 공학'이라는 거대한 벽에 부딪혔습니다. 이 문제를 해결하기 위해 딥러닝, 즉 BiLSTM이 CRF와 결합되었습니다.
+
+\subsection{CRF의 단점을 해결하다: BiLSTM의 등장}
+
+CRF의 문제는 '좋은 특징'을 사람이 만들어야 한다는 것이었습니다. 만약 '좋은 특징'을 기계가 알아서 문맥을 보고 뽑아주면 어떨까요?
+
+\begin{infobox}
+\textbf{BiLSTM-CRF 아키텍처}는 두 개의 강력한 모델이 각자의 장점을 살려 결합한 형태입니다.
+
+\begin{enumerate}
+    \item \textbf{BiLSTM (Bidirectional LSTM) 층: "자동 특징 추출기"}
+    \begin{itemize}
+        \item 입력: 단어들의 시퀀스 (보통 임베딩 벡터로 변환됨)
+        \item 역할: CRF에 필요했던 '특징 함수'($f_k$)를 \textbf{자동으로 학습}합니다.
+        \item BiLSTM은 문장을 정방향(왼쪽 $\rightarrow$ 오른쪽)과 역방향(오른쪽 $\rightarrow$ 왼쪽)으로 동시에 읽습니다.
+        \item (예시) "Smith"라는 단어를 처리할 때, 정방향 LSTM은 "Mr."라는 과거 문맥을, 역방향 LSTM은 "lives in..."이라는 미래 문맥을 모두 고려합니다.
+        \item 출력: 각 단어 위치($t$)에서, 과거와 미래 문맥이 모두 풍부하게 반영된 \textbf{"특징 벡터" (H_t)}를 생성합니다. 이 벡터는 CRF가 사용할 수 있는 '고품질의 자동 생성 특징'입니다.
+    \end{itemize}
+    \item \textbf{CRF 층: "최종 레이블 결정자"}
+    \begin{itemize}
+        \item 입력: BiLSTM이 뽑아준 고품질 특징 벡터들 (H\_1, H\_2, ...)
+        \item 역할: 이 특징들을 입력받아, \textbf{레이블 시퀀스 간의 의존성}을 학습하고 최종 레이블을 결정합니다.
+        \item (예시) "Smith"가 B-PERSON(이름 시작)일 확률이 높다는 특징 벡터를 받아도, CRF는 "I-PER(이름 중간) 뒤에는 B-LOC(장소 시작)이 올 수 없다"와 같은 \textbf{레이블 간의 규칙}을 학습하여, "B-PERSON $\rightarrow$ I-PERSON"처럼 문법적으로 올바른 레이블 시퀀스를 출력하도록 보장합니다.
+    \end{itemize}
+\end{enumerate}
+\end{infobox}
+
+\begin{qabox}{왜 BiLSTM 위에 Softmax만 쓰지 않고 굳이 CRF를 붙이나요?}
+BiLSTM의 각 시점 출력(H\_t)에 Softmax를 적용하여 바로 레이블을 예측할 수도 있습니다 (이것을 '독립적인 분류'라고 합니다).
+
+\textbf{문제점:} Softmax는 각 단어의 레이블을 \textbf{독립적으로} 예측합니다.
+\begin{itemize}
+    \item (예시) "Mr. John Smith"를 예측할 때, "Mr."(B-PER), "John"(I-PER)까지는 잘 맞히다가, "Smith"에서 실수로 B-LOC(장소 시작)를 예측할 수 있습니다.
+    \item 그 결과 "B-PER $\rightarrow$ I-PER $\rightarrow$ \textbf{B-LOC}"라는, 문법적으로 말이 안 되는(I-PER 다음에는 I-PER나 O가 와야 함) 레이블 시퀀스가 나올 수 있습니다.
+\end{itemize}
+\textbf{CRF의 역할:} CRF 층은 $P(Y|X)$를 '전역적(Globally)'으로 최적화합니다.
+\begin{itemize}
+    \item 즉, BiLSTM이 "Smith"를 B-LOC로 예측하려는 성향(Emission 점수)을 보여도, CRF 층이 학습한 "I-PER $\rightarrow$ B-LOC"라는 \textbf{전이(Transition) 점수}가 매우 낮다면,
+    \item CRF는 이 경로를 패널티를 주어 선택하지 않고, 대신 "I-PER $\rightarrow$ I-PER"라는 더 그럴듯한(점수가 높은) 전체 시퀀스를 선택합니다.
+\end{itemize}
+\textbf{결론:} BiLSTM이 '문맥을 읽어 특징을 뽑는' 두뇌라면, CRF는 '레이블 간의 문법 규칙을 적용하는' 문법 교정기 역할을 합니다.
+\end{qabox}
+
+\subsection{장점과 단점}
+
+\begin{infobox}
+\textbf{장점:}
+\begin{itemize}
+    \item \textbf{자동 특징 공학}: BiLSTM이 문맥을 읽어 CRF가 필요로 하는 특징을 자동으로 학습합니다. (수동 공학 불필요)
+    \item \textbf{높은 정확도}: 문맥(BiLSTM)과 레이블 의존성(CRF)을 모두 고려하여, NER, POS 태깅 등에서 SOTA(최고 수준) 성능을 보였습니다.
+\end{itemize}
+\textbf{단점:}
+\begin{itemize}
+    \item \textbf{높은 계산 비용}: BiLSTM과 CRF를 모두 학습해야 하므로 HMM이나 CRF 단독 모델보다 복잡하고 느립니다.
+    \item \textbf{복잡한 모델 튜닝}: 하이퍼파라미터가 많아 튜닝이 어렵습니다.
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{실습/코드: BiLSTM-CRF 구현 (Python)}
+%========================================================================================
+
+BiLSTM-CRF 모델은 \texttt{torch}와 \texttt{pytorch-crf} 같은 라이브러리를 사용하여 구현할 수 있습니다. (코드는 개념 이해를 위한 의사 코드(pseudo-code)에 가깝게 단순화되었습니다.)
+
+\begin{lstlisting}[language=Python, caption={BiLSTM-CRF 모델 클래스 정의 (PyTorch 예시)}, label={lst:bilstm-crf}]
+import torch
+import torch.nn as nn
+from TorchCRF import CRF
+
+class BiLSTM_CRF(nn.Module):
+    def __init__(self, vocab_size, tagset_size, embedding_dim, hidden_dim):
+        super(BiLSTM_CRF, self).__init__()
+        
+        # 1. 임베딩 층 (단어 -> 벡터)
+        self.embedding = nn.Embedding(vocab_size, embedding_dim)
+        
+        # 2. BiLSTM 층 (특징 추출기)
+        #    hidden_dim // 2 는 양방향이므로 합치면 hidden_dim이 됨
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim // 2,
+                            num_layers=1, bidirectional=True, 
+                            batch_first=True)
+        
+        # 3. Linear 층 (LSTM 출력을 CRF가 받을 점수로 변환)
+        #    이것이 CRF의 'Emission 점수'가 됨
+        self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
+        
+        # 4. CRF 층 (레이블 결정자)
+        self.crf = CRF(tagset_size, batch_first=True)
+
+    def forward(self, sentences, tags=None, mask=None):
+        # 1. 임베딩
+        embeddings = self.embedding(sentences)
+        
+        # 2. BiLSTM 통과
+        lstm_out, _ = self.lstm(embeddings)
+        
+        # 3. Emission 점수 계산
+        emissions = self.hidden2tag(lstm_out)
+        
+        if tags is not None:
+            # 학습 모드: (emissions, tags) 간의 로그 가능도(likelihood)를 계산
+            # (이것이 Loss가 됨. 우리는 이 값을 최소화 = 음수 로그 가능도 최소화)
+            log_likelihood = self.crf(emissions, tags, mask=mask)
+            return -log_likelihood
+        else:
+            # 예측 모드: emissions 점수와 CRF의 전이 점수를 고려하여
+            # 가장 점수가 높은 최적의 태그 시퀀스를 디코딩(Viterbi)
+            tag_seq = self.crf.decode(emissions, mask=mask)
+            return tag_seq
+\end{lstlisting}
+
+\begin{infobox}[title=코드 해설]
+\begin{itemize}
+    \item \texttt{nn.Embedding}: 입력된 단어 인덱스(예: 1, 3, 10)를 밀집 벡터(예: 100차원)로 변환합니다.
+    \item \texttt{nn.LSTM}: 임베딩된 벡터 시퀀스를 입력받아, 양방향 문맥을 고려한 특징 벡터 시퀀스(\texttt{lstm\_out})를 출력합니다.
+    \item \texttt{nn.Linear}: \texttt{lstm\_out} (예: 256차원)을 \texttt{tagset\_size} (예: 9개 태그) 차원의 '점수(Emission Score)'로 변환합니다. 이 점수는 "이 단어가 이 태그일 확률이 얼마나 높은가"에 대한 BiLSTM의 의견입니다.
+    \item \texttt{self.crf}: 이 'Emission 점수'와 자신이 학습한 '전이 점수(Tramsition Score)'를 함께 고려합니다.
+    \item \textbf{학습 시 (\texttt{forward}의 if문)}: 정답 \texttt{tags}를 알려주고, 해당 정답 경로의 확률(\texttt{log\_likelihood})을 높이도록 모델(BiLSTM의 가중치, CRF의 전이 행렬)을 업데이트합니다.
+    \item \textbf{예측 시 (\texttt{forward}의 else문)}: 정답이 없으므로, \texttt{crf.decode} (보통 비터비 알고리즘 사용)를 통해 현재 Emission 점수와 전이 점수를 조합할 때 총점이 가장 높은 '최적의 경로'를 찾아 반환합니다.
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{핵심 개념 4: Variational Autoencoders (VAEs)}
+%========================================================================================
+
+지금까지는 주어진 입력(X)에서 레이블(Y)을 맞히는 '판별 모델' 또는 '순차 모델'을 다뤘습니다. 이제부터는 모델이 스스로 무언가를 '생성'해내는 **생성 모델(Generative Models)**을 다룹니다.
+
+\subsection{시작하기: 일반 오토인코더 (Autoencoder, AE)}
+
+VAE를 이해하려면 먼저 일반 AE를 알아야 합니다.
+
+\begin{infobox}
+\textbf{오토인코더(AE)}는 "입력을 압축했다가 다시 복원하는" 신경망입니다.
+\begin{itemize}
+    \item \textbf{인코더 (Encoder)}: 입력 데이터(예: 고해상도 이미지)를 저차원의 벡터(예: 30차원 벡터)로 \textbf{압축}합니다. 이 압축된 벡터를 \textbf{잠재 변수(Latent Variable)} 또는 \textbf{코딩(Coding)}이라고 부릅니다.
+    \item \textbf{병목 (Bottleneck)}: 이 잠재 변수가 있는 가장 좁은 구간입니다.
+    \item \textbf{디코더 (Decoder)}: 압축된 잠재 변수를 입력받아 다시 원본 데이터(이미지)로 \textbf{복원}합니다.
+\end{itemize}
+\textbf{학습 목표:} (입력)과 (복원된 출력)이 최대한 같아지도록 (즉, 재구성 손실(Reconstruction Loss)을 최소화하도록) 학습합니다. 이 과정에서 인코더는 데이터의 핵심 특징(예: 얼굴 이미지의 눈, 코, 입 특징)만 잠재 변수에 압축하는 법을 배우게 됩니다.
+\end{infobox}
+
+\subsection{일반 AE의 한계: 비구조화된 잠재 공간}
+
+AE는 데이터 압축에는 유용하지만, '생성 모델'로 쓰기에는 치명적인 한계가 있습니다.
+
+\begin{cautionbox}
+\textbf{문제: 잠재 공간에 구멍(Hole)이 많다.}
+\begin{itemize}
+    \item AE는 학습 데이터(예: 입력 이미지 1000장)를 잠재 공간(예: 2차원 평면)의 특정 점(1000개의 점)으로 매핑합니다.
+    \item 디코더는 \textbf{정확히 그 1000개의 점} 위치에서만 원본을 잘 복원하도록 학습됩니다.
+    \item 만약 우리가 1번 이미지의 잠재 변수(A점)와 2번 이미지의 잠재 변수(B점)의 \textbf{중간 지점(C점)}에 있는 값을 디코더에 넣으면 어떻게 될까요?
+    \item \textbf{결과:} C점은 학습된 적이 없는 '구멍(Hole)' 영역이므로, 디코더는 완전히 깨지거나 의미 없는 이미지(노이즈)를 생성합니다.
+\end{itemize}
+이처럼 잠재 공간이 '점'들로만 이루어져 있고 그 사이가 비어있는 것을 \textbf{"비구조화된(Unstructured) 잠재 공간"}이라고 부릅니다.
+\end{cautionbox}
+
+\subsection{VAE의 혁신: 잠재 공간을 확률 분포로}
+
+VAE는 "잠재 공간을 점이 아닌, 확률 분포(영역)로 만들어서 구멍을 메우자!"라는 아이디어에서 시작합니다.
+
+\begin{infobox}
+\textbf{VAE(Variational Autoencoder)}의 작동 방식:
+\begin{enumerate}
+    \item \textbf{인코더}: 입력을 받아 \textbf{하나의 점(벡터)}을 출력하는 대신, 이 점 주변의 \textbf{확률 분포}를 나타내는 두 개의 벡터를 출력합니다.
+    \begin{itemize}
+        \item \textbf{평균 ($\mu$, mu)}: 분포의 중심점
+        \item \textbf{로그 분산 (log $\sigma^2$, sigma)}: 분포가 퍼진 정도 (분산)
+    \end{itemize}
+    \item \textbf{샘플링 (Sampling)}: 이 평균과 분산을 따르는 정규 분포(가우시안 노이즈)에서 \textbf{랜덤하게 잠재 변수(z)를 샘플링}합니다. (이것이 '랜덤성 주입'입니다.)
+    \item \textbf{디코더}: 이 랜덤하게 샘플링된 z를 입력받아 원본을 복원합니다.
+\end{enumerate}
+\textbf{결과:} 인코더는 입력을 받을 때마다 매번 조금씩 다른(랜덤한) z를 디코더에게 줍니다. 디코더는 이 '살짝 흔들린' z값들로도 원본을 잘 복원해야 하므로, 특정 '점'이 아닌 그 '주변 영역' 전체에서 복원하는 법을 배우게 됩니다.
+\end{infobox}
+
+\subsection{핵심: 잠재 손실 (Latent Loss / KL Divergence)}
+
+여기서 매우 중요한 질문이 생깁니다.
+
+\begin{qabox}{만약 VAE가 재구성에만 집중하면 어떻게 될까요?}
+모델(인코더)은 '랜덤성'이 재구성을 방해한다는 것을 알고 있습니다.
+
+\textbf{모델의 꼼수:} 인코더가 분산($\sigma$)을 0으로 만들어 버립니다.
+\begin{itemize}
+    \item 분산이 0이 되면 확률 분포는 '점'이 되고, 랜덤 샘플링은 항상 평균($\mu$) 값만 뽑게 됩니다.
+    \item 랜덤성이 사라지고, VAE는 일반 AE와 똑같이 행동하게 됩니다.
+    \item 잠재 공간은 다시 '비구조화된' 상태가 됩니다.
+\end{itemize}
+\end{qabox}
+
+이 꼼수를 막기 위해 VAE는 두 번째 손실 함수, 즉 **잠재 손실**을 도입합니다.
+
+\begin{infobox}
+\textbf{잠재 손실 (Latent Loss)}: (정확히는 쿨백-라이블러 발산, $D_{KL}$)
+
+이 손실은 인코더가 만든 모든 확률 분포($\mu, \sigma$)가 "특정 기준 분포" (보통 $\mu=0, \sigma=1$인 표준 정규 분포)와 비슷해지도록 강제하는 패널티입니다.
+
+\textbf{잠재 손실의 두 가지 역할:}
+\begin{enumerate}
+    \item \textbf{분산($\sigma$)이 0이 되는 것을 방지}: $\sigma$를 0이 아닌 1에 가깝게 유지하도록 강제하여, 인코더가 \textbf{적절한 랜덤성(노이즈)}을 유지하게 만듭니다. (잠재 공간에 '영역'을 만들도록 강제)
+    \item \textbf{평균($\mu$)을 0 근처로 집결}: 모든 분포의 중심($\mu$)을 원점(0) 근처로 모읍니다.
+\end{enumerate}
+\textbf{최종 효과 (가장 중요):}
+모든 분포가 원점 근처로 모이고(by $\mu \rightarrow 0$), 적절한 분산(by $\sigma \rightarrow 1$)을 가지게 되면, 서로 다른 이미지(예: A이미지, B이미지)의 잠재 공간 분포가 서로 \textbf{오버랩(Overlap)}하게 됩니다.
+
+이 '오버랩' 덕분에 잠재 공간에는 더 이상 '구멍'이 존재하지 않습니다. (이를 \textbf{"구조화된(Structured) 잠재 공간"}이라 부름)
+
+이제 A이미지의 분포와 B이미지의 분포 사이의 임의의 점 C를 뽑아 디코더에 넣어도, 그럴듯한 (A와 B를 섞은 듯한) 새로운 이미지가 생성됩니다.
+\end{infobox}
+
+\newpage
+
+%========================================================================================
+\section{핵심 개념 5: Generative Adversarial Networks (GANs)}
+%========================================================================================
+
+GAN(생성적 적대 신경망)은 VAE와는 완전히 다른 철학을 가진 생성 모델입니다. VAE가 확률과 분포를 이용했다면, GAN은 두 신경망의 '경쟁'을 이용합니다.
+
+\subsection{핵심 비유: 위조지폐범 vs 경찰}
+
+GAN의 핵심 아이디어는 두 개의 신경망이 서로를 속이고 잡아내기 위해 경쟁(Adversarial)하는 것입니다.
+
+\begin{infobox}
+\textbf{GAN의 두 가지 구성 요소:}
+
+\begin{enumerate}
+    \item \textbf{생성자 (Generator, G): "위조지폐범"}
+    \begin{itemize}
+        \item \textbf{입력:} 무작위 노이즈 (Noise, z) (예: 100차원의 랜덤 벡터)
+        \item \textbf{역할:} 이 노이즈를 입력받아 '가짜' 데이터(예: 가짜 이미지)를 생성합니다.
+        \item \textbf{목표:} 판별자가 "진짜"라고 속을 만큼 정교한 가짜 데이터를 만드는 것.
+    \end{itemize}
+    \item \textbf{판별자 (Discriminator, D): "경찰"}
+    \begin{itemize}
+        \item \textbf{입력:} '진짜' 데이터 (학습 데이터셋) 또는 '가짜' 데이터 (생성자가 만든 것)
+        \item \textbf{역할:} 입력된 데이터가 진짜인지 가짜인지 판별합니다. (이진 분류: 0=Fake, 1=Real)
+        \item \textbf{목표:} 생성자가 만든 가짜를 '가짜(Fake)'라고 정확히 잡아내고, 진짜는 '진짜(Real)'라고 정확히 맞히는 것.
+    \end{itemize}
+\end{enumerate}
+\end{infobox}
+
+\subsection{학습 과정 (Minimax Game)}
+
+두 네트워크는 서로의 이익이 반대되는 '제로섬 게임(Minimax Game)'을 벌이며 함께 똑똑해집니다.
+
+\begin{infobox}[title=GAN 학습 단계]
+학습은 두 단계를 번갈아 가며 진행됩니다.
+
+\textbf{1단계: 판별자(D) 학습 (생성자(G)는 고정)}
+\begin{itemize}
+    \item 생성자(G)가 노이즈로부터 '가짜 이미지'를 생성합니다.
+    \item 판별자(D)에게 (1) '진짜 이미지'와 (2) '가짜 이미지'를 보여줍니다.
+    \item 판별자(D)는 (1)에는 1(Real)이라고 답하고, (2)에는 0(Fake)이라고 답하도록 학습(업데이트)됩니다.
+    \item (비유) 경찰이 진짜 지폐와 위조지폐를 보며 감별법을 익힙니다.
+\end{itemize}
+\textbf{2단계: 생성자(G) 학습 (판별자(D)는 고정)}
+\begin{itemize}
+    \item 생성자(G)가 노이즈로부터 '가짜 이미지'를 생성합니다.
+    \item 이 '가짜 이미지'를 \textbf{고정된} 판별자(D)에게 보여줍니다.
+    \item 생성자(G)는 판별자(D)가 이 이미지를 보고 0(Fake)이 아닌 \textbf{1(Real)이라고 답하도록} 자신의 가중치를 학습(업데이트)합니다.
+    \item (비유) 위조지폐범이 경찰(판별자)을 속일 수 있는(즉, 경찰이 '진짜'라고 착각할 만한) 더 정교한 위조지폐를 만드는 법을 배웁니다.
+\end{itemize}
+이 과정을 수없이 반복하면, 생성자(G)는 실제 데이터와 구별이 불가능할 정도로 고품질의 가짜 데이터를 생성하게 되고, 판별자(D)는 더 이상 진짜와 가짜를 구별하지 못하게 됩니다 (판별 확률 0.5에 수렴).
+\end{infobox}
+
+\subsection{GAN의 진화와 응용}
+
+초기 GAN은 학습이 불안정했지만, 이후 DCGAN (합성곱 신경망 적용), StyleGAN 등 고도화된 모델이 등장하며 놀라운 성능을 보였습니다.
+
+\begin{examplebox}
+\textbf{예시: StyleGAN}
+"This Person Does Not Exist" / "This Cat Does Not Exist"와 같은 웹사이트가 바로 StyleGAN을 이용한 예시입니다.
+
+\begin{itemize}
+    \item 이 웹사이트들이 보여주는 사람 얼굴이나 고양이 이미지는 \textbf{세상에 존재하지 않는} 이미지입니다.
+    \item GAN(생성자)이 수많은 실제 사진을 학습한 뒤, 데이터의 '특징'(예: 머리 스타일, 눈 색깔, 배경)을 이해하고 이를 조합하여 완전히 새로운(하지만 현실적인) 이미지를 생성해낸 것입니다.
+\end{itemize}
+\textbf{장점:} VAE보다 훨씬 더 선명하고 고품질의 이미지를 생성하는 경향이 있습니다.
+\textbf{단점:} 학습이 매우 불안정하고(예: 생성자가 한 가지 이미지만 계속 생성하는 'Mode Collapse'), 많은 데이터와 계산 자원이 필요합니다.
+\end{examplebox}
+
+\newpage
+
+%========================================================================================
+\section{체크리스트: 학습 점검표}
+%========================================================================================
+
+이 문서를 읽고 다음 질문에 스스로 답할 수 있는지 확인해 보세요.
+
+\begin{tcolorbox}[title=최종 점검 리스트]
+\begin{itemize}
+    \item $\square$ 마코프 속성이 무엇이며, 왜 HMM의 한계와 연결되는지 설명할 수 있는가?
+    \item $\square$ HMM과 CRF의 결정적인 차이는 무엇인가? (생성 모델 vs 판별 모델)
+    \item $\square$ CRF가 HMM보다 유연한 이유는 무엇인가? (특징 함수)
+    \item $\square$ CRF의 가장 큰 단점(수동 특징 공학)이 무엇을 의미하는지 예시를 들어 설명할 수 있는가?
+    \item $\square$ BiLSTM-CRF 아키텍처에서 BiLSTM과 CRF는 각각 어떤 역할을 담당하는가?
+    \item $\square$ 왜 BiLSTM의 출력에 Softmax 대신 CRF를 사용하는 것이 더 좋은가? (레이블 의존성)
+    \item $\square$ 일반 오토인코더(AE)로 고품질의 '새로운' 이미지를 생성하기 어려운 이유는 무엇인가? (비구조화된 잠재 공간)
+    \item $\square$ VAE는 AE와 달리 왜 인코더가 $\mu$와 $\sigma$를 출력하는가? (랜덤성 주입)
+    \item $\square$ VAE에서 '잠재 손실(KL Divergence)'이 없다면 어떤 문제가 발생하는가? ($\sigma \rightarrow 0$)
+    \item $\square$ VAE의 잠재 손실이 어떻게 잠재 공간을 '구조화'하는가? (오버랩 강제)
+    \item $\square$ GAN의 생성자(G)와 판별자(D)의 목표는 각각 무엇인가?
+    \item $\square$ GAN의 학습 과정(2단계)을 '경찰과 위조지폐범' 비유를 사용하여 설명할 수 있는가?
+\end{itemize}
+\end{tcolorbox}
+
+%========================================================================================
+\section{FAQ: 초심자 주요 질문}
+%========================================================================================
+
+\begin{qabox}{HMM은 이제 쓸모가 없나요?}
+그렇지 않습니다. HMM은 모델이 단순하고 계산이 빠르며, 데이터가 매우 적을 때도 비교적 안정적으로 작동합니다. 딥러닝 모델(BiLSTM 등)이 성능이 좋지만 학습을 위해 훨씬 많은 데이터와 자원이 필요합니다. 간단한 시퀀스 문제나 초기 베이스라인 모델로 여전히 유용합니다.
+\end{qabox}
+
+\begin{qabox}{CRF와 로지스틱 회귀(Logistic Regression)는 무슨 관계인가요?}
+CRF는 종종 "로지스틱 회귀의 시퀀스(순차) 버전"이라고 불립니다.
+\begin{itemize}
+    \item \textbf{로지스틱 회귀}: 여러 특징(X)을 입력받아 하나의 레이블(Y)을 예측하는 판별 모델입니다. (예: $P(Y=1|X)$)
+    \item \textbf{CRF}: 여러 특징(X 시퀀스)을 입력받아 \textbf{레이블 시퀀스(Y 시퀀스)}를 예측하는 판별 모델입니다. (예: $P(Y\_1, Y\_2, ... | X\_1, X\_2, ...)$)
+\end{itemize}
+둘 다 특징을 유연하게 사용하고 $P(Y|X)$를 직접 모델링한다는 공통점이 있습니다.
+\end{qabox}
+
+\begin{qabox}{생성 모델로 VAE와 GAN 중 어느 것이 더 좋은가요?}
+목적에 따라 다릅니다.
+\begin{itemize}
+    \item \textbf{VAE}:
+        \begin{itemize}
+            \item \textbf{장점:} 학습이 안정적이며, 잠재 공간이 잘 구조화되어 데이터의 '분포'를 학습하기 좋습니다.
+            \item \textbf{단점:} 생성된 이미지가 GAN에 비해 다소 흐릿(Blurry)한 경향이 있습니다.
+        \end{itemize}
+    \item \textbf{GAN}:
+        \begin{itemize}
+            \item \textbf{장점:} 매우 선명하고 현실적인 고품질 이미지를 생성하는 데 탁월합니다.
+            \item \textbf{단점:} 학습이 매우 불안정하고(Minimax 최적점을 찾기 어려움) 하이퍼파라미터에 민감합니다.
+        \end{itemize}
+\end{itemize}
+\end{qabox}
+
+\newpage
+
+%========================================================================================
+\section{빠르게 훑어보기 (1페이지 요약)}
+%========================================================================================
+
+\begin{tcolorbox}[colback=myblue, colframe=blue!50!black, title=\textbf{HMM (Hidden Markov Model)}, breakable]
+\begin{itemize}
+    \item \textbf{개념:} 숨겨진 상태(Y)가 마코프 속성을 따르며 전이하고, 각 상태가 관찰(X)을 방출(생성)함.
+    \item \textbf{모델:} 생성 모델 ($P(X, Y)$).
+    \item \textbf{핵심:} 전이 확률 ($P(Y_t|Y_{t-1})$), 방출 확률 ($P(X_t|Y_t)$).
+    \item \textbf{한계:} 미래는 오직 현재 상태(Y\_t)에만 의존. 다른 관찰(X)을 참고하지 못함.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=myyellow, colframe=orange!80!black, title=\textbf{CRF (Conditional Random Field)}, breakable]
+\begin{itemize}
+    \item \textbf{개념:} HMM의 한계 극복. 관찰 시퀀스(X) 전체를 조건으로 레이블 시퀀스(Y)의 확률($P(Y|X)$)을 직접 모델링.
+    \item \textbf{모델:} 판별 모델 ($P(Y|X)$).
+    \item \textbf{핵심:} 유연한 특징 함수($f_k$)와 가중치($\lambda_k$)의 조합.
+    \item \textbf{한계:} 유용한 특징($f_k$)을 \textbf{사람이 직접} 설계해야 함 (수동 특징 공학).
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=mygray, colframe=black!60!black, title=\textbf{BiLSTM-CRF}, breakable]
+\begin{itemize}
+    \item \textbf{개념:} CRF의 수동 특징 공학 문제를 BiLSTM으로 자동화.
+    \item \textbf{BiLSTM (특징 추출기):} 양방향 문맥을 읽어 고품질 특징(Emission 점수)을 자동 생성.
+    \item \textbf{CRF (레이블 결정자):} BiLSTM의 특징을 받아, 레이블 간의 전이(Transition) 규칙을 적용하여 최적의 시퀀스 결정.
+    \item \textbf{장점:} 자동 특징 공학 + 높은 정확도.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=myblue, colframe=blue!50!black, title=\textbf{VAE (Variational Autoencoder)}, breakable]
+\begin{itemize}
+    \item \textbf{개념:} 일반 AE의 '비구조화된 잠재 공간' 문제를 해결한 생성 모델.
+    \item \textbf{핵심:} 인코더가 잠재 변수를 '점'이 아닌 '확률 분포($\mu, \sigma$)'로 출력. 이 분포에서 샘플링하여 디코더에 주입 (랜덤성).
+    \item \textbf{잠재 손실($D_{KL}$):} 모델이 랜덤성을 포기하는 꼼수($\sigma \rightarrow 0$)를 막는 패널티. 분포들을 원점 근처로 모아 '오버랩'시켜 잠재 공간을 빽빽하게 채움.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=myyellow, colframe=orange!80!black, title=\textbf{GAN (Generative Adversarial Network)}, breakable]
+\begin{itemize}
+    \item \textbf{개념:} 생성자(G)와 판별자(D)가 경쟁하며 학습하는 생성 모델.
+    \item \textbf{G (생성자/위조범):} 노이즈(z)를 받아 가짜 데이터를 생성. D를 속이는 것이 목표.
+    \item \textbf{D (판별자/경찰):} 진짜와 가짜를 구별. G에게 속지 않는 것이 목표.
+    \item \textbf{장점:} 지도 데이터 없이 학습 가능. 매우 현실적인 고품질 이미지 생성.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

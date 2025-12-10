@@ -1,0 +1,1384 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard CSCI E-103: Reproducible Machine Learning
+% Lecture 14: Databricks Roadmap & Emerging Features
+% English Version
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Table Related ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.2}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Machine Learning}}
+\fancyhead[R]{\small\textit{Lecture 14}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, MERGE, INTO, USING, WHEN, MATCHED, INSERT, UPDATE, DELETE},
+}
+
+\lstdefinestyle{bashstyle}{
+    language=bash,
+    morekeywords={psql, databricks, connect},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Reproducible Machine Learning - Lecture 14},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Databricks Roadmap and Emerging Features}
+}
+
+%========================================================================================
+% Other Useful Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Title Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box Command
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.70\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+\begin{document}
+%========================================================================================
+
+\thispagestyle{firstpage}
+
+\metainfo{CSCI E-103: Reproducible Machine Learning}
+    {Lecture 14 -- Databricks Roadmap \& Emerging Features}
+    {Anindita Mahapatra \& Eric Gieseke}
+    {Explore Databricks' latest platform features including Lakebase, AI/BI, Agent Bricks, MCP integration, and review key concepts from Quiz 2 and Assignment 3}
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+\section{Introduction: The Databricks Data Intelligence Platform}
+%========================================================================================
+
+\begin{overviewbox}
+This lecture explores the cutting-edge features in the Databricks roadmap---technologies that are either in public preview or will be released soon. These innovations represent the platform's evolution toward a comprehensive \textbf{Data Intelligence Platform} that handles everything from data storage to AI agent deployment.
+
+\textbf{Key Learning Objectives:}
+\begin{itemize}
+    \item Understand the new Databricks One unified experience
+    \item Learn about Lakebase and OLTP capabilities within the Lakehouse
+    \item Explore Agent Bricks and AI/BI features (Genie, Research Mode)
+    \item Understand Lakehouse Apps for building secure data applications
+    \item Review Quiz 2 concepts (Spark optimization, Delta Lake internals)
+    \item Review Assignment 3 concepts (Streaming, SCD, Kafka/Kinesis)
+\end{itemize}
+\end{overviewbox}
+
+\subsection{The Data Intelligence Platform Architecture}
+
+The modern Databricks platform is built on a layered architecture that serves diverse workloads:
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{4cm}p{7cm}}
+\toprule
+\textbf{Layer} & \textbf{Components} & \textbf{Purpose} \\
+\midrule
+\textbf{Foundation} & Cloud Storage & Object storage (S3, ADLS, GCS) for all data \\
+\textbf{Format Layer} & Delta, Iceberg & Open table formats ensuring data reliability and ACID compliance \\
+\textbf{Governance} & Unity Catalog & Centralized governance, security, and lineage tracking \\
+\textbf{Compute} & Serverless SQL, Clusters & Scalable compute for all workload types \\
+\textbf{Applications} & Agent Bricks, DBSQL, Apps & User-facing applications and AI capabilities \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Databricks Data Intelligence Platform Layers}
+\end{table}
+
+\begin{infobox}
+\textbf{Key Investment Areas in Databricks:}
+\begin{enumerate}
+    \item \textbf{Data Intelligence Capabilities}: Making the platform smarter so data professionals do less manual work
+    \item \textbf{Built-in Governance \& Security}: Data sharing tools with ABAC and fine-grained access control
+    \item \textbf{Tools to Build AI Agents}: Agent Bricks, MCP servers, model serving
+    \item \textbf{Data Engineering \& Migration}: LakeFlow, connectors, zero-copy ETL
+\end{enumerate}
+\end{infobox}
+
+%========================================================================================
+\newsection{Databricks One: The Unified Experience}
+%========================================================================================
+
+\begin{definitionbox}{Databricks One}
+\textbf{Databricks One} is a new unified portal experience designed for business users. It provides account-level access to dashboards, Genie spaces, and apps across all workspaces in a single, intuitive interface.
+\end{definitionbox}
+
+\subsection{Portal Switcher: Three Experiences}
+
+When you log into Databricks, you'll see a portal switcher with three options:
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3.5cm}p{4cm}p{6.5cm}}
+\toprule
+\textbf{Portal} & \textbf{Target Users} & \textbf{Purpose} \\
+\midrule
+\textbf{Lakehouse} & Data Engineers, Data Scientists & Full workspace with SQL, ML, Data Engineering features. This is the traditional Databricks experience. \\
+\textbf{Databricks One} & Business Users, Analysts & Simplified view showing dashboards, Genie, and apps across all workspaces. No technical complexity. \\
+\textbf{Lakebase Postgres} & Application Developers & OLTP database interface for transactional workloads. PostgreSQL-compatible. \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Databricks Portal Experiences}
+\end{table}
+
+\subsection{Databricks One Features}
+
+\begin{itemize}
+    \item \textbf{Account-Level Access}: View assets from all workspaces in one place
+    \item \textbf{Vanity URL}: Companies can use their own domain (e.g., \texttt{analytics.yourcompany.com})
+    \item \textbf{Domain Integration}: Organize content by business domain (Marketing, Finance, Tech)
+    \item \textbf{Intuitive Navigation}: Search and discover dashboards, Genie spaces, and apps easily
+\end{itemize}
+
+\begin{examplebox}{Why Databricks One Matters}
+Imagine a large enterprise with 50+ workspaces. Without Databricks One, a marketing analyst would need to know which specific workspace contains their dashboard. With Databricks One, they simply log in, see all marketing-related assets, and get to work---regardless of which workspace hosts the asset.
+\end{examplebox}
+
+%========================================================================================
+\newsection{Lakebase: Bringing OLTP to the Lakehouse}
+%========================================================================================
+
+\begin{definitionbox}{Lakebase}
+\textbf{Lakebase} is Databricks' managed PostgreSQL implementation that brings \textbf{OLTP (Online Transaction Processing)} capabilities to the Lakehouse platform. It enables transactional workloads alongside analytical workloads, all within the same governance framework.
+\end{definitionbox}
+
+\subsection{Understanding OLTP vs OLAP}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{6cm}p{5cm}}
+\toprule
+\textbf{Aspect} & \textbf{OLTP (Transactional)} & \textbf{OLAP (Analytical)} \\
+\midrule
+\textbf{Purpose} & Handle real-time transactions & Analyze historical data \\
+\textbf{Operations} & INSERT, UPDATE, DELETE (many small) & SELECT (few large queries) \\
+\textbf{Data Volume} & Current operational data & Historical aggregated data \\
+\textbf{Users} & Applications, end users & Analysts, data scientists \\
+\textbf{Examples} & Banking transactions, order processing & Sales reports, trend analysis \\
+\textbf{Traditional Tools} & Oracle, SQL Server, PostgreSQL & Data warehouses, Databricks \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{OLTP vs OLAP Comparison}
+\end{table}
+
+\subsection{Why Lakebase is Revolutionary}
+
+\begin{importantbox}{The Storage-Compute Separation Paradigm Shift}
+Traditional databases (Oracle, SQL Server) have compute and storage tightly coupled. If you buy a database server, it runs 24/7 whether you have one row or one billion rows.
+
+\textbf{Lakebase changes this fundamentally:}
+\begin{itemize}
+    \item Storage and compute are completely separated
+    \item Compute can scale up as load increases
+    \item Compute can scale \textbf{down to zero} when idle---you pay nothing
+    \item Sub-second startup time means instant readiness when needed
+\end{itemize}
+
+This was possible for data lakes and warehouses, but \textbf{never before for transactional databases}. Lakebase is the first to achieve this for OLTP workloads.
+\end{importantbox}
+
+\subsection{Lakebase Architecture}
+
+\begin{lstlisting}[style=sqlstyle, caption={Lakebase PostgreSQL Connection}]
+-- Connection string format
+psql "postgres://your-lakebase-instance.databricks.com:5432/database_name"
+
+-- Use OAuth token for authentication
+-- Default role is your Databricks username
+\end{lstlisting}
+
+\subsubsection{Key Features}
+
+\begin{enumerate}
+    \item \textbf{PostgreSQL Compatibility}: Standard PostgreSQL syntax and tools work seamlessly
+
+    \item \textbf{Version Selection}: Choose your PostgreSQL version (e.g., PostgreSQL 17)
+
+    \item \textbf{Branch-Based Development}:
+    \begin{itemize}
+        \item Production branch (for live data)
+        \item Development branch (for testing)
+        \item Git-style workflow: Test safely without touching production
+    \end{itemize}
+
+    \item \textbf{Backup and Recovery}:
+    \begin{itemize}
+        \item Scheduled snapshots
+        \item Point-in-time recovery
+        \item Instant recovery capabilities
+    \end{itemize}
+
+    \item \textbf{SQL Editor}: Built-in query interface, monitoring, and table management
+\end{enumerate}
+
+\subsection{Catalog Types in Unity Catalog}
+
+When creating a catalog in Unity Catalog, you now have four options:
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Catalog Type} & \textbf{Use Case} & \textbf{Description} \\
+\midrule
+\textbf{Standard} & Default projects & Typical catalog for tables, views, models \\
+\textbf{Foreign} & Data federation & Connect to external data stores (Snowflake, Redshift, Teradata) without moving data \\
+\textbf{Shared} & Delta Sharing & Zero-copy data sharing with external parties \\
+\textbf{Lakebase PostgreSQL} & OLTP workloads & Connect to your Lakebase databases for transactional access \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Unity Catalog Types}
+\end{table}
+
+\subsection{Bidirectional Sync: Lakehouse $\leftrightarrow$ Lakebase}
+
+\begin{examplebox}{Data Flow Between Lakehouse and Lakebase}
+\textbf{Forward Sync (Lakehouse $\rightarrow$ Lakebase):}
+\begin{itemize}
+    \item Sync a subset of your analytical data to Lakebase
+    \item Enables low-latency reads for applications
+    \item Useful for ML inference, real-time dashboards
+\end{itemize}
+
+\textbf{Reverse Sync (Lakebase $\rightarrow$ Lakehouse):}
+\begin{itemize}
+    \item Business users make small corrections in Lakebase
+    \item Changes sync back to the Lakehouse
+    \item Maintains a single source of truth
+\end{itemize}
+
+\begin{lstlisting}[style=sqlstyle]
+-- Create table in Unity Catalog
+CREATE TABLE catalog.schema.user_segments (
+    user_id INT,
+    segment STRING,
+    engagement STRING
+);
+
+-- Sync to Lakebase PostgreSQL
+-- (Done through UI or sync configuration)
+
+-- Query in Lakebase
+SELECT * FROM default.user_segment_synced
+WHERE engagement = 'high';
+\end{lstlisting}
+\end{examplebox}
+
+%========================================================================================
+\newsection{AI/BI: Genie and Research Mode}
+%========================================================================================
+
+\begin{definitionbox}{AI/BI}
+\textbf{AI/BI} is Databricks' AI-powered business intelligence solution consisting of two main components:
+\begin{enumerate}
+    \item \textbf{Dashboards}: Interactive visualizations with drill-down capabilities
+    \item \textbf{Genie}: Natural language interface for querying data
+\end{enumerate}
+\end{definitionbox}
+
+\subsection{Genie: Answering ``What'' Questions}
+
+Genie transforms natural language questions into SQL queries against your structured data:
+
+\begin{itemize}
+    \item \textbf{Factual Questions}: ``What were total sales last quarter?''
+    \item \textbf{SQL Generation}: Automatically generates optimized SQL
+    \item \textbf{Custom Instructions}: Add context, join logic, and example queries
+    \item \textbf{Consistent Responses}: Trained on your data semantics
+\end{itemize}
+
+\subsection{Research Mode: Answering ``Why'' Questions}
+
+\begin{importantbox}{Research Mode vs Regular Genie}
+\textbf{Regular Genie}: Answers \textit{what} questions with direct SQL queries.
+\begin{itemize}
+    \item ``What were sales in Q4?'' $\rightarrow$ Returns a number
+    \item Fast response, factual answer
+\end{itemize}
+
+\textbf{Research Mode}: Answers \textit{why} questions with hypothesis-driven analysis.
+\begin{itemize}
+    \item ``Why did sales drop in Q4?'' $\rightarrow$ Explores multiple factors
+    \item Uses \textbf{Chain of Thought} reasoning
+    \item Takes longer (several minutes) but provides deeper insights
+    \item Shows the reasoning paths explored
+\end{itemize}
+\end{importantbox}
+
+\begin{examplebox}{Research Mode in Action}
+\textbf{Question:} ``What would happen to my portfolio if oil prices increase by 20\%?''
+
+\textbf{Research Mode Process:}
+\begin{enumerate}
+    \item Identifies relevant data (portfolio holdings, sector exposure)
+    \item Generates hypotheses about impact paths
+    \item Explores correlations with oil-sensitive sectors
+    \item Analyzes historical patterns during price spikes
+    \item Synthesizes findings into actionable insights
+\end{enumerate}
+
+\textbf{Output:} A detailed analysis showing multiple scenarios, not just a simple number.
+\end{examplebox}
+
+\subsection{Enhanced AI/BI Features}
+
+\begin{itemize}
+    \item \textbf{Document Upload}: Attach CSVs, Excel files, or PDFs to combine with structured data
+    \item \textbf{Drill-Down for Dashboards}: Click on visualizations to explore hierarchies (Region $\rightarrow$ Country $\rightarrow$ State $\rightarrow$ City)
+    \item \textbf{Slack/Teams Integration}: Subscribe to dashboard alerts and notifications
+    \item \textbf{Multi-Page Subscriptions}: Schedule reports across multiple dashboard pages
+\end{itemize}
+
+%========================================================================================
+\newsection{Agent Bricks and AI Agents}
+%========================================================================================
+
+\begin{definitionbox}{Agent Bricks}
+\textbf{Agent Bricks} is Databricks' framework for creating AI agents with minimal code. Similar to AutoML, you point it to data and specify what you want---the framework handles the scaffolding, evaluation, and deployment.
+\end{definitionbox}
+
+\subsection{Types of Agents Available}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{4cm}p{9cm}}
+\toprule
+\textbf{Agent Type} & \textbf{Purpose} \\
+\midrule
+\textbf{Information Extraction} & Extract structured data from unstructured documents \\
+\textbf{Knowledge Assistant} & Answer questions using your organization's knowledge base \\
+\textbf{AI/BI Genie} & Natural language querying of structured data \\
+\textbf{Multi-Agent Supervisor} & Coordinate multiple specialized agents \\
+\textbf{Custom LLM} & Build agents using your own fine-tuned models \\
+\textbf{Custom Agent} & Full control over agent logic and behavior \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Agent Bricks Agent Types}
+\end{table}
+
+\subsection{Creating an Agent}
+
+\begin{examplebox}{Information Extraction Agent}
+Creating an information extraction agent:
+
+\begin{enumerate}
+    \item \textbf{Name}: Give your agent a descriptive name
+    \item \textbf{Data Location}: Point to your documents (PDFs, emails, forms)
+    \item \textbf{Fields to Extract}: Specify what information to pull (company name, address, dates)
+    \item \textbf{Deploy}: Agent is ready in minutes
+\end{enumerate}
+
+No coding required---similar to the AutoML experience for machine learning.
+\end{examplebox}
+
+\subsection{MCP (Model Context Protocol)}
+
+\begin{definitionbox}{MCP}
+\textbf{Model Context Protocol (MCP)} is an open standard that enables AI agents to connect to external tools, data sources, and services. MCP servers act as bridges between agents and the resources they need.
+\end{definitionbox}
+
+\begin{itemize}
+    \item \textbf{MCP in Marketplace}: Discover and use pre-built MCP servers
+    \item \textbf{Governance}: MCP servers are governed by Unity Catalog
+    \item \textbf{Custom MCP}: Build your own MCP servers for proprietary tools
+    \item \textbf{Serverless GPU}: MCP servers can leverage GPU compute for AI tasks
+\end{itemize}
+
+%========================================================================================
+\newsection{Lakehouse Apps}
+%========================================================================================
+
+\begin{definitionbox}{Lakehouse Apps}
+\textbf{Lakehouse Apps} allow you to build and deploy web applications directly on the Databricks platform, where your data lives. Apps can read and write data securely, interact with models, and provide user-friendly interfaces for non-technical users.
+\end{definitionbox}
+
+\subsection{Why Apps vs Dashboards?}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{5cm}p{5cm}}
+\toprule
+\textbf{Aspect} & \textbf{Dashboards} & \textbf{Apps} \\
+\midrule
+\textbf{Interaction} & Read-only visualization & Bidirectional (read \& write) \\
+\textbf{Data Modification} & Not possible & Users can update data \\
+\textbf{Use Case} & Reporting, monitoring & Data correction, input forms, chatbots \\
+\textbf{User Experience} & Pre-defined views & Custom, interactive UI \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Dashboards vs Apps Comparison}
+\end{table}
+
+\subsection{Supported Frameworks}
+
+\begin{itemize}
+    \item \textbf{Python}: Streamlit, Dash, Flask, Gradio, Shiny
+    \item \textbf{JavaScript}: Node.js, React
+    \item \textbf{Templates}: Data apps, chatbots, model serving interfaces
+\end{itemize}
+
+\subsection{App Architecture}
+
+\begin{lstlisting}[style=pythonstyle, caption={Simple Streamlit App Example}]
+import streamlit as st
+from databricks import sql
+
+# Connect to SQL warehouse
+connection = sql.connect(
+    server_hostname="your-workspace.databricks.com",
+    http_path="/sql/1.0/warehouses/abc123"
+)
+
+# Query data
+cursor = connection.cursor()
+cursor.execute("SELECT * FROM gold.customer_metrics LIMIT 100")
+data = cursor.fetchall()
+
+# Display in Streamlit
+st.title("Customer Metrics Dashboard")
+st.dataframe(data)
+
+# Allow user to update data
+if st.button("Mark as Reviewed"):
+    cursor.execute("UPDATE gold.customer_metrics SET reviewed = TRUE")
+    st.success("Data updated!")
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{Key Benefits of Lakehouse Apps:}
+\begin{itemize}
+    \item Data stays in place---no copying to external systems
+    \item Security inherited from Unity Catalog
+    \item Horizontal scaling for many users
+    \item Easy deployment from Git or SDK
+    \item Support for vibe coding tools (Claude, Cursor)
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\newsection{Data Intelligence Features}
+%========================================================================================
+
+\subsection{AI Parse Document}
+
+\begin{lstlisting}[style=sqlstyle, caption={AI Parse Document Example}]
+-- Extract structured data from PDFs
+SELECT AI_PARSE_DOCUMENT(
+    file_path,
+    'company_name, address, invoice_date, total_amount'
+)
+FROM volumes.documents.invoices;
+
+-- Result: Structured columns extracted from unstructured PDFs
+\end{lstlisting}
+
+\textbf{Use Cases:}
+\begin{itemize}
+    \item Extract data from scanned forms and invoices
+    \item Parse regulatory documents
+    \item Convert unstructured PDFs to structured tables
+\end{itemize}
+
+\subsection{AI Query with Multimodal Support}
+
+\begin{lstlisting}[style=sqlstyle, caption={Multimodal AI Query}]
+-- Filter product catalog for white shoes using AI
+SELECT AI_QUERY(
+    'Filter our catalog for white shoes',
+    image_column
+)
+FROM product_catalog;
+
+-- AI understands both the query and the images
+\end{lstlisting}
+
+\subsection{Spatial SQL}
+
+Databricks now supports spatial SQL for geographic analysis:
+
+\begin{itemize}
+    \item \textbf{Geometry/Geography Types}: Native support for spatial data
+    \item \textbf{Spatial Functions}: Intersection, distance, containment
+    \item \textbf{Use Cases}: Disaster impact analysis, location-based services
+\end{itemize}
+
+%========================================================================================
+\newsection{Data Engineering: LakeFlow and Spark Declarative Pipelines}
+%========================================================================================
+
+\subsection{LakeFlow Connect}
+
+\begin{definitionbox}{LakeFlow Connect}
+\textbf{LakeFlow Connect} provides a unified way to ingest data from various sources into the Lakehouse. Previously, Databricks relied on data already being in cloud storage---now it actively pulls data from source systems.
+\end{definitionbox}
+
+\textbf{Supported Connectors:}
+\begin{itemize}
+    \item \textbf{File Sources}: Excel, SFTP
+    \item \textbf{Databases}: PostgreSQL, MySQL, Oracle
+    \item \textbf{Marketing}: Google Ads, Salesforce Marketing Cloud, TikTok Ads
+    \item \textbf{Industry}: Customer 360, Financial Services, Insurance
+\end{itemize}
+
+\subsection{LakeFlow Designer}
+
+A visual interface for building ETL pipelines:
+
+\begin{enumerate}
+    \item Drag and drop data sources from your catalog
+    \item Add operators (Filter, Join, Aggregate, AI Functions)
+    \item Visual representation of data flow
+    \item Behind the scenes: Generates Spark Declarative Pipeline code
+\end{enumerate}
+
+\subsection{Spark Declarative Pipelines}
+
+\begin{infobox}
+\textbf{Evolution of Delta Live Tables (DLT):}
+\begin{itemize}
+    \item \textbf{Original Name}: Delta Live Tables (DLT)
+    \item \textbf{Renamed To}: Live Tables Pipeline (LTP)
+    \item \textbf{Current Name}: Spark Declarative Pipelines
+    \item \textbf{Status}: Now fully open-sourced and Generally Available
+\end{itemize}
+\end{infobox}
+
+%========================================================================================
+\newsection{Feature Release Lifecycle}
+%========================================================================================
+
+Understanding when features are safe to use in production:
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Stage} & \textbf{Access} & \textbf{Production Ready?} \\
+\midrule
+\textbf{Beta} & Very early, limited & No---experimental only \\
+\textbf{Private Preview} & Selected customers & No---for evaluation \\
+\textbf{Public Preview} & Available in documentation, anyone can try & Caution---some enterprises wait \\
+\textbf{Generally Available (GA)} & Production-ready & Yes---enterprise use \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Feature Release Stages}
+\end{table}
+
+%========================================================================================
+\newsection{Quiz 2 Review: Spark and Delta Lake Concepts}
+%========================================================================================
+
+\begin{summarybox}
+This section reviews key concepts from Quiz 2 that students found challenging.
+\end{summarybox}
+
+\subsection{Spark Optimization: The Four S's}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{3cm}p{4cm}p{6cm}}
+\toprule
+\textbf{Problem} & \textbf{Description} & \textbf{Solution} \\
+\midrule
+\textbf{Data Skew} & Uneven data distribution across partitions & Salting, broadcast joins, AQE \\
+\textbf{Shuffle} & Data movement between nodes & Minimize wide transformations, optimize partitioning \\
+\textbf{Spill} & Memory overflow to disk & Increase executor memory, reduce data size \\
+\textbf{Small Files} & Too many tiny files & Use OPTIMIZE, predictive optimization \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Spark Performance Problems and Solutions}
+\end{table}
+
+\subsection{Broadcast Variables}
+
+\begin{warningbox}
+\textbf{Common Misconception}: Broadcast variables are \textit{not} shared across the cluster.
+
+\textbf{Correct Understanding:}
+\begin{itemize}
+    \item Broadcast variables are \textbf{immutable}---cannot be changed after creation
+    \item They are \textbf{local to each worker node}---each node gets its own copy
+    \item Used for small lookup tables that would otherwise require shuffle
+\end{itemize}
+\end{warningbox}
+
+\subsection{Repartition vs Coalesce}
+
+\begin{lstlisting}[style=pythonstyle, caption={Partition Operations}]
+# INCREASING partitions (12 -> 24): Use repartition
+df_more = df.repartition(24)  # Full shuffle
+
+# DECREASING partitions (24 -> 12): Use coalesce
+df_less = df.coalesce(12)  # No shuffle, more efficient
+
+# ERROR: coalesce(24) when you have 12 partitions
+# This won't increase partitions!
+\end{lstlisting}
+
+\subsection{collect() vs take()}
+
+\begin{importantbox}{The Danger of collect()}
+\textbf{collect()} brings \textit{all} data to the driver. This causes Out of Memory (OOM) errors with large datasets.
+
+\textbf{Best Practices:}
+\begin{itemize}
+    \item Use \texttt{take(n)} to retrieve only what you need
+    \item Use \texttt{collect()} only for debugging small datasets
+    \item Always be suspicious of \texttt{collect()} in production code
+\end{itemize}
+
+\begin{lstlisting}[style=pythonstyle]
+# DANGEROUS for large datasets
+all_data = df.collect()  # OOM risk!
+
+# SAFE alternative
+sample = df.take(5)  # Returns only 5 rows
+\end{lstlisting}
+\end{importantbox}
+
+\subsection{Delta Lake Transaction Log}
+
+\begin{definitionbox}{Delta Log Structure}
+Every Delta table has an \texttt{\_delta\_log} folder containing:
+\begin{itemize}
+    \item \textbf{JSON files}: One per transaction (000000000000.json, 000000000001.json, ...)
+    \item \textbf{Checkpoint files}: Parquet files created every 10 transactions
+    \item This enables \textbf{time travel} without separate copies
+\end{itemize}
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{Quiz Correction}: The question asked about Delta log structure. The correct answer is that each transaction creates a \textbf{separate JSON file} (not a single JSON). If you marked ``single JSON'' as correct, please reach out to have your grade adjusted.
+\end{warningbox}
+
+\subsection{DataFrame Operations}
+
+\begin{lstlisting}[style=pythonstyle, caption={Common DataFrame Gotchas}]
+# EXPLODE is NOT a DataFrame method
+# WRONG:
+df.explode("array_column")  # This doesn't exist!
+
+# CORRECT - use inside select:
+from pyspark.sql.functions import explode
+df.select("id", explode("array_column").alias("item"))
+
+# DROP DUPLICATES - use a list for columns
+# WRONG:
+df.dropDuplicates("col1", "col2")  # Incorrect syntax
+
+# CORRECT:
+df.dropDuplicates(["col1", "col2"])  # Pass columns as a list
+\end{lstlisting}
+
+\subsection{Generated Columns}
+
+\begin{lstlisting}[style=sqlstyle, caption={Generated Always As}]
+CREATE TABLE transactions (
+    transaction_id BIGINT,
+    transaction_timestamp TIMESTAMP,
+    -- Generated column: automatically computed
+    transaction_date DATE GENERATED ALWAYS AS (
+        CAST(transaction_timestamp AS DATE)
+    )
+) PARTITIONED BY (transaction_date);
+
+-- Benefit: Filtering by timestamp automatically
+-- resolves the partition pruning on transaction_date
+\end{lstlisting}
+
+%========================================================================================
+\newsection{Assignment 3 Review: Streaming and Data Architecture}
+%========================================================================================
+
+\subsection{Kafka vs Kinesis}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{4cm}p{5cm}p{5cm}}
+\toprule
+\textbf{Aspect} & \textbf{Apache Kafka} & \textbf{AWS Kinesis} \\
+\midrule
+\textbf{Management} & Self-managed or Confluent Cloud & Fully managed by AWS \\
+\textbf{Cloud Agnostic} & Yes---runs anywhere & No---AWS only \\
+\textbf{Scaling Unit} & Partitions & Shards \\
+\textbf{Pricing} & Confluent fees or infrastructure & Per-shard pricing \\
+\textbf{Data Distribution} & Round-robin or key-based & Partition key \\
+\textbf{Ecosystem} & KSQL, Kafka Connect, Schema Registry & Kinesis Data Analytics, Firehose \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Kafka vs Kinesis Comparison}
+\end{table}
+
+\begin{infobox}
+\textbf{Other Cloud Equivalents:}
+\begin{itemize}
+    \item \textbf{Azure}: Event Hubs
+    \item \textbf{Google Cloud}: Pub/Sub
+\end{itemize}
+\end{infobox}
+
+\subsection{Slowly Changing Dimensions (SCD)}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{2cm}p{4cm}p{4cm}p{3cm}}
+\toprule
+\textbf{Type} & \textbf{Behavior} & \textbf{History} & \textbf{Use Case} \\
+\midrule
+\textbf{Type 1} & Overwrite the row & No history kept & Correction of errors \\
+\textbf{Type 2} & Add new row with version & Full history with dates/flags & Customer address changes \\
+\textbf{Type 3} & Add column for previous value & Limited history & Only need previous value \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{SCD Types Summary}
+\end{table}
+
+\begin{lstlisting}[style=sqlstyle, caption={MERGE for SCD Type 1 with Condition}]
+MERGE INTO target_table t
+USING source_table s
+ON t.id = s.id
+-- Only update if city actually changed
+WHEN MATCHED AND t.city <> s.city THEN
+    UPDATE SET t.city = s.city, t.updated_at = CURRENT_TIMESTAMP
+WHEN NOT MATCHED THEN
+    INSERT (id, name, city, updated_at)
+    VALUES (s.id, s.name, s.city, CURRENT_TIMESTAMP);
+\end{lstlisting}
+
+\subsection{Spark Streaming Key Concepts}
+
+\subsubsection{Trigger Options}
+
+\begin{lstlisting}[style=pythonstyle, caption={Streaming Trigger Options}]
+# DEPRECATED - reads all available data at once
+stream.writeStream \
+    .trigger(once=True) \  # Don't use this!
+    ...
+
+# RECOMMENDED - micro-batch processing
+stream.writeStream \
+    .trigger(availableNow=True) \  # Use this instead
+    ...
+
+# CONTINUOUS - for low-latency (sub-100ms)
+stream.writeStream \
+    .trigger(processingTime='10 seconds') \
+    ...
+\end{lstlisting}
+
+\subsubsection{Checkpointing and Exactly-Once Processing}
+
+\begin{lstlisting}[style=pythonstyle, caption={Streaming with Checkpoint}]
+stream = (
+    spark.readStream
+    .format("kafka")
+    .option("kafka.bootstrap.servers", "server:9092")
+    .option("subscribe", "sensor_data")
+    .option("startingOffsets", "earliest")  # or "latest"
+    .load()
+)
+
+# Checkpoint location enables exactly-once processing
+stream.writeStream \
+    .format("delta") \
+    .outputMode("append") \
+    .option("checkpointLocation", "/checkpoints/sensor_stream") \
+    .table("bronze.sensor_readings")
+\end{lstlisting}
+
+\begin{definitionbox}{Exactly-Once Processing}
+Achieved through the combination of:
+\begin{enumerate}
+    \item \textbf{Checkpointing}: Tracks progress through the stream
+    \item \textbf{Idempotent Sinks}: Ensure operations can be safely replayed
+    \item \textbf{WAL (Write-Ahead Log)}: Records operations before execution
+\end{enumerate}
+\end{definitionbox}
+
+\subsubsection{Reading from Kafka}
+
+\begin{lstlisting}[style=pythonstyle, caption={Kafka Stream Processing}]
+from pyspark.sql.functions import from_json, col
+from pyspark.sql.types import StructType, StringType, IntegerType
+
+# Define schema
+schema = StructType() \
+    .add("user_id", StringType()) \
+    .add("device_id", StringType()) \
+    .add("steps", IntegerType())
+
+# Read and parse Kafka stream
+df = (
+    spark.readStream
+    .format("kafka")
+    .option("kafka.bootstrap.servers", "server:9092")
+    .option("subscribe", "fitness_data")
+    .load()
+    # Kafka value is binary, cast to string
+    .selectExpr("CAST(value AS STRING)")
+    # Parse JSON
+    .select(from_json(col("value"), schema).alias("data"))
+    # Flatten
+    .select("data.*")
+    # Deduplicate
+    .dropDuplicates(["user_id", "device_id"])
+)
+\end{lstlisting}
+
+\subsection{AutoLoader (Cloud Files)}
+
+\begin{lstlisting}[style=pythonstyle, caption={AutoLoader Example}]
+# Read incrementally from cloud storage
+df = (
+    spark.readStream
+    .format("cloudFiles")  # AutoLoader format
+    .option("cloudFiles.format", "csv")
+    .option("cloudFiles.schemaLocation", "/schema/sales")
+    .option("header", "true")
+    .load("/data/sales/")
+)
+
+# Write to Delta table
+df.writeStream \
+    .format("delta") \
+    .option("checkpointLocation", "/checkpoints/sales") \
+    .option("mergeSchema", "true") \
+    .outputMode("append") \
+    .table("bronze.sales")
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{AutoLoader SQL Equivalent:} \texttt{COPY INTO}
+\begin{lstlisting}[style=sqlstyle]
+COPY INTO bronze.sales
+FROM '/data/sales/'
+FILEFORMAT = CSV
+FORMAT_OPTIONS ('header' = 'true')
+COPY_OPTIONS ('mergeSchema' = 'true');
+\end{lstlisting}
+\end{infobox}
+
+%========================================================================================
+\newsection{Machine Learning Review (Quiz 2)}
+%========================================================================================
+
+\subsection{Hyperparameter Optimization}
+
+\begin{warningbox}
+\textbf{Hyperopt Deprecation:} The \texttt{hyperopt} library has stopped development. Use \texttt{Optuna} instead for hyperparameter optimization in new projects.
+\end{warningbox}
+
+\begin{lstlisting}[style=pythonstyle, caption={Optuna for Hyperparameter Tuning}]
+import optuna
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+def objective(trial):
+    # Define hyperparameters to tune
+    n_estimators = trial.suggest_int('n_estimators', 10, 100)
+    max_depth = trial.suggest_int('max_depth', 2, 32)
+
+    model = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth
+    )
+
+    score = cross_val_score(model, X, y, cv=5).mean()
+    return score  # Optuna maximizes by default
+
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=100)
+\end{lstlisting}
+
+\subsection{MLflow Model Registry}
+
+\begin{itemize}
+    \item \textbf{Purpose}: Store, version, and govern ML models
+    \item \textbf{Aliases}: Champion, Challenger, Production, Staging
+    \item \textbf{Integration}: Now part of Unity Catalog
+    \item \textbf{Auto-logging}: Use \texttt{mlflow.autolog()} for automatic metric capture
+\end{itemize}
+
+\subsection{Handling Imbalanced Data}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{4cm}p{9cm}}
+\toprule
+\textbf{Technique} & \textbf{Description} \\
+\midrule
+\textbf{Oversampling} & Duplicate minority class examples \\
+\textbf{Undersampling} & Remove majority class examples \\
+\textbf{SMOTE} & Synthetic Minority Over-sampling Technique---create synthetic minority examples \\
+\textbf{Class Weights} & Adjust loss function to penalize minority misclassification more \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Techniques for Imbalanced Data}
+\end{table}
+
+%========================================================================================
+\newsection{Advanced Sharing: ABAC with Delta Sharing}
+%========================================================================================
+
+\begin{definitionbox}{ABAC in Delta Sharing}
+\textbf{Attribute-Based Access Control (ABAC)} policies now carry over during Delta Sharing. When a provider shares a table with ABAC policies (e.g., PII masking), the recipient automatically inherits those policies.
+\end{definitionbox}
+
+\begin{infobox}
+\textbf{Benefits:}
+\begin{itemize}
+    \item No separate policy configuration needed on recipient side
+    \item Consistent data protection across organizations
+    \item Share tables, views, and materialized views with embedded policies
+    \item Row-level security and column masking preserved
+\end{itemize}
+\end{infobox}
+
+\subsection{Sharing to Iceberg Clients}
+
+Through \textbf{UniForm} (Delta with Iceberg metadata) or \textbf{Managed Iceberg}:
+\begin{itemize}
+    \item Delta tables generate both Delta and Iceberg metadata
+    \item External tools that only understand Iceberg can read the data
+    \item Delta Sharing protocol works for both formats
+    \item Zero-copy sharing---no data duplication
+\end{itemize}
+
+%========================================================================================
+\newsection{Course Summary and Next Steps}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Key Takeaways from Lecture 14:}
+\begin{enumerate}
+    \item \textbf{Databricks One}: Unified experience for business users across workspaces
+    \item \textbf{Lakebase}: Revolutionary OLTP with scale-to-zero compute
+    \item \textbf{AI/BI}: Genie for ``what'' questions, Research Mode for ``why''
+    \item \textbf{Agent Bricks}: Low-code AI agent creation
+    \item \textbf{Lakehouse Apps}: Build secure, interactive applications on data
+    \item \textbf{MCP}: Connect agents to external tools and data
+    \item \textbf{Quiz Review}: Broadcast variables are immutable and local to workers
+    \item \textbf{Streaming Review}: Use \texttt{availableNow} instead of deprecated \texttt{once}
+\end{enumerate}
+\end{summarybox}
+
+\subsection{Upcoming Events}
+
+\begin{itemize}
+    \item \textbf{Next Lecture}: Guest speakers from industry---highly recommended attendance
+    \item \textbf{Assignment 4}: Review the final assignment requirements
+    \item \textbf{Final Project}: Consider building a Lakehouse App for extra credit
+\end{itemize}
+
+%========================================================================================
+\section*{Glossary}
+%========================================================================================
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{4cm}p{10cm}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+\textbf{OLTP} & Online Transaction Processing---real-time transactional systems \\
+\textbf{OLAP} & Online Analytical Processing---analytical data warehousing \\
+\textbf{Lakebase} & Databricks' managed PostgreSQL for OLTP workloads \\
+\textbf{Databricks One} & Unified business user experience across workspaces \\
+\textbf{Genie} & Natural language interface for data querying \\
+\textbf{Research Mode} & Hypothesis-driven deep analysis mode in Genie \\
+\textbf{Agent Bricks} & Low-code framework for building AI agents \\
+\textbf{MCP} & Model Context Protocol---standard for agent-tool integration \\
+\textbf{Lakehouse Apps} & Web applications built on the Databricks platform \\
+\textbf{UniForm} & Delta tables with Iceberg metadata compatibility \\
+\textbf{ABAC} & Attribute-Based Access Control \\
+\textbf{SCD} & Slowly Changing Dimensions---dimension management pattern \\
+\textbf{AQE} & Adaptive Query Execution---Spark runtime optimization \\
+\textbf{Checkpoint} & Streaming progress tracking for fault tolerance \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+%========================================================================================
+\section*{One-Page Summary}
+%========================================================================================
+
+\begin{tcolorbox}[
+    colback=lightblue,
+    colframe=darkblue,
+    title=\textbf{CSCI E-103 Lecture 14: Databricks Roadmap \& Emerging Features},
+    fonttitle=\bfseries\large
+]
+
+\textbf{1. Databricks One \& Portal Experiences}
+\begin{itemize}[noitemsep]
+    \item Three portals: Lakehouse (data professionals), Databricks One (business users), Lakebase (OLTP)
+    \item Account-level access with vanity URLs and domain organization
+\end{itemize}
+
+\textbf{2. Lakebase: OLTP Revolution}
+\begin{itemize}[noitemsep]
+    \item Managed PostgreSQL with storage-compute separation
+    \item Scale-to-zero: Pay only when compute is used
+    \item Production/Development branching like Git
+    \item Bidirectional sync with Lakehouse
+\end{itemize}
+
+\textbf{3. AI/BI Enhancements}
+\begin{itemize}[noitemsep]
+    \item Genie: ``What'' questions $\rightarrow$ SQL $\rightarrow$ Answers
+    \item Research Mode: ``Why'' questions $\rightarrow$ Hypothesis exploration
+    \item Document upload: Combine PDFs/CSVs with structured data
+\end{itemize}
+
+\textbf{4. Agent Bricks \& MCP}
+\begin{itemize}[noitemsep]
+    \item AutoML-like agent creation: Point to data, specify task
+    \item MCP servers in marketplace for agent integrations
+    \item Governed by Unity Catalog
+\end{itemize}
+
+\textbf{5. Quiz 2 Key Points}
+\begin{itemize}[noitemsep]
+    \item Broadcast variables: Immutable + Local to each worker
+    \item Repartition (increase) vs Coalesce (decrease)
+    \item collect() = dangerous for large data; use take(n)
+    \item Delta log: One JSON per transaction, checkpoint every 10
+\end{itemize}
+
+\textbf{6. Assignment 3 Key Points}
+\begin{itemize}[noitemsep]
+    \item Kafka (partitions, open-source) vs Kinesis (shards, AWS-managed)
+    \item SCD Type 1 (overwrite) vs Type 2 (version history)
+    \item Use \texttt{trigger(availableNow=True)} instead of deprecated \texttt{once}
+    \item Checkpointing enables exactly-once processing
+\end{itemize}
+
+\end{tcolorbox}
+
+%========================================================================================
+\end{document}
+%========================================================================================

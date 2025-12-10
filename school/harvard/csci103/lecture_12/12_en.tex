@@ -1,0 +1,1124 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CSCI E-103: Reproducible Machine Learning - Lecture 12
+% Topic: Data and AI Governance
+% Version: 2.1 - English Edition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Table Packages ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Reproducible Machine Learning}}
+\fancyhead[R]{\small\textit{Lecture 12}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING, CREATE, FUNCTION, RETURN, ALTER, SET, MASK, GRANT, REVOKE},
+}
+
+%========================================================================================
+% Table of Contents Styling
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Figures and Tables
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CSCI E-103: Reproducible ML - Lecture 12: Data and AI Governance},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Styling
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Week:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.72\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CSCI E-103: Reproducible Machine Learning}{Lecture 12}{Ram Sriharsha (Guest Speaker)}{Master the fundamentals of Data and AI Governance, including information governance frameworks, Unity Catalog implementation, and attribute-based access control (ABAC)}
+
+\tableofcontents
+\newpage
+
+%===============================================================================
+% SECTION 1: Introduction
+%===============================================================================
+\section{Introduction: Why Governance Matters}
+
+This lecture covers \textbf{Data and AI Governance}---the frameworks, policies, and technologies that enable organizations to maximize the value of their data assets while minimizing security and compliance risks.
+
+\begin{overviewbox}
+\textbf{Key Learning Objectives:}
+\begin{itemize}
+    \item \textbf{Understand} the hierarchy: Information Governance $\supset$ Data Governance $\supset$ AI Governance
+    \item \textbf{Learn} the four pillars: Policies, Procedures, Standards, and Controls
+    \item \textbf{Implement} governance using Databricks Unity Catalog
+    \item \textbf{Apply} Attribute-Based Access Control (ABAC) for fine-grained security
+    \item \textbf{Monitor} data quality and track data lineage automatically
+\end{itemize}
+\end{overviewbox}
+
+\begin{infobox}
+\textbf{Why Should You Care?}
+
+"Data is the new oil"---but unlike oil, data is \textbf{renewable and limitless}. Organizations constantly produce, collect, and process data. The challenge is:
+\begin{itemize}
+    \item \textbf{Maximize Value:} Make data accessible to drive business decisions
+    \item \textbf{Minimize Risk:} Protect sensitive data from breaches and regulatory violations
+\end{itemize}
+
+These two goals are in constant tension. Governance is the art of balancing them.
+\end{infobox}
+
+%===============================================================================
+% SECTION 2: Information Governance Overview
+%===============================================================================
+\section{Information Governance: The Big Picture}
+
+\subsection{What Is Information Governance?}
+
+\begin{definitionbox}{Information Governance}
+Information Governance is the overarching framework that encompasses \textbf{all} organizational information---physical documents, digital files, knowledge assets, and AI models.
+
+\textbf{Scope:} Anything that is created, collected, stored, processed, or shared.
+
+\textbf{Examples:}
+\begin{itemize}
+    \item Locking your laptop when leaving your desk
+    \item Shredding printed documents with sensitive information
+    \item Policies about who can access which email folders
+\end{itemize}
+\end{definitionbox}
+
+\subsection{The Governance Hierarchy}
+
+Information Governance contains two major subsets:
+
+\begin{center}
+\begin{tabular}{|l|p{10cm}|}
+\hline
+\textbf{Type} & \textbf{Focus Area} \\
+\hline
+\textbf{Data Governance} & Managing digital data: quality, security, lifecycle, access control \\
+\hline
+\textbf{AI Governance} & Managing AI models: bias prevention, explainability, ethical use, training data lineage \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{warningbox}
+\textbf{You Can't Walk Before You Run:}
+
+AI Governance is \textbf{built on top of} Data Governance. If your data is messy, inconsistent, or poorly secured, you cannot build fair, transparent, and safe AI systems.
+
+\textbf{Example:} If you don't know the lineage of your training data, how can you verify the model isn't trained on copyrighted or biased content?
+\end{warningbox}
+
+\subsection{Goals of Information Governance}
+
+\begin{enumerate}
+    \item \textbf{Maximize Information Value}
+    \begin{itemize}
+        \item Make data discoverable and accessible to authorized users
+        \item Enable self-service analytics and AI development
+    \end{itemize}
+
+    \item \textbf{Mitigate Risk}
+    \begin{itemize}
+        \item Prevent data breaches (reputational and financial damage)
+        \item Ensure regulatory compliance (GDPR, HIPAA, PCI-DSS, CCPA)
+    \end{itemize}
+
+    \item \textbf{Enhance Security}
+    \begin{itemize}
+        \item Implement multi-factor authentication
+        \item Encrypt data at rest and in transit
+    \end{itemize}
+
+    \item \textbf{Optimize Lifecycle Management}
+    \begin{itemize}
+        \item Define data retention policies
+        \item Archive or delete data when no longer needed
+    \end{itemize}
+
+    \item \textbf{Promote Transparency and Accountability}
+    \begin{itemize}
+        \item Clear roles: Data Stewards, Governance Officers, Catalog Owners
+        \item Audit trails for all data access and modifications
+    \end{itemize}
+\end{enumerate}
+
+%===============================================================================
+% SECTION 3: The Four Pillars of Governance
+%===============================================================================
+\section{The Four Pillars: Policies, Procedures, Standards, Controls}
+
+\subsection{Framework Overview}
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{|l|p{5cm}|p{6cm}|}
+\hline
+\textbf{Pillar} & \textbf{Definition} & \textbf{Example (GDPR)} \\
+\hline
+\textbf{Policies} & High-level rules established by leadership or regulators & "Individuals have the right to request deletion of their personal data" \\
+\hline
+\textbf{Procedures} & Step-by-step instructions for implementing policies & "Process data deletion requests within 45 days" \\
+\hline
+\textbf{Standards} & Technical specifications and best practices & "Use AES-256 encryption; minimize data storage" \\
+\hline
+\textbf{Controls} & Mechanisms that enforce policies & "Multi-factor authentication; access logs; role-based permissions" \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{The Four Pillars of Governance}
+\end{table}
+
+\subsection{How They Work Together}
+
+\begin{examplebox}{GDPR Compliance Flow}
+\textbf{Policy:} GDPR mandates the "Right to Be Forgotten"
+
+\textbf{Procedure:}
+\begin{enumerate}
+    \item User submits deletion request
+    \item Request logged in ticketing system
+    \item Data team identifies all user data across systems
+    \item Data deleted or anonymized within 30 days
+    \item Confirmation sent to user
+\end{enumerate}
+
+\textbf{Standards:}
+\begin{itemize}
+    \item Data must be encrypted at rest
+    \item Access controlled via Role-Based Access Control (RBAC)
+    \item Minimum data retention periods defined
+\end{itemize}
+
+\textbf{Controls:}
+\begin{itemize}
+    \item Technical: Encryption, access control lists
+    \item Administrative: Background checks for data handlers
+    \item Physical: Secure data centers
+\end{itemize}
+\end{examplebox}
+
+%===============================================================================
+% SECTION 4: Data Governance vs AI Governance
+%===============================================================================
+\section{Data Governance vs AI Governance}
+
+\subsection{Data Governance}
+
+\begin{definitionbox}{Data Governance}
+Data Governance focuses on managing \textbf{digital data assets}---their quality, security, lifecycle, and accessibility.
+
+\textbf{Key Questions:}
+\begin{itemize}
+    \item Who can access this dataset?
+    \item Is this data encrypted?
+    \item How long should we retain this data?
+    \item Is the data accurate and up-to-date?
+\end{itemize}
+\end{definitionbox}
+
+\subsection{AI Governance}
+
+\begin{definitionbox}{AI Governance}
+AI Governance extends data governance to \textbf{AI models and their outputs}.
+
+\textbf{Key Questions:}
+\begin{itemize}
+    \item Is the training data free of bias?
+    \item Can the model's decisions be explained?
+    \item Was the training data legally obtained?
+    \item Does the model produce fair outcomes across demographic groups?
+\end{itemize}
+\end{definitionbox}
+
+\begin{importantbox}{AI Governance is Critical Now}
+With the rise of LLMs trained on internet-scale data:
+\begin{itemize}
+    \item \textbf{Copyright concerns:} Was copyrighted material used for training?
+    \item \textbf{Privacy violations:} Does the model memorize PII from training data?
+    \item \textbf{Indemnification:} If you use an LLM to generate content that infringes IP, who is liable?
+\end{itemize}
+
+Organizations are increasingly asking: "What is our legal exposure when using third-party AI models?"
+\end{importantbox}
+
+%===============================================================================
+% SECTION 5: Governance Maturity Model
+%===============================================================================
+\section{Governance Maturity Model}
+
+Organizations progress through maturity levels. \textbf{You cannot skip levels}---each stage builds on the previous.
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{|c|l|p{8cm}|}
+\hline
+\textbf{Level} & \textbf{Stage} & \textbf{Characteristics} \\
+\hline
+1 & \textbf{Initial/Aware} & No formal governance. Individuals manage data ad-hoc. \\
+\hline
+2 & \textbf{Reactive/Managed} & Problems trigger responses. Some documentation exists. \\
+\hline
+3 & \textbf{Defined/Proactive} & Enterprise-wide standards established. Most organizations target this. \\
+\hline
+4 & \textbf{Quantified} & Governance effectiveness measured with metrics. \\
+\hline
+5 & \textbf{Optimized} & Automated detection and remediation. Continuous improvement. \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{Data Governance Maturity Model}
+\end{table}
+
+\begin{infobox}
+\textbf{The Goal for Most Organizations:} Level 3 (Defined/Proactive)
+
+At this level, you have:
+\begin{itemize}
+    \item Documented policies and procedures
+    \item Clear roles and responsibilities
+    \item Automated access controls
+    \item Regular audits and compliance checks
+\end{itemize}
+\end{infobox}
+
+%===============================================================================
+% SECTION 6: Governance Operating Models
+%===============================================================================
+\section{Governance Operating Models}
+
+How governance is implemented depends on organizational culture and structure.
+
+\begin{table}[h!]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{|l|p{4cm}|p{4cm}|p{4cm}|}
+\hline
+\textbf{Model} & \textbf{Characteristics} & \textbf{Pros} & \textbf{Cons/Best For} \\
+\hline
+\textbf{Centralized} & Central team controls all governance & High consistency, strong security & Slow, bottlenecks (regulated industries) \\
+\hline
+\textbf{Decentralized} & Each department self-governs & Fast innovation, flexibility & No standards, duplication (startups) \\
+\hline
+\textbf{Federated} & Central guidelines + local execution & Balance of control and autonomy & Coordination challenges (enterprises) \\
+\hline
+\textbf{Hybrid} & Core data centralized, rest decentralized & Protects sensitive data + efficiency & Complex structure \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{Governance Operating Models}
+\end{table}
+
+\begin{examplebox}{Federated Model in Practice}
+\textbf{Central Governance Office:}
+\begin{itemize}
+    \item Defines global policies (e.g., "All PII must be encrypted")
+    \item Maintains the enterprise data catalog
+    \item Conducts compliance audits
+\end{itemize}
+
+\textbf{Business Unit Data Stewards:}
+\begin{itemize}
+    \item Implement policies within their domain
+    \item Define local schemas and data quality rules
+    \item Grant access to their datasets
+\end{itemize}
+\end{examplebox}
+
+%===============================================================================
+% SECTION 7: Unity Catalog Deep Dive
+%===============================================================================
+\section{Databricks Unity Catalog: Implementation}
+
+Unity Catalog (UC) is Databricks' unified governance solution for all data and AI assets.
+
+\subsection{The Three-Level Hierarchy}
+
+\begin{center}
+\texttt{Metastore} $\rightarrow$ \texttt{Catalog} $\rightarrow$ \texttt{Schema} $\rightarrow$ \texttt{Table / Volume / Model / Function}
+\end{center}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{Level} & \textbf{Description} \\
+\hline
+\textbf{Metastore} & Top-level container (typically one per cloud region). Stores all metadata. \\
+\hline
+\textbf{Catalog} & Largest grouping of data assets. Examples: \texttt{prod}, \texttt{dev}, \texttt{hr\_data} \\
+\hline
+\textbf{Schema} & Logical grouping within a catalog (equivalent to a database) \\
+\hline
+\textbf{Table/Volume} & Actual data. Tables = structured; Volumes = unstructured files \\
+\hline
+\end{tabular}
+\caption{Unity Catalog Hierarchy}
+\end{table}
+
+\subsection{Managed vs External Tables}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Type} & \textbf{Managed Table} & \textbf{External Table} \\
+\hline
+\textbf{Storage} & Databricks manages location & You specify cloud storage path \\
+\hline
+\textbf{Lifecycle} & DROP TABLE deletes data files & DROP TABLE removes metadata only \\
+\hline
+\textbf{Use Case} & Recommended for most scenarios & Legacy data, shared storage \\
+\hline
+\end{tabular}
+\caption{Managed vs External Tables}
+\end{table}
+
+\subsection{How Unity Catalog Security Works}
+
+\begin{enumerate}
+    \item \textbf{User submits query:} \texttt{SELECT * FROM catalog.schema.table}
+    \item \textbf{Access Control check:} Does user have SELECT permission?
+    \item \textbf{If authorized:} UC delegates to cloud IAM role to fetch data
+    \item \textbf{Data returned:} User sees only what they're permitted to see
+\end{enumerate}
+
+\begin{infobox}
+\textbf{Two-Layer Security:}
+\begin{itemize}
+    \item \textbf{Layer 1 (Cloud IAM):} Controls access to storage buckets (get, put, list)
+    \item \textbf{Layer 2 (Unity Catalog):} Fine-grained control (SELECT, INSERT on specific tables/columns)
+\end{itemize}
+
+Advantage: You don't need hundreds of IAM roles for different access patterns. One IAM role with broad access + UC for fine-grained control.
+\end{infobox}
+
+%===============================================================================
+% SECTION 8: ABAC - Attribute-Based Access Control
+%===============================================================================
+\section{ABAC: Attribute-Based Access Control}
+
+\subsection{RBAC vs ABAC}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Approach} & \textbf{RBAC (Role-Based)} & \textbf{ABAC (Attribute-Based)} \\
+\hline
+\textbf{How it works} & Assign permissions to roles; assign roles to users & Define policies based on data attributes (tags) \\
+\hline
+\textbf{Example} & "Managers can see all HR data" & "Anyone querying PII-tagged columns sees masked data" \\
+\hline
+\textbf{Scalability} & Role explosion as permissions grow & Scales well with tags \\
+\hline
+\textbf{Flexibility} & Static; requires role changes & Dynamic; tag changes propagate automatically \\
+\hline
+\end{tabular}
+\caption{RBAC vs ABAC Comparison}
+\end{table}
+
+\subsection{ABAC in Unity Catalog}
+
+The ABAC workflow in Databricks:
+
+\begin{enumerate}
+    \item \textbf{Create Governance Tags:} Define tag names and allowed values
+    \item \textbf{Tag Data Assets:} Apply tags to columns/tables (manually or via AI classification)
+    \item \textbf{Create ABAC Policies:} Define rules based on tags
+    \item \textbf{Automatic Enforcement:} Policies apply whenever tagged data is accessed
+\end{enumerate}
+
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Column Masking Function}]
+-- Step 1: Create a masking function
+CREATE FUNCTION ssn_mask(ssn STRING)
+RETURNS STRING
+RETURN
+    CASE
+        WHEN is_account_group_member('admin_group') THEN ssn
+        WHEN is_account_group_member('analyst_group') THEN CONCAT('***-**-', RIGHT(ssn, 4))
+        ELSE '***-**-****'
+    END;
+
+-- Step 2: Apply mask to a column
+ALTER TABLE employees
+ALTER COLUMN social_security_number
+SET MASK ssn_mask;
+\end{lstlisting}
+
+\subsection{ABAC Policy Types}
+
+\begin{definitionbox}{Row-Level Filtering}
+Restrict which \textbf{rows} a user can see based on a condition.
+
+\textbf{Example:} Sales reps can only see customers in their assigned region.
+\begin{lstlisting}[style=sqlstyle]
+-- Only show rows where region matches user's region
+CREATE FUNCTION region_filter()
+RETURNS BOOLEAN
+RETURN region = current_user_region();
+\end{lstlisting}
+\end{definitionbox}
+
+\begin{definitionbox}{Column-Level Masking}
+Transform or hide \textbf{column values} based on user permissions.
+
+\textbf{Example:} Non-admin users see email as \texttt{j***@company.com}
+\end{definitionbox}
+
+\subsection{Automatic Data Classification}
+
+Unity Catalog can automatically detect PII using AI models:
+
+\begin{itemize}
+    \item \textbf{Email addresses:} Detected and tagged automatically
+    \item \textbf{Phone numbers:} Pattern recognition
+    \item \textbf{Names, locations:} NER-based detection
+    \item \textbf{Credit card numbers:} Regex + Luhn validation
+\end{itemize}
+
+\begin{infobox}
+\textbf{Auto-Classification + ABAC = Powerful Automation}
+
+When you combine:
+\begin{enumerate}
+    \item Auto-classification (AI detects email columns)
+    \item Governance tags (email columns get "PII" tag)
+    \item ABAC policy (PII-tagged columns are masked for analysts)
+\end{enumerate}
+
+New tables are automatically protected without manual intervention!
+\end{infobox}
+
+%===============================================================================
+% SECTION 9: Data Quality Monitoring
+%===============================================================================
+\section{Data Quality Monitoring}
+
+\subsection{Why Monitor Data Quality?}
+
+"Garbage in, garbage out" applies doubly to AI. If your data quality degrades, your models and reports become unreliable.
+
+\subsection{Key Metrics}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Metric} & \textbf{Description} \\
+\hline
+\textbf{Freshness} & How recently was the data updated? \\
+\hline
+\textbf{Completeness} & Are all expected records present? (No sudden drops) \\
+\hline
+\textbf{Anomaly Detection} & Have data patterns changed unexpectedly? \\
+\hline
+\textbf{Data Profiling} & Statistics: min, max, nulls, distributions \\
+\hline
+\end{tabular}
+\caption{Data Quality Metrics}
+\end{table}
+
+\begin{examplebox}{Completeness Monitoring}
+\textbf{Normal Pattern:} 10,000 rows daily
+
+\textbf{Day 1:} 10,200 rows \\
+\textbf{Day 2:} 9,800 rows \\
+\textbf{Day 3:} 10,100 rows \\
+\textbf{Day 4:} \textcolor{red}{0 rows} $\leftarrow$ \textbf{ALERT!}
+
+The monitoring system detects the anomaly and triggers an alert before downstream systems are affected.
+\end{examplebox}
+
+\subsection{Setting Up Monitoring in Databricks}
+
+Data quality monitoring is enabled with a single click:
+\begin{enumerate}
+    \item Navigate to schema in Unity Catalog
+    \item Click "Enable Quality Monitoring"
+    \item System automatically tracks freshness, completeness, anomalies
+    \item Alerts can be configured for threshold violations
+\end{enumerate}
+
+%===============================================================================
+% SECTION 10: Lineage Tracking
+%===============================================================================
+\section{Lineage: Tracing Data Origins}
+
+\subsection{What Is Data Lineage?}
+
+\begin{definitionbox}{Data Lineage}
+A visual representation of data's journey: where it came from, how it was transformed, and where it goes.
+
+\textbf{Analogy:} A family tree (genealogy) for your data.
+\end{definitionbox}
+
+\subsection{Why Lineage Matters}
+
+\begin{enumerate}
+    \item \textbf{Debugging:} "This dashboard number looks wrong. Where did it come from?"
+    \item \textbf{Impact Analysis:} "If I change this column, what downstream reports break?"
+    \item \textbf{Compliance:} "Can we prove this data wasn't derived from restricted sources?"
+    \item \textbf{AI Governance:} "What data was used to train this model?"
+\end{enumerate}
+
+\subsection{Lineage in Unity Catalog}
+
+Unity Catalog automatically captures lineage:
+
+\begin{itemize}
+    \item \textbf{Table-level:} Which tables feed into which tables
+    \item \textbf{Column-level:} How specific columns are derived (e.g., substring, join)
+    \item \textbf{Custom lineage:} Connect external sources (Salesforce) and targets (PowerBI)
+\end{itemize}
+
+\begin{examplebox}{Lineage Use Case}
+\textbf{Scenario:} A BI report shows incorrect revenue figures.
+
+\textbf{With Lineage:}
+\begin{enumerate}
+    \item Navigate to the report's source table
+    \item Click "View Lineage"
+    \item Trace back through transformations
+    \item Discover: A join condition was changed 3 days ago
+    \item Fix the join and reprocess
+\end{enumerate}
+\end{examplebox}
+
+%===============================================================================
+% SECTION 11: Lakehouse Federation
+%===============================================================================
+\section{Lakehouse Federation: Unified Governance}
+
+\subsection{The Problem}
+
+Organizations have data in multiple systems:
+\begin{itemize}
+    \item Snowflake data warehouse
+    \item PostgreSQL operational database
+    \item MySQL legacy systems
+    \item Cloud storage (S3, Azure Blob)
+\end{itemize}
+
+Managing governance separately in each system is impractical.
+
+\subsection{The Solution: Federation}
+
+\begin{definitionbox}{Lakehouse Federation}
+Connect external databases to Unity Catalog \textbf{without copying data}. Query remote data as if it were local, with unified governance.
+
+\textbf{Analogy:} An embassy on foreign soil---your laws (governance rules) apply, even though the data physically resides elsewhere.
+\end{definitionbox}
+
+\subsection{How Federation Works}
+
+\begin{enumerate}
+    \item \textbf{Create Connection:} Register external database (Snowflake, PostgreSQL, etc.)
+    \item \textbf{Create Foreign Catalog:} Maps external schemas to UC
+    \item \textbf{Query with Pushdown:} Queries are pushed to the source system for efficiency
+    \item \textbf{Unified Governance:} Same grant statements, same ABAC policies
+\end{enumerate}
+
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Federated Connection}]
+-- Create connection to external Snowflake
+CREATE CONNECTION snowflake_conn
+TYPE snowflake
+OPTIONS (
+    host = 'account.snowflakecomputing.com',
+    warehouse = 'COMPUTE_WH'
+);
+
+-- Create foreign catalog
+CREATE FOREIGN CATALOG snowflake_catalog
+USING CONNECTION snowflake_conn;
+
+-- Query as if local!
+SELECT * FROM snowflake_catalog.schema.table;
+\end{lstlisting}
+
+%===============================================================================
+% SECTION 12: Delta Sharing
+%===============================================================================
+\section{Delta Sharing: Secure Data Exchange}
+
+\subsection{The Challenge of Data Sharing}
+
+Traditional methods are insecure and inefficient:
+\begin{itemize}
+    \item Email CSV files (security nightmare)
+    \item FTP transfers (no access control)
+    \item Copy data to partner's system (data duplication)
+\end{itemize}
+
+\subsection{Delta Sharing Solution}
+
+\begin{definitionbox}{Delta Sharing}
+An open protocol for securely sharing data \textbf{without copying}. Recipients don't need Databricks---they can consume via Pandas, Tableau, PowerBI.
+\end{definitionbox}
+
+\textbf{What Can Be Shared:}
+\begin{itemize}
+    \item Tables (Delta format)
+    \item Volumes (files)
+    \item Notebooks
+    \item AI Models
+    \item Even federated tables from external sources!
+\end{itemize}
+
+\begin{infobox}
+\textbf{Cross-Cloud Sharing:}
+
+You can share a Snowflake table (connected via Federation) with a partner on AWS who uses Pandas. The data never leaves Snowflake, but governance is controlled through Unity Catalog.
+\end{infobox}
+
+%===============================================================================
+% SECTION 13: The Competitive Landscape
+%===============================================================================
+\section{The Governance Platform Wars}
+
+\subsection{Who's Competing?}
+
+Every major data platform is building governance capabilities:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Platform} & \textbf{Governance Layer} & \textbf{Differentiator} \\
+\hline
+Databricks & Unity Catalog & ML/AI-first; models, volumes, functions \\
+\hline
+Snowflake & Polaris + Horizon & SQL warehouse heritage; Iceberg focus \\
+\hline
+Microsoft & Fabric & Office 365 integration; broad enterprise \\
+\hline
+AWS & Glue Catalog + Lake Formation & Native AWS integration \\
+\hline
+\end{tabular}
+\caption{Governance Platform Comparison}
+\end{table}
+
+\begin{infobox}
+\textbf{The Winner's Strategy:}
+
+The platform that can govern \textbf{everyone's assets}---not just their own---will win. If Databricks can effectively govern Snowflake data and vice versa, the most interoperable platform gains the most "assets under management."
+\end{infobox}
+
+%===============================================================================
+% SECTION 14: Real-World Considerations
+%===============================================================================
+\section{Real-World Governance Considerations}
+
+\subsection{Data Breaches and Reputational Risk}
+
+\begin{examplebox}{Case Study: Capital One Breach}
+In 2019, Capital One suffered a major data breach affecting 100+ million customers.
+
+\textbf{Consequences:}
+\begin{itemize}
+    \item \$80 million in regulatory fines
+    \item Class action lawsuits
+    \item Years of reputational damage
+    \item Increased scrutiny from regulators
+\end{itemize}
+
+\textbf{Lesson:} The cost of poor governance far exceeds the cost of implementing it.
+\end{examplebox}
+
+\subsection{The Governance-Agility Tradeoff}
+
+\begin{itemize}
+    \item \textbf{Too Strict:} "I need 5 approvals to access any data"---innovation stalls
+    \item \textbf{Too Loose:} "Everyone has access to everything"---breaches happen
+\end{itemize}
+
+\textbf{Solution: Risk-Based Governance}
+\begin{itemize}
+    \item \textbf{High-risk data (PII, financial):} Strict controls, approval workflows
+    \item \textbf{Low-risk data (public datasets, experiments):} Permissive access
+\end{itemize}
+
+%===============================================================================
+% SECTION 15: Quick Summary
+%===============================================================================
+\section{Quick Summary: One-Page Review}
+
+\begin{summarybox}
+\textbf{Key Takeaways from Lecture 12:}
+
+\begin{enumerate}
+    \item \textbf{Governance Hierarchy:} Information Governance $\supset$ Data Governance $\supset$ AI Governance
+
+    \item \textbf{Four Pillars:} Policies (what) $\rightarrow$ Procedures (how) $\rightarrow$ Standards (specifications) $\rightarrow$ Controls (enforcement)
+
+    \item \textbf{Unity Catalog Structure:} Metastore $\rightarrow$ Catalog $\rightarrow$ Schema $\rightarrow$ Table/Volume/Model
+
+    \item \textbf{ABAC Advantages:}
+    \begin{itemize}
+        \item Tag-based policies scale better than per-table permissions
+        \item Auto-classification discovers PII automatically
+        \item Policies propagate to new data without manual intervention
+    \end{itemize}
+
+    \item \textbf{Data Quality:}
+    \begin{itemize}
+        \item Monitor: Freshness, Completeness, Anomalies
+        \item Enable with one click in Unity Catalog
+    \end{itemize}
+
+    \item \textbf{Lineage:}
+    \begin{itemize}
+        \item Automatically captured for all Databricks operations
+        \item Custom lineage for external sources/targets
+    \end{itemize}
+
+    \item \textbf{Federation:}
+    \begin{itemize}
+        \item Query external databases without copying data
+        \item Unified governance across heterogeneous systems
+    \end{itemize}
+
+    \item \textbf{Delta Sharing:}
+    \begin{itemize}
+        \item Share data without copying
+        \item Recipients don't need Databricks
+    \end{itemize}
+\end{enumerate}
+\end{summarybox}
+
+%===============================================================================
+% SECTION 16: FAQ
+%===============================================================================
+\section{Frequently Asked Questions}
+
+\textbf{Q: Why use Unity Catalog if we already have cloud IAM roles?}
+
+A: Cloud IAM controls access at the file/folder level. Unity Catalog provides fine-grained control at the table, column, and row level. You can have one IAM role with broad storage access, and use UC for precise governance.
+
+\vspace{1em}
+
+\textbf{Q: Does governance slow down innovation?}
+
+A: Initially, there's overhead in setting up policies. Long-term, governance \textbf{accelerates} work by:
+\begin{itemize}
+    \item Reducing time spent finding/validating data
+    \item Avoiding security incidents that halt projects
+    \item Enabling self-service access to pre-approved datasets
+\end{itemize}
+
+\vspace{1em}
+
+\textbf{Q: What's the difference between RBAC and ABAC?}
+
+A: RBAC assigns permissions to roles ("Managers can see HR data"). ABAC uses attributes/tags ("Anyone querying PII sees masked data"). ABAC is more flexible and scales better.
+
+\vspace{1em}
+
+\textbf{Q: How does federation handle performance?}
+
+A: Queries are pushed down to the source system. If PostgreSQL is efficient at filtering, that filter runs on PostgreSQL---not in Spark. This minimizes data movement.
+
+\end{document}

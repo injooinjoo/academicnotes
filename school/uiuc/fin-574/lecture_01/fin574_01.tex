@@ -1,0 +1,821 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{FIN 574: 기업 수준 경제학}}
+\fancyhead[R]{\small\textit{Lecture 01}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={FIN 574: 기업 수준 경제학 - Lecture 01},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{FIN 574: 기업 수준 경제학}{Lecture 01}{UIUC Faculty}{Lecture 01의 핵심 개념 학습}
+
+
+\begin{summarybox}
+이 문서는 기업 수준 경제학의 첫 번째 모듈인 '소비자 및 생산자 행동'의 핵심 내용을 정리합니다. 경제학의 근본적인 문제인 \textbf{희소성(scarcity)}에서 출발하여, 자원이 배분되는 방식으로서의 \textbf{시장(market)}과 \textbf{가격(price)}의 역할을 탐구합니다. \textbf{수요(demand)}와 \textbf{공급(supply)} 곡선의 도출 원리와 시장 \textbf{균형(equilibrium)}이 결정되는 과정을 학습합니다. 특히, '곡선 상의 이동'과 '곡선 자체의 이동'을 구분하는 것은 시장 변화를 분석하는 데 가장 중요한 핵심입니다.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+\section{학습 로드맵 (Learning Roadmap)}
+
+이 문서는 다음과 같은 논리적 흐름으로 구성되어 있습니다. 이 순서대로 개념을 정복해 나가는 것이 좋습니다.
+
+\begin{enumerate}
+    \item \textbf{경제학의 근본 문제 (희소성)}: 왜 경제학이 필요한지 이해합니다. "세상에 공짜는 없다"는 말의 진짜 의미를 배웁니다.
+    \item \textbf{핵심 의사결정 도구 (기회비용)}: 모든 선택에 따르는 보이지 않는 비용, 즉 기회비용(opportunity cost)을 계산하는 법을 배웁니다.
+    \item \textbf{구매자의 행동 (수요 곡선)}: 가격이 변할 때 소비자가 어떻게 반응하는지를 나타내는 수요 곡선(demand curve)을 이해합니다.
+    \item \textbf{판매자의 행동 (공급 곡선)}: 가격이 변할 때 기업(생산자)이 어떻게 반응하는지를 나타내는 공급 곡선(supply curve)을 이해합니다.
+    \item \textbf{시장의 작동 (균형)}: 구매자와 판매자가 만나 가격이 결정되고 거래가 이루어지는 '시장 균형(market equilibrium)' 지점을 찾습니다.
+    \item \textbf{시장 변화 분석 (이동과 변동)}: 이 모듈의 최종 목표입니다. 외부 충격(뉴스, 정책, 재해 등)이 발생했을 때, 시장 가격과 거래량이 어떻게 변하는지 예측합니다.
+\end{enumerate}
+
+\section{핵심 용어 정리 (Key Terminology)}
+
+경제학은 용어의 정확한 정의에서 시작합니다. 특히 '수요'와 '수요량'의 구분은 매우 중요합니다.
+
+\begin{table}[h!]
+\centering
+\caption{모듈 1 핵심 용어}
+\label{tab:key_terms}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{3cm}}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어 (Eng)} \\
+\midrule
+\textbf{희소성} & 단순히 '드문 것'이 아니라, '사람들의 욕구에 비해 원하는 만큼 다 가질 수 없는 상태'를 의미합니다. & Scarcity \\
+\textbf{기회비용} & 어떤 것을 선택했을 때 포기해야 하는 '차선책(next best alternative)의 가치'. (암묵적 비용 포함) & Opportunity Cost \\
+\textbf{수요 (Demand)} & \textbf{모든} 가능한 가격 수준에서 소비자가 구매하려는 의사와 능력을 나타내는 \textbf{관계 전체 (곡선 자체)}. & Demand \\
+\textbf{수요량} & \textbf{특정한} 가격 수준에서 소비자가 구매하려는 \textbf{구체적인 양 (곡선 위의 한 점)}. & Quantity Demanded \\
+\textbf{공급 (Supply)} & \textbf{모든} 가능한 가격 수준에서 생산자가 판매하려는 의사와 능력을 나타내는 \textbf{관계 전체 (곡선 자체)}. & Supply \\
+\textbf{공급량} & \textbf{특정한} 가격 수준에서 생산자가 판매하려는 \textbf{구체적인 양 (곡선 위의 한 점)}. & Quantity Supplied \\
+\textbf{시장 균형} & 수요량과 공급량이 정확히 일치하여, 가격이나 거래량이 변할 유인이 없는 안정된 상태. (수요=공급) & Market Equilibrium \\
+\textbf{초과 공급 (잉여)} & 가격이 너무 높아 공급량이 수요량을 초과하는 상태. (재고가 쌓임) & Surplus \\
+\textbf{초과 수요 (부족)} & 가격이 너무 낮아 수요량이 공급량을 초과하는 상태. (줄을 서야 함) & Shortage \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+\section{핵심 개념 1: 희소성과 기회비용 (Scarcity and Opportunity Cost)}
+
+\subsection{희소성 (Scarcity)과 배분 메커니즘}
+
+경제학은 \textbf{희소성(scarcity)}의 문제를 해결하는 학문입니다.
+희소성이란 "모두가 원하는 만큼 가질 수 없는 상태(not enough to go around)"를 의미합니다.
+
+\begin{itemize}
+    \item 희소성은 단순히 '희귀함(rare)'과는 다릅니다. 예를 들어, 레오나르도 다빈치의 '모나리자'는 희귀하지만($\approx$희소함), 공기 중의 '깨끗한 공기'는 흔해 보이지만 희소합니다. (모두가 원하는 만큼의 깨끗한 공기를 가질 수 없기 때문)
+    \item 희소성 때문에 우리는 필연적으로 '선택'을 해야 하며, "누가 얼마나 가질 것인가"를 결정할 규칙, 즉 \textbf{배분 메커니즘(Allocation Mechanism)}이 필요합니다.
+    \item 과거에는 왕이나 정부가 모든 것을 결정했습니다(명령 경제, Command Economy).
+    \item 현대 서구 경제에서는 주로 \textbf{시장(Market)}이 이 역할을 합니다.
+\end{itemize}
+
+\begin{mybox}{사례: 1990년의 RAM 가격과 시장의 힘}
+    1990년, Compaq 컴퓨터의 4MB RAM 가격은 약 \$2,600였습니다. 이는 당시 매우 비싼 가격이었습니다. 하지만 오늘날 512MB (4MB의 128배) RAM은 \$4.59에 불과합니다.
+
+    이러한 극적인 가격 하락은 정부의 계획 때문이 아니었습니다.
+    높은 가격($P \uparrow$)을 본 실리콘 밸리의 많은 기업가들이 "저 비용으로 나도 만들 수 있겠다"고 판단하여 시장에 진입(Entry)했습니다.
+    그 결과, 공급자(producers)가 많아지면서 경쟁이 발생했고, \textbf{공급이 증가($S \uparrow$)}하여 \textbf{가격이 하락($P \downarrow$)}했습니다.
+    이것이 바로 시장이 작동하는 방식입니다.
+\end{mybox}
+
+\subsection{가격의 역할: 배급 장치 (Rationing Device)}
+
+시장은 \textbf{가격(Price)}이라는 도구를 사용하여 희소한 자원을 배분합니다.
+가격은 단순히 '비용'이 아니라, 누가 그 재화를 가질 자격이 있는지를 결정하는 \textbf{배급 장치(Rationing Device)}입니다.
+
+\begin{itemize}
+    \item \textbf{가격 상승 ($\uparrow$)}: 재화가 더 희소해지면(e.g., 공급 감소), 가격이 오릅니다.
+        \begin{itemize}
+            \item 일부 소비자는 "이 가격을 낼 가치는 없다"며 구매를 포기합니다 (수요량 감소).
+            \item 일부 생산자는 "수익성이 좋다"며 시장에 진입합니다 (공급량 증가).
+        \end{itemize}
+    \item \textbf{가격 하락 ($\downarrow$)}: 재화가 덜 희소해지면(e.g., 공급 증가), 가격이 내립니다.
+        \begin{itemize}
+            \item 더 많은 소비자가 "이 가격이면 살 만하다"며 구매를 시작합니다 (수요량 증가).
+            \item 일부 생산자는 "수익성이 나쁘다"며 시장을 떠납니다 (공급량 감소).
+        \end{itemize}
+\end{itemize}
+
+\begin{warningbox}
+\textbf{만약 가격이 없다면? $\rightarrow$ 대기 (Queuing)}
+
+미국 듀크(Duke) 대학의 농구팀 티켓은 학생들에게 \$0 (무료)입니다.
+    하지만 경기장은 10,000석 미만으로 매우 작아(희소성), 모든 학생이 들어갈 수 없습니다.
+
+    가격을 \$0로 정한다고 해서 희소성이 사라지진 않습니다.
+    단지 배분 메커니즘이 '가격'에서 '대기(Queuing)'로 바뀌었을 뿐입니다. 학생들은 티켓을 얻기 위해 몇 주 동안 텐트에서 생활('Krzyzewskiville')해야 합니다.
+    즉, '돈' 대신 '시간'이라는 엄청난 비용을 지불하는 것입니다.
+\end{warningbox}
+
+\subsection{기회비용 (Opportunity Cost)}
+
+모든 선택에는 비용이 따릅니다. 경제학에서 말하는 '진짜' 비용은 \textbf{기회비용(Opportunity Cost)}입니다.
+
+\textbf{정의}: "어떤 것을 선택함으로써 포기해야 하는 것 중 가장 가치가 큰 대안 (The value of the next best foregone alternative)"
+
+\begin{itemize}
+    \item 노벨상 수상자인 밀턴 프리드먼(Milton Friedman)은 "세상에 공짜 점심은 없다(There's no such thing as a free lunch)"고 말했습니다.
+    \item 누군가 당신에게 공짜로 점심을 사주더라도, 당신은 그 시간에 친구를 만나거나 넷플릭스를 볼 수 있는 '시간'을 포기해야 합니다. 이 시간이 바로 기회비용입니다.
+\end{itemize}
+
+\begin{keypointbox}{핵심 예시: 명시적 비용 vs. 암묵적 비용(기회비용)}
+    당신이 친구와 함께 차를 사려 한다고 가정합시다.
+
+    \begin{itemize}
+        \item \textbf{당신 (명시적 비용)}: 돈이 없어 은행에서 \$3,000를 대출받고 이자를 냅니다.
+        \item \textbf{친구 (암묵적 비용)}: 모아둔 저축 \$3,000를 인출해서 차를 샀습니다. 친구는 "나는 이자를 내지 않으니 공짜다"라고 주장합니다.
+    \end{itemize}
+
+    \textbf{경제학적 분석}: 친구의 주장은 틀렸습니다.
+    친구가 만약 그 돈 \$3,000를 은행에 계속 저축했다면 이자를 받을 수 있었을 것입니다.
+    차를 사기 위해 돈을 인출하는 순간, 그 '받을 수 있었던 이자'를 포기한 것입니다.
+    이것이 바로 눈에 보이지 않는 \textbf{암묵적 비용(Implicit Cost)}이며, 기회비용의 핵심입니다.
+
+    \textbf{기업의 적용}: 회계 장부상 \$3백만의 '이익(Profit)'을 낸 CEO라도, 경제학적으로는 다음과 같이 생각해야 합니다. "내가 이 자산을 모두 팔고 트윙키(Twinkies)를 만들었다면 \$4백만을 벌 수 있지 않았을까?" 만약 그렇다면, 이 기업은 회계상 흑자임에도 불구하고 경제학적으로는 \$1백만의 손실을 본 것입니다.
+\end{keypointbox}
+
+
+\newpage
+
+\section{핵심 개념 2: 수요 곡선 (The Demand Curve)}
+
+시장은 \textbf{구매자(Buyers)}와 \textbf{판매자(Sellers)}의 상호작용으로 이루어집니다.
+구매자들의 행동을 요약한 것이 바로 \textbf{수요 곡선(Demand Curve)}입니다. (이 분석은 정부 개입이 없다고 가정합니다.)
+
+\subsection{수요(Demand)의 정의}
+
+\textbf{정의}: "다른 모든 조건이 일정할 때, 각각의 가격 수준에서 소비자들이 구매하고자 하는 재화의 양을 나타내는 점들의 궤적 (Locus of points showing how much consumers wish to purchase at different prices)"
+
+\begin{itemize}
+    \item 수학적으로는 $Q = f(P)$ 로 표현할 수 있습니다. 즉, 구매하려는 수량(Quantity, Q)이 가격(Price, P)에 따라 결정됩니다.
+    \item 수요 곡선은 \textbf{우하향(Downward sloping)}합니다.
+    \item \textbf{이유 (수요의 법칙, Law of Demand)}:
+        \begin{itemize}
+            \item 가격이 하락하면($P \downarrow$), 더 적은 '녹색 종이(돈)'를 포기해도 되므로(기회비용 감소), 더 많이 구매합니다($Q \uparrow$).
+            \item 가격이 상승하면($P \uparrow$), 더 많은 것을 포기해야 하므로(기회비용 증가), 더 적게 구매합니다($Q \downarrow$).
+        \end{itemize}
+\end{itemize}
+
+\subsection{수요 곡선의 형태와 관행}
+
+\begin{keypointbox}{주의: 축(Axis)이 반대로 되어 있습니다}
+    수학적으로 $Q = f(P)$ 라면, 독립 변수인 가격(P)이 X축에, 종속 변수인 수량(Q)이 Y축에 있어야 합니다.
+
+    하지만 100여 년 전 경제학자 알프레드 마샬(Alfred Marshall)이 처음 그래프를 그릴 때, 가격(P)을 Y축(세로축)에, 수량(Q)을 X축(가로축)에 두었습니다.
+    이것이 관행으로 굳어져, 오늘날 모든 경제학 교과서가 이 방식을 따릅니다.
+
+    엄밀히 말해 우리가 그리는 것은 $P = f^{-1}(Q)$ 인 \textbf{역수요함수(Inverse Demand Curve)}이지만, 관습적으로 그냥 "수요 곡선"이라고 부릅니다. 이 관행에 익숙해져야 합니다.
+\end{keypointbox}
+
+\subsection{선형(Linear)으로 그리는 이유}
+
+현실 세계의 수요 곡선은 복잡한 곡선(non-linear)일 것입니다.
+하지만 우리는 이 수업에서 수요 곡선을 \textbf{직선(Linear)}으로 단순화하여 그립니다.
+
+\begin{itemize}
+    \item \textbf{이유}: 분석의 편의성(Tractability) 때문입니다.
+    \item 직선으로 그려도 "가격이 오르면 수요량이 줄어든다"는 핵심 직관(Intuition)은 동일하게 얻을 수 있습니다.
+    \item 곡선으로 그리면 시장 균형을 찾기 위해 복잡한 이차방정식의 근의 공식(quadratic rule) 등을 사용해야 하지만, 직선으로 그리면 간단한 연립방정식으로 해결할 수 있습니다.
+\end{itemize}
+
+\subsection{실제 수요 곡선은 어디에서 오는가?}
+
+현실의 기업들은 수요 곡선을 어떻게 추정할까요?
+
+\begin{itemize}
+    \item \textbf{불확실성과 기대값}: 기업이 특정 가격($P_0$)을 책정할 때, 실제로 팔릴 양은 불확실합니다. 통계적으로 이는 '정규 분포(Normal Distribution)' 또는 '벨 커브(Bell Curve)'를 따릅니다.
+    \item \textbf{수요 곡선의 진짜 의미}: 우리가 그리는 수요 곡선 상의 한 점($P_0, Q_0$)은, 사실 해당 가격($P_0$)에서 팔릴 것으로 예상되는 \textbf{기대값(Expected Value, $\mu$)}, 즉 벨 커브의 가장 높은 지점을 의미합니다.
+    \item \textbf{데이터 수집 (Big Data)}: 기업들은 '빅데이터'를 활용해 이 기대값을 추정합니다.
+        \begin{enumerate}
+            \item \textbf{고객 로열티 카드}: 식료품점은 고객 카드를 통해 '가격이 할인될 때(P$\downarrow$) 래리 교수가 마요네즈를 얼마나 더 사는지(Q$\uparrow$)' 데이터를 수집합니다.
+            \item \textbf{데이터 결합}: 이 구매 데이터를 Zillow(주택 가격 $\to$ 부의 대리 변수), 인구조사 데이터(가구 구성, 자녀 수) 등과 결합합니다.
+            \item \textbf{결과}: 통계 분석을 통해 '마요네즈'나 '냉동 피자'에 대한 정교한 수요 곡선을 추정할 수 있습니다.
+        \end{enumerate}
+\end{itemize}
+
+\newpage
+
+\section{핵심 개념 3: 공급 곡선 (The Supply Curve)}
+
+판매자(Sellers, Firms)의 행동을 요약한 것이 \textbf{공급 곡선(Supply Curve)}입니다.
+
+\subsection{공급(Supply)의 정의}
+
+\textbf{정의}: "다른 모든 조건이 일정할 때, 각각의 가격 수준에서 생산자들이 판매하고자 하는 재화의 양을 나타내는 점들의 궤적 (How much will firms be willing to sell at different prices?)"
+
+\begin{itemize}
+    \item 수학적으로는 $Q = h(P)$ 로 표현할 수 있습니다.
+    \item 공급 곡선은 \textbf{우상향(Upward sloping)}합니다.
+    \item \textbf{이유}:
+        \begin{itemize}
+            \item 생산량을 늘리기 위해서는($Q \uparrow$) 추가 노동자를 고용하거나 공장을 더 돌려야 하므로 \textbf{추가 생산 비용이 더 많이 듭니다}.
+            \item 기업이 이처럼 더 비싼 비용을 감수하고 생산량을 늘리도록 유인하려면, 시장에서 더 높은 가격($P \uparrow$)을 보장받아야 합니다.
+            \item (이 직관적인 이유는 이후 모듈에서 '이윤 극대화', '생산 함수' 등을 통해 엄밀하게 증명될 것입니다.)
+        \end{itemize}
+    \item 공급 곡선 역시 수요 곡선과 마찬가지로, 분석의 편의를 위해 \textbf{선형(Linear)}으로 가정합니다.
+\end{itemize}
+
+\newpage
+
+\section{핵심 개념 4: 시장 균형 (Market Equilibrium)}
+
+수요 곡선(구매자)과 공급 곡선(판매자)을 한 그래프에 합치면, 시장이 어떻게 작동하는지 알 수 있습니다.
+
+\subsection{균형(Equilibrium)의 정의}
+
+\textbf{정의}: "더 이상 변화할 유인이 없는 안정된 상태 (No tendency for change)"
+
+\begin{itemize}
+    \item \textbf{비유 (Cereal Bowl)}: 시리얼 그릇 바닥에 구슬이 멈춰 있는 상태가 '균형'입니다.
+    \item 만약 누군가 그릇을 쳐서(외부 충격, Shock) 구슬이 흔들리더라도, 구슬은 결국 그릇 바닥의 새로운 지점에서 다시 멈출 것입니다. 이것이 '새로운 균형'입니다.
+    \item 경제학자의 목표는 (1) 현재의 균형을 찾고, (2) 충격이 왔을 때, (3) 시장이 어떤 혼란을 거쳐 (4) 어떤 '새로운 균형'으로 이동할지 예측하는 것입니다.
+\end{itemize}
+
+\subsection{균형점의 결정}
+
+\textbf{균형점(E)}: 수요 곡선($D_0$)과 공급 곡선($S_0$)이 교차하는 지점입니다.
+
+\begin{itemize}
+    \item \textbf{균형 가격 ($P_E$)}: 이 교차점의 가격입니다.
+    \item \textbf{균형 거래량 ($Q_E$)}: 이 교차점의 수량입니다.
+    \item \textbf{균형의 의미}: $P_E$ 가격에서는 소비자가 사고 싶어 하는 양(\textbf{수요량, $Q_D$})과 생산자가 팔고 싶어 하는 양(\textbf{공급량, $Q_S$})이 정확히 일치합니다 ($Q_D = Q_S$).
+    \item 이 상태에서는 재고가 쌓이거나 물건이 부족해 줄을 서는 사람이 없습니다. 모든 시장 참여자(구매자, 판매자)가 만족하므로 가격이 변할 유인이 없습니다.
+\end{itemize}
+
+\subsection{반증법(Proof by Contradiction)을 통한 균형 증명}
+
+만약 $P_E$가 균형 가격이 아니라면 어떤 일이 벌어질까요?
+
+\begin{mybox}{상황 1: 가격이 균형보다 높을 때 ($P_1 > P_E$)}
+    \begin{itemize}
+        \item \textbf{소비자 반응}: 가격이 비싸므로 조금만 사려 합니다 (수요량 $Q_D$는 적음).
+        \item \textbf{생산자 반응}: 가격이 높으므로 신나서 많이 생산합니다 (공급량 $Q_S$는 많음).
+        \item \textbf{결과}: $Q_S > Q_D$. 시장에 물건이 팔리지 않고 쌓입니다. $\rightarrow$ \textbf{초과 공급 (Surplus)}
+        \item \textbf{시장의 조정}: 재고를 없애기 위해 기업들은 가격을 \textbf{인하($\downarrow$)}하기 시작합니다. 가격은 $P_E$를 향해 내려갑니다.
+        \item \textbf{결론}: $P_1$은 균형이 될 수 없습니다.
+    \end{itemize}
+\end{mybox}
+
+\begin{mybox}{상황 2: 가격이 균형보다 낮을 때 ($P_2 < P_E$)}
+    \begin{itemize}
+        \item \textbf{소비자 반응}: 가격이 싸므로 많이 사려 합니다 (수요량 $Q_D$는 많음).
+        \item \textbf{생산자 반응}: 가격이 낮으므로 수익성이 나빠 조금만 생산합니다 (공급량 $Q_S$는 적음).
+        \item \textbf{결과}: $Q_D > Q_S$. 물건이 부족해서 사지 못하는 사람이 생깁니다. $\rightarrow$ \textbf{초과 수요 (Shortage)}
+        \item \textbf{시장의 조정}: 소비자들은 물건을 사기 위해 "내가 돈을 더 낼게"라며 경쟁합니다. 가격은 \textbf{인상($\uparrow$)}되기 시작합니다. 가격은 $P_E$를 향해 올라갑니다.
+        \item \textbf{결론}: $P_2$는 균형이 될 수 없습니다.
+    \end{itemize}
+\end{mybox}
+
+오직 $P_E$에서만 가격이 오르거나 내릴 압력이 없는 유일한 '균형' 상태가 됩니다.
+
+\newpage
+
+\section{절차/방법론: 시장 변화 분석 (Analyzing Market Changes)}
+
+현실 세계의 뉴스(날씨, 정책, 기술)가 시장에 어떤 영향을 미치는지 분석하는 것은 이 모듈의 최종 목표입니다.
+이를 위해서는 \textbf{두 가지 용어를 명확히 구별}해야 합니다. 이것이 이 모듈에서 가장 중요한 핵심입니다.
+
+\subsection{가장 중요한 구분: '곡선 자체의 이동' vs '곡선 상의 이동'}
+
+\begin{warningbox}{치명적인 용어 혼동 (Jargon Warning)}
+    "수요가 감소했다"와 "수요량이 감소했다"는 완전히 다른 말이며, 혼용할 경우 0점 처리될 수 있습니다.
+\end{warningbox}
+
+\begin{table}[h!]
+\centering
+\caption{수요/공급 변화 용어 비교}
+\label{tab:shift_vs_move}
+\begin{tabularx}{\textwidth}{>{\raggedright}p{3.5cm} >{\raggedright}X >{\raggedright}X}
+\toprule
+\textbf{구분} & \textbf{...량(Quantity)의 변화} & \textbf{...자체의 변화} \\
+\midrule
+\textbf{용어 (Jargon)} & $\bullet$ \textbf{수요량}의 변화 \newline $\bullet$ \textbf{공급량}의 변화 & $\bullet$ \textbf{수요}의 변화 \newline $\bullet$ \textbf{공급}의 변화 \\
+\textbf{그래프 상의 의미} & $\bullet$ \textbf{곡선 상에서의 이동} \newline (Movement along the curve) & $\bullet$ \textbf{곡선 자체의 이동} \newline (Shift of the entire curve) \\
+\textbf{유일한 원인} & $\bullet$ 해당 상품의 \textbf{가격(P) 변화} & $\bullet$ \textbf{가격 이외의} 모든 요인 \newline (e.g., 소득, 유행, 날씨, 기술, 세금) \\
+\textbf{예시 (가솔린)} & [나쁜 예 👎] \newline "가솔린 \textbf{가격이 올라서} 가솔린 \textbf{수요가} 줄었다." \newline (틀림!) & [좋은 예 👍] \newline "가솔린 \textbf{가격이 올라서} 가솔린 \textbf{수요량이} 줄었다." \newline (옳음!) \\
+\textbf{예시 (토마토)} & [좋은 예 👍] \newline "토마토 \textbf{가격이 하락하자} 토마토 \textbf{수요량이} 증가했다." \newline (곡선 상에서 이동) & [좋은 예 👍] \newline "토마토가 심장병에 좋다는 \textbf{연구 결과}가 나와 토마토 \textbf{수요가} 증가했다." \newline (곡선 자체가 오른쪽으로 이동) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{분석 프레임워크: 오렌지 주스(O.J.) 시장 예시}
+
+\textbf{질문}: "어느 날 아침 뉴스에서 플로리다 오렌지 농장에 얼음이 1인치 두께로 얼어붙었다는(냉해) 보도가 나왔다. 오렌지 주스(O.J.) 시장의 가격과 거래량은 어떻게 변할까?"
+
+\textbf{분석 단계}:
+
+\begin{enumerate}
+    \item \textbf{시작 (Start)}: 시장은 원래 $S_0$ (공급 곡선)와 $D_0$ (수요 곡선)가 만나는 균형점 $(P_0, Q_0)$에 있었습니다.
+
+    \item \textbf{충격 식별 (Shock)}: 플로리다(주요 공급처)의 냉해로 오렌지 작물이 전멸했습니다.
+        \begin{itemize}
+            \item 이것은 '가격' 변화가 아니라 '생산 조건'의 변화입니다.
+            \item 따라서 '공급량'이 아니라 \textbf{'공급(Supply)'}이 변합니다.
+        \end{itemize}
+
+    \item \textbf{곡선 이동 (Shift)}: 공급 능력이 파괴되었으므로, 모든 가격 수준에서 판매할 수 있는 O.J.의 양이 줄어듭니다.
+        \begin{itemize}
+            \item \textbf{공급 곡선이 왼쪽으로 이동합니다. ($S_0 \rightarrow S_1$)}
+            \item (수요 곡선($D_0$)은 변하지 않습니다. 사람들의 O.J.에 대한 취향이 변한 것은 아닙니다.)
+        \end{itemize}
+
+    \item \textbf{즉각적 효과 (Disequilibrium)}: 공급 곡선이 $S_1$으로 이동한 직후, 시장 가격은 아직 $P_0$에 머물러 있습니다.
+        \begin{itemize}
+            \item 이 $P_0$ 가격에서 소비자들은 여전히 $Q_0$만큼 사려 하지만 (수요 곡선 $D_0$ 기준),
+            \item 생산자들은 이제 $S_1$ 곡선에 따라 훨씬 적은 양만 팔려 합니다.
+            \item $Q_D > Q_S$ $\rightarrow$ 시장에 O.J.가 동나는 \textbf{초과 수요 (Shortage)}가 발생합니다.
+        \end{itemize}
+
+    \item \textbf{새 균형으로의 이동 (Movement)}:
+        \begin{itemize}
+            \item 물건이 부족(Shortage)하니 소비자들이 가격을 올려 부르기 시작합니다. \textbf{가격이 상승($P \uparrow$)}합니다.
+            \item 가격이 $P_0$에서 $P_1$으로 오르는 동안 \textbf{두 가지 일이 동시에} 일어납니다:
+                \begin{enumerate}
+                    \item \textbf{(공급)}: 가격이 오르자, 텍사스나 캘리포니아의 남은 공급자들이 "수익성이 좋다"며 공급을 늘립니다. (새로운 $S_1$ 곡선을 \textit{따라} 우상향 \textbf{이동})
+                    \item \textbf{(수요)}: 가격이 오르자, 소비자들은 "너무 비싸다"며 구매를 포기하고 다이어트 콜라로 바꿉니다. (원래 $D_0$ 곡선을 \textit{따라} 좌상향 \textbf{이동})
+                \end{enumerate}
+        \end{itemize}
+
+    \item \textbf{결론 (New Equilibrium)}: 이 과정은 가격이 $P_1$에 도달할 때까지 계속됩니다.
+        \begin{itemize}
+            \item $P_1$은 $D_0$와 \textbf{새로운 $S_1$}이 만나는 새 균형점입니다.
+            \item \textbf{최종 결과}: 원래 균형 $(P_0, Q_0)$과 비교할 때, \textbf{가격은 상승($P_1 > P_0$)}하고 \textbf{거래량은 감소($Q_1 < Q_0$)}합니다.
+        \end{itemize}
+\end{enumerate}
+
+\newpage
+
+\section{학습 체크리스트 (Checklist)}
+
+이 모듈을 완료한 후, 다음 질문에 스스로 답할 수 있는지 확인하세요.
+
+\begin{itemize}
+    \item [ ] '희소성'의 경제학적 정의가 "드물다(rare)"와 어떻게 다른지 설명할 수 있는가?
+    \item [ ] "세상에 공짜 점심은 없다"는 말을 '기회비용'을 사용해 설명할 수 있는가?
+    \item [ ] 은행 예금으로 차를 산 친구가 실제로는 '이자 비용(암묵적 비용)'을 지불하고 있음을 증명할 수 있는가?
+    \item [ ] 수학적으로 $Q=f(P)$임에도 불구하고 왜 경제학자들이 가격(P)을 Y축에 그리는지 설명할 수 있는가?
+    \item [ ] 수요 곡선이 왜 우하향하고, 공급 곡선이 왜 우상향하는지 '직관적'으로 설명할 수 있는가?
+    \item [ ] 시장 가격이 균형 가격보다 높을 때 (초과 공급), 왜 가격이 하락할 수밖에 없는지 설명할 수 있는가?
+    \item [ ] 시장 가격이 균형 가격보다 낮을 때 (초과 수요), 왜 가격이 상승할 수밖에 없는지 설명할 수 있는가?
+    \item [ ] (매우 중요) "가솔린에 세금이 붙어 가격이 올랐다"는 뉴스가 '수요의 변화'인지 '수요량의 변화'인지 구별하고, 그 이유를 설명할 수 있는가?
+    \item [ ] (매우 중요) "AI 기술의 발전으로 반도체 생산 비용이 절반이 되었다"는 뉴스가 '공급의 변화'인지 '공급량의 변화'인지 구별하고, 그 이유를 설명할 수 있는가?
+\end{itemize}
+
+\section{주요 Q\&A (FAQ)}
+
+\begin{keypointbox}{Q: 왜 수요 곡선을 그릴 때 가격(P)을 Y축에 두나요? 수학적으로 틀린 것 아닌가요?}
+    \textbf{A}: 맞습니다. 수학적으로 $Q=f(P)$이므로 P가 X축(독립변수)에 와야 하지만, 100여 년 전 경제학자 알프레드 마샬의 관행이 굳어진 것입니다. 우리는 기술적으로 '역수요함수'를 그리고 있지만, 모두가 이를 '수요 곡선'이라고 부르기로 약속했습니다. 불편하더라도 이 관행을 따라야 합니다.
+\end{keypointbox}
+
+\begin{keypointbox}{Q: 수요/공급 곡선은 현실에서 정말 직선(Linear)인가요?}
+    \textbf{A}: 아닐 가능성이 높습니다. 현실에서는 복잡한 곡선 형태일 것입니다. 하지만 "가격이 오르면 덜 산다" (우하향) 또는 "가격이 오르면 더 판다" (우상향)는 핵심 직관(Intuition)은 동일합니다. 우리는 복잡한 수학 없이 이 핵심 직관을 배우기 위해 분석하기 쉬운 '직선' 모델을 사용하는 것입니다.
+\end{keypointbox}
+
+\begin{keypointbox}{Q: '수요의 변화'와 '수요량의 변화'를 구분하는 것이 왜 그렇게 중요한가요?}
+    \textbf{A}: 시장 분석의 전부이기 때문입니다.
+    \begin{itemize}
+        \item "가격이 올라서 수요\textbf{량}이 줄었다" $\rightarrow$ 단순히 곡선 위에서 $A \rightarrow B$로 이동한 것입니다. 시장의 근본적인 룰(수요 곡선)은 그대로입니다.
+        \item "유행이 변해서 수요가 줄었다" $\rightarrow$ 시장의 룰 자체가 변한 것입니다 ($D_0 \rightarrow D_1$). 이는 완전히 새로운 균형 가격과 균형 거래량을 만듭니다.
+    \end{itemize}
+    원인이 '가격'인지 '가격 외 요인'인지 구분하지 못하면, 시장이 앞으로 어떻게 변할지 전혀 예측할 수 없습니다.
+\end{keypointbox}
+
+\newpage
+
+\section{빠르게 훑어보기 (1-Page Summary)}
+
+\begin{tcolorbox}[title=\textbf{1. 희소성 (Scarcity) \& 기회비용 (Opportunity Cost)}]
+    $\bullet$ \textbf{희소성}: 원하는 만큼 가질 수 없는 상태 $\rightarrow$ '배분 메커니즘' 필요.
+    \newline
+    $\bullet$ \textbf{시장}: '가격'을 배급 장치로 사용하여 희소성 문제를 해결.
+    \newline
+    $\bullet$ \textbf{기회비용}: 선택 시 포기하는 차선책의 가치. (e.g., 공짜 점심의 '시간' 비용, 저축으로 산 차의 '이자' 비용)
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{2. 수요 (Demand, $D_0$)}]
+    $\bullet$ \textbf{정의}: 소비자가 각 가격에서 얼마나 사려 하는가? ($Q = f(P)$)
+    \newline
+    $\bullet$ \textbf{형태}: \textbf{우하향} (Downward Sloping)
+    \newline
+    $\bullet$ \textbf{이유 (수요의 법칙)}: 가격($P \uparrow$) $\rightarrow$ 기회비용($\uparrow$) $\rightarrow$ 구매($Q \downarrow$)
+    \newline
+    $\bullet$ \textbf{관행}: P를 Y축, Q를 X축에 그린다 (원래는 반대여야 함).
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{3. 공급 (Supply, $S_0$)}]
+    $\bullet$ \textbf{정의}: 생산자가 각 가격에서 얼마나 팔려 하는가? ($Q = h(P)$)
+    \newline
+    $\bullet$ \textbf{형태}: \textbf{우상향} (Upward Sloping)
+    \newline
+    $\bullet$ \textbf{이유}: 생산량($Q \uparrow$) $\rightarrow$ 추가 생산 비용($\uparrow$) $\rightarrow$ 요구 가격($P \uparrow$)
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{4. 시장 균형 (Equilibrium, $E$)}]
+    $\bullet$ \textbf{정의}: 수요 곡선과 공급 곡선의 교차점. "변화할 유인이 없는 상태"
+    \newline
+    $\bullet$ \textbf{균형}: 수요량($Q_D$) = 공급량($Q_S$)
+    \newline
+    $\bullet$ \textbf{가격 \textgreater{} 균형가} $\rightarrow$ 초과 공급 (Surplus) $\rightarrow$ 가격 하락($\downarrow$) 압력
+    \newline
+    $\bullet$ \textbf{가격 \textless{} 균형가} $\rightarrow$ 초과 수요 (Shortage) $\rightarrow$ 가격 상승($\uparrow$) 압력
+\end{tcolorbox}
+
+\begin{warningbox}{★ 모듈 1의 핵심: 용어 구분 ★}
+\begin{tabularx}{\linewidth}{>{\raggedright}X >{\raggedright}X}
+    \textbf{...량 (Quantity)의 변화} & \textbf{...자체 (Demand/Supply)의 변화} \\
+    \midrule
+    $\bullet$ 곡선 \textbf{위에서} 점이 이동 & $\bullet$ 곡선 \textbf{자체가} 평행 이동 \\
+    $\bullet$ \textbf{원인: 가격(P) 변화} (Only) & $\bullet$ \textbf{원인: 가격 외} 모든 것 (날씨, 유행, 소득...) \\
+    $\bullet$ 예: "가솔린 가격이 오르자 \textit{수요량이} 줄었다." & $\bullet$ 예: "전기차가 유행하자 가솔린 \textit{수요가} 줄었다." \\
+\end{tabularx}
+\end{warningbox}
+
+\end{document}

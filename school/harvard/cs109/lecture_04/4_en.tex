@@ -1,0 +1,801 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CS109A: Introduction to Data Science - Lecture 04
+% k-Nearest Neighbors Regression
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 04}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced, colback=lightpurple, colframe=darkpurple,
+    fonttitle=\bfseries\large, title=Lecture Overview,
+    arc=3mm, boxrule=1pt, left=8pt, right=8pt, top=8pt, bottom=8pt, breakable, #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced, colback=lightblue, colframe=darkblue,
+    fonttitle=\bfseries, title=Key Summary,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced, colback=lightgreen, colframe=darkgreen,
+    fonttitle=\bfseries, title=Key Information,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced, colback=lightyellow, colframe=darkorange,
+    fonttitle=\bfseries, title=Warning,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced, colback=lightgray, colframe=black!60,
+    fonttitle=\bfseries, title=Example: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced, colback=lightpink, colframe=purple!70!black,
+    fonttitle=\bfseries, title=Definition: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced, colback=boxred, colframe=red!70!black,
+    fonttitle=\bfseries, title=Important: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced, colback=lightgreen, colframe=darkgreen,
+    fonttitle=\bfseries, title=Analogy: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left, numbersep=8pt,
+    breaklines=true, breakatwhitespace=false,
+    frame=single, frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b, showstringspaces=false,
+    tabsize=2, xleftmargin=15pt, xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 04},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple, colframe=darkpurple,
+    boxrule=1pt, arc=2mm, left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CS109A: Introduction to Data Science\\Lecture 04: k-Nearest Neighbors Regression}
+\author{Harvard University}
+\date{Fall 2024}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 04: k-Nearest Neighbors (kNN) Regression}{Pavlos Protopapas}{Understand statistical modeling fundamentals, the kNN algorithm, model evaluation using MSE and $R^2$, and the train/validation/test split}
+
+
+\begin{summarybox}
+This lecture introduces \textbf{statistical modeling}---the process of finding mathematical relationships between variables to make predictions. We focus on \textbf{k-Nearest Neighbors (kNN)}, an intuitive algorithm that predicts values by looking at ``similar'' examples in the training data. We also learn how to evaluate models using \textbf{Mean Squared Error (MSE)} and \textbf{R-squared ($R^2$)}, and why we must split our data into \textbf{training, validation, and test} sets. By the end, you'll understand how to build, evaluate, and compare predictive models.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================
+\section{Key Terminology}
+%========================================
+
+Before diving into modeling, let's establish a common vocabulary:
+
+\begin{table}[h!]
+\centering
+\caption{Essential Modeling Terminology}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{@{}llp{6cm}@{}}
+\toprule
+\textbf{Term} & \textbf{Also Known As} & \textbf{Description} \\
+\midrule
+\textbf{Response Variable ($y$)} & Target, Dependent Variable, Outcome & The variable we want to predict \\
+\textbf{Predictor Variables ($X$)} & Features, Independent Variables, Covariates & Variables used to make predictions \\
+\textbf{Design Matrix ($X$)} & Data Matrix, Feature Matrix & Matrix of all predictors ($n \times p$) \\
+\textbf{Statistical Model ($\hat{f}$)} & Estimator, Predictor & Our approximation of the true relationship \\
+\textbf{Hyperparameter} & Tuning Parameter & Values set by humans before training (e.g., $k$ in kNN) \\
+\textbf{Loss Function} & Cost Function, Objective Function & Measures how wrong the model is \\
+\textbf{MSE} & Mean Squared Error & Average of squared prediction errors \\
+\textbf{$R^2$} & R-squared, Coefficient of Determination & How much better than the baseline model \\
+\textbf{Training Set} & --- & Data used to fit/train the model \\
+\textbf{Validation Set} & Dev Set & Data used to select hyperparameters \\
+\textbf{Test Set} & Holdout Set & Data used ONLY for final evaluation \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+
+%========================================
+\section{Introduction to Statistical Modeling}
+%========================================
+
+\subsection{The Prediction Problem}
+
+We often want to predict one variable based on others:
+
+\begin{itemize}
+    \item Predict \textbf{TikTok views} based on video length, posting time, and past performance
+    \item Predict \textbf{movie ratings} based on user history and demographics
+    \item Predict \textbf{product sales} based on advertising budget
+\end{itemize}
+
+In this lecture, we'll use the \textbf{Advertising Dataset}:
+\begin{itemize}
+    \item 200 markets (observations)
+    \item 3 predictors: TV, Radio, Newspaper budgets (in \$1,000s)
+    \item 1 response: Sales (in 1,000 units)
+\end{itemize}
+
+\textbf{Goal}: Build a model to predict Sales given advertising budgets.
+
+\subsection{Response vs. Predictor Variables}
+
+Not all variables are equal. There's an asymmetry:
+
+\begin{definitionbox}{Response and Predictor Variables}
+\begin{itemize}
+    \item \textbf{Response Variable ($y$)}: The outcome we're trying to predict
+    \begin{itemize}
+        \item Often harder to measure, more important, or influenced by other variables
+        \item Example: Sales
+    \end{itemize}
+    \item \textbf{Predictor Variables ($X$)}: The inputs we use to make predictions
+    \begin{itemize}
+        \item Variables we can measure or control
+        \item Example: TV budget, Radio budget, Newspaper budget
+    \end{itemize}
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Mathematical Notation}
+
+\begin{itemize}
+    \item \textbf{$y$}: Response vector of length $n$ (one value per observation)
+    \item \textbf{$X$}: Design matrix of size $n \times p$ ($n$ observations, $p$ predictors)
+    \item \textbf{Convention}: Capital letters = matrices, lowercase = vectors
+\end{itemize}
+
+\begin{examplebox}{Design Matrix Structure}
+With $n=5$ observations and $p=3$ predictors:
+
+\textbf{$X$ (Design Matrix, $5 \times 3$):}
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+TV & Radio & Newspaper \\
+\midrule
+230.1 & 37.8 & 69.2 \\
+44.5 & 39.3 & 45.1 \\
+17.2 & 45.9 & 69.3 \\
+151.5 & 41.3 & 58.5 \\
+180.8 & 10.8 & 58.4 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{$y$ (Response Vector, $5 \times 1$):}
+\begin{center}
+\begin{tabular}{c}
+\toprule
+Sales \\
+\midrule
+22.1 \\
+10.4 \\
+9.3 \\
+18.5 \\
+12.9 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{Shape Matters in Code!}
+
+In pandas and sklearn:
+\begin{itemize}
+    \item \code{X.shape} returns \code{(n, p)} --- 2D matrix
+    \item \code{y.shape} returns \code{(n,)} (Series) or \code{(n, 1)} (DataFrame)
+\end{itemize}
+
+The difference between \code{(n,)} and \code{(n, 1)} can cause errors. Always check \code{.shape}!
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{What is a Statistical Model?}
+%========================================
+
+\subsection{The True Relationship vs. Our Approximation}
+
+\begin{analogybox}{The Ice Cream Analogy}
+Imagine there exists a \textbf{perfect ice cream} recipe---the ideal combination of flavors that no one has ever discovered.
+
+\begin{itemize}
+    \item \textbf{True model $f$}: The perfect, unknown recipe that determines how inputs (ingredients) relate to outputs (taste)
+    \item \textbf{Statistical model $\hat{f}$}: Our attempt to recreate that perfect recipe using the ingredients (data) we have
+\end{itemize}
+
+We'll never find the perfect recipe, but we try to get as close as possible!
+\end{analogybox}
+
+Mathematically, we assume there exists a true relationship:
+
+\[
+Y = f(X) + \epsilon
+\]
+
+\begin{itemize}
+    \item \textbf{$f(X)$}: The systematic, predictable part (the ``true'' function)
+    \item \textbf{$\epsilon$}: Random noise (measurement error, missing variables, inherent randomness)
+\end{itemize}
+
+\textbf{Statistical modeling} is our attempt to estimate $f$ with $\hat{f}$ using data.
+
+\subsection{Two Goals: Inference vs. Prediction}
+
+\begin{table}[h!]
+\centering
+\caption{Inference vs. Prediction}
+\begin{tabular}{@{}lp{5.5cm}p{5.5cm}@{}}
+\toprule
+& \textbf{Inference} & \textbf{Prediction} \\
+\midrule
+\textbf{Goal} & Understand the \textit{relationship} between $X$ and $y$ & Get accurate \textit{values} for $y$ \\
+\textbf{Key Question} & ``How does TV budget \textit{affect} sales?'' & ``What sales should we \textit{expect} with \$150k TV budget?'' \\
+\textbf{Model Type} & Simple, interpretable (e.g., linear regression) & Complex, accurate (e.g., neural networks) \\
+\textbf{Is $\hat{f}$ interpretable?} & \textbf{Yes}---we need to understand it & \textbf{No}---black box is fine \\
+\textbf{Analogy} & Detective (understanding the crime) & Archer (hitting the target) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{This lecture focuses on prediction.} We'll cover inference with linear regression later.
+
+\newpage
+
+%========================================
+\section{The Simplest Model: The Mean}
+%========================================
+
+Before learning kNN, let's establish the \textbf{simplest possible model}---predicting the average:
+
+\[
+\hat{y} = \bar{y} = \frac{1}{n}\sum_{i=1}^{n}y_i
+\]
+
+This model ignores $X$ entirely. No matter what the TV budget is, it always predicts the same value: the average sales (e.g., 12.5).
+
+\begin{infobox}
+\textbf{Why Start with the Dumbest Model?}
+
+The mean model serves as our \textbf{baseline}. Any useful model should beat this baseline!
+
+If your fancy machine learning model can't outperform ``just guess the average,'' something is wrong.
+
+We'll use this baseline to calculate $R^2$ later.
+\end{infobox}
+
+\newpage
+
+%========================================
+\section{k-Nearest Neighbors (kNN) Algorithm}
+%========================================
+
+\subsection{The Core Idea}
+
+\begin{analogybox}{The Doctor's Diagnosis}
+A patient comes in with a stomach ache. The doctor thinks:
+
+``This week, 10 other patients had stomach aches. They all ate from that food truck and got food poisoning. This patient probably has food poisoning too!''
+
+The doctor \textbf{found similar past cases} (neighbors) and used their outcomes to make a prediction for the current case.
+\end{analogybox}
+
+\begin{definitionbox}{k-Nearest Neighbors (kNN)}
+\textbf{kNN} is a non-parametric algorithm that:
+\begin{enumerate}
+    \item Finds the $k$ training examples most similar to the query point
+    \item Averages their $y$ values to make a prediction
+\end{enumerate}
+
+\textbf{Key insight}: ``Tell me who your neighbors are, and I'll tell you who you are.''
+\end{definitionbox}
+
+\subsection{kNN Step by Step (1D Example)}
+
+Given: Training data $\{(x_i, y_i)\}$ and a query point $x_q$
+
+\begin{enumerate}
+    \item \textbf{Calculate distances}: Compute $D(x_q, x_i) = |x_q - x_i|$ for all training points
+    \item \textbf{Find k neighbors}: Select the $k$ points with smallest distances
+    \item \textbf{Average}: Compute the prediction as the mean of neighbors' $y$ values:
+    \[
+    \hat{y}_q = \frac{1}{k}\sum_{i \in \text{Neighbors}_k} y_i
+    \]
+\end{enumerate}
+
+\begin{examplebox}{kNN with k=1}
+\textbf{Query}: What's the predicted sales when TV budget is \$150k?
+
+\textbf{Step 1}: Calculate distances from \$150k to all training points
+
+\textbf{Step 2}: Find the closest point (say, \$148k with sales = 18.2)
+
+\textbf{Step 3}: Prediction: $\hat{y} = 18.2$ (just copy the nearest neighbor's value)
+\end{examplebox}
+
+\subsection{Effect of k on Model Complexity}
+
+The choice of $k$ dramatically affects the model:
+
+\begin{table}[h!]
+\centering
+\caption{How k Affects kNN}
+\begin{tabular}{@{}lp{4.5cm}p{5.5cm}@{}}
+\toprule
+\textbf{k Value} & \textbf{Behavior} & \textbf{Problem} \\
+\midrule
+\textbf{k = 1} (small) & Copies nearest neighbor exactly. Very jagged, step-like predictions. & \textbf{Overfitting}: Too sensitive to noise \\
+\textbf{k = 10} (medium) & Averages 10 neighbors. Smoother curve that follows the trend. & Usually a good balance \\
+\textbf{k = n} (large) & Averages ALL data points. Returns the global mean for any query. & \textbf{Underfitting}: Ignores local patterns \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}
+\textbf{The Goldilocks Problem}
+
+\begin{itemize}
+    \item \textbf{k too small}: Model is too complex, memorizes noise (overfitting)
+    \item \textbf{k too large}: Model is too simple, misses patterns (underfitting)
+    \item \textbf{k just right}: Captures the true relationship without the noise
+\end{itemize}
+
+Finding the ``just right'' $k$ requires model evaluation (next section).
+\end{warningbox}
+
+\subsection{k is a Hyperparameter}
+
+\begin{definitionbox}{Hyperparameter}
+A \textbf{hyperparameter} is a value that:
+\begin{itemize}
+    \item Is NOT learned from data
+    \item Must be set by the human BEFORE training
+    \item Controls the model's complexity or behavior
+\end{itemize}
+
+In kNN, $k$ is the hyperparameter. We must choose it---the algorithm doesn't learn it.
+\end{definitionbox}
+
+\textbf{Question}: How do we find the best $k$? We need to evaluate different models!
+
+\newpage
+
+%========================================
+\section{Model Evaluation}
+%========================================
+
+\subsection{What Does ``Best'' Mean?}
+
+Before comparing models, we must define ``best.'' For prediction problems:
+
+\textbf{Best = Lowest prediction error}
+
+But how do we measure error?
+
+\subsection{Train, Validation, and Test Splits}
+
+\begin{importantbox}{The Golden Rule of Model Evaluation}
+You \textbf{cannot} evaluate a model on the same data you trained it on!
+
+Why? The model has ``seen'' that data---it could just memorize the answers.
+
+We need to test on \textbf{unseen data} to measure how well the model \textbf{generalizes}.
+\end{importantbox}
+
+\begin{analogybox}{The Exam Analogy}
+\begin{itemize}
+    \item \textbf{Training Set}: Practice problems with answer key. You study from these.
+    \item \textbf{Validation Set}: Practice exam. You test yourself to see which study strategy works best.
+    \item \textbf{Test Set}: The real final exam. You take it \textbf{once} to see your true ability.
+\end{itemize}
+
+If you memorize the practice exam answers instead of learning the material, you'll fail the real exam!
+\end{analogybox}
+
+\begin{table}[h!]
+\centering
+\caption{Data Split Purposes}
+\begin{tabular}{@{}llp{7cm}@{}}
+\toprule
+\textbf{Set} & \textbf{Purpose} & \textbf{When Used} \\
+\midrule
+\textbf{Training} & Fit the model & During model training (kNN stores these points) \\
+\textbf{Validation} & Choose hyperparameters & To compare $k=1$ vs $k=10$ vs $k=70$ \\
+\textbf{Test} & Final evaluation & \textbf{ONLY ONCE} at the very end \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{warningbox}
+\textbf{Data Contamination}
+
+``There's a special place in hell for people who use the test set to choose hyperparameters.''
+
+---Professor Protopapas
+
+If you peek at the test set while tuning, your final evaluation is \textbf{invalid}. The test set must remain \textbf{untouched} until the very end.
+\end{warningbox}
+
+\newpage
+
+\subsection{Mean Squared Error (MSE)}
+
+\begin{definitionbox}{Mean Squared Error}
+\textbf{MSE} measures the average squared difference between predictions and actual values:
+
+\[
+\text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2
+\]
+
+\begin{itemize}
+    \item $y_i$: Actual value
+    \item $\hat{y}_i$: Predicted value
+    \item $(y_i - \hat{y}_i)$: Residual (error for one point)
+\end{itemize}
+\end{definitionbox}
+
+\textbf{Why square the errors?}
+\begin{itemize}
+    \item Residuals can be positive or negative
+    \item Without squaring, they might cancel out (e.g., +5 and -5 sum to 0)
+    \item Squaring ensures all errors are positive and penalizes large errors more
+\end{itemize}
+
+\begin{infobox}
+\textbf{Why MSE (and not Mean Absolute Error)?}
+
+Short answer: MSE has nice mathematical properties (differentiable everywhere).
+
+Deeper answer (covered in Lecture 7): If we assume the noise $\epsilon$ follows a Gaussian distribution (which the Central Limit Theorem suggests is often true), then minimizing MSE is mathematically optimal.
+\end{infobox}
+
+\subsection{Choosing k Using Validation MSE}
+
+\begin{enumerate}
+    \item Split data into train and validation sets
+    \item For each candidate $k$ (e.g., 1, 3, 5, 10, 20, 50):
+    \begin{enumerate}
+        \item Train kNN on training set
+        \item Compute predictions on validation set
+        \item Calculate validation MSE
+    \end{enumerate}
+    \item Choose the $k$ with the \textbf{lowest validation MSE}
+\end{enumerate}
+
+\newpage
+
+\subsection{R-squared ($R^2$): Is the Best Model Good Enough?}
+
+\begin{analogybox}{The Basketball Analogy}
+Suppose Professor Protopapas claims to be the ``best basketball player on the teaching team.''
+
+Would you sign him to the NBA?
+
+\textbf{No!} Being the best among a small group doesn't mean you're actually good.
+
+Similarly, having the best MSE among your models doesn't mean your model is actually useful.
+\end{analogybox}
+
+\begin{definitionbox}{R-squared ($R^2$)}
+$R^2$ measures how much better your model is compared to the baseline (mean) model:
+
+\[
+R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2} = 1 - \frac{\text{MSE}_{\text{model}}}{\text{MSE}_{\text{baseline}}}
+\]
+
+\textbf{Interpretation}:
+\begin{itemize}
+    \item $R^2 = 1$: Perfect predictions ($\hat{y}_i = y_i$ for all $i$)
+    \item $R^2 = 0$: Model is no better than predicting the mean
+    \item $R^2 < 0$: Model is \textbf{worse} than the mean (something is wrong!)
+\end{itemize}
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{$R^2$ Can Be Negative!}
+
+Despite the ``squared'' name, $R^2$ is NOT the square of anything---it's just a name.
+
+If your model performs worse than the baseline (e.g., due to a bug or overfitting on the wrong data), $R^2$ will be negative.
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{High-Dimensional kNN}
+%========================================
+
+\subsection{Multiple Predictors}
+
+With more than one predictor, we use \textbf{Euclidean distance}:
+
+\[
+D(\mathbf{x}_q, \mathbf{x}_i) = \sqrt{\sum_{j=1}^{p}(x_{q,j} - x_{i,j})^2}
+\]
+
+This is just the Pythagorean theorem extended to $p$ dimensions.
+
+\subsection{The Curse of Dimensionality}
+
+\begin{warningbox}
+\textbf{The Curse of Dimensionality}
+
+As the number of dimensions ($p$) increases:
+\begin{itemize}
+    \item Data becomes \textbf{sparse}---points spread out in the high-dimensional space
+    \item All points become roughly \textbf{equidistant} from each other
+    \item The concept of ``nearest neighbor'' becomes meaningless
+\end{itemize}
+
+\textbf{Consequence}: kNN struggles in high dimensions unless you have massive amounts of data.
+\end{warningbox}
+
+\subsection{Feature Scaling}
+
+\begin{importantbox}{Scale Your Features!}
+If TV budget is in thousands (\$0--\$300) but Newspaper budget is in dollars (\$0--\$300,000), the Newspaper dimension will dominate the distance calculation.
+
+\textbf{Solution}: Standardize all features to have similar scales (covered in sections).
+\end{importantbox}
+
+\newpage
+
+%========================================
+\section{Key Takeaways}
+%========================================
+
+\begin{summarybox}
+\textbf{Summary of Lecture 04}
+
+\textbf{Statistical Modeling Basics}
+\begin{itemize}
+    \item Response variable ($y$): What we predict
+    \item Predictor variables ($X$): What we use to predict
+    \item Goal: Find $\hat{f}$ that approximates the true relationship $f$
+\end{itemize}
+
+\textbf{k-Nearest Neighbors}
+\begin{itemize}
+    \item Non-parametric algorithm: no assumed form for $f$
+    \item Predicts by averaging the $k$ closest training examples
+    \item $k$ is a hyperparameter: small $k$ = complex/overfit, large $k$ = simple/underfit
+\end{itemize}
+
+\textbf{Model Evaluation}
+\begin{itemize}
+    \item Split data into \textbf{Train} (fit model), \textbf{Validation} (choose hyperparameters), \textbf{Test} (final evaluation)
+    \item \textbf{MSE}: Average squared error---lower is better
+    \item \textbf{$R^2$}: How much better than the baseline---higher is better (max 1)
+\end{itemize}
+
+\textbf{Practical Considerations}
+\begin{itemize}
+    \item Never use test set for model selection
+    \item In high dimensions, kNN struggles (curse of dimensionality)
+    \item Always scale features when using distance-based methods
+\end{itemize}
+\end{summarybox}
+
+\subsection{Learning Objectives Checklist}
+
+By the end of this lecture, you should be able to:
+
+\begin{itemize}
+    \item[$\square$] Define response and predictor variables
+    \item[$\square$] Represent data using design matrix $X$ and response vector $y$
+    \item[$\square$] Explain the difference between inference and prediction
+    \item[$\square$] Describe kNN as a non-parametric algorithm
+    \item[$\square$] Implement kNN in 1D: find neighbors, compute distances, average values
+    \item[$\square$] Extend kNN to multiple dimensions using Euclidean distance
+    \item[$\square$] Calculate MSE and $R^2$
+    \item[$\square$] Explain the purpose of train/validation/test splits
+    \item[$\square$] Recognize the curse of dimensionality and importance of feature scaling
+\end{itemize}
+
+\end{document}

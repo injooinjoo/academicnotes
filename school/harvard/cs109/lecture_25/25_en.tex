@@ -1,0 +1,895 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CS109A: Introduction to Data Science
+% Lecture 25: Blending, Stacking, and Mixture of Experts
+% English Version - Beginner Friendly
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+% --- Page Layout ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 25}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. Overview Box
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=Lecture Overview,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt, right=8pt, top=8pt, bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. Summary Box
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Key Summary,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. Info Box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=Key Information,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. Warning Box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=Warning,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. Example Box
+\newtcolorbox{examplebox}[1]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=Example: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 6. Definition Box
+\newtcolorbox{definitionbox}[1]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 7. Important Box
+\newtcolorbox{importantbox}[1]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important: #1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 8. Caution Box
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Listings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Table of Contents Style
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% Graphics and Captions
+%========================================================================================
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+%========================================================================================
+% Mathematics
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+%========================================================================================
+% Hyperlinks
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 25},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% Section Spacing
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructors:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.7\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Begins
+%========================================================================================
+
+\begin{document}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 25: Blending, Stacking, and Mixture of Experts}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Learn advanced ensemble methods that combine heterogeneous models, understand meta-learning, and explore the Mixture of Experts architecture used in modern LLMs}
+
+\tableofcontents
+\newpage
+
+%========================================================================================
+\section{The Big Picture: Combining Different Models}
+%========================================================================================
+
+\begin{summarybox}
+This final lecture introduces \textbf{advanced ensemble methods} that go beyond Bagging and Boosting:
+
+\begin{itemize}
+    \item \textbf{Previous methods} (Bagging, Random Forest, Boosting): Combine \textbf{homogeneous} models (same type, e.g., all decision trees)
+    \item \textbf{New methods} (Blending, Stacking, MoE): Combine \textbf{heterogeneous} models (different types, e.g., logistic regression + random forest + KNN)
+\end{itemize}
+
+Key insight: A \textbf{meta-model} learns how to best combine predictions from diverse base models!
+\end{summarybox}
+
+\subsection{Why This Matters}
+
+\begin{infobox}
+\textbf{Practical Relevance:}
+\begin{itemize}
+    \item In data science projects, you often try multiple models (logistic regression, SVM, random forest, boosting, etc.)
+    \item Instead of choosing the ``best'' one, why not combine them?
+    \item This is extremely valuable for final projects and Kaggle competitions
+    \item \textbf{Modern LLMs} (like DeepSeek, Mistral) use Mixture of Experts for efficiency---this architecture is revolutionizing AI!
+\end{itemize}
+\end{infobox}
+
+\subsection{Review: What We've Learned}
+
+\begin{table}[h!]
+\centering
+\caption{Ensemble Methods Review}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Method} & \textbf{Base Models} & \textbf{Training} & \textbf{Aggregation} & \textbf{Goal} \\
+\midrule
+Bagging & Homogeneous (trees) & Parallel & Average/Vote & Reduce variance \\
+Random Forest & Homogeneous (trees) & Parallel & Average/Vote & Reduce variance \\
+Boosting & Homogeneous (stumps) & Sequential & Weighted sum & Reduce bias \\
+\textbf{Blending} & \textbf{Heterogeneous} & Parallel & \textbf{Meta-model} & Best of all \\
+\textbf{Stacking} & \textbf{Heterogeneous} & Parallel + CV & \textbf{Meta-model} & Best of all \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+%========================================================================================
+\newpage
+\section{Blending: Simple Heterogeneous Ensembles}
+%========================================================================================
+
+\begin{definitionbox}{Blending}
+\textbf{Blending} is an ensemble method that:
+\begin{enumerate}
+    \item Trains multiple \textbf{different} base models on training data
+    \item Gets predictions from these models on a held-out validation set
+    \item Trains a \textbf{meta-model} to learn how to combine these predictions
+\end{enumerate}
+
+The meta-model learns ``when to trust which model.''
+\end{definitionbox}
+
+\subsection{The Blending Architecture}
+
+\begin{center}
+\textbf{Data} $\rightarrow$ \textbf{Base Models} (Logistic, RF, KNN, ...) $\rightarrow$ \textbf{Predictions} $\rightarrow$ \textbf{Meta-Model} $\rightarrow$ \textbf{Final Prediction}
+\end{center}
+
+\subsection{Step-by-Step Blending Process}
+
+\textbf{Step 1: Split the Data}
+
+Split your data into four parts:
+\begin{itemize}
+    \item \textbf{Training set}: To train base models
+    \item \textbf{Validation set}: To generate predictions for meta-model training
+    \item \textbf{Hold-out set}: To validate the meta-model
+    \item \textbf{Test set}: Final evaluation (untouched until the end!)
+\end{itemize}
+
+\textbf{Step 2: Train Base Models}
+
+Train multiple different models on the training set:
+\begin{itemize}
+    \item Model 1: Logistic Regression
+    \item Model 2: Random Forest
+    \item Model 3: Gradient Boosting
+    \item Model 4: KNN
+    \item ... (as many as you want!)
+\end{itemize}
+
+\textbf{Step 3: Generate Validation Predictions}
+
+Use each trained base model to predict on the validation set. This gives you:
+\begin{itemize}
+    \item $\hat{y}_1$: Predictions from Model 1
+    \item $\hat{y}_2$: Predictions from Model 2
+    \item ... and so on
+\end{itemize}
+
+\textbf{Step 4: Create Meta-Model Training Data}
+
+Combine the predictions into a new dataset:
+\[
+X_{meta} = [\hat{y}_1, \hat{y}_2, \hat{y}_3, \hat{y}_4, \text{(optionally: original X)}]
+\]
+\[
+y_{meta} = \text{true labels from validation set}
+\]
+
+\textbf{Step 5: Train the Meta-Model}
+
+Train a simple model (often linear regression or logistic regression) on this meta-dataset:
+\[
+\text{Final prediction} = f_{meta}(X_{meta})
+\]
+
+\textbf{Step 6: Evaluate on Hold-out and Test}
+
+Use the same process for hold-out (to tune meta-model) and test (final evaluation).
+
+\subsection{Why Use a Simple Meta-Model?}
+
+\begin{infobox}
+\textbf{Recommendation: Keep the Meta-Model Simple!}
+
+A simple meta-model (like linear regression) has advantages:
+\begin{itemize}
+    \item \textbf{Interpretability}: Coefficients tell you which base model is most trusted
+    \item \textbf{Avoids overfitting}: Complex meta-models can overfit to validation predictions
+    \item \textbf{Fast to train}: Meta-model training should be quick
+\end{itemize}
+
+For example, if the meta-model learns:
+\[
+\hat{y}_{final} = 0.5 \cdot \hat{y}_{RF} + 0.3 \cdot \hat{y}_{GB} + 0.2 \cdot \hat{y}_{LR}
+\]
+You know Random Forest contributes most to the final prediction!
+\end{infobox}
+
+\subsection{The Passthrough Option}
+
+\begin{definitionbox}{Passthrough}
+\textbf{Passthrough} means including the original features $X$ along with the base model predictions when training the meta-model.
+
+Without passthrough: $X_{meta} = [\hat{y}_1, \hat{y}_2, ..., \hat{y}_K]$
+
+With passthrough: $X_{meta} = [X, \hat{y}_1, \hat{y}_2, ..., \hat{y}_K]$
+\end{definitionbox}
+
+\textbf{Why use passthrough?}
+\begin{itemize}
+    \item The meta-model can learn ``when input looks like THIS, trust Model 2 more''
+    \item Base models might miss some signal that the meta-model can capture
+    \item Generally improves performance
+\end{itemize}
+
+\begin{warningbox}
+In sklearn, \code{passthrough=False} by default. The instructor recommends setting \code{passthrough=True} for better results!
+\end{warningbox}
+
+%========================================================================================
+\newpage
+\section{Stacking: Blending with Cross-Validation}
+%========================================================================================
+
+\begin{definitionbox}{Stacking}
+\textbf{Stacking} (Stacked Generalization) is similar to blending but uses \textbf{cross-validation} instead of a fixed validation split. This makes better use of data!
+\end{definitionbox}
+
+\subsection{The Problem with Blending}
+
+Blending requires:
+\begin{itemize}
+    \item Training set (for base models)
+    \item Validation set (for meta-model training)
+    \item Hold-out set (for meta-model validation)
+    \item Test set (for final evaluation)
+\end{itemize}
+
+That's 4 separate datasets! With limited data, this is wasteful.
+
+\subsection{Stacking Solution: Out-of-Fold Predictions}
+
+Stacking uses K-fold cross-validation to generate ``out-of-fold'' predictions:
+
+\begin{enumerate}
+    \item Split training data into K folds (e.g., K=5)
+    \item For each fold:
+    \begin{itemize}
+        \item Train base models on K-1 folds
+        \item Predict on the held-out fold
+    \end{itemize}
+    \item After K iterations, every sample has a prediction from a model that \textbf{didn't see it during training}
+    \item These predictions become the meta-model's training data
+\end{enumerate}
+
+\begin{examplebox}{3-Fold Stacking Example}
+\textbf{Data}: 900 samples, 3 folds of 300 each
+
+\textbf{Round 1}:
+\begin{itemize}
+    \item Train on Folds 2+3 (600 samples)
+    \item Predict on Fold 1 (300 samples) $\rightarrow$ $\hat{y}_1^{(1)}$
+\end{itemize}
+
+\textbf{Round 2}:
+\begin{itemize}
+    \item Train on Folds 1+3 (600 samples)
+    \item Predict on Fold 2 (300 samples) $\rightarrow$ $\hat{y}_1^{(2)}$
+\end{itemize}
+
+\textbf{Round 3}:
+\begin{itemize}
+    \item Train on Folds 1+2 (600 samples)
+    \item Predict on Fold 3 (300 samples) $\rightarrow$ $\hat{y}_1^{(3)}$
+\end{itemize}
+
+\textbf{Result}: 900 out-of-fold predictions for Model 1!
+
+Repeat for all base models. Then train meta-model on these predictions.
+\end{examplebox}
+
+\subsection{Stacking vs. Blending}
+
+\begin{table}[h!]
+\centering
+\caption{Stacking vs. Blending Comparison}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Aspect} & \textbf{Blending} & \textbf{Stacking} \\
+\midrule
+Data efficiency & Lower & Higher \\
+Implementation & Simpler & More complex \\
+Computation & Faster & Slower (K-fold) \\
+Risk of overfitting & Higher & Lower \\
+Recommended for & Large datasets & Smaller datasets \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%========================================================================================
+\newpage
+\section{Stacking in Python}
+%========================================================================================
+
+\begin{lstlisting}[style=pythonstyle]
+from sklearn.ensemble import StackingClassifier, StackingRegressor
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+
+# Define base models (heterogeneous!)
+estimators = [
+    ('rf', RandomForestClassifier(n_estimators=100, random_state=42)),
+    ('gb', GradientBoostingClassifier(n_estimators=100, random_state=42)),
+    ('knn', KNeighborsClassifier(n_neighbors=5))
+]
+
+# Define meta-model (keep it simple!)
+meta_model = LogisticRegression()
+
+# Create stacking classifier
+stacking_clf = StackingClassifier(
+    estimators=estimators,
+    final_estimator=meta_model,
+    cv=5,                    # 5-fold cross-validation
+    passthrough=True,        # Include original features!
+    stack_method='predict_proba'  # Use probabilities, not labels
+)
+
+# Train
+stacking_clf.fit(X_train, y_train)
+
+# Evaluate
+print(f"Stacking Train Accuracy: {stacking_clf.score(X_train, y_train):.4f}")
+print(f"Stacking Test Accuracy: {stacking_clf.score(X_test, y_test):.4f}")
+\end{lstlisting}
+
+\subsection{Important: Use Probabilities, Not Labels}
+
+\begin{warningbox}
+When stacking classifiers, use \code{stack\_method='predict\_proba'} instead of hard labels!
+
+\textbf{Why?}
+\begin{itemize}
+    \item Labels are discrete (0 or 1)---limited information
+    \item Probabilities are continuous (0.0 to 1.0)---much richer signal
+    \item Meta-model can learn ``Model A is confident, Model B is uncertain''
+\end{itemize}
+\end{warningbox}
+
+%========================================================================================
+\newpage
+\section{Mixture of Experts (MoE)}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{Mixture of Experts} takes a fundamentally different approach:
+
+Instead of combining all models' outputs, MoE \textbf{selects which expert(s) to use} based on the input!
+
+This is the architecture behind modern efficient LLMs like DeepSeek and Mistral.
+\end{summarybox}
+
+\subsection{The Core Idea}
+
+In previous ensembles, ALL models contribute to every prediction:
+\[
+\hat{y} = \frac{1}{K}\sum_{k=1}^K f_k(x) \quad \text{(everyone votes)}
+\]
+
+In MoE, a \textbf{gating network} decides which experts to activate:
+\[
+\hat{y} = \sum_{k=1}^K g_k(x) \cdot f_k(x) \quad \text{(specialists handle their domain)}
+\]
+
+where $g_k(x)$ is the ``gate'' for expert $k$, and gates sum to 1: $\sum_k g_k(x) = 1$
+
+\subsection{Components of MoE}
+
+\begin{definitionbox}{Mixture of Experts Components}
+\textbf{1. Experts} ($f_k$): Individual models that specialize in different regions of the input space
+
+\textbf{2. Gating Network} ($g$): A model that looks at the input $x$ and outputs weights for each expert
+
+\textbf{3. Combination}: Final prediction is a weighted combination based on gates
+\end{definitionbox}
+
+\begin{examplebox}{Medical Diagnosis MoE}
+\textbf{Experts}:
+\begin{itemize}
+    \item Expert 1: Radiologist (specializes in imaging)
+    \item Expert 2: Pathologist (specializes in lab tests)
+    \item Expert 3: General Practitioner (handles common cases)
+\end{itemize}
+
+\textbf{Gating Network}: Looks at patient symptoms and test results
+
+\textbf{For a patient with MRI scan}:
+\begin{itemize}
+    \item Gate outputs: $g_1 = 0.7$, $g_2 = 0.2$, $g_3 = 0.1$
+    \item Radiologist's opinion is weighted most heavily!
+\end{itemize}
+
+\textbf{For a patient with blood work}:
+\begin{itemize}
+    \item Gate outputs: $g_1 = 0.1$, $g_2 = 0.8$, $g_3 = 0.1$
+    \item Pathologist's opinion dominates!
+\end{itemize}
+\end{examplebox}
+
+\subsection{The Gating Network}
+
+The gating network uses \textbf{softmax} to ensure gates sum to 1:
+
+\[
+g_k(x) = \frac{\exp(\alpha_k^T x)}{\sum_{j=1}^K \exp(\alpha_j^T x)}
+\]
+
+where $\alpha_k$ are learnable parameters for expert $k$.
+
+\begin{infobox}
+This is exactly like \textbf{multinomial logistic regression} (softmax)! The gating network is essentially classifying ``which expert should handle this input.''
+\end{infobox}
+
+\subsection{Training MoE: The Challenge}
+
+\begin{importantbox}{Expert Collapse Problem}
+A naive loss function can cause \textbf{expert collapse}:
+\begin{itemize}
+    \item One expert becomes dominant
+    \item Other experts never get trained
+    \item System degenerates to single-model performance
+\end{itemize}
+
+This is what happened with early implementations (like Mistral's initial attempts).
+
+\textbf{Solution}: Use a loss function that gives each expert its own error signal, not just the global error.
+\end{importantbox}
+
+\subsubsection{Bad Loss (Causes Collapse)}
+
+\[
+L = \sum_n (y_n - \sum_k g_k(x_n) \cdot f_k(x_n))^2
+\]
+
+Problem: All experts see the same global error. They all try to do the same thing and collapse.
+
+\subsubsection{Good Loss (Prevents Collapse)}
+
+\[
+L = \sum_n \sum_k g_k(x_n) \cdot (y_n - f_k(x_n))^2
+\]
+
+Benefit: Each expert gets weighted error specific to its domain. Experts specialize!
+
+\subsection{Why MoE Matters for LLMs}
+
+\begin{infobox}
+\textbf{Sparse MoE in Large Language Models:}
+
+Modern LLMs like DeepSeek use MoE to be more efficient:
+\begin{itemize}
+    \item Model has billions of parameters spread across many experts
+    \item For each input, only a \textbf{few experts} are activated (sparse activation)
+    \item This gives the \textbf{capacity} of a huge model with the \textbf{computation} of a small one
+\end{itemize}
+
+Example: A model with 100 experts but only top-2 activated per token can have 10x the parameters with only 2x the compute!
+\end{infobox}
+
+%========================================================================================
+\newpage
+\section{Practical Guidelines}
+%========================================================================================
+
+\subsection{When to Use Each Method}
+
+\begin{table}[h!]
+\centering
+\caption{Choosing an Ensemble Method}
+\begin{tabular}{ll}
+\toprule
+\textbf{Situation} & \textbf{Recommended Method} \\
+\midrule
+Quick baseline, plenty of data & Random Forest or Gradient Boosting \\
+Want to squeeze last 1\% accuracy & Stacking with diverse models \\
+Data has distinct regions/modes & Mixture of Experts \\
+Need interpretability & Stacking with linear meta-model \\
+Limited computational resources & Blending (simpler than stacking) \\
+Building a large-scale system & Sparse Mixture of Experts \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Best Practices}
+
+\begin{enumerate}
+    \item \textbf{Diversity is key}: Use models with different ``philosophies''
+    \begin{itemize}
+        \item Linear model (captures global trends)
+        \item Tree model (captures interactions)
+        \item KNN (captures local patterns)
+        \item Boosting (captures complex patterns)
+    \end{itemize}
+
+    \item \textbf{Watch for data leakage}: Never use test data during stacking/blending
+
+    \item \textbf{Keep meta-model simple}: Complex meta-models tend to overfit
+
+    \item \textbf{Use probabilities for classification}: More informative than labels
+
+    \item \textbf{Enable passthrough}: Let meta-model see original features
+
+    \item \textbf{Validate properly}: Use hold-out set for meta-model tuning
+\end{enumerate}
+
+%========================================================================================
+\newpage
+\section{Course Summary: The ML Toolkit}
+%========================================================================================
+
+\begin{summarybox}
+\textbf{What You've Learned in CS109A:}
+
+\textbf{Regression:}
+\begin{itemize}
+    \item Linear Regression, Polynomial Regression
+    \item Regularization (Ridge, Lasso)
+\end{itemize}
+
+\textbf{Classification:}
+\begin{itemize}
+    \item Logistic Regression
+    \item K-Nearest Neighbors
+\end{itemize}
+
+\textbf{Probabilistic Methods:}
+\begin{itemize}
+    \item Bayesian Inference
+    \item MCMC Sampling
+\end{itemize}
+
+\textbf{Tree-Based Methods:}
+\begin{itemize}
+    \item Decision Trees (Classification and Regression)
+    \item Bagging and Random Forests
+    \item Gradient Boosting and AdaBoost
+\end{itemize}
+
+\textbf{Advanced Ensembles:}
+\begin{itemize}
+    \item Blending and Stacking
+    \item Mixture of Experts
+\end{itemize}
+
+\textbf{Important Concepts Throughout:}
+\begin{itemize}
+    \item Bias-Variance Tradeoff
+    \item Cross-Validation
+    \item Feature Engineering
+    \item Model Selection and Evaluation
+\end{itemize}
+\end{summarybox}
+
+\begin{infobox}
+\textbf{Final Thoughts from the Instructors:}
+
+\begin{enumerate}
+    \item \textbf{Use office hours!} You learn more in 30 minutes with a TA than hours struggling alone.
+
+    \item \textbf{Don't over-rely on LLMs}: They're good for small questions, but can lead you astray for learning core concepts.
+
+    \item \textbf{Start simple}: Even with all these methods, linear/logistic regression should be your first attempt. Understand the basics before reaching for complex tools.
+
+    \item \textbf{For tabular data}: Random Forest and Gradient Boosting often beat deep learning!
+
+    \item \textbf{Keep learning}: This course is just the beginning. There's much more in CS109B and beyond.
+\end{enumerate}
+\end{infobox}
+
+%========================================================================================
+\newpage
+\section{Practice Questions}
+%========================================================================================
+
+\begin{enumerate}
+    \item \textbf{Conceptual}: Explain the difference between homogeneous and heterogeneous ensembles. Give an example of each.
+
+    \item \textbf{Blending}: Why do we need a separate validation set for blending? What would happen if we used the same data to train base models and generate meta-model training data?
+
+    \item \textbf{Stacking}: Explain what ``out-of-fold predictions'' are and why they prevent overfitting in the meta-model.
+
+    \item \textbf{Passthrough}: What is the passthrough option in stacking? Why is it recommended to enable it?
+
+    \item \textbf{MoE Gating}: In a Mixture of Experts model, what does the gating network do? What function ensures the gate outputs sum to 1?
+
+    \item \textbf{Expert Collapse}: What is expert collapse in MoE, and why does a naive loss function cause it?
+
+    \item \textbf{Practical}: You're competing in a Kaggle competition. You've trained:
+    \begin{itemize}
+        \item Logistic Regression: 82\% accuracy
+        \item Random Forest: 85\% accuracy
+        \item Gradient Boosting: 86\% accuracy
+        \item KNN: 80\% accuracy
+    \end{itemize}
+    How would you use stacking to potentially improve beyond 86\%? Write the sklearn code.
+
+    \item \textbf{LLM Application}: Why are Large Language Models using Mixture of Experts architectures? What efficiency benefit does sparse MoE provide?
+\end{enumerate}
+
+\end{document}

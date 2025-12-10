@@ -195,6 +195,59 @@ class LaTeXCompiler:
             return False
 
 
+def detect_output_filename(tex_file: Path) -> str:
+    """
+    TEX 파일 경로에서 적절한 output 파일명을 생성합니다.
+
+    Args:
+        tex_file: TEX 파일 경로
+
+    Returns:
+        생성된 파일명 (예: CS109A_lecture_01.pdf)
+    """
+    path_parts = tex_file.parts
+
+    # 과목 감지
+    course_map = {
+        'cs109': 'CS109A',
+        'csci103': 'CSCI103',
+        'csci89': 'CSCI89',
+        'fin-574': 'FIN574'
+    }
+
+    course = None
+    for part in path_parts:
+        if part in course_map:
+            course = course_map[part]
+            break
+
+    # 강의 번호 감지
+    lecture_num = None
+    for part in path_parts:
+        if part.startswith('lecture_'):
+            lecture_num = part.replace('lecture_', '')
+            break
+
+    # 파일명에서 번호 추출 시도
+    if not lecture_num:
+        filename = tex_file.stem
+        # csci89_01 형식
+        if '_' in filename:
+            parts = filename.split('_')
+            if parts[-1].isdigit():
+                lecture_num = parts[-1]
+        # 1, 2, 3 등 숫자만
+        elif filename.isdigit():
+            lecture_num = filename.zfill(2)
+
+    # 파일명 생성
+    if course and lecture_num:
+        return f"{course}_lecture_{lecture_num.zfill(2)}.pdf"
+    else:
+        # 기본값: 원본 파일명
+        return tex_file.with_suffix('.pdf').name
+
+
 def compile_tex_file(
     tex_file: Path,
     output_filename: Optional[str] = None,
@@ -206,7 +259,7 @@ def compile_tex_file(
 
     Args:
         tex_file: 컴파일할 .tex 파일 경로
-        output_filename: output 폴더에 저장할 파일명
+        output_filename: output 폴더에 저장할 파일명 (None이면 자동 감지)
         cleanup: 보조 파일 정리 여부
         copy_to_output: output 폴더로 복사 여부
 
@@ -225,6 +278,10 @@ def compile_tex_file(
 
     # output 폴더로 복사
     if copy_to_output:
+        # output_filename이 None이면 자동 감지
+        if output_filename is None:
+            output_filename = detect_output_filename(tex_file)
+
         if not compiler.copy_to_output(output_filename):
             return False
 

@@ -1,0 +1,1081 @@
+% CSCI E-89B: Natural Language Processing
+% Lecture 7: Latent Dirichlet Allocation and Topic Modeling
+% English Version
+
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ============================================================
+% PAGE SETUP
+% ============================================================
+\geometry{margin=25mm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{CSCI E-89B: Natural Language Processing}
+\fancyhead[R]{Lecture 7}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================
+% COLORS
+% ============================================================
+\definecolor{harvardcrimson}{RGB}{165,28,48}
+\definecolor{codegreen}{RGB}{34,139,34}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codepurple}{RGB}{148,0,211}
+\definecolor{backcolour}{RGB}{248,248,248}
+\definecolor{darkblue}{RGB}{0,0,139}
+
+% ============================================================
+% CODE LISTING STYLE
+% ============================================================
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{harvardcrimson},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+\lstset{style=pythonstyle}
+
+% ============================================================
+% TCOLORBOX ENVIRONMENTS
+% ============================================================
+\tcbuselibrary{skins,breakable}
+
+\newtcolorbox{summarybox}[1][]{
+    colback=red!5!white,
+    colframe=harvardcrimson,
+    fonttitle=\bfseries,
+    title=Summary,
+    breakable,
+    #1
+}
+
+\newtcolorbox{overviewbox}[1][]{
+    colback=blue!5!white,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=Overview,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    colback=cyan!5!white,
+    colframe=cyan!60!black,
+    fonttitle=\bfseries,
+    title=Information,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    colback=yellow!10!white,
+    colframe=orange!80!black,
+    fonttitle=\bfseries,
+    title=Warning,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=Example,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    colback=purple!5!white,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=Definition,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    colback=red!10!white,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=Important,
+    breakable,
+    #1
+}
+
+% ============================================================
+% CUSTOM COMMANDS
+% ============================================================
+\newcommand{\metainfo}[4]{
+    \begin{tcolorbox}[colback=gray!10, colframe=gray!50, title=Lecture Information]
+    \begin{tabular}{@{}ll}
+    \textbf{Course:} & #1 \\
+    \textbf{Lecture:} & #2 \\
+    \textbf{Topic:} & #3 \\
+    \textbf{Date:} & #4 \\
+    \end{tabular}
+    \end{tcolorbox}
+}
+
+% ============================================================
+% DOCUMENT
+% ============================================================
+\begin{document}
+
+\metainfo{CSCI E-89B: Natural Language Processing}{Lecture 7}{Latent Dirichlet Allocation and Topic Modeling}{Fall 2024}
+
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Quiz Review: Autoencoders Revisited}
+% ============================================================
+
+\begin{overviewbox}
+This lecture begins with a review of autoencoder concepts before introducing topic modeling---a powerful unsupervised learning technique for discovering hidden themes in document collections.
+\end{overviewbox}
+
+\subsection{One-Hot Encoding Disadvantages}
+
+\begin{definitionbox}[title=One-Hot Encoding Problems]
+One-hot encoding has two major disadvantages:
+\begin{enumerate}[label=\arabic*.]
+\item \textbf{Sparsity}: The representation contains many zeros
+\item \textbf{High dimensionality}: As a direct result of sparsity
+\end{enumerate}
+\end{definitionbox}
+
+\textbf{Why sparsity is problematic}:
+\begin{itemize}
+\item When computing linear combinations, you perform many operations with zeros
+\item $0 \times \text{something}$ contributes nothing but still requires computation
+\item Information is represented inefficiently
+\item This is precisely why we use embeddings instead
+\end{itemize}
+
+\subsection{Undercomplete Autoencoders}
+
+\begin{definitionbox}[title=Undercomplete Autoencoder]
+An autoencoder is called \textbf{undercomplete} when the dimensionality of the representation (encoding) is \textbf{lower} than the dimensionality of the input. This creates a bottleneck that forces compression.
+\end{definitionbox}
+
+\begin{examplebox}[title=Understanding ``Undercomplete'']
+The terminology makes intuitive sense:
+\begin{itemize}
+\item \textbf{Complete}: 4 dimensions in $\rightarrow$ 4 dimensions in middle $\rightarrow$ 4 dimensions out
+\item \textbf{Undercomplete}: 4 dimensions in $\rightarrow$ 2 dimensions in middle $\rightarrow$ 4 dimensions out
+\item \textbf{Overcomplete}: 3 dimensions in $\rightarrow$ 7 dimensions in middle $\rightarrow$ 3 dimensions out
+\end{itemize}
+
+If you have a 3-dimensional dataset and map it to 2 dimensions, your representation is ``undercomplete'' because you cannot fully represent 3D data in 2D without some loss. You're taking projections rather than keeping complete information.
+\end{examplebox}
+
+\subsection{Stacked Autoencoders}
+
+\begin{definitionbox}[title=Stacked Autoencoder]
+A \textbf{stacked autoencoder} (also called a deep autoencoder) has multiple hidden layers. ``Stacked'' by definition implies depth---at least 2 hidden layers.
+\begin{itemize}
+\item \textbf{Shallow network}: 1 hidden layer only
+\item \textbf{Deep network}: 2 or more hidden layers
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection{Layer-wise Training}
+
+\begin{importantbox}
+Layers of stacked autoencoders do not need to be trained together. You can train them one at a time using a ``sandwich'' approach:
+\begin{enumerate}[label=\textbf{Phase \arabic*:}]
+\item Train only input $\rightarrow$ hidden$_1$ $\rightarrow$ output (no middle layers)
+\item Freeze coefficients, add hidden$_2$ between hidden$_1$ and output
+\item Train middle part while keeping frozen layers fixed
+\item Continue stacking more layers
+\end{enumerate}
+\end{importantbox}
+
+\subsubsection{Why Layer-wise Training?}
+
+The motivation relates to gradient descent optimization:
+
+\begin{warningbox}[title=The Scale Problem]
+Weights $W$ for different layers can be on different scales:
+\begin{itemize}
+\item $W_1$ (near input) and $W_{200}$ (near output) may differ vastly in magnitude
+\item Cost function level curves become stretched (elliptical rather than circular)
+\item The gradient $-\alpha \nabla J$ points away from the true minimum
+\item Training may diverge or take forever
+\end{itemize}
+\end{warningbox}
+
+\textbf{Modern solutions to the scale problem}:
+\begin{enumerate}
+\item \textbf{Adam optimizer}: Adjusts gradient direction based on local curvature
+\item \textbf{Batch normalization}: Normalizes signals locally, mitigating weight scale issues
+\item \textbf{Shortcut connections}: Connect layers to later layers, allowing signals to bypass problematic areas
+\end{enumerate}
+
+\begin{infobox}[title=Modern Practice]
+Due to these techniques, the scale problem is largely solved today. People often train deep autoencoders with all layers at once. However, the phase-wise approach remains elegant and worth knowing.
+\end{infobox}
+
+\subsection{Autoencoders for Sequences}
+
+\begin{importantbox}
+Autoencoders \textbf{can} be used for sequences. A sequence of words (sentence) can be compressed into a single vector (the bottleneck), which has no time component.
+
+\[
+\text{Sequence } \underbrace{[x_1, x_2, \ldots, x_T]}_{\text{vectors}} \xrightarrow{\text{Encoder}} \underbrace{z}_{\text{single vector}} \xrightarrow{\text{Decoder}} \text{Reconstructed sequence}
+\]
+\end{importantbox}
+
+\subsubsection{How Small Should the Bottleneck Be?}
+
+This is a fundamental question with no universal answer:
+
+\begin{examplebox}[title=Goal Determines Architecture]
+\textbf{If your goal is perfect reconstruction}:
+\begin{itemize}
+\item Don't squeeze at all!
+\item Why would you compress if you need to recover everything?
+\item Just use input $=$ output directly
+\end{itemize}
+
+\textbf{If your goal is feature extraction for downstream tasks}:
+\begin{itemize}
+\item Use the encoder output as input to a classifier
+\item The optimal bottleneck size depends on classification performance
+\item Iterate: try 2D, 5D, 10D representations and evaluate which works best
+\end{itemize}
+\end{examplebox}
+
+\begin{warningbox}[title=Practical Consideration]
+If you have millions of input features, feeding them directly to a classifier creates millions of parameters. You may want to compress first to:
+\begin{itemize}
+\item Reduce parameter count
+\item Avoid getting stuck in local minima
+\item Make optimization tractable
+\end{itemize}
+\end{warningbox}
+
+
+% ============================================================
+\section{Introduction to Topic Modeling}
+% ============================================================
+
+\begin{overviewbox}
+Topic modeling is an \textbf{unsupervised learning} approach for discovering hidden themes in document collections. Unlike clustering, documents can belong to \textbf{multiple topics} with different proportions.
+\end{overviewbox}
+
+\subsection{Motivation: Why Not Clustering?}
+
+\begin{definitionbox}[title=Traditional Clustering]
+Standard clustering algorithms (K-means, hierarchical) assign each data point to \textbf{exactly one cluster}:
+\begin{itemize}
+\item Students belong to ``students'' cluster
+\item Retired people belong to ``retired'' cluster
+\item Points don't overlap between clusters
+\end{itemize}
+\end{definitionbox}
+
+\textbf{The problem with text documents}:
+
+\begin{warningbox}[title=Documents Are Different]
+In text, topics naturally \textbf{overlap}:
+\begin{itemize}
+\item A news article may start discussing economics, shift to politics, and mention artificial intelligence
+\item The same document contains multiple themes
+\item Hard assignment to one cluster loses important information
+\end{itemize}
+\end{warningbox}
+
+\begin{examplebox}[title=Document as Topic Mixture]
+Consider Document 2 in a corpus:
+\begin{itemize}
+\item Topic 1 (Economics): 60\%
+\item Topic 2 (Politics): 30\%
+\item Topic 3 (AI): 10\%
+\end{itemize}
+This soft assignment captures the document's multi-topical nature far better than forcing it into one category.
+\end{examplebox}
+
+\subsection{Topic Modeling Methods}
+
+Three main approaches for topic modeling:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Method} & \textbf{Type} & \textbf{Characteristics} \\
+\midrule
+LDA & Probabilistic & Assumes stochastic text generation \\
+NMF & Deterministic & Matrix factorization approach \\
+STM & Probabilistic & LDA + covariates (metadata) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{infobox}[title=Why Social Scientists Love Topic Models]
+Topic modeling is popular in political science, government departments, and social sciences:
+\begin{itemize}
+\item Extract information from large text corpora computationally
+\item Discover biases and patterns
+\item Correlate topics with covariates (gender, source, etc.)
+\end{itemize}
+\end{infobox}
+
+\subsection{Latent Topics}
+
+\begin{definitionbox}[title=Latent Topics]
+Topics are called ``latent'' because:
+\begin{itemize}
+\item We don't define topics upfront (e.g., ``economics'')
+\item The model discovers topics from data
+\item We only assign labels \textbf{after} processing
+\item Labels come from examining top-weighted documents/words per topic
+\end{itemize}
+\end{definitionbox}
+
+\begin{importantbox}
+The number of topics is a \textbf{hyperparameter} you must specify beforehand. If you say 3 topics, the model will find exactly 3 topics---it won't tell you the ``true'' number.
+\end{importantbox}
+
+
+% ============================================================
+\section{Maximum Likelihood Estimation}
+% ============================================================
+
+\begin{overviewbox}
+Before diving into LDA, we need to understand \textbf{maximum likelihood estimation (MLE)}---the framework used to recover model parameters from observed data.
+\end{overviewbox}
+
+\subsection{The MLE Framework}
+
+\begin{definitionbox}[title=Maximum Likelihood Estimation]
+MLE finds parameters that maximize the probability of observing the data we actually observed:
+\[
+\hat{\theta} = \arg\max_{\theta} P(\text{data} | \theta)
+\]
+\end{definitionbox}
+
+\begin{examplebox}[title=Simple Example: Normal Distribution]
+Suppose we observe data and create a histogram. We assume data comes from a normal distribution with unknown $\mu$ and $\sigma^2$.
+
+\textbf{Step 1}: Try parameters (Model A): $\mu$ far left of data
+\begin{itemize}
+\item Probability of observing our data given Model A is very small
+\item Likelihood $\approx 0$
+\end{itemize}
+
+\textbf{Step 2}: Try parameters (Model B): $\mu$ closer to data center
+\begin{itemize}
+\item Probability is higher
+\item Likelihood increases
+\end{itemize}
+
+\textbf{Step 3}: Try parameters (Model C): $\mu$ at data mean, appropriate $\sigma^2$
+\begin{itemize}
+\item Probability is highest
+\item This is our MLE solution!
+\end{itemize}
+
+\textbf{Step 4}: Try parameters (Model D): Overshoot $\mu$
+\begin{itemize}
+\item Probability decreases again
+\end{itemize}
+\end{examplebox}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.8]
+% This is a conceptual diagram - actual rendering would need tikz
+\end{tikzpicture}
+\textit{Conceptual diagram: Scanning through parameter space to find maximum likelihood}
+\end{figure}
+
+\begin{importantbox}
+MLE is incredibly powerful:
+\begin{itemize}
+\item Works with many parameters (dozens or more)
+\item Used in time series, LDA, STM, and countless applications
+\item Very natural approach: find parameters that make observed data most probable
+\end{itemize}
+\end{importantbox}
+
+
+% ============================================================
+\section{Latent Dirichlet Allocation (LDA)}
+% ============================================================
+
+\begin{overviewbox}
+LDA models each document as a \textbf{mixture of topics}, where each topic is a distribution over words. Unlike clustering, LDA provides soft (probabilistic) topic assignments.
+\end{overviewbox}
+
+\subsection{The Generative Model}
+
+LDA assumes text is generated by the following process:
+
+\begin{definitionbox}[title=LDA Text Generation Process]
+For document $m$:
+\begin{enumerate}[label=\textbf{Step \arabic*:}]
+\item Choose number of words $N \sim \text{Poisson}(\xi)$
+\item Choose topic proportions $\theta_m \sim \text{Dirichlet}(\alpha)$
+\item For each word $n = 1, \ldots, N$:
+    \begin{enumerate}[label=(\alph*)]
+    \item Choose topic $z_n \sim \text{Multinomial}(\theta_m)$
+    \item Choose word $w_n \sim \text{Multinomial}(\beta_{z_n})$
+    \end{enumerate}
+\end{enumerate}
+\end{definitionbox}
+
+\subsection{Understanding Each Component}
+
+\subsubsection{Poisson Distribution for Document Length}
+
+\begin{definitionbox}[title=Poisson Distribution]
+The Poisson distribution models count data:
+\[
+P(N = k) = \frac{\xi^k e^{-\xi}}{k!}
+\]
+where $\xi$ is both the mean and variance. If documents average 25 words, $\xi \approx 25$.
+\end{definitionbox}
+
+\subsubsection{Dirichlet Distribution for Topic Proportions}
+
+\begin{definitionbox}[title=Dirichlet Distribution]
+The Dirichlet distribution produces vectors of probabilities that sum to 1. For $K$ topics:
+\[
+\theta_m = (\theta_{m,1}, \theta_{m,2}, \ldots, \theta_{m,K}) \quad \text{where } \sum_k \theta_{m,k} = 1
+\]
+
+Example for 3 topics: $\theta_m = (0.6, 0.3, 0.1)$ means:
+\begin{itemize}
+\item 60\% Topic 1 (Economics)
+\item 30\% Topic 2 (Politics)
+\item 10\% Topic 3 (AI)
+\end{itemize}
+\end{definitionbox}
+
+\begin{infobox}[title=Dirichlet as Generalized Beta]
+\begin{itemize}
+\item For 2 topics: Dirichlet reduces to the Beta distribution
+\item For $K > 2$ topics: Dirichlet is the natural generalization
+\item Parameter $\alpha$ (vector) controls the shape of the distribution
+\end{itemize}
+\end{infobox}
+
+\subsubsection{Multinomial Distribution for Topic and Word Selection}
+
+\begin{definitionbox}[title=Multinomial Selection]
+Given probabilities, multinomial sampling selects one category:
+\begin{itemize}
+\item $z_n \sim \text{Multinomial}(\theta_m)$: Select topic for word $n$
+\item $w_n \sim \text{Multinomial}(\beta_{z_n})$: Select word from chosen topic's vocabulary distribution
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=Concrete Word Generation]
+Given $\theta_m = (0.1, 0.2, 0.6)$ for three topics:
+\begin{enumerate}
+\item Draw topic: Most likely Topic 3 (60\%), but could be Topic 2 (20\% chance)
+\item Suppose Topic 2 is selected
+\item Draw word from $\beta_2$: Each topic has its own word distribution
+\item Word ``maximization'' is selected from Topic 2's distribution
+\end{enumerate}
+This is repeated independently for each word position.
+\end{examplebox}
+
+\subsection{Key Assumptions of LDA}
+
+\begin{warningbox}[title=Bag of Words Assumption]
+LDA assumes \textbf{no word order}:
+\begin{itemize}
+\item Words are generated independently
+\item ``maximization'' doesn't depend on what came before
+\item Shuffling words in a document doesn't change its LDA representation
+\item Generated text wouldn't be grammatical---that's not the point!
+\end{itemize}
+\end{warningbox}
+
+\begin{importantbox}
+LDA is not for generating readable text. It's for:
+\begin{itemize}
+\item Discovering what topics a document discusses
+\item Finding topic proportions for each document
+\item Identifying words associated with each topic
+\end{itemize}
+\end{importantbox}
+
+\subsection{The EM Algorithm}
+
+\begin{definitionbox}[title=Expectation-Maximization (EM)]
+LDA uses the EM algorithm because topic assignments $z_n$ are \textbf{latent variables} (not observed):
+\begin{enumerate}
+\item \textbf{E-step}: Estimate expected values of latent variables $z_n$ given current parameters
+\item \textbf{M-step}: Maximize likelihood given these expected values
+\item Iterate until convergence
+\end{enumerate}
+\end{definitionbox}
+
+\begin{infobox}[title=Why EM?]
+We observe documents (sequences of words) but not:
+\begin{itemize}
+\item Which topic each word came from ($z_n$)
+\item The true topic proportions ($\theta_m$)
+\item The topic-word distributions ($\beta_k$)
+\end{itemize}
+EM handles this missing information elegantly.
+\end{infobox}
+
+
+% ============================================================
+\section{LDA Implementation in Python}
+% ============================================================
+
+\subsection{Using scikit-learn}
+
+\begin{lstlisting}[caption={LDA with scikit-learn}]
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+
+# Example documents
+documents = [
+    "Cats are wonderful pets",
+    "Cats and dogs are popular animals",
+    "Dogs enjoy long walks",
+    "Walks in the park are relaxing",
+    # ... more documents
+]
+
+# Create document-term matrix
+vectorizer = CountVectorizer(stop_words='english')
+X = vectorizer.fit_transform(documents)
+
+# Fit LDA
+lda = LatentDirichletAllocation(
+    n_components=2,      # Number of topics
+    random_state=42      # For reproducibility
+)
+lda.fit(X)
+
+# Get topic-document distribution
+doc_topic_dist = lda.transform(X)
+print(doc_topic_dist)
+# Output: [[0.05, 0.95], [0.06, 0.94], [0.93, 0.07], ...]
+\end{lstlisting}
+
+\begin{examplebox}[title=Interpreting Results]
+Output $[0.05, 0.95]$ means:
+\begin{itemize}
+\item 5\% contribution from Topic 1
+\item 95\% contribution from Topic 2
+\end{itemize}
+Since this document is mostly Topic 2, and it's about cats, Topic 2 is likely the ``cats'' topic.
+\end{examplebox}
+
+\subsection{Extracting Top Words per Topic}
+
+\begin{lstlisting}[caption={Display top words for each topic}]
+def display_topics(model, feature_names, num_top_words=5):
+    for topic_idx, topic in enumerate(model.components_):
+        top_words_idx = topic.argsort()[:-num_top_words-1:-1]
+        top_words = [feature_names[i] for i in top_words_idx]
+        print(f"Topic {topic_idx}: {', '.join(top_words)}")
+
+feature_names = vectorizer.get_feature_names_out()
+display_topics(lda, feature_names)
+
+# Output:
+# Topic 0: dogs, enjoy, long, walks, exploring
+# Topic 1: cats, purr, love, climb, trees
+\end{lstlisting}
+
+\subsection{Document-Based Topic Interpretation}
+
+\begin{importantbox}
+A better way to understand topics: look at documents with highest topic prevalence, not just top words.
+\end{importantbox}
+
+\begin{lstlisting}[caption={Find most representative documents}]
+# For each topic, find documents with highest prevalence
+for topic_idx in range(n_topics):
+    # Sort documents by topic prevalence
+    top_docs = doc_topic_dist[:, topic_idx].argsort()[::-1][:2]
+
+    print(f"\nTopic {topic_idx} - Top documents:")
+    for doc_idx in top_docs:
+        prevalence = doc_topic_dist[doc_idx, topic_idx]
+        print(f"  [{prevalence:.2%}] {documents[doc_idx]}")
+\end{lstlisting}
+
+\begin{infobox}[title=Why Document-Based Interpretation?]
+Looking at actual documents is more reliable than top words because:
+\begin{itemize}
+\item Top words may be ambiguous or share meanings
+\item Documents provide context
+\item 95\% prevalence means the document is almost entirely about that topic
+\item Reading the document tells you definitively what the topic represents
+\end{itemize}
+\end{infobox}
+
+
+% ============================================================
+\section{Non-negative Matrix Factorization (NMF)}
+% ============================================================
+
+\begin{overviewbox}
+NMF is a \textbf{deterministic} alternative to LDA. It uses linear algebra rather than probabilistic modeling to decompose documents into topics.
+\end{overviewbox}
+
+\subsection{The Matrix Factorization Idea}
+
+\begin{definitionbox}[title=NMF Decomposition]
+Given document-term matrix $V$ (documents $\times$ vocabulary):
+\[
+V \approx W \cdot H
+\]
+where:
+\begin{itemize}
+\item $W$: Document-topic matrix (documents $\times$ topics)
+\item $H$: Topic-word matrix (topics $\times$ vocabulary)
+\item All entries in $W$ and $H$ are $\geq 0$ (non-negative)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Matrix Multiplication Review}
+
+\begin{examplebox}[title=Matrix Multiplication Example]
+\[
+W = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}, \quad
+H = \begin{pmatrix} 1 & 1 & 0 \\ 0 & 0 & 2 \end{pmatrix}
+\]
+
+\[
+V = W \cdot H = \begin{pmatrix}
+1 \cdot 1 + 2 \cdot 0 & 1 \cdot 1 + 2 \cdot 0 & 1 \cdot 0 + 2 \cdot 2 \\
+3 \cdot 1 + 4 \cdot 0 & 3 \cdot 1 + 4 \cdot 0 & 3 \cdot 0 + 4 \cdot 2
+\end{pmatrix}
+= \begin{pmatrix} 1 & 1 & 4 \\ 3 & 3 & 8 \end{pmatrix}
+\]
+
+Rules:
+\begin{itemize}
+\item $(m \times n) \cdot (n \times p) = (m \times p)$
+\item Element $(i,j)$ = dot product of row $i$ from first matrix and column $j$ from second
+\end{itemize}
+\end{examplebox}
+
+\subsection{NMF for Topic Modeling}
+
+\begin{examplebox}[title=Concrete NMF Example]
+Three documents with vocabulary [cats, dogs, bark, purr, growl]:
+\begin{itemize}
+\item Doc 1: ``cats meow'' $\rightarrow$ [1, 0, 0, 1, 0]
+\item Doc 2: ``dogs bark'' $\rightarrow$ [0, 1, 1, 0, 0]
+\item Doc 3: ``cats purr dogs growl'' $\rightarrow$ [1, 1, 0, 1, 1]
+\end{itemize}
+
+\[
+V = \begin{pmatrix} 1 & 0 & 0 & 1 & 0 \\ 0 & 1 & 1 & 0 & 0 \\ 1 & 1 & 0 & 1 & 1 \end{pmatrix}
+\]
+
+NMF finds:
+\[
+W = \begin{pmatrix} 1 & 0 \\ 0 & 1 \\ 0.5 & 0.5 \end{pmatrix}, \quad
+H = \begin{pmatrix} 1 & 0 & 0 & 1 & 0 \\ 0 & 1 & 1 & 0 & 1 \end{pmatrix}
+\]
+
+Interpretation:
+\begin{itemize}
+\item Topic 1: cats-related (cats, purr)
+\item Topic 2: dogs-related (dogs, bark, growl)
+\item Doc 3: 50\% Topic 1, 50\% Topic 2
+\end{itemize}
+\end{examplebox}
+
+\subsection{NMF vs LDA}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Aspect} & \textbf{LDA} & \textbf{NMF} \\
+\midrule
+Approach & Probabilistic & Deterministic \\
+Algorithm & EM (iterative) & Matrix factorization \\
+Reproducibility & Stochastic (varies) & Deterministic (same result) \\
+Interpretability & Often better & Harder to interpret $W$ values \\
+Speed & Slower & Faster \\
+Constraints & Probabilities sum to 1 & Only non-negativity \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warningbox}[title=NMF Interpretation Challenge]
+NMF's $W$ matrix entries are just non-negative numbers, not probabilities:
+\begin{itemize}
+\item Values like 2.0 and 5.0 are valid
+\item Harder to say ``60\% Topic 1''
+\item Requires normalization for probability interpretation
+\end{itemize}
+\end{warningbox}
+
+\subsection{NMF Implementation}
+
+\begin{lstlisting}[caption={NMF in Python}]
+from sklearn.decomposition import NMF
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Same document-term matrix X from before
+nmf = NMF(n_components=2, random_state=42)
+W = nmf.fit_transform(X)  # Document-topic matrix
+H = nmf.components_        # Topic-word matrix
+
+# Display top words per topic
+for idx, topic in enumerate(H):
+    top_words = [feature_names[i] for i in topic.argsort()[-5:]]
+    print(f"Topic {idx}: {top_words}")
+\end{lstlisting}
+
+
+% ============================================================
+\section{Choosing the Number of Topics}
+% ============================================================
+
+\begin{overviewbox}
+Selecting the optimal number of topics is crucial. Two key metrics help: \textbf{coherence} (within-topic word relatedness) and \textbf{exclusivity} (between-topic word distinctiveness).
+\end{overviewbox}
+
+\subsection{Coherence}
+
+\begin{definitionbox}[title=Topic Coherence]
+Coherence measures how related the top words within a topic are to each other. Higher coherence means the topic's top words frequently co-occur in documents.
+\end{definitionbox}
+
+\textbf{Intuition}: If Topic 1's top words are [dogs, walks, fetch, leash, park], these words should appear together in documents more often than random word pairs.
+
+\begin{examplebox}[title=Computing Coherence (Simplified)]
+For top words in a topic, compute co-occurrence:
+\[
+\text{Coherence} \propto \sum_{i < j} \log \frac{P(w_i, w_j) + \epsilon}{P(w_i) \cdot P(w_j)}
+\]
+
+This is essentially a log-transformed correlation measure.
+\end{examplebox}
+
+\subsection{Exclusivity}
+
+\begin{definitionbox}[title=Topic Exclusivity]
+Exclusivity measures how distinct topics are from each other. High exclusivity means top words in one topic don't appear as top words in other topics.
+\end{definitionbox}
+
+\begin{examplebox}[title=Exclusivity Calculation (Simplified)]
+For word $w$ in topic $k$:
+\[
+\text{Exclusivity}(w, k) = \frac{P(w | \text{topic } k)}{\sum_{k'} P(w | \text{topic } k')}
+\]
+
+If ``dogs'' has high probability only in Topic 1 and low in others, it has high exclusivity for Topic 1.
+\end{examplebox}
+
+\subsection{The Coherence-Exclusivity Trade-off}
+
+\begin{warningbox}[title=Trade-off]
+Coherence and exclusivity often compete:
+\begin{itemize}
+\item More topics $\rightarrow$ Higher exclusivity but potentially lower coherence
+\item Fewer topics $\rightarrow$ Higher coherence but topics may overlap
+\end{itemize}
+\end{warningbox}
+
+\begin{importantbox}
+\textbf{Selection strategy}:
+\begin{enumerate}
+\item Compute coherence and exclusivity for different numbers of topics
+\item Standardize both metrics (z-scores)
+\item Plot: x-axis = exclusivity, y-axis = coherence
+\item Choose model closest to top-right corner (high both)
+\end{enumerate}
+\end{importantbox}
+
+\begin{lstlisting}[caption={Coherence calculation with gensim}]
+from gensim.models.coherencemodel import CoherenceModel
+
+# After training LDA model
+coherence_model = CoherenceModel(
+    model=lda_gensim,
+    texts=tokenized_docs,
+    dictionary=dictionary,
+    coherence='c_v',      # Coherence type
+    topn=20               # Top 20 words per topic
+)
+coherence_score = coherence_model.get_coherence()
+print(f"Coherence: {coherence_score:.4f}")
+\end{lstlisting}
+
+\subsection{Multiple Runs}
+
+\begin{infobox}[title=Stochastic Nature of LDA]
+LDA results vary between runs due to:
+\begin{itemize}
+\item Random initialization
+\item EM algorithm finding different local optima
+\item Topic labeling is arbitrary (Topic 1 in run A might be Topic 2 in run B)
+\end{itemize}
+
+\textbf{Best practice}: Run multiple times with different seeds, evaluate coherence/exclusivity, select best run.
+\end{infobox}
+
+
+% ============================================================
+\section{LDA Implementation in R}
+% ============================================================
+
+\begin{overviewbox}
+R has excellent support for topic modeling, especially for Structural Topic Modeling (STM). Learning basic R is worthwhile for NLP research.
+\end{overviewbox}
+
+\subsection{Setting Up R}
+
+\begin{enumerate}
+\item Download R from \url{https://cran.r-project.org/}
+\item Download RStudio from \url{https://posit.co/}
+\item Install R first, then RStudio (so RStudio finds R automatically)
+\end{enumerate}
+
+\subsection{Basic R Syntax for LDA}
+
+\begin{lstlisting}[caption={LDA in R}, language=R]
+# Install and load packages
+install.packages("topicmodels")
+library(topicmodels)
+
+# Create documents
+documents <- c(
+  "cats are wonderful pets",
+  "cats and dogs are popular",
+  "dogs enjoy long walks",
+  # ... more documents
+)
+
+# Preprocessing
+corpus <- Corpus(VectorSource(documents))
+corpus <- tm_map(corpus, tolower)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
+
+# Create Document-Term Matrix
+dtm <- DocumentTermMatrix(corpus)
+
+# Fit LDA
+lda_model <- LDA(dtm, k = 2, control = list(seed = 42))
+
+# Get top terms per topic
+terms(lda_model, 5)
+\end{lstlisting}
+
+\subsection{R Markdown for Reports}
+
+\begin{infobox}[title=RMarkdown Files (.Rmd)]
+Similar to Jupyter notebooks:
+\begin{itemize}
+\item Mix code and text
+\item Code in ``chunks'' (like cells)
+\item \texttt{Ctrl+Enter} runs current line
+\item \texttt{Knit} creates HTML/PDF report
+\item Use \texttt{\#} for sections, \texttt{\#\#} for subsections
+\end{itemize}
+\end{infobox}
+
+
+% ============================================================
+\section{Practical Applications}
+% ============================================================
+
+\subsection{What Can You Do with Topic Models?}
+
+\begin{enumerate}
+\item \textbf{Document Classification}: Assign documents to dominant topics
+\item \textbf{Search}: Find documents about specific topics
+\item \textbf{Trend Analysis}: Track topic prevalence over time
+\item \textbf{Bias Detection}: Correlate topics with metadata (gender, source)
+\item \textbf{Summarization}: Understand what a corpus is ``about''
+\end{enumerate}
+
+\subsection{Real-World Example: Student Evaluations}
+
+\begin{examplebox}[title=Analyzing Student Evaluations]
+Study with ~1 million student evaluations:
+\begin{itemize}
+\item Extracted 11 topics from evaluation text
+\item Topics: ``caring instructor'', ``interesting lectures'', ``good feedback'', etc.
+\item Correlated with instructor gender
+\end{itemize}
+
+\textbf{Findings}:
+\begin{itemize}
+\item Female instructors: more mentions of ``caring'', ``facilitates discussion'', ``nice feedback''
+\item Male instructors: more mentions of ``humor'', ``interesting'', ``relevant''
+\item This pattern persisted after controlling for department and course type
+\item Suggests systematic bias in how students perceive instructors
+\end{itemize}
+\end{examplebox}
+
+\subsection{Comparing Across Departments}
+
+\begin{examplebox}[title=Topic Variation by Division]
+Same student evaluation study:
+\begin{itemize}
+\item \textbf{Sciences}: ``explains complex concepts effectively''
+\item \textbf{Humanities}: ``facilitates effective discussions''
+\item \textbf{Freshman seminars}: ``positive timely feedback''
+\end{itemize}
+
+These differences reflect genuine pedagogical differences across disciplines.
+\end{examplebox}
+
+
+% ============================================================
+\section{Structural Topic Modeling (STM) Preview}
+% ============================================================
+
+\begin{overviewbox}
+STM extends LDA by incorporating \textbf{covariates}---document-level metadata that can affect topic prevalence and content.
+\end{overviewbox}
+
+\begin{definitionbox}[title=LDA vs STM]
+\begin{itemize}
+\item \textbf{LDA}: Documents have topic proportions, but ignores metadata
+\item \textbf{STM}: Topic proportions can depend on covariates (author gender, publication source, date, etc.)
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=When STM Helps]
+Analyzing news articles with known sources:
+\begin{itemize}
+\item LDA: Discovers topics, then you manually correlate with sources
+\item STM: Directly models how source affects topic distribution
+\item STM produces more accurate topics by using all available information
+\end{itemize}
+\end{examplebox}
+
+\begin{warningbox}[title=Software Note]
+STM is primarily implemented in R (\texttt{stm} package). Python implementations exist but are unofficial. For serious STM work, learn R.
+\end{warningbox}
+
+
+% ============================================================
+\section{One-Page Summary}
+% ============================================================
+
+\begin{summarybox}
+\textbf{Topic Modeling} discovers hidden themes in document collections.
+
+\textbf{Why Not Clustering?}
+\begin{itemize}
+\item Documents contain multiple topics (soft assignment)
+\item Clustering forces hard assignment to one cluster
+\end{itemize}
+
+\textbf{LDA (Latent Dirichlet Allocation)}:
+\begin{itemize}
+\item Probabilistic model: documents are mixtures of topics
+\item Topics are distributions over words
+\item Generative process: choose topic proportions, then for each word, choose topic then word
+\item Uses EM algorithm for parameter estimation
+\item Number of topics is a hyperparameter
+\end{itemize}
+
+\textbf{NMF (Non-negative Matrix Factorization)}:
+\begin{itemize}
+\item Deterministic approach: $V \approx W \cdot H$
+\item Faster but harder to interpret
+\item No probabilistic interpretation
+\end{itemize}
+
+\textbf{Choosing Number of Topics}:
+\begin{itemize}
+\item \textbf{Coherence}: Are top words related? (higher = better)
+\item \textbf{Exclusivity}: Are topics distinct? (higher = better)
+\item Balance both; maximize average of standardized scores
+\end{itemize}
+
+\textbf{Interpreting Topics}:
+\begin{itemize}
+\item Look at top words per topic
+\item Better: examine documents with highest topic prevalence
+\item Assign human-readable labels after analysis
+\end{itemize}
+
+\textbf{Key Formulas}:
+\[
+\theta_m \sim \text{Dirichlet}(\alpha) \quad \text{(topic proportions)}
+\]
+\[
+z_n \sim \text{Multinomial}(\theta_m) \quad \text{(topic selection)}
+\]
+\[
+w_n \sim \text{Multinomial}(\beta_{z_n}) \quad \text{(word selection)}
+\]
+\[
+V \approx W \cdot H \quad \text{(NMF decomposition)}
+\]
+\end{summarybox}
+
+
+% ============================================================
+\section{Glossary}
+% ============================================================
+
+\begin{definitionbox}[title=Key Terms]
+\begin{itemize}
+\item \textbf{LDA}: Latent Dirichlet Allocation---probabilistic topic model
+\item \textbf{NMF}: Non-negative Matrix Factorization---deterministic topic model
+\item \textbf{STM}: Structural Topic Modeling---LDA with covariates
+\item \textbf{Dirichlet distribution}: Produces probability vectors summing to 1
+\item \textbf{Latent topic}: Hidden theme discovered from data (not predefined)
+\item \textbf{Topic proportions}: How much each topic contributes to a document
+\item \textbf{Coherence}: Metric measuring word co-occurrence within topics
+\item \textbf{Exclusivity}: Metric measuring distinctiveness between topics
+\item \textbf{EM algorithm}: Expectation-Maximization for latent variable models
+\item \textbf{MLE}: Maximum Likelihood Estimation---find parameters maximizing data probability
+\item \textbf{Undercomplete}: Bottleneck dimension < input dimension
+\item \textbf{Stacked autoencoder}: Deep autoencoder with multiple hidden layers
+\item \textbf{Bag of words}: Document representation ignoring word order
+\item \textbf{Document-term matrix}: Matrix of word counts (documents $\times$ vocabulary)
+\end{itemize}
+\end{definitionbox}
+
+\end{document}

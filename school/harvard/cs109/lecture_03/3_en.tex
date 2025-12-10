@@ -1,0 +1,986 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - English Master Template
+% CS109A: Introduction to Data Science - Lecture 03
+% Introduction to Pandas
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% Basic Packages
+%========================================================================================
+
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\renewcommand{\arraystretch}{1.1}
+
+%========================================================================================
+% Header and Footer
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Lecture 03}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% Color Definitions
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% Box Environments
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced, colback=lightpurple, colframe=darkpurple,
+    fonttitle=\bfseries\large, title=Lecture Overview,
+    arc=3mm, boxrule=1pt, left=8pt, right=8pt, top=8pt, bottom=8pt, breakable, #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced, colback=lightblue, colframe=darkblue,
+    fonttitle=\bfseries, title=Key Summary,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced, colback=lightgreen, colframe=darkgreen,
+    fonttitle=\bfseries, title=Key Information,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced, colback=lightyellow, colframe=darkorange,
+    fonttitle=\bfseries, title=Warning,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable, #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced, colback=lightgray, colframe=black!60,
+    fonttitle=\bfseries, title=Example: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced, colback=lightpink, colframe=purple!70!black,
+    fonttitle=\bfseries, title=Definition: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced, colback=boxred, colframe=red!70!black,
+    fonttitle=\bfseries, title=Important: #1,
+    arc=2mm, boxrule=0.7pt, left=6pt, right=6pt, top=6pt, bottom=6pt, breakable,
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% Code Block Settings
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left, numbersep=8pt,
+    breaklines=true, breakatwhitespace=false,
+    frame=single, frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b, showstringspaces=false,
+    tabsize=2, xleftmargin=15pt, xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+%========================================================================================
+% Other Packages
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+\usepackage{graphicx}
+\usepackage{adjustbox}
+
+\usepackage{caption}
+\captionsetup[table]{labelfont=bf, textfont=it, skip=5pt}
+\captionsetup[figure]{labelfont=bf, textfont=it, skip=5pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Lecture 03},
+    pdfauthor={Lecture Notes},
+    pdfsubject={Academic Notes}
+}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{footnote}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% Custom Commands
+%========================================================================================
+
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% Document Title Style
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% Meta Information Box
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple, colframe=darkpurple,
+    boxrule=1pt, arc=2mm, left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+$\blacksquare$ \textbf{Course:} & #1 \\[0.3em]
+$\blacksquare$ \textbf{Lecture:} & #2 \\[0.3em]
+$\blacksquare$ \textbf{Instructor:} & #3 \\[0.3em]
+$\blacksquare$ \textbf{Objective:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% Document Content
+%========================================================================================
+
+\title{CS109A: Introduction to Data Science\\Lecture 03: Introduction to Pandas}
+\author{Harvard University}
+\date{Fall 2024}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 03: Introduction to Pandas}{Chris Gumb}{Learn the fundamentals of Pandas for data manipulation and analysis in Python}
+
+
+\begin{summarybox}
+This lecture introduces \textbf{Pandas}, the essential Python library for data manipulation and analysis. You'll learn about the two core data structures: \texttt{Series} (1-dimensional) and \texttt{DataFrame} (2-dimensional tables). We cover how to create these structures, load data from CSV files, inspect and clean data, select subsets using boolean indexing and the \texttt{loc}/\texttt{iloc} accessors, and perform aggregations with \texttt{groupby}. By the end of this lecture, you'll have the foundational skills needed to work with tabular data in Python.
+\end{summarybox}
+
+\tableofcontents
+
+\newpage
+
+%========================================
+\section{Introduction: Why Pandas?}
+%========================================
+
+\subsection{What is Pandas?}
+
+\begin{definitionbox}{Pandas}
+\textbf{Pandas} is a Python library that provides high-performance, easy-to-use data structures and data analysis tools. The name comes from ``Panel Data'' (a term from econometrics) and ``Python Data Analysis.''
+
+Pandas gives you access to data types that don't exist in standard Python:
+\begin{itemize}
+    \item \textbf{Series}: A 1-dimensional labeled array
+    \item \textbf{DataFrame}: A 2-dimensional labeled table (like an Excel spreadsheet)
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Why Use Pandas Instead of Plain Python?}
+
+You could store data in Python lists and dictionaries, but Pandas offers significant advantages:
+
+\begin{itemize}
+    \item \textbf{Speed}: Pandas is built on NumPy, which stores data in contiguous memory blocks for fast operations
+    \item \textbf{Convenience}: Methods like \code{.head()}, \code{.describe()}, \code{.groupby()} make common operations trivial
+    \item \textbf{Data Alignment}: Pandas automatically aligns data by labels during operations
+    \item \textbf{Missing Data Handling}: Built-in support for missing values (\code{NaN})
+    \item \textbf{File I/O}: Easy reading/writing of CSV, Excel, SQL databases, JSON, and more
+\end{itemize}
+
+\subsection{Importing Pandas}
+
+The standard convention is to import pandas with the alias \code{pd}:
+
+\begin{lstlisting}[language=Python]
+import pandas as pd
+import numpy as np  # Often used alongside pandas
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Don't break conventions!} Always use \code{pd} for pandas and \code{np} for numpy. Using other aliases will confuse anyone reading your code.
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{The Series Data Structure}
+%========================================
+
+\subsection{What is a Series?}
+
+\begin{definitionbox}{Series}
+A \textbf{Series} is a one-dimensional array with labels (called an \textbf{index}). Think of it as:
+\begin{itemize}
+    \item A single column from a spreadsheet
+    \item A dictionary where keys are the index and values are the data
+    \item A NumPy array with attached labels
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Creating a Series}
+
+The simplest way is from a Python list:
+
+\begin{lstlisting}[language=Python, caption={Creating a Series from a list}]
+# Create a simple Series
+my_list = [10, 20, 30, 40, 50]
+s = pd.Series(my_list)
+print(s)
+\end{lstlisting}
+
+\textbf{Output:}
+\begin{verbatim}
+0    10
+1    20
+2    30
+3    40
+4    50
+dtype: int64
+\end{verbatim}
+
+Notice the output shows:
+\begin{itemize}
+    \item \textbf{Left column}: The \textbf{index} (0, 1, 2, 3, 4)---created automatically
+    \item \textbf{Right column}: The \textbf{values} from your list
+    \item \textbf{Bottom}: The \textbf{dtype} (data type)---\code{int64} means 64-bit integers
+\end{itemize}
+
+\subsection{Series Attributes}
+
+Every Series has four key attributes:
+
+\begin{lstlisting}[language=Python, caption={Series attributes}]
+s = pd.Series([10, 20, 30], index=['a', 'b', 'c'], name='my_series')
+
+print(s.values)   # The actual data (as a NumPy array)
+# Output: array([10, 20, 30])
+
+print(s.index)    # The labels
+# Output: Index(['a', 'b', 'c'], dtype='object')
+
+print(s.name)     # The series name (becomes column name in DataFrame)
+# Output: 'my_series'
+
+print(s.dtype)    # The data type
+# Output: dtype('int64')
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{Why dtype Matters}
+
+Under the hood, a Series stores its values in a NumPy array. NumPy requires all elements to be the same type for efficient memory layout.
+
+\begin{itemize}
+    \item \textbf{Numeric types} (\code{int64}, \code{float64}): Data stored directly in memory, fast operations
+    \item \textbf{Object type} (\code{object}): Stores memory addresses pointing to actual data, slower operations
+\end{itemize}
+
+If you mix types (e.g., integers and strings), pandas will upcast to \code{object} type, which is slower.
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+\subsection{Custom Indexes}
+
+The index doesn't have to be integers---you can use any labels:
+
+\begin{lstlisting}[language=Python, caption={Custom string index}]
+s = pd.Series([100, 200, 300])
+s.index = ['apple', 'banana', 'cherry']
+print(s)
+
+# Output:
+# apple     100
+# banana    200
+# cherry    300
+# dtype: int64
+
+# Access by label
+print(s['banana'])  # Output: 200
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Index Labels Can Be Non-Unique!}
+
+Unlike dictionary keys, Series indices can have duplicates:
+
+\begin{lstlisting}[language=Python]
+s.index = ['a', 'a', 'b']
+print(s['a'])
+# Returns BOTH values with index 'a':
+# a    100
+# a    200
+\end{lstlisting}
+
+This can cause unexpected behavior if you're not careful!
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{The DataFrame Data Structure}
+%========================================
+
+\subsection{What is a DataFrame?}
+
+\begin{definitionbox}{DataFrame}
+A \textbf{DataFrame} is a 2-dimensional labeled data structure---like an Excel spreadsheet or SQL table.
+
+\begin{itemize}
+    \item Each \textbf{column} is a Series
+    \item All columns share the same \textbf{index} (row labels)
+    \item Different columns can have different data types
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Creating a DataFrame}
+
+\subsubsection{Method 1: From a List of Dictionaries (Row by Row)}
+
+Each dictionary represents one row; keys become column names:
+
+\begin{lstlisting}[language=Python, caption={DataFrame from list of dictionaries}]
+data = [
+    {'fruit': 'apple', 'color': 'red', 'price': 1.50},
+    {'fruit': 'banana', 'color': 'yellow', 'price': 0.75},
+    {'fruit': 'cherry', 'color': 'red', 'price': 3.00}
+]
+
+df = pd.DataFrame(data)
+print(df)
+\end{lstlisting}
+
+\textbf{Output:}
+\begin{verbatim}
+    fruit   color  price
+0   apple     red   1.50
+1  banana  yellow   0.75
+2  cherry     red   3.00
+\end{verbatim}
+
+\subsubsection{Method 2: From a Dictionary of Lists (Column by Column)}
+
+Each key is a column name; the list becomes that column's values:
+
+\begin{lstlisting}[language=Python, caption={DataFrame from dictionary of lists}]
+data = {
+    'fruit': ['apple', 'banana', 'cherry'],
+    'color': ['red', 'yellow', 'red'],
+    'price': [1.50, 0.75, 3.00]
+}
+
+df = pd.DataFrame(data)
+# Same result as above
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{Which Method to Use?}
+
+\begin{itemize}
+    \item \textbf{List of dictionaries}: Useful when scraping data (you build up rows one at a time)
+    \item \textbf{Dictionary of lists}: Useful when you already have column-wise data
+\end{itemize}
+\end{infobox}
+
+\newpage
+
+\subsection{DataFrame Attributes}
+
+\begin{lstlisting}[language=Python, caption={DataFrame attributes}]
+print(df.shape)    # (rows, columns)
+# Output: (3, 3)
+
+print(df.columns)  # Column names
+# Output: Index(['fruit', 'color', 'price'], dtype='object')
+
+print(df.index)    # Row labels
+# Output: RangeIndex(start=0, stop=3, step=1)
+
+print(df.dtypes)   # Data type of each column
+# Output:
+# fruit     object
+# color     object
+# price    float64
+# dtype: object
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Loading Data from Files}
+%========================================
+
+\subsection{Reading CSV Files}
+
+The most common way to get data into pandas:
+
+\begin{lstlisting}[language=Python, caption={Reading a CSV file}]
+# Read a CSV file into a DataFrame
+df = pd.read_csv('data/survey_results.csv')
+
+# Peek at the first few rows
+df.head()
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{Other File Formats}
+
+Pandas can read many formats:
+\begin{itemize}
+    \item \code{pd.read\_excel('file.xlsx')} --- Excel files
+    \item \code{pd.read\_json('file.json')} --- JSON files
+    \item \code{pd.read\_html('url')} --- Tables from web pages
+    \item \code{pd.read\_sql(query, connection)} --- SQL databases
+    \item \code{pd.read\_clipboard()} --- From your clipboard!
+\end{itemize}
+\end{infobox}
+
+\subsection{Inspecting Your Data}
+
+After loading data, always inspect it first:
+
+\begin{lstlisting}[language=Python, caption={Inspecting a DataFrame}]
+# First 5 rows (default) or specify n
+df.head()
+df.head(2)
+
+# Last 5 rows
+df.tail()
+
+# Shape: (rows, columns)
+df.shape
+
+# Column names
+df.columns
+
+# Data types and memory usage
+df.info()
+
+# Summary statistics for numeric columns
+df.describe()
+
+# Data types only
+df.dtypes
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Selecting Data}
+%========================================
+
+\subsection{Selecting Columns}
+
+\begin{lstlisting}[language=Python, caption={Selecting columns}]
+# Single column (returns a Series)
+df['fruit']
+
+# Single column using dot notation (shortcut)
+df.fruit  # Only works if column name has no spaces
+
+# Multiple columns (returns a DataFrame)
+df[['fruit', 'price']]
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Be Careful with Dot Notation}
+
+\code{df.fruit} is convenient but dangerous if:
+\begin{itemize}
+    \item Column name has spaces (\code{df.my column} doesn't work)
+    \item Column name matches a DataFrame method (\code{df.head} returns the method, not a column!)
+\end{itemize}
+
+The bracket notation \code{df['fruit']} is always safe.
+\end{warningbox}
+
+\subsection{The loc and iloc Accessors}
+
+Pandas provides two ways to select rows:
+
+\begin{definitionbox}{loc vs iloc}
+\begin{itemize}
+    \item \textbf{loc}: Selection by \textbf{label} (what you see in the index)
+    \item \textbf{iloc}: Selection by \textbf{integer position} (0, 1, 2, ...)
+\end{itemize}
+\end{definitionbox}
+
+\begin{lstlisting}[language=Python, caption={Using loc and iloc}]
+# Create a DataFrame with a non-default index
+df = pd.DataFrame({
+    'name': ['Alice', 'Bob', 'Charlie'],
+    'age': [25, 30, 35]
+}, index=['a', 'b', 'c'])
+
+# loc: by label
+df.loc['b']        # Row with label 'b'
+df.loc['a':'b']    # Rows 'a' through 'b' (inclusive!)
+df.loc['a', 'age'] # Specific cell: row 'a', column 'age'
+
+# iloc: by position
+df.iloc[1]         # Second row (position 1)
+df.iloc[0:2]       # First two rows (exclusive end!)
+df.iloc[0, 1]      # Specific cell: row 0, column 1
+\end{lstlisting}
+
+\begin{importantbox}{The Index Trap}
+After filtering or sorting, row indices get scrambled:
+
+\begin{lstlisting}[language=Python]
+df_sorted = df.sort_values('age', ascending=False)
+print(df_sorted)
+#        name  age
+# c   Charlie   35
+# b       Bob   30
+# a     Alice   25
+
+# Trying to get "first row" by position
+df_sorted.iloc[0]  # Gets Charlie (correct)
+
+# Trying by label 0
+df_sorted.loc[0]   # ERROR! No label '0' exists
+\end{lstlisting}
+
+\textbf{Solution}: Use \code{.reset\_index(drop=True)} after sorting/filtering.
+\end{importantbox}
+
+\newpage
+
+%========================================
+\section{Boolean Indexing (Filtering)}
+%========================================
+
+\subsection{Creating Boolean Masks}
+
+A \textbf{boolean mask} is a Series of True/False values that you use to filter rows:
+
+\begin{lstlisting}[language=Python, caption={Creating boolean masks}]
+df = pd.DataFrame({
+    'name': ['Alice', 'Bob', 'Charlie', 'Diana'],
+    'age': [25, 30, 35, 28],
+    'city': ['NYC', 'LA', 'NYC', 'LA']
+})
+
+# Create a mask: which rows have age > 27?
+mask = df['age'] > 27
+print(mask)
+# 0    False
+# 1     True
+# 2     True
+# 3     True
+# dtype: bool
+\end{lstlisting}
+
+\subsection{Applying the Mask}
+
+Use the mask inside brackets to filter:
+
+\begin{lstlisting}[language=Python, caption={Filtering with boolean masks}]
+# Get rows where age > 27
+df[mask]
+# or directly:
+df[df['age'] > 27]
+
+#       name  age city
+# 1      Bob   30   LA
+# 2  Charlie   35  NYC
+# 3    Diana   28   LA
+\end{lstlisting}
+
+\subsection{Combining Conditions}
+
+\begin{lstlisting}[language=Python, caption={Combining conditions}]
+# Use & for AND, | for OR, ~ for NOT
+# IMPORTANT: Each condition must be in parentheses!
+
+# Age > 27 AND city is NYC
+df[(df['age'] > 27) & (df['city'] == 'NYC')]
+
+# Age > 30 OR city is LA
+df[(df['age'] > 30) | (df['city'] == 'LA')]
+
+# NOT in NYC
+df[~(df['city'] == 'NYC')]
+\end{lstlisting}
+
+\begin{warningbox}
+\textbf{Parentheses are Required!}
+
+Due to Python operator precedence, you must wrap each condition in parentheses:
+
+\begin{lstlisting}[language=Python]
+# WRONG:
+df[df['age'] > 27 & df['city'] == 'NYC']  # Error!
+
+# CORRECT:
+df[(df['age'] > 27) & (df['city'] == 'NYC')]
+\end{lstlisting}
+\end{warningbox}
+
+\newpage
+
+%========================================
+\section{Common DataFrame Operations}
+%========================================
+
+\subsection{Sorting}
+
+\begin{lstlisting}[language=Python, caption={Sorting DataFrames}]
+# Sort by one column
+df.sort_values('age')
+
+# Sort descending
+df.sort_values('age', ascending=False)
+
+# Sort by multiple columns
+df.sort_values(['city', 'age'])
+
+# Reset index after sorting (usually what you want)
+df.sort_values('age').reset_index(drop=True)
+\end{lstlisting}
+
+\subsection{Value Counts}
+
+Count occurrences of unique values:
+
+\begin{lstlisting}[language=Python, caption={Counting values}]
+# How many people in each city?
+df['city'].value_counts()
+# NYC    2
+# LA     2
+
+# Get unique values
+df['city'].unique()
+# array(['NYC', 'LA'], dtype=object)
+
+# Number of unique values
+df['city'].nunique()
+# 2
+\end{lstlisting}
+
+\subsection{Group By and Aggregation}
+
+\begin{definitionbox}{GroupBy}
+\textbf{GroupBy} splits data into groups based on a column's values, then applies an aggregation function to each group.
+\end{definitionbox}
+
+\begin{lstlisting}[language=Python, caption={GroupBy operations}]
+# Average age by city
+df.groupby('city')['age'].mean()
+# city
+# LA     29.0
+# NYC    30.0
+
+# Multiple aggregations
+df.groupby('city').agg({
+    'age': ['mean', 'min', 'max'],
+    'name': 'count'
+})
+
+# Count rows per group
+df.groupby('city').size()
+\end{lstlisting}
+
+\newpage
+
+\subsection{Handling Missing Data}
+
+\begin{lstlisting}[language=Python, caption={Working with missing values}]
+# Check for missing values
+df.isna()           # Boolean mask of NaN locations
+df.isna().sum()     # Count NaNs per column
+
+# Drop rows with any NaN
+df.dropna()
+
+# Fill NaN with a value
+df.fillna(0)
+df['column'].fillna('Unknown')
+
+# Fill with column mean
+df['age'].fillna(df['age'].mean())
+\end{lstlisting}
+
+\subsection{Renaming Columns}
+
+\begin{lstlisting}[language=Python, caption={Renaming columns}]
+# Rename specific columns
+df.rename(columns={'old_name': 'new_name'})
+
+# Rename all columns at once
+df.columns = ['col1', 'col2', 'col3', 'col4']
+
+# Make all column names lowercase
+df.columns = df.columns.str.lower()
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Method Chaining}
+%========================================
+
+\subsection{What is Method Chaining?}
+
+Instead of saving intermediate results to variables, you can chain multiple operations together:
+
+\begin{lstlisting}[language=Python, caption={Method chaining example}]
+# Without chaining (verbose)
+df_filtered = df[df['age'] > 25]
+df_sorted = df_filtered.sort_values('age')
+df_top = df_sorted.head(3)
+
+# With chaining (concise)
+result = (df[df['age'] > 25]
+          .sort_values('age')
+          .head(3))
+\end{lstlisting}
+
+\begin{infobox}
+\textbf{Benefits of Method Chaining}
+\begin{itemize}
+    \item More concise code
+    \item No intermediate variables cluttering your namespace
+    \item Reads like a pipeline: ``Take df, filter it, sort it, take top 3''
+\end{itemize}
+
+\textbf{Tip}: Wrapping in parentheses lets you break across multiple lines for readability.
+\end{infobox}
+
+\newpage
+
+%========================================
+\section{Practical Example: Survey Data}
+%========================================
+
+Let's walk through a realistic example using class survey data:
+
+\begin{lstlisting}[language=Python, caption={Complete example workflow}]
+# 1. Load the data
+df = pd.read_csv('data/survey_raw.csv')
+
+# 2. Inspect
+print(df.shape)
+print(df.columns)
+df.head()
+
+# 3. Clean column names (remove spaces, lowercase)
+df.columns = ['timestamp', 'program', 'jupyter_exp',
+              'python_exp', 'pandas_skill', 'os',
+              'dark_mode', 'languages', 'dob']
+
+# 4. Check data types
+df.dtypes
+df.info()
+
+# 5. Convert dark_mode to boolean
+df['dark_mode'] = df['dark_mode'] == 'Yes'
+
+# 6. Filter to students with pandas skill > 3
+skilled = df[df['pandas_skill'] > 3]
+
+# 7. Count programs
+df['program'].value_counts()
+
+# 8. Average pandas skill by program
+(df.groupby('program')['pandas_skill']
+   .mean()
+   .sort_values(ascending=False))
+
+# 9. Save cleaned data
+df.to_csv('data/survey_clean.csv', index=False)
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Advanced: Exploding Lists}
+%========================================
+
+Sometimes a column contains comma-separated values that you want to split:
+
+\begin{lstlisting}[language=Python, caption={Exploding comma-separated values}]
+# Sample data
+df = pd.DataFrame({
+    'name': ['Alice', 'Bob'],
+    'languages': ['English, Spanish', 'English, Mandarin, French']
+})
+
+# Step 1: Split the string into a list
+df['lang_list'] = df['languages'].str.split(', ')
+
+# Step 2: Explode - each list item becomes its own row
+df_exploded = df.explode('lang_list')
+
+#     name                  languages   lang_list
+# 0  Alice           English, Spanish     English
+# 0  Alice           English, Spanish     Spanish
+# 1    Bob  English, Mandarin, French     English
+# 1    Bob  English, Mandarin, French    Mandarin
+# 1    Bob  English, Mandarin, French      French
+
+# Now you can count languages, filter, etc.
+df_exploded['lang_list'].value_counts()
+\end{lstlisting}
+
+\newpage
+
+%========================================
+\section{Key Takeaways}
+%========================================
+
+\begin{summarybox}
+\textbf{Summary of Lecture 03: Pandas Fundamentals}
+
+\textbf{Core Data Structures}
+\begin{itemize}
+    \item \textbf{Series}: 1D labeled array (values + index + name + dtype)
+    \item \textbf{DataFrame}: 2D table of Series (columns share an index)
+\end{itemize}
+
+\textbf{Creating DataFrames}
+\begin{itemize}
+    \item \code{pd.DataFrame(list\_of\_dicts)} --- Row by row
+    \item \code{pd.DataFrame(dict\_of\_lists)} --- Column by column
+    \item \code{pd.read\_csv('file.csv')} --- From file
+\end{itemize}
+
+\textbf{Inspecting Data}
+\begin{itemize}
+    \item \code{df.head()}, \code{df.tail()}, \code{df.shape}
+    \item \code{df.info()}, \code{df.describe()}, \code{df.dtypes}
+\end{itemize}
+
+\textbf{Selecting Data}
+\begin{itemize}
+    \item Columns: \code{df['col']} or \code{df[['col1', 'col2']]}
+    \item Rows by label: \code{df.loc['label']}
+    \item Rows by position: \code{df.iloc[0]}
+    \item Boolean filtering: \code{df[df['col'] > value]}
+\end{itemize}
+
+\textbf{Common Operations}
+\begin{itemize}
+    \item Sort: \code{df.sort\_values('col')}
+    \item Count: \code{df['col'].value\_counts()}
+    \item Group: \code{df.groupby('col').agg({'other': 'mean'})}
+    \item Reset: \code{df.reset\_index(drop=True)}
+\end{itemize}
+
+\textbf{Key Warnings}
+\begin{itemize}
+    \item \code{loc} uses labels; \code{iloc} uses positions
+    \item After sorting/filtering, indices get scrambled---use \code{reset\_index()}
+    \item Use parentheses around each condition when combining with \code{\&}/\code{|}
+    \item Mixed types become \code{object} dtype (slow!)
+\end{itemize}
+\end{summarybox}
+
+\end{document}
