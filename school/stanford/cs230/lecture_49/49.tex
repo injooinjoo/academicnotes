@@ -1,0 +1,244 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Attention Mechanism}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1-10.10 RNN, LSTM, Word2Vec, BLEU \textit{- Completed}
+        \item \textbf{10.11 Attention Mechanism}
+        \begin{itemize}
+            \item The Bottleneck Problem in Seq2Seq
+            \item Dynamic Context Vector ($c^{\langle t \rangle}$)
+            \item Alignment Scores \& Attention Weights ($\alpha$)
+            \item Implementation: Bahdanau Attention
+        \end{itemize}
+    \end{itemize}
+    \item[Chapter 11.] Transformer Network \textit{- Next Part}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 배운 Seq2Seq 모델은 혁신적이었지만, 문장이 길어지면 성능이 급격히 떨어지는 \textbf{'병목(Bottleneck)'} 현상을 겪었습니다. 인코더가 100단어짜리 긴 문장을 고정된 크기의 벡터 하나에 억지로 압축해야 했기 때문입니다.
+
+생각해 봅시다. 여러분이 긴 문장을 번역할 때, 문장 전체를 한 번 읽고 외운 다음 눈을 감고 번역합니까? 아닙니다. \textbf{"지금 번역하려는 단어와 관련된 원문 부분을 그때그때 다시 쳐다보면서(Attend)"} 번역합니다. 이 과정을 구현한 것이 바로 \textbf{어텐션(Attention)}입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 긴 시퀀스 정보 손실을 해결하고 성능을 극대화하는 어텐션 메커니즘을 다룹니다.
+\begin{itemize}
+    \item \textbf{동적 문맥:} 매 타임 스텝마다 다르게 계산되는 \textbf{문맥 벡터 $c^{\langle t \rangle}$}의 개념을 이해합니다.
+    \item \textbf{가중치:} 인코더의 특정 단어에 얼마나 집중할지 나타내는 \textbf{어텐션 가중치($\alpha$)}를 정의합니다.
+    \item \textbf{구조:} 인코더의 모든 은닉 상태를 가중 합(Weighted Sum)하여 정보를 취합하는 원리를 배웁니다.
+    \item \textbf{학습:} 가중치를 결정하는 정렬 모델(Alignment Model)도 역전파로 함께 학습됨을 파악합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{비유} \\ \hline
+\textbf{Attention Weight} & $\alpha^{\langle t, t' \rangle}$: $t$번째 출력 시 $t'$번째 입력의 중요도. & 돋보기로 비추는 빛의 세기. \\ \hline
+\textbf{Context Vector} & $c^{\langle t \rangle}$: 인코더 상태들의 가중 평균. & 번역 중인 단어의 연관 참고 자료. \\ \hline
+\textbf{Alignment Score} & 단어 간의 유사도/관련성 점수. & 두 단어가 얼마나 '찰떡궁합'인가. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 필요한 곳만 쳐다보기}
+
+\subsection{1. The Intuition (직관)}
+
+
+기존 Seq2Seq는 인코더의 \textbf{마지막 정보} 하나만 디코더에게 던져줍니다. 반면, 어텐션 모델은 디코더가 단어를 생성할 때마다 인코더의 \textbf{모든 은닉 상태}($a^{\langle 1 \rangle}, a^{\langle 2 \rangle}, \dots$)를 다 참고합니다. 단, 중요한 것은 진하게(높은 가중치), 안 중요한 것은 흐리게 봅니다.
+
+\begin{analogybox}{번역가의 힐끔거리기}
+\begin{itemize}
+    \item \textbf{기존:} 문장을 한 번 읽고 책을 덮은 뒤 암기해서 번역함. (병목 발생)
+    \item \textbf{어텐션:} 번역문을 쓰면서 원문에서 지금 단어와 관련된 부분(예: 주어, 목적어)을 계속 \textbf{힐끔힐끔} 다시 보며 번역함.
+\end{itemize}
+\end{analogybox}
+
+\subsection{2. The Architecture: Context Vector $c^{\langle t \rangle}$}
+문맥 벡터 $c^{\langle t \rangle}$는 인코더의 모든 은닉 상태 $a^{\langle t' \rangle}$의 \textbf{가중 평균}입니다.
+
+\begin{formulabox}{Context Vector 공식}
+$$ c^{\langle t \rangle} = \sum_{t'} \alpha^{\langle t, t' \rangle} a^{\langle t' \rangle} $$
+\begin{itemize}
+    \item $\alpha^{\langle t, t' \rangle}$: 디코더 $t$ 시점에 인코더 $t'$ 시점을 보는 비중.
+    \item $\sum_{t'} \alpha^{\langle t, t' \rangle} = 1$ (확률값).
+\end{itemize}
+\end{formulabox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Computing Attention (수학적 원리)}
+
+그렇다면 가장 중요한 $\alpha$ (가중치)는 누가 정할까요? 사람이 정하는 게 아니라, 이조차 \textbf{작은 신경망(Alignment Model)}이 학습합니다.
+
+\begin{enumerate}
+    \item \textbf{Alignment Score ($e^{\langle t, t' \rangle}$):} 디코더의 이전 상태 $s^{\langle t-1 \rangle}$와 인코더 상태 $a^{\langle t' \rangle}$가 얼마나 어울리는지 점수를 매깁니다.
+    $$ e^{\langle t, t' \rangle} = \text{dense\_layer}([s^{\langle t-1 \rangle}, a^{\langle t' \rangle}]) $$
+    
+    \item \textbf{Softmax (Weights):} 점수를 확률로 변환합니다.
+    $$ \alpha^{\langle t, t' \rangle} = \frac{\exp(e^{\langle t, t' \rangle})}{\sum_{k=1}^{T_x} \exp(e^{\langle t, k \rangle})} $$
+\end{enumerate}
+
+
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Bahdanau Attention}
+
+TensorFlow/Keras의 서브클래싱 방식으로 구현한 예시입니다.
+
+\begin{lstlisting}[language=Python, caption=Bahdanau Attention Layer, breaklines=true]
+import tensorflow as tf
+from tensorflow.keras.layers import Layer, Dense
+
+class BahdanauAttention(Layer):
+    def __init__(self, units):
+        super().__init__()
+        self.W1 = Dense(units) # Decoder state weight
+        self.W2 = Dense(units) # Encoder state weight
+        self.V = Dense(1)      # Score weight
+
+    def call(self, query, values):
+        # query: 디코더 은닉 상태 (Batch, hidden)
+        # values: 인코더 은닉 상태들 (Batch, Tx, hidden)
+        
+        query_with_time = tf.expand_dims(query, 1)
+        
+        # 1. 점수 계산 (Additive Attention)
+        score = self.V(tf.nn.tanh(self.W1(query_with_time) + self.W2(values)))
+        
+        # 2. 가중치 계산 (Softmax)
+        attention_weights = tf.nn.softmax(score, axis=1)
+        
+        # 3. 문맥 벡터 계산 (Weighted Sum)
+        context_vector = attention_weights * values
+        context_vector = tf.reduce_sum(context_vector, axis=1)
+        
+        return context_vector, attention_weights
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. 어텐션을 쓰면 모델이 무거워지지 않나요?} \\
+\textbf{A.} 네, 인코더의 모든 타임 스텝을 매번 연산해야 하므로 $T_x \times T_y$의 연산량이 추가됩니다. 하지만 성능 향상 폭이 워낙 커서 감수할 만한 비용입니다.
+
+\textbf{Q. 어텐션은 번역 말고 어디에 쓰이나요?} \\
+\textbf{A.} \textbf{이미지 캡셔닝}에서도 쓰입니다. 단어를 생성할 때마다 이미지의 특정 구역을 쳐다보는 식이죠.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+어텐션은 RNN의 한계를 부수고 성능을 극대화했습니다. 하지만 사람들은 깨달았습니다.
+\textbf{"어텐션이 이렇게 강력하다면, 굳이 느린 순차 방식(RNN)을 써야 할까? 그냥 어텐션만 쓰면 안 되나?"}
+
+여기서 딥러닝 역사를 바꾼 논문, \textbf{"Attention Is All You Need"}가 등장합니다.
+다음 시간, RNN과 CNN을 모두 버리고 오직 어텐션만으로 무장한 현대 AI의 심장, \textbf{[Transformer Network]}에 대해 알아보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Problem:} Seq2Seq 인코더의 고정 크기 벡터 병목 현상.
+    \item \textbf{Solution:} 디코더가 매 순간 인코더의 모든 부분을 연관성에 따라 참고한다.
+    \item \textbf{Formula:} $c^{\langle t \rangle} = \sum \alpha^{\langle t, t' \rangle} a^{\langle t' \rangle}$ (가중 평균).
+    \item \textbf{Benefit:} 긴 문장 번역 성능 비약적 상승 + 시각적 해석 가능.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

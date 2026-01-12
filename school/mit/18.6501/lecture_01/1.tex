@@ -1,0 +1,257 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex} % 한글 지원
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 통계학의 수학적 기초}}
+\author{Fundamentals of Statistics Notes}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 0: Probability Review (Prerequisites)
+    \item \textbf{\textcolor{mainblue}{Unit 1: Modeling, Identifiability, Likelihood (현재 단원)}}
+    \begin{itemize}
+        \item 1.1 Statistical Model
+        \item 1.2 Identifiability
+        \item 1.3 Likelihood Function
+    \end{itemize}
+    \item Unit 2: Maximum Likelihood Estimation (MLE)
+    \item Unit 3: Method of Moments
+    \item Unit 4: Hypothesis Testing
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 1. 통계적 모델링과 우도 (Modeling, Identifiability, Likelihood)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지난 시간(Unit 0)까지 우리는 확률론의 기초와 큰 수의 법칙(LLN), 중심극한정리(CLT)라는 무기를 손에 넣었습니다. 이제 이 무기를 가지고 현실 세계의 데이터를 분석하기 위해, 가장 먼저 해야 할 일은 \textbf{'데이터를 담을 수학적 그릇(모델)'}을 만드는 것입니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+통계학을 제대로 하기 위해서는 현실의 불확실한 데이터를 수학적으로 엄밀하게 정의해야 합니다. 이 단원에서는 데이터를 수학적 집합으로 변환하는 \textbf{통계적 모델(Statistical Model)}의 정의, 모델의 파라미터가 유일한지 확인하는 \textbf{식별 가능성(Identifiability)}, 그리고 데이터를 통해 파라미터를 추정하기 위한 도구인 \textbf{우도(Likelihood)}의 개념을 배웁니다. 이는 추후 배울 '최대우도추정(MLE)'을 위한 필수적인 기초 작업입니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{0.25\textwidth}|p{0.7\textwidth}|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Sample Space ($E$)} & 데이터가 나올 수 있는 모든 후보들의 집합 (무대) \\
+\hline
+\textbf{Parameter Space ($\Theta$)} & 우리가 찾고 싶은 정답($\theta$)이 숨어있는 범위 \\
+\hline
+\textbf{Statistical Model} & 데이터가 발생할 수 있는 확률 규칙들의 모음집 \\
+\hline
+\textbf{Identifiability} & 범인의 지문이 유일한가? (파라미터 구별 가능 여부) \\
+\hline
+\textbf{Likelihood ($L_n$)} & 이 데이터가 관측되었을 때, 범인이 $\theta$일 가능성 \\
+\hline
+\end{tabular}
+\end{table}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 통계적 모델 (Statistical Model)}
+
+\begin{conceptbox}{개념 1: 통계적 모델이란 무엇인가?}
+\textbf{한 줄 요약:} 현실의 막연한 데이터를 엄밀한 수학적 집합(Set)과 확률(Probability)로 번역하는 과정입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 맞춤 정장 만들기}
+현실의 데이터는 '사람의 몸'과 같습니다. 통계적 모델은 이 몸에 딱 맞는 '정장(수트)'을 만드는 과정입니다.
+\begin{itemize}
+    \item \textbf{표본 공간 ($E$):} 옷감이 될 수 있는 재료들입니다. (면인가? 실크인가?)
+    \item \textbf{파라미터 공간 ($\Theta$):} 옷의 치수 조절 범위입니다. (허리 20~40인치 사이)
+    \item \textbf{확률 분포 족 ($\{P_\theta\}$):} 치수($\theta$)에 따라 만들어지는 다양한 옷 디자인들입니다.
+\end{itemize}
+우리는 이 중에서 '내 몸(데이터)'에 가장 잘 맞는 옷($\theta$)을 찾고 싶은 것입니다.
+
+\subsubsection*{2) 기술적 정의 및 수학적 구조}
+통계적 모델은 쌍(Pair) $(E, \{P_\theta\}_{\theta \in \Theta})$으로 정의됩니다.
+\begin{enumerate}
+    \item \textbf{Sample Space ($E$):} 관측 데이터 $X$가 취할 수 있는 값들의 집합.
+    \item \textbf{Parameter Space ($\Theta$):} 미지수 $\theta$가 속한 집합. $\Theta \subseteq \mathbb{R}^k$.
+    \item \textbf{Probability Family ($P_\theta$):} $\theta$값 하나가 정해지면, 그에 대응하는 확률 분포 하나가 결정됩니다.
+\end{enumerate}
+
+\subsubsection*{3) 구체적 예시: 동전 던지기 (베르누이 모델)}
+우리가 앞면(1), 뒷면(0)이 나오는 동전을 던진다고 합시다.
+\begin{itemize}
+    \item $E = \{0, 1\}$ (동전은 0 아니면 1만 나옵니다.)
+    \item $\Theta = [0, 1]$ (앞면이 나올 확률 $p$는 0과 1 사이입니다.)
+    \item $\{P_\theta\}$ = 베르누이 분포 $\text{Ber}(p)$ 들의 집합.
+\end{itemize}
+
+\begin{warningbox}{오해 방지: 잘 정의된 모델(Well-specified)이란?}
+"모델을 세운다"는 것은 가정을 한다는 뜻입니다. 만약 실제 데이터는 '주사위(1~6)'인데, 모델을 '동전(0,1)'으로 세우면 어떻게 될까요?
+\begin{itemize}
+    \item 실제 데이터 생성 원리 $P$가 우리 모델 집합 $\{P_\theta\}$ 안에 없을 때, 이를 \textbf{Misspecified Model}이라고 합니다.
+    \item 반대로, 실제 자연의 법칙 $P$가 우리 모델 안에 포함되어 있다면 \textbf{Well-specified Model}이라고 합니다.
+\end{itemize}
+\end{warningbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 식별 가능성 (Identifiability)}
+
+\begin{conceptbox}{개념 2: 이 모델로 정답을 찾을 수 있는가?}
+\textbf{한 줄 요약:} 서로 다른 원인(파라미터)이 서로 다른 결과(분포)를 만들어야만, 결과를 보고 원인을 역추적할 수 있습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 범인의 지문}
+범죄 현장에서 지문을 채취했습니다(데이터).
+\begin{itemize}
+    \item \textbf{식별 가능:} 모든 사람의 지문이 다르다면, 지문을 보고 범인을 특정할 수 있습니다.
+    \item \textbf{식별 불가능:} 만약 철수와 영희의 지문이 똑같이 생겼다면? 지문을 확보해도 둘 중 누가 범인인지 알 수 없습니다.
+\end{itemize}
+
+\subsubsection*{2) 기술적 정의}
+함수 $\theta \mapsto P_\theta$가 \textbf{단사함수(Injective)}여야 합니다.
+즉,
+$$ \theta \neq \theta' \implies P_\theta \neq P_{\theta'} $$
+만약 서로 다른 $\theta$가 같은 $P_\theta$를 만든다면, 데이터가 무한히 많아도 $\theta$를 추정할 수 없습니다.
+
+\subsubsection*{3) 숫자 예시: 식별 불가능한 경우 (Non-identifiable)}
+어떤 데이터 $X$가 평균이 $\mu_1 + \mu_2$인 정규분포를 따른다고 가정해 봅시다.
+$$ X \sim \mathcal{N}(\mu_1 + \mu_2, 1) $$
+우리가 데이터에서 평균이 5라는 사실을 알아냈습니다.
+\begin{itemize}
+    \item 경우 A: $\mu_1 = 2, \mu_2 = 3$ $\rightarrow$ 합 5
+    \item 경우 B: $\mu_1 = 1, \mu_2 = 4$ $\rightarrow$ 합 5
+\end{itemize}
+$\mu_1$과 $\mu_2$의 조합은 무수히 많습니다. 데이터만으로는 절대 진짜 $(\mu_1, \mu_2)$를 찾을 수 없습니다. 이것이 \textbf{식별 불가능}입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 우도 (Likelihood)}
+
+\begin{conceptbox}{개념 3: 관점의 대전환}
+\textbf{한 줄 요약:} "데이터가 주어졌을 때, 이 파라미터가 정답일 점수는 몇 점인가?"를 계산하는 함수입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 명탐정 코난}
+\begin{itemize}
+    \item \textbf{확률(PDF):} 범인($\theta$)이 정해져 있을 때, 어떤 증거($x$)를 남길지 예측하는 것. (미래 예측)
+    \item \textbf{우도(Likelihood):} 증거($x$)가 이미 확보되었을 때, 누가 범인($\theta$)일지 추리하는 것. (과거 추론)
+\end{itemize}
+
+\subsubsection*{2) 기술적 정의: i.i.d와 결합 확률}
+데이터 $X_1, ..., X_n$이 서로 독립(Independent)이고 같은 분포(Identically Distributed)를 따른다고 가정합니다.
+우도 함수 $L_n(\theta)$는 결합 확률 밀도 함수(Joint PDF)와 식은 같지만, \textbf{주인공(변수)}이 다릅니다.
+$$ L_n(\theta) = \prod_{i=1}^n f(X_i; \theta) $$
+여기서 $X_i$는 이미 관측된 고정값(상수)이고, $\theta$가 변수입니다.
+
+\subsubsection*{3) 계산 예시: 불량품 찾기}
+공장에서 부품을 3개 뽑았는데 (양품, 양품, 불량)이 나왔습니다. 양품확률을 $p$라고 합시다. (1=양품, 0=불량)
+데이터: $X_1=1, X_2=1, X_3=0$.
+\begin{itemize}
+    \item \textbf{가설 A ($p=0.5$):} 공장이 반반 확률로 만듦.
+    $$ L_3(0.5) = 0.5 \times 0.5 \times (1-0.5) = 0.125 $$
+    \item \textbf{가설 B ($p=0.9$):} 공장이 90\% 확률로 잘 만듦.
+    $$ L_3(0.9) = 0.9 \times 0.9 \times (1-0.9) = 0.081 $$
+\end{itemize}
+결과: 이 데이터(양,양,불) 기준으로는 가설 A($p=0.5$)의 우도(0.125)가 더 높습니다. 즉, $p=0.5$일 가능성이 더 높다고 추론할 수 있습니다.
+
+\section{로그 우도 (Log-Likelihood)와 실전 적용}
+
+\subsection*{왜 로그를 취하는가?}
+우도 $L_n$은 확률의 곱셈($\prod$)입니다. $n$이 커지면 값이 0에 너무 가깝게 작아져서 컴퓨터가 계산하지 못합니다(Underflow).
+따라서 로그를 취해 \textbf{덧셈($\sum$)}으로 바꿉니다. 로그는 단조증가 함수이므로 최대값의 위치는 변하지 않습니다.
+$$ \ell_n(\theta) = \sum_{i=1}^n \log f(X_i; \theta) $$
+
+\subsection*{실전 시나리오: 사용자 체류 시간 분석}
+당신이 앱 서비스 기획자라고 가정합시다. 사용자의 체류 시간($T$)이 지수 분포 $f(t;\lambda) = \lambda e^{-\lambda t}$를 따른다고 모델링했습니다.
+\begin{enumerate}
+    \item \textbf{데이터 수집:} 3명의 유저가 각각 2분, 3분, 5분을 머물렀습니다. ($x_1=2, x_2=3, x_3=5$)
+    \item \textbf{우도 함수 구성:}
+    $$ L(\lambda) = (\lambda e^{-2\lambda}) \times (\lambda e^{-3\lambda}) \times (\lambda e^{-5\lambda}) = \lambda^3 e^{-10\lambda} $$
+    \item \textbf{로그 우도:}
+    $$ \ell(\lambda) = \log(\lambda^3 e^{-10\lambda}) = 3\log\lambda - 10\lambda $$
+    \item \textbf{최적화:} 이것을 미분해서 0이 되는 $\lambda$를 찾으면, 그것이 바로 가장 그럴듯한(Likely) 파라미터입니다.
+\end{enumerate}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 확률(Probability)과 우도(Likelihood)는 같은 거 아닌가요?]
+    \textbf{A.} 아니요, 정반대입니다! 
+    \begin{itemize}
+        \item 확률: $\theta$가 고정 $\rightarrow$ 데이터 $x$가 변수. (적분하면 1)
+        \item 우도: 데이터 $x$가 고정 $\rightarrow$ 파라미터 $\theta$가 변수. (적분해도 1이 아님)
+    \end{itemize}
+    
+    \item[Q2. 왜 식별 가능성(Identifiability)을 먼저 확인하나요?]
+    \textbf{A.} 식별 불가능한 모델을 가지고 우도 계산을 하는 것은, 답이 없는 문제를 열심히 푸는 것과 같습니다. 열심히 계산해서 우도가 최대인 지점을 찾아도, 그 $\theta$가 유일한 정답이라고 확신할 수 없기 때문입니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 이제 '우도 함수'라는 강력한 점수판을 만들었습니다. 다음 단원인 \textbf{Unit 2}에서는 미분(Calculus)을 사용하여 이 우도 함수를 \textbf{최대화(Maximum)} 시키는 $\theta$, 즉 \textbf{MLE(Maximum Likelihood Estimator)}를 구하는 법을 본격적으로 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 1 핵심 요약}
+\begin{itemize}
+    \item \textbf{통계적 모델:} 데이터를 설명하기 위한 수학적 가정 $(E, \{P_\theta\})$.
+    \item \textbf{식별 가능성:} 파라미터가 다르면 분포도 달라야 한다 ($\theta \neq \theta' \implies P_\theta \neq P_{\theta'}$). 이것이 보장되어야 추정이 가능하다.
+    \item \textbf{우도(Likelihood):} 관측된 데이터 $X$를 고정하고, 파라미터 $\theta$를 변화시키며 '가능성'을 측정하는 함수.
+    \item \textbf{로그 우도:} 계산의 편의성과 미분을 위해 우도에 로그를 취한 형태 ($\sum \log f$).
+\end{itemize}
+\end{summarybox}
+
+\end{document}

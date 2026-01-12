@@ -1,0 +1,251 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 증명)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Convolutional Neural Networks: \\ Inception Network \& 1x1 Convolutions}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-8.] Deep Learning Strategy \& Architecture \textit{- Completed}
+    \item[\textbf{Chapter 9.}] \textbf{Convolutional Neural Networks (Current Part)}
+    \begin{itemize}
+        \item 9.1-9.4 CNN Basics, Classic Nets, ResNet \textit{- Completed}
+        \item \textbf{9.5 Inception Network}
+        \begin{itemize}
+            \item The Magic of $1 \times 1$ Convolution
+            \item Inception Module (Naive vs Optimized)
+            \item Bottleneck Layer (Computational Cost Reduction)
+            \item Implementation with Keras
+        \end{itemize}
+        \item 9.6 Object Detection Introduction \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 ResNet을 통해 신경망을 "깊게(Deep)" 쌓는 법을 배웠습니다.
+그런데 구글 연구팀은 전혀 다른 질문을 던졌습니다.
+\textbf{"필터 크기를 꼭 하나만 골라야 하나? $1 \times 1$, $3 \times 3$, $5 \times 5$를 다 쓰면 안 되나?"}
+이 단순하고 무식해 보이는 아이디어에서 출발하여, 연산 효율성을 극대화한 아키텍처가 바로 \textbf{Inception Network}입니다. 그리고 이를 가능하게 만든 숨은 공신은 \textbf{$1 \times 1$ Convolution}입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 CNN의 효율성 혁명을 이끈 Inception 구조와 핵심 기술을 다룹니다.
+\begin{itemize}
+    \item \textbf{1x1 Conv:} 채널 수를 조절하여 연산량을 줄이는 \textbf{Network in Network} 개념을 이해합니다.
+    \item \textbf{Inception Module:} 다양한 크기의 필터를 병렬로 수행하고 합치는 구조를 파악합니다.
+    \item \textbf{Bottleneck:} $1 \times 1$ 합성곱을 통해 연산 비용을 \textbf{1/10 수준}으로 줄이는 원리를 증명합니다.
+    \item \textbf{구현:} 복잡한 분기(Branch) 구조를 Keras로 구현합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{핵심 역할} \\ \hline
+\textbf{$1 \times 1$ Convolution} & $1 \times 1 \times C$ 필터 연산 & \textbf{채널 수 조절 (Dimensionality Reduction)}. \\ \hline
+\textbf{Bottleneck Layer} & 입력을 압축하는 층 & 연산량을 획기적으로 줄임. \\ \hline
+\textbf{Inception Module} & 병렬 연산 블록 & 다양한 스케일의 특징을 동시에 추출함. \\ \hline
+\textbf{Concatenate} & 이어 붙이기 & 병렬로 나온 결과들을 채널 축으로 합침. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 수도꼭지를 잠가라}
+
+\subsection{1. The Magic of $1 \times 1$ Convolution}
+"교수님, $1 \times 1$ 필터면 그냥 숫자 하나 곱하는 거 아닙니까?"
+2D 이미지에서는 그렇습니다. 하지만 입체적인 볼륨($H \times W \times C$)에서는 다릅니다.
+
+
+
+\begin{itemize}
+    \item \textbf{연산:} $1 \times 1 \times \mathbf{192}$ (입력 채널 수) 크기의 필터가 입력을 훑습니다.
+    \item \textbf{효과:} 채널 방향으로 FC Layer를 적용하는 것과 같습니다. 필터 개수를 32개로 설정하면, 출력 채널은 32개가 됩니다. \textbf{(192 $\to$ 32 압축)}
+\end{itemize}
+
+\subsection{2. Bottleneck Layer (비용 절감의 핵심)}
+이 섹션이 오늘 강의의 하이라이트입니다. 숫자로 증명합니다.
+
+\begin{mathbox}{Computational Cost Analysis}
+\textbf{상황:} 입력 $28 \times 28 \times 192$ $\to$ 출력 $28 \times 28 \times 32$ (using $5 \times 5$ conv).
+
+\textbf{1. Naive Approach (그냥 $5 \times 5$ 사용):}
+$$ \text{Cost} = (28 \times 28 \times 32) \times (5 \times 5 \times 192) \approx \mathbf{120,000,000} \text{ (1.2억)} $$
+
+\textbf{2. Bottleneck Approach ($1 \times 1$로 줄이고 $5 \times 5$ 사용):}
+(1) $1 \times 1$로 192ch $\to$ 16ch 압축 (중간 단계)
+$$ (28 \times 28 \times 16) \times (1 \times 1 \times 192) \approx 2,400,000 $$
+(2) $5 \times 5$로 16ch $\to$ 32ch 확장 (최종 단계)
+$$ (28 \times 28 \times 32) \times (5 \times 5 \times 16) \approx 10,000,000 $$
+\textbf{총합:} $2.4M + 10M = \mathbf{12.4M}$
+
+\textbf{결과:} 연산량이 약 \textbf{1/10}로 줄었습니다. 성능 저하는 거의 없습니다.
+\end{mathbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Inception Module Architecture}
+
+구글은 고민했습니다. "$3 \times 3$을 쓸까, $5 \times 5$를 쓸까?"
+결론은 \textbf{"그냥 다 하자(Do them all)"}였습니다.
+
+
+
+\begin{itemize}
+    \item \textbf{구조:} $1 \times 1$, $3 \times 3$, $5 \times 5$, Max Pooling을 병렬로 수행합니다.
+    \item \textbf{병합:} 나온 결과들의 크기($28 \times 28$)를 맞추고(Padding='same'), 채널 축으로 이어 붙입니다(Concatenate).
+    \item \textbf{최적화:} $3 \times 3$과 $5 \times 5$ 앞에는 반드시 \textbf{$1 \times 1$ 병목 층}을 두어 연산량을 줄입니다.
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Inception Block with Keras}
+
+Keras Functional API를 사용해야 복잡한 분기(Branch) 구조를 짤 수 있습니다.
+
+\begin{lstlisting}[language=Python, caption=Inception Module Implementation, breaklines=true]
+from tensorflow.keras import layers
+
+def inception_module(x, filters):
+    """
+    x: 입력 텐서
+    filters: 각 분기별 필터 개수 딕셔너리
+    """
+    
+    # Branch 1: 1x1 Conv
+    path1 = layers.Conv2D(filters['f1x1'], (1, 1), padding='same', activation='relu')(x)
+    
+    # Branch 2: 1x1 (Reduce) -> 3x3
+    path2 = layers.Conv2D(filters['f3x3_reduce'], (1, 1), padding='same', activation='relu')(x)
+    path2 = layers.Conv2D(filters['f3x3'], (3, 3), padding='same', activation='relu')(path2)
+    
+    # Branch 3: 1x1 (Reduce) -> 5x5
+    path3 = layers.Conv2D(filters['f5x5_reduce'], (1, 1), padding='same', activation='relu')(x)
+    path3 = layers.Conv2D(filters['f5x5'], (5, 5), padding='same', activation='relu')(path3)
+    
+    # Branch 4: MaxPool -> 1x1
+    path4 = layers.MaxPooling2D((3, 3), strides=(1, 1), padding='same')(x)
+    path4 = layers.Conv2D(filters['pool_proj'], (1, 1), padding='same', activation='relu')(path4)
+    
+    # 병합 (Concatenate)
+    output = layers.concatenate([path1, path2, path3, path4], axis=3)
+    
+    return output
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. 정보를 압축했다가 늘려도 손실이 없나요?} \\
+\textbf{A.} 네, 괜찮습니다. 이미지 데이터에는 \textbf{중복성(Redundancy)}이 많기 때문입니다. $1 \times 1$ 층은 필요한 핵심 정보만 압축(Linear Combination)해서 다음 층에 넘겨주는 역할을 합니다.
+
+\textbf{Q. Max Pooling 뒤에 왜 $1 \times 1$ Conv를 붙이나요?} \\
+\textbf{A.} 풀링은 채널 수를 줄이지 못합니다. 인셉션 모듈을 거칠 때마다 채널이 계속 늘어나는 것을 막기 위해, 풀링 뒤에 $1 \times 1$을 붙여 채널 수를 강제로 줄여줍니다(Projection).
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+우리는 이제 이미지를 분류(Classification)하는 최고의 아키텍처들을 모두 섭렵했습니다 (VGG, ResNet, Inception).
+
+하지만 현실 세계에서는 이미지에 무엇이 있는지만 아는 것으로는 부족합니다. \textbf{"그 물체가 어디에 있는지(위치)"}도 알아야 합니다.
+다음 시간에는 컴퓨터 비전의 꽃, \textbf{[Object Detection]}으로 넘어갑니다. 그중에서도 실시간 객체 탐지의 혁명, \textbf{YOLO (You Only Look Once)} 알고리즘을 향한 여정을 시작해 보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{$1 \times 1$ Conv:} 채널 수를 줄여 연산량을 아끼는 핵심 도구.
+    \item \textbf{Inception:} 여러 필터를 병렬로 사용하여 다양한 특징을 동시에 잡는다.
+    \item \textbf{Bottleneck:} 큰 필터 앞에 $1 \times 1$을 두어 입력을 압축한다. (비용 1/10 절감)
+    \item \textbf{Concatenate:} 병렬 연산 결과를 채널 축으로 합친다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

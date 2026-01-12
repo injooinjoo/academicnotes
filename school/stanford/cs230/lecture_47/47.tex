@@ -1,0 +1,213 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (핵심 수식)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Beam Search (Optimization)}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1-10.8 RNN, Embedding, Seq2Seq \textit{- Completed}
+        \item \textbf{10.9 Beam Search}
+        \begin{itemize}
+            \item Greedy Search vs Beam Search
+            \item Beam Width Parameter ($B$)
+            \item Refinements: Log Likelihood \& Length Normalization
+        \end{itemize}
+    \end{itemize}
+    \item[Chapter 11.] Attention Mechanism \textit{- Next Part}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 Seq2Seq 모델로 번역기를 만들었습니다. 그런데 막상 돌려보니 엉뚱한 문장이 나옵니다.
+이유는 우리가 \textbf{'당장의 최선(Greedy)'}만 선택했기 때문입니다. 1등만 뽑아서 문장을 이었더니 전체 문맥은 엉망이 된 것이죠.
+인생과 마찬가지로, "당장의 최선이 결과적인 최선은 아닐 수" 있습니다. 여러 가능성을 동시에 탐색하는 \textbf{빔 서치(Beam Search)}가 필요합니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 텍스트 생성 모델의 성능을 결정짓는 탐색 알고리즘을 다룹니다.
+\begin{itemize}
+    \item \textbf{Greedy:} 매 순간 1등만 뽑는 방식의 한계(Local Optima)를 이해합니다.
+    \item \textbf{Beam:} 상위 $B$개의 가능성을 살려두며 탐색하는 원리를 파악합니다.
+    \item \textbf{Refinement:} 로그 우도(Log Likelihood)와 길이 정규화(Length Normalization)를 통해 수학적 안정성을 확보합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{특징} \\ \hline
+\textbf{Greedy Search} & 매번 확률 1등 단어만 선택. & 빠르지만 최적해 보장 못함. \\ \hline
+\textbf{Beam Search} & 매번 상위 $B$개를 유지하며 탐색. & 느리지만 더 좋은 문장 생성. \\ \hline
+\textbf{Beam Width ($B$)} & 유지할 후보 개수 (보통 3~10). & $B=1$이면 Greedy와 같음. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 여러 길을 동시에 가라}
+
+\subsection{1. The Problem: Greedy Search}
+
+매 스텝에서 확률이 가장 높은 단어 1개만 고르고 다음으로 넘어갑니다.
+\begin{analogybox}{미로 찾기}
+갈림길에서 무조건 "출구와 가까워 보이는 쪽"으로만 가는 것과 같습니다. 가다 보니 막다른 길일 수 있지만, 되돌아갈 수 없습니다(No Backtracking).
+\end{analogybox}
+
+\subsection{2. The Solution: Beam Search}
+
+매 순간 상위 $B$개의 가능성(Hypothesis)을 유지합니다. ($B=3$ 가정)
+
+\begin{itemize}
+    \item \textbf{Step 1:} 첫 단어 후보 중 상위 3개를 뽑습니다. (예: "in", "the", "a")
+    \item \textbf{Step 2:} 살아남은 3개의 단어 각각에 대해, 다음 단어 확률을 계산합니다.
+    \item \textbf{Step 3:} 총 30,000개(3 $\times$ 단어장) 조합 중 다시 상위 3등까지만 남기고 나머지는 버립니다.
+    \item \textbf{Repeat:} 문장이 끝날 때까지 반복합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Refinements (정밀화)}
+
+단순 확률 곱셈에는 수학적 문제가 있습니다. 이를 보정해야 합니다.
+
+\subsection{1. Log Likelihood (로그 우도)}
+확률(0.1, 0.05...)을 수십 번 곱하면 값이 $0.0000\dots$이 되어 컴퓨터가 0으로 인식해버립니다 (\textbf{Underflow}).
+해결책은 \textbf{로그($\log$)}를 취하는 것입니다. 곱셈이 덧셈으로 변합니다.
+
+\begin{formulabox}{Score Function}
+$$ \sum_{t=1}^{T_y} \log P(y^{\langle t \rangle} | y^{\langle 1 \dots t-1 \rangle}, x) $$
+로그 합을 최대화하는 것은 확률 곱을 최대화하는 것과 수학적으로 동일합니다.
+\end{formulabox}
+
+\subsection{2. Length Normalization (길이 정규화)}
+로그 확률(음수)을 계속 더하면, 문장이 길어질수록 점수는 계속 낮아집니다. 모델이 \textbf{"짧은 문장"}을 과도하게 선호하게 됩니다.
+해결책은 점수를 문장 길이($T_y$)로 나누어 \textbf{평균}을 내는 것입니다.
+
+\begin{formulabox}{Normalized Score}
+$$ \text{Score} = \frac{1}{T_y^\alpha} \sum \log P(\dots) $$
+\begin{itemize}
+    \item $\alpha$: 보정 계수 (보통 0.7).
+    \item 긴 문장에 대한 페널티를 완화해줍니다.
+\end{itemize}
+\end{formulabox}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. $B$를 무조건 크게 하면 좋은가요?} \\
+\textbf{A.} 아닙니다. $B$가 크면 더 좋은 문장을 찾을 확률은 높지만, 계산량과 메모리가 $B$배로 늘어납니다. 실무에서는 보통 $B=3 \sim 10$ 정도를 쓰며, 아주 정밀한 번역이 필요할 때만 더 키웁니다.
+
+\textbf{Q. 빔 서치는 최적해(Global Optima)를 보장하나요?} \\
+\textbf{A.} 아니요. $B$가 무한대(BFS)가 아닌 이상, 휴리스틱 탐색이므로 완벽한 최적해를 보장하진 않습니다. 하지만 Greedy보다는 훨씬 낫습니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+빔 서치로 문장 생성 능력은 좋아졌습니다. 하지만 여전히 근본적인 문제가 남았습니다.
+Seq2Seq의 인코더는 아무리 긴 문장이라도 \textbf{하나의 고정된 벡터(Context Vector)}에 욱여넣어야 한다는 \textbf{'병목(Bottleneck)'} 현상입니다.
+
+\textbf{"번역할 때 문장 전체를 외우고 하는 사람은 없습니다. 필요한 단어를 그때그때 다시 보면서(Attention) 하죠."}
+다음 시간에는 딥러닝 역사상 가장 위대한 발명 중 하나인 \textbf{[Attention Mechanism]}을 통해 이 병목을 부수고 Transformer로 가는 문을 열겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Greedy:} 빠르지만 시야가 좁아 최적 문장을 놓친다.
+    \item \textbf{Beam Search:} $B$개의 유망주를 끝까지 키운다.
+    \item \textbf{Log:} 언더플로우 방지를 위해 확률 곱 대신 로그 합을 쓴다.
+    \item \textbf{Normalize:} 짧은 문장 편향을 막기 위해 길이로 나눈다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

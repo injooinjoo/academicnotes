@@ -1,0 +1,249 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Optimization Algorithms: \\ Batch Normalization}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1-5.5 Regularization \& Data Setup \textit{- Completed}
+        \item 5.6-5.10 Optimization (Adam, Tuning) \textit{- Completed}
+        \item \textbf{5.11 Batch Normalization}
+        \begin{itemize}
+            \item Concept: Internal Covariate Shift
+            \item The Algorithm: Norm, Scale, Shift
+            \item Train Mode vs Test Mode (Running Average)
+            \item Implementation
+        \end{itemize}
+        \item 5.12 Softmax Regression \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 가중치 초기화와 하이퍼파라미터 튜닝을 통해 모델 성능을 높였습니다. 하지만 층이 깊어질수록 여전히 학습이 불안정하고, 학습률을 조금만 높여도 발산해버리는 문제가 발생합니다.
+이유는 \textbf{앞단 층의 파라미터가 바뀌면, 뒷단 층으로 넘어오는 데이터의 분포가 계속 바뀌기 때문}입니다. 뒷단 층 입장에서는 계속 흔들리는 땅 위에서 균형을 잡으려는 것과 같습니다.
+이를 해결하기 위해 2015년, \textbf{"데이터 분포를 강제로 고정시키자"}는 혁명적인 아이디어가 등장합니다. 바로 \textbf{배치 정규화(Batch Normalization)}입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 딥러닝 역사상 가장 위대한 발명 중 하나인 \textbf{배치 정규화}의 원리와 구현을 다룹니다.
+\begin{itemize}
+    \item \textbf{원인:} 학습을 방해하는 \textbf{내부 공변량 변화(Internal Covariate Shift)} 현상을 이해합니다.
+    \item \textbf{알고리즘:} 미니 배치 단위로 평균/분산을 정규화하고, \textbf{Scale($\gamma$) \& Shift($\beta$)} 파라미터로 복원하는 과정을 유도합니다.
+    \item \textbf{차이:} 학습(Train) 때는 배치 통계량을, 추론(Test) 때는 \textbf{이동 평균(Running Average)}을 써야 함을 배웁니다.
+    \item \textbf{구현:} 두 가지 모드를 지원하는 BN 클래스를 Python으로 구현합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어/기호} & \textbf{의미} & \textbf{역할} \\ \hline
+\textbf{Batch Norm} & 배치 정규화 & 은닉층의 활성화 값을 정규 분포로 만듦. \\ \hline
+\textbf{Gamma ($\gamma$)} & 스케일 파라미터 & 정규화된 값의 \textbf{분산}을 조절 (학습 가능). \\ \hline
+\textbf{Beta ($\beta$)} & 시프트 파라미터 & 정규화된 값의 \textbf{평균}을 조절 (학습 가능). \\ \hline
+\textbf{Running Stats} & 이동 평균 통계량 & 테스트 시 사용하기 위해 학습 중 누적해둔 평균/분산. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 흔들리는 땅 고정하기}
+
+\subsection{1. Internal Covariate Shift (내부 공변량 변화)}
+
+
+\begin{analogybox}{흔들리는 다리 위에서 걷기}
+\begin{itemize}
+    \item \textbf{Without BN:} 앞사람(Layer 1)이 발을 구를 때마다 다리가 흔들립니다. 뒷사람(Layer 2)은 중심 잡느라 앞으로 나아갈 수가 없습니다. (학습 속도 저하)
+    \item \textbf{With BN:} 각 층마다 \textbf{"발판을 수평으로 고정(Normalize)"}해줍니다. 뒷사람은 앞사람의 움직임에 상관없이 안정적으로 달릴 수 있습니다. (학습 속도 비약적 향상)
+\end{itemize}
+\end{analogybox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. The Algorithm: Norm, Scale, Shift}
+은닉층의 값 $Z$에 대해 미니 배치 단위로 4단계를 수행합니다.
+
+\begin{enumerate}
+    \item \textbf{Mean:} $\mu = \frac{1}{m} \sum z^{(i)}$
+    \item \textbf{Variance:} $\sigma^2 = \frac{1}{m} \sum (z^{(i)} - \mu)^2$
+    \item \textbf{Normalize:} $z_{norm} = \frac{z - \mu}{\sqrt{\sigma^2 + \epsilon}}$ \quad ($\epsilon$: 0 나누기 방지)
+    \item \textbf{Scale \& Shift (핵심):} $\tilde{z} = \gamma z_{norm} + \beta$
+\end{enumerate}
+
+\begin{warningbox}{왜 다시 $\gamma, \beta$로 망가뜨리나요?}
+무조건 평균 0, 분산 1로 고정하면, 데이터가 Sigmoid의 선형 구간(가운데)에만 몰리게 되어 \textbf{비선형성(표현력)을 잃게 됩니다.}
+$\gamma$와 $\beta$를 학습 가능하게 두어, "필요하다면 원래 분포로 되돌릴 수 있는 자유"를 모델에게 주는 것입니다.
+\end{warningbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Train vs Test Mode}
+
+배치 정규화 구현에서 가장 중요한 포인트입니다.
+
+\begin{itemize}
+    \item \textbf{Training Mode:} 현재 들어온 \textbf{미니 배치의 평균/분산}을 계산해서 씁니다. 동시에 이 값들을 `running_mean`, `running_var`에 누적(업데이트)해둡니다.
+    \item \textbf{Test Mode:} 테스트 때는 데이터가 1개만 들어올 수도 있습니다(분산 계산 불가). 따라서 학습 때 미리 저장해둔 \textbf{`running_mean`, `running_var`}를 가져와서 정규화합니다.
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Batch Norm Class}
+
+\begin{lstlisting}[language=Python, caption=Batch Normalization Implementation, breaklines=true]
+import numpy as np
+
+class BatchNorm:
+    def __init__(self, n_features, momentum=0.9):
+        self.gamma = np.ones((n_features, 1)) # 초기값 1 (변화 없음)
+        self.beta = np.zeros((n_features, 1)) # 초기값 0 (변화 없음)
+        
+        # 테스트 단계를 위한 메모리 (Running Stats)
+        self.running_mean = np.zeros((n_features, 1))
+        self.running_var = np.ones((n_features, 1))
+        self.momentum = momentum
+        self.epsilon = 1e-8
+
+    def forward(self, Z, mode='train'):
+        if mode == 'train':
+            # 1. 미니 배치 통계량 계산
+            mu = np.mean(Z, axis=1, keepdims=True)
+            var = np.var(Z, axis=1, keepdims=True)
+            
+            # 2. 정규화
+            Z_norm = (Z - mu) / np.sqrt(var + self.epsilon)
+            
+            # 3. Running Stats 업데이트 (지수 가중 평균)
+            # 역전파와 무관하게 별도로 기록해둠
+            self.running_mean = self.momentum * self.running_mean + (1 - self.momentum) * mu
+            self.running_var = self.momentum * self.running_var + (1 - self.momentum) * var
+            
+        elif mode == 'test':
+            # 테스트 시에는 저장해둔 통계량 사용
+            Z_norm = (Z - self.running_mean) / np.sqrt(self.running_var + self.epsilon)
+            
+        # 4. Scale and Shift (공통)
+        out = self.gamma * Z_norm + self.beta
+        return out
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. BN을 쓰면 왜 $b$(Bias)를 없애도 되나요?} \\
+\textbf{A.} $Z = WX + b$에서 평균 $\mu$를 빼는 과정($Z - \mu$) 때문에 상수 $b$는 어차피 상쇄되어 사라집니다. 대신 BN의 $\beta$가 편향 역할을 대신합니다.
+
+\textbf{Q. BN은 어디에 넣나요? Activation 전? 후?} \\
+\textbf{A.} 원래 논문(Andrew Ng 스타일)은 \textbf{Activation 전}($Z \to BN \to A$)을 권장합니다. 하지만 최근에는 후($Z \to A \to BN$)에 넣는 경우도 많습니다. 둘 다 잘 동작합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 딥러닝 모델의 성능을 극한으로 끌어올리는 모든 도구(초기화, 정규화, 최적화, 배치 정규화)를 손에 넣었습니다.
+
+지금까지는 '고양이 vs 개'처럼 답이 두 개인 이진 분류만 다뤘습니다. 하지만 세상에는 답이 여러 개인 문제가 더 많습니다. (숫자 0~9, 옷 종류 등)
+다음 시간에는 여러 개의 클래스를 동시에 분류하는 \textbf{[Softmax Regression]}에 대해 다루겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Batch Norm:} 각 층의 입력을 정규화하여 학습을 안정화하고 가속한다.
+    \item \textbf{Gamma/Beta:} 정규화로 잃어버린 표현력을 복구하기 위한 학습 파라미터.
+    \item \textbf{Train/Test:} 학습 시엔 배치 통계량, 테스트 시엔 이동 평균(Running Avg)을 쓴다.
+    \item \textbf{Effect:} 초기화에 덜 민감해지고, 높은 학습률을 쓸 수 있다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

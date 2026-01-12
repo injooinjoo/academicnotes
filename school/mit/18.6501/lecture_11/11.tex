@@ -1,0 +1,256 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 5}
+\fancyhead[R]{Principal Component Analysis}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 데이터의 본질을 찾아서}}
+\author{Unit 5: Principal Component Analysis (PCA)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 3: Linear Regression (정답 $Y$를 맞추는 지도 학습)
+    \item Unit 4: Density Estimation (데이터의 분포 모양 추정)
+    \item \textbf{\textcolor{mainblue}{Unit 5: Principal Component Analysis (현재 단원: 데이터 구조 파악 및 압축)}}
+    \begin{itemize}
+        \item 5.1 Philosophy: Variance is Information
+        \item 5.2 Geometric Interpretation
+        \item 5.3 Covariance Matrix \& Eigen-decomposition
+        \item 5.4 Dimension Reduction Process
+    \end{itemize}
+    \item Unit 6: Clustering (K-means, Hierarchical)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 5. 주성분 분석 (PCA)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 4에서 우리는 데이터의 밀도(Density)를 추정했습니다. 하지만 데이터의 차원($p$)이 커지면 밀도 추정은 급격히 어려워집니다(차원의 저주). "변수가 100개나 되는데, 이걸 다 써야 하나? 중요한 것 몇 개만 추릴 순 없을까?" 이 질문에 답하기 위해, 우리는 데이터의 핵심 정보만 남기고 껍데기를 버리는 \textbf{차원 축소(Dimensionality Reduction)}의 세계로 들어갑니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+PCA는 고차원 데이터의 정보를 최대한 보존하면서 저차원으로 압축하는 기법입니다. \textbf{"분산(Variance)이 곧 정보(Information)"}라는 철학을 바탕으로, 데이터의 분산을 최대화하는 새로운 축(주성분)을 찾습니다. 이 과정은 수학적으로 \textbf{공분산 행렬의 고유값 분해(Eigenvalue Decomposition)} 문제로 귀결됩니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Variance (분산)} & 데이터가 퍼진 정도. PCA에서는 이를 '정보량'으로 해석함. \\
+\hline
+\textbf{Principal Component (PC)} & 데이터를 가장 잘 설명하는 새로운 좌표축 (방향). \\
+\hline
+\textbf{Orthogonality (직교성)} & PC1과 PC2는 수직이다. 즉, 서로 겹치는 정보가 없다. \\
+\hline
+\textbf{Eigenvector ($v$)} & 새로운 축의 '방향'. \\
+\hline
+\textbf{Eigenvalue ($\lambda$)} & 그 축이 설명하는 정보의 '크기' (분산의 양). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 차원 축소의 철학: 분산은 정보다}
+
+\begin{conceptbox}{개념 1: 심장 박동기 모니터}
+\textbf{한 줄 요약:} 변화가 없는(분산 0) 데이터는 죽은 데이터입니다. 요동치는(분산 큰) 데이터가 살아있는 정보입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유}
+병원 모니터의 심전도 그래프를 상상해 보세요.
+\begin{itemize}
+    \item \textbf{일직선 ($Var=0$):} 환자가 사망했습니다. 정보가 없습니다.
+    \item \textbf{위아래로 뜀 ($Var > 0$):} 환자가 살아있습니다. 분석할 정보가 있습니다.
+    \item \textbf{결론:} 데이터가 넓게 퍼져 있을수록, 서로를 구별할 수 있는 정보가 많습니다. 따라서 우리는 \textbf{분산이 가장 큰 방향}을 찾고 싶습니다.
+\end{itemize}
+
+\subsubsection*{2) 차원의 저주 탈출}
+변수(차원)가 많으면 계산도 힘들고 시각화도 불가능합니다. 정보량이 적은(분산이 작은) 변수는 과감히 버려서, 핵심만 남기는 것이 목표입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 기하학적 해석: 최적의 좌표축 찾기}
+
+
+\begin{conceptbox}{개념 2: 럭비공 돌리기}
+\textbf{한 줄 요약:} 데이터 구름(Cloud)의 모양에 맞춰서 좌표축을 회전시킵니다. 가장 길쭉한 쪽이 $x$축(PC1), 그 다음 넓은 쪽이 $y$축(PC2)이 되도록요.
+\end{conceptbox}
+
+\subsubsection*{1) 첫 번째 주성분 (PC1)}
+데이터 점들을 가장 길게 통과하는 직선입니다.
+\begin{itemize}
+    \item 기하학적으로는, 데이터 점들을 직선에 투영(Projection)했을 때 그 그림자들이 가장 넓게 퍼지는 선입니다.
+    \item 동시에, 데이터 점들과 직선 사이의 수직 거리(Reconstruction Error)를 최소화하는 선입니다.
+\end{itemize}
+
+\subsubsection*{2) 두 번째 주성분 (PC2)}
+PC1과 반드시 \textbf{수직(Orthogonal)}이면서, 남은 분산을 가장 잘 설명하는 방향입니다.
+\begin{itemize}
+    \item \textbf{Why Orthogonal?} PC1이 이미 설명한 정보와 겹치지 않는, 완전히 \textbf{새로운 정보(Independent Information)}만 담기 위해서입니다. 이를 통해 변수 간의 상관관계를 제거(Decorrelation)합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 수학적 엔진: 공분산 행렬과 고유값 분해}
+
+\begin{conceptbox}{개념 3: 모든 것은 고유값 문제로 통한다}
+\textbf{한 줄 요약:} "분산을 최대화하는 축을 찾아라"라는 복잡한 미적분 문제가, 놀랍게도 선형대수의 $Av = \lambda v$를 푸는 문제로 바뀝니다.
+\end{conceptbox}
+
+\subsubsection*{Step 1: 표본 공분산 행렬 ($S$)}
+데이터 $\mathbf{X}$ (중심화됨, Mean=0)에 대해:
+$$ S = \frac{1}{n-1} \mathbf{X}^T \mathbf{X} $$
+이 행렬은 변수들끼리 얼마나 같이 움직이는지(Correlation)를 담고 있습니다. 우리의 목표는 이 상관성을 없애는(대각화하는) 것입니다.
+
+\subsubsection*{Step 2: 스펙트럼 정리 (Spectral Theorem)}
+$S$는 대칭 행렬(Symmetric Matrix)입니다. 선형대수학의 스펙트럼 정리에 의해, 대칭 행렬은 반드시 \textbf{실수 고유값}을 가지며, 그 \textbf{고유벡터들은 서로 직교}합니다.
+\begin{itemize}
+    \item 즉, 우리가 억지로 직교하는 축을 찾을 필요가 없습니다. 수학적으로 이미 직교하는 축(고유벡터)이 존재함이 보장됩니다.
+\end{itemize}
+
+\subsubsection*{Step 3: 고유값 분해 (The Solution)}
+$$ S v_j = \lambda_j v_j $$
+\begin{itemize}
+    \item \textbf{고유벡터 ($v_j$):} 우리가 찾던 새로운 축의 \textbf{방향} (Principal Component).
+    \item \textbf{고유값 ($\lambda_j$):} 그 축 방향으로의 \textbf{분산의 크기} (정보량).
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 차원 축소의 실행 (Dimension Reduction)}
+
+\begin{conceptbox}{개념 4: 정보의 압축}
+\textbf{한 줄 요약:} 중요도가 낮은(고유값이 작은) 축은 과감히 버립니다.
+\end{conceptbox}
+
+\subsubsection*{절차}
+\begin{enumerate}
+    \item 고유값들을 크기순으로 나열합니다: $\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_p$.
+    \item \textbf{Scree Plot}을 그려보거나, 누적 기여율(Cumulative Variance Ratio)을 확인합니다.
+    $$ \frac{\sum_{i=1}^k \lambda_i}{\sum_{j=1}^p \lambda_j} \ge 0.95 \quad (\text{95\% 정보 보존}) $$
+    \item 상위 $k$개의 고유벡터만 남기고 나머지는 버립니다.
+    \item 데이터를 이 $k$개의 축으로 투영(Projection)하여 차원을 $p \to k$로 줄입니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 유저 세분화 (User Segmentation)}
+
+\begin{storybox}{Scenario: 너무 많은 게임 지표들}
+당신은 넥슨의 데이터 분석가입니다. 유저들의 플레이 패턴을 분석하려고 보니 지표가 너무 많습니다.
+(변수 20개: 총 킬 수, 데스 수, 어시스트, 가한 피해량, 받은 피해량, 힐량, 타워 철거 수, CS, 골드 획득량...)
+변수가 20개라 시각화도 안 되고, 군집화(Clustering)를 돌려도 결과가 엉망입니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{문제:} 변수 간 상관관계가 너무 높습니다. (킬 많이 하면 골드도 많고 피해량도 높음).
+    \item \textbf{PCA 적용:} 20차원 데이터를 입력하여 주성분 분석을 수행합니다.
+    \item \textbf{결과 해석:}
+    \begin{itemize}
+        \item \textbf{PC1 (설명력 60\%):} 킬, 딜량, 골드 등 '전투/성장' 관련 변수들이 모두 양의 가중치를 가짐. $\rightarrow$ 해석: \textbf{"실력(Skill) 지표"}
+        \item \textbf{PC2 (설명력 20\%):} 받은 피해량, 힐량은 높고 킬은 낮음. $\rightarrow$ 해석: \textbf{"탱킹/서포팅 성향"}
+    \end{itemize}
+    \item \textbf{활용:} 20개의 변수 대신, (Skill, Style)이라는 단 2개의 변수로 유저를 2차원 평면에 찍어봅니다. 유저 그룹이 명확하게 보이기 시작합니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 축을 돌리면 데이터의 의미가 변하지 않나요?]
+    \textbf{A.} 네, 변합니다. 원래 변수는 "키", "몸무게"처럼 물리적 의미가 명확했지만, PCA로 만들어진 PC1은 "$0.7 \times \text{키} + 0.3 \times \text{몸무게}$" 같은 섞인 값이 됩니다. 이를 "크기(Size)"라고 해석할지는 분석가의 몫입니다. \textbf{해석력(Interpretability)을 잃는 대신, 요약력(Summarization)을 얻는 것}입니다.
+    
+    \item[Q2. 데이터 스케일링(Scaling)을 꼭 해야 하나요?]
+    \textbf{A.} 필수입니다! 만약 키는 cm(170), 몸무게는 kg(60) 단위인데, 연봉을 원(50,000,000) 단위로 넣으면, 연봉의 분산이 압도적으로 커서 PC1이 그냥 "연봉" 축이 되어버립니다. 반드시 모든 변수를 표준화(Standardization, 평균 0 분산 1)한 뒤 PCA를 돌려야 공평한 비교가 됩니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 PCA를 통해 데이터를 압축하고 시각화했습니다. 이제 이 잘 정리된 데이터들을 끼리끼리 묶어볼 수 없을까요? 다음 \textbf{Unit 6}에서는 비지도 학습의 또 다른 핵심인 \textbf{군집화 (Clustering: K-means, Hierarchical)}를 통해 데이터 속에 숨어있는 그룹을 찾아냅니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 5 핵심 요약}
+\begin{itemize}
+    \item \textbf{철학:} 분산(Variance)이 클수록 정보가 많다.
+    \item \textbf{목표:} 정보를 최대한 보존하면서 변수의 개수(차원)를 줄이자.
+    \item \textbf{방법:} 공분산 행렬 $S$의 고유벡터(Eigenvector)를 찾는다.
+    \item \textbf{PC의 성질:} 서로 직교(Orthogonal)하며, 상관관계가 제거된다.
+    \item \textbf{주의:} 해석이 어려워질 수 있으며, 스케일링(정규화)이 필수적이다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

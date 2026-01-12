@@ -11,6 +11,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{geometry}
@@ -559,7 +560,7 @@ STM is primarily implemented in R. The \texttt{stm} package is highly reliable a
 
 \subsection{Basic Workflow}
 
-\begin{lstlisting}[style=rstyle, caption={STM Workflow in R}]
+\begin{lstlisting}[style=rstyle, caption={STM Workflow in R}, breaklines=true]
 # Install and load
 install.packages("stm")
 library(stm)
@@ -642,7 +643,7 @@ If a document becomes \textbf{empty} after preprocessing, it's removed along wit
 
 \subsection{Viewing Topic Summaries}
 
-\begin{lstlisting}[style=rstyle, caption={Summarize and plot topics}]
+\begin{lstlisting}[style=rstyle, caption={Summarize and plot topics}, breaklines=true]
 # Summary of topics
 summary(stm_model)
 
@@ -663,7 +664,7 @@ Top words may be:
 \end{itemize}
 \end{importantbox}
 
-\begin{lstlisting}[style=rstyle, caption={Find representative documents}]
+\begin{lstlisting}[style=rstyle, caption={Find representative documents}, breaklines=true]
 # Find documents most associated with each topic
 findThoughts(stm_model, texts = documents, n = 3, topics = 1:5)
 \end{lstlisting}
@@ -679,7 +680,7 @@ To understand how covariates affect topic prevalence, use \texttt{estimateEffect
 \end{enumerate}
 \end{definitionbox}
 
-\begin{lstlisting}[style=rstyle, caption={Estimate and plot effects}]
+\begin{lstlisting}[style=rstyle, caption={Estimate and plot effects}, breaklines=true]
 # Estimate effects for all topics
 effects <- estimateEffect(
   1:5 ~ author,                   # Topics ~ covariates
@@ -702,7 +703,7 @@ plot(effects,
 
 \subsection{Time Series of Topic Prevalence}
 
-\begin{lstlisting}[style=rstyle, caption={Topic prevalence over time}]
+\begin{lstlisting}[style=rstyle, caption={Topic prevalence over time}, breaklines=true]
 # If date is a covariate
 effects_time <- estimateEffect(
   1:5 ~ date,
@@ -743,7 +744,7 @@ Choosing K (number of topics) requires running STM multiple times and comparing 
 
 \subsection{Using searchK}
 
-\begin{lstlisting}[style=rstyle, caption={Search for optimal K}]
+\begin{lstlisting}[style=rstyle, caption={Search for optimal K}, breaklines=true]
 # Search across different numbers of topics
 k_search <- searchK(
   documents = out$documents,
@@ -772,7 +773,7 @@ These often trade off:
 \end{itemize}
 \end{definitionbox}
 
-\begin{lstlisting}[style=rstyle, caption={Extract and plot coherence/exclusivity}]
+\begin{lstlisting}[style=rstyle, caption={Extract and plot coherence/exclusivity}, breaklines=true]
 # Extract metrics
 coherence <- k_search$results$semcoh
 exclusivity <- k_search$results$exclus
@@ -882,7 +883,7 @@ STM allows researchers to \textbf{quantify} these effects and test their signifi
 
 \subsection{Topic Correlations}
 
-\begin{lstlisting}[style=rstyle, caption={Visualize topic correlations}]
+\begin{lstlisting}[style=rstyle, caption={Visualize topic correlations}, breaklines=true]
 # Plot topic correlations
 topicCorr(stm_model, method = "simple")
 \end{lstlisting}
@@ -891,7 +892,7 @@ This shows which topics tend to co-occur within documents.
 
 \subsection{Selecting Among Multiple Runs}
 
-\begin{lstlisting}[style=rstyle, caption={Select best model from multiple runs}]
+\begin{lstlisting}[style=rstyle, caption={Select best model from multiple runs}, breaklines=true]
 # searchK already runs multiple times internally
 # To manually select the best model:
 best_model <- selectModel(

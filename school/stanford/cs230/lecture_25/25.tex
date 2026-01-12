@@ -1,0 +1,267 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{strategybox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧭 #1 (전략 가이드)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Structuring Machine Learning Projects: \\ Error Analysis}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-6.] ML Strategy Basics \textit{- Completed}
+    \item[\textbf{Chapter 7.}] \textbf{Error Analysis (Current Unit)}
+    \begin{itemize}
+        \item \textbf{7.1 Manual Error Analysis}
+        \begin{itemize}
+            \item Philosophy: Don't Guess, Look
+            \item Ceiling Analysis (Prioritization)
+            \item Incorrectly Labeled Data Strategy
+            \item Implementation: Analysis Tool
+        \end{itemize}
+        \item 7.2 Training vs Dev/Test Distribution Mismatch \textit{- Upcoming}
+        \item 7.3 Transfer Learning \& Multi-task Learning \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 최적의 모델을 선택하는 방법을 배웠습니다. 하지만 선택된 모델도 목표 성능(예: 99\%)에는 도달하지 못했을 수 있습니다.
+이때 많은 엔지니어들이 \textbf{"직감"}에 의존합니다. "개가 고양이처럼 보이네? 개 데이터를 더 모으자", "흐려서 그런가? 포토샵 전처리를 하자."
+하지만 이것이 수개월을 낭비하는 최악의 결정이 될 수 있습니다. 우리는 직감이 아니라 \textbf{'데이터'}가 말하게 해야 합니다. 오늘 배울 \textbf{에러 분석}은 가장 효율적인 성능 향상 경로를 알려주는 나침반입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 틀린 데이터를 직접 분석하여 프로젝트의 우선순위를 정하는 전략을 다룹니다.
+\begin{itemize}
+    \item \textbf{철학:} "추측하지 말고 확인하라(Don't guess, look)." 오분류된 데이터를 직접 눈으로 확인합니다.
+    \item \textbf{천장 분석:} 특정 문제를 해결했을 때 성능이 얼마나 오를지 상한선(Ceiling)을 계산합니다.
+    \item \textbf{라벨 오류:} 정답 라벨 자체가 틀린 경우(Incorrect Label), 이를 수정해야 할지 판단하는 기준을 배웁니다.
+    \item \textbf{구현:} 에러 리포트를 자동으로 생성하는 Python 클래스를 작성합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{활용} \\ \hline
+\textbf{Ceiling Analysis} & 성능 향상의 최대치 분석 & "이거 고치면 몇 점 오르지?" 계산 \\ \hline
+\textbf{Misclassified} & 오분류된 데이터 & 모델이 틀린 것만 모아놓은 집합 \\ \hline
+\textbf{Incorrect Label} & 잘못된 정답지 & 사람이 실수로 라벨링을 잘못한 경우 \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 데이터가 말하게 하라}
+
+\subsection{1. The Philosophy: Don't Guess, Look}
+모델 정확도가 90\%입니다. (에러율 10\%).
+팀원이 제안합니다. \textbf{"흐릿한(Blurry) 사진 때문에 틀리는 것 같아요. 흐림 제거 모델을 만듭시다! (예상 소요: 3개월)"}
+이 제안을 수락해야 할까요? \textbf{천장 분석(Ceiling Analysis)}을 해보기 전엔 모릅니다.
+
+\subsection{2. Ceiling Analysis (천장 분석)}
+Dev Set에서 모델이 틀린 샘플 100개를 무작위로 뽑아 엑셀에 정리합니다.
+
+
+
+\begin{strategybox}{분석 결과 시뮬레이션}
+\begin{center}
+\begin{tabular}{l|c|c}
+\hline
+\textbf{에러 원인 (Category)} & \textbf{비율 (Count)} & \textbf{Ceiling (예상 향상)} \\ \hline
+흐릿함 (Blurry) & 5\% & $10\% \times 0.05 = \mathbf{0.5\%}$ \\ \hline
+배경 노이즈 (Noise) & 60\% & $10\% \times 0.60 = \mathbf{6.0\%}$ \\ \hline
+고양이 닮은 개 & 35\% & $10\% \times 0.35 = \mathbf{3.5\%}$ \\ \hline
+\end{tabular}
+\end{center}
+\textbf{결론:} 흐림 제거 모델을 완벽하게 만들어도 성능은 고작 \textbf{0.5\%} 오릅니다. 3개월을 낭비할 뻔했습니다. 우리는 \textbf{'배경 노이즈'} 문제(6.0\% 향상 가능)에 집중해야 합니다.
+\end{strategybox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. Incorrectly Labeled Data (라벨 오류)}
+데이터를 보다 보니, 모델은 맞았는데 사람이 정답을 잘못 달아놓은 경우를 발견했습니다. 고쳐야 할까요?
+
+\begin{itemize}
+    \item \textbf{Training Set:} 딥러닝은 \textbf{무작위 오류(Random Error)}에 강합니다. 데이터가 많다면 무시해도 됩니다. (단, 체계적 오류는 수정 필수)
+    \item \textbf{Dev/Test Set:} 에러 분석 표에 'Incorrect Label' 열을 추가합니다.
+    \begin{itemize}
+        \item 만약 이 비율이 전체 에러의 상당수라면(예: 에러의 30\%), \textbf{반드시 고쳐야 합니다.}
+        \item \textbf{주의:} Dev와 Test는 항상 \textbf{동시에} 고쳐야 분포가 유지됩니다.
+    \end{itemize}
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Error Report Generator}
+
+에러 분석을 도와주는 자동화 도구입니다.
+
+\begin{lstlisting}[language=Python, caption=Error Analysis Tool, breaklines=true]
+import pandas as pd
+import numpy as np
+
+class ErrorAnalyzer:
+    def __init__(self, y_true, y_pred):
+        self.y_true = np.array(y_true)
+        self.y_pred = np.array(y_pred)
+        # 틀린 인덱스 추출
+        self.error_indices = np.where(self.y_true != self.y_pred)[0]
+        self.total_errors = len(self.error_indices)
+        self.total_samples = len(y_true)
+
+    def generate_report(self, manual_tags):
+        """
+        manual_tags: {index: ['Blurry', 'Noise'], ...}
+        """
+        counts = {}
+        for tags in manual_tags.values():
+            for tag in tags:
+                counts[tag] = counts.get(tag, 0) + 1
+        
+        df = pd.DataFrame(list(counts.items()), columns=['Category', 'Count'])
+        
+        # Ceiling Analysis 계산
+        # 전체 데이터 대비 성능 향상 가능치
+        df['Ceiling (%)'] = (df['Count'] / self.total_samples) * 100
+        
+        # 정렬
+        df = df.sort_values(by='Count', ascending=False)
+        return df
+
+# --- 실행 ---
+if __name__ == "__main__":
+    # 전체 데이터 1000개 중 에러 100개라고 가정
+    y_true = np.zeros(1000)
+    y_pred = np.zeros(1000)
+    y_pred[:100] = 1 # 100개 틀림
+    
+    analyzer = ErrorAnalyzer(y_true, y_pred)
+    
+    # 사람이 직접 보고 태깅했다고 가정 (엑셀 연동)
+    tags = {
+        0: ['Blurry'], 1: ['Noise'], 2: ['Blurry', 'Noise'],
+        # ... (생략) ...
+        99: ['Noise']
+    }
+    # (가정: Blurry 5개, Noise 60개)
+    
+    # 리포트 생성
+    # df = analyzer.generate_report(tags)
+    # print(df)
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{Dev Set만 고치면 안 되나요?}
+\textbf{절대 안 됩니다.}
+Dev Set의 라벨만 고치고 Test Set을 그대로 두면, 두 데이터셋의 분포가 달라집니다(Distribution Mismatch). 평가의 신뢰도가 깨집니다. 귀찮더라도 Dev와 Test는 \textbf{한 몸처럼} 다뤄야 합니다.
+\end{warningbox}
+
+\textbf{Q. 몇 개나 분석해야 하나요?} \\
+\textbf{A.} 보통 \textbf{100개} 정도면 충분한 통계적 인사이트를 얻을 수 있습니다. 혼자서 100개 보는 데 1~2시간이면 됩니다. 팀원들과 100개씩 나눠서 보면 더 좋습니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+에러 분석을 통해 '무엇'을 고쳐야 할지 알게 되었습니다.
+그런데 분석 결과, \textbf{"훈련 데이터와 검증 데이터의 분포가 너무 다르다"}는 결론이 나오면 어떻게 해야 할까요? (예: 훈련은 고화질, 검증은 저화질)
+
+이것은 단순한 과대적합과는 다른 차원의 문제입니다. 다음 시간에는 \textbf{[Training vs Dev/Test Distribution Mismatch]} 문제를 진단하고 해결하는 고급 전략인 \textbf{'Training-Dev Set'}의 개념에 대해 배우겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Don't Guess:} 직감이 아닌 데이터를 보고 결정하라.
+    \item \textbf{Ceiling Analysis:} 특정 문제를 해결했을 때 얻을 수 있는 최대 이익(ROI)을 계산하라.
+    \item \textbf{Incorrect Label:} 전체 에러 중 비중이 높다면 수정하라. 단, Dev/Test를 동시에 수정해야 한다.
+    \item \textbf{Spreadsheet:} 엑셀 등을 활용해 팀원과 에러 원인을 공유하라.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

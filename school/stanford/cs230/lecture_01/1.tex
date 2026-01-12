@@ -1,0 +1,297 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+
+% --- 색상 정의 ---
+\definecolor{sblue}{RGB}{70, 130, 180}
+\definecolor{wgray}{RGB}{245, 245, 245}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=#1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=red!5!white,
+    colframe=red!75!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 금지)
+}
+
+\newtcolorbox{examplebox}[1]{
+    colback=orange!5!white,
+    colframe=orange!75!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (실전 계산)
+}
+
+% --- 문서 시작 ---
+\begin{document}
+
+% --- 전체 목차 (TOC) ---
+\tableofcontents
+\newpage
+
+% --- 1. 이전 단원 (Dummy) ---
+\section*{Chapter 1. Deep Learning Introduction (Completed)}
+\addcontentsline{toc}{section}{Chapter 1. Deep Learning Introduction}
+\textit{(이전 단원에서 우리는 딥러닝이 무엇인지, 그리고 데이터가 어떻게 새로운 석유가 되었는지 배웠습니다. 이제 그 거대한 딥러닝이라는 기계를 구성하는 가장 작은 부품을 뜯어볼 차례입니다.)}
+
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+% --- 2. 현재 단원 시작 ---
+\section{Logistic Regression as a Neural Network}
+
+% 2.1 연결 문장
+\subsection*{🔗 연결 고리}
+거대한 빌딩도 벽돌 한 장에서 시작하듯, 아무리 복잡한 AI(LLM, AlphaGo 등)도 결국 \textbf{'뉴런(Neuron)'}이라는 작은 단위의 집합입니다. 이번 단원에서는 딥러닝의 가장 기초 단위인 \textbf{로지스틱 회귀(Logistic Regression)}를 하나의 신경망으로 해석하고, 그 내부 동작 원리를 완전히 해부합니다.
+
+% 2.2 개요
+\begin{summarybox}{📌 단원 개요 (Overview)}
+이 단원은 딥러닝 학습의 \textbf{'기초 체력'}을 다지는 구간입니다.
+\begin{itemize}
+    \item \textbf{목표}: 이진 분류 문제를 신경망 구조(Input $\to$ Linear $\to$ Activation)로 모델링합니다.
+    \item \textbf{핵심}: 계산 그래프를 통해 순전파(Forward)와 역전파(Backpropagation)를 유도합니다.
+    \item \textbf{이유}: MSE 대신 \textbf{Binary Cross-Entropy}를 비용 함수로 쓰는 이유를 이해합니다.
+    \item \textbf{구현}: Python(NumPy)을 사용하여 for-loop 없는 \textbf{벡터화(Vectorization)} 코드를 작성합니다.
+\end{itemize}
+\end{summarybox}
+
+% 2.3 용어 정리
+\subsection{핵심 용어 정리 (Terminology)}
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+\textbf{용어} & \textbf{설명 (한 줄 정의)} \\
+\hline
+\textbf{특징 벡터 (Feature Vector, $x$)} & 예측을 위해 입력되는 데이터의 정보들 (예: 이미지의 픽셀값) \\
+\hline
+\textbf{가중치 (Weight, $w$)} & 입력 정보가 결과에 미치는 중요도 (클수록 중요한 정보) \\
+\hline
+\textbf{편향 (Bias, $b$)} & 입력과 상관없이 기본적으로 가지는 성향 혹은 임계값 \\
+\hline
+\textbf{시그모이드 (Sigmoid, $\sigma$)} & 계산된 점수를 0과 1 사이의 확률로 변환하는 활성화 함수 \\
+\hline
+\textbf{교차 엔트로피 (Cross-Entropy)} & 확률 분포 간의 차이를 측정하는 비용 함수 (틀릴수록 값이 커짐) \\
+\hline
+\end{tabular}
+\end{center}
+
+% 2.4 핵심 개념 상세 설명
+\subsection{Core Concepts: 신경망의 해부}
+
+\subsubsection{1. 문제 정의: 이진 분류 (Binary Classification)}
+\textbf{한 줄 요약}: 질문에 대해 YES(1) 또는 NO(0)로 답하는 문제입니다.
+
+\begin{analogybox}{고양이 탐지기}
+당신이 사진을 보고 "이것은 고양이입니까?"라는 질문에 답해야 한다고 상상해봅시다.
+\begin{itemize}
+    \item \textbf{입력($x$):} 사진 속의 털, 귀 모양, 눈동자 색깔 등의 단서들.
+    \item \textbf{출력($\hat{y}$):} "고양이일 확률은 80%입니다." (즉, 0.8)
+\end{itemize}
+\end{analogybox}
+
+\textbf{기술적 정의}:
+$n_x$ 차원의 입력 벡터 $x$가 주어졌을 때, 출력 $y$가 1일 확률 $\hat{y} = P(y=1 | x)$를 예측합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsubsection{2. 뉴런의 구조: 선형 결합과 활성화}
+로지스틱 회귀는 두 단계의 '생각 과정'을 거칩니다.
+
+\paragraph{Step 1: 선형 결합 (Linear Function) - 점수 매기기}
+$$z = w^T x + b$$
+\begin{itemize}
+    \item $w$ (가중치): 각 단서가 얼마나 중요한지 결정합니다. (예: '뾰족한 귀'는 고양이 판별에 중요함 $\to$ 높은 $w$)
+    \item $b$ (편향): 입력이 0이어도 기본적으로 갖는 점수입니다. (예: "나는 동물을 좋아해서 일단 고양이로 보고 싶어" $\to$ 높은 $b$)
+\end{itemize}
+
+\paragraph{Step 2: 활성화 함수 (Sigmoid) - 확률로 변환}
+$$a = \sigma(z) = \frac{1}{1 + e^{-z}}$$
+선형 결합의 결과 $z$는 $-\infty$에서 $+\infty$까지의 값을 가질 수 있습니다. 이를 $0 \sim 1$ 사이의 확률로 압축하는 과정입니다.
+
+\begin{itemize}
+    \item $z$가 매우 크면 $\to$ $a \approx 1$ (확신)
+    \item $z$가 0이면 $\to$ $a = 0.5$ (반반)
+    \item $z$가 매우 작으면 $\to$ $a \approx 0$ (아님)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsubsection{3. 비용 함수 (Cost Function): 왜 MSE가 아닐까?}
+우리는 모델이 예측한 값($a$)과 실제 정답($y$)이 다르다면 모델을 '혼내줘야' 합니다. 그 벌점을 매기는 규칙이 비용 함수입니다.
+
+\begin{warningbox}{MSE(평균 제곱 오차)를 쓰면 안 되나요?}
+선형 회귀에서는 MSE($\frac{1}{2}(\hat{y}-y)^2$)를 쓰지만, 로지스틱 회귀에서 이를 쓰면 비용 함수가 \textbf{울퉁불퉁한(Non-Convex)} 모양이 됩니다.
+즉, 경사 하강법을 할 때, 진짜 최소점(Global Minimum)이 아닌 웅덩이(Local Optima)에 빠져 학습이 멈출 수 있습니다.
+\end{warningbox}
+
+따라서 우리는 매끄러운 그릇 모양(Convex)을 보장하는 \textbf{이진 교차 엔트로피(Log Loss)}를 사용합니다.
+$$L(a, y) = -(y \log(a) + (1-y) \log(1-a))$$
+\begin{itemize}
+    \item 정답이 1($y=1$)인데 예측을 0에 가깝게 하면($a \to 0$), $-\log(a)$ 때문에 비용이 무한대로 치솟습니다. (엄청난 벌점!)
+\end{itemize}
+
+% 2.5 공식 및 계산 예시
+\subsection{Numerical Example: 손으로 풀어보는 로지스틱 회귀}
+
+수식을 이해하는 가장 좋은 방법은 숫자를 넣어보는 것입니다.
+
+\begin{examplebox}{시험 합격 예측 시나리오}
+\textbf{상황}: 학생의 '공부 시간($x_1$)'과 '수면 시간($x_2$)'으로 '합격($y=1$)'을 예측합니다.
+\begin{itemize}
+    \item \textbf{데이터}: 공부 2시간($x_1=2$), 수면 5시간($x_2=5$). 실제 결과: 합격($y=1$).
+    \item \textbf{초기 파라미터}: $w_1=0.1, w_2=-0.1, b=0.0$ (초기화 상태)
+\end{itemize}
+
+\textbf{Step 1: 선형 계산 (Forward)}
+$$z = (w_1 \cdot x_1) + (w_2 \cdot x_2) + b$$
+$$z = (0.1 \cdot 2) + (-0.1 \cdot 5) + 0 = 0.2 - 0.5 = -0.3$$
+
+\textbf{Step 2: 활성화 (Sigmoid)}
+$$a = \frac{1}{1 + e^{-(-0.3)}} = \frac{1}{1 + 1.349} \approx 0.425$$
+$\rightarrow$ 모델은 합격 확률을 \textbf{42.5\%}로 예측했습니다. (실제는 합격인데, 예측이 틀렸네요!)
+
+\textbf{Step 3: 비용 계산 (Loss)}
+$$L = -(1 \cdot \log(0.425) + 0 \cdot \log(\dots)) \approx -(-0.855) = 0.855$$
+$\rightarrow$ 벌점은 \textbf{0.855}입니다.
+
+\textbf{Step 4: 역전파 (Backward) - 학습의 핵심}
+우리는 정답($y=1$)에 가까워지도록 $w$를 수정해야 합니다. 여기서 \textbf{마법의 공식} $dz = a - y$가 등장합니다.
+$$dz = a - y = 0.425 - 1 = -0.575$$
+
+이제 가중치에 대한 기울기($dw$)를 구합니다.
+$$dw_1 = x_1 \cdot dz = 2 \cdot (-0.575) = -1.15$$
+$$dw_2 = x_2 \cdot dz = 5 \cdot (-0.575) = -2.875$$
+$$db = dz = -0.575$$
+
+\textbf{Step 5: 파라미터 업데이트 (Gradient Descent)}
+학습률 $\alpha = 0.1$이라고 가정합시다.
+$$w_1 \leftarrow w_1 - \alpha \cdot dw_1 = 0.1 - 0.1(-1.15) = 0.1 + 0.115 = 0.215$$
+$$w_2 \leftarrow w_2 - \alpha \cdot dw_2 = -0.1 - 0.1(-2.875) = -0.1 + 0.2875 = 0.1875$$
+
+\textbf{결과 해석}:
+$w_1$ (공부 시간 중요도)이 0.1에서 0.215로 증가했습니다. 즉, 모델은 "공부를 많이 할수록 합격한다"는 것을 배웠습니다!
+\end{examplebox}
+
+% 2.6 구현 코드
+\subsection{Python Implementation (Vectorization)}
+
+이론을 실제 코드로 옮겨봅시다. 여기서 중요한 것은 `for` 루프를 쓰지 않는 \textbf{벡터화}입니다.
+
+\begin{lstlisting}[language=Python, caption=Vectorized Logistic Regression, breaklines=true]
+import numpy as np
+
+def propagate(w, b, X, Y):
+    """
+    Arguments:
+    w -- 가중치 (n_x, 1)
+    b -- 편향 (scalar)
+    X -- 입력 데이터 (n_x, m) -> m은 데이터 개수
+    Y -- 실제 레이블 (1, m)
+    """
+    m = X.shape[1]
+    
+    # --- Forward Propagation (순전파) ---
+    # 행렬 연산으로 m개의 데이터를 한 번에 계산 (Vectorization)
+    Z = np.dot(w.T, X) + b  
+    A = 1 / (1 + np.exp(-Z)) # Sigmoid
+    
+    # Cost 계산
+    cost = -1/m * np.sum(Y * np.log(A) + (1-Y) * np.log(1-A))
+    
+    # --- Backward Propagation (역전파) ---
+    # 수학적으로 유도된 공식: dZ = A - Y
+    dZ = A - Y
+    
+    # Gradients 계산
+    dw = 1/m * np.dot(X, dZ.T) # 차원 확인: (n, m) * (m, 1) = (n, 1)
+    db = 1/m * np.sum(dZ)
+    
+    return dw, db, cost
+\end{lstlisting}
+
+\begin{warningbox}{주의: Rank-1 Array Pitfall}
+NumPy에서 `a = np.random.randn(5)`는 `(5,)` 형태를 가집니다. 이는 행 벡터도 열 벡터도 아니어서 전치(`T`)를 해도 모양이 바뀌지 않아 버그를 유발합니다.
+반드시 `a = np.random.randn(5, 1)` 처럼 \textbf{차원을 명시}하십시오.
+\end{warningbox}
+
+% 2.7 FAQ
+\subsection{자주 묻는 질문 (FAQ)}
+
+\textbf{Q1. 편향(Bias) $b$는 왜 필요한가요? 없으면 안 되나요?} \\
+A. 원점을 반드시 지나야 한다는 제약이 생깁니다. 예를 들어, 공부를 하나도 안 했어도($x=0$) 합격할 확률이 0이 아닐 수 있습니다. $b$는 그래프를 좌우로 이동시켜 데이터에 더 잘 맞도록 해주는 '유연성'을 제공합니다.
+
+\textbf{Q2. 초기화할 때 $w$를 0으로 둬도 되나요?} \\
+A. \textbf{로지스틱 회귀에서는 가능합니다.} 비용 함수가 볼록(Convex)하기 때문에 어디서 시작하든 바닥(최적해)으로 굴러갑니다. 하지만 나중에 배울 심층 신경망(Deep Network)에서는 절대 0으로 초기화하면 안 됩니다(대칭성 문제).
+
+\textbf{Q3. 학습률(Learning Rate)이 너무 크면 어떻게 되나요?} \\
+A. 보폭이 너무 커서 최적점을 지나쳐 버리거나(Overshooting), 영원히 수렴하지 않고 발산할 수 있습니다. 반대로 너무 작으면 학습 속도가 너무 느려집니다.
+
+% 2.8 다음 단원 예고 및 요약
+\vspace{1cm}
+\hrule
+\vspace{0.5cm}
+
+\begin{summarybox}{📝 단원 요약 (Chapter Summary)}
+\begin{enumerate}
+    \item 로지스틱 회귀는 딥러닝의 가장 작은 단위인 \textbf{1-Layer Neural Network}이다.
+    \item 구조: $z = w^Tx + b$ (선형) $\rightarrow$ $a = \sigma(z)$ (비선형 활성화).
+    \item 학습: \textbf{이진 교차 엔트로피}를 최소화하는 방향으로 경사 하강법을 수행한다.
+    \item 구현: $m$개의 데이터를 `for`문 없이 처리하기 위해 \textbf{Vectorization(행렬 연산)}을 사용한다.
+\end{enumerate}
+\end{summarybox}
+
+\subsection*{🔜 다음 단원 예고}
+축하합니다! 여러분은 이제 신경망의 '뇌세포' 하나를 완벽하게 만들 수 있습니다. 다음 장 \textbf{[Chapter 3. Shallow Neural Networks]}에서는 이 세포들을 옆으로 나란히 연결하고, 뒤로 층층이 쌓아서 더 복잡한 문제를 해결하는 \textbf{은닉층(Hidden Layer)}의 마법을 배워보겠습니다.
+
+\end{document}

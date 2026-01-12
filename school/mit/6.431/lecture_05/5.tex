@@ -1,0 +1,254 @@
+\documentclass[a4paper, 11pt]{book}
+
+%===========================================================
+% 패키지 설정 (일관된 스타일 유지)
+%===========================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsfonts, amsthm}
+\usepackage{geometry}
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{tikz}
+
+%===========================================================
+% 커스텀 스타일 정의
+%===========================================================
+\definecolor{mainblue}{RGB}{0, 80, 160}
+\definecolor{subgray}{RGB}{240, 240, 240}
+\definecolor{alertred}{RGB}{200, 50, 50}
+\definecolor{examplegreen}{RGB}{50, 150, 50}
+\definecolor{conceptpurple}{RGB}{100, 50, 150}
+
+\newcommand{\chaptertitle}[2]{
+    \begin{tcolorbox}[colback=mainblue, colframe=mainblue, sharp corners, boxrule=0pt, top=10pt, bottom=10pt]
+        \centering \Large \bfseries \textcolor{white}{#1: #2}
+    \end{tcolorbox}
+}
+
+\newtcolorbox{conceptbox}[1]{
+    colback=white, colframe=mainblue, fonttitle=\bfseries,
+    title={💡 #1}, rounded corners, drop shadow
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
+    title={⚠️ 치명적 함정 (Geometric Trap): #1}, rounded corners
+}
+
+\newtcolorbox{examplebox}[1]{
+    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
+    title={📝 예시 계산: #1}, rounded corners
+}
+
+\newtcolorbox{storybox}[1]{
+    colback=yellow!10!white, colframe=orange, fonttitle=\bfseries,
+    title={📖 Story Scenario: #1}, rounded corners, fontupper=\small
+}
+
+\newtcolorbox{mathstep}[1]{
+    colback=conceptpurple!5!white, colframe=conceptpurple, fonttitle=\bfseries,
+    title={🛠️ 문제 해결 스킬: #1}, rounded corners
+}
+
+\begin{document}
+
+%===========================================================
+% 1. 전체 목차 (TOC) - 구조 명시
+%===========================================================
+\tableofcontents
+\newpage
+
+\section*{📚 이 교재의 전체 구조 (Roadmap)}
+\begin{itemize}
+    \item Unit 1: 확률의 기초와 이산 확률 변수 (완료)
+    \item \textbf{Unit 2: 일반 확률 변수 (General Random Variables)}
+    \begin{itemize}
+        \item Chapter 4: 연속 확률 변수와 PDF (완료)
+        \item[$\to$] \textbf{\textcolor{mainblue}{Chapter 5: 결합 확률 분포 (Joint Distributions) \textit{<-- 현재 위치}}}
+        \item Chapter 6: 확률 변수의 변환과 유도
+    \end{itemize}
+    \item Unit 3: 확률 과정과 극한 정리
+\end{itemize}
+\vspace{1cm}
+
+%===========================================================
+% 2. 현재 단원 제목
+%===========================================================
+\chaptertitle{Unit 2 - Chapter 5}{결합 분포: 평면 위의 미적분}
+
+%===========================================================
+% 3. 이전 단원과의 연결 \& 4. 개요
+%===========================================================
+\section*{Intro: 1차원 선에서 2차원 평면으로}
+
+\textbf{[이전 단계와의 연결]} \\
+Chapter 4에서는 변수가 하나($X$)인 상황, 즉 수직선 위의 확률 밀도를 적분했습니다. 하지만 현실 세계의 문제는 변수 하나로 설명되지 않습니다. 키($X$)와 몸무게($Y$), 위도($X$)와 경도($Y$)처럼 두 변수는 서로 얽혀 있습니다.
+
+이제 우리는 \textbf{2차원 평면($x, y$)} 위에서 확률을 다룹니다. 선적분($\int$)이 \textbf{이중 적분($\iint$)}으로, 그래프의 면적이 \textbf{입체의 부피(Volume)}로 확장됩니다.
+
+\begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
+\begin{enumerate}
+    \item \textbf{Joint PDF (지형도):} 확률을 3차원 입체의 '부피'로 이해합니다.
+    \item \textbf{Marginal PDF (그림자):} 입체를 벽면에 투영(Projection)하여 한 변수의 분포만 뽑아냅니다.
+    \item \textbf{독립성 (함정):} 수식뿐만 아니라 \textbf{'영역의 모양'}이 독립성을 결정한다는 사실을 배웁니다.
+    \item \textbf{Bayesian Inference:} 미지의 상수(Parameter)를 확률 변수로 취급하여 추정하는 현대 통계의 핵심을 맛봅니다.
+\end{enumerate}
+\end{tcolorbox}
+
+%===========================================================
+% 5. 용어 정리 표
+%===========================================================
+\section{필수 용어 사전}
+
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\rowcolor{mainblue!20} \textbf{기호} & \textbf{용어} & \textbf{직관적 의미} \\ \hline
+$f_{X,Y}(x,y)$ & 결합 PDF (Joint PDF) & $(x,y)$ 지점에서의 확률 밀도 높이 (지형도) \\ \hline
+$f_X(x)$ & 주변 PDF (Marginal PDF) & $Y$를 무시하고(적분해서 없애고) $X$만 본 분포 (그림자) \\ \hline
+$\iint_A$ & 이중 적분 & 평면의 특정 영역 $A$ 위에 쌓인 확률의 부피 구하기 \\ \hline
+Support & 지지 집합 (정의역) & 확률 밀도가 0이 아닌 $(x,y)$의 영역 (지도상의 땅) \\ \hline
+Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파라미터의 분포 \\ \hline
+\end{tabular}
+\end{center}
+
+%===========================================================
+% 6. 핵심 개념 1: 결합 PDF와 주변 PDF
+%===========================================================
+\section{핵심 개념 1: 입체로 생각하고 축으로 투영하라}
+ 
+
+\subsection{결합 PDF ($f_{X,Y}$): 확률은 부피다}
+\begin{conceptbox}{지형도(Surface)의 부피 구하기}
+\begin{itemize}
+    \item \textbf{한 줄 요약:} 평면의 땅($x,y$) 위에 확률이라는 흙을 쌓아 올린 산입니다.
+    \item \textbf{직관적 비유:} 지도 위의 등고선. 특정 지역(A)에 비가 올 확률은 그 지역 위에 떠 있는 구름의 \textbf{부피}와 같습니다.
+    \item \textbf{공식:}
+    \[ P((X,Y) \in A) = \iint_A f_{X,Y}(x,y) \, dx \, dy \]
+\end{itemize}
+\end{conceptbox}
+
+\subsection{주변 PDF ($f_X$): 차원 뭉개기 (Marginalization)}
+ 
+
+복잡하게 얽힌 두 변수 중 하나만 알고 싶을 때 사용합니다.
+\begin{itemize}
+    \item \textbf{개념:} "나는 $Y$값은 상관 안 해. $X$가 $x$일 확률 밀도만 다 모아줘."
+    \item \textbf{직관적 비유 (Projection):} 3차원 물체에 $Y$축 방향에서 빛을 비췄을 때, \textbf{$X$축 벽면에 생기는 그림자}입니다. 입체적인 정보가 납작해집니다.
+    \item \textbf{계산:} $Y$가 가질 수 있는 모든 값($-\infty \sim \infty$)을 적분하여 없앱니다.
+    \[ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) \, dy \]
+\end{itemize}
+
+%===========================================================
+% 7. 핵심 개념 2: 독립성과 기하학적 함정
+%===========================================================
+\section{핵심 개념 2: 독립성 (Independence)과 함정}
+
+두 변수 $X, Y$가 독립이라는 것은 $f_{X,Y}(x,y) = f_X(x)f_Y(y)$로 인수분해된다는 뜻입니다. 하지만 \textbf{수식만 보면 100\% 틀립니다.}
+
+\begin{warningbox}{기하학적 함정 (The Geometry Trap)}
+수식이 곱하기로 쪼개지더라도, \textbf{정의역(Support)의 모양}을 반드시 확인해야 합니다.
+\begin{itemize}
+    \item \textbf{직사각형 (Rectangle):} $a \le x \le b, c \le y \le d$
+    \begin{itemize}
+        \item $\to$ 독립일 가능성 있음 (수식 확인 필요).
+    \end{itemize}
+    \item \textbf{삼각형, 원 등 (Non-Product):} $0 \le y \le x \le 1$ 등
+    \begin{itemize}
+        \item $\to$ \textbf{무조건 종속 (Dependent)!}
+        \item 이유: $X$값이 변하면 $Y$가 놀 수 있는 범위(Range)가 변하기 때문입니다. 정보가 섞여 있습니다.
+    \end{itemize}
+\end{itemize}
+ 
+\end{warningbox}
+
+\begin{examplebox}{삼각형 위에서의 균등 분포}
+영역 $A = \{(x,y) | 0 \le y \le x \le 1\}$ (삼각형) 위에서 균등하게 분포하는 $(X,Y)$가 있습니다. 면적이 $1/2$이므로 높이(PDF)는 2입니다. ($f_{X,Y}(x,y)=2$)
+\begin{enumerate}
+    \item \textbf{주변 PDF 구하기 ($f_X(x)$):}
+    $x$를 고정하고 $y$에 대해 적분합니다. 이때 $y$는 $0$부터 $x$까지만 존재합니다!
+    \[ f_X(x) = \int_{0}^{x} 2 \, dy = [2y]_0^x = 2x \quad (0 \le x \le 1) \]
+    \item \textbf{독립성 판별:}
+    정의역이 삼각형이므로 계산해볼 것도 없이 \textbf{종속}입니다. (실제로 $f_X(x)f_Y(y)$를 곱해보면 $2 \neq 2x \cdot 2(1-y)$가 되어 성립하지 않습니다.)
+\end{enumerate}
+\end{examplebox}
+
+%===========================================================
+% 8. 핵심 개념 3: 연속 베이즈 정리 (Inference)
+%===========================================================
+\section{핵심 개념 3: 모수(Parameter)도 확률 변수다}
+
+통계학의 패러다임 전환이 일어나는 구간입니다. 동전의 앞면 확률 $\Theta$를 고정된 상수($0.5$)가 아니라, \textbf{분포를 가진 확률 변수}로 바라봅니다.
+
+\begin{storybox}{로봇의 위치 추정 (Localization)}
+로봇이 복도($X$)의 어딘가에 있습니다.
+\begin{enumerate}
+    \item \textbf{Prior (사전 확률):} 로봇은 처음에 자신이 복도 중앙 쯤($\Theta \approx 5m$)에 있다고 믿습니다. (정규분포)
+    \item \textbf{Observation (데이터):} 센서로 거리를 쟀더니 $5.2m$가 나왔습니다($X=5.2$). 하지만 센서에는 오차(Noise)가 있습니다.
+    \item \textbf{Posterior (사후 확률):} 센서 데이터($5.2m$)와 내 믿음($5m$)을 적절히 섞어서(Update), "아, 나는 실제로는 $5.1m$ 쯤에 있겠구나"라고 믿음을 수정합니다.
+\end{enumerate}
+\end{storybox}
+
+\begin{mathstep}{베이지안 추론의 3단계}
+\textbf{목표:} 관측 데이터 $x$를 보고 미지의 파라미터 $\Theta$의 분포를 찾아라.
+
+\[ f_{\Theta|X}(\theta|x) = \frac{f_\Theta(\theta) \cdot f_{X|\Theta}(x|\theta)}{f_X(x)} \]
+
+\begin{enumerate}
+    \item \textbf{분자 계산:} Prior($\theta$ 믿음) $\times$ Likelihood(데이터 설명력).
+    \item \textbf{분모 계산 (Normalization):} 분자를 $\theta$에 대해 전체 적분하여 상수를 구함 (면적을 1로 맞춤).
+    \item \textbf{추정 (Estimation):}
+    \begin{itemize}
+        \item \textbf{MAP:} PDF가 가장 높은 봉우리(Mode)를 찍음. ("가장 그럴듯한 값")
+        \item \textbf{LMS:} PDF의 무게중심(Expectation)을 찍음. ("평균적인 값")
+    \end{itemize}
+\end{enumerate}
+\end{mathstep}
+
+%===========================================================
+% 9. FAQ
+%===========================================================
+\section{초심자가 자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 이중 적분 순서($dx dy$ vs $dy dx$)는 어떻게 정하나요?] \hfill \\
+    영역의 모양을 보고 \textbf{"화살표를 쏘기 편한 쪽"}으로 정합니다.
+    \begin{itemize}
+        \item $y$축 방향(위아래)으로 화살표를 쐈을 때 진입/진출 곡선이 하나라면 $dy$ 먼저.
+        \item $x$축 방향(좌우)이 편하면 $dx$ 먼저.
+        \item \textbf{Tip:} 반드시 그림을 그려야 보입니다!
+    \end{itemize}
+    
+    \item[Q2. 주변 PDF를 구할 때 범위가 헷갈려요.] \hfill \\
+    이게 가장 어렵습니다. $f_X(x)$를 구할 땐, \textbf{"$x$를 상수로 고정했다"}고 생각하세요. 그 고정된 $x$ 선 위에서 $y$가 어디서부터 어디까지 움직이는지(구간)를 찾아야 합니다. (삼각형 예제에서 $y$는 $0$부터 $1$이 아니라 $x$까지였습니다!)
+\end{description}
+
+%===========================================================
+% 10. 요약 및 다음 단계
+%===========================================================
+\section{요약 및 다음 단계}
+
+\begin{tcolorbox}[colback=mainblue!10, colframe=mainblue, title={\textbf{📝 Unit 2-2 핵심 요약}}]
+\begin{enumerate}
+    \item \textbf{Joint PDF:} 확률은 입체의 부피다 ($\iint$).
+    \item \textbf{Marginal PDF:} 그림자 놀이다 (한 변수 적분해서 없애기).
+    \item \textbf{독립성 Trap:} 직사각형 영역이 아니면 무조건 종속이다.
+    \item \textbf{Bayes:} 모수($\Theta$)를 확률 변수로 보고, 데이터를 통해 분포를 업데이트한다.
+\end{enumerate}
+\end{tcolorbox}
+
+\vspace{0.5cm}
+\textbf{[다음 단원 예고]} \\
+지금까지는 $X, Y$를 그대로 사용했습니다. 만약 $Z = X + Y$나 $W = X/Y$처럼 변수들을 지지고 볶아서 \textbf{새로운 변수}를 만들면, 그 변수의 PDF는 어떻게 될까요? \\
+다음 장 \textbf{Chapter 6: 파생 변수의 분포(Derived Distributions)}에서 미분의 반격, \textbf{야코비안(Jacobian)}이 등장합니다.
+
+\end{document}

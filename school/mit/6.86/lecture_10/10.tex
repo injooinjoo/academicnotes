@@ -1,0 +1,236 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 5}
+\fancyhead[R]{Recurrent Neural Networks}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 기억을 가진 신경망}}
+\author{Unit 5: Recurrent Neural Networks (RNN)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 3: CNN (공간 정보 처리)
+    \item Unit 4: Backpropagation (학습 원리)
+    \item \textbf{\textcolor{mainblue}{Unit 5: Recurrent Neural Networks (현재 단원: 시간 정보 처리)}}
+    \begin{itemize}
+        \item 10.1 The Loop: RNN Architecture
+        \item 10.2 The Problem: Vanishing Gradient
+        \item 10.3 The Solution: LSTM \& GRU
+        \item 10.4 The Evolution: Attention Mechanism
+    \end{itemize}
+    \item Unit 6: Unsupervised Learning (군집화)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 5. 순환 신경망 (RNN)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{CNN 덕분에 컴퓨터는 '보는 눈'을 가졌습니다. 하지만 "나는 밥을 먹었다"라는 문장을 CNN에 넣으면 "나", "밥", "먹"의 위치 관계는 알 수 있을지 몰라도, 단어가 등장하는 \textbf{순서(Sequence)}가 만드는 인과관계는 놓치기 쉽습니다. 언어, 주가, 영상처럼 흐름이 있는 데이터를 처리하기 위해 우리는 신경망에 \textbf{'기억력(Memory)'}을 심어주어야 합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+RNN은 이전 단계의 출력(Hidden State)을 현재 단계의 입력으로 다시 사용하는 \textbf{재귀적(Recurrent) 구조}를 가집니다. 이 단원에서는 기본 RNN의 구조와 한계(장기 의존성 문제), 이를 해결한 \textbf{LSTM}, 그리고 현대 자연어 처리(NLP)의 핵심인 \textbf{Attention} 메커니즘까지의 진화 과정을 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Sequence Data} & 순서가 바뀌면 의미가 깨지는 데이터 (텍스트, 시계열). \\
+\hline
+\textbf{Hidden State ($h_t$)} & 과거의 정보를 압축해서 들고 있는 '기억 상자'. \\
+\hline
+\textbf{Vanishing Gradient} & 문장이 길어지면 앞부분의 기억이 희미해져 학습이 안 되는 현상. \\
+\hline
+\textbf{LSTM / GRU} & 기억을 오래 유지하기 위해 '문지기(Gate)'를 단 똑똑한 RNN. \\
+\hline
+\textbf{Attention} & 모든 걸 다 기억하려 하지 말고, 필요할 때마다 원본을 다시 찾아보는 기술. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. RNN의 핵심 아이디어: "기억(Memory)"}
+
+
+\begin{conceptbox}{개념 1: 돌림 노래 (Loop)}
+\textbf{한 줄 요약:} 현재의 나($h_t$)는 어제의 기억($h_{t-1}$)과 오늘의 경험($x_t$)이 합쳐져서 만들어집니다.
+\end{conceptbox}
+
+\subsubsection*{1) 구조적 특징}
+일반 신경망(FNN)은 입력 $x$가 출력 $y$로 직행하지만, RNN은 은닉층의 출력이 다시 은닉층의 입력으로 들어옵니다. 이를 시간 순서대로 펼치면(Unfold) 마치 여러 개의 신경망이 옆으로 연결된 것처럼 보입니다.
+
+\subsubsection*{2) 수식 (Update Rule)}
+$$ h_t = \tanh(W_{hh} h_{t-1} + W_{xh} x_t + b) $$
+\begin{itemize}
+    \item $h_t$: 현재 시점($t$)의 상태(기억).
+    \item $h_{t-1}$: 이전 시점($t-1$)의 상태(과거의 기억).
+    \item $x_t$: 현재 시점의 새로운 입력.
+    \item \textbf{핵심:} 가중치 $W_{hh}, W_{xh}$는 모든 시점에서 \textbf{공유(Shared)}됩니다. 즉, 어제의 나를 만든 규칙과 오늘의 나를 만드는 규칙은 같습니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. LSTM (Long Short-Term Memory)}
+
+
+\begin{conceptbox}{개념 2: 정보의 고속도로와 문지기}
+\textbf{한 줄 요약:} 중요한 정보는 고속도로(Cell State)에 태워 끝까지 보내고, 불필요한 정보는 휴게소(Forget Gate)에서 버립니다.
+\end{conceptbox}
+
+\subsubsection*{1) 한계: 장기 의존성 (Long-Term Dependency)}
+기본 RNN은 문장이 길어지면($t$가 커지면) 역전파 시 기울기가 계속 곱해지면서 0에 수렴해버립니다. (예: "나는... (100단어) ... 한국 사람이다"에서 '나는'을 까먹음).
+
+\subsubsection*{2) 해결책: 3개의 게이트 (Gate)}
+LSTM은 \textbf{셀 상태(Cell State, $C_t$)}라는 정보 전용 통로를 뚫고, 3개의 문지기가 정보를 관리합니다.
+\begin{itemize}
+    \item \textbf{Forget Gate ($f_t$):} "과거 기억 중 쓸모없는 건 지워라." (Sigmoid $\to$ 0이면 삭제)
+    \item \textbf{Input Gate ($i_t$):} "현재 정보 중 중요한 것만 저장해라."
+    \item \textbf{Output Gate ($o_t$):} "다음 단계로 무엇을 넘겨줄지 결정해라."
+\end{itemize}
+\textbf{GRU:} LSTM이 너무 복잡해서, 게이트를 2개(Update, Reset)로 줄여 속도를 높인 가성비 모델입니다. 성능은 비슷합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 어텐션(Attention) 메커니즘}
+
+
+\begin{conceptbox}{개념 3: 컨닝 페이퍼 (Cheat Sheet)}
+\textbf{한 줄 요약:} 시험 볼 때(출력할 때) 모든 걸 외워서 풀려 하지 말고, 필요할 때마다 교과서(입력 문장)의 해당 부분을 훔쳐보세요.
+\end{conceptbox}
+
+\subsubsection*{1) 병목 현상 (Bottleneck)}
+LSTM조차도 아무리 긴 문장이라도 결국 마지막에 하나의 벡터(Context Vector)로 압축해야 합니다. 이 과정에서 정보 손실이 발생합니다.
+
+\subsubsection*{2) 핵심 아이디어}
+출력 단어를 하나 만들 때마다, 입력 문장 전체를 다시 훑어봅니다. 단, \textbf{가중치(Attention Score)}를 다르게 둡니다.
+\begin{itemize}
+    \item 예: "I ate an apple" $\to$ "나는 사과를 먹었다"
+    \item "사과를" 예측할 때: 입력의 "apple"에 집중도(Score) 90\%, "I"에 5\%를 줍니다.
+    \item \textbf{수식:} $\text{Context} = \sum \alpha_i h_i$ ($\alpha_i$: 집중도 가중치)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 글로벌 게임 실시간 번역}
+
+\begin{storybox}{Scenario: '메이플스토리 월드' 글로벌 채팅}
+한국 유저와 미국 유저가 실시간으로 소통합니다. 채팅 번역 시스템을 구축합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{입력 문장:} "배가 너무 고파서 배를 먹었어."
+    \item \textbf{문제 (동음이의어):} 앞의 '배(Stomach)'와 뒤의 '배(Pear)'를 구분해야 합니다.
+    \item \textbf{RNN/LSTM의 한계:} 문맥을 파악하긴 하지만, 문장이 복잡하면 두 '배'를 혼동하여 "Stomach... ate stomach"으로 오역할 수 있습니다.
+    \item \textbf{Attention 적용:}
+    \begin{itemize}
+        \item 첫 번째 '배' 번역 시: "고파서(hungry)" 단어에 Attention이 꽂힙니다. $\to$ \textbf{Stomach}로 번역.
+        \item 두 번째 '배' 번역 시: "먹었어(ate)" 단어에 Attention이 꽂힙니다. $\to$ \textbf{Pear}로 번역.
+    \end{itemize}
+    \item \textbf{결과:} "I was so hungry that I ate a pear." (완벽한 번역)
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 요즘도 LSTM을 쓰나요? Transformer(GPT)가 다 대체하지 않았나요?]
+    \textbf{A.} 대규모 언어 모델(LLM)은 Transformer가 지배했습니다. 하지만 시계열 데이터(주가, 서버 로그 예측)나, 리소스가 제한적인 모바일 기기에서의 간단한 음성 인식 등에는 여전히 가볍고 효율적인 LSTM/GRU가 현역으로 쓰입니다.
+    
+    \item[Q2. 이미지는 CNN, 텍스트는 RNN으로 딱 정해져 있나요?]
+    \textbf{A.} 예전엔 그랬지만 경계가 무너졌습니다.
+    \begin{itemize}
+        \item \textbf{Vision Transformer (ViT):} 이미지를 조각내서 순서대로 처리하는 Transformer가 CNN을 위협하고 있습니다.
+        \item \textbf{1D-CNN:} 텍스트를 1차원 이미지로 보고 CNN을 돌려서 빠르게 분류하기도 합니다.
+    \end{itemize}
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 지도 학습(정답 맞히기)의 여정이 끝났습니다. 이제 정답이 없는 데이터에서 스스로 패턴을 찾아내는 \textbf{비지도 학습(Unsupervised Learning)}의 세계로 넘어갑니다. 다음 시간에는 비슷한 유저끼리 묶는 \textbf{군집화(Clustering)}와 복잡한 데이터를 압축하는 차원 축소를 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 5 핵심 요약}
+\begin{itemize}
+    \item \textbf{RNN:} 출력이 입력으로 돌아오는 루프 구조. 순차 데이터 처리에 특화됨.
+    \item \textbf{LSTM:} 셀 상태(Cell State)와 게이트(Gate)를 도입하여 장기 기억력을 확보함.
+    \item \textbf{Attention:} 입력 데이터의 중요한 부분에 가중치를 두어 병목 현상을 해결함. (Transformer의 시초)
+    \item \textbf{활용:} 번역, 챗봇, 주가 예측, 로그 분석 등 시간 흐름이 있는 모든 곳.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

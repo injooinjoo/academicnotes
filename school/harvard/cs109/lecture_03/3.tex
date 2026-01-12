@@ -475,7 +475,7 @@ Pandas는 파이썬에서 기본적으로 제공하지 않는, 데이터 분석�
 가장 기본적인 방법은 파이썬 리스트를 사용하는 것입니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={파이썬 리스트로 Series 생성}, label={lst:series_from_list}]
+\begin{lstlisting}[language=Python, caption={파이썬 리스트로 Series 생성}, label={lst:series_from_list}, breaklines=true]
 import pandas as pd
 import numpy as np
 
@@ -500,7 +500,7 @@ dtype: float64
 인덱스를 직접 지정할 수도 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={인덱스를 지정하여 Series 생성}, label={lst:series_with_index}]
+\begin{lstlisting}[language=Python, caption={인덱스를 지정하여 Series 생성}, label={lst:series_with_index}, breaklines=true]
 # 문자열 리스트와 사용자 정의 인덱스
 data = ['a', 'b', 'c']
 index = [5, 3, 1]
@@ -531,7 +531,7 @@ dtype: int64
 Series 객체는 데이터 자체 외에도 유용한 정보를 속성으로 가지고 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={Series 속성 확인}, label={lst:series_attributes}]
+\begin{lstlisting}[language=Python, caption={Series 속성 확인}, label={lst:series_attributes}, breaklines=true]
 l = [-3, -2, -1]
 series = pd.Series(l, name='ints!', dtype=str) # 이름과 타입 지정
 series.index = ['foo', 'bar', 'foo'] # 인덱스 변경 (중복 가능!)
@@ -563,7 +563,7 @@ print(f"값의 타입: {type(series.values)}")
 Series에는 데이터를 탐색하고 요약하는 데 유용한 여러 메서드가 내장되어 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={Series 기본 메서드 사용}, label={lst:series_methods}]
+\begin{lstlisting}[language=Python, caption={Series 기본 메서드 사용}, label={lst:series_methods}, breaklines=true]
 data = [1, 3, 5, np.nan, 6, 8]
 s = pd.Series(data)
 
@@ -632,7 +632,7 @@ DataFrame을 만드는 방법은 여러 가지가 있습니다.
 각 딕셔너리가 하나의 행(row)이 되고, 딕셔너리의 키가 열(column) 이름이 됩니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={딕셔너리의 리스트로 DataFrame 생성}, label={lst:df_from_list_of_dicts}]
+\begin{lstlisting}[language=Python, caption={딕셔너리의 리스트로 DataFrame 생성}, label={lst:df_from_list_of_dicts}, breaklines=true]
 import pandas as pd
 
 data = [{'fruit': 'apple', 'color': 'red'},
@@ -653,7 +653,7 @@ print(df_fruits)
 딕셔너리의 키가 열(column) 이름이 되고, 값으로 주어지는 리스트가 해당 열의 데이터가 됩니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={리스트의 딕셔너리로 DataFrame 생성}, label={lst:df_from_dict_of_lists}]
+\begin{lstlisting}[language=Python, caption={리스트의 딕셔너리로 DataFrame 생성}, label={lst:df_from_dict_of_lists}, breaklines=true]
 import pandas as pd
 
 data = {'fruit': ['apple', 'grape'],
@@ -674,7 +674,7 @@ print(df_fruits_alt)
 2차원 NumPy 배열로부터 DataFrame을 생성할 수 있습니다. 이때 열 이름을 명시적으로 지정해주는 것이 좋습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={NumPy 배열로 DataFrame 생성}, label={lst:df_from_numpy}]
+\begin{lstlisting}[language=Python, caption={NumPy 배열로 DataFrame 생성}, label={lst:df_from_numpy}, breaklines=true]
 import pandas as pd
 import numpy as np
 
@@ -701,7 +701,7 @@ print(df_np.head()) # 처음 5개 행만 출력
 DataFrame도 Series와 유사하게 유용한 속성들을 제공합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={DataFrame 속성 확인}, label={lst:df_attributes}]
+\begin{lstlisting}[language=Python, caption={DataFrame 속성 확인}, label={lst:df_attributes}, breaklines=true]
 # 위의 df_np DataFrame 사용
 print(f"형태 (Shape): {df_np.shape}")
 print(f"컬럼 (Columns): {df_np.columns}")
@@ -730,7 +730,7 @@ print(f"값 (Values): \n{df_np.values[:2]}") # 값은 NumPy 배열, 처음 2행�
 DataFrame의 데이터를 빠르게 파악하기 위한 기본 메서드들입니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={DataFrame 기본 메서드 사용}, label={lst:df_methods}]
+\begin{lstlisting}[language=Python, caption={DataFrame 기본 메서드 사용}, label={lst:df_methods}, breaklines=true]
 # 위의 df_np DataFrame 사용
 print("--- 처음 3개 데이터 (head) ---")
 print(df_np.head(3))
@@ -798,7 +798,7 @@ max      2.308703    1.638069
 가장 먼저 할 일은 데이터를 DataFrame으로 읽어 들이는 것입니다. CSV(Comma Separated Values) 파일은 가장 흔한 데이터 형식 중 하나이며, \texttt{pd.read\_csv()} 함수를 사용합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={CSV 파일 읽어오기}, label={lst:read_csv}]
+\begin{lstlisting}[language=Python, caption={CSV 파일 읽어오기}, label={lst:read_csv}, breaklines=true]
 import pandas as pd
 
 # CSV 파일을 DataFrame으로 불러오기
@@ -836,7 +836,7 @@ except FileNotFoundError:
 데이터를 불러온 후에는 어떤 데이터가 들어 있는지 확인하는 것이 중요합니다. \texttt{head()}, \texttt{shape}, \texttt{columns}, \texttt{info()}, \texttt{describe()} 등을 사용합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={데이터 초기 검사}, label={lst:initial_inspection}]
+\begin{lstlisting}[language=Python, caption={데이터 초기 검사}, label={lst:initial_inspection}, breaklines=true]
 # 처음 5개 행 확인
 print("--- 데이터 미리보기 (head) ---")
 print(df.head())
@@ -879,7 +879,7 @@ print(df.describe())
 길고 복잡한 컬럼명은 사용하기 불편하므로, 짧고 의미 있는 이름으로 변경합니다. 일반적으로 소문자와 언더스코어(\_)를 사용하는 것이 좋습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={컬럼명 변경}, label={lst:rename_columns}]
+\begin{lstlisting}[language=Python, caption={컬럼명 변경}, label={lst:rename_columns}, breaklines=true]
 # 새 컬럼명 리스트 정의
 new_cols = [
     "timestamp", "program", "jupyter", "python_exp", "pandas_skill", "os", "dark_mode",
@@ -902,7 +902,7 @@ print(df.head())
 분석에 사용하지 않을 컬럼은 제거하여 DataFrame을 가볍게 만듭니다. 여기서는 'timestamp' 컬럼을 제거합니다. \texttt{drop()} 메서드를 사용하며, \texttt{axis=1}은 열을 기준으로 제거하라는 의미입니다. (\texttt{axis=0}은 행 기준)
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={컬럼 제거}, label={lst:drop_column}]
+\begin{lstlisting}[language=Python, caption={컬럼 제거}, label={lst:drop_column}, breaklines=true]
 # 'timestamp' 컬럼 제거 (axis=1은 열을 의미)
 # inplace=True를 사용하면 원본 DataFrame이 바로 수정됨
 # 여기서는 수정된 결과를 다시 df에 할당
@@ -922,7 +922,7 @@ print(df.head(2))
 \textbf{Boolean 타입 변환:} 'Yes'/'No' 형태의 데이터를 True/False로 변환합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={Boolean 타입 변환}, label={lst:astype_bool}]
+\begin{lstlisting}[language=Python, caption={Boolean 타입 변환}, label={lst:astype_bool}, breaklines=true]
 # 'dark_mode' 컬럼 값이 'yes'이면 True, 아니면 False로 변환
 # .str.lower()를 먼저 적용하여 대소문자 구분 없이 처리
 df['dark_mode'] = (df['dark_mode'].str.lower() == 'yes')
@@ -942,7 +942,7 @@ print(df['jupyter'].dtype)
 \textbf{Category 타입 변환:} 정해진 몇 가지 값 중 하나를 가지는 범주형 데이터는 \texttt{category} 타입으로 변환하는 것이 좋습니다. 메모리 효율성을 높이고, 해당 컬럼이 가질 수 있는 값을 제한할 수 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={Category 타입 변환}, label={lst:astype_category}]
+\begin{lstlisting}[language=Python, caption={Category 타입 변환}, label={lst:astype_category}, breaklines=true]
 # 'os' 컬럼을 category 타입으로 변환
 df['os'] = df['os'].astype('category')
 
@@ -955,7 +955,7 @@ print(df['os'].cat.categories)
 \textbf{순서 있는 Category 타입 변환 (Ordinal):} 'python\_exp'처럼 순서가 있는 범주형 데이터는 순서를 명시하여 \texttt{category} 타입으로 변환합니다. 이렇게 하면 크기 비교나 정렬이 의미 있게 가능해집니다. \texttt{CategoricalDtype}을 사용합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={순서 있는 Category 타입 변환}, label={lst:astype_ordered_category}]
+\begin{lstlisting}[language=Python, caption={순서 있는 Category 타입 변환}, label={lst:astype_ordered_category}, breaklines=true]
 from pandas.api.types import CategoricalDtype
 
 # Python 경험 순서 정의
@@ -981,7 +981,7 @@ print(df[df['python_experience'] > '1-2 years']['python_experience'].head())
 \textbf{Datetime 타입 변환:} 날짜/시간 관련 문자열은 \texttt{datetime} 타입으로 변환해야 날짜 계산 등을 수행할 수 있습니다. \texttt{pd.to\_datetime()} 함수를 사용하며, \texttt{errors='coerce'} 옵션은 변환 불가능한 값을 NaT(Not a Time)로 처리합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={Datetime 타입 변환}, label={lst:astype_datetime}]
+\begin{lstlisting}[language=Python, caption={Datetime 타입 변환}, label={lst:astype_datetime}, breaklines=true]
 # 'dob' 컬럼을 datetime 타입으로 변환
 df['dob'] = pd.to_datetime(df['dob'], errors='coerce')
 
@@ -996,7 +996,7 @@ print(df['dob'].dtype)
 사용자가 직접 입력한 텍스트 데이터는 대소문자가 섞여 있거나 앞뒤 공백이 있을 수 있습니다. 분석의 일관성을 위해 모두 소문자로 변환하고 불필요한 공백을 제거하는 것이 좋습니다. \texttt{str.lower()}와 \texttt{str.strip()} 메서드를 사용합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={텍스트 소문자 변환}, label={lst:text_lower}]
+\begin{lstlisting}[language=Python, caption={텍스트 소문자 변환}, label={lst:text_lower}, breaklines=true]
 # object 타입(주로 문자열) 컬럼만 선택
 str_cols = df.select_dtypes(include='object').columns
 
@@ -1016,7 +1016,7 @@ print(df['program'].head())
 완전히 동일한 행이 중복되어 있는지 확인합니다. \texttt{duplicated()}는 각 행이 중복인지 여부를 boolean Series로 반환하고, \texttt{sum()}을 사용하면 중복된 행의 개수를 알 수 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={중복 행 확인}, label={lst:check_duplicates}]
+\begin{lstlisting}[language=Python, caption={중복 행 확인}, label={lst:check_duplicates}, breaklines=true]
 duplicate_rows = df.duplicated().sum()
 print(f"중복된 행의 개수: {duplicate_rows}")
 
@@ -1031,7 +1031,7 @@ print(f"중복된 행의 개수: {duplicate_rows}")
 데이터에 값이 없는 경우(NaN, NaT 등)를 결측치라고 합니다. \texttt{info()} 메서드로 컬럼별 non-null 개수를 확인하거나, \texttt{isna().sum()}으로 컬럼별 결측치 개수를 직접 확인할 수 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={컬럼별 결측치 개수 확인}, label={lst:check_na}]
+\begin{lstlisting}[language=Python, caption={컬럼별 결측치 개수 확인}, label={lst:check_na}, breaklines=true]
 print("--- 컬럼별 결측치 개수 ---")
 print(df.isna().sum())
 \end{lstlisting}
@@ -1045,7 +1045,7 @@ print(df.isna().sum())
 \end{itemize}
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={결측치 처리 예시 (제거)}, label={lst:handle_na_drop}]
+\begin{lstlisting}[language=Python, caption={결측치 처리 예시 (제거)}, label={lst:handle_na_drop}, breaklines=true]
 # 예시: 'hobbies' 컬럼에 결측치가 있는 행을 제거한 결과 확인 (원본 변경 X)
 df_dropped_hobbies = df.dropna(subset=['hobbies'])
 print(f"원본 행 개수: {df.shape[0]}")
@@ -1074,7 +1074,7 @@ print(f"최종 데이터 크기: {df.shape}")
 가장 강력하고 흔하게 사용되는 방법입니다. 특정 조건(예: 'pandas\_skill' > 3)을 DataFrame이나 Series에 적용하면, 각 행(또는 원소)이 조건을 만족하는지 여부를 나타내는 True/False 값으로 이루어진 Series (이를 \textbf{마스크(mask)}라고 부름)가 반환됩니다. 이 마스크를 DataFrame의 인덱서(\texttt{[ ]})에 넣어주면 조건이 True인 행들만 선택됩니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={Boolean Indexing으로 필터링}, label={lst:boolean_indexing}]
+\begin{lstlisting}[language=Python, caption={Boolean Indexing으로 필터링}, label={lst:boolean_indexing}, breaklines=true]
 # 조건: Pandas 스킬 레벨이 3보다 큰 경우
 mask = df['pandas_skill'] > 3
 
@@ -1085,8 +1085,8 @@ df_high_skill = df[mask]
 print(df_high_skill['pandas_skill'].head())
 
 # 조건: dark mode를 사용하고(True) OS가 MacOS인 경우
-# 여러 조건은 & (AND), | (OR) 연산자로 연결하며, 각 조건은 괄호로 묶어야 함
-mask_dark_mac = (df['dark_mode'] == True) & (df['os'] == 'macos')
+# 여러 조건은 \& (AND), | (OR) 연산자로 연결하며, 각 조건은 괄호로 묶어야 함
+mask_dark_mac = (df['dark_mode'] == True) \& (df['os'] == 'macos')
 df_dark_mac = df[mask_dark_mac]
 
 # 결과 확인 (os, dark_mode 컬럼 및 크기 출력)
@@ -1106,7 +1106,7 @@ print(f"해당 학생 수: {df_dark_mac.shape[0]}")
 \end{itemize}
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={loc 및 iloc 사용 예시}, label={lst:loc_iloc}]
+\begin{lstlisting}[language=Python, caption={loc 및 iloc 사용 예시}, label={lst:loc_iloc}, breaklines=true]
 # 예시 DataFrame 생성
 data = {'A': [10, 20, 30, 40], 'B': [50, 60, 70, 80]}
 index = ['r1', 'r2', 'r3', 'r4']
@@ -1143,7 +1143,7 @@ print(f"\n처음 두 행 (iloc[0:2]):\n{df_example.iloc[0:2]}")
 특정 컬럼의 값을 기준으로 행을 정렬할 때는 \texttt{sort\_values()} 메서드를 사용합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={데이터 정렬}, label={lst:sort_values}]
+\begin{lstlisting}[language=Python, caption={데이터 정렬}, label={lst:sort_values}, breaklines=true]
 # 'pandas_skill' 기준으로 내림차순 정렬 (ascending=False)
 df_sorted_skill = df.sort_values(by='pandas_skill', ascending=False)
 print(df_sorted_skill[['program', 'pandas_skill']].head())
@@ -1167,7 +1167,7 @@ print(df_sorted_skill[['program', 'pandas_skill']].head())
 특정 값을 다른 값으로 바꿀 때 사용합니다. 정규 표현식(regex)을 사용하여 패턴 기반의 변환도 가능합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={값 변환 (replace)}, label={lst:replace_values}]
+\begin{lstlisting}[language=Python, caption={값 변환 (replace)}, label={lst:replace_values}, breaklines=true]
 # 'program' 컬럼에서 'certificate' 포함된 문자열을 하나로 통일
 df['program'] = df['program'].replace(r".*certificate.*",
                                      "graduate certificate [extension school]",
@@ -1187,7 +1187,7 @@ print(df['program'].value_counts().head())
 \textbf{2. 데이터 확장 (\texttt{explode}):} 리스트가 들어있는 컬럼을 기준으로, 리스트의 각 원소가 별도의 행이 되도록 DataFrame을 확장합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={문자열 분리 및 확장}, label={lst:split_explode}]
+\begin{lstlisting}[language=Python, caption={문자열 분리 및 확장}, label={lst:split_explode}, breaklines=true]
 # 'languages' 컬럼을 콤마와 공백(', ') 기준으로 분리하여 리스트 생성
 split_languages = df['languages'].str.split(', ')
 print("--- 분리 후 (Series of lists) ---")
@@ -1216,7 +1216,7 @@ print(f"\n--- 고유 언어 개수: {len(unique_languages)} ---")
 Series나 DataFrame의 각 원소 또는 행/열에 대해 사용자 정의 함수나 내장 함수를 적용할 때 사용합니다. 예를 들어, \texttt{split}된 리스트의 길이를 계산하여 각 학생이 구사하는 언어의 수를 계산할 수 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={apply를 이용한 계산}, label={lst:apply_len}]
+\begin{lstlisting}[language=Python, caption={apply를 이용한 계산}, label={lst:apply_len}, breaklines=true]
 # 'languages' 컬럼을 분리한 리스트의 길이를 계산하여 'num_languages' 컬럼 생성
 # 결측치(NaN)가 있는 경우 오류가 발생할 수 있으므로, fillna('') 등으로 사전 처리 필요
 # 여기서는 languages 결측치를 이미 제거했으므로 바로 적용
@@ -1234,7 +1234,7 @@ print(df.loc[df['num_languages'].idxmax(), ['languages', 'num_languages']]) # id
 특정 컬럼(들)의 값을 기준으로 데이터를 그룹화하고, 각 그룹에 대해 집계 함수(평균, 합계, 개수 등)를 적용하여 요약 통계를 계산합니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={groupby 및 agg 사용}, label={lst:groupby_agg}]
+\begin{lstlisting}[language=Python, caption={groupby 및 agg 사용}, label={lst:groupby_agg}, breaklines=true]
 # 'program' 별 평균 'pandas_skill' 계산
 avg_skill_by_program = df.groupby('program')['pandas_skill'].mean()
 print("--- 프로그램별 평균 Pandas 스킬 (상위 5개) ---")
@@ -1261,7 +1261,7 @@ else:
 두 범주형 변수 간의 관계를 파악하기 위해 각 조합에 해당하는 빈도수를 표 형태로 보여줍니다. 예를 들어, 운영체제(os)와 다크 모드(dark\_mode) 선호도 간의 관계를 볼 수 있습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={crosstab 사용}, label={lst:crosstab}]
+\begin{lstlisting}[language=Python, caption={crosstab 사용}, label={lst:crosstab}, breaklines=true]
 # 'os'와 'dark_mode' 간의 교차표 생성
 os_darkmode_crosstab = pd.crosstab(df['os'], df['dark_mode'])
 print("--- OS별 Dark Mode 선호도 교차표 ---")
@@ -1281,7 +1281,7 @@ print(os_darkmode_crosstab)
 정제 및 분석된 DataFrame을 나중에 다시 사용하기 위해 파일로 저장합니다. CSV 파일로 저장하는 것이 일반적이며, \texttt{to\_csv()} 메서드를 사용합니다. \texttt{index=False} 옵션을 주면 DataFrame의 인덱스가 파일에 저장되지 않습니다.
 
 \begin{codeexamplebox}
-\begin{lstlisting}[language=Python, caption={DataFrame을 CSV 파일로 저장}, label={lst:to_csv}]
+\begin{lstlisting}[language=Python, caption={DataFrame을 CSV 파일로 저장}, label={lst:to_csv}, breaklines=true]
 # 정제된 DataFrame을 'survey_final.csv' 파일로 저장 (인덱스 제외)
 try:
     df.to_csv('survey_final.csv', index=False)
@@ -1297,7 +1297,7 @@ except Exception as e:
 
 다음은 위에서 설명한 주요 Pandas 작업을 연속적으로 보여주는 코드 예제입니다.
 
-\begin{lstlisting}[language=Python, caption={Pandas 데이터 처리 파이프라인 예제}, label={lst:pipeline_example}]
+\begin{lstlisting}[language=Python, caption={Pandas 데이터 처리 파이프라인 예제}, label={lst:pipeline_example}, breaklines=true]
 import pandas as pd
 import numpy as np
 from pandas.api.types import CategoricalDtype

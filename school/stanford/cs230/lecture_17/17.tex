@@ -1,0 +1,269 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Optimization Algorithms: \\ Momentum \& RMSprop}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1-5.5 Regularization \& Data Setup \textit{- Completed}
+        \item 5.6 Mini-batch Gradient Descent \textit{- Completed}
+        \item \textbf{5.7 Optimization Algorithms (Momentum \& RMSprop)}
+        \begin{itemize}
+            \item Exponential Weighted Moving Average (The Trend)
+            \item Momentum (Physics: Velocity)
+            \item RMSprop (Adaptive Learning Rate)
+            \item Implementation
+        \end{itemize}
+        \item 5.8 Adam Optimizer \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 데이터를 작은 덩어리로 쪼개 학습하는 \textbf{미니 배치 경사 하강법}을 배웠습니다. 속도는 빨라졌지만, 그래프를 보면 여전히 최적점을 향해 곧바로 가지 못하고 \textbf{지그재그(Zigzag)로 진동(Oscillation)}하며 내려갑니다.
+이 진동을 줄이고, 최적해를 향해 \textbf{'가속도(Acceleration)'}를 붙일 수는 없을까요? 물리학의 관성을 이용한 \textbf{Momentum}과, 보폭을 자동으로 조절하는 \textbf{RMSprop}이 그 해답입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 단순한 경사 하강법을 넘어선 \textbf{고급 최적화 알고리즘} 두 가지를 다룹니다.
+\begin{itemize}
+    \item \textbf{기초:} 시계열 데이터의 트렌드를 추출하는 \textbf{지수 가중 이동 평균(EWMA)}을 이해합니다.
+    \item \textbf{Momentum:} 과거의 기울기를 누적하여 관성을 만드는 원리를 배웁니다.
+    \item \textbf{RMSprop:} 기울기의 크기(제곱)에 따라 학습 보폭을 조절하는 적응형 알고리즘을 익힙니다.
+    \item \textbf{구현:} 두 알고리즘의 수식을 Python 코드로 옮기고 하이퍼파라미터($\beta$)를 설정합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{기호} & \textbf{설명} \\ \hline
+\textbf{EWMA} & $v_t$ & 지수 가중 이동 평균. 최근 데이터의 경향성을 나타냄. \\ \hline
+\textbf{Momentum} & $v$ & 관성(속도). 과거의 진행 방향을 유지하려는 성질. \\ \hline
+\textbf{RMSprop} & $S$ & Root Mean Square Prop. 기울기 제곱을 이용해 보폭 조절. \\ \hline
+\textbf{Beta} & $\beta$ & 과거 데이터를 얼마나 기억할지 결정하는 계수 (0.9 등). \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 가속의 원리}
+
+\subsection{1. 지수 가중 이동 평균 (Exponentially Weighted Moving Average)}
+이 알고리즘들의 기초가 되는 수학입니다.
+$$ v_t = \beta v_{t-1} + (1 - \beta) \theta_t $$
+\begin{itemize}
+    \item $\beta = 0.9$: 최근 10일간의 평균 ($\frac{1}{1-0.9} = 10$)
+    \item $\beta = 0.98$: 최근 50일간의 평균 ($\frac{1}{1-0.98} = 50$)
+    \item $\beta$가 클수록 그래프가 부드러워지지만(Smoothing), 변화에 둔감해집니다(Latency).
+\end{itemize}
+
+
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. Momentum (관성)}
+\textbf{"공이 언덕을 굴러 내려갈 때 속도가 붙는 물리 법칙"}
+
+\begin{analogybox}{얼음판 위의 쇠구슬}
+\begin{itemize}
+    \item \textbf{SGD (일반 경사 하강법):} 마찰력이 무한대인 바닥. 힘(기울기)을 주면 움직이고, 안 주면 딱 멈춥니다. 방향이 바뀌면 즉시 꺾입니다 (지그재그).
+    \item \textbf{Momentum:} 마찰력이 없는 얼음판. 힘을 주지 않아도 기존에 내려오던 \textbf{속도(Velocity, $v$)} 때문에 계속 미끄러져 내려갑니다. 이 관성이 진동을 상쇄하고 웅덩이(Local Minima)를 넘게 해줍니다.
+\end{itemize}
+\end{analogybox}
+
+\begin{mathbox}{Update Rule}
+1. 속도 계산: $v = \beta v + (1-\beta) dW$ \\
+2. 파라미터 업데이트: $W = W - \alpha v$ \\
+($\alpha$: 학습률, $\beta$: 보통 0.9 사용)
+\end{mathbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. RMSprop (Root Mean Square Propagation)}
+\textbf{"가파른 곳은 천천히, 완만한 곳은 빠르게"}
+
+제프리 힌튼 교수가 제안한 방법입니다. 기울기($dW$)의 크기를 보고 보폭을 조절합니다.
+\begin{itemize}
+    \item \textbf{원리:} 학습률 $\alpha$를 $\sqrt{S}$로 나눠줍니다.
+    \item \textbf{효과:} 
+    \begin{itemize}
+        \item 기울기가 큼($S$ 큼) $\rightarrow$ 분모가 커짐 $\rightarrow$ 업데이트 폭 감소 (진동 억제)
+        \item 기울기가 작음($S$ 작음) $\rightarrow$ 분모가 작아짐 $\rightarrow$ 업데이트 폭 증가 (가속)
+    \end{itemize}
+\end{itemize}
+
+\begin{mathbox}{Update Rule}
+1. 제곱 평균: $S = \beta_2 S + (1-\beta_2) dW^2$ (요소별 제곱) \\
+2. 파라미터 업데이트: $W = W - \alpha \frac{dW}{\sqrt{S} + \epsilon}$ \\
+($\epsilon$: 0으로 나누기 방지용, $10^{-8}$)
+\end{mathbox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Momentum \& RMSprop}
+
+\begin{lstlisting}[language=Python, caption=Optimization Algorithms Implementation, breaklines=true]
+import numpy as np
+
+def update_with_momentum(parameters, grads, v, beta, learning_rate):
+    """
+    v: 속도(Velocity) 딕셔너리 (초기값은 0)
+    beta: Momentum 계수 (보통 0.9)
+    """
+    L = len(parameters) // 2
+    
+    for l in range(1, L + 1):
+        # 1. 속도(v) 업데이트 (관성 누적)
+        v["dW" + str(l)] = beta * v["dW" + str(l)] + (1 - beta) * grads["dW" + str(l)]
+        v["db" + str(l)] = beta * v["db" + str(l)] + (1 - beta) * grads["db" + str(l)]
+        
+        # 2. 파라미터 업데이트 (v를 빼줌)
+        parameters["W" + str(l)] -= learning_rate * v["dW" + str(l)]
+        parameters["b" + str(l)] -= learning_rate * v["db" + str(l)]
+        
+    return parameters, v
+
+def update_with_rmsprop(parameters, grads, s, beta2, learning_rate, epsilon=1e-8):
+    """
+    s: 제곱 평균(Squared Gradient) 딕셔너리
+    beta2: RMSprop 계수 (보통 0.999)
+    """
+    L = len(parameters) // 2
+    
+    for l in range(1, L + 1):
+        # 1. 제곱 평균(s) 업데이트 (기울기 제곱 주의!)
+        s["dW" + str(l)] = beta2 * s["dW" + str(l)] + (1 - beta2) * np.square(grads["dW" + str(l)])
+        s["db" + str(l)] = beta2 * s["db" + str(l)] + (1 - beta2) * np.square(grads["db" + str(l)])
+        
+        # 2. 파라미터 업데이트 (적응형 학습률)
+        # 분모에 sqrt(s) + epsilon
+        parameters["W" + str(l)] -= learning_rate * (grads["dW" + str(l)] / (np.sqrt(s["dW" + str(l)]) + epsilon))
+        parameters["b" + str(l)] -= learning_rate * (grads["db" + str(l)] / (np.sqrt(s["db" + str(l)]) + epsilon))
+        
+    return parameters, s
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{변수 초기화 실수}
+$v$와 $s$는 학습 루프(Iteration)가 돌 때마다 초기화하면 안 됩니다! 
+그러면 관성이 사라집니다. 반드시 \textbf{학습 시작 전(Epoch 0 이전)에 한 번만 0으로 초기화}하고, 계속 값을 누적해가야 합니다.
+\end{warningbox}
+
+\textbf{Q. $\beta$(Momentum)와 $\beta_2$(RMSprop) 값은 튜닝해야 하나요?} \\
+\textbf{A.} 보통은 \textbf{기본값($\beta=0.9, \beta_2=0.999$)}을 그대로 씁니다. 이 값들이 경험적으로 대부분의 문제에서 잘 작동합니다. 학습률($\alpha$) 튜닝이 훨씬 중요합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+우리는 최고의 가속 엔진 두 개를 얻었습니다.
+\begin{itemize}
+    \item \textbf{Momentum:} 관성을 이용하여 속도를 높임.
+    \item \textbf{RMSprop:} 보폭을 조절하여 진동을 줄임.
+\end{itemize}
+"둘 다 쓰면 안 되나요?" 
+당연히 됩니다. 이 둘을 결합한 것이 바로 \textbf{Adam (Adaptive Moment Estimation)}입니다. 현재 딥러닝 세계를 지배하고 있는 Adam 알고리즘을 다음 시간에 완성하고, 최적화 단원을 마무리하겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Momentum:} $v \leftarrow dW$. 과거의 속도를 유지하여 Local Minima 탈출 및 가속.
+    \item \textbf{RMSprop:} $S \leftarrow dW^2$. 기울기가 크면 학습률을 낮춰 진동을 방지.
+    \item \textbf{Math:} $dW^2$은 요소별 제곱이다. 나눗셈 시 $\epsilon$을 더해 에러를 방지한다.
+    \item \textbf{Hyperparam:} $\beta=0.9$, $\beta_2=0.999$가 국룰(Standard)이다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

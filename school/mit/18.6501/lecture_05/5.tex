@@ -1,0 +1,283 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 2 (Part B)}
+\fancyhead[R]{Hypothesis Testing}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 의사결정의 수학적 최적화}}
+\author{Unit 2 (Part B): Hypothesis Testing (가설 검정)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 1: Modeling (무대 세팅)
+    \item Unit 2 (Part A): Point Estimation (범인 추정)
+    \item \textbf{\textcolor{mainblue}{Unit 2 (Part B): Hypothesis Testing (현재 단원: 판결 내리기)}}
+    \begin{itemize}
+        \item 2.5 Structure: $H_0$ vs $H_1$
+        \item 2.6 Two Types of Errors
+        \item 2.7 Level($\alpha$) and Power($1-\beta$)
+        \item 2.8 p-value Interpretation
+    \end{itemize}
+    \item Unit 3: Asymptotic Properties
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 2 (Part B). 가설 검정 (Hypothesis Testing)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지난 파트(Estimation)에서 우리는 데이터를 통해 "성공 확률이 60\%($\hat{p}=0.6$)일 것이다"라고 추측했습니다. 하지만 누군가 딴지를 겁니다. "에이, 원래 50\%인데 우연히 높게 나온 거 아냐?" 이 질문에 답하기 위해 우리는 단순히 값을 구하는 것을 넘어, \textbf{'Yes or No'로 결정을 내리는 체계}가 필요합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+가설 검정은 불확실한 데이터 속에서 두 가지 주장($H_0, H_1$) 중 하나를 선택하는 과정입니다. 이 단원에서는 가설 검정을 \textbf{"제1종 오류($\alpha$)를 통제하면서 제2종 오류를 최소화(Power 최대화)하는 수학적 최적화 문제"}로 정의하고, 그 결과물인 p-value의 진정한 의미를 배웁니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Null Hypothesis ($H_0$)} & 귀무가설. "차이가 없다", "효과가 없다". (피고인은 무죄) \\
+\hline
+\textbf{Alternative Hypothesis ($H_1$)} & 대립가설. "차이가 있다", "효과가 있다". (피고인은 유죄) \\
+\hline
+\textbf{Type I Error ($\alpha$)} & 멀쩡한 사람을 범인으로 잡음. (거짓 양성) \\
+\hline
+\textbf{Type II Error ($\beta$)} & 진짜 범인을 놓아줌. (거짓 음성) \\
+\hline
+\textbf{Power ($1-\beta$)} & 진짜 범인을 잡아낼 확률. (검정력) \\
+\hline
+\textbf{p-value} & 피고인이 무죄($H_0$)라고 쳤을 때, 이런 증거가 나올 희박함의 정도. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 가설 검정의 구조: 비대칭적 싸움}
+
+\begin{conceptbox}{개념 1: 법정 공방 (Courtroom Trial)}
+\textbf{한 줄 요약:} 가설 검정은 두 가설이 대등하게 싸우는 것이 아니라, "무죄 추정의 원칙" 하에 유죄의 증거를 찾는 과정입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유}
+\begin{itemize}
+    \item \textbf{검사 ($H_1$):} "이 약은 효과가 있습니다!" (입증하고 싶은 것)
+    \item \textbf{변호사 ($H_0$):} "아닙니다. 그냥 물(Placebo)과 똑같습니다." (기본 상태)
+    \item \textbf{판사 ($\psi$):} 증거(데이터)가 압도적으로 확실하지 않으면, 무죄($H_0$)를 선고합니다. 즉, $H_0$를 기각하기(Reject) 전까지는 $H_0$가 참이라고 가정합니다.
+\end{itemize}
+
+\subsubsection*{2) 수학적 정의}
+\begin{itemize}
+    \item 파라미터 공간 $\Theta$를 두 개로 쪼갭니다. $\Theta_0$ (귀무가설 영역) vs $\Theta_1$ (대립가설 영역).
+    \item \textbf{검정 함수 (Test Function) $\psi(X)$:}
+    $$ \psi(X) = \begin{cases} 1 & \text{($H_0$ 기각, $H_1$ 채택)} \\ 0 & \text{($H_0$ 기각 실패, $H_0$ 유지)} \end{cases} $$
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 두 가지 종류의 오류 (Type I \& Type II Error)}
+
+
+\begin{conceptbox}{개념 2: 억울한 누명 vs 범인 놓침}
+\textbf{한 줄 요약:} 우리는 신이 아니기에 오류를 피할 수 없습니다. 어떤 오류가 더 치명적인지 파악해야 합니다.
+\end{conceptbox}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|c|c}
+\toprule
+\textbf{실제 진실 $\setminus$ 우리의 결정} & \textbf{$H_0$ 유지 (무죄 선고)} & \textbf{$H_0$ 기각 (유죄 선고)} \\
+\midrule
+\textbf{$H_0$ 참 (무죄)} & 옳은 결정 ($\checkmark$) & \textbf{Type I Error ($\alpha$)} \\
+& & (억울한 옥살이) \\
+\hline
+\textbf{$H_1$ 참 (유죄)} & \textbf{Type II Error ($\beta$)} & 옳은 결정 ($1-\beta$) \\
+& (범인 도주) & (정의 구현 = Power) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{과학계의 관점}
+과학계는 \textbf{Type I Error(거짓 발견)}를 훨씬 심각하게 봅니다.
+\begin{itemize}
+    \item Type I: 효과 없는 약을 "효과 있다"고 팔아서 환자가 죽음. (치명적)
+    \item Type II: 효과 있는 약을 발견 못하고 지나침. (아쉽지만 안전함)
+\end{itemize}
+따라서 통계학은 \textbf{"Type I Error를 철통같이 막는 것"}을 최우선으로 설계됩니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 유의 수준($\alpha$)과 검정력(Power): 최적화 문제}
+
+\begin{conceptbox}{개념 3: 제약 조건 하의 최적화}
+\textbf{한 줄 요약:} "무고한 사람을 가둘 확률은 5\% 미만으로 하되($\alpha \le 0.05$), 그 한도 내에서 최대한 많은 범인을 잡아라(Max Power)."
+\end{conceptbox}
+
+\subsubsection*{수학적 레시피 (Neyman-Pearson Lemma)}
+우리의 목표는 최고의 검정 함수 $\psi$를 찾는 것입니다.
+\begin{enumerate}
+    \item \textbf{Constraint (제약):} $P_{H_0}(\psi(X)=1) \le \alpha$ (보통 $\alpha=0.05$)
+    \item \textbf{Objective (목표):} Maximize $P_{H_1}(\psi(X)=1)$ (이를 \textbf{검정력(Power)}이라 함)
+\end{enumerate}
+
+\subsubsection*{계산 예시: 동전 던지기}
+동전이 앞면($H_1, p>0.5$)에 편향되어 있는지 검사합니다. $H_0: p=0.5$.
+데이터: 10번 던져서 앞면 개수 $X$를 셉니다.
+\begin{itemize}
+    \item \textbf{전략:} "앞면이 많이 나오면 기각하자." (기각역: $X \ge k$)
+    \item \textbf{$\alpha$ 설정 (0.05):} $H_0(p=0.5)$ 하에서 확률 계산
+    \begin{itemize}
+        \item $P(X \ge 9) = P(9) + P(10) \approx 0.0098 + 0.0010 = 0.0108$ ($< 0.05$ OK)
+        \item $P(X \ge 8) = P(8) + \dots \approx 0.0439 + 0.0108 = 0.0547$ ($> 0.05$ Fail)
+    \end{itemize}
+    \item \textbf{결정:} 기준($k$)은 9입니다. 9번 이상 나와야만 "사기 동전"이라고 부를 수 있습니다.
+    \item \textbf{검정력 계산:} 만약 실제 $p=0.8$이라면?
+    Power $= P_{p=0.8}(X \ge 9) \approx 0.37$. (범인이 $p=0.8$ 정도면 37\% 확률로만 검거 가능. 데이터($n$)를 더 늘려야 함.)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. p-value의 정확한 정의와 오해}
+
+
+\begin{conceptbox}{개념 4: 증거의 강도(Strength of Evidence)}
+\textbf{한 줄 요약:} "피고인이 무죄($H_0$)라고 치자. 근데 이런 데이터가 나올 확률이 로또 1등 당첨 확률만큼 낮네? 그럼 무죄가 아닌가보다."
+\end{conceptbox}
+
+\subsubsection*{1) 정의}
+$$ p\text{-value} = P(T(X) \ge t_{obs} \mid H_0 \text{ is true}) $$
+관측된 값($t_{obs}$)보다 \textbf{더 극단적인(More Extreme)} 값이 $H_0$ 세상에서 나올 확률입니다.
+
+\subsubsection*{2) 해석 가이드}
+\begin{itemize}
+    \item \textbf{Small p-value ($< 0.05$):} $H_0$ 하에서는 거의 기적 같은 일이다. $\rightarrow$ $H_0$가 틀렸다고 보자. (기각)
+    \item \textbf{Large p-value ($> 0.05$):} $H_0$ 하에서도 흔히 일어날 법한 일이다. $\rightarrow$ $H_0$를 유지하자.
+    \item \textbf{주의:} p-value는 "H0가 참일 확률"이 아닙니다! (조건부 확률의 방향 혼동 금지)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 신규 아이템 매출 분석}
+
+\begin{storybox}{Scenario: 업데이트 효과 검증}
+당신은 '카트라이더'의 신규 카트바디를 출시했습니다.
+기존 일평균 매출은 1억 원($\mu_0 = 1$)입니다. 업데이트 후 30일간 데이터를 보니 평균 1.05억 원($\bar{X} = 1.05$)이 되었습니다. 표준편차는 $\sigma = 0.2$입니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{가설 설정:}
+    \begin{itemize}
+        \item $H_0$: 매출 변화 없다 ($\mu = 1$)
+        \item $H_1$: 매출 올랐다 ($\mu > 1$)
+    \end{itemize}
+    \item \textbf{검정 통계량 (Z-score):}
+    $$ Z = \frac{\bar{X} - \mu_0}{\sigma / \sqrt{n}} = \frac{1.05 - 1}{0.2 / \sqrt{30}} \approx \frac{0.05}{0.0365} \approx 1.37 $$
+    \item \textbf{p-value 계산:}
+    표준정규분포에서 $Z \ge 1.37$일 확률은 약 $0.085$ (8.5\%)입니다.
+    \item \textbf{결론:}
+    $p\text{-value}(0.085) > \alpha(0.05)$.
+    \item \textbf{Report:} "매출이 500만 원 오르긴 했지만, 통계적으로 유의미하지 않습니다. 단순한 운(우연)이었을 가능성을 배제할 수 없습니다." ($H_0$ 기각 실패)
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 왜 하필 0.05(5\%)인가요?]
+    \textbf{A.} 역사적인 관습(Convention)입니다. 통계학의 아버지 로널드 피셔가 "20번에 1번 정도 틀리는 건 봐주자"라고 제안한 데서 유래했습니다. 의학이나 항공 우주처럼 안전이 중요한 분야는 0.01(1\%)이나 그 이하를 쓰기도 합니다.
+    
+    \item[Q2. p-value가 0.0001이면 효과가 엄청나게 크다는 뜻인가요?]
+    \textbf{A.} \textbf{아닙니다!} p-value는 "효과가 0이 아니라는 확신"의 정도이지, "효과의 크기(Effect Size)"가 아닙니다.
+    \begin{itemize}
+        \item 데이터가 100만 개면, 매출이 1원만 올랐어도 p-value는 0.00001이 될 수 있습니다.
+        \item 따라서 실무에서는 p-value(유의성)와 함께 \textbf{Effect Size(실질적 변화량)}를 꼭 같이 봐야 합니다.
+    \end{itemize}
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 p-value를 통해 "효과가 있다/없다"를 판별하는 법을 배웠습니다. 하지만 $n$이 무한히 커지면 모든 가설 검정이 어떻게 수렴할까요? 다음 \textbf{Unit 3}에서는 데이터가 많을 때($n \to \infty$) 가설 검정 통계량이 어떤 분포로 수렴하는지(점근적 성질)를 다룹니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 2 (Part B) 핵심 요약}
+\begin{itemize}
+    \item \textbf{구조:} $H_0$(보수적) vs $H_1$(입증 목표). 무죄 추정의 원칙.
+    \item \textbf{오류:} Type I(거짓 발견, $\alpha$)이 Type II(놓침, $\beta$)보다 더 심각하게 다뤄진다.
+    \item \textbf{최적화:} $\alpha$를 고정(0.05)하고, Power($1-\beta$)를 최대화하는 기각역을 찾는다.
+    \item \textbf{p-value:} $H_0$가 참일 때 관측 데이터가 나올 확률. $\alpha$보다 작으면 "너무 희박하므로 $H_0$가 거짓말 같다"고 판단한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

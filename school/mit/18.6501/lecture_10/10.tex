@@ -1,0 +1,262 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 4}
+\fancyhead[R]{Density Estimation}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 가정을 버리고 데이터 그대로}}
+\author{Unit 4: Density Estimation (밀도 추정)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 1~3: Parametric Statistics (정규분포 가정 하의 추정)
+    \item \textbf{\textcolor{mainblue}{Unit 4: Non-parametric Statistics (현재 단원: 가정 없는 추정)}}
+    \begin{itemize}
+        \item 10.1 Histograms (가장 기초적인 방법)
+        \item 10.2 Kernel Density Estimation (KDE, 스무딩)
+        \item 10.3 Bias-Variance Trade-off (핵심 딜레마)
+        \item 10.4 Optimal Bandwidth Selection
+    \end{itemize}
+    \item Unit 5: PCA (차원 축소)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 4. 밀도 추정 (Density Estimation)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 3까지는 "키는 정규분포를 따른다"고 가정하고 평균($\mu$)만 찾았습니다. 하지만 만약 분포가 낙타 등처럼 봉우리가 두 개(Bimodal)라면요? 평균만으로는 데이터의 진짜 모습을 설명할 수 없습니다. 이제 우리는 파라미터 몇 개를 찾는 게 아니라, \textbf{분포의 모양(함수 $f$) 자체를 그려내는 방법}을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+밀도 추정은 관측된 데이터로부터 미지의 확률 밀도 함수 $f$를 복원하는 기술입니다. 가장 단순한 \textbf{히스토그램}의 한계를 극복하기 위해 \textbf{커널 밀도 추정(KDE)}을 도입하며, 이때 발생하는 \textbf{편향(Bias)}과 \textbf{분산(Variance)}의 트레이드오프를 조절하여 최적의 스무딩 파라미터(대역폭 $h$)를 찾는 것이 핵심입니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Density Estimation} & 데이터 점들을 보고 원래 어떻게 분포해 있었는지 지도를 그리는 것. \\
+\hline
+\textbf{Histogram} & 데이터를 구간(Bin)별로 나눠 벽돌 쌓기. (각지고 거침) \\
+\hline
+\textbf{KDE (Kernel Density Estimation)} & 데이터를 벽돌 대신 부드러운 모래무덤으로 쌓기. (부드러움) \\
+\hline
+\textbf{Bandwidth ($h$)} & 모래무덤의 퍼짐 정도. 작으면 뾰족, 크면 펑퍼짐. \\
+\hline
+\textbf{Bias-Variance Trade-off} & 디테일을 살릴 것인가(Low Bias), 노이즈를 없앨 것인가(Low Variance)? \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 히스토그램 (Histogram)}
+
+\begin{conceptbox}{개념 1: 디지털 모자이크}
+\textbf{한 줄 요약:} 데이터 공간을 격자(Bin)로 나누고, 각 칸에 떨어진 데이터 개수만큼 높이를 올리는 계단 함수입니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{1) 한계점}
+\begin{itemize}
+    \item \textbf{불연속성:} 현실의 확률은 부드러운 곡선인데, 히스토그램은 각진 계단 모양입니다.
+    \item \textbf{시작점 의존성:} 구간을 0부터 시작하느냐, 0.5부터 시작하느냐에 따라 모양이 완전히 달라집니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 커널 밀도 추정 (KDE, Kernel Density Estimation)}
+
+\begin{conceptbox}{개념 2: 벽돌 대신 모래를 쌓자}
+\textbf{한 줄 요약:} 각 데이터 포인트 위치에 '커널(Kernel)'이라는 작은 확률의 언덕을 쌓고, 이 언덕들을 모두 더해서 전체 지형을 만듭니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 모래무덤 쌓기}
+데이터 점이 하나($X_i$) 찍힐 때마다, 그 위에 모래 한 줌($K$)을 붓습니다.
+\begin{itemize}
+    \item 데이터가 몰려 있는 곳: 모래가 많이 쌓여 높은 산이 됩니다.
+    \item 데이터가 없는 곳: 모래가 없어 평지가 됩니다.
+    \item 결과적으로 아주 부드러운 곡선(Smooth Curve)이 완성됩니다.
+\end{itemize}
+
+\subsubsection*{2) 수학적 정의 (The Estimator)}
+$$ \hat{f}_n(x) = \frac{1}{nh} \sum_{i=1}^n K\left( \frac{x - X_i}{h} \right) $$
+\begin{itemize}
+    \item $K(\cdot)$: 커널 함수. 보통 정규분포(Gaussian) 모양을 씁니다. ($\int K = 1$)
+    \item $h$: \textbf{대역폭(Bandwidth)}. 커널의 폭을 결정하는 가장 중요한 변수입니다.
+    \item 수학적 의미: 경험적 분포와 커널 함수의 \textbf{합성곱(Convolution)}입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 편향-분산 트레이드오프 (Bias-Variance Trade-off)}
+
+\begin{conceptbox}{개념 3: 너무 섬세해도, 너무 둔감해도 안 된다}
+\textbf{한 줄 요약:} 대역폭 $h$가 작으면 노이즈까지 따라그리고(과적합), $h$가 크면 중요 특징을 뭉개버립니다(과소적합).
+\end{conceptbox}
+
+
+
+우리의 목표는 추정함수 $\hat{f}$와 실제함수 $f$ 사이의 차이(MSE)를 줄이는 것입니다.
+$$ \text{MSE} = \text{Bias}^2 + \text{Variance} $$
+
+\subsubsection*{1) 대역폭 $h$가 작을 때 (Narrow Bandwidth)}
+\begin{itemize}
+    \item \textbf{현상:} 그래프가 자글자글하고 뾰족합니다 (Spiky).
+    \item \textbf{Bias (낮음):} 데이터가 있는 위치를 아주 정확히 찌릅니다.
+    \item \textbf{Variance (높음):} 데이터 하나만 바뀌어도 그래프 모양이 요동칩니다. (Overfitting)
+\end{itemize}
+
+\subsubsection*{2) 대역폭 $h$가 클 때 (Wide Bandwidth)}
+\begin{itemize}
+    \item \textbf{현상:} 그래프가 펑퍼짐하고 밋밋합니다 (Smooth).
+    \item \textbf{Bias (높음):} 뾰족한 봉우리(Peak)를 깎아먹고 평탄화시킵니다. (Underfitting)
+    \item \textbf{Variance (낮음):} 데이터가 좀 바뀌어도 둔감하게 반응합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 최적의 대역폭 선택 (Optimal Bandwidth)}
+
+\begin{conceptbox}{개념 4: 중용(Golden Mean)을 찾아서}
+\textbf{한 줄 요약:} Bias와 Variance의 합이 최소가 되는 지점을 미분으로 찾습니다.
+\end{conceptbox}
+
+\subsubsection*{수학적 결론}
+MISE(Mean Integrated Squared Error)를 최소화하는 최적의 $h$는 데이터 개수 $n$과 다음과 같은 관계를 가집니다.
+$$ h_{opt} \propto n^{-1/5} $$
+\begin{itemize}
+    \item 의미: 데이터 $n$이 많아지면 $h$를 천천히 줄여서 디테일을 살려야 합니다.
+    \item \textbf{주의:} 모수적 방법($1/\sqrt{n}$)보다 수렴 속도($n^{-2/5}$)가 느립니다. 즉, 함수 전체를 추정하려면 훨씬 더 많은 데이터가 필요합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 게임 유저 플레이 타임 분석}
+
+\begin{storybox}{Scenario: 평균의 함정 탈출}
+당신은 MMORPG 게임의 PM입니다. "유저들의 평균 플레이 타임은 2시간입니다"라는 보고를 받았습니다. 그래서 2시간짜리 콘텐츠를 만들었는데 망했습니다. 왜일까요?
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터 시각화 (KDE 적용):}
+    단순 평균($\mu$) 대신 KDE로 분포를 그려보았습니다.
+    
+    \item \textbf{발견 (Bimodal Distribution):}
+    분포가 낙타 등처럼 \textbf{봉우리가 두 개}였습니다.
+    \begin{itemize}
+        \item 그룹 A (라이트 유저): 30분 플레이 (숙제만 하고 끔)
+        \item 그룹 B (헤비 유저): 5시간 플레이 (레이드 뜀)
+    \end{itemize}
+    평균인 '2시간'에 해당하는 유저는 사실 아무도 없었습니다!
+    
+    \item \textbf{$h$ 파라미터 튜닝:}
+    \begin{itemize}
+        \item $h$를 너무 크게 잡으면: 두 봉우리가 뭉개져서 하나로 보임 (평균 2시간의 함정 재현).
+        \item $h$를 적절히 잡으면: 30분과 5시간의 두 봉우리가 명확히 분리됨.
+    \end{itemize}
+    
+    \item \textbf{전략 수정:}
+    2시간짜리 콘텐츠 대신, \textbf{"30분짜리 일일 퀘스트"}와 \textbf{"4시간짜리 레이드"}로 콘텐츠를 이원화하여 대성공을 거둡니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 커널 함수 $K$의 모양(정규분포, 삼각형 등)이 중요한가요?]
+    \textbf{A.} 별로 안 중요합니다. 커널의 모양보다는 \textbf{대역폭 $h$의 크기}가 결과에 100배는 더 큰 영향을 미칩니다. 그냥 미분하기 편한 가우시안 커널을 쓰면 됩니다.
+    
+    \item[Q2. 왜 비모수적 방법은 데이터가 많이 필요한가요?]
+    \textbf{A.} 모수적 방법은 "종 모양이다"라는 강력한 힌트(가정)를 가지고 시작하므로, 중심($\mu$)과 폭($\sigma$)만 맞추면 됩니다. 하지만 비모수적 방법은 아무런 힌트 없이 백지상태에서 지도를 그려야 하므로, 빈 공간을 채우기 위해 훨씬 많은 정보(데이터)가 필요합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 데이터의 분포(밀도)를 알아냈습니다. 이제 이 고차원 데이터를 다루기 쉽게 압축할 수는 없을까요? 다음 시간에는 비모수 통계의 또 다른 축인 \textbf{Unit 5: 주성분 분석 (PCA, Principal Component Analysis)}을 통해 데이터의 차원을 축소하고 숨겨진 구조를 시각화하는 법을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 4 핵심 요약}
+\begin{itemize}
+    \item \textbf{비모수 통계:} 특정 분포($\mathcal{N}$)를 가정하지 않고 함수 $f$ 자체를 추정한다.
+    \item \textbf{히스토그램:} 쉽지만 각지고, 구간 설정에 민감하다.
+    \item \textbf{KDE:} 커널($K$)과 대역폭($h$)을 이용해 스무딩하는 기법.
+    \item \textbf{Bias-Variance Trade-off:} $h$가 작으면 과적합(Variance $\uparrow$), 크면 과소적합(Bias $\uparrow$).
+    \item \textbf{최적의 $h$:} $n^{-1/5}$에 비례하여 설정한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

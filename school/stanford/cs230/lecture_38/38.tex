@@ -1,0 +1,250 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Special Applications: \\ Neural Style Transfer (NST)}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Special Applications (Current Unit)}
+    \begin{itemize}
+        \item 10.1 Face Recognition \textit{- Completed}
+        \item \textbf{10.2 Neural Style Transfer}
+        \begin{itemize}
+            \item What are we optimizing? (Pixel vs Weights)
+            \item Content Cost Function ($J_{content}$)
+            \item Style Cost Function ($J_{style}$): Gram Matrix
+            \item Implementation Strategy
+        \end{itemize}
+    \end{itemize}
+    \item[Chapter 11.] Sequence Models (RNN) \textit{- Next Part}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 샴 네트워크를 통해 CNN이 이미지의 특징을 벡터로 압축하는 법을 배웠습니다.
+그렇다면, 이 특징을 분리해서 조작할 수는 없을까요? 이미지의 \textbf{'내용(Content)'}은 내 사진인데, \textbf{'화풍(Style)'}은 반 고흐의 그림처럼 만들 수 있다면 어떨까요?
+이것이 바로 AI 예술의 시초, \textbf{Neural Style Transfer(NST)}입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 CNN의 특성을 활용하여 두 이미지를 합성하는 NST 알고리즘을 다룹니다.
+\begin{itemize}
+    \item \textbf{전환:} 가중치($W$)가 아닌 \textbf{입력 이미지($G$)의 픽셀}을 학습한다는 차이점을 이해합니다.
+    \item \textbf{콘텐츠:} 깊은 층의 활성화 맵을 비교하여 내용의 유사성을 측정합니다.
+    \item \textbf{스타일:} \textbf{그람 행렬(Gram Matrix)}을 통해 이미지의 질감과 상관관계를 수치화합니다.
+    \item \textbf{통합:} $J(G) = \alpha J_{content} + \beta J_{style}$을 최소화하여 예술 작품을 생성합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{이미지} & \textbf{기호} & \textbf{역할} \\ \hline
+\textbf{Content Image} & $C$ & 내용의 기준 (예: 내 사진). \\ \hline
+\textbf{Style Image} & $S$ & 화풍의 기준 (예: 고흐 그림). \\ \hline
+\textbf{Generated Image} & $G$ & 우리가 만들 결과물 (처음엔 노이즈). \\ \hline
+\textbf{Gram Matrix} & $G_{kk'}$ & 특성맵 채널 간의 상관관계를 나타내는 행렬. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 무엇을 학습하는가?}
+
+\subsection{1. The Big Picture}
+NST의 가장 큰 특징은 학습의 대상이 다르다는 것입니다.
+
+\begin{itemize}
+    \item \textbf{기존 CNN 학습:} 이미지 고정 $\rightarrow$ 가중치 $W$ 업데이트.
+    \item \textbf{NST 학습:} 가중치 $W$ 고정(Pre-trained) $\rightarrow$ \textbf{생성 이미지 $G$의 픽셀값 업데이트.}
+\end{itemize}
+
+\subsection{2. Content Cost Function ($J_{content}$)}
+"이미지 $G$가 이미지 $C$와 비슷한 내용을 담고 있는가?"
+\begin{itemize}
+    \item \textbf{원리:} CNN의 깊은 층(Deep Layer)은 사물의 배치나 구조 같은 고차원 정보를 담고 있습니다.
+    \item \textbf{수식:} 특정 층 $l$에서 두 이미지의 활성화 맵($a^{[l]}$) 간의 차이(MSE)를 계산합니다.
+    $$ J_{content}(C, G) = \frac{1}{2} \| a^{[l](C)} - a^{[l](G)} \|^2 $$
+\end{itemize}
+
+\subsection{3. Style Cost Function ($J_{style}$) - [핵심]}
+"이미지 $G$가 이미지 $S$의 화풍(질감)을 담고 있는가?"
+스타일은 "어디에 있는가"가 아니라 \textbf{"무엇이 함께 나타나는가(Correlation)"}입니다.
+
+\begin{analogybox}{그람 행렬의 직관}
+어떤 층에 두 개의 필터(채널)가 있다고 가정합시다.
+\begin{itemize}
+    \item \textbf{필터 A:} 수직선을 찾음.
+    \item \textbf{필터 B:} 주황색을 찾음.
+\end{itemize}
+이 두 필터가 이미지의 같은 위치에서 동시에 활성화된다면(상관관계 높음), "이 화풍은 수직선과 주황색이 함께 다니는 스타일이다"라고 정의할 수 있습니다. 이것을 수치화한 것이 \textbf{그람 행렬(Gram Matrix)}입니다.
+\end{analogybox}
+
+\begin{formulabox}{Gram Matrix ($G^{[l]}$)}
+$$ G_{kk'}^{[l]} = \sum_{i} \sum_{j} a_{i,j,k}^{[l]} \cdot a_{i,j,k'}^{[l]} $$
+(채널 $k$와 채널 $k'$의 활성화 맵 내적)
+\end{formulabox}
+
+스타일 비용은 두 이미지의 그람 행렬 차이입니다.
+$$ J_{style}^{[l]}(S, G) = \| G^{[l](S)} - G^{[l](G)} \|^2 $$
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Implementation: Optimization Loop}
+
+TensorFlow/Keras를 사용한 구현의 핵심 구조입니다.
+
+\begin{lstlisting}[language=Python, caption=Neural Style Transfer Logic, breaklines=true]
+import tensorflow as tf
+
+# 1. 모델 준비 (VGG19, 가중치 고정)
+vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
+vgg.trainable = False 
+
+# 2. 생성 이미지(G) 초기화 (학습 대상!)
+# 처음에는 랜덤 노이즈로 시작하거나 Content 이미지로 시작
+generated_image = tf.Variable(content_image) 
+
+# 3. 최적화 루프
+optimizer = tf.optimizers.Adam(learning_rate=0.02)
+
+@tf.function
+def train_step(image):
+    with tf.GradientTape() as tape:
+        # 모델 통과 -> 활성화 맵 추출
+        outputs = get_vgg_layers(image)
+        
+        # Loss 계산
+        loss_c = calculate_content_loss(outputs, content_targets)
+        loss_s = calculate_style_loss(outputs, style_targets) # Gram Matrix 사용
+        
+        total_loss = alpha * loss_c + beta * loss_s
+        
+    # 핵심: 가중치가 아닌 '입력 이미지'에 대한 기울기 계산
+    grad = tape.gradient(total_loss, image)
+    
+    # 이미지 픽셀 업데이트
+    optimizer.apply_gradients([(grad, image)])
+    
+    # 픽셀값 클리핑 (0~1 사이 유지)
+    image.assign(tf.clip_by_value(image, 0.0, 1.0))
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{왜 그람 행렬인가요?}
+그람 행렬은 공간 정보(Spatial Information)를 합쳐버립니다($\sum_{i,j}$). 즉, "어디에" 있는지는 무시하고 "어떤 특징들이 통계적으로 공존하는가"만 남기기 때문에 \textbf{스타일(질감, 패턴)}을 표현하기에 적합합니다.
+\end{warningbox}
+
+\textbf{Q. $\alpha$와 $\beta$는 어떻게 정하나요?} \\
+\textbf{A.} 취향입니다. $\alpha$(콘텐츠)를 높이면 원본 사진과 비슷해지고, $\beta$(스타일)를 높이면 그림 화풍이 강해집니다. 보통 $\beta$를 훨씬 크게 설정합니다(숫자 스케일 차이 때문).
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+우리는 CNN을 이용해 이미지를 분류하고, 탐지하고, 심지어 예술 작품으로 변환하는 방법까지 배웠습니다. 이로써 \textbf{컴퓨터 비전(Computer Vision)} 파트를 마무리합니다.
+
+이제 시각 정보가 아닌, \textbf{시간의 흐름이 있는 데이터(Sequence Data)}의 세계로 넘어갑니다. 
+다음 시간부터는 음성, 언어, 주가 등 연속적인 데이터를 처리하는 \textbf{[Part 5. Sequence Models]}를 시작하며, 그 첫 번째 주자인 \textbf{RNN (Recurrent Neural Networks)}에 대해 알아보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{NST:} 사전 학습된 CNN을 이용해 콘텐츠와 스타일을 합성한다.
+    \item \textbf{Learning:} 가중치는 고정하고, \textbf{입력 이미지의 픽셀}을 학습(업데이트)한다.
+    \item \textbf{Content:} 깊은 층의 활성화 맵 차이를 줄인다.
+    \item \textbf{Style:} \textbf{그람 행렬(Gram Matrix)}의 차이를 줄여 질감 상관관계를 모방한다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

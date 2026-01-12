@@ -1,0 +1,265 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+\usepackage{colortbl} % 표 색상
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{diagnosisbox}[1]{
+    colback=purple!5!white,
+    colframe=purple!80!black,
+    fonttitle=\bfseries,
+    title=🩺 #1 (모델 진단)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Improving Deep Neural Networks: \\ Data Setup Strategy}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item \textbf{5.1 Train / Dev / Test Sets Strategy}
+        \begin{itemize}
+            \item The Purpose of Splitting
+            \item Big Data Era Ratio (98/1/1)
+            \item Distribution Mismatch \& Data Leakage
+            \item Bias-Variance Diagnosis
+        \end{itemize}
+        \item 5.2 Regularization (L2, Dropout)
+        \item 5.3 Optimization Algorithms (Adam, RMSProp)
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지금까지 우리는 신경망이라는 \textbf{'최고급 엔진'}을 조립했습니다. 하지만 페라리 엔진을 트랙터에 달거나, 불순물이 섞인 연료를 넣으면 아무 소용이 없습니다.
+이제부터는 엔진을 \textbf{'어떻게 운용해야(Strategy)'} 최고의 성능을 낼 수 있는지 배웁니다. 그 첫걸음은 데이터를 올바르게 나누는 것입니다. 많은 초심자가 데이터를 몽땅 털어 넣고 학습부터 시키지만, 이는 "채점 기준도 모른 채 시험 공부를 하는 것"과 같습니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 성공적인 머신러닝 프로젝트의 나침반인 \textbf{'데이터 분할 전략'}을 다룹니다.
+\begin{itemize}
+    \item \textbf{정의:} Train(학습), Dev(튜닝), Test(평가) 세트의 명확한 역할 차이를 이해합니다.
+    \item \textbf{비율:} 빅데이터 시대(100만 개 이상)에 왜 \textbf{98:1:1} 비율을 사용하는지 통계적으로 설명합니다.
+    \item \textbf{원칙:} Dev와 Test 세트가 반드시 \textbf{동일한 분포(Same Distribution)}여야 하는 이유를 배웁니다.
+    \item \textbf{진단:} 데이터 분할 결과를 통해 모델의 과소적합/과대적합을 진단하는 표를 해석합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{데이터셋} & \textbf{역할} & \textbf{비유 (수험생)} \\ \hline
+\textbf{Train Set} & 모델의 파라미터($W, b$) 학습 & \textbf{교과서} (평소 공부) \\ \hline
+\textbf{Dev Set} & 하이퍼파라미터 튜닝 \& 모델 선택 & \textbf{모의고사} (실력 점검 및 공부법 수정) \\ \hline
+\textbf{Test Set} & 최종 성능 평가 (학습/튜닝 관여 X) & \textbf{수능/본고사} (결과 번복 불가) \\ \hline
+\end{tabular}
+\end{center}
+\textit{* Note: 과거에는 'Validation Set'이라고 불렀으나, Andrew Ng 교수는 'Dev Set'이라는 용어를 선호합니다.}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 전략적 분할}
+
+\subsection{1. The Era Shift: 60/20/20 vs 98/1/1}
+데이터의 양(Size)에 따라 황금 비율은 달라집니다.
+
+\begin{itemize}
+    \item \textbf{Traditional ML (Small Data):} 데이터가 1만 개 미만일 때.
+    \begin{itemize}
+        \item 비율: \textbf{60\% : 20\% : 20\%}
+        \item 이유: 평가용 데이터가 너무 적으면 통계적으로 신뢰할 수 없어서 20\%나 떼어놔야 했습니다.
+    \end{itemize}
+    
+    \item \textbf{Deep Learning Era (Big Data):} 데이터가 100만 개 이상일 때.
+    \begin{itemize}
+        \item 비율: \textbf{98\% : 1\% : 1\%}
+        \item 이유: 100만 개의 1\%면 1만 개입니다. 이 정도면 평가하기에 충분합니다. 나머지 98\%를 학습(Train)에 몰아주어 성능을 극대화하는 것이 유리합니다.
+    \end{itemize}
+\end{itemize}
+
+
+
+\subsection{2. The Golden Rule: Same Distribution}
+\textbf{"Dev Set과 Test Set은 반드시 같은 과녁을 겨냥해야 한다."}
+
+\begin{warningbox}{나쁜 예시 (Bad Example)}
+\begin{itemize}
+    \item \textbf{Train:} 웹에서 크롤링한 고화질 고양이 사진 (20만 장)
+    \item \textbf{Dev/Test:} 사용자가 폰으로 찍은 흐릿한 고양이 사진 (1만 장)
+\end{itemize}
+\textbf{결과:} 훈련 때는 99점(고화질 마스터)이지만, 실전에서는 0점입니다.
+\textbf{해결:} 모든 데이터를 섞어서(Shuffle) 나누거나, Dev/Test를 실제 목표(모바일 사진)로만 구성해야 합니다.
+\end{warningbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: 모델 진단 (Bias vs Variance)}
+
+데이터를 나누는 진짜 이유는 모델의 상태를 진단하기 위해서입니다.
+
+\begin{diagnosisbox}{성능 진단표 (Human Error $\approx$ 0\% 가정)}
+\begin{center}
+\begin{tabular}{c|c|l|l}
+\hline
+\textbf{Train Error} & \textbf{Dev Error} & \textbf{진단 (Diagnosis)} & \textbf{처방 (Action)} \\ \hline
+1\% & 11\% & \textbf{High Variance} (과대적합) & 데이터 추가, 정규화(Dropout), 모델 축소 \\ \hline
+15\% & 16\% & \textbf{High Bias} (과소적합) & 더 큰 모델(층 추가), 학습 시간 연장 \\ \hline
+15\% & 30\% & \textbf{High Bias \& Variance} & 모델 구조 변경, 데이터 정제 \\ \hline
+0.5\% & 1\% & \textbf{Low Bias \& Low Variance} & \textbf{Ideal (성공!)} \\ \hline
+\end{tabular}
+\end{center}
+\end{diagnosisbox}
+
+\begin{itemize}
+    \item \textbf{Bias(편향) 문제:} Train Set조차 제대로 못 맞춤. (공부를 안 함)
+    \item \textbf{Variance(분산) 문제:} Train은 잘 맞추는데 Dev는 못 맞춤. (교과서만 달달 외움, 응용 불가)
+\end{itemize}
+
+
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Data Leakage 방지}
+
+가장 중요한 것은 \textbf{Data Leakage(데이터 누수)}를 막는 것입니다. 정규화(Normalization)를 할 때, 전체 데이터의 평균을 쓰면 안 됩니다. \textbf{오직 Train Set의 통계량}만 사용해야 합니다.
+
+\begin{lstlisting}[language=Python, caption=Stratified Split \& Safe Normalization, breaklines=true]
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+def prepare_data(X, y):
+    """
+    X: (m, n_x) features
+    y: (m,) labels
+    """
+    # 1. Stratified Split (클래스 비율 유지하며 분할)
+    # Train(98%) vs Temp(2%)
+    X_train, X_temp, y_train, y_temp = train_test_split(
+        X, y, test_size=0.02, random_state=42, stratify=y
+    )
+    
+    # Temp를 다시 반반 나누어 Dev(1%) vs Test(1%)
+    X_dev, X_test, y_dev, y_test = train_test_split(
+        X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp
+    )
+    
+    # 2. Data Leakage 방지 전처리 (핵심!)
+    # 전체 X가 아니라, 오직 X_train 만으로 평균/표준편차 계산
+    mean = np.mean(X_train, axis=0)
+    std = np.std(X_train, axis=0)
+    
+    # 계산된 통계량으로 Train, Dev, Test 모두 변환
+    X_train_norm = (X_train - mean) / (std + 1e-8)
+    X_dev_norm = (X_dev - mean) / (std + 1e-8)
+    X_test_norm = (X_test - mean) / (std + 1e-8)
+    
+    return X_train_norm, X_dev_norm, X_test_norm, y_train, y_dev, y_test
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q1. Test Set 없이 Train/Dev만 쓰면 안 되나요?} \\
+\textbf{A.} 가능은 합니다만, 위험합니다. Dev Set을 보고 모델을 계속 수정하다 보면, 모델이 Dev Set에 과적합(Overfitting)됩니다. 마치 모의고사 답을 외워버린 것과 같습니다. 객관적인 최종 평가를 위해 Test Set은 한 번도 보지 않은 상태로 남겨둬야 합니다.
+
+\textbf{Q2. 시계열 데이터(주식)도 랜덤 셔플(Shuffle)해도 되나요?} \\
+\textbf{A.} \textbf{절대 안 됩니다.} 미래 정보가 과거 학습 데이터에 섞여 들어가게 됩니다(Look-ahead Bias). 시계열 데이터는 시간 순서대로 잘라야 합니다. (예: 1~9월 Train, 10월 Dev, 11월 Test)
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+데이터 세팅이 끝났습니다. 이제 여러분은 모델이 \textbf{High Variance(과대적합)} 상태인지, \textbf{High Bias(과소적합)} 상태인지 진단할 수 있습니다.
+
+만약 진단 결과 모델이 \textbf{High Variance(과대적합)}라면 어떻게 해야 할까요? 데이터를 더 모으는 것이 좋겠지만, 돈과 시간이 듭니다.
+다음 시간에는 데이터를 늘리지 않고도 과대적합을 해결하는 마법 같은 기법, \textbf{[Regularization] (L2 Regularization \& Dropout)}을 배우겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Split:} 빅데이터 시대에는 \textbf{98/1/1} 비율이 대세다. Train에 집중하라.
+    \item \textbf{Distribution:} Dev와 Test는 반드시 \textbf{같은 분포}여야 한다.
+    \item \textbf{Leakage:} 정규화 시 평균($\mu$)과 분산($\sigma$)은 \textbf{오직 Train Set}에서만 구한다.
+    \item \textbf{Diagnosis:} Train Error와 Dev Error의 차이가 크면 \textbf{Variance(과대적합)} 문제다.
+  \end{enumerate}
+\end{summarybox}
+
+\end{document}

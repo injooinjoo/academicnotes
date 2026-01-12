@@ -1,0 +1,286 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm} % 볼드체 벡터 표시용
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 3}
+\fancyhead[R]{Linear Regression}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 설명에서 예측으로}}
+\author{Unit 3: Linear Regression (선형 회귀)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 1, 2: Estimation (현재 상태 파악)
+    \item \textbf{\textcolor{mainblue}{Unit 3: Linear Regression (현재 단원: 미래 예측과 관계 규명)}}
+    \begin{itemize}
+        \item 3.1 The Setup: Matrix Formulation
+        \item 3.2 Least Squares Estimation (LSE)
+        \item 3.3 Geometric Interpretation (Projection)
+        \item 3.4 Gauss-Markov Theorem (BLUE)
+        \item 3.5 Inference (t-test, F-test)
+    \end{itemize}
+    \item Unit 4: Hypothesis Testing (심화)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 3. 선형 회귀 (Linear Regression)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지금까지 우리는 하나의 변수(예: 동전 앞면 확률 $p$, 평균 키 $\mu$)를 추정하는 데 집중했습니다. 하지만 현실 세계는 여러 변수가 얽혀 있습니다. 키는 유전, 영양, 운동량에 영향을 받죠. 이제 우리는 \textbf{"변수 $X$가 변할 때 결과 $Y$는 어떻게 변하는가?"}를 수학적으로 모델링하고, 이를 통해 보이지 않는 미래를 \textbf{예측(Prediction)}하는 단계로 나아갑니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+선형 회귀는 입력($X$)과 출력($Y$)의 관계를 선형 방정식($Y=X\beta$)으로 설명하는 기법입니다. 이 단원에서는 \textbf{최소자승법(LSE)}이 기하학적으로는 \textbf{직교 투영(Orthogonal Projection)}임을 이해하고, 데이터가 정규분포를 따르지 않아도 LSE가 최적의 추정량(\textbf{BLUE})이 됨을 증명하는 \textbf{가우스-마르코프 정리}를 배웁니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Design Matrix ($\mathbf{X}$)} & 요리 재료들의 목록표 ($n \times p$ 행렬). \\
+\hline
+\textbf{Coefficient Vector ($\beta$)} & 각 재료가 맛에 미치는 영향력 (우리가 구해야 할 레시피). \\
+\hline
+\textbf{Residual ($e$ or $\hat{\epsilon}$)} & 실제 맛($Y$)과 레시피대로 만든 맛($\hat{Y}$)의 차이. \\
+\hline
+\textbf{Projection Matrix ($P$)} & $Y$를 $X$의 공간 위로 수직으로 내리꽂는 그림자 생성기. \\
+\hline
+\textbf{BLUE} & Best Linear Unbiased Estimator. (가장 믿을만한 선형 추정량). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 선형 회귀 모델의 구조 (The Setup)}
+
+\begin{conceptbox}{개념 1: 행렬로 세상을 표현하다}
+\textbf{한 줄 요약:} 복잡한 연립방정식 문제를 $\mathbf{Y} = \mathbf{X}\beta + \epsilon$이라는 우아한 행렬식 하나로 압축합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 아파트 가격 맞추기}
+\begin{itemize}
+    \item $\mathbf{Y}$ (결과): 아파트 가격들 (10억, 15억, ...)
+    \item $\mathbf{X}$ (재료): [평수, 역까지 거리, 학군 점수]
+    \item $\beta$ (영향력): [평당 가격, 1km당 감가액, 학군 프리미엄]
+    \item $\epsilon$ (잡음): 옆집이 시세보다 싸게 내놓은 급매물 같은 예측 불가능한 요인.
+\end{itemize}
+
+\subsubsection*{2) 수학적 정의}
+$$ \mathbf{Y} = \mathbf{X}\beta + \epsilon $$
+여기서 $\mathbf{X}$는 $n \times p$ 행렬입니다 ($n$: 데이터 개수, $p$: 변수 개수).
+\textbf{주요 가정:}
+\begin{enumerate}
+    \item $\mathbb{E}[\epsilon] = 0$ (잡음의 평균은 0이다.)
+    \item $\text{Var}(\epsilon) = \sigma^2 I_n$ (모든 데이터의 잡음 수준은 일정하고 독립적이다.)
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 최소자승법 (Least Squares Estimation, LSE)}
+
+
+\begin{conceptbox}{개념 2: 오차의 제곱을 최소화하라}
+\textbf{한 줄 요약:} 모든 데이터 점들과 직선 사이의 거리(잔차) 제곱합을 최소로 만드는 $\beta$를 찾습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 최적화 문제}
+우리의 목표는 잔차 벡터의 길이($\| Y - \mathbf{X}\beta \|^2$)를 최소화하는 $\hat{\beta}$를 찾는 것입니다.
+$$ \hat{\beta} = \text{argmin}_{\beta} \| \mathbf{Y} - \mathbf{X}\beta \|^2 $$
+
+\subsubsection*{2) 해 구하기 (Normal Equations)}
+위 식을 $\beta$로 미분하여 0이 되는 지점을 찾으면 다음과 같은 \textbf{정규 방정식(Normal Equations)}이 나옵니다.
+$$ \mathbf{X}^T \mathbf{X} \beta = \mathbf{X}^T \mathbf{Y} $$
+만약 $(\mathbf{X}^T \mathbf{X})$의 역행렬이 존재한다면, 우리는 \textbf{단 한 번의 행렬 연산}으로 정답을 얻습니다.
+$$ \hat{\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y} $$
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 기하학적 해석: 직교 투영 (Projection)}
+
+
+\begin{conceptbox}{개념 3: 그림자 놀이}
+\textbf{한 줄 요약:} 우리의 예측값 $\hat{Y}$는 실제 데이터 $Y$를 $\mathbf{X}$가 만드는 평면(공간) 위로 \textbf{수직으로 내리꽂은 그림자}입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 공간의 이해}
+\begin{itemize}
+    \item 데이터 $\mathbf{Y}$는 $n$차원 공간에 떠 있는 하나의 점입니다.
+    \item 우리가 가진 재료 $\mathbf{X}$들로 만들 수 있는 모든 예측값들의 집합을 \textbf{열 공간(Column Space, $\mathcal{C}(\mathbf{X})$)}이라고 합니다. 이는 $n$차원 공간 속의 작은 평면입니다.
+\end{itemize}
+
+\subsubsection*{2) 직교성 (Orthogonality)}
+점 $Y$에서 평면 $\mathcal{C}(\mathbf{X})$까지 거리가 가장 짧으려면? 당연히 \textbf{수직(Orthogonal)}으로 내려야 합니다.
+즉, 잔차 벡터 $e = Y - \hat{Y}$는 평면 $\mathcal{C}(\mathbf{X})$와 직교합니다.
+$$ \mathbf{X}^T e = 0 \implies \mathbf{X}^T (Y - \mathbf{X}\hat{\beta}) = 0 $$
+이 식을 풀면 앞서 본 정규 방정식 $\mathbf{X}^T \mathbf{X} \beta = \mathbf{X}^T \mathbf{Y}$가 바로 유도됩니다!
+
+\subsubsection*{3) 투영 행렬 (Hat Matrix)}
+예측값 $\hat{Y}$는 $Y$에 \textbf{투영 행렬 $P$}를 곱한 것입니다.
+$$ \hat{Y} = P Y, \quad \text{where } P = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T $$
+($P$를 Hat Matrix라고 부르는 이유는 $Y$ 머리 위에 모자 $\hat{Y}$를 씌워주기 때문입니다.)
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 가우스-마르코프 정리 (Gauss-Markov Theorem)}
+
+\begin{conceptbox}{개념 4: 왜 하필 LSE인가?}
+\textbf{한 줄 요약:} 데이터가 정규분포가 아니더라도, 오차의 평균이 0이고 분산이 일정하다면 LSE가 \textbf{"가장 분산이 작은(정밀한) 선형 추정량"}임이 수학적으로 보장됩니다.
+\end{conceptbox}
+
+\subsubsection*{BLUE (Best Linear Unbiased Estimator)}
+LSE 추정량 $\hat{\beta}$는 다음 조건을 만족하는 챔피언입니다.
+\begin{itemize}
+    \item \textbf{Linear:} 데이터 $Y$의 선형 결합으로 계산됨.
+    \item \textbf{Unbiased:} 평균적으로 참값 $\beta$를 맞춤 ($\mathbb{E}[\hat{\beta}] = \beta$).
+    \item \textbf{Best:} 위의 두 조건을 만족하는 애들 중에서 \textbf{분산이 가장 작음(Minimum Variance)}.
+\end{itemize}
+즉, 다른 방법을 쓰면 영점이 흔들리거나(Biased), 탄착군이 넓어집니다(High Variance).
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{5. 추론 (Inference): 가설 검정}
+
+이제 $\epsilon \sim \mathcal{N}(0, \sigma^2 I)$라는 \textbf{정규분포 가정}을 추가합니다. 그래야 신뢰 구간과 p-value를 구할 수 있습니다.
+
+\subsubsection*{1) 추정량의 분포}
+$\hat{\beta}$는 정규분포 따르는 $Y$의 선형 변환이므로, 역시 정규분포를 따릅니다.
+$$ \hat{\beta} \sim \mathcal{N}\left(\beta, \sigma^2 (\mathbf{X}^T \mathbf{X})^{-1}\right) $$
+
+\subsubsection*{2) t-test (변수의 유의성 검정)}
+"학군($\beta_3$)이 집값에 진짜 영향이 있나?" ($H_0: \beta_3 = 0$)
+$$ T = \frac{\hat{\beta}_j - 0}{\text{SE}(\hat{\beta}_j)} \sim t_{n-p} $$
+여기서 $\text{SE}(\hat{\beta}_j)$는 $\hat{\sigma} \sqrt{(\mathbf{X}^T \mathbf{X})^{-1}_{jj}}$ 입니다.
+
+\begin{warningbox}{코크란의 정리 (Cochran's Theorem)}
+우리가 t-분포를 쓸 수 있는 이유는 \textbf{"추정된 계수($\hat{\beta}$)와 잔차($\hat{\epsilon}$)가 서로 독립"}이라는 수학적 성질 덕분입니다. 이는 기하학적으로 투영된 그림자($\hat{Y}$)와 수직선($e$)이 직교하기 때문에 성립합니다.
+\end{warningbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넷플릭스 시청 시간 예측}
+
+\begin{storybox}{Scenario: 새로운 드라마의 성공 예측}
+당신은 넷플릭스의 데이터 과학자입니다. 신규 드라마의 '첫 달 시청 시간($Y$)'을 예측하려 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{변수 설정 ($\mathbf{X}$):}
+    \begin{itemize}
+        \item $X_1$: 제작비 (억 원)
+        \item $X_2$: 주연 배우의 인스타 팔로워 수 (만 명)
+        \item $X_3$: 에피소드 수
+    \end{itemize}
+    
+    \item \textbf{모델링:} $Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_3 + \epsilon$
+    
+    \item \textbf{LSE 결과:} $\hat{\beta} = [100, 2.5, 0.1, 50]^T$
+    \begin{itemize}
+        \item 해석: 제작비 1억 늘면 시청 시간 2.5만 시간 증가.
+        \item 해석: 팔로워 1만 명당 시청 시간 0.1만 시간 증가. (생각보다 적음)
+    \end{itemize}
+    
+    \item \textbf{t-test:} $X_2$(팔로워 수)의 p-value가 0.35가 나옴.
+    \begin{itemize}
+        \item 결론: "주연 배우의 팔로워 수는 시청 시간에 통계적으로 유의미한 영향이 없습니다." $\rightarrow$ 마케팅 팀에 "인플루언서 섭외보다 제작비 증액이 낫습니다"라고 제안.
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. $(\mathbf{X}^T \mathbf{X})$의 역행렬이 없으면 어떡하죠?]
+    \textbf{A.} 이를 \textbf{다중공선성(Multicollinearity)} 문제라고 합니다. 예를 들어 '키(cm)'와 '키(m)'를 동시에 변수로 넣으면, 두 변수가 완벽하게 겹쳐서 수학적으로 해를 구할 수 없습니다. 이때는 변수를 하나 제거하거나, \textbf{Ridge Regression} 같은 기법을 써야 합니다.
+    
+    \item[Q2. 왜 잔차 제곱의 합을 쓰나요? 절댓값의 합을 쓰면 안 되나요?]
+    \textbf{A.} 써도 됩니다(LAD 회귀). 하지만 절댓값은 미분이 불가능한 점(뾰족한 점)이 있어서 수학적으로 다루기 어렵습니다. 반면 제곱($L^2$)은 미분이 깔끔하고, 기하학적으로 '직교 투영'이라는 완벽한 해석이 가능하기 때문에 통계학의 표준이 되었습니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 연속형 숫자($Y$)를 예측하는 선형 회귀를 배웠습니다. 그런데 만약 결과가 숫자가 아니라 \textbf{"합격/불합격", "암/정상"} 같은 범주라면 어떡할까요? 선형 회귀로는 0과 1 사이의 확률을 표현하기 어렵습니다. 다음 시간에는 이를 해결하는 \textbf{로지스틱 회귀(Logistic Regression)}와 일반화 선형 모형(GLM)을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 3 핵심 요약}
+\begin{itemize}
+    \item \textbf{모델:} $Y = \mathbf{X}\beta + \epsilon$. 현실을 선형 결합으로 근사한다.
+    \item \textbf{LSE:} 잔차 제곱합을 최소화하는 방법. $\hat{\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T Y$.
+    \item \textbf{기하학:} 예측값 $\hat{Y}$는 데이터 $Y$를 열 공간 $\mathcal{C}(\mathbf{X})$에 \textbf{수직 투영(Orthogonal Projection)}한 것이다.
+    \item \textbf{Gauss-Markov:} 정규성 가정이 없어도 LSE는 분산이 가장 작은 최적의 추정량(BLUE)이다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

@@ -1,0 +1,251 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (핵심 수식)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Vanishing Gradients \& GRU}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1 RNN Basics \textit{- Completed}
+        \item 10.2 Various RNN Architectures \textit{- Completed}
+        \item \textbf{10.3 Vanishing Gradients \& Gated Units}
+        \begin{itemize}
+            \item The Problem: Vanishing Gradients
+            \item The Solution: Gating Mechanism
+            \item GRU (Gated Recurrent Unit)
+            \item Implementation: Update \& Reset Gates
+        \end{itemize}
+        \item 10.4 LSTM (Long Short-Term Memory) \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 배운 기본 RNN은 이론적으로는 완벽해 보입니다. 과거 정보를 현재로 전달하니까요.
+하지만 실제로는 문장이 10단어만 넘어가도 앞부분 내용을 까맣게 잊어버립니다.
+\textbf{"The cat, which ate ..., was full."}
+RNN은 중간 수식어가 길어지면 주어 'cat(단수)'을 잊어버리고 동사 'was'를 예측하지 못합니다.
+이것이 바로 \textbf{기울기 소실(Vanishing Gradient)} 문제입니다. 오늘은 이 난제를 해결한 \textbf{GRU}를 배웁니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 RNN의 장기 의존성 문제를 해결하는 게이트(Gate) 메커니즘을 다룹니다.
+\begin{itemize}
+    \item \textbf{원인:} 역전파 시 기울기가 지수적으로 작아져서 초기 기억이 사라지는 수학적 원리를 이해합니다.
+    \item \textbf{해결:} 정보를 "얼마나 유지하고 버릴지" 결정하는 \textbf{게이트(Gate)} 개념을 도입합니다.
+    \item \textbf{모델:} LSTM의 간소화 버전인 \textbf{GRU}의 구조와 수식을 마스터합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{역할} \\ \hline
+\textbf{Vanishing Gradient} & 기울기 소실 & 깊은 신경망 학습을 방해하는 주범. \\ \hline
+\textbf{Gate ($\Gamma$)} & 문지기 (0~1) & 정보 흐름을 제어하는 시그모이드 함수. \\ \hline
+\textbf{Update Gate ($\Gamma_u$)} & 업데이트 게이트 & 과거 기억을 얼마나 유지할지 결정. \\ \hline
+\textbf{Reset Gate ($\Gamma_r$)} & 리셋 게이트 & 과거 기억을 얼마나 무시할지 결정. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 기억의 보존}
+
+\subsection{1. The Problem: Vanishing Gradients}
+RNN에서 $t=100$ 시점의 오차를 $t=1$ 시점까지 전파하려면 가중치 행렬 $W$를 100번 곱해야 합니다.
+
+\begin{analogybox}{복사본의 복사본}
+문서를 복사하고, 그 복사본을 또 복사하는 과정을 100번 반복한다고 상상해 보세요.
+조금이라도 흐릿해지면($W < 1$), 100번째 복사본은 백지가 되어버립니다.
+반대로 진해지면($W > 1$), 검은색 잉크 덩어리가 됩니다(Exploding).
+\end{analogybox}
+
+\subsection{2. The Solution: Gated Recurrent Unit (GRU)}
+핵심 아이디어는 \textbf{"기억을 위한 전용 금고(Memory Cell)를 만들고 문지기를 세우자"}는 것입니다.
+
+\begin{formulabox}{GRU의 핵심 수식}
+$$ c^{\langle t \rangle} = \Gamma_u \cdot \tilde{c}^{\langle t \rangle} + (1 - \Gamma_u) \cdot c^{\langle t-1 \rangle} $$
+\begin{itemize}
+    \item $\Gamma_u$ (Update Gate): 0이면 문을 닫습니다.
+    \item $\Gamma_u \approx 0$ 일 때: $c^{\langle t \rangle} \approx c^{\langle t-1 \rangle}$.
+    \item \textbf{의미:} 과거의 기억($c^{\langle t-1 \rangle}$)이 아무런 변형 없이(행렬 곱셈 없이) 그대로 복사되어 다음으로 넘어갑니다. \textbf{기울기 소실 없이 고속도로처럼 전달}됩니다.
+\end{itemize}
+\end{formulabox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: GRU Gates Detail}
+
+GRU는 두 개의 게이트를 사용합니다.
+
+\begin{enumerate}
+    \item \textbf{Update Gate ($\Gamma_u$):} "이 기억을 계속 가져갈까?" (단수/복수 정보 유지)
+    $$ \Gamma_u = \sigma(W_u[c^{\langle t-1 \rangle}, x^{\langle t \rangle}] + b_u) $$
+    
+    \item \textbf{Reset Gate ($\Gamma_r$):} "이제 과거는 잊을까?" (문침표가 나오면 리셋)
+    $$ \Gamma_r = \sigma(W_r[c^{\langle t-1 \rangle}, x^{\langle t \rangle}] + b_r) $$
+    
+    \item \textbf{Candidate Memory ($\tilde{c}$):} 새로운 기억 후보
+    $$ \tilde{c}^{\langle t \rangle} = \tanh(W_c[\Gamma_r \cdot c^{\langle t-1 \rangle}, x^{\langle t \rangle}] + b_c) $$
+\end{enumerate}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: GRU Cell}
+
+\begin{lstlisting}[language=Python, caption=GRU Cell Forward Implementation, breaklines=true]
+import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def gru_cell_forward(xt, a_prev, parameters):
+    """
+    xt: 현재 입력
+    a_prev: 과거 은닉 상태 (GRU에선 Memory Cell c와 동일)
+    """
+    # 파라미터 로드
+    W_u = parameters["Wu"] # Update Gate Weights
+    W_r = parameters["Wr"] # Reset Gate Weights
+    W_c = parameters["Wc"] # Candidate Memory Weights
+    
+    # 입력 결합 (Concatenate)
+    concat = np.concatenate((a_prev, xt), axis=0)
+    
+    # 1. Update Gate (Gamma_u)
+    Gamma_u = sigmoid(np.dot(W_u, concat) + parameters["bu"])
+    
+    # 2. Reset Gate (Gamma_r)
+    Gamma_r = sigmoid(np.dot(W_r, concat) + parameters["br"])
+    
+    # 3. Candidate Memory (c_tilde)
+    # 과거 기억에 Reset Gate 적용
+    concat_reset = np.concatenate((Gamma_r * a_prev, xt), axis=0)
+    c_candidate = np.tanh(np.dot(W_c, concat_reset) + parameters["bc"])
+    
+    # 4. Final Memory Update (The Magic Formula)
+    # u가 0이면 과거 기억 보존, 1이면 새 기억으로 덮어씀
+    c_next = Gamma_u * c_candidate + (1 - Gamma_u) * a_prev
+    
+    return c_next
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{Gradient Clipping (기울기 자르기)}
+기울기 소실의 반대는 \textbf{기울기 폭발(Exploding Gradient)}입니다. 숫자가 너무 커져서 `NaN`이 뜹니다.
+해결책은 간단합니다. 기울기 벡터의 크기(Norm)가 특정 값(예: 5)을 넘으면 강제로 줄여버리는 \textbf{Gradient Clipping}을 사용합니다.
+\end{warningbox}
+
+\textbf{Q. GRU와 LSTM 중 뭐가 더 좋나요?} \\
+\textbf{A.} \textbf{정답은 없습니다.} GRU는 구조가 단순해서(게이트 2개) 연산이 빠르고 데이터가 적을 때 유리합니다. LSTM은 구조가 복잡하지만(게이트 3개) 표현력이 더 좋습니다. 보통 LSTM을 기본으로 쓰고, 속도가 중요하면 GRU를 씁니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+GRU는 훌륭하고 단순합니다. 하지만 때로는 더 섬세한 제어가 필요합니다. GRU보다 조금 더 복잡하지만, 더 강력하고 널리 쓰이는 형님이 있습니다.
+
+다음 시간에는 GRU의 확장판이자 RNN의 사실상 표준(De facto Standard), \textbf{[LSTM (Long Short-Term Memory)]}에 대해 다루겠습니다. 3개의 게이트(Forget, Input, Output)가 어떻게 기억을 수술하듯 정교하게 다루는지 알아보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Vanishing Gradient:} 시퀀스가 길어지면 초기 정보가 사라지는 문제.
+    \item \textbf{Gate:} 시그모이드를 사용해 정보의 통과 여부(0~1)를 결정하는 밸브.
+    \item \textbf{GRU:} Update/Reset 게이트를 사용해 기억을 보존하거나 갱신한다.
+    \item \textbf{Key:} $\Gamma_u=0$일 때 과거 기억이 손실 없이 그대로 전달된다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

@@ -576,7 +576,7 @@ Here's where reproducibility becomes critical:
 \textbf{Cause:} Features were computed \textbf{differently} during training vs. serving:
 
 \textbf{During Training (Offline):}
-\begin{lstlisting}[style=sqlstyle]
+\begin{lstlisting}[style=sqlstyle, breaklines=true]
 -- Batch computation, can be slow
 SELECT AVG(purchase_amount) as avg_purchase
 FROM transactions
@@ -585,7 +585,7 @@ GROUP BY customer_id
 \end{lstlisting}
 
 \textbf{During Serving (Online):}
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 # Real-time computation, must be fast
 avg_purchase = (sum_so_far + new_purchase) / (count + 1)
 \end{lstlisting}
@@ -716,7 +716,7 @@ Why? Because once trained, the model can \texttt{.transform()} new data into pre
 \end{enumerate}
 \end{summarybox}
 
-\begin{lstlisting}[style=pythonstyle, caption={Transformer vs. Estimator in Code}]
+\begin{lstlisting}[style=pythonstyle, caption={Transformer vs. Estimator in Code}, breaklines=true]
 from sklearn.preprocessing import StandardScaler  # Transformer
 from sklearn.linear_model import LinearRegression  # Estimator
 
@@ -936,7 +936,7 @@ MLflow provides four integrated components that solve the reproducibility crisis
 \end{itemize}
 \end{infobox}
 
-\begin{lstlisting}[style=pythonstyle, caption={MLflow Tracking: Manual vs. AutoLog}]
+\begin{lstlisting}[style=pythonstyle, caption={MLflow Tracking: Manual vs. AutoLog}, breaklines=true]
 import mlflow
 
 # OPTION 1: Manual Logging (explicit control)
@@ -1035,7 +1035,7 @@ Anyone can then run \texttt{mlflow run <project\_path>} and MLflow automatically
 
 Here's how all four components work together:
 
-\begin{lstlisting}[style=pythonstyle, caption={Complete MLflow Workflow}]
+\begin{lstlisting}[style=pythonstyle, caption={Complete MLflow Workflow}, breaklines=true]
 import mlflow
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
@@ -1053,7 +1053,7 @@ with mlflow.start_run(run_name="xgboost_tuning_v1"):
     mlflow.log_params(params)
 
     # 4. Train the model
-    model = XGBRegressor(**params)
+    model = XGBRegressor(\textbf{params)
     model.fit(X_train, y_train)
 
     # 5. Evaluate and log metrics (outputs)
@@ -1090,7 +1090,7 @@ new_predictions = loaded_model.predict(new_data)
 
 When doing hyperparameter tuning (with Optuna, Hyperopt, etc.), use \textbf{nested runs}:
 
-\begin{lstlisting}[style=pythonstyle, caption={Hyperparameter Tuning with Nested Runs}]
+\begin{lstlisting}[style=pythonstyle, caption={Hyperparameter Tuning with Nested Runs}, breaklines=true]
 import optuna
 
 def objective(trial):
@@ -1102,7 +1102,7 @@ def objective(trial):
         }
         mlflow.log_params(params)
 
-        model = XGBRegressor(**params)
+        model = XGBRegressor(}params)
         model.fit(X_train, y_train)
         rmse = evaluate(model, X_val, y_val)
         mlflow.log_metric("rmse", rmse)
@@ -1128,7 +1128,7 @@ When running the labs in the free Databricks Community Edition:
 Replace \texttt{main.default} with your own catalog (e.g., \texttt{cscie103\_catalog.default})
 
 \textbf{2. Use Local Trials Instead of SparkTrials:}
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 # ORIGINAL (may fail in serverless):
 from hyperopt import SparkTrials
 trials = SparkTrials(parallelism=4)
@@ -1168,7 +1168,7 @@ When you have a new model, you don't immediately replace the production model. I
 \end{enumerate}
 \end{definitionbox}
 
-\begin{lstlisting}[style=pythonstyle, caption={Model Stage Transitions in MLflow}]
+\begin{lstlisting}[style=pythonstyle, caption={Model Stage Transitions in MLflow}, breaklines=true]
 from mlflow import MlflowClient
 
 client = MlflowClient()

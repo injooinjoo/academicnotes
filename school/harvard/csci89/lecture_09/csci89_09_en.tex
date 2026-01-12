@@ -11,6 +11,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{geometry}
@@ -269,7 +270,7 @@ In practice, use log probabilities for numerical stability:
 
 \subsection{Implementation}
 
-\begin{lstlisting}[caption={Naive Bayes for Text Classification}]
+\begin{lstlisting}[caption={Naive Bayes for Text Classification}, breaklines=true]
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import train_test_split
@@ -393,7 +394,7 @@ Ties must be broken randomly, so results may vary between runs. Default implemen
 
 \subsection{Implementation}
 
-\begin{lstlisting}[caption={KNN for Text Classification}]
+\begin{lstlisting}[caption={KNN for Text Classification}, breaklines=true]
 from sklearn.neighbors import KNeighborsClassifier
 
 # After TF-IDF vectorization...
@@ -472,7 +473,7 @@ This allows curved decision boundaries, but requires manual feature design.
 
 \subsection{Implementation}
 
-\begin{lstlisting}[caption={Logistic Regression for Text}]
+\begin{lstlisting}[caption={Logistic Regression for Text}, breaklines=true]
 from sklearn.linear_model import LogisticRegression
 
 lr = LogisticRegression(max_iter=1000)
@@ -590,7 +591,7 @@ The $\gamma$ parameter controls how ``local'' the influence of each point is.
 
 \subsection{Implementation}
 
-\begin{lstlisting}[caption={SVM for Text Classification}]
+\begin{lstlisting}[caption={SVM for Text Classification}, breaklines=true]
 from sklearn.svm import SVC
 
 # Linear kernel
@@ -722,7 +723,7 @@ Random forests are ``black boxes''---hard to understand why predictions are made
 
 \subsection{Implementation}
 
-\begin{lstlisting}[caption={Random Forest for Text}]
+\begin{lstlisting}[caption={Random Forest for Text}, breaklines=true]
 from sklearn.ensemble import RandomForestClassifier
 
 rf = RandomForestClassifier(
@@ -799,7 +800,7 @@ Every data point is tested exactly once!
 When using K-fold, the TF-IDF vectorizer must be fit on training folds only, not test fold. Use sklearn Pipeline to handle this automatically.
 \end{warningbox}
 
-\begin{lstlisting}[caption={Pipeline with Cross-Validation}]
+\begin{lstlisting}[caption={Pipeline with Cross-Validation}, breaklines=true]
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 

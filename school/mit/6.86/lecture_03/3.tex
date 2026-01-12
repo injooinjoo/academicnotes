@@ -1,0 +1,239 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 3}
+\fancyhead[R]{Support Vector Machines}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 가장 안전한 경계선}}
+\author{Unit 3: Maximum Margin \& SVM}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 2: Linear Classifiers (틀리지만 않으면 됨)
+    \item \textbf{\textcolor{mainblue}{Unit 3: Support Vector Machines (현재 단원: 가장 완벽하게 나누기)}}
+    \begin{itemize}
+        \item 3.1 Hinge Loss (확신을 갖는 학습)
+        \item 3.2 Margin Maximization (도로 폭 넓히기)
+        \item 3.3 Regularization ($\lambda$의 역할)
+    \end{itemize}
+    \item Unit 4: Feature Engineering (비선형 데이터 다루기)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 3. 마진 최대화와 SVM (Maximum Margin \& SVM)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 2의 퍼셉트론은 훌륭했지만, "아무 선이나" 긋는다는 치명적인 단점이 있었습니다. 절벽 끝에 서 있어도 떨어지지만 않으면 안전하다고 판단했죠. SVM은 다릅니다. \textbf{"절벽에서 적어도 1m는 떨어져 있어야 안전하다"}라고 주장합니다. 이것이 바로 마진(Margin)입니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 분류 경계면과 데이터 사이의 거리를 최대화하는 \textbf{SVM(Support Vector Machine)}을 배웁니다. 이를 위해 단순한 오분류(0/1 Loss) 대신 \textbf{힌지 손실(Hinge Loss)}을 도입하여 "여유 있는 정답"을 유도하고, \textbf{정칙화(Regularization)}를 통해 이상치(Outlier)에 대처하는 유연한(Soft) 경계면을 만드는 법을 익힙니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Margin (마진)} & 결정 경계와 가장 가까운 데이터 사이의 거리 (도로 폭). \\
+\hline
+\textbf{Support Vectors} & 도로의 경계선에 딱 붙어있는 데이터들 (결정적인 기준점). \\
+\hline
+\textbf{Hinge Loss} & "틀리면 혼나고, 아슬아슬하게 맞춰도 혼나는" 손실 함수. \\
+\hline
+\textbf{Regularization ($\lambda$)} & "마진을 넓힐래, 아니면 문제를 다 맞출래?" 사이의 조절 나사. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 힌지 손실 (Hinge Loss)}
+
+
+\begin{conceptbox}{개념 1: 턱걸이는 인정하지 않는다}
+\textbf{한 줄 요약:} 정답을 맞췄더라도, 경계선에서 충분히 멀리 떨어져 있지 않으면(확신이 없으면) 벌점을 부과합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 낭떠러지 운전}
+\begin{itemize}
+    \item \textbf{Perceptron (0/1 Loss):} 바퀴가 낭떠러지에 걸치지만 않으면 OK. (위험천만)
+    \item \textbf{SVM (Hinge Loss):} 낭떠러지에서 최소 \textbf{1m 이상} 떨어져야 OK. 50cm 떨어져서 운전하면, 비록 떨어지진 않았지만 "위험했다"며 벌점을 줍니다.
+\end{itemize}
+
+\subsubsection*{2) 수식과 해석}
+$$ Loss(y, z) = \max(0, 1 - yz), \quad (z = \theta \cdot x) $$
+\begin{itemize}
+    \item \textbf{$yz \ge 1$ (안전):} 정답을 맞췄고 여유 공간(Margin)도 1 이상임. $\rightarrow$ \textbf{Loss = 0}.
+    \item \textbf{$0 < yz < 1$ (불안):} 정답은 맞췄지만 경계선에 너무 붙어있음. $\rightarrow$ \textbf{Loss 발생 ($0 \sim 1$)}.
+    \item \textbf{$yz < 0$ (오답):} 틀렸음. $\rightarrow$ \textbf{Loss 큼 ($1$ 이상)}.
+\end{itemize}
+그래프 모양이 문의 경첩(Hinge)처럼 꺾여 있어서 힌지 손실이라 부릅니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. SVM의 목적 함수 (Primal Formulation)}
+
+
+\begin{conceptbox}{개념 2: 도로 확장 공사}
+\textbf{한 줄 요약:} 도로의 폭(Margin)을 넓히는 것은 수학적으로 법선 벡터의 길이 $\|\theta\|$를 줄이는 것과 같습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 기하학적 원리}
+점 $x$에서 초평면 $\theta \cdot x = 0$까지의 거리는 $\frac{|\theta \cdot x|}{\|\theta\|}$ 입니다.
+우리가 "안전 기준"을 1로 잡았으므로($|\theta \cdot x| \ge 1$), 마진 거리는 최소 $\frac{1}{\|\theta\|}$가 됩니다.
+\begin{itemize}
+    \item 마진 최대화 ($\max \frac{1}{\|\theta\|}$) $\iff$ \textbf{벡터 길이 최소화 ($\min \|\theta\|^2$)}
+\end{itemize}
+
+\subsubsection*{2) 최적화 문제 (Hard Margin)}
+$$ \min_{\theta} \frac{1}{2} \|\theta\|^2 $$
+$$ \text{subject to } y^{(i)}(\theta \cdot x^{(i)} + \theta_0) \ge 1 \quad (\forall i) $$
+이 식은 2차 함수(Quadratic)이므로, 오목/볼록이 확실하여 \textbf{유일한 해(Global Optimum)}가 존재합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 정칙화 (Regularization)와 Soft Margin}
+
+\begin{conceptbox}{개념 3: 융통성 있는 보안관}
+\textbf{한 줄 요약:} 완벽한 분리가 불가능할 때, "도로를 침범하는 것"을 일부 허용하되 벌금을 물려서 균형을 맞춥니다.
+\end{conceptbox}
+
+\subsubsection*{1) 현실의 문제 (Noise)}
+데이터에 노이즈가 섞여 있다면, 완벽하게 두 그룹을 나누는 직선은 존재하지 않거나 아주 구불구불한 억지스러운 선이 됩니다(과적합).
+
+\subsubsection*{2) 해결책: Soft Margin SVM}
+$$ J(\theta) = \underbrace{\frac{\lambda}{2} \|\theta\|^2}_{\text{마진 최대화}} + \underbrace{\frac{1}{n} \sum_{i=1}^n \max(0, 1 - y^{(i)}(\theta \cdot x^{(i)}))}_{\text{에러 최소화 (힌지 손실)}} $$
+
+\subsubsection*{3) $\lambda$의 역할 (Trade-off 조절)}
+$\lambda$는 "마진(안전)"을 얼마나 중요하게 생각하는지 나타내는 파라미터입니다.
+\begin{itemize}
+    \item \textbf{$\lambda$가 큼 (Regularization 중시):}
+    "에러가 좀 나더라도 도로를 넓게 써라."
+    $\rightarrow$ 단순한 모델, 과소적합(Underfitting) 주의.
+    \item \textbf{$\lambda$가 작음 (Error 최소화 중시):}
+    "도로가 좁아져도 좋으니 데이터 하나하나 다 맞춰라."
+    $\rightarrow$ 복잡한 모델, 과적합(Overfitting) 주의.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 자율주행 차선 인식}
+
+\begin{storybox}{Scenario: 넥슨 카트라이더 자율주행 모드}
+당신은 카트라이더의 AI 주행 보조 시스템을 개발합니다. 트랙 위에서 "주행 가능 구역(Positive)"과 "벽/장애물(Negative)"을 구분해야 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{Perceptron 적용 시:}
+    경계선을 벽에 딱 붙어서 긋습니다. 조금만 미끄러지면 바로 충돌 사고가 납니다. (불안정)
+    
+    \item \textbf{SVM 적용 시:}
+    벽에서 최대한 멀리 떨어진 중앙선(Margin 최대화)을 찾습니다. 약간 미끄러져도(Noise) 충돌하지 않습니다. (안정적)
+    
+    \item \textbf{Soft Margin 상황:}
+    트랙 중간에 바나나 껍질(Outlier)이 하나 떨어져 있습니다.
+    \begin{itemize}
+        \item \textbf{Hard Margin:} 바나나를 피하려고 핸들을 급격히 꺾다가 오히려 사고가 납니다.
+        \item \textbf{Soft Margin:} "저건 그냥 이상치야"라고 무시하고(Loss 감수), 부드럽게 밟고 지나가면서 전체적인 주행 라인을 유지합니다.
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 왜 마진을 최대화하는데 $\|\theta\|$를 최소화하나요?]
+    \textbf{A.} 마진 공식이 $\frac{1}{\|\theta\|}$이기 때문입니다. 분모가 작아져야 전체 값이 커집니다. 기하학적으로는 $\theta$ 벡터의 길이가 짧아질수록, 결정 경계면($\theta \cdot x = 1$)이 원점에서 멀어지기 때문입니다.
+    
+    \item[Q2. 힌지 손실의 미분은 어떻게 하나요? 꺾인 점이 있잖아요.]
+    \textbf{A.} 맞습니다. $z=1$인 지점에서는 미분 불가능합니다. 그래서 \textbf{'서브그라디언트(Subgradient)'}라는 개념을 사용합니다. 꺾인 점에서는 미분값을 0과 -1 사이의 임의의 값(보통 둘 중 하나)으로 정의해서 넘어갑니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} SVM은 직선(초평면)으로 데이터를 나누는 최강의 도구입니다. 하지만 데이터가 도넛 모양이나 소용돌이 모양이라면요? 직선으로는 절대 못 나눕니다. 다음 \textbf{Unit 4}에서는 데이터를 고차원으로 보내서 휘어진 경계면을 만드는 마법, \textbf{커널(Kernel) 기법}과 특징 공학(Feature Engineering)을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 3 핵심 요약}
+\begin{itemize}
+    \item \textbf{목표:} 단순 분류가 아니라, 가장 안전한 분류(Max Margin)를 한다.
+    \item \textbf{Hinge Loss:} $\max(0, 1-yz)$. 1 이상의 여유를 갖고 맞추도록 강제한다.
+    \item \textbf{Primal Objective:} $\min \frac{\lambda}{2}\|\theta\|^2 + \text{Loss}$. 마진과 에러의 균형을 찾는다.
+    \item \textbf{$\lambda$:} 모델의 단순함(마진)과 정확함(에러) 사이의 트레이드오프를 조절한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

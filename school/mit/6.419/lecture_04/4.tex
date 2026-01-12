@@ -1,0 +1,255 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 2}
+\fancyhead[R]{Centrality Measures}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 네트워크의 권력자들}}
+\author{Module 2: Network Analysis - Centrality Measures}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Module 1: High-Dimensional Data (데이터 시각화 및 군집화)
+    \item \textbf{\textcolor{mainblue}{Module 2: Analysis of Networks (현재 단원: 그래프 이론)}}
+    \begin{itemize}
+        \item \textbf{2.1 Centrality Measures (누가 중요한가?)}
+        \item 2.2 Community Detection (끼리끼리 뭉치기)
+        \item 2.3 Network Models (Random Graphs, SBM)
+    \end{itemize}
+    \item Module 3: Time Series \& Spatial Data
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 2. 그래프 중심성 (Centrality Measures)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Module 1에서 스펙트럴 클러스터링을 통해 데이터를 '그래프'로 바라보는 법을 배웠습니다. 이제 우리는 이 그래프 안으로 줌인(Zoom-in)합니다. 거대한 네트워크 안에서 \textbf{가장 영향력 있는 노드(Key Player)}는 누구일까요? 친구가 가장 많은 사람? 아니면 정보를 독점하는 사람? 상황에 따라 달라지는 '중요함'의 정의를 수학적으로 파헤칩니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 복잡한 네트워크에서 노드의 중요도를 평가하는 4가지 핵심 척도를 배웁니다. 양적 인기를 측정하는 \textbf{연결 중심성}, 흐름을 통제하는 \textbf{매개 중심성}, 질적 영향력을 보는 \textbf{고유벡터 중심성}, 그리고 이를 웹 환경에 맞게 발전시킨 \textbf{페이지랭크}까지 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Degree (차수)} & 한 노드에 연결된 엣지(다리)의 개수. \\
+\hline
+\textbf{Shortest Path} & 노드 A에서 B로 가는 가장 빠른 길. \\
+\hline
+\textbf{Adjacency Matrix ($A$)} & 그래프의 연결 상태를 0과 1로 나타낸 행렬. \\
+\hline
+\textbf{Principal Eigenvector} & 행렬 $A$를 대표하는 가장 힘센 고유벡터. \\
+\hline
+\textbf{Damping Factor ($d$)} & 웹 서퍼가 링크를 클릭하지 않고 딴청 피울 확률을 고려한 계수. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 연결 중심성 (Degree Centrality)}
+
+\begin{conceptbox}{개념 1: 마당발 (The Popular Kid)}
+\textbf{한 줄 요약:} "내 전화번호부에 친구가 몇 명 저장되어 있는가?" (양적 인기)
+\end{conceptbox}
+
+\subsubsection*{1) 정의 및 특징}
+$$ C_D(v) = \text{deg}(v) = \text{# of edges connected to } v $$
+\begin{itemize}
+    \item \textbf{특징:} 가장 계산하기 쉽습니다.
+    \item \textbf{한계:} \textbf{국소적(Local)} 정보만 봅니다. 내 친구 100명이 전부 '아싸'일 수도 있고, 친구 1명이 '대통령'일 수도 있는데, 이를 구분하지 못하고 똑같이 1명으로 칩니다.
+    \item \textbf{활용:} 연예인의 트위터 팔로워 수, 허브 공항 찾기.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 매개 중심성 (Betweenness Centrality)}
+
+
+\begin{conceptbox}{개념 2: 문지기 (The Gatekeeper / Broker)}
+\textbf{한 줄 요약:} "도시 A에서 도시 B로 가는 최단 경로상에 내가 위치하는가?" (흐름 통제권)
+\end{conceptbox}
+
+\subsubsection*{1) 정의}
+네트워크 내의 모든 노드 쌍 $(s, t)$에 대하여, 최단 경로가 나($v$)를 거쳐가는 비율입니다.
+$$ C_B(v) = \sum_{s \neq v \neq t} \frac{\sigma_{st}(v)}{\sigma_{st}} $$
+($\sigma_{st}$: $s \to t$ 최단 경로 총개수, $\sigma_{st}(v)$: 그중 $v$를 지나는 개수)
+
+\subsubsection*{2) 특징 및 활용}
+\begin{itemize}
+    \item \textbf{Bridge:} 친구가 딱 2명뿐이어도, 그 2명이 서로 다른 거대 그룹의 리더라면 매개 중심성은 폭발합니다.
+    \item \textbf{활용:} 무역로의 길목(파나마 운하), 사내 부서 간 조율자, 스파이 네트워크의 연락책.
+    \item \textbf{의미:} 이 노드를 제거하면 네트워크가 두 동강 날 확률이 높습니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 고유벡터 중심성 (Eigenvector Centrality)}
+
+\begin{conceptbox}{개념 3: 유유상종 (The Influencer)}
+\textbf{한 줄 요약:} "친구가 몇 명인지가 중요한 게 아니라, \textbf{누구랑} 친구인지가 중요하다." (질적 인기)
+\end{conceptbox}
+
+\subsubsection*{1) 재귀적 정의 (Recursive Definition)}
+나의 중요도($x_i$)는 내 친구들의 중요도($x_j$)의 합에 비례합니다.
+$$ x_i = \frac{1}{\lambda} \sum_{j \in \text{neighbors}(i)} x_j \quad \iff \quad Ax = \lambda x $$
+이 식은 선형대수학의 \textbf{고유값 문제(Eigenvalue Problem)}와 정확히 일치합니다.
+
+\subsubsection*{2) 특징}
+중요하지 않은 사람 100명과 아는 것보다, 대통령 1명과 아는 것이 더 높은 점수를 받습니다.
+\begin{itemize}
+    \item \textbf{활용:} 학계에서의 평판(노벨상 수상자가 인용해 줌), 사교계의 명사.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 페이지랭크 (PageRank)}
+
+
+\begin{conceptbox}{개념 4: 구글을 만든 알고리즘 (The Authority)}
+\textbf{한 줄 요약:} 고유벡터 중심성을 \textbf{방향성 그래프(웹)}에 맞게 수정한 버전. "권위 있는 페이지가 링크를 걸어주면 나도 권위가 생긴다."
+\end{conceptbox}
+
+\subsubsection*{1) 문제 상황: 스파이더 트랩 (Spider Trap)}
+웹(Web)은 링크가 한쪽으로만 가는 방향성 그래프입니다. 링크를 받기만 하고 내보내지 않는 페이지(Sink)가 있으면, 고유벡터 중심성 점수가 그곳으로 다 빨려 들어가서 다른 노드들이 0점이 됩니다.
+
+\subsubsection*{2) 해결책: 랜덤 서퍼 모델 (Random Surfer)}
+웹 서퍼가 링크를 따라가다가, 지루해지면 주소창에 새로운 주소를 쳐서 \textbf{순간이동(Teleport)} 한다고 가정합니다.
+$$ PR(A) = (1-d) + d \sum_{i \in \text{InLink}(A)} \frac{PR(T_i)}{C(T_i)} $$
+\begin{itemize}
+    \item \textbf{$d$ (Damping Factor):} 보통 0.85. (85\%는 링크 클릭, 15\%는 딴 데로 점프)
+    \item \textbf{$C(T_i)$:} 나를 추천해 준 페이지가 링크를 100개나 달아놨다면, 내가 받는 추천 효력은 $1/100$로 희석됩니다.
+    \item \textbf{결과:} 막다른 골목에 갇히지 않고 전 세계 웹페이지의 중요도 순위를 매길 수 있습니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 길드 네트워크 분석}
+
+\begin{storybox}{Scenario: 길드장과 숨은 실세 찾기}
+당신은 MMORPG 게임의 커뮤니티 매니저입니다. 길드 간의 채팅 로그를 분석해 여론을 주도하는 유저를 찾고 싶습니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{Degree (연결 중심성):}
+    \begin{itemize}
+        \item 채팅을 제일 많이 하고, 아는 사람이 많은 유저.
+        \item \textbf{판단:} "그냥 수다쟁이일 수도 있음. 정보의 가치는 낮을 수 있음."
+    \end{itemize}
+    \item \textbf{Eigenvector (고유벡터 중심성):}
+    \begin{itemize}
+        \item 길드장들이나 랭커들과 친하게 지내는 유저.
+        \item \textbf{판단:} "\textbf{진짜 실세(비선 실세)}일 확률 높음. 이 사람을 잡으면 상위권 여론 파악 가능."
+    \end{itemize}
+    \item \textbf{Betweenness (매개 중심성):}
+    \begin{itemize}
+        \item A 길드와 적대 관계인 B 길드 양쪽 모두와 귓속말을 하는 유저.
+        \item \textbf{판단:} "\textbf{이중 간첩}이거나 평화 협상가. 전쟁 발발의 열쇠를 쥐고 있음."
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 고유벡터 중심성과 페이지랭크의 결정적 차이는 뭔가요?]
+    \textbf{A.} 방향성과 나눔(Sharing)입니다.
+    \begin{itemize}
+        \item 고유벡터: 친구가 힘이 세면 나도 무조건 힘이 셉니다.
+        \item 페이지랭크: 친구가 힘이 세도, 그 친구가 여기저기 다 추천하고 다니면(링크 남발) 내가 받는 힘은 $1/N$로 줄어듭니다.
+    \end{itemize}
+    
+    \item[Q2. 중심성이 높으면 무조건 좋은가요?]
+    \textbf{A.} 목적에 따라 다릅니다. 바이러스를 막으려면 '매개 중심성'이 높은 허브를 격리해야 하고, 마케팅 소문을 내려면 '고유벡터 중심성'이 높은 인플루언서를 공략해야 합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 개별 노드의 중요도를 파악했습니다. 이제 시야를 넓혀서, 이 노드들이 뭉쳐서 형성하는 \textbf{거대한 덩어리(Community)}를 찾아볼까요? 다음 시간에는 네트워크 버전의 군집화인 \textbf{커뮤니티 탐지(Community Detection)}를 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 2 핵심 요약}
+\begin{itemize}
+    \item \textbf{Degree:} 이웃 수. (Local Popularity)
+    \item \textbf{Betweenness:} 최단 경로 통과 횟수. (Flow \& Control)
+    \item \textbf{Eigenvector:} 이웃의 중요도 반영. (Global Influence)
+    \item \textbf{PageRank:} 방향성 그래프에서의 권위. 랜덤 서퍼 모델(Teleport)로 쏠림 현상 해결.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

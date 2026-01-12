@@ -1,0 +1,275 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{tikz} % 간단한 도식화 가능 시 사용
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 6}
+\fancyhead[R]{Testing Methodology}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 최적의 검정 레시피}}
+\author{Unit 6: Testing Methodology (검정 방법론)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 4: Confidence Intervals (범위 추정)
+    \item Unit 5: Hypothesis Testing Basics (검정의 철학: $\alpha, \beta$)
+    \item \textbf{\textcolor{mainblue}{Unit 6: Testing Methodology (현재 단원: 구체적인 계산법)}}
+    \begin{itemize}
+        \item 6.1 Neyman-Pearson Lemma (검정의 황금률)
+        \item 6.2 Likelihood Ratio Test (LRT) \& Wilks' Theorem
+        \item 6.3 The Holy Trinity (LRT, Wald, Score)
+        \item 6.4 t-test (소표본 검정)
+    \end{itemize}
+    \item Unit 7: Goodness of Fit (적합도 검정)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 6. 검정 방법론 (Testing Methodology)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 5에서 우리는 가설 검정이 "1종 오류($\alpha$)를 묶어두고 검정력(Power)을 최대화하는 최적화 문제"라는 것을 배웠습니다. 하지만 "그래서 구체적으로 어떤 식을 계산해야 검정력이 최대가 되는데?"라는 질문에는 아직 답하지 않았습니다. 이번 단원에서는 우도(Likelihood)를 이용해 그 \textbf{'최강의 공식'}을 만들어냅니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 검정력을 수학적으로 최대화하는 \textbf{네이만-피어슨 보조정리}를 시작으로, 이를 일반화한 \textbf{LRT(우도비 검정)}를 배웁니다. 특히 우도 함수(Likelihood Function)의 기하학적 형태를 분석하는 3가지 방법(\textbf{LRT, Wald, Score})의 관계를 이해하고, 데이터가 적을 때 사용하는 \textbf{t-test}까지 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Neyman-Pearson Lemma} & "단순 vs 단순" 가설에서 우도비(Ratio)가 짱이다. \\
+\hline
+\textbf{Likelihood Ratio ($\lambda$)} & ($H_0$ 설명력) / ($H_1$ 설명력). 작을수록 $H_0$ 기각. \\
+\hline
+\textbf{Wilks' Theorem} & LRT 통계량은 데이터가 많으면 카이제곱 분포($\chi^2$)가 된다. \\
+\hline
+\textbf{Wald Test} & MLE와 $H_0$ 사이의 \textbf{수평 거리}를 잰다. \\
+\hline
+\textbf{Score Test} & $H_0$ 지점에서의 \textbf{기울기(Slope)}를 잰다. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 네이만-피어슨 보조정리 (Neyman-Pearson Lemma)}
+
+\begin{conceptbox}{개념 1: 가장 강력한 검정(UMP)을 만드는 레시피}
+\textbf{한 줄 요약:} 두 개의 점($\theta_0$ vs $\theta_1$)을 비교할 때, 직관이나 감이 아니라 \textbf{"우도의 비율"}을 기준으로 삼는 것이 수학적으로 가장 정확하다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 비밀번호 매칭}
+두 사람이 각자 자신이 진짜 계정 주인이라고 주장합니다.
+\begin{itemize}
+    \item 철수($H_0$): "비밀번호는 1234야."
+    \item 영희($H_1$): "비밀번호는 5678이야."
+\end{itemize}
+우리가 가진 데이터(입력된 키로그)가 1234와 얼마나 비슷한지($L(\theta_0)$), 5678과 얼마나 비슷한지($L(\theta_1)$) 확률을 계산해서 \textbf{비율}을 봅니다. 이 비율만큼 확실한 증거는 없습니다.
+
+\subsubsection*{2) 수학적 결론}
+기각역(Rejection Region)을 다음과 같이 설정할 때 검정력(Power)이 최대가 됩니다.
+$$ \frac{L(\theta_1)}{L(\theta_0)} > k \quad (\text{즉, } H_1\text{의 우도가 압도적으로 높을 때}) $$
+이것을 \textbf{최강력 검정(UMP: Uniformly Most Powerful test)}이라고 합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 우도비 검정 (LRT)과 윌크스 정리}
+
+\begin{conceptbox}{개념 2: 만능열쇠 (Universal Key)}
+\textbf{한 줄 요약:} 복잡한 모델이라도 "제약 있는 우도"와 "제약 없는 우도"의 비율만 계산하면, 카이제곱 분포를 이용해 바로 검정할 수 있습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 검정 통계량의 구성}
+$$ \lambda = \frac{\max_{\theta \in \Theta_0} L(\theta)}{\max_{\theta \in \Theta} L(\theta)} = \frac{L(\hat{\theta}_{H_0})}{L(\hat{\theta}_{MLE})} $$
+\begin{itemize}
+    \item 분자: $H_0$라는 족쇄를 차고 낼 수 있는 최대 점수.
+    \item 분모: 족쇄를 풀고(전체 공간) 낼 수 있는 최대 점수.
+    \item 해석: 비율 $\lambda$가 1에 가까우면 족쇄($H_0$)가 별로 방해가 안 된 것이니 $H_0$ 채택. 0에 가까우면 기각.
+\end{itemize}
+
+\subsubsection*{2) Wilks' Theorem (핵심 정리)}
+$n \to \infty$ 일 때, 다음 통계량은 \textbf{카이제곱 분포}를 따릅니다.
+$$ -2 \log \lambda \xrightarrow{d} \chi^2_d $$
+($d$: 파라미터 개수의 차이. 예: $H_0$는 고정값, $H_1$은 자유면 $d=1$)
+이 정리 덕분에 우리는 복잡한 시뮬레이션 없이도 p-value를 구할 수 있습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 통계적 검정의 삼위일체 (The Holy Trinity)}
+
+
+\begin{conceptbox}{개념 3: 우도 산(Mountain) 등반하기}
+\textbf{한 줄 요약:} $H_0$가 틀렸다는 것을 입증하기 위해 산의 높이(LRT), 너비(Wald), 기울기(Score) 중 하나를 잽니다.
+\end{conceptbox}
+
+우도 함수(Likelihood Function)를 \textbf{하나의 산봉우리}라고 상상해 봅시다.
+\begin{itemize}
+    \item \textbf{정상(Peak):} $\hat{\theta}_{MLE}$ (데이터가 가장 잘 설명되는 지점)
+    \item \textbf{현재 위치:} $\theta_0$ (귀무가설이 주장하는 지점)
+\end{itemize}
+
+\subsubsection*{A. LRT (Likelihood Ratio Test) - "높이 차이"}
+\begin{itemize}
+    \item \textbf{질문:} "정상의 고도($L(\hat{\theta})$)와 현재 위치의 고도($L(\theta_0)$) 차이가 많이 나는가?"
+    \item \textbf{특징:} 가장 정확하지만, 두 지점의 우도를 모두 계산해야 합니다.
+    \item \textbf{수식:} $2 [\ell(\hat{\theta}) - \ell(\theta_0)]$ (로그 우도의 차이)
+\end{itemize}
+
+\subsubsection*{B. Wald Test - "수평 거리"}
+\begin{itemize}
+    \item \textbf{질문:} "정상($\hat{\theta}$)까지 수평으로 얼마나 걸어가야 하는가?" ($\hat{\theta} - \theta_0$)
+    \item \textbf{특징:} 직관적입니다. 하지만 $\theta$를 제곱하거나 로그를 취하면 거리가 변하는 단점이 있습니다.
+    \item \textbf{수식:} $\frac{(\hat{\theta} - \theta_0)^2}{\text{Var}(\hat{\theta})}$ (거리를 표준오차로 나눈 것의 제곱)
+\end{itemize}
+
+\subsubsection*{C. Score Test (LM Test) - "경사도(Slope)"}
+\begin{itemize}
+    \item \textbf{질문:} "지금 서 있는 곳($\theta_0$)의 경사가 가파른가?"
+    \item \textbf{특징:} 정상을 밟아볼 필요가 없습니다! (MLE 계산 불필요). 경사가 평평하면($\approx 0$) 여기가 정상이니 $H_0$ 유지, 가파르면 정상이 저 위에 있다는 뜻이니 $H_0$ 기각.
+    \item \textbf{수식:} $H_0$ 지점에서의 미분값(Score)의 제곱을 정보량(Information)으로 나눈 것.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. t-test: 데이터가 적을 때의 현실}
+
+\begin{conceptbox}{개념 4: 모르는 게 있으면 꼬리가 두꺼워진다}
+\textbf{한 줄 요약:} 분산 $\sigma^2$을 몰라서 표본분산 $S^2$을 대충 써야 할 때, 그 불안감만큼 기각 기준을 엄격하게(꼬리를 두껍게) 만듭니다.
+\end{conceptbox}
+
+\subsubsection*{상황}
+데이터 $X_i \sim \mathcal{N}(\mu, \sigma^2)$인데, $\mu$를 검정하고 싶지만 $\sigma$도 모릅니다.
+\begin{itemize}
+    \item $Z$-test (이상적): $\frac{\bar{X} - \mu_0}{\sigma/\sqrt{n}}$ (분산을 앎 $\to$ 정규분포)
+    \item $t$-test (현실적): $\frac{\bar{X} - \mu_0}{S/\sqrt{n}}$ (분산을 추정함 $\to$ t-분포)
+\end{itemize}
+$n \to \infty$가 되면 $S \to \sigma$가 되므로 t-분포는 정규분포와 같아집니다. 즉, t-test는 \textbf{LRT의 유한 표본(Finite Sample) 버전}입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 계산: 불공정 동전 판별 (Wald Test)}
+
+\begin{storybox}{Scenario: 카지노의 의심}
+카지노에서 어떤 동전이 앞면($p$)이 너무 많이 나온다는 제보가 들어왔습니다.
+$H_0: p = 0.5$ vs $H_1: p \neq 0.5$.
+데이터: $n=100$번 던져서 앞면이 60번 나옴 ($\hat{p} = 0.6$).
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{도구 선택:} 계산이 편한 \textbf{Wald Test}를 사용합시다.
+    \item \textbf{거리 측정:} $|\hat{p} - p_0| = |0.6 - 0.5| = 0.1$.
+    \item \textbf{불확실성(표준오차) 계산:} $H_0$ 하에서의 표준오차는 $\sqrt{\frac{p_0(1-p_0)}{n}} = \sqrt{\frac{0.5 \times 0.5}{100}} = 0.05$.
+    \item \textbf{Wald 통계량 ($Z$-score):}
+    $$ W = \frac{\text{거리}}{\text{표준오차}} = \frac{0.1}{0.05} = 2.0 $$
+    \item \textbf{판정:} $|W| = 2.0 > 1.96$ (유의수준 5\% 기준값).
+    \item \textbf{결론:} "2표준편차만큼 벗어났으므로 통계적으로 유의미하다. $H_0$ 기각. 이 동전은 불공정하다."
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. LRT, Wald, Score 중에 뭘 써야 하나요?]
+    \textbf{A.} 데이터가 무한히 많다면($n \to \infty$) 셋의 결과는 같습니다.
+    \begin{itemize}
+        \item \textbf{정확도:} LRT > Wald $\approx$ Score. (LRT가 분포 근사가 제일 좋습니다.)
+        \item \textbf{편의성:} Wald가 제일 쉽습니다 (신뢰구간 구할 때 좋음).
+        \item \textbf{계산 비용:} 모델이 너무 복잡해서 MLE를 구하기 힘들 땐 Score가 짱입니다.
+    \end{itemize}
+    
+    \item[Q2. 윌크스 정리는 왜 -2를 곱하나요?]
+    \textbf{A.} 수학적 유도 과정에서 정규분포의 지수승($e^{-x^2/2}$)에 로그를 취하면 $-x^2/2$가 나옵니다. 여기서 $x^2$(카이제곱) 모양을 맞추기 위해 $-2$를 곱해서 계수를 없애주는 것입니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 지금까지는 "파라미터 $\theta$가 0이냐 아니냐"를 검정했습니다(Parametric Test). 그런데 만약 "데이터가 정규분포를 따르긴 하는가?"처럼 분포의 모양 자체를 의심해야 한다면 어떻게 할까요? 다음 \textbf{Unit 7}에서는 모델의 가정 자체를 검증하는 \textbf{적합도 검정(Goodness of Fit)}을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 6 핵심 요약}
+\begin{itemize}
+    \item \textbf{Neyman-Pearson:} 단순 가설 대립 시 우도비(Likelihood Ratio)가 검정력 최강(UMP)이다.
+    \item \textbf{Wilks' Theorem:} $-2 \log (\text{우도비}) \sim \chi^2$. 복잡한 모델 검정의 만능열쇠.
+    \item \textbf{The Holy Trinity:}
+    \begin{itemize}
+        \item LRT: 높이 차이 (정확함)
+        \item Wald: 수평 거리 (직관적, $\hat{\theta}$ 필요)
+        \item Score: 기울기 (계산 빠름, $\hat{\theta}$ 불필요)
+    \end{itemize}
+    \item \textbf{t-test:} 분산을 모를 때 사용하는 LRT의 엄밀한 버전.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

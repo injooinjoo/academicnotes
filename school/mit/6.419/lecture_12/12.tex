@@ -1,0 +1,259 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 5}
+\fancyhead[R]{Graph Neural Networks}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 관계를 학습하다}}
+\author{Module 5 (Part B): Graph Neural Networks (GNN)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Module 5 (Part A): CNN \& Autoencoders (이미지와 이상 탐지)
+    \item \textbf{\textcolor{mainblue}{Module 5 (Part B): Graph Neural Networks (현재 단원: 관계형 데이터 학습)}}
+    \begin{itemize}
+        \item \textbf{12.1 Why GNN? (유클리드 vs 비유클리드 데이터)}
+        \item \textbf{12.2 Message Passing (이웃 정보 집계)}
+        \item \textbf{12.3 Algorithms: GCN, GraphSAGE, GAT}
+        \item \textbf{12.4 Tasks: Node, Link, Graph Classification}
+    \end{itemize}
+    \item Module 5 (Part C): Generative Models (VAE, GAN)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 5 (Part B). 그래프 신경망 (GNN)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{CNN은 픽셀이 격자처럼 예쁘게 정렬된 이미지에서만 작동합니다. 하지만 "철수와 영희는 친구다", "A유저는 B아이템을 샀다"와 같은 데이터는 상하좌우 개념이 없습니다. 이런 \textbf{불규칙한 네트워크(Graph)} 구조를 딥러닝에 넣으려면 어떻게 해야 할까요? GNN은 "친구를 보면 그 사람을 알 수 있다"는 철학으로 이 문제를 해결합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 비유클리드 데이터(Graph)를 처리하는 GNN의 핵심 원리인 \textbf{메시지 패싱(Message Passing)}을 배웁니다. 또한 실시간 추천 시스템에 특화된 \textbf{GraphSAGE}, 중요도에 따라 정보를 선별하는 \textbf{GAT} 등 주요 알고리즘을 살펴보고, 이를 통해 노드 분류(어뷰징 탐지)와 링크 예측(추천)을 수행하는 방법을 익힙니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Node (Vertex)} & 네트워크의 점. (유저, 아이템, 게임 등) \\
+\hline
+\textbf{Edge (Link)} & 점들을 잇는 선. (친구 관계, 구매 이력) \\
+\hline
+\textbf{Message Passing} & 이웃 노드들의 정보를 모아서 내 정보를 업데이트하는 과정. \\
+\hline
+\textbf{Embedding} & 노드의 특성과 관계 정보를 압축한 숫자 벡터. \\
+\hline
+\textbf{Inductive Learning} & 학습 때 없었던 새로운 노드가 들어와도 바로 처리가 가능한 방식. (GraphSAGE) \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 왜 GNN인가? (데이터의 구조)}
+
+\begin{conceptbox}{개념 1: 줄을 설 수 없는 데이터}
+\textbf{한 줄 요약:} 이미지는 고정된 그리드($3 \times 3$)가 있지만, 소셜 네트워크에서 내 친구는 1명일 수도, 100명일 수도 있어서 기존 CNN 필터를 쓸 수 없습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 유클리드 vs 비유클리드}
+\begin{itemize}
+    \item \textbf{Euclidean Data:} 이미지, 텍스트, 오디오. (규칙적, 격자 구조) $\rightarrow$ CNN, RNN 사용.
+    \item \textbf{Non-Euclidean Data:} 소셜 네트워크, 분자 구조, 지식 그래프. (불규칙) $\rightarrow$ \textbf{GNN 사용.}
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 핵심 원리: 메시지 패싱 (Message Passing)}
+
+
+\begin{conceptbox}{개념 2: 소문 퍼뜨리기 (Gossip)}
+\textbf{한 줄 요약:} "내 정보"는 "내 이웃들의 정보의 합"으로 정의됩니다. 층(Layer)을 거듭할수록 내 친구의 친구, 그 친구의 친구 정보까지 나에게 도달합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 2단계 프로세스}
+\begin{enumerate}
+    \item \textbf{Aggregate (집계):} 연결된 이웃 노드들의 정보를 수집합니다. (예: 평균, 합계)
+    \item \textbf{Update (갱신):} 수집된 이웃 정보와 나의 현재 정보를 결합해, 나의 새로운 상태(Embedding)를 만듭니다.
+\end{enumerate}
+
+\subsubsection*{2) 수식 (GCN 예시)}
+$$ H^{(l+1)} = \sigma( \underbrace{\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^{-\frac{1}{2}}}_{\text{정규화된 인접 행렬}} H^{(l)} W^{(l)} ) $$
+\begin{itemize}
+    \item \textbf{의미:} 나의 다음 상태($H^{l+1}$)는 나와 연결된($A$) 이웃들의 현재 상태($H^l$)를 가중 평균($W$) 낸 것입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 주요 GNN 알고리즘}
+
+\begin{conceptbox}{개념 3: GNN의 진화}
+\textbf{한 줄 요약:} 기본형(GCN)에서 시작해, 대용량 처리를 위한 실전형(GraphSAGE), 중요한 친구를 더 챙기는 고급형(GAT)으로 발전했습니다.
+\end{conceptbox}
+
+\subsubsection*{1) GCN (Graph Convolutional Networks)}
+이미지의 컨볼루션을 그래프로 가져왔습니다. 모든 이웃의 정보를 \textbf{똑같은 비중}으로 평균 내어 가져옵니다.
+
+\subsubsection*{2) GraphSAGE (Sample and Aggregate)}
+\begin{itemize}
+    \item \textbf{문제:} 넷플릭스나 넥슨처럼 노드(유저)가 수억 명이면, 모든 이웃을 다 계산할 수 없습니다.
+    \item \textbf{해결:} 이웃 중 몇 명만 \textbf{샘플링(Random Sampling)}해서 정보를 가져옵니다.
+    \item \textbf{강점 (Inductive):} 학습하지 않은 \textbf{신규 유저(New Node)}가 들어와도, 그 유저의 이웃 정보만 있으면 즉시 임베딩을 만들 수 있습니다. (추천 시스템의 핵심)
+\end{itemize}
+
+\subsubsection*{3) GAT (Graph Attention Networks)}
+\begin{itemize}
+    \item \textbf{아이디어:} 모든 친구가 다 똑같이 중요하진 않습니다.
+    \item \textbf{해결:} \textbf{Attention 메커니즘}을 사용하여, 나에게 더 중요한 영향을 미치는 이웃의 정보에 \textbf{가중치($\alpha$)}를 더 줍니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. GNN의 주요 태스크 (Tasks)}
+
+\begin{enumerate}
+    \item \textbf{Node Classification (점 분류):}
+    \begin{itemize}
+        \item "이 유저 노드는 악성 봇(Bot)인가, 일반 유저인가?"
+        \item 활용: 어뷰징 탐지, 신용 사기 탐지.
+    \end{itemize}
+    
+    \item \textbf{Link Prediction (선 예측):}
+    \begin{itemize}
+        \item "유저 A와 아이템 B 사이에 연결선(구매)이 생길까?"
+        \item 활용: \textbf{추천 시스템 (Recommendation)}.
+    \end{itemize}
+    
+    \item \textbf{Graph Classification (그래프 분류):}
+    \begin{itemize}
+        \item "이 분자 구조 그래프는 독성이 있는가?"
+        \item 활용: 신약 개발 (Drug Discovery).
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 추천 시스템 및 보안}
+
+\begin{storybox}{Scenario 1: 차세대 게임 추천 시스템 (Link Prediction)}
+기존 협업 필터링(MF)은 "비슷한 구매 이력"만 봤습니다. GNN은 "유저의 사회적 관계"까지 봅니다.
+\end{storybox}
+\begin{itemize}
+    \item \textbf{그래프 구성:} 유저, 게임, 길드, 스트리머를 모두 노드로 만듭니다.
+    \item \textbf{GNN 적용:}
+    \begin{itemize}
+        \item 유저 A는 게임 B를 한 번도 안 봤지만,
+        \item 유저 A가 속한 '길드'의 길드장이 게임 B를 플레이했습니다.
+        \item \textbf{GraphSAGE}를 통해 길드장의 정보가 유저 A에게 전달(Message Passing)됩니다.
+    \end{itemize}
+    \item \textbf{결과:} "길드장님이 하는 게임"이라며 추천이 뜹니다. 관계 기반의 정교한 추천이 가능해집니다.
+\end{itemize}
+
+\begin{storybox}{Scenario 2: 작업장 탐지 (Node Classification)}
+작업장 계정들은 서로 아이템을 주고받는 패턴이 일반 유저와 다릅니다.
+\end{storybox}
+\begin{itemize}
+    \item \textbf{특징:} 수백 개의 채굴 계정이 하나의 창고 계정으로 재화를 보냅니다 (Star 구조).
+    \item \textbf{GNN 적용:} GNN은 각 노드의 '연결 구조적 특징'을 임베딩에 포함합니다.
+    \item \textbf{결과:} 행동 로그를 조작해 일반인 흉내를 내더라도, \textbf{네트워크 구조상 창고 계정과 연결된 패턴}이 드러나므로 GNN이 이를 '이상 노드'로 즉시 분류해냅니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 협업 필터링(MF)과 GNN 추천의 차이는?]
+    \textbf{A.} MF는 유저-아이템 상호작용 행렬만 씁니다. GNN은 유저의 프로필(성별, 나이), 아이템의 속성(장르, 가격), 그리고 친구 관계 등 \textbf{모든 부가 정보(Feature)}를 그래프에 녹여서 학습할 수 있어 훨씬 성능이 좋습니다. (Cold Start에 강함)
+    
+    \item[Q2. GNN은 학습이 오래 걸리지 않나요?]
+    \textbf{A.} 맞습니다. 그래프 전체를 메모리에 올리는 것은 불가능합니다. 그래서 현업(Pinterest, Uber 등)에서는 \textbf{GraphSAGE}처럼 이웃을 샘플링하거나, 그래프를 쪼개서(Sub-graph) 학습하는 기법을 필수로 사용합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 관계를 학습하는 GNN까지 마쳤습니다. 이제 AI의 마지막 경지, \textbf{"없던 것을 만들어내는" 생성 모델}로 넘어갑니다. 넥슨의 게임 아트 리소스를 무한히 생성하거나, 가상 유저 데이터를 만들어낼 수 있는 \textbf{VAE와 GAN}을 다음 시간에 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 5 (Part B) 핵심 요약}
+\begin{itemize}
+    \item \textbf{GNN:} 불규칙한 그래프 데이터를 처리하는 딥러닝. 관계(Edge)를 통해 정보를 학습한다.
+    \item \textbf{Message Passing:} 이웃의 정보를 집계(Aggregate)하고 갱신(Update)하는 GNN의 엔진.
+    \item \textbf{GraphSAGE:} 대용량 그래프를 위한 샘플링 기반 알고리즘. 신규 유저 처리에 탁월하다.
+    \item \textbf{활용:} 소셜 네트워크 분석, 정교한 추천 시스템, 지능형 어뷰징 탐지.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

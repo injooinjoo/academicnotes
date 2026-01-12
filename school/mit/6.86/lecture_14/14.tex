@@ -1,0 +1,247 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 5 (Part B)}
+\fancyhead[R]{Q-Learning \& DQN}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 경험으로 완성하는 지능}}
+\author{Unit 5 (Part B): Q-Learning \& Deep Q-Networks}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 5 (Part A): RL Basics (MDP, Bellman Eq - 룰을 알 때)
+    \item \textbf{\textcolor{mainblue}{Unit 5 (Part B): Q-Learning (현재 단원: 룰을 모를 때)}}
+    \begin{itemize}
+        \item 14.1 Q-Function \& Q-Table (컨닝 페이퍼 만들기)
+        \item 14.2 Exploration vs Exploitation (모험과 안주)
+        \item 14.3 Deep Q-Network (테이블을 뇌로 교체하다)
+    \end{itemize}
+    \item Unit 6: Unsupervised Learning (군집화)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 5 (Part B). Q-러닝 (Q-Learning)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지난 파트(MDP)에서는 "확률 $P$를 아니, 계산만 하면 답이 나온다"고 했습니다. 하지만 여러분이 '카트라이더'를 처음 할 때, 드리프트 마찰 계수 공식을 알고 게임을 하나요? 아닙니다. 일단 박아보고(Fail), 완주해보며(Success) 몸으로 배웁니다. 이번 단원에서는 환경의 규칙을 모르는 상태에서 \textbf{오직 경험(Experience)만으로 최적의 전략을 학습하는 Q-러닝}을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+Q-러닝은 \textbf{"Model-free(환경 모델 없음)"} 강화 학습의 대표 주자입니다. 에이전트는 \textbf{Q-함수(행동 가치 함수)}를 정의하고, 시행착오를 통해 이 값을 갱신해 나갑니다. 이 과정에서 필연적으로 발생하는 \textbf{탐험(Exploration)과 활용(Exploitation)}의 딜레마를 해결하는 전략과, 테이블 방식의 한계를 딥러닝으로 극복한 \textbf{DQN}까지 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Q-Function $Q(s, a)$} & "상태 $s$에서 $a$를 하면, 나중에 총 몇 점 받을까?" (예상 점수) \\
+\hline
+\textbf{Model-free} & 게임의 룰(물리 법칙 등)을 몰라도 학습 가능함. \\
+\hline
+\textbf{Temporal Difference (TD)} & "직접 해보니 내 예상이랑 이만큼 다르네?" (예측 오차) \\
+\hline
+\textbf{Exploration} & 아는 길 말고 새로운 길 가보기. (도전) \\
+\hline
+\textbf{Exploitation} & 아는 길 중 제일 좋은 길 가기. (안주) \\
+\hline
+\textbf{DQN} & Q값 적는 표(Table)가 너무 커져서, 신경망(Brain)으로 대체한 것. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. Q-러닝의 핵심: Q-테이블과 업데이트}
+
+\begin{conceptbox}{개념 1: 나만의 맛집 리스트 작성}
+\textbf{한 줄 요약:} 빈 노트(Table)를 들고 다니면서, 행동을 해보고 점수(Reward)가 좋으면 노트에 적힌 점수를 높이고, 나쁘면 깎습니다.
+\end{conceptbox}
+
+\subsubsection*{1) Q-Table (커닝 페이퍼)}
+엑셀 표를 상상하세요.
+\begin{itemize}
+    \item \textbf{행(Row):} 모든 가능한 상태 (내 위치).
+    \item \textbf{열(Column):} 모든 가능한 행동 (상, 하, 좌, 우).
+    \item \textbf{값(Cell):} 그 행동의 가치(점수). 처음엔 모두 0입니다.
+\end{itemize}
+
+\subsubsection*{2) 학습 식 (Update Rule)}
+행동 $a$를 해서 보상 $R$을 받고 다음 상태 $s'$이 되었습니다. 내 생각($Q_{old}$)을 현실($Target$)에 맞춰 수정합니다.
+$$ Q(s, a) \leftarrow \underbrace{Q(s, a)}_{\text{기존 예상}} + \alpha \left[ \underbrace{(R + \gamma \max_{a'} Q(s', a'))}_{\text{현실 (Target)}} - \underbrace{Q(s, a)}_{\text{기존 예상}} \right] $$
+\begin{itemize}
+    \item \textbf{Target:} "방금 받은 보상($R$) + 거기서 낼 수 있는 최고의 미래 가치($\max Q$)"
+    \item \textbf{Error:} 현실(Target)과 내 예상($Q$)의 차이.
+    \item \textbf{$\alpha$ (학습률):} 새로운 경험을 얼마나 반영할 것인가? (보통 0.1)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 탐험(Exploration) vs 활용(Exploitation)}
+
+\begin{conceptbox}{개념 2: 단골집 vs 신상 맛집}
+\textbf{한 줄 요약:} 아는 것만 하면 발전이 없고(Local Optima), 모험만 하면 실속이 없습니다. 둘의 균형을 잡아야 합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 딜레마 (Dilemma)}
+\begin{itemize}
+    \item \textbf{활용 (Exploitation):} Q값이 제일 높은 행동만 함. $\rightarrow$ 우물 안 개구리가 됨.
+    \item \textbf{탐험 (Exploration):} 아무거나 막 해봄. $\rightarrow$ 위험하고 비효율적임.
+    \item \textbf{문제:} 처음엔 Q값이 다 0이라서, 아무것도 안 해보면 어디가 좋은지 영원히 모름.
+\end{itemize}
+
+\subsubsection*{2) 해결책: $\epsilon$-Greedy (엡실론 그리디)}
+동전을 던져서 행동을 결정합니다.
+\begin{itemize}
+    \item 확률 $\epsilon$ (예: 10\%): \textbf{탐험}. 미친 척하고 랜덤 행동을 합니다. "오늘은 새로운 메뉴 도전!"
+    \item 확률 $1-\epsilon$ (예: 90\%): \textbf{활용}. Q값이 가장 높은 행동을 합니다. "늘 먹던 걸로."
+    \item \textbf{Decay:} 학습 초기엔 $\epsilon=1.0$(완전 탐험)으로 시작해, 점점 줄여서 나중엔 $\epsilon=0.01$(고수의 플레이)로 수렴시킵니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 딥 Q-네트워크 (DQN, Deep Q-Network)}
+
+\begin{conceptbox}{개념 3: 노트를 뇌로 바꾸다}
+\textbf{한 줄 요약:} 상태가 너무 많아서 표(Table)를 그릴 수 없으니, 상태를 입력하면 Q값을 계산해주는 '함수(신경망)'를 만듭니다.
+\end{conceptbox}
+
+\subsubsection*{1) Q-Learning의 한계 (차원의 저주)}
+미로 찾기는 표를 그릴 수 있습니다. 하지만 화면 픽셀이나 바둑판 같은 경우, 상태의 개수가 우주의 원자 수보다 많습니다. 표를 만들 메모리가 부족합니다.
+
+\subsubsection*{2) 해결책: Function Approximation}
+표 대신 \textbf{신경망(Neural Network)}을 사용합니다.
+$$ Q(s, a) \approx f_w(s, a) $$
+우리가 Unit 3에서 배운 FNN(Fully Connected Neural Network)이 여기서 다시 등장합니다.
+
+\begin{itemize}
+    \item \textbf{입력:} 현재 게임 화면 (픽셀) or 상태 벡터.
+    \item \textbf{네트워크:} 위 그림과 같은 신경망이 복잡한 패턴을 분석합니다.
+    \item \textbf{출력:} 각 행동(버튼) 별 예상 Q값.
+\end{itemize}
+이것이 딥마인드가 아타리(Atari) 게임을 정복하고 알파고를 만든 핵심 원리입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 카트라이더 AI}
+
+\begin{storybox}{Scenario: 드리프트 장인 AI 만들기}
+당신은 카트라이더 AI 개발자입니다. AI에게 "최적의 드리프트 타이밍"을 가르치고 싶습니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{상태($S$):} 트랙의 커브 각도, 현재 속도, 벽과의 거리.
+    \item \textbf{행동($A$):} [직진, 좌회전, 우회전, 드리프트, 부스터]
+    \item \textbf{보상($R$):}
+    \begin{itemize}
+        \item 벽 충돌: -10점
+        \item 속도 유지: +1점
+        \item 게이지 충전: +5점
+    \end{itemize}
+    \item \textbf{학습 과정 ($\epsilon$-Greedy):}
+    \begin{itemize}
+        \item \textbf{초반 ($\epsilon=1.0$):} AI가 벽에 계속 박습니다. (탐험)
+        \item \textbf{중반:} "드리프트를 했더니 게이지가 차고 부스터를 쓰니 빨라지더라"는 사실을 Q-Table(혹은 DQN)에 기록합니다.
+        \item \textbf{후반 ($\epsilon=0.05$):} 이제 AI는 칼같이 코너를 공략하며(활용), 가끔 새로운 라인을 시도해봅니다.
+    \end{itemize}
+    \item \textbf{결과:} 사람이 짠 `if-else` 로직보다 훨씬 자연스럽고 빠른 주행을 선보입니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. Q-러닝은 항상 최적의 해를 찾나요?]
+    \textbf{A.} 이론적으로는 충분한 시간과 탐험이 주어지면 Q-Table 방식은 최적해에 수렴함이 증명되었습니다. 하지만 DQN(신경망)을 쓸 때는 근사(Approximation)를 하기 때문에, 완벽한 최적해보다는 "꽤 훌륭한 해"를 찾는 것에 만족하는 경우가 많습니다.
+    
+    \item[Q2. 알파고도 Q-러닝인가요?]
+    \textbf{A.} 네, 알파고의 핵심 부품 중 하나가 DQN과 유사한 가치 네트워크(Value Network)입니다. 여기에 몬테카를로 트리 탐색(MCTS)이라는 계획 알고리즘을 섞어서 완성했습니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 강화 학습은 에이전트가 환경과 상호작용하며 데이터를 스스로 만들어냅니다. 지금까지 우리는 정해진 데이터셋이 있거나(지도/비지도), 상호작용하는 데이터(강화학습)를 다뤘습니다. 그렇다면 \textbf{데이터가 거의 없는 상황}에서는 어떻게 학습할까요? 다음 시간에는 \textbf{전이 학습(Transfer Learning)}과 소량의 데이터 학습법을 다룹니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 5 (Part B) 핵심 요약}
+\begin{itemize}
+    \item \textbf{Model-free:} 룰을 몰라도 경험($S, A, R, S'$)만으로 학습한다.
+    \item \textbf{Q-Function:} 행동의 가치를 평가하는 함수. $Target - Current$ 오차를 줄이며 학습한다.
+    \item \textbf{Exploration-Exploitation:} $\epsilon$-Greedy 전략으로 모험과 안주의 균형을 잡는다.
+    \item \textbf{DQN:} Q-Table 대신 신경망을 사용하여 무한한 상태 공간을 커버한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

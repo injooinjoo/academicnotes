@@ -1,0 +1,279 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 12}
+\fancyhead[R]{High-dimensional Regression}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 빅데이터의 딜레마와 돌파구}}
+\author{Unit 12: High-dimensional Regression \& Sparsity}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 8: Linear Regression (변수 $p$가 작고 고정됨)
+    \item Unit 11: PCA (변수를 합쳐서 줄임)
+    \item \textbf{\textcolor{mainblue}{Unit 12: High-dimensional Regression (현재 단원: 변수가 너무 많음 $p \gg n$)}}
+    \begin{itemize}
+        \item 12.1 The Curse of Dimensionality ($p > n$)
+        \item 12.2 Sparsity Assumption (Occam's Razor)
+        \item 12.3 Regularization: Ridge vs LASSO
+        \item 12.4 Geometry of LASSO (왜 0이 되는가?)
+    \end{itemize}
+    \item Unit 13: Robustness (이상치 대응)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 12. 고차원 회귀와 희소성 (High-dimensional Regression \& Sparsity)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 8에서 우리는 $Y = X\beta + \epsilon$을 풀기 위해 최소자승법(OLS)을 배웠습니다. 그때는 데이터($n$)가 변수($p$)보다 충분히 많았습니다. 하지만 현대의 유전체학이나 텍스트 분석 데이터는 변수는 수만 개인데 샘플은 수십 개뿐입니다. \textbf{"미지수가 식보다 많은 연립방정식"}, 과연 풀 수 있을까요? 이 불가능해 보이는 문제를 풀기 위해 우리는 \textbf{'희소성(Sparsity)'}이라는 강력한 믿음을 도입합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 변수의 수($p$)가 데이터의 수($n$)보다 큰 고차원 상황($p \gg n$)에서 발생하는 문제점(Singularity, Overfitting)을 진단합니다. 이를 해결하기 위해 \textbf{"진짜 중요한 변수는 소수일 것이다"}라는 희소성 가정을 도입하고, \textbf{LASSO(L1 Regularization)}를 통해 변수 선택(Variable Selection)과 추정(Estimation)을 동시에 수행하는 기하학적 원리를 배웁니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{High-dimensional ($p \gg n$)} & 방정식보다 미지수가 더 많은 난감한 상황. \\
+\hline
+\textbf{Sparsity (희소성)} & "진짜 범인은 이 수만 명 중에 딱 한두 명이다." \\
+\hline
+\textbf{Regularization (규제)} & 정답을 맞추는 것뿐만 아니라, 답안지(계수)가 깔끔해야 점수를 주는 채점 방식. \\
+\hline
+\textbf{Ridge (L2)} & 계수들을 0에 가깝게 작게 만듦 (Shrinkage). \\
+\hline
+\textbf{LASSO (L1)} & 중요하지 않은 계수를 아예 0으로 만듦 (Selection). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 문제의 본질: $p > n$ 일 때 발생하는 일}
+
+\begin{conceptbox}{개념 1: 식보다 미지수가 많다}
+\textbf{한 줄 요약:} 해가 하나로 정해지지 않고 무수히 많으며, 컴퓨터는 그중에서 "노이즈까지 외워버린" 최악의 해를 선택하게 됩니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{1) 수학적 불능 (Singularity)}
+OLS 해 $\hat{\beta} = (X^T X)^{-1} X^T Y$를 구하려면 역행렬이 존재해야 합니다.
+하지만 $p > n$이면 $X^T X$는 \textbf{비가역 행렬(Singular Matrix)}이 되어 역행렬이 없습니다.
+\begin{itemize}
+    \item 예: $x + y + z = 10$. 미지수는 3개, 식은 1개. $(1,1,8), (2,3,5)...$ 해가 무한함.
+\end{itemize}
+
+\subsubsection*{2) 완벽한 과적합 (Perfect Overfitting)}
+변수가 많으면 모델은 모든 데이터 포인트를 완벽하게 지나가는 구불구불한 곡선을 만들 수 있습니다. (Training Error = 0). 하지만 새로운 데이터가 들어오면 예측력이 0에 수렴합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 희소성 가정 (Sparsity Assumption)}
+
+\begin{conceptbox}{개념 2: 오컴의 면도날 (Occam's Razor)}
+\textbf{한 줄 요약:} "현상은 복잡해 보이지만, 실제로 결과($Y$)를 조종하는 핵심 변수($\beta_j \neq 0$)는 극소수($s$)일 것이다."
+\end{conceptbox}
+
+\subsubsection*{수학적 정의}
+참값 벡터 $\beta^*$는 $p$차원이지만, 그중 0이 아닌 성분의 개수 $s$는 $n$보다 훨씬 작다고 가정합니다 ($s \ll n$).
+$$ \|\beta^*\|_0 := \sum_{j=1}^p \mathbb{I}(\beta^*_j \neq 0) = s \ll n $$
+이 믿음이 있어야만 우리는 $p$차원이라는 거대한 우주에서 $s$개의 별을 찾을 수 있습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 규제화 (Regularization): Ridge vs LASSO}
+
+\begin{conceptbox}{개념 3: 벌점(Penalty) 시스템}
+\textbf{한 줄 요약:} "문제를 잘 푸는 것(RSS 최소화)"도 중요하지만, "답안지가 복잡하면(계수가 크면)" 감점을 시키는 새로운 채점 기준을 도입합니다.
+\end{conceptbox}
+
+\subsubsection*{최적화 문제의 변화}
+$$ \hat{\beta} = \text{argmin}_{\beta} \left( \|Y - X\beta\|^2 + \lambda \cdot \text{Penalty}(\beta) \right) $$
+$\lambda$는 규제의 강도입니다. $\lambda$가 클수록 계수를 더 강하게 억누릅니다.
+
+\subsubsection*{1) Ridge 회귀 (L2 Norm)}
+$$ \text{Penalty} = \sum \beta_j^2 $$
+\begin{itemize}
+    \item 효과: 모든 계수를 균일하게 줄여줍니다 (Shrinkage).
+    \item 한계: 0이 되지는 않습니다. (0.0001 같은 작은 값으로 살아남음). 변수 선택 기능이 없습니다.
+\end{itemize}
+
+\subsubsection*{2) LASSO 회귀 (L1 Norm)}
+$$ \text{Penalty} = \sum |\beta_j| $$
+\begin{itemize}
+    \item 효과: 덜 중요한 변수의 계수를 \textbf{정확히 0}으로 만듭니다 (Selection).
+    \item 의의: 모델 해석이 용이해지고, 희소성 가정을 구현할 수 있습니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. LASSO의 기하학적 해석 (The Geometry of Sparsity)}
+
+\begin{conceptbox}{개념 4: 둥근 원과 뾰족한 마름모}
+\textbf{한 줄 요약:} L1 페널티 영역(마름모)은 모서리가 뾰족해서, 최적해가 축(Axis) 위에서 형성될 확률이 매우 높습니다. 축 위에 있다는 것은 해당 좌표값이 0이라는 뜻입니다.
+\end{conceptbox}
+
+
+
+이 그림은 Unit 12의 하이라이트입니다.
+\begin{itemize}
+    \item \textbf{등고선 (RSS):} 타원형으로 퍼져나가는 "데이터가 원하는 답".
+    \item \textbf{제약 영역 (Penalty):} 원점 주변의 "우리가 허용하는 답의 범위". ($\lambda$에 의해 결정됨).
+\end{itemize}
+
+\subsubsection*{상황 비교}
+\begin{enumerate}
+    \item \textbf{Ridge (원형):} $\beta_1^2 + \beta_2^2 \le C$.
+    타원이 둥근 원과 만납니다. 접점은 주로 1사분면 어딘가($\beta_1 \neq 0, \beta_2 \neq 0$)에서 생깁니다. 0이 되지 않습니다.
+    
+    \item \textbf{LASSO (마름모):} $|\beta_1| + |\beta_2| \le C$.
+    타원이 퍼져나가다가 \textbf{뾰족한 모서리(Corner)}에 먼저 닿습니다.
+    이 모서리는 축 위에 존재합니다 (예: $\beta_1=C, \beta_2=0$).
+    \textbf{즉, 자연스럽게 $\beta_2$가 0이 됩니다.} 이것이 LASSO가 변수를 제거하는 수학적/기하학적 원리입니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{5. 이론적 보장 (Theoretical Guarantees)}
+
+\begin{conceptbox}{개념 5: 신(Oracle)과의 대결}
+\textbf{한 줄 요약:} LASSO는 우리가 "진짜 중요한 변수가 무엇인지 미리 알고 있을 때(Oracle)" 수행하는 추정만큼이나 훌륭한 성능을 냅니다.
+\end{conceptbox}
+
+\subsubsection*{오라클 부등식 (Oracle Inequalities)}
+LASSO의 오차는 다음을 만족합니다 (확률적으로).
+$$ \| \hat{\beta}_{LASSO} - \beta^* \|^2 \le C \frac{s \log p}{n} $$
+\begin{itemize}
+    \item 오차는 전체 변수 $p$가 아니라, \textbf{중요 변수 개수 $s$}에 비례합니다.
+    \item $\log p$는 $p$가 아주 커져도 매우 천천히 증가하므로, $p \gg n$ 상황에서도 오차가 작게 유지됩니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 로그 분석}
+
+\begin{storybox}{Scenario: 이탈 유저를 찾아라}
+당신은 넥슨의 데이터 분석가입니다. '메이플스토리' 유저 중 누가 다음 달에 게임을 접을지(Churn) 예측하고 싶습니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터 상황:}
+    \begin{itemize}
+        \item $n = 500$ (최근 이탈한 유저 샘플 수)
+        \item $p = 10,000$ (수집된 행동 로그 종류: 점프 횟수, 채팅 수, 물약 사용, 특정 맵 방문 등 무수히 많음)
+    \end{itemize}
+    \item \textbf{문제:} $p \gg n$ 이므로 일반 회귀분석을 돌리면 모든 변수가 중요하다고 나오거나 에러가 납니다.
+    
+    \item \textbf{LASSO 적용:} L1 규제를 걸고 회귀분석을 수행합니다.
+    
+    \item \textbf{결과:} 10,000개의 변수 중 9,995개의 계수가 0이 되었습니다.
+    \begin{itemize}
+        \item 살아남은 변수 5개: [길드 탈퇴 여부], [친구 목록 삭제 수], [고가 아이템 판매], [접속 시간 급감], [고객센터 불만 접수]
+    \end{itemize}
+    
+    \item \textbf{인사이트:} "수만 가지 행동 중, 이 5가지만 모니터링하면 이탈을 90\% 예측할 수 있구나!" $\rightarrow$ 해당 유저들에게 쿠폰 발송(Action Item).
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 중요한 변수가 0이 되어버리면 어떡하나요?]
+    \textbf{A.} 그럴 위험이 있습니다. 만약 변수들끼리 상관관계가 높다면(예: 왼발 움직임 vs 오른발 움직임), LASSO는 둘 중 하나만 남기고 하나는 0으로 죽여버립니다. 이를 방지하기 위해 Ridge와 LASSO를 섞은 \textbf{Elastic Net}을 사용하기도 합니다.
+    
+    \item[Q2. $\lambda$(규제 강도)는 어떻게 정하나요?]
+    \textbf{A.} $\lambda$가 너무 크면 다 0이 되고(Underfitting), 너무 작으면 OLS랑 같아집니다(Overfitting). 보통 \textbf{교차 검증(Cross-Validation)}을 통해 예측 에러가 가장 작은 최적의 $\lambda$를 찾습니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 고차원 데이터에서 희소성을 이용해 '중요한 변수'를 찾아냈습니다. 그런데 만약 데이터에 단순히 변수가 많은 게 아니라, \textbf{악의적인 노이즈(Outlier)}가 섞여 있다면 어떡할까요? 다음 \textbf{Unit 13}에서는 데이터가 오염되어도 흔들리지 않는 \textbf{로버스트 통계(Robust Statistics)}를 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 12 핵심 요약}
+\begin{itemize}
+    \item \textbf{문제:} $p \gg n$이면 OLS는 불가능하거나 과적합된다.
+    \item \textbf{가정:} 희소성(Sparsity). 중요한 변수는 소수($s$)다.
+    \item \textbf{LASSO (L1):} 절댓값 페널티를 사용하여 변수 선택과 추정을 동시에 한다.
+    \item \textbf{기하학:} L1의 뾰족한 모서리(Corner)가 최적해를 0으로 유도한다.
+    \item \textbf{이론:} $s \log p / n$ 속도로 수렴하여 고차원에서도 작동한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

@@ -1,0 +1,260 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 6}
+\fancyhead[R]{Kernel Methods}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 차원의 저주를 피하는 지름길}}
+\author{Unit 6: Kernel Methods (커널 방법)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 3: SVM (최적의 직선 찾기)
+    \item Unit 5: Feature Engineering (고차원 변환 $\phi(x)$)
+    \item \textbf{\textcolor{mainblue}{Unit 6: Kernel Methods (현재 단원: 계산 비용 없이 고차원 효과 내기)}}
+    \begin{itemize}
+        \item 6.1 Dual Problem (내적의 발견)
+        \item 6.2 The Kernel Trick (지름길)
+        \item 6.3 RBF Kernel (무한 차원의 마법)
+        \item 6.4 Kernel SVM (비선형 분류의 완성)
+    \end{itemize}
+    \item Unit 7: Neural Networks (딥러닝)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 6. 커널 방법 (Kernel Methods)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 5에서 우리는 데이터를 고차원으로 매핑($\phi(x)$)하면 선형 분리가 가능해진다는 것을 배웠습니다. 하지만 100차원의 데이터를 2차 다항식으로만 확장해도 특징이 수천 개로 늘어나고, 계산 속도는 거북이가 됩니다. \textbf{"고차원의 혜택은 누리면서, 계산은 저차원에서 빠르게 할 수는 없을까?"} 이 말도 안 되는 욕심을 수학적으로 실현한 것이 바로 커널 트릭입니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+커널 방법은 SVM의 최적화 문제를 \textbf{듀얼(Dual)} 형태로 변형하여, 데이터가 오직 \textbf{내적(Dot Product)} 형태로만 등장한다는 점을 이용합니다. 이를 통해 데이터를 실제로 고차원으로 변환하지 않고도 고차원 공간에서의 내적값을 계산해주는 \textbf{커널 함수(Kernel Function)}를 도입, 계산 비용을 획기적으로 줄이면서도 복잡한 비선형 경계면을 만들어냅니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Primal Problem} & 원래 문제. $w, b$를 찾자. 데이터 좌표 $x$가 직접 쓰임. \\
+\hline
+\textbf{Dual Problem} & 쌍대 문제. $\alpha$(가중치)를 찾자. 데이터 간 유사도(내적)만 쓰임. \\
+\hline
+\textbf{Kernel Trick} & 고차원 계산 결과를 저차원에서 즉시 알아내는 마법의 함수. \\
+\hline
+\textbf{RBF Kernel} & 두 점 사이의 거리를 이용해 유사도를 측정하는 커널 (가우시안). \\
+\hline
+\textbf{Feature Space} & 실제로 가진 않지만, 수학적으로 존재하는 가상의 고차원 공간. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 듀얼 문제 (Dual Problem)와 내적의 발견}
+
+\begin{conceptbox}{개념 1: 관점의 전환}
+\textbf{한 줄 요약:} "데이터의 절대적 위치(좌표)"는 중요하지 않습니다. "데이터끼리 얼마나 닮았나(내적)"가 중요합니다.
+\end{conceptbox}
+
+\subsubsection*{1) Primal vs Dual}
+SVM의 목적식을 라그랑주 승수법을 이용해 변형하면 다음과 같은 \textbf{듀얼 문제}가 됩니다.
+$$ \max_{\alpha} \sum \alpha_i - \frac{1}{2} \sum_{i,j} y^{(i)} y^{(j)} \alpha_i \alpha_j (\mathbf{x}^{(i)} \cdot \mathbf{x}^{(j)}) $$
+\subsubsection*{2) 핵심 발견}
+위 식을 자세히 보세요. 데이터 $x$가 단독으로 쓰이지 않고, 반드시 \textbf{두 데이터의 내적 $(\mathbf{x}^{(i)} \cdot \mathbf{x}^{(j)})$ 형태}로만 등장합니다.
+\begin{itemize}
+    \item 내적(Dot Product)은 기하학적으로 \textbf{유사도(Similarity)}를 의미합니다.
+    \item 즉, 분류 경계선을 찾기 위해 필요한 것은 좌표가 아니라 \textbf{유사도 정보}뿐입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 커널 트릭 (Kernel Trick)}
+
+\begin{conceptbox}{개념 2: 웜홀(Wormhole) 타기}
+\textbf{한 줄 요약:} $\phi(x)$를 계산해서 고차원으로 날아간 뒤 내적하고 다시 돌아오는 대신, 그냥 땅바닥에서 $K(x, z)$만 계산하면 똑같은 결과가 나옵니다.
+\end{conceptbox}
+
+
+\subsubsection*{1) 문제 상황 (The Hard Way)}
+데이터 $x, z$를 고차원으로 보낸 뒤 내적하려면:
+\begin{enumerate}
+    \item 변환: $x \to \phi(x)$, $z \to \phi(z)$ (엄청난 연산 비용)
+    \item 내적: $\phi(x) \cdot \phi(z)$ (엄청난 연산 비용)
+\end{enumerate}
+
+\subsubsection*{2) 해결책 (The Smart Way)}
+다음 성질을 만족하는 함수 $K$를 찾습니다.
+$$ K(x, z) = \phi(x) \cdot \phi(z) $$
+이제 우리는 $\phi$를 몰라도, $K$만 계산하면 됩니다.
+\begin{itemize}
+    \item 예: 다항식 커널 $K(x, z) = (x \cdot z + 1)^2$
+    \item 이걸 전개해보면 실제로 2차 다항식 특징들의 내적과 수학적으로 동일함이 증명됩니다. 하지만 계산은 단순히 \textbf{숫자 곱셈 한 번}이면 끝납니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 대표적인 커널: 가우시안 (RBF) 커널}
+
+\begin{conceptbox}{개념 3: 무한 차원의 마법}
+\textbf{한 줄 요약:} 데이터 주변에 산봉우리(유사도)를 세워서 지형을 만듭니다. 이는 수학적으로 데이터를 \textbf{무한대 차원}으로 보낸 것과 같습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 수식}
+$$ K(x, z) = \exp\left( -\gamma \| x - z \|^2 \right) $$
+\begin{itemize}
+    \item \textbf{의미:} 두 점 $x, z$ 사이의 \textbf{유클리드 거리}가 가까우면 1, 멀면 0에 수렴. (유사도 측정)
+    \item \textbf{$\gamma$ (Gamma):} 산봉우리의 뾰족한 정도. $\gamma$가 크면 아주 뾰족한 산(Overfitting 위험), 작으면 완만한 언덕.
+\end{itemize}
+
+
+\subsubsection*{2) 왜 무한 차원인가?}
+지수 함수 $e^x$를 테일러 급수(Taylor Series)로 전개하면 $1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \dots$ 처럼 무한한 다항식의 합이 됩니다.
+즉, RBF 커널을 쓴다는 것은 \textbf{모든 차수의 다항식 특징을 다 고려한다}는 뜻과 같습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 커널 SVM (Kernel SVM)}
+
+\begin{conceptbox}{개념 4: 휘어지는 경계선}
+\textbf{한 줄 요약:} 고차원에서는 평면으로 잘랐지만, 이를 다시 원래 차원으로 투영해보면 꼬불꼬불한 곡선이 되어 있습니다.
+\end{conceptbox}
+
+\subsubsection*{작동 원리}
+\begin{enumerate}
+    \item 데이터는 선형 분리 불가능한 복잡한 형태입니다.
+    \item 커널 함수 $K$를 사용하여 듀얼 문제를 풉니다. (실제 변환 없이 고차원 내적 값만 사용)
+    \item 최적의 $\alpha$(가중치)를 찾습니다.
+    \item 새로운 데이터 $u$가 들어오면 판별 함수는 다음과 같습니다:
+    $$ h(u) = \text{sign}\left( \sum_{i \in SV} \alpha_i y^{(i)} K(x^{(i)}, u) + b \right) $$
+    \item \textbf{해석:} 새로운 데이터 $u$가 기존의 중요한 데이터들(Support Vectors)과 얼마나 유사한지($K$)를 측정하고, 가중치 투표를 통해 분류합니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 봇(Bot) 탐지}
+
+\begin{storybox}{Scenario: 인간과 봇의 움직임 구분}
+당신은 '던전앤파이터'의 보안팀입니다. 봇들의 마우스 이동 경로를 분석하여 차단하려 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터:} 마우스의 $(x, y)$ 좌표 이동 궤적.
+    \item \textbf{특징:}
+    \begin{itemize}
+        \item 봇: 기계적으로 정확하게 움직이지만, 가끔 랜덤 노이즈를 섞어서 선형적으로 구분이 안 됨.
+        \item 인간: 불규칙하지만 자연스러운 곡선을 그림.
+    \end{itemize}
+    \item \textbf{선형 SVM 실패:} 직선으로는 복잡한 궤적 패턴을 나눌 수 없음.
+    \item \textbf{다항식 특징 시도:} $x^2, y^2, xy \dots$ 몇 차까지 늘려야 할지 모르겠고 계산이 너무 느림.
+    \item \textbf{RBF 커널 SVM 적용:}
+    \begin{itemize}
+        \item "특정 봇 패턴($x^{(i)}$)과 거리가 가까우면(유사하면) 봇이다"라는 논리로 접근.
+        \item 무한 차원의 특징을 고려하므로 아주 미세하고 복잡한 '봇만의 영역'을 곡선으로 도려내듯 찾아냄.
+    \end{itemize}
+    \item \textbf{결과:} 봇 탐지율 99\% 달성. (단, $\gamma$ 튜닝이 중요했음).
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 어떤 커널을 써야 할지 어떻게 아나요?]
+    \textbf{A.} 정답은 없지만, \textbf{RBF 커널}이 가장 무난하고 강력해서 기본값(Default)으로 쓰입니다. 텍스트 데이터처럼 희소(Sparse)한 경우에는 선형 커널(Linear Kernel)이 더 좋을 때도 있습니다. 결국 교차 검증(Cross Validation)으로 찾아야 합니다.
+    
+    \item[Q2. RBF 커널은 무한 차원이라는데 과적합 안 되나요?]
+    \textbf{A.} 될 수 있습니다! 그래서 규제 파라미터 \textbf{$C$ (Cost)}와 커널 파라미터 \textbf{$\gamma$ (Gamma)}를 잘 조절해야 합니다.
+    \begin{itemize}
+        \item $\gamma$가 크면: 내 주변 데이터만 신경 씀 $\rightarrow$ 섬세한 경계 $\rightarrow$ 과적합.
+        \item $\gamma$가 작으면: 멀리 있는 데이터까지 신경 씀 $\rightarrow$ 뭉뚱그린 경계 $\rightarrow$ 과소적합.
+    \end{itemize}
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 커널 SVM은 강력하지만, 데이터가 많아지면($n > 100,000$) 내적 계산량이 많아져서 느려집니다. 이 한계를 극복하고, 빅데이터에서도 복잡한 패턴을 스스로 학습하는 끝판왕 모델, \textbf{Unit 7: 신경망(Neural Networks)과 딥러닝}으로 넘어갑니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 6 핵심 요약}
+\begin{itemize}
+    \item \textbf{Dual Problem:} SVM은 데이터의 좌표가 아니라 '내적(유사도)'만 있으면 풀 수 있다.
+    \item \textbf{Kernel Trick:} $K(x, z) = \phi(x) \cdot \phi(z)$. 고차원 변환 없이 고차원 내적값을 계산하는 지름길.
+    \item \textbf{RBF Kernel:} 거리 기반 유사도 측정. 무한 차원으로 매핑하는 효과를 낸다.
+    \item \textbf{장점:} 저차원의 계산 비용으로 고차원의 분류 성능을 얻는다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

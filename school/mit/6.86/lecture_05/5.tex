@@ -1,0 +1,259 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 2 (Part B)}
+\fancyhead[R]{Feature Engineering}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 데이터를 조각하는 기술}}
+\author{Unit 2 (Part B): Feature Engineering \& Polynomial Features}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 2 (Part A): Linear Classifiers (직선으로 자르기)
+    \item \textbf{\textcolor{mainblue}{Unit 2 (Part B): Feature Engineering (현재 단원: 데이터 차원 확장)}}
+    \begin{itemize}
+        \item 2.5 Non-linear Separability (직선의 한계)
+        \item 2.6 Feature Maps $\phi(x)$ (차원 확장)
+        \item 2.7 Polynomial Features (다항식 변환)
+        \item 2.8 Curse of Dimensionality (차원의 저주)
+    \end{itemize}
+    \item Unit 3: Neural Networks (특징을 스스로 학습하기)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 2 (Part B). 특징 공학 (Feature Engineering)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{우리는 퍼셉트론과 SVM을 통해 최적의 '직선'을 긋는 법을 배웠습니다. 하지만 세상의 데이터가 모두 직선으로 깔끔하게 나뉠까요? 만약 데이터가 \textbf{도넛 모양}으로 분포한다면 직선 하나로 절대 자를 수 없습니다. 이 한계를 극복하기 위해 우리는 칼(모델)을 바꾸는 대신, \textbf{데이터의 모양을 바꾸는(Transformation)} 전략을 취합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원은 선형 분리가 불가능한 데이터를 해결하기 위해 입력 데이터 $x$를 고차원 특징 공간 $\phi(x)$로 매핑하는 방법을 배웁니다. 특히 \textbf{다항식 특징(Polynomial Features)}을 통해 곡선 경계를 만드는 원리와, 차원이 너무 높아질 때 발생하는 \textbf{계산 비용 및 과적합 문제(Trade-off)}를 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Non-linear Separability} & 직선 하나로 100\% 분류가 불가능한 상태 (예: XOR, 도넛). \\
+\hline
+\textbf{Feature Map ($\phi$)} & 데이터를 저차원에서 고차원으로 옮기는 함수. \\
+\hline
+\textbf{Feature Space} & 매핑된 데이터들이 살고 있는 고차원 세상. \\
+\hline
+\textbf{Polynomial Feature} & $x^2, x_1 x_2$ 처럼 곱하기를 통해 만든 새로운 특징. \\
+\hline
+\textbf{Linear in Feature Space} & 고차원에서는 평면으로 잘리지만, 원래 세상에선 곡선으로 보임. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 비선형성 (Non-linearity)의 필요성}
+
+
+\begin{conceptbox}{개념 1: 직선의 한계}
+\textbf{한 줄 요약:} 동그라미 안에 있는 점과 밖에 있는 점은 자 하나로 가를 수 없습니다. 가위(비선형 모델)가 필요하거나, 종이를 접어야(특징 변환) 합니다.
+\end{conceptbox}
+
+\subsubsection*{문제 상황: XOR과 도넛}
+\begin{itemize}
+    \item \textbf{XOR:} $(0,0), (1,1)$은 파란색, $(0,1), (1,0)$은 빨간색. 대각선 관계.
+    \item \textbf{Donut:} 원점 $(0,0)$ 근처는 빨간색, 그 바깥 고리 모양은 파란색.
+\end{itemize}
+이런 데이터에 퍼셉트론(선형 분류기)을 적용하면, 오차가 줄어들지 않고 계속 진동(Oscillation)하며 실패합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 특징 변환 (Feature Mapping)}
+
+\begin{conceptbox}{개념 2: 차원 띄우기 (Lifting)}
+\textbf{한 줄 요약:} 2차원 바닥에 흩어진 구슬들을 3차원 공중으로 띄우면, 그 사이로 판(평면)을 끼워 넣을 수 있습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유}
+도넛 모양 데이터를 상상해 봅시다.
+\begin{itemize}
+    \item 가운데 빨간 구슬들 (원점 근처)
+    \item 바깥쪽 파란 구슬들 (반지름이 큼)
+\end{itemize}
+여기에 새로운 축(고도) $z = x_1^2 + x_2^2$를 추가합니다.
+\begin{itemize}
+    \item 빨간 구슬: 원점 근처라 $z$값이 작음 $\rightarrow$ 바닥에 깔림.
+    \item 파란 구슬: 원점에서 멀어서 $z$값이 큼 $\rightarrow$ 공중으로 떠오름.
+    \item \textbf{해결:} 이제 바닥과 공중 사이에 \textbf{수평 판(Hyperplane)}을 끼워 넣으면 완벽하게 분리됩니다!
+\end{itemize}
+
+\subsubsection*{2) 수학적 정의}
+입력 벡터 $x \in \mathbb{R}^d$를 고차원 벡터 $\phi(x) \in \mathbb{R}^D$로 변환합니다 ($D > d$).
+$$ \theta \cdot x + \theta_0 \quad \xrightarrow{\text{Transformation}} \quad \theta' \cdot \phi(x) + \theta'_0 $$
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 다항식 특징 (Polynomial Features)}
+
+\begin{conceptbox}{개념 3: 곱셈으로 특징 만들기}
+\textbf{한 줄 요약:} 원래 변수들을 서로 곱해서($x_1^2, x_1 x_2$) 새로운 정보를 만들어냅니다.
+\end{conceptbox}
+
+\subsubsection*{1) 2차 다항식 (Quadratic Features)}
+입력 $x = [x_1, x_2]^T$일 때, 2차항까지 모두 만들면:
+$$ \phi(x) = [1, x_1, x_2, x_1^2, x_2^2, x_1 x_2]^T $$
+\begin{itemize}
+    \item 원래 차원: 2차원
+    \item 확장된 차원: 6차원
+\end{itemize}
+
+\subsubsection*{2) 기하학적 의미}
+확장된 공간에서의 선형 결합 $\theta^T \phi(x) = 0$은 원래 공간($x_1, x_2$)에서 보면 다음과 같습니다.
+$$ w_0 + w_1 x_1 + w_2 x_2 + w_3 x_1^2 + w_4 x_2^2 + w_5 x_1 x_2 = 0 $$
+이것은 원, 타원, 쌍곡선 같은 \textbf{2차 곡선(Conic Section)}의 방정식입니다.
+즉, \textbf{"고차원에서의 평면 = 저차원에서의 곡선"}입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 장점과 주의점 (The Trade-off)}
+
+\begin{conceptbox}{개념 4: 공짜 점심은 없다}
+\textbf{한 줄 요약:} 표현력(Power)이 좋아지지만, 그만큼 계산 비용과 과적합(Overfitting) 위험이 폭증합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 차원의 저주 (Curse of Dimensionality)}
+차수(Degree) $Q$를 높이면 특징의 개수 $D$가 기하급수적으로 늘어납니다.
+$$ D \approx d^Q $$
+\begin{itemize}
+    \item 입력 변수가 100개($d=100$)인데 3차 다항식($Q=3$)을 쓰면? 특징 개수가 약 \textbf{100만 개}가 됩니다.
+    \item \textbf{계산 문제:} 100만 차원 벡터의 내적을 계산해야 함 $\rightarrow$ 느려짐.
+    \item \textbf{통계적 문제:} 변수가 100만 개인데 데이터가 1만 개라면? $\rightarrow$ $p \gg n$ 문제 발생 $\rightarrow$ \textbf{과적합(Overfitting)}.
+\end{itemize}
+
+\begin{warningbox}{커널 트릭 (Kernel Trick) 예고}
+"특징 개수가 100만 개라도, 실제로 $\phi(x)$를 계산하지 않고 내적값 $\phi(x) \cdot \phi(y)$만 빠르게 구할 수 있다면?"
+이것이 다음 단원에서 배울 \textbf{SVM 커널 트릭}의 핵심 아이디어입니다.
+\end{warningbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 불법 프로그램(핵) 사용자 탐지}
+
+\begin{storybox}{Scenario: 넥슨 FPS 게임 '서든어택'의 에임봇 탐지}
+당신은 보안팀입니다. 유저의 마우스 움직임 데이터를 분석해 '에임봇(Auto-aim)' 사용자를 잡고 싶습니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터:} $x_1$ (조준 속도), $x_2$ (정확도).
+    \item \textbf{분포 확인:}
+    \begin{itemize}
+        \item 일반 유저: 속도가 빠르면 정확도가 낮고, 느리면 높음 (반비례). 넓게 퍼져 있음.
+        \item 핵 유저: \textbf{속도가 엄청 빠르면서 동시에 정확도도 100\%임}. 특정 영역(우상단)에 몰려 있음.
+    \end{itemize}
+    \item \textbf{선형 분류 시도:} 직선을 그어보지만, 고수 유저(빠르고 정확함)와 핵 유저가 섞여서 구분이 안 됩니다.
+    \item \textbf{다항식 특징 추가:} $x_1^2, x_2^2, x_1 x_2$를 추가합니다.
+    \begin{itemize}
+        \item 특히 \textbf{$x_1 \times x_2$ (속도 $\times$ 정확도)} 라는 교호작용 항(Interaction Term)이 핵심입니다.
+        \item 일반 유저는 이 값이 일정 한계를 넘지 못하지만(인간의 한계), 핵 유저는 이 값이 비정상적으로 높습니다.
+    \end{itemize}
+    \item \textbf{결과:} 고차원 공간에서 핵 유저 그룹만 뚝 떨어져 나와, 평면 하나로 깔끔하게 검거(Classification)할 수 있게 되었습니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 차수는 몇 차(Degree)까지 늘려야 하나요?]
+    \textbf{A.} 정답은 없습니다. 보통 2차나 3차 정도만 써도 충분한 경우가 많습니다. 너무 높이면 훈련 데이터는 다 맞추지만(Overfitting), 새로운 데이터는 다 틀리는 괴물이 탄생합니다. 교차 검증(Cross Validation)으로 적절한 차수를 찾아야 합니다.
+    
+    \item[Q2. 요즘 딥러닝은 특징 공학을 안 한다던데요?]
+    \textbf{A.} 맞습니다! 딥러닝(Neural Networks)의 가장 큰 장점은, 사람이 손으로 $\phi(x)$를 설계하는 대신, \textbf{네트워크가 스스로 최적의 특징 $\phi(x)$를 찾아낸다(Representation Learning)}는 점입니다. 다음 Unit 3에서 바로 그 내용을 배웁니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 사람이 직접 $\phi(x) = x^2$ 처럼 식을 정해주는 방식을 배웠습니다. 그런데 이미지나 음성처럼 복잡한 데이터는 어떤 식을 써야 할지 감도 안 옵니다. 컴퓨터가 스스로 $\phi(x)$를 만들게 할 수는 없을까요? 다음 \textbf{Unit 3: 신경망(Neural Networks)}에서는 퍼셉트론을 여러 겹 쌓아 스스로 특징을 학습하는 딥러닝의 기초를 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 2 (Part B) 핵심 요약}
+\begin{itemize}
+    \item \textbf{문제:} 현실 데이터는 직선 하나로 나뉘지 않는다 (Non-linear).
+    \item \textbf{해결:} 데이터를 고차원으로 매핑($\phi(x)$)하면 선형 분리가 가능해진다.
+    \item \textbf{방법:} 다항식 특징($1, x, x^2, \dots$)이 가장 대표적이다.
+    \item \textbf{대가:} 차원이 늘어나면 계산량이 폭증하고 과적합 위험이 생긴다.
+    \item \textbf{의의:} 딥러닝 이전에는 사람이 이 특징($\phi$)을 찾는 것이 머신러닝의 전부였다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

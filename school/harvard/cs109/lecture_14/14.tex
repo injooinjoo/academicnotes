@@ -436,7 +436,7 @@
 \subsection{핵심 아이디어: 확률을 직접 모델링하지 않는다}
 
 로지스틱 회귀는 $P(Y=1|X)$ (성공 확률)을 직접 모델링하는 대신,
-'확률'을 변형한 **'로그-오즈(Log-Odds)'**를 선형 회귀 형태로 모델링합니다.
+'확률'을 변형한 \textbf{'로그-오즈(Log-Odds)'}를 선형 회귀 형태로 모델링합니다.
 
 \begin{enumerate}
   \item \textbf{확률 (Probability, $P$):} 0과 1 사이의 값. (예: $P = 0.8$)
@@ -455,11 +455,11 @@ $$ \underbrace{\ln\left(\frac{P}{1-P}\right)}_{\text{Log-Odds}} = \beta_0 + \bet
 
 선형 회귀는 $\beta$를 찾기 위해 오차제곱합(SSE)을 최소화했습니다 (최소제곱법, OLS).
 
-로지스틱 회귀는 **최대가능도 추정법 (Maximum Likelihood Estimation, MLE)**을 사용합니다.
+로지스틱 회귀는 \textbf{최대가능도 추정법 (Maximum Likelihood Estimation, MLE)}을 사용합니다.
 직관적으로, "우리가 가진 데이터($Y$ 값들)가 관찰될 확률을 가장 높게 만드는 $\beta$ 값을 찾자"는 의미입니다.
 
-이는 수학적으로 **'음의 로그-가능도(Negative Log-Likelihood)'**를 최소화하는 것과 같으며,
-이 손실 함수(Loss Function)를 **'이진 교차 엔트로피 (Binary Cross-Entropy)'**라고 부릅니다.
+이는 수학적으로 \textbf{'음의 로그-가능도(Negative Log-Likelihood)'}를 최소화하는 것과 같으며,
+이 손실 함수(Loss Function)를 \textbf{'이진 교차 엔트로피 (Binary Cross-Entropy)'}라고 부릅니다.
 
 $$ \text{Loss (Binary Cross-Entropy)} = - \sum_{i=1}^{n} \left[ y_i \ln(p_i) + (1-y_i) \ln(1-p_i) \right] $$
 
@@ -467,7 +467,7 @@ $$ \text{Loss (Binary Cross-Entropy)} = - \sum_{i=1}^{n} \left[ y_i \ln(p_i) + (
 * $p_i$: 모델이 예측한 $P(Y_i=1)$ 확률
 
 선형 회귀와 달리 한 번에 풀리는 해(Closed-form solution)가 없으며,
-**경사 하강법(Gradient Descent)**과 같은 수치 최적화(Numerical Optimization) 기법을 사용해 $\beta$ 값을 반복적으로 찾아나갑니다.
+\textbf{경사 하강법(Gradient Descent)}과 같은 수치 최적화(Numerical Optimization) 기법을 사용해 $\beta$ 값을 반복적으로 찾아나갑니다.
 
 \newpage
 
@@ -508,7 +508,7 @@ $\beta$ 값 자체보다 $e^{\beta}$ (지수 변환) 값이 훨씬 직관적입�
   \item $\boldsymbol{e^{\beta_j}}$: $X_j$가 1단위 증가할 때, \textbf{오즈(Odds)}가 $e^{\beta_j}$만큼 \textbf{곱해집니다(배수)}.
 \end{itemize}
 
-이를 **오즈비 (Odds Ratio, OR)**라고 부릅니다.
+이를 \textbf{오즈비 (Odds Ratio, OR)}라고 부릅니다.
 * $e^{\beta_j} > 1$: $X_j$가 증가하면 성공 오즈가 증가합니다. (긍정적 관계)
 * $e^{\beta_j} = 1$: $X_j$는 성공 오즈와 관계 없습니다. ($\beta_j=0$)
 * $e^{\beta_j} < 1$: $X_j$가 증가하면 성공 오즈가 감소합니다. (부정적 관계)
@@ -608,7 +608,7 @@ $$ \ln\left(\frac{P}{1-P}\right) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots +
 \subsection{확률에서 분류로: 임계값 (Threshold)}
 
 로지스틱 회귀는 $P(Y=1|X)$ 확률을 예측합니다.
-이를 0 또는 1의 분류로 바꾸려면 **'임계값(Threshold)'** (보통 0.5)을 정해야 합니다.
+이를 0 또는 1의 분류로 바꾸려면 \textbf{'임계값(Threshold)'} (보통 0.5)을 정해야 합니다.
 
 \begin{itemize}
   \item $P(Y=1) \ge 0.5$ 이면, $\hat{Y} = 1$ (성공)으로 분류한다.
@@ -626,7 +626,7 @@ $P=0.5$라는 것은 어떤 의미일까요?
   \item $\ln(\text{Odds}) = \ln(1) = 0$
 \end{itemize}
 
-즉, 결정 경계는 **로그-오즈가 0이 되는 지점**입니다.
+즉, 결정 경계는 \textbf{로그-오즈가 0이 되는 지점}입니다.
 $$ \ln(\text{Odds}) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p = 0 $$
 
 \begin{warningbox}
@@ -667,7 +667,7 @@ $$ \ln(\text{Odds}) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p = 0 $$
 모델에 다항식 항이나 상호작용 항을 많이 추가하면 결정 경계가 매우 복잡해지면서 훈련 데이터에만 꼭 맞는 \textbf{과적합(Overfitting)}이 발생할 수 있습니다.
 
 \textbf{정규화(Regularization)}는 모델의 복잡도에 페널티를 부과하여 과적합을 방지하는 기법입니다.
-계수($\beta$)의 크기가 너무 커지지 않도록 손실 함수(Loss Function)에 **페널티 항(Penalty Term)**을 추가합니다.
+계수($\beta$)의 크기가 너무 커지지 않도록 손실 함수(Loss Function)에 \textbf{페널티 항(Penalty Term)}을 추가합니다.
 
 \subsection{손실 함수 + L2 (Ridge) 페널티}
 
@@ -701,7 +701,7 @@ $$ \text{Loss}_{\text{Regularized}} = \underbrace{\text{Loss (Binary Cross-Entro
   최적의 $C$ 값은 \textbf{교차 검증(Cross-Validation)}을 통해 찾아야 합니다.
 \end{warningbox}
 
-\begin{lstlisting}[language=Python, caption={sklearn에서 Ridge 정규화를 적용한 로지스틱 회귀}, label={lst:sklearn_c}]
+\begin{lstlisting}[language=Python, caption={sklearn에서 Ridge 정규화를 적용한 로지스틱 회귀}, label={lst:sklearn_c}, breaklines=true]
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 
@@ -722,7 +722,7 @@ grid_search = GridSearchCV(LogisticRegression(penalty='l2'), params, cv=5)
 %================================================================================
 
 $Y$의 범주가 3개 이상일 때 (예: 'CS', 'Stat', 'Other') 사용하는 방법입니다.
-여기서는 순서가 없는 **명목형(Nominal)** 범주를 가정합니다.
+여기서는 순서가 없는 \textbf{명목형(Nominal)} 범주를 가정합니다.
 
 \subsection{접근법 1: One-vs-Rest (OvR)}
 
@@ -739,7 +739,7 @@ $Y$의 범주가 3개 이상일 때 (예: 'CS', 'Stat', 'Other') 사용하는 �
 \subsection{접근법 2: 다항 로지스틱 회귀 (Multinomial)}
 
 OvR과 달리, $K$개의 클래스를 한 번에 처리하는 단일 모델을 만듭니다.
-하나의 클래스(예: 'Other')를 **기준(Reference) 클래스**로 정합니다.
+하나의 클래스(예: 'Other')를 \textbf{기준(Reference) 클래스}로 정합니다.
 그리고 $K-1$개의 로그-오즈 모델을 만듭니다.
 
 \begin{itemize}
@@ -753,7 +753,7 @@ OvR과 달리, $K$개의 클래스를 한 번에 처리하는 단일 모델을 �
 OvR이든 다항 로지스틱이든, 각 클래스 $k$에 대한 '점수(Score)' 또는 '로짓(Logit)' $s_k$가 나옵니다.
 이 점수들은 합쳐도 1이 되지 않기 때문에 확률로 사용하기 어렵습니다.
 
-**소프트맥스(Softmax)** 함수는 이 점수($s_k$)들을 0과 1 사이의 값으로 변환하고,
+\textbf{소프트맥스(Softmax)} 함수는 이 점수($s_k$)들을 0과 1 사이의 값으로 변환하고,
 모든 클래스의 확률 총합이 1이 되도록 정규화해줍니다.
 
 $$ P(Y=k|X) = \frac{e^{s_k}}{\sum_{j=1}^{K} e^{s_j}} $$
@@ -761,8 +761,8 @@ $$ P(Y=k|X) = \frac{e^{s_k}}{\sum_{j=1}^{K} e^{s_j}} $$
 \subsection{다중 클래스 분류 (K>2)}
 
 임계값 0.5는 더 이상 의미가 없습니다.
-대신 **'다수결 원칙(Plurality Wins)'**을 사용합니다.
-Softmax를 통해 계산된 $K$개의 확률 중, **가장 높은 확률을 가진 클래스**로 예측합니다.
+대신 \textbf{'다수결 원칙(Plurality Wins)'}을 사용합니다.
+Softmax를 통해 계산된 $K$개의 확률 중, \textbf{가장 높은 확률을 가진 클래스}로 예측합니다.
 
 예: $P(\text{CS})=0.2$, $P(\text{Stat})=0.4$, $P(\text{Other})=0.4$
 $\implies$ 가장 높은 확률이 0.4로 두 개이므로, 둘 중 하나를 선택 (혹은 추가 규칙 적용).

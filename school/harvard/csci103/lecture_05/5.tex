@@ -391,7 +391,7 @@
 \maketitle
 \thispagestyle{firstpage}
 
-\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 05}{Anindita Mahapatra & Eric Gieseke}{Lecture 05의 핵심 개념 학습}
+\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 05}{Anindita Mahapatra \& Eric Gieseke}{Lecture 05의 핵심 개념 학습}
 
 
 \tableofcontents
@@ -405,12 +405,12 @@
 \begin{summarybox}
 이 문서는 5주차 '데이터 레이크' 강의의 핵심 내용을 정리합니다.
 
-데이터가 고립되는 **'데이터 사일로'** 문제를 해결하기 위해 등장한 **'데이터 레이크'**의 개념을 배웁니다.
-하지만 데이터 레이크가 적절한 관리 없이 방치되면 **'데이터 스웜프(늪)'**가 되는 위험성을 인지합니다.
+데이터가 고립되는 \textbf{'데이터 사일로'} 문제를 해결하기 위해 등장한 \textbf{'데이터 레이크'}의 개념을 배웁니다.
+하지만 데이터 레이크가 적절한 관리 없이 방치되면 \textbf{'데이터 스웜프(늪)'}가 되는 위험성을 인지합니다.
 
-이 문제를 해결하고 데이터 웨어하우스의 장점(신뢰성, 성능)을 결합한 **'데이터 레이크하우스'**가 왜 필요한지, 그리고 그 기반 기술인 **'델타 레이크(Delta Lake)'**가 어떻게 동작하는지(ACID, 타임 트래블) 학습합니다.
+이 문제를 해결하고 데이터 웨어하우스의 장점(신뢰성, 성능)을 결합한 \textbf{'데이터 레이크하우스'}가 왜 필요한지, 그리고 그 기반 기술인 \textbf{'델타 레이크(Delta Lake)'}가 어떻게 동작하는지(ACID, 타임 트래블) 학습합니다.
 
-마지막으로, 실제 데이터 파이프라인을 구축하는 **'메달리온 아키텍처'**(Bronze/Silver/Gold)와 파이프라인의 성능을 저하하는 주요 원인들(Spill, Shuffle, Skew)을 이해합니다.
+마지막으로, 실제 데이터 파이프라인을 구축하는 \textbf{'메달리온 아키텍처'}(Bronze/Silver/Gold)와 파이프라인의 성능을 저하하는 주요 원인들(Spill, Shuffle, Skew)을 이해합니다.
 \end{summarybox}
 
 이 문서는 강의 내용과 실습 코드를 통합하여, 데이터 엔지니어링을 처음 접하는 사람도 쉽게 이해할 수 있도록 구성되었습니다.
@@ -898,7 +898,7 @@ Spark 작업이 유난히 느리게 실행될 때 확인해야 할 4가지 주�
 기존 Parquet 데이터를 Delta Lake 형식으로 변환하는 것은 매우 간단합니다.
 `CREATE TABLE ... USING delta AS ...` 구문을 사용합니다.
 
-\begin{lstlisting}[language=SQL, caption={Parquet 파일을 Delta Lake 테이블로 변환}, label={lst:create_delta}]
+\begin{lstlisting}[language=SQL, caption={Parquet 파일을 Delta Lake 테이블로 변환}, label={lst:create_delta}, breaklines=true]
 -- Lending Club 데이터셋(Parquet)을 읽어와
 -- 'loans_by_state_delta'라는 Delta Lake 테이블로 생성
 CREATE TABLE IF NOT EXISTS loans_by_state_delta
@@ -909,7 +909,7 @@ AS SELECT * FROM parquet_table_view;
 
 테이블이 Delta 형식인지 확인하려면 `DESCRIBE DETAIL`을 사용합니다.
 
-\begin{lstlisting}[language=SQL, caption={테이블 상세 정보 확인 (Delta 확인)}, label={lst:desc_detail}]
+\begin{lstlisting}[language=SQL, caption={테이블 상세 정보 확인 (Delta 확인)}, label={lst:desc_detail}, breaklines=true]
 DESCRIBE DETAIL loans_by_state_delta;
 \end{lstlisting}
 % 결과 예: format: delta, ...
@@ -920,7 +920,7 @@ DESCRIBE DETAIL loans_by_state_delta;
 
 Delta Lake의 ACID 트랜잭션 덕분에, 한쪽에서는 데이터를 스트리밍으로 읽는(`readStream`) 동시에 다른 쪽에서는 배치(Batch)로 데이터를 삽입(`INSERT`)할 수 있습니다.
 
-\begin{lstlisting}[language=Python, caption={Delta 테이블에서 스트리밍 읽기 시작 (가상 코드)}, label={lst:readstream}]
+\begin{lstlisting}[language=Python, caption={Delta 테이블에서 스트리밍 읽기 시작 (가상 코드)}, label={lst:readstream}, breaklines=true]
 # streaming_query = (
 #   spark.readStream
 #     .format("delta")
@@ -931,7 +931,7 @@ Delta Lake의 ACID 트랜잭션 덕분에, 한쪽에서는 데이터를 스트�
 # )
 \end{lstlisting}
 
-\begin{lstlisting}[language=SQL, caption={동시에 배치 데이터 삽입 (Iowa 데이터 추가)}, label={lst:batch_insert}]
+\begin{lstlisting}[language=SQL, caption={동시에 배치 데이터 삽입 (Iowa 데이터 추가)}, label={lst:batch_insert}, breaklines=true]
 -- Iowa (IA) 주에 450건의 대출 데이터를 6번 반복 삽입
 INSERT INTO loans_by_state_delta VALUES ('IA', 450);
 INSERT INTO loans_by_state_delta VALUES ('IA', 450);
@@ -945,7 +945,7 @@ INSERT INTO loans_by_state_delta VALUES ('IA', 450);
 
 전통적인 Parquet 파일에서는 불가능했던 행(Row) 단위 데이터 삭제가 가능합니다.
 
-\begin{lstlisting}[language=SQL, caption={Delta 테이블에서 특정 데이터 삭제}, label={lst:delete}]
+\begin{lstlisting}[language=SQL, caption={Delta 테이블에서 특정 데이터 삭제}, label={lst:delete}, breaklines=true]
 -- Iowa (IA) 주의 모든 데이터를 삭제
 DELETE FROM loans_by_state_delta WHERE state = 'IA';
 \end{lstlisting}
@@ -962,7 +962,7 @@ DELETE FROM loans_by_state_delta WHERE state = 'IA';
     \item 조건이 일치하지 않으면 (`WHEN NOT MATCHED`) $\rightarrow$ \textbf{INSERT}
 \end{itemize}
 
-\begin{lstlisting}[language=SQL, caption={MERGE를 사용한 Upsert 작업}, label={lst:merge}]
+\begin{lstlisting}[language=SQL, caption={MERGE를 사용한 Upsert 작업}, label={lst:merge}, breaklines=true]
 -- 'new_updates_table' (Source)의 데이터를
 -- 'loans_by_state_delta' (Target)에 병합
 MERGE INTO loans_by_state_delta AS target
@@ -1001,7 +1001,7 @@ $\rightarrow$ \textbf{오류 발생!} (Schema mismatch)
 
 Delta Lake는 모든 변경 이력(로그)을 보관합니다. `DESCRIBE HISTORY` 명령으로 이력을 볼 수 있습니다.
 
-\begin{lstlisting}[language=SQL, caption={테이블 변경 이력 조회}, label={lst:history}]
+\begin{lstlisting}[language=SQL, caption={테이블 변경 이력 조회}, label={lst:history}, breaklines=true]
 DESCRIBE HISTORY loans_by_state_delta;
 \end{lstlisting}
 % 결과 예:
@@ -1015,7 +1015,7 @@ DESCRIBE HISTORY loans_by_state_delta;
 
 이 버전을 사용하여 과거 데이터를 조회할 수 있습니다.
 
-\begin{lstlisting}[language=SQL, caption={특정 버전(Version)으로 과거 데이터 조회}, label={lst:version_as_of}]
+\begin{lstlisting}[language=SQL, caption={특정 버전(Version)으로 과거 데이터 조회}, label={lst:version_as_of}, breaklines=true]
 -- 가장 처음(버전 0)의 데이터 조회 (Iowa 데이터가 없던 시점)
 SELECT * FROM loans_by_state_delta VERSION AS OF 0;
 
@@ -1025,7 +1025,7 @@ SELECT * FROM loans_by_state_delta VERSION AS OF 9;
 
 버전 번호 대신 타임스탬프(시간)를 사용할 수도 있습니다.
 
-\begin{lstlisting}[language=SQL, caption={특정 시간(Timestamp)으로 과거 데이터 조회}, label={lst:timestamp_as_of}]
+\begin{lstlisting}[language=SQL, caption={특정 시간(Timestamp)으로 과거 데이터 조회}, label={lst:timestamp_as_of}, breaklines=true]
 -- 특정 날짜/시간 기준의 데이터 조회
 SELECT * FROM loans_by_state_delta
 TIMESTAMP AS OF '2025-10-26 03:00:00';
@@ -1061,7 +1061,7 @@ Databricks UI의 'Jobs' 탭에서 새 작업을 생성합니다.
 
 노트북 내에서 이 파라미터를 받으려면 `dbutils.widgets.get()`을 사용합니다.
 
-\begin{lstlisting}[language=Python, caption={노트북에서 워크플로우 파라미터 받기}, label={lst:dbutils}]
+\begin{lstlisting}[language=Python, caption={노트북에서 워크플로우 파라미터 받기}, label={lst:dbutils}, breaklines=true]
 # 'param1'이라는 이름으로 전달된 태스크 파라미터 값을 가져옴
 param_value = dbutils.widgets.get("param1")
 

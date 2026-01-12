@@ -1,0 +1,264 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 3}
+\fancyhead[R]{Neural Networks Basics}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 뇌를 모방하다}}
+\author{Unit 3 (Part A): Neural Network Basics}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 2: Linear Classifiers (직선 하나 긋기)
+    \item \textbf{\textcolor{mainblue}{Unit 3: Neural Networks (현재 단원: 선을 쌓아 면을 만들기)}}
+    \begin{itemize}
+        \item 7.1 Feedforward Neural Networks (구조)
+        \item 7.2 The Role of Non-linearity (활성화 함수의 필요성)
+        \item 7.3 Activation Functions (Sigmoid, Tanh, ReLU)
+        \item 7.4 Output Layers (Softmax)
+    \end{itemize}
+    \item Unit 4: Backpropagation (학습의 원리)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 3 (Part A). 신경망 기초 (Neural Network Basics)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 2에서 우리는 XOR 문제처럼 직선 하나로 풀 수 없는 문제를 해결하기 위해, 사람이 직접 $x^2, xy$ 같은 특징을 만들어줬습니다(Feature Engineering). 하지만 이미지나 음성 데이터에서 어떤 특징이 중요한지 사람이 어떻게 알 수 있을까요? 신경망은 \textbf{"선형 모델을 층층이 쌓으면 컴퓨터가 알아서 특징을 찾아낸다"}는 아이디어에서 출발합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 딥러닝의 가장 기본 구조인 \textbf{피드포워드 신경망(FNN)}을 배웁니다. 입력층-은닉층-출력층으로 이어지는 데이터의 흐름을 이해하고, 단순한 선형 결합을 강력한 비선형 모델로 바꿔주는 핵심 부품인 \textbf{활성화 함수(Activation Function)}의 종류와 역할을 학습합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{FNN (Feedforward NN)} & 신호가 앞으로만 전달되는 신경망. (Loop 없음) \\
+\hline
+\textbf{Hidden Layer (은닉층)} & 입력과 출력 사이에 숨어서 '특징'을 추출하는 층. \\
+\hline
+\textbf{Activation Function} & 뉴런을 켤지 끌지 결정하는 스위치. 비선형성을 부여함. \\
+\hline
+\textbf{ReLU} & 양수는 통과, 음수는 차단. 딥러닝의 표준 스위치. \\
+\hline
+\textbf{Softmax} & 출력값들을 '확률(합=1)'로 변환해주는 함수. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 피드포워드 신경망 (FNN)}
+
+
+\begin{conceptbox}{개념 1: 정보의 조립 라인}
+\textbf{한 줄 요약:} 데이터가 공장 컨베이어 벨트(Layer)를 지나가면서 점점 더 추상적이고 고급진 정보로 가공되어 출력됩니다.
+\end{conceptbox}
+
+\subsubsection*{1) 구조와 흐름}
+$$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden 2} \xrightarrow{W_3} \text{Output} $$
+\begin{itemize}
+    \item \textbf{방향성:} 입력에서 출력으로 한 방향(Forward)으로만 흐릅니다. (순환 시 RNN)
+    \item \textbf{각 층의 연산:} 선형 변환($Wx+b$) 후 비선형 함수($\sigma$) 통과.
+    $$ a^{[l]} = \sigma(W^{[l]} a^{[l-1]} + b^{[l]}) $$
+\end{itemize}
+
+\subsubsection*{2) Deep Learning이란?}
+\textbf{은닉층(Hidden Layer)}이 2개 이상 깊게(Deep) 쌓이면 심층 신경망, 즉 딥러닝이라고 부릅니다. 은닉층이 많을수록 데이터의 복잡한 패턴을 더 잘 이해할 수 있습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 활성화 함수가 왜 필요한가?}
+
+\begin{conceptbox}{개념 2: 선형 + 선형 = 선형}
+\textbf{한 줄 요약:} 활성화 함수(비선형)가 없으면, 신경망을 100층을 쌓아도 그냥 1층짜리 선형 회귀랑 똑같아집니다.
+\end{conceptbox}
+
+\subsubsection*{수학적 증명 (간단 버전)}
+만약 활성화 함수 $\sigma$가 없다면 ($y = x$):
+\begin{itemize}
+    \item Layer 1: $h = W_1 x$
+    \item Layer 2: $y = W_2 h = W_2 (W_1 x) = (W_2 W_1) x = W_{new} x$
+\end{itemize}
+결국 행렬 곱셈 한 번 한 것과 차이가 없습니다. 신경망이 \textbf{곡선}을 그리고 \textbf{복잡한 경계}를 만들기 위해서는 반드시 비선형 함수(꺾임, 곡선)를 중간에 끼워 넣어야 합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 주요 활성화 함수 (The Big 4)}
+
+
+\subsubsection*{1) Sigmoid ($\sigma(z) = \frac{1}{1+e^{-z}}$)}
+\begin{itemize}
+    \item \textbf{특징:} 입력을 $0 \sim 1$로 압축. S자 곡선.
+    \item \textbf{용도:} 이진 분류(Binary Classification)의 \textbf{출력층}.
+    \item \textbf{치명적 단점:} 입력값이 크거나 작으면 기울기가 0이 되어 학습이 멈춤 (\textbf{Vanishing Gradient}). 은닉층에는 잘 안 씀.
+\end{itemize}
+
+\subsubsection*{2) Tanh ($\tanh(z)$)}
+\begin{itemize}
+    \item \textbf{특징:} 입력을 $-1 \sim 1$로 압축. 0을 중심(Zero-centered)으로 함.
+    \item \textbf{용도:} Sigmoid보다는 낫지만, 여전히 깊은 층에서는 기울기 소실 문제 발생.
+\end{itemize}
+
+\subsubsection*{3) ReLU (Rectified Linear Unit, $f(z) = \max(0, z)$)}
+\begin{itemize}
+    \item \textbf{특징:} 양수는 그대로, 음수는 0.
+    \item \textbf{용도:} \textbf{은닉층의 표준(Default)}.
+    \item \textbf{장점:}
+    \begin{enumerate}
+        \item 계산이 초고속 (비교 연산 하나면 끝).
+        \item 양수 구간에서 기울기가 1이라서, 깊게 쌓아도 학습이 잘 됨 (기울기 소실 해결).
+    \end{enumerate}
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 출력층 설계 (Output Layer)}
+
+\begin{conceptbox}{개념 3: 문제 유형에 따른 마무으리}
+\textbf{한 줄 요약:} 마지막 층의 활성화 함수는 "우리가 풀고 싶은 문제"가 무엇이냐에 따라 결정됩니다.
+\end{conceptbox}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l|l|l}
+\toprule
+\textbf{문제 유형} & \textbf{출력층 함수} & \textbf{예시} \\
+\midrule
+회귀 (값 예측) & Linear (None) & 집값 예측 ($-\infty \sim \infty$) \\
+이진 분류 (O/X) & Sigmoid & 스팸 메일 분류 ($0 \sim 1$) \\
+다중 분류 (A/B/C) & \textbf{Softmax} & 숫자 인식 (0~9 중 하나) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{Softmax 함수}
+입력값들을 \textbf{"확률의 총합이 1이 되도록"} 변환해 주는 함수입니다. 가장 큰 값을 더 돋보이게(Soft Max) 만들어줍니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 캐릭터 직업 추천 AI}
+
+\begin{storybox}{Scenario: 뉴비에게 딱 맞는 직업은?}
+신규 유저의 플레이 스타일 데이터($x$)를 분석해 전사, 마법사, 도적 중 하나를 추천해 주는 AI를 만듭니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{입력층:} 공격성향, 이동빈도, 파티선호도 등 10개 변수.
+    \item \textbf{은닉층 (Hidden Layers):}
+    \begin{itemize}
+        \item 3개의 층을 쌓음.
+        \item 활성화 함수: \textbf{ReLU} 사용. (복잡한 패턴 학습 + 빠른 속도)
+        \item 역할: "공격적이고 이동이 많음" 같은 추상적 특징을 스스로 조합해냄.
+    \end{itemize}
+    \item \textbf{출력층 (Output Layer):}
+    \begin{itemize}
+        \item 클래스 개수: 3개 (전사, 마법사, 도적).
+        \item 활성화 함수: \textbf{Softmax} 사용.
+    \end{itemize}
+    \item \textbf{결과 예시:}
+    $$ [2.5, 0.1, 4.8] \xrightarrow{\text{Softmax}} [0.09, 0.01, 0.90] $$
+    \item \textbf{해석:} "이 유저는 90\% 확률로 '도적'이 적합합니다."
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 은닉층 개수는 어떻게 정하나요?]
+    \textbf{A.} 정해진 공식은 없습니다. 이를 \textbf{하이퍼파라미터(Hyperparameter)}라고 합니다. 보통 1~2층으로 시작해서 성능을 보며 늘려나갑니다. 너무 깊으면 학습이 어렵고(Overfitting), 너무 얕으면 복잡한 문제를 못 풉니다.
+    
+    \item[Q2. Dying ReLU가 뭔가요?]
+    \textbf{A.} ReLU의 단점입니다. 입력이 계속 음수가 들어와서 출력이 0이 되면, 해당 뉴런이 영원히 깨어나지 못하고 '죽어버리는' 현상입니다. 이를 막기 위해 Leaky ReLU(음수일 때 약간의 기울기를 줌)를 쓰기도 합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 신경망의 구조(집)를 다 지었습니다. 이제 이 집에 지능을 불어넣으려면 \textbf{학습(Training)}을 시켜야겠죠? 정답과 예측의 오차를 계산해서, 거꾸로 전파하며 가중치를 수정하는 마법 같은 알고리즘, \textbf{역전파(Backpropagation)}를 다음 시간에 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 3 (Part A) 핵심 요약}
+\begin{itemize}
+    \item \textbf{FNN:} 입력 $\to$ 은닉 $\to$ 출력으로 흐르는 가장 기초적인 신경망.
+    \item \textbf{비선형성:} 활성화 함수가 있어야 딥러닝이 선형 회귀보다 똑똑해진다.
+    \item \textbf{ReLU:} 은닉층의 지배자. 학습 속도가 빠르고 깊은 망에 유리하다.
+    \item \textbf{Softmax:} 다중 분류 문제에서 출력값을 확률로 변환한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

@@ -876,7 +876,7 @@ When deploying a new model, you don't immediately replace the production model. 
 \end{definitionbox}
 
 In MLflow, this is implemented using \textbf{Model Aliases}:
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 # Set new model as challenger
 client.set_registered_model_alias("churn_model", "challenger", version)
 
@@ -906,7 +906,7 @@ The lab demonstrates a complete MLOps pipeline for customer churn prediction usi
 
 \subsection{Step 1: Data Preparation \& Feature Engineering}
 
-\begin{lstlisting}[style=pythonstyle, caption={Feature Engineering}]
+\begin{lstlisting}[style=pythonstyle, caption={Feature Engineering}, breaklines=true]
 # Read raw customer data
 telco_df = spark.table("mlops_churn_bronze_customer")
 
@@ -927,7 +927,7 @@ cleaned_df.write.format("delta").saveAsTable("mlops_churn_training")
 
 The key insight: \textbf{Log which data was used to train the model.}
 
-\begin{lstlisting}[style=pythonstyle, caption={Logging Data Lineage (Critical!)}]
+\begin{lstlisting}[style=pythonstyle, caption={Logging Data Lineage (Critical!)}, breaklines=true]
 import mlflow
 
 # Load and log the SOURCE DATA
@@ -955,7 +955,7 @@ Without data lineage, you can't reproduce the model. MLflow's \texttt{log\_input
 
 \subsection{Step 3: Register to Model Registry}
 
-\begin{lstlisting}[style=pythonstyle, caption={Finding Best Model and Registering}]
+\begin{lstlisting}[style=pythonstyle, caption={Finding Best Model and Registering}, breaklines=true]
 # Search for best run by F1 score
 best_run = mlflow.search_runs(
     experiment_ids=[exp_id],
@@ -974,7 +974,7 @@ client.set_registered_model_alias("mlops_churn", "challenger", 1)
 
 \subsection{Step 4: Champion-Challenger Validation}
 
-\begin{lstlisting}[style=pythonstyle, caption={Promoting Challenger to Champion}]
+\begin{lstlisting}[style=pythonstyle, caption={Promoting Challenger to Champion}, breaklines=true]
 # Load challenger model
 challenger = mlflow.pyfunc.load_model("models:/mlops_churn@challenger")
 challenger_f1 = get_metric(challenger, "f1_score")
@@ -994,7 +994,7 @@ except:
 
 \subsection{Step 5: Batch Inference}
 
-\begin{lstlisting}[style=pythonstyle, caption={Scoring New Data}]
+\begin{lstlisting}[style=pythonstyle, caption={Scoring New Data}, breaklines=true]
 # Load champion model
 champion_model = mlflow.pyfunc.load_model("models:/mlops_churn@champion")
 
@@ -1029,7 +1029,7 @@ MLOps pipelines can be automated using \textbf{webhooks}---HTTP callbacks that t
 \end{itemize}
 \end{examplebox}
 
-\begin{lstlisting}[style=pythonstyle, caption={Webhook Example (Conceptual)}]
+\begin{lstlisting}[style=pythonstyle, caption={Webhook Example (Conceptual)}, breaklines=true]
 # When a model is registered, trigger testing
 @webhook.on("model_registered")
 def run_tests(event):
@@ -1120,7 +1120,7 @@ Don't blindly replace production models. Compare:
   title={Key MLflow Commands},
   colframe=gray!60!black, colback=gray!5!white, fonttitle=\bfseries
 ]
-\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize, breaklines=true]
 mlflow.log_input(dataset, context="training")  # Data lineage
 mlflow.autolog()                                # Auto-log everything
 mlflow.register_model(uri, "model_name")        # Register to registry

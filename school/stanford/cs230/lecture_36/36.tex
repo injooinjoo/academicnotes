@@ -1,0 +1,252 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 증명)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Special Applications: \\ Face Recognition \& One-shot Learning}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] CNN Foundations \& Architectures \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Special Applications (Current Unit)}
+    \begin{itemize}
+        \item \textbf{10.1 Face Recognition}
+        \begin{itemize}
+            \item The One-shot Learning Problem
+            \item Siamese Network Architecture
+            \item Triplet Loss Function
+            \item Binary Classification Alternative
+        \end{itemize}
+        \item 10.2 Neural Style Transfer \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간까지 우리는 YOLO를 통해 객체의 위치를 찾는 법을 배웠습니다.
+오늘은 그보다 더 까다로운 문제인 \textbf{"이 사람이 누구인가?"}를 구별하는 얼굴 인식에 도전합니다.
+우리는 스마트폰을 살 때 얼굴을 한 번만 등록합니다. 그런데 딥러닝은 보통 수천 장의 데이터가 필요합니다. 어떻게 단 한 장의 사진만으로 주인을 알아볼까요? 기존 상식을 깨는 \textbf{One-shot Learning}과 \textbf{Siamese Network}의 비밀을 파헤쳐 봅니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 데이터가 극도로 적은 상황에서 작동하는 얼굴 인식 시스템의 원리를 다룹니다.
+\begin{itemize}
+    \item \textbf{One-shot Learning:} 단 한 장의 데이터로 학습하는 문제를 '분류'가 아닌 '유사도 측정'으로 풉니다.
+    \item \textbf{Siamese Network:} 두 이미지를 같은 네트워크에 통과시켜 거리(Distance)를 계산하는 구조를 배웁니다.
+    \item \textbf{Triplet Loss:} Anchor, Positive, Negative 세 장의 사진을 이용한 학습 방법을 수학적으로 유도합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{핵심 역할} \\ \hline
+\textbf{One-shot Learning} & 한 번만 보고 배우기 & 데이터가 적은 문제 해결. \\ \hline
+\textbf{Siamese Network} & 샴 네트워크 & 두 입력이 같은 가중치($W$)를 공유함. \\ \hline
+\textbf{Encoding} & $f(x)$ & 이미지를 128차원 등의 숫자 벡터로 변환. \\ \hline
+\textbf{Triplet Loss} & 세 쌍 손실 함수 & A-P는 가깝게, A-N은 멀게 만듦. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 분류가 아니라 비교다}
+
+\subsection{1. The Challenge (One-shot Learning)}
+직원 1,000명의 출입 통제 시스템을 만든다고 가정합시다.
+\begin{itemize}
+    \item \textbf{Softmax (실패):} 1,000개 클래스로 분류. 신입 사원이 오면 네트워크 전체를 재학습해야 합니다. (확장성 0점)
+    \item \textbf{Similarity (성공):} 두 사진을 비교하여 \textbf{거리(Distance) $d$}를 출력합니다.
+    \begin{itemize}
+        \item $d(\text{img1}, \text{img2}) \le \tau$: 같은 사람 (문 열림)
+        \item $d(\text{img1}, \text{img2}) > \tau$: 다른 사람 (거부)
+    \end{itemize}
+    신입 사원이 오면 사진만 DB에 추가하면 됩니다. 재학습이 필요 없습니다.
+\end{itemize}
+
+\subsection{2. Siamese Network (샴 네트워크)}
+[Image of Siamese network architecture with two shared CNNs feeding into distance calculation]
+
+두 개의 똑같은 네트워크가 머리(가중치)를 공유합니다.
+\begin{enumerate}
+    \item 두 이미지 $x^{(1)}, x^{(2)}$를 각각 CNN에 넣습니다.
+    \item 마지막 FC 층에서 나온 벡터(인코딩) $f(x^{(1)}), f(x^{(2)})$를 얻습니다.
+    \item 두 벡터 사이의 유클리드 거리를 계산합니다.
+    $$ d(x^{(1)}, x^{(2)}) = || f(x^{(1)}) - f(x^{(2)}) ||^2 $$
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Triplet Loss (트리플렛 손실)}
+
+샴 네트워크를 어떻게 학습시킬까요? 세 장의 사진을 한 세트(Triplet)로 묶어 학습합니다.
+
+\begin{itemize}
+    \item \textbf{Anchor (A):} 기준이 되는 내 사진.
+    \item \textbf{Positive (P):} 나와 같은 사람의 다른 사진.
+    \item \textbf{Negative (N):} 나와 다른 사람(영희)의 사진.
+\end{itemize}
+
+\begin{mathbox}{Loss Function Derivation}
+우리의 목표는 다음과 같습니다.
+$$ ||f(A) - f(P)||^2 \le ||f(A) - f(N)||^2 $$
+(A와 P 사이의 거리가 A와 N 사이의 거리보다 작아야 한다.)
+
+하지만 신경망이 $f(x)=0$ (모든 출력을 0으로)으로 학습해버리면, $0 \le 0$이 되어버립니다(Trivial Solution). 이를 막기 위해 \textbf{마진($\alpha$)}을 둡니다.
+
+$$ ||f(A) - f(P)||^2 - ||f(A) - f(N)||^2 + \alpha \le 0 $$
+
+최종 손실 함수 (ReLU 형태):
+$$ L(A, P, N) = \max(0, ||f(A) - f(P)||^2 - ||f(A) - f(N)||^2 + \alpha) $$
+\end{mathbox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Triplet Loss}
+
+TensorFlow/Keras 스타일의 손실 함수 구현입니다.
+
+\begin{lstlisting}[language=Python, caption=Triplet Loss Function, breaklines=true]
+import tensorflow as tf
+
+def triplet_loss(y_true, y_pred, alpha=0.2):
+    """
+    y_pred: [Anchor, Positive, Negative] 임베딩이 연결된 텐서
+    """
+    # 1. 임베딩 벡터 분리 (전체 길이의 1/3씩)
+    total_len = y_pred.shape[1]
+    emb_size = total_len // 3
+    
+    anchor = y_pred[:, 0:emb_size]
+    positive = y_pred[:, emb_size:2*emb_size]
+    negative = y_pred[:, 2*emb_size:]
+    
+    # 2. 거리 계산 (제곱합)
+    # axis=-1: 벡터의 각 성분별 합
+    pos_dist = tf.reduce_sum(tf.square(anchor - positive), axis=-1)
+    neg_dist = tf.reduce_sum(tf.square(anchor - negative), axis=-1)
+    
+    # 3. Loss 계산 (Margin 추가)
+    basic_loss = pos_dist - neg_dist + alpha
+    
+    # 4. max(0, loss)
+    loss = tf.maximum(basic_loss, 0.0)
+    
+    return tf.reduce_mean(loss)
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{Hard Triplet Mining (학습 데이터 선정)}
+랜덤하게 A, P, N을 고르면 학습이 잘 안 됩니다. 왜냐하면 대부분의 경우 랜덤한 두 사람(A, N)은 이미 충분히 다르게 생겼기 때문입니다. ($Loss=0$)
+학습 효율을 위해 \textbf{"A와 N이 꽤 닮은 경우(Hard Triplet)"}를 골라내어 학습시켜야 합니다.
+\end{warningbox}
+
+\textbf{Q. 얼굴 말고 다른 거에도 쓸 수 있나요?} \\
+\textbf{A.} 네! 서명 인식, 지문 인식, 심지어 \textbf{이미지 검색(쇼핑몰에서 비슷한 옷 찾기)} 등 "유사한 것을 찾는" 모든 분야에 쓰입니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+얼굴 인식은 CNN이 추출한 \textbf{'내용(Content)'}을 비교하는 기술이었습니다.
+그렇다면 CNN이 추출한 \textbf{'화풍(Style)'}만 따로 떼어낼 수도 있을까요?
+
+다음 시간에는 반 고흐의 화풍을 내 사진에 입히는 예술적인 AI, \textbf{[Neural Style Transfer]}에 대해 알아봅니다. CNN의 깊은 층이 무엇을 보고 있는지 시각적으로 확인할 수 있는 흥미로운 시간이 될 것입니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Similarity:} 분류가 아닌 거리 측정 문제로 접근한다.
+    \item \textbf{Siamese Network:} 가중치를 공유하는 쌍둥이 네트워크.
+    \item \textbf{Triplet Loss:} $(A, P, N)$ 구조. A-P는 당기고, A-N은 민다.
+    \item \textbf{Margin $\alpha$:} 모델이 모든 출력을 0으로 만드는 꼼수를 방지한다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

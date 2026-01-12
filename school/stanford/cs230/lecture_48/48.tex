@@ -1,0 +1,234 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (핵심 수식)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ BLEU Score (Evaluation Metric)}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1-10.9 RNN, Seq2Seq, Beam Search \textit{- Completed}
+        \item \textbf{10.10 BLEU Score}
+        \begin{itemize}
+            \item The Multiple Reference Problem
+            \item Modified Precision (Clipping)
+            \item N-grams (Unigram, Bigram, Trigram)
+            \item Brevity Penalty (Length Normalization)
+        \end{itemize}
+    \end{itemize}
+    \item[Chapter 11.] Attention Mechanism \textit{- Next Part}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 빔 서치로 최적의 문장을 생성하는 법을 배웠습니다. 그런데 근본적인 질문이 남습니다.
+\textbf{"번역이 잘 됐는지 컴퓨터가 어떻게 채점할까?"}
+이미지 분류는 정답이 하나(고양이)지만, 번역은 정답이 여러 개입니다. ("나는 학교에 간다", "학교에 가는 중이다" 등)
+사람이 일일이 채점하기엔 너무 비쌉니다. 이를 해결하기 위해 IBM이 제안한 자동화된 점수, \textbf{BLEU Score}를 배웁니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 기계 번역 평가의 표준인 BLEU Score의 원리를 다룹니다.
+\begin{itemize}
+    \item \textbf{다중 정답:} 여러 개의 참고 문장(Reference)을 기준으로 평가합니다.
+    \item \textbf{정밀도:} 단순 일치가 아닌 \textbf{클리핑된 정밀도(Clipped Precision)}를 사용해 "the the the" 문제를 해결합니다.
+    \item \textbf{N-gram:} 단어 묶음을 비교하여 문맥과 어순의 정확성을 평가합니다.
+    \item \textbf{페널티:} 너무 짧은 문장에 페널티(BP)를 주어 꼼수를 방지합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{역할} \\ \hline
+\textbf{Reference} & 정답 문장(들). & 채점 기준. (사람이 번역한 것) \\ \hline
+\textbf{Candidate} & 모델이 생성한 문장. & 채점 대상. \\ \hline
+\textbf{Modified Precision} & 빈도수 제한 정밀도. & 중복 단어 남발 방지. \\ \hline
+\textbf{Brevity Penalty} & 길이 불이익. & 정보 누락(짧은 문장) 방지. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 정밀도의 함정}
+
+\subsection{1. The Problem with Standard Precision}
+
+
+\textbf{Candidate:} "the the the the the" (5단어)
+\textbf{Reference:} "The cat is on the mat."
+\begin{itemize}
+    \item \textbf{단순 정밀도:} 5개 모두 정답에 있음("the"). $\rightarrow$ 5/5 = 100점? (말도 안 됨)
+    \item \textbf{해결책 (Clipping):} 정답 문장에 "the"가 최대 몇 번 나오는지 셉니다. (2번). 분자를 2로 제한합니다. $\rightarrow$ 2/5 = 40점.
+\end{itemize}
+
+\subsection{2. N-gram Analysis (어순 평가)}
+단어만 다 있다고 문장이 아닙니다.
+"The cat the mat on is" (단어는 맞지만 엉터리)
+이를 잡기 위해 \textbf{N-gram(단어 묶음)}을 봅니다.
+\begin{itemize}
+    \item \textbf{Unigram (1-gram):} 단어 존재 여부 (내용 충실도).
+    \item \textbf{Bigram (2-gram):} "The cat", "cat is" ... (어순/유창성).
+\end{itemize}
+
+\subsection{3. Brevity Penalty (BP)}
+정밀도 기반 평가는 \textbf{"짧게 말하면 유리하다"}는 약점이 있습니다.
+\textbf{Cand:} "The cat" (2단어 다 맞음. 정밀도 100%)
+하지만 정보가 누락되었습니다. 예측 문장이 정답보다 짧으면 점수를 깎습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: The Formula}
+
+\begin{formulabox}{BLEU Formula}
+$$ \text{BLEU} = BP \times \exp \left( \frac{1}{4} \sum_{n=1}^{4} p_n \right) $$
+\begin{itemize}
+    \item $p_n$: n-gram의 보정된 정밀도.
+    \item $BP$: Brevity Penalty (길이 페널티).
+    \item $\exp(\dots)$: 기하 평균(Geometric Mean)을 구하는 방식.
+\end{itemize}
+\end{formulabox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: NLTK Library}
+
+파이썬 NLTK 라이브러리로 쉽게 계산할 수 있습니다.
+
+\begin{lstlisting}[language=Python, caption=BLEU Score Calculation, breaklines=true]
+from nltk.translate.bleu_score import sentence_bleu
+
+# 1. 데이터 준비
+# Reference는 여러 개일 수 있음 (리스트의 리스트)
+references = [
+    ['the', 'cat', 'is', 'on', 'the', 'mat'],       # Ref 1
+    ['there', 'is', 'a', 'cat', 'on', 'the', 'mat'] # Ref 2
+]
+
+# Candidate는 하나의 리스트
+candidate = ['the', 'cat', 'is', 'on', 'the', 'mat']
+
+# 2. BLEU 계산
+# weights: 1-gram ~ 4-gram 가중치 (보통 균등하게 0.25)
+score = sentence_bleu(references, candidate, weights=(0.25, 0.25, 0.25, 0.25))
+
+print(f"BLEU Score: {score:.4f}")
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. BLEU 점수가 높으면 완벽한 번역인가요?} \\
+\textbf{A.} \textbf{아니요.} BLEU는 단어 일치도만 봅니다. 의미는 통하는데 단어가 다른 의역(Paraphrasing)이나, 미묘한 뉘앙스 차이는 잡아내지 못합니다. 하지만 "최소한 이 정도는 한다"는 지표로는 가장 훌륭합니다.
+
+\textbf{Q. 만약 4-gram이 하나도 안 맞으면요?} \\
+\textbf{A.} $p_4 = 0$이 되면 기하 평균 특성상 전체 점수가 0이 되어버립니다. 이를 막기 위해 아주 작은 값($\epsilon$)을 더해주는 \textbf{Smoothing} 기법을 씁니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+우리는 빔 서치로 문장을 만들고, BLEU로 평가까지 했습니다. 하지만 Seq2Seq에는 여전히 \textbf{"긴 문장의 병목 현상"}이라는 거대한 벽이 남아 있습니다.
+인코더가 100단어를 벡터 하나에 압축하는 것은 무리입니다.
+
+\textbf{"번역할 때 문장 전체를 외우지 않고, 필요한 단어만 그때그때 다시 보면서(Attend) 번역할 수는 없을까?"}
+다음 시간, 딥러닝 역사상 가장 위대한 발명 중 하나인 \textbf{[Attention Mechanism]}을 통해 이 벽을 부수겠습니다. 이것이 바로 Transformer와 GPT로 가는 마지막 열쇠입니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Modified Precision:} 정답에 등장하는 횟수만큼만 인정하여 중복 꼼수를 막는다.
+    \item \textbf{N-gram:} 1~4단어 묶음을 비교하여 문맥과 유창성을 평가한다.
+    \item \textbf{BP:} 문장이 짧으면 점수를 깎아 정보 누락을 방지한다.
+    \item \textbf{Standard:} 기계 번역 성능 평가의 업계 표준이다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

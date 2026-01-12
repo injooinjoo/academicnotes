@@ -10,11 +10,13 @@
 \usepackage{geometry} % 여백 설정
 \geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
 \usepackage{xcolor} % 색상 지원
-\usepackage{graphicx} % 이미지 지원
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 지원
 \usepackage{hyperref} % 하이퍼링크
 \usepackage{booktabs} % 표 디자인
 \usepackage{enumitem} % 리스트 디자인
-\usepackage[most]{tcolorbox} % 박스 디자인
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -84,7 +86,7 @@
 \chaptertitle{Unit 1 - Chapter 1}{확률 모형의 수립과 기초 공리}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 불확실한 세상으로의 첫걸음}
 
@@ -138,7 +140,7 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 \begin{itemize}
     \item \textbf{Outcome (근원 사건):} 주사위를 던져 '1'이 나오는 것. (더 쪼갤 수 없음)
     \item \textbf{Event (사건):} 주사위를 던져 '홀수'가 나오는 것 ($\{1, 3, 5\}$). (Outcome들의 묶음)
-    \item 확률론에서는 주로 **Event(집합)**에 확률을 부여합니다.
+    \item 확률론에서는 주로 \textbf{Event(집합)}에 확률을 부여합니다.
 \end{itemize}
 \end{warningbox}
 
@@ -192,7 +194,7 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 %===========================================================
 \section{핵심 개념 3: 셈하기 (Counting)}
 
-모든 결과가 동등하게 일어날 때(주사위 등), 확률 계산은 결국 **"분모와 분자를 잘 세는 싸움"**입니다.
+모든 결과가 동등하게 일어날 때(주사위 등), 확률 계산은 결국 \textbf{"분모와 분자를 잘 세는 싸움"}입니다.
 \[ P(A) = \frac{\text{사건 A의 경우의 수}}{\text{전체 경우의 수}} \]
 
 \subsection{셈하기 결정 트리 (Decision Tree)}
@@ -212,13 +214,13 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 \begin{storybox}{비밀요원 K의 가방 열기 (Counting 시나리오)}
 비밀요원 K가 3자리 숫자 자물쇠가 달린 가방을 열어야 합니다.
 \begin{enumerate}
-    \item **상황 A (순열):** 비밀번호는 0~9 숫자 중 서로 다른 3개로 이루어져 있고, 순서가 중요합니다.
+    \item \textbf{상황 A (순열):} 비밀번호는 0~9 숫자 중 서로 다른 3개로 이루어져 있고, 순서가 중요합니다.
     \begin{itemize}
         \item 계산: 첫 번째 칸 10개 $\times$ 두 번째 칸 9개 $\times$ 세 번째 칸 8개
         \item $10 \times 9 \times 8 = 720$가지.
     \end{itemize}
     
-    \item **상황 B (조합):** 사실 자물쇠가 아니라, 10개의 버튼 중 3개를 동시에 누르면 열리는 방식이었습니다. (순서 상관 없음)
+    \item \textbf{상황 B (조합):} 사실 자물쇠가 아니라, 10개의 버튼 중 3개를 동시에 누르면 열리는 방식이었습니다. (순서 상관 없음)
     \begin{itemize}
         \item 계산: 순열(720)에서 순서 섞이는 경우($3! = 3 \times 2 \times 1 = 6$)를 나눠줘야 합니다.
         \item $\binom{10}{3} = \frac{720}{6} = 120$가지.
@@ -286,18 +288,6 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 %===========================================================
 % 패키지 설정 (Chapter 1과 동일)
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -366,12 +356,12 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 \chaptertitle{Unit 1 - Chapter 2}{조건부 확률과 추론 (Inference)}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 정보는 확률을 바꾼다}
 
 \textbf{[이전 단계와의 연결]} \\
-Chapter 1에서는 아무런 정보가 없는 상태에서 확률을 계산했습니다. 하지만 현실에서는 끊임없이 **"정보(단서)"**가 들어옵니다. "구름이 끼었다"는 정보를 알았을 때, 비가 올 확률은 변해야 합니다. 이번 장에서는 **정보가 주어졌을 때 확률을 업데이트하는 법**을 배웁니다.
+Chapter 1에서는 아무런 정보가 없는 상태에서 확률을 계산했습니다. 하지만 현실에서는 끊임없이 \textbf{"정보(단서)"}가 들어옵니다. "구름이 끼었다"는 정보를 알았을 때, 비가 올 확률은 변해야 합니다. 이번 장에서는 \textbf{정보가 주어졌을 때 확률을 업데이트하는 법}을 배웁니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
@@ -426,7 +416,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 \end{examplebox}
 
 \subsection{곱셈 법칙 (Multiplication Rule)}
-조건부 확률 식을 살짝 바꾸면, 사건이 **순차적**으로 일어나는 과정을 설명할 수 있습니다.
+조건부 확률 식을 살짝 바꾸면, 사건이 \textbf{순차적}으로 일어나는 과정을 설명할 수 있습니다.
 \[ P(A \cap B) = P(B) \cdot P(A|B) \]
 \textbf{해석:} "먼저 $B$가 일어나고, 그 상황 속에서 $A$가 일어난다."
 
@@ -435,10 +425,10 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 %===========================================================
 \section{핵심 개념 2: 전체 확률과 베이즈 정리 (The Core)}
 
-이 부분은 MIT 수업에서 가장 강조하는 **"시스템적 추론(Inference)"**의 핵심입니다.
+이 부분은 MIT 수업에서 가장 강조하는 \textbf{"시스템적 추론(Inference)"}의 핵심입니다.
 
 \subsection{전체 확률의 정리 (Total Probability Theorem)}
-복잡한 문제를 해결하는 전략: **"분할 정복(Divide and Conquer)"**
+복잡한 문제를 해결하는 전략: \textbf{"분할 정복(Divide and Conquer)"}
 \begin{itemize}
     \item $B$가 일어날 확률을 한 번에 구하기 어렵다면, 원인별 시나리오($A_1, A_2, \dots$)로 쪼개서 계산한 뒤 합칩니다.
     \[ P(B) = P(A_1)P(B|A_1) + P(A_2)P(B|A_2) + \dots \]
@@ -520,7 +510,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 
 \begin{description}
     \item[Q1. $P(A|B)$와 $P(B|A)$는 같은 거 아닌가요?] \hfill \\
-    완전히 다릅니다! 이를 **"검사의 오류(Prosecutor's Fallacy)"**라고 합니다.
+    완전히 다릅니다! 이를 \textbf{"검사의 오류(Prosecutor's Fallacy)"}라고 합니다.
     \begin{itemize}
         \item $P(\text{죽음}|\text{상어에 물림}) \approx 100\%$ (매우 높음)
         \item $P(\text{상어에 물림}|\text{죽음}) \approx 0\%$ (대부분의 죽음은 상어와 무관함)
@@ -558,18 +548,6 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 %===========================================================
 % 패키지 설정 (Chapter 1, 2와 동일한 스타일 유지)
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -639,12 +617,12 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 \chaptertitle{Unit 1 - Chapter 3}{이산 확률 변수와 분포의 세계}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 결과(Outcome)를 숫자(Number)로 바꾸다}
 
 \textbf{[이전 단계와의 연결]} \\
-Chapter 2까지 우리는 "앞면/뒷면", "성공/실패" 같은 추상적인 사건(Event)을 다뤘습니다. 하지만 데이터 분석이나 공학에서는 \textbf{"그래서 성공을 몇 번 했는데?"}, \textbf{"평균적으로 얼마를 버는데?"}와 같이 **숫자**로 요약된 정보가 필요합니다. 이제 우리는 추상적인 사건을 숫자로 매핑(Mapping)하는 법을 배웁니다.
+Chapter 2까지 우리는 "앞면/뒷면", "성공/실패" 같은 추상적인 사건(Event)을 다뤘습니다. 하지만 데이터 분석이나 공학에서는 \textbf{"그래서 성공을 몇 번 했는데?"}, \textbf{"평균적으로 얼마를 버는데?"}와 같이 \textbf{숫자}로 요약된 정보가 필요합니다. 이제 우리는 추상적인 사건을 숫자로 매핑(Mapping)하는 법을 배웁니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
@@ -715,7 +693,7 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
 \section{핵심 개념 2: 데이터를 요약하는 기술}
 
 \subsection{기댓값 (Expectation, $E[X]$)}
-기댓값은 단순한 '산술 평균(N빵)'이 아닙니다. **확률 가중치가 반영된 무게 중심**입니다.
+기댓값은 단순한 '산술 평균(N빵)'이 아닙니다. \textbf{확률 가중치가 반영된 무게 중심}입니다.
 
 \begin{itemize}
     \item \textbf{공식:} $E[X] = \sum x \cdot p_X(x)$
@@ -743,9 +721,9 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
 % 8. 핵심 개념 3: 분포의 동물원 (The Zoo)
 %===========================================================
 \section{핵심 개념 3: 주요 이산 분포 (Story Matching)}
-공식을 외우기 전에, 어떤 **상황(Story)**에서 이 분포를 쓰는지 파악해야 합니다.
+공식을 외우기 전에, 어떤 \textbf{상황(Story)}에서 이 분포를 쓰는지 파악해야 합니다.
 
-\begin{storybox}{1. 베르누이 & 이항 분포 (Binomial)}
+\begin{storybox}{1. 베르누이 \& 이항 분포 (Binomial)}
 \textbf{"동전 던지기의 반복"}
 \begin{itemize}
     \item \textbf{상황:} 성공 확률 $p$인 실험을 $n$번 독립적으로 반복했을 때, 성공 횟수 $X$.
@@ -842,19 +820,7 @@ Unit 2에서는 $\sum$(더하기)가 $\int$(적분)으로 바뀌는 \textbf{연�
 %===========================================================
 % 패키지 설정 (일관된 스타일 유지)
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
-\usepackage{tikz} % 간단한 그래프 표현용 (선택사항)
+ % 간단한 그래프 표현용 (선택사항)
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -923,14 +889,14 @@ Unit 2에서는 $\sum$(더하기)가 $\int$(적분)으로 바뀌는 \textbf{연�
 \chaptertitle{Unit 2 - Chapter 4}{연속 확률 변수: 레고에서 유체로}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 더하기($\sum$)에서 적분($\int$)으로}
 
 \textbf{[이전 단계와의 연결]} \\
-Unit 1에서는 주사위 눈이나 동전 개수처럼 **하나하나 셀 수 있는(Countable)** '레고 블록' 같은 데이터를 다뤘습니다. 이때는 확률을 블록의 높이로 생각하고 단순히 더했습니다($\sum$).
+Unit 1에서는 주사위 눈이나 동전 개수처럼 \textbf{하나하나 셀 수 있는(Countable)} '레고 블록' 같은 데이터를 다뤘습니다. 이때는 확률을 블록의 높이로 생각하고 단순히 더했습니다($\sum$).
 
-하지만 현실의 시간, 온도, 속도, 전압은 뚝뚝 끊어져 있지 않고 **연속적으로 흐르는 유체(Fluid)**와 같습니다. 물의 양을 잴 때 블록 개수를 세지 않고 '부피'를 측정하듯이, 이제 우리는 확률을 **'구간의 면적(Area)'**으로 다루는 미적분의 세계로 들어갑니다.
+하지만 현실의 시간, 온도, 속도, 전압은 뚝뚝 끊어져 있지 않고 \textbf{연속적으로 흐르는 유체(Fluid)}와 같습니다. 물의 양을 잴 때 블록 개수를 세지 않고 '부피'를 측정하듯이, 이제 우리는 확률을 \textbf{'구간의 면적(Area)'}으로 다루는 미적분의 세계로 들어갑니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
@@ -950,8 +916,8 @@ Unit 1에서는 주사위 눈이나 동전 개수처럼 **하나하나 셀 수 �
 \begin{tabular}{|c|l|l|}
 \hline
 \rowcolor{mainblue!20} \textbf{기호} & \textbf{용어} & \textbf{직관적 의미} \\ \hline
-PDF & 확률 밀도 함수 ($f_X(x)$) & 특정 지점에서의 확률의 **농도(높이)**. (확률 아님!) \\ \hline
-CDF & 누적 분포 함수 ($F_X(x)$) & $-\infty$부터 $x$까지 그래프 아래의 **면적** (진짜 확률) \\ \hline
+PDF & 확률 밀도 함수 ($f_X(x)$) & 특정 지점에서의 확률의 \textbf{농도(높이)}. (확률 아님!) \\ \hline
+CDF & 누적 분포 함수 ($F_X(x)$) & $-\infty$부터 $x$까지 그래프 아래의 \textbf{면적} (진짜 확률) \\ \hline
 Uniform & 균등 분포 & "정보가 없다." 모든 구간의 확률 밀도가 평평함. \\ \hline
 Exponential & 지수 분포 & "대기 시간." 사건이 터질 때까지 걸리는 시간. \\ \hline
 Normal & 정규 분포 (Gaussian) & "오차의 합." 자연계의 잡음(Noise)을 설명하는 종 모양. \\ \hline
@@ -969,7 +935,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 
 \begin{conceptbox}{높이가 아니라 '면적'이 확률이다}
 \begin{itemize}
-    \item \textbf{한 줄 요약:} PDF 그래프의 $y$값(높이)은 확률이 아니라 '밀도'이며, 이를 구간으로 **적분(넓이)**해야 비로소 확률이 됩니다.
+    \item \textbf{한 줄 요약:} PDF 그래프의 $y$값(높이)은 확률이 아니라 '밀도'이며, 이를 구간으로 \textbf{적분(넓이)}해야 비로소 확률이 됩니다.
     \item \textbf{직관적 비유:} 금속 막대의 어느 한 점을 바늘로 찔렀을 때의 무게는 0입니다. 하지만 일정 길이(구간)를 잘라내면 무게(확률)가 생깁니다.
     \item \textbf{공식:}
     \[ P(a \le X \le b) = \int_{a}^{b} f_X(x) \, dx \]
@@ -980,7 +946,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 많은 분들이 가장 혼란스러워하는 부분입니다.
 \begin{itemize}
     \item 친구가 약속 장소에 "정확히 2.00000...초"에 도착할 확률은? \textbf{0입니다.}
-    \item 수학적으로 **선(Line)의 넓이는 0**이기 때문입니다.
+    \item 수학적으로 \textbf{선(Line)의 넓이는 0}이기 때문입니다.
     \item 따라서 연속 확률 변수에서는 등호의 유무가 중요하지 않습니다.
     \[ P(X \ge a) = P(X > a) \]
 \end{itemize}
@@ -1020,7 +986,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 %===========================================================
 \section{필수 스킬: 정규 분포의 표준화 (Standardization)}
 
-정규 분포 곡선 $e^{-x^2}$은 손으로 적분하는 것이 불가능합니다. 그래서 우리는 모든 정규 분포를 **표준 정규 분포($Z$)**로 변환하여 미리 계산된 표(Standard Normal Table)를 사용합니다.
+정규 분포 곡선 $e^{-x^2}$은 손으로 적분하는 것이 불가능합니다. 그래서 우리는 모든 정규 분포를 \textbf{표준 정규 분포($Z$)}로 변환하여 미리 계산된 표(Standard Normal Table)를 사용합니다.
 
 \begin{mathstep}{모든 정규 분포를 $N(0, 1)$로 만드는 마법}
 변수 $X$가 평균 $\mu$, 표준편차 $\sigma$를 가질 때 ($X \sim N(\mu, \sigma^2)$):
@@ -1049,17 +1015,17 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 
 \textbf{[상황]} AI 모델이 이미지를 보고 '고양이(0)'인지 '개(1)'인지 분류하려 합니다.
 \begin{itemize}
-    \item **원인(Discrete):** 실제 정답 $K \in \{0, 1\}$.
-    \item **결과(Continuous):** 모델이 뱉어낸 확신 점수(Score) $X$ (0.0 ~ 1.0 사이의 실수).
+    \item \textbf{원인(Discrete):} 실제 정답 $K \in \{0, 1\}$.
+    \item \textbf{결과(Continuous):} 모델이 뱉어낸 확신 점수(Score) $X$ (0.0 ~ 1.0 사이의 실수).
 \end{itemize}
 우리는 점수 $X=0.7$을 관측했을 때, 이것이 실제로 개($K=1$)일 확률을 알고 싶습니다.
 
 \[ P(K=1 | X=0.7) = \frac{P(K=1) \cdot f_{X|K}(0.7|1)}{f_X(0.7)} \]
 
 \begin{itemize}
-    \item **이산과 연속의 만남:** 분자는 '이산 확률 $\times$ 연속 밀도'입니다.
-    \item **분모(전체 확률):** 전체 밀도 $f_X(0.7)$은 고양이일 때의 밀도와 개일 때의 밀도를 가중 합(Total Probability)하여 구합니다.
-    \item 이 공식이 바로 **모든 머신러닝 분류기(Classifier)**가 작동하는 수학적 원리입니다.
+    \item \textbf{이산과 연속의 만남:} 분자는 '이산 확률 $\times$ 연속 밀도'입니다.
+    \item \textbf{분모(전체 확률):} 전체 밀도 $f_X(0.7)$은 고양이일 때의 밀도와 개일 때의 밀도를 가중 합(Total Probability)하여 구합니다.
+    \item 이 공식이 바로 \textbf{모든 머신러닝 분류기(Classifier)}가 작동하는 수학적 원리입니다.
 \end{itemize}
 
 %===========================================================
@@ -1078,7 +1044,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
     속도($v$)를 적분하면 이동 거리($s$)가 나오죠? 마찬가지로 확률의 '변화율(밀도)'을 쌓아야 전체 '양(확률)'이 나오기 때문입니다.
     
     \item[Q3. 정규 분포 식을 외워야 하나요?] \hfill \\
-    복잡한 식($\frac{1}{\sqrt{2\pi}\sigma}e^{-\dots}$) 자체를 외울 필요는 없습니다. 중요한 것은 그 식을 **$Z$로 변환하는 방법**과 그래프의 **대칭성(Symmetry)**을 활용하는 능력입니다.
+    복잡한 식($\frac{1}{\sqrt{2\pi}\sigma}e^{-\dots}$) 자체를 외울 필요는 없습니다. 중요한 것은 그 식을 \textbf{$Z$로 변환하는 방법}과 그래프의 \textbf{대칭성(Symmetry)}을 활용하는 능력입니다.
 \end{description}
 
 %===========================================================
@@ -1107,19 +1073,6 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 %===========================================================
 % 패키지 설정 (일관된 스타일 유지)
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
-\usepackage{tikz}
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -1188,20 +1141,20 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 \chaptertitle{Unit 2 - Chapter 5}{결합 분포: 평면 위의 미적분}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 1차원 선에서 2차원 평면으로}
 
 \textbf{[이전 단계와의 연결]} \\
 Chapter 4에서는 변수가 하나($X$)인 상황, 즉 수직선 위의 확률 밀도를 적분했습니다. 하지만 현실 세계의 문제는 변수 하나로 설명되지 않습니다. 키($X$)와 몸무게($Y$), 위도($X$)와 경도($Y$)처럼 두 변수는 서로 얽혀 있습니다.
 
-이제 우리는 **2차원 평면($x, y$)** 위에서 확률을 다룹니다. 선적분($\int$)이 **이중 적분($\iint$)**으로, 그래프의 면적이 **입체의 부피(Volume)**로 확장됩니다.
+이제 우리는 \textbf{2차원 평면($x, y$)} 위에서 확률을 다룹니다. 선적분($\int$)이 \textbf{이중 적분($\iint$)}으로, 그래프의 면적이 \textbf{입체의 부피(Volume)}로 확장됩니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
     \item \textbf{Joint PDF (지형도):} 확률을 3차원 입체의 '부피'로 이해합니다.
     \item \textbf{Marginal PDF (그림자):} 입체를 벽면에 투영(Projection)하여 한 변수의 분포만 뽑아냅니다.
-    \item \textbf{독립성 (함정):} 수식뿐만 아니라 **'영역의 모양'**이 독립성을 결정한다는 사실을 배웁니다.
+    \item \textbf{독립성 (함정):} 수식뿐만 아니라 \textbf{'영역의 모양'}이 독립성을 결정한다는 사실을 배웁니다.
     \item \textbf{Bayesian Inference:} 미지의 상수(Parameter)를 확률 변수로 취급하여 추정하는 현대 통계의 핵심을 맛봅니다.
 \end{enumerate}
 \end{tcolorbox}
@@ -1233,7 +1186,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 \begin{conceptbox}{지형도(Surface)의 부피 구하기}
 \begin{itemize}
     \item \textbf{한 줄 요약:} 평면의 땅($x,y$) 위에 확률이라는 흙을 쌓아 올린 산입니다.
-    \item \textbf{직관적 비유:} 지도 위의 등고선. 특정 지역(A)에 비가 올 확률은 그 지역 위에 떠 있는 구름의 **부피**와 같습니다.
+    \item \textbf{직관적 비유:} 지도 위의 등고선. 특정 지역(A)에 비가 올 확률은 그 지역 위에 떠 있는 구름의 \textbf{부피}와 같습니다.
     \item \textbf{공식:}
     \[ P((X,Y) \in A) = \iint_A f_{X,Y}(x,y) \, dx \, dy \]
 \end{itemize}
@@ -1245,7 +1198,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 복잡하게 얽힌 두 변수 중 하나만 알고 싶을 때 사용합니다.
 \begin{itemize}
     \item \textbf{개념:} "나는 $Y$값은 상관 안 해. $X$가 $x$일 확률 밀도만 다 모아줘."
-    \item \textbf{직관적 비유 (Projection):} 3차원 물체에 $Y$축 방향에서 빛을 비췄을 때, **$X$축 벽면에 생기는 그림자**입니다. 입체적인 정보가 납작해집니다.
+    \item \textbf{직관적 비유 (Projection):} 3차원 물체에 $Y$축 방향에서 빛을 비췄을 때, \textbf{$X$축 벽면에 생기는 그림자}입니다. 입체적인 정보가 납작해집니다.
     \item \textbf{계산:} $Y$가 가질 수 있는 모든 값($-\infty \sim \infty$)을 적분하여 없앱니다.
     \[ f_X(x) = \int_{-\infty}^{\infty} f_{X,Y}(x,y) \, dy \]
 \end{itemize}
@@ -1255,10 +1208,10 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 %===========================================================
 \section{핵심 개념 2: 독립성 (Independence)과 함정}
 
-두 변수 $X, Y$가 독립이라는 것은 $f_{X,Y}(x,y) = f_X(x)f_Y(y)$로 인수분해된다는 뜻입니다. 하지만 **수식만 보면 100\% 틀립니다.**
+두 변수 $X, Y$가 독립이라는 것은 $f_{X,Y}(x,y) = f_X(x)f_Y(y)$로 인수분해된다는 뜻입니다. 하지만 \textbf{수식만 보면 100\% 틀립니다.}
 
 \begin{warningbox}{기하학적 함정 (The Geometry Trap)}
-수식이 곱하기로 쪼개지더라도, **정의역(Support)의 모양**을 반드시 확인해야 합니다.
+수식이 곱하기로 쪼개지더라도, \textbf{정의역(Support)의 모양}을 반드시 확인해야 합니다.
 \begin{itemize}
     \item \textbf{직사각형 (Rectangle):} $a \le x \le b, c \le y \le d$
     \begin{itemize}
@@ -1280,7 +1233,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
     $x$를 고정하고 $y$에 대해 적분합니다. 이때 $y$는 $0$부터 $x$까지만 존재합니다!
     \[ f_X(x) = \int_{0}^{x} 2 \, dy = [2y]_0^x = 2x \quad (0 \le x \le 1) \]
     \item \textbf{독립성 판별:}
-    정의역이 삼각형이므로 계산해볼 것도 없이 **종속**입니다. (실제로 $f_X(x)f_Y(y)$를 곱해보면 $2 \neq 2x \cdot 2(1-y)$가 되어 성립하지 않습니다.)
+    정의역이 삼각형이므로 계산해볼 것도 없이 \textbf{종속}입니다. (실제로 $f_X(x)f_Y(y)$를 곱해보면 $2 \neq 2x \cdot 2(1-y)$가 되어 성립하지 않습니다.)
 \end{enumerate}
 \end{examplebox}
 
@@ -1289,7 +1242,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 %===========================================================
 \section{핵심 개념 3: 모수(Parameter)도 확률 변수다}
 
-통계학의 패러다임 전환이 일어나는 구간입니다. 동전의 앞면 확률 $\Theta$를 고정된 상수($0.5$)가 아니라, **분포를 가진 확률 변수**로 바라봅니다.
+통계학의 패러다임 전환이 일어나는 구간입니다. 동전의 앞면 확률 $\Theta$를 고정된 상수($0.5$)가 아니라, \textbf{분포를 가진 확률 변수}로 바라봅니다.
 
 \begin{storybox}{로봇의 위치 추정 (Localization)}
 로봇이 복도($X$)의 어딘가에 있습니다.
@@ -1323,15 +1276,15 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 
 \begin{description}
     \item[Q1. 이중 적분 순서($dx dy$ vs $dy dx$)는 어떻게 정하나요?] \hfill \\
-    영역의 모양을 보고 **"화살표를 쏘기 편한 쪽"**으로 정합니다.
+    영역의 모양을 보고 \textbf{"화살표를 쏘기 편한 쪽"}으로 정합니다.
     \begin{itemize}
         \item $y$축 방향(위아래)으로 화살표를 쐈을 때 진입/진출 곡선이 하나라면 $dy$ 먼저.
         \item $x$축 방향(좌우)이 편하면 $dx$ 먼저.
-        \item **Tip:** 반드시 그림을 그려야 보입니다!
+        \item \textbf{Tip:} 반드시 그림을 그려야 보입니다!
     \end{itemize}
     
     \item[Q2. 주변 PDF를 구할 때 범위가 헷갈려요.] \hfill \\
-    이게 가장 어렵습니다. $f_X(x)$를 구할 땐, **"$x$를 상수로 고정했다"**고 생각하세요. 그 고정된 $x$ 선 위에서 $y$가 어디서부터 어디까지 움직이는지(구간)를 찾아야 합니다. (삼각형 예제에서 $y$는 $0$부터 $1$이 아니라 $x$까지였습니다!)
+    이게 가장 어렵습니다. $f_X(x)$를 구할 땐, \textbf{"$x$를 상수로 고정했다"}고 생각하세요. 그 고정된 $x$ 선 위에서 $y$가 어디서부터 어디까지 움직이는지(구간)를 찾아야 합니다. (삼각형 예제에서 $y$는 $0$부터 $1$이 아니라 $x$까지였습니다!)
 \end{description}
 
 %===========================================================
@@ -1350,7 +1303,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 
 \vspace{0.5cm}
 \textbf{[다음 단원 예고]} \\
-지금까지는 $X, Y$를 그대로 사용했습니다. 만약 $Z = X + Y$나 $W = X/Y$처럼 변수들을 지지고 볶아서 **새로운 변수**를 만들면, 그 변수의 PDF는 어떻게 될까요? \\
+지금까지는 $X, Y$를 그대로 사용했습니다. 만약 $Z = X + Y$나 $W = X/Y$처럼 변수들을 지지고 볶아서 \textbf{새로운 변수}를 만들면, 그 변수의 PDF는 어떻게 될까요? \\
 다음 장 \textbf{Chapter 6: 파생 변수의 분포(Derived Distributions)}에서 미분의 반격, \textbf{야코비안(Jacobian)}이 등장합니다.
 
 \end{document}
@@ -1361,19 +1314,6 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 %===========================================================
 % 패키지 설정 (일관된 스타일 유지)
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
-\usepackage{tikz}
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -1443,14 +1383,14 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 \chaptertitle{Unit 2 - Chapter 6}{변환과 관계: 확률 변수를 요리하다}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 관찰을 넘어 조작으로}
 
 \textbf{[이전 단계와의 연결]} \\
 Chapter 5에서는 주어진 변수 $X, Y$를 있는 그대로 관찰했습니다. 하지만 공학 현실은 더 복잡합니다. 전압($X$)을 제곱해서 전력($Y=X^2$)을 구하거나, 신호($X$)와 잡음($Y$)이 섞인 수신 값($Z=X+Y$)을 분석해야 합니다.
 
-이제 우리는 확률 변수를 **함수에 넣어 변형**하거나, **서로 더했을 때** 분포가 어떻게 찌그러지고(Distort) 이동하는지 추적하는 기술을 배웁니다.
+이제 우리는 확률 변수를 \textbf{함수에 넣어 변형}하거나, \textbf{서로 더했을 때} 분포가 어떻게 찌그러지고(Distort) 이동하는지 추적하는 기술을 배웁니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
@@ -1474,7 +1414,7 @@ $Y=g(X)$ & 파생 변수 & $X$를 재료로 요리해서 만든 새로운 변수
 CDF Method & 2단계 접근법 & 누적 확률(CDF)을 먼저 구하고 미분하는 안전한 방법 \\ \hline
 Convolution & 합성곱 ($f_X * f_Y$) & 두 함수를 뒤집고 밀어서 겹치는 면적을 구하는 것 ($X+Y$) \\ \hline
 $\rho$ & 상관계수 & 두 변수의 선형 관계 강도 (-1 $\sim$ 1). (단위 없음) \\ \hline
-$E[X|Y]$ & 조건부 기댓값 & $Y$에 따라 값이 변하는 **확률 변수** (숫자 아님!) \\ \hline
+$E[X|Y]$ & 조건부 기댓값 & $Y$에 따라 값이 변하는 \textbf{확률 변수} (숫자 아님!) \\ \hline
 \end{tabular}
 \end{center}
 
@@ -1483,7 +1423,7 @@ $E[X|Y]$ & 조건부 기댓값 & $Y$에 따라 값이 변하는 **확률 변수*
 %===========================================================
 \section{핵심 개념 1: 분포 구하기의 정석 (Transformation)}
 
-입력 $X$가 함수 $g(X)$를 통과하면 $Y$의 분포는 어떻게 될까요? 단순히 $X$의 확률을 대입하면 안 됩니다. **공간이 왜곡(Stretch & Squeeze)**되기 때문입니다.
+입력 $X$가 함수 $g(X)$를 통과하면 $Y$의 분포는 어떻게 될까요? 단순히 $X$의 확률을 대입하면 안 됩니다. \textbf{공간이 왜곡(Stretch \& Squeeze)}되기 때문입니다.
 
 
 
@@ -1508,7 +1448,7 @@ $Y$의 사건을 $X$의 사건으로 번역합니다.
 \begin{itemize}
     \item 밀가루 반죽($X$)을 넓게 펴면($g'$이 큼), 두께(밀도)는 얇아집니다. $\to$ 나누기 $g'$
     \item 반죽을 좁게 뭉치면($g'$이 작음), 두께(밀도)는 두꺼워집니다.
-    \item **야코비안($1/|g'|$):** 공간이 늘어난 만큼 밀도를 줄여주는 **보정 계수**입니다.
+    \item \textbf{야코비안($1/|g'|$):} 공간이 늘어난 만큼 밀도를 줄여주는 \textbf{보정 계수}입니다.
 \end{itemize}
 \end{conceptbox}
 
@@ -1517,7 +1457,7 @@ $Y$의 사건을 $X$의 사건으로 번역합니다.
 %===========================================================
 \section{핵심 개념 2: 두 변수를 더하면? (Sum of Independent RVs)}
 
-$Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(Convolution)** 적분입니다.
+$Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼루션(Convolution)} 적분입니다.
 
 
 
@@ -1551,8 +1491,8 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(
 
 \subsection{공분산(Covariance) vs 상관계수(Correlation)}
 \begin{itemize}
-    \item **공분산:** 방향(+, -)은 알 수 있지만, 크기가 단위에 의존합니다. (키를 m로 재냐 cm로 재냐에 따라 값이 10000배 차이남)
-    \item **상관계수 ($\rho$):** 표준편차로 나누어 정규화(-1 $\sim$ 1)한 값. 단위가 사라집니다.
+    \item \textbf{공분산:} 방향(+, -)은 알 수 있지만, 크기가 단위에 의존합니다. (키를 m로 재냐 cm로 재냐에 따라 값이 10000배 차이남)
+    \item \textbf{상관계수 ($\rho$):} 표준편차로 나누어 정규화(-1 $\sim$ 1)한 값. 단위가 사라집니다.
     \begin{itemize}
         \item $\rho=1$: 완벽한 직선 ($Y=X$)
         \item $\rho=0$: 선형 관계 없음 (구름 모양)
@@ -1562,11 +1502,11 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(
 \begin{warningbox}{Uncorrelated $\neq$ Independent}
 가장 많이 틀리는 함정입니다.
 \begin{itemize}
-    \item **Uncorrelated ($\rho=0$):** "직선 관계"가 없다는 뜻입니다.
-    \item **Independent:** "아무런 관계"가 없다는 뜻입니다.
+    \item \textbf{Uncorrelated ($\rho=0$):} "직선 관계"가 없다는 뜻입니다.
+    \item \textbf{Independent:} "아무런 관계"가 없다는 뜻입니다.
     \item \textbf{반례:} $X$가 $-1 \sim 1$ 사이의 값이고, $Y = X^2$이라고 합시다.
         \begin{itemize}
-            \item $X$를 알면 $Y$를 완벽히 알 수 있으므로 **종속(Dependent)**입니다.
+            \item $X$를 알면 $Y$를 완벽히 알 수 있으므로 \textbf{종속(Dependent)}입니다.
             \item 하지만 계산해보면 $\rho = 0$이 나옵니다. (2차 곡선 관계이므로 선형성은 0)
         \end{itemize}
     \item \textbf{예외:} 정규 분포(Gaussian)인 경우에만 $\rho=0$이면 독립입니다.
@@ -1581,7 +1521,7 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(
 \subsection{조건부 기댓값 ($E[X|Y]$)}
 \begin{itemize}
     \item $E[X]$는 숫자입니다.
-    \item $E[X|Y]$는 **$Y$에 대한 함수(확률 변수)**입니다.
+    \item $E[X|Y]$는 \textbf{$Y$에 대한 함수(확률 변수)}입니다.
     \item 예: $X=$키, $Y=$성별. $E[X|Y]$는 '남자의 평균 키' 또는 '여자의 평균 키'라는 값을 갖는 변수입니다.
 \end{itemize}
 
@@ -1609,10 +1549,10 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(
 당신이 주식 A와 B에 절반씩 투자해서 포트폴리오 $Z = 0.5X + 0.5Y$를 만들었습니다.
 \begin{itemize}
     \item 수익률($E[Z]$)은 단순 평균입니다.
-    \item 하지만 **위험(분산, $\text{var}(Z)$)**은 다릅니다.
+    \item 하지만 \textbf{위험(분산, $\text{var}(Z)$)}은 다릅니다.
     \[ \text{var}(Z) = 0.25\text{var}(X) + 0.25\text{var}(Y) + 2(0.5)(0.5)\text{cov}(X,Y) \]
-    \item 만약 두 주식이 **역의 상관관계($\rho < 0$)**라면?
-    \item 공분산 항이 마이너스가 되어 **전체 위험(분산)이 줄어듭니다!**
+    \item 만약 두 주식이 \textbf{역의 상관관계($\rho < 0$)}라면?
+    \item 공분산 항이 마이너스가 되어 \textbf{전체 위험(분산)이 줄어듭니다!}
     \item 이것이 "계란을 한 바구니에 담지 말라"는 격언의 수학적 증명입니다.
 \end{itemize}
 \end{storybox}
@@ -1633,8 +1573,8 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(
 
 \vspace{0.5cm}
 \textbf{[다음 단원 예고]} \\
-지금까지는 한 번의 실험이나 고정된 시점의 확률을 다뤘습니다. 하지만 주식 가격이나 대기 행렬처럼 **시간에 따라 변하는 확률**은 어떻게 다룰까요? \\
-이제 Unit 3 **"확률 과정(Random Processes)"**으로 넘어가 베르누이 프로세스와 포아송 프로세스를 배웁니다. "시간($t$)이 변수로 들어옵니다!"
+지금까지는 한 번의 실험이나 고정된 시점의 확률을 다뤘습니다. 하지만 주식 가격이나 대기 행렬처럼 \textbf{시간에 따라 변하는 확률}은 어떻게 다룰까요? \\
+이제 Unit 3 \textbf{"확률 과정(Random Processes)"}으로 넘어가 베르누이 프로세스와 포아송 프로세스를 배웁니다. "시간($t$)이 변수로 들어옵니다!"
 
 \end{document}
 
@@ -1644,19 +1584,6 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(
 %===========================================================
 % 패키지 설정
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
-\usepackage{tikz}
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -1726,20 +1653,20 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. **컨볼루션(
 \chaptertitle{Unit 3 - Chapter 7}{극한 정리: 무한($\infty$)이 주는 선물}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 정확한 계산에서 '근사(Approximation)'로}
 
 \textbf{[이전 단계와의 연결]} \\
 지금까지는 확률 변수의 분포(PMF/PDF)를 정확히 알고 있다고 가정하고, $P(X \le 3)$ 같은 값을 '정확하게' 계산했습니다.
 하지만 현실 세계(빅데이터)에서는 데이터가 너무 많거나 분포를 모르는 경우가 대부분입니다.
-이제 우리는 **"데이터가 무한히 많아지면($n \to \infty$), 분포를 몰라도 결과를 예측할 수 있다"**는 강력한 도구를 배웁니다.
+이제 우리는 \textbf{"데이터가 무한히 많아지면($n \to \infty$), 분포를 몰라도 결과를 예측할 수 있다"}는 강력한 도구를 배웁니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
     \item \textbf{부등식 (Bounds):} 분포를 몰라도 평균과 분산만 알면 '최악의 시나리오'를 막을 수 있다. (마르코프, 체비셰프)
     \item \textbf{대수의 법칙 (LLN):} 데이터가 많아지면 통계치(평균)는 결국 진실(True Mean)로 수렴한다.
-    \item \textbf{중심 극한 정리 (CLT):} 데이터가 많아지면 합과 평균의 분포는 무조건 **정규 분포(Bell Curve)**가 된다.
+    \item \textbf{중심 극한 정리 (CLT):} 데이터가 많아지면 합과 평균의 분포는 무조건 \textbf{정규 분포(Bell Curve)}가 된다.
 \end{enumerate}
 \end{tcolorbox}
 
@@ -1765,7 +1692,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 %===========================================================
 \section{핵심 개념 1: 분포를 모를 때의 생존법 (부등식)}
 
-분포의 모양(PDF)을 몰라도, **평균($\mu$)**과 **분산($\sigma^2$)**만 안다면 확률의 한계(Limit)를 설정할 수 있습니다. 이것은 리스크 관리(Risk Management)의 기초입니다.
+분포의 모양(PDF)을 몰라도, \textbf{평균($\mu$)}과 \textbf{분산($\sigma^2$)}만 안다면 확률의 한계(Limit)를 설정할 수 있습니다. 이것은 리스크 관리(Risk Management)의 기초입니다.
 
 \subsection{1. 마르코프 부등식 (Markov Inequality)}
 \begin{conceptbox}{평균의 시소 원리}
@@ -1805,7 +1732,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 \textbf{"데이터가 깡패다."} 데이터($n$)가 많아지면 표본 평균($M_n$)은 흔들림을 멈추고 진실($\mu$)로 수렴합니다.
 
 \subsection{분산의 축소 (Variance Shrinking)}
-왜 수렴할까요? 수학적 엔진은 바로 **분산이 줄어들기 때문**입니다.
+왜 수렴할까요? 수학적 엔진은 바로 \textbf{분산이 줄어들기 때문}입니다.
 \[ M_n = \frac{X_1 + \dots + X_n}{n} \implies \text{var}(M_n) = \frac{\sigma^2}{n} \]
 
 \begin{itemize}
@@ -1826,7 +1753,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 %===========================================================
 \section{핵심 개념 3: 중심 극한 정리 (Central Limit Theorem)}
 
-이 챕터의 하이라이트입니다. LLN이 "평균으로 간다"는 **위치**를 알려줬다면, CLT는 "**어떤 모양**으로 가는가?"를 알려줍니다.
+이 챕터의 하이라이트입니다. LLN이 "평균으로 간다"는 \textbf{위치}를 알려줬다면, CLT는 "\textbf{어떤 모양}으로 가는가?"를 알려줍니다.
 
 \begin{conceptbox}{모든 길은 정규 분포로 통한다}
 원래 데이터가 이항 분포든, 균등 분포든, 지수 분포든 상관없습니다.
@@ -1889,7 +1816,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 
 \begin{description}
     \item[Q1. $n$이 얼마나 커야 정규 분포라고 볼 수 있나요?] \hfill \\
-    보통 통계학 교과서에서는 **$n \ge 30$**이면 충분하다고 봅니다. 하지만 분포가 심하게 치우친(Skewed) 경우라면 데이터가 더 많이 필요할 수 있습니다.
+    보통 통계학 교과서에서는 \textbf{$n \ge 30$}이면 충분하다고 봅니다. 하지만 분포가 심하게 치우친(Skewed) 경우라면 데이터가 더 많이 필요할 수 있습니다.
     
     \item[Q2. 왜 $\sqrt{n}$으로 나누나요?] \hfill \\
     이게 핵심입니다! 합($S_n$)은 $n$에 비례해서 커지지만, 변동성(표준편차)은 $\sqrt{n}$에 비례해서 커집니다.
@@ -1914,13 +1841,13 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
     \item \textbf{부등식:} 분포를 몰라도 평균($\mu$)과 분산($\sigma^2$)만 있으면 리스크의 상한선을 그을 수 있다.
     \item \textbf{LLN:} 데이터가 많으면 표본 평균 $\approx$ 진짜 평균이다. (믿어라!)
     \item \textbf{CLT:} 데이터 합계의 분포는 결국 정규 분포($Z$)로 수렴한다.
-    \item \textbf{공학적 의의:} 복잡한 세상의 현상을 정규 분포라는 단순한 모델로 **근사(Approximation)**하여 해석할 수 있게 해준다.
+    \item \textbf{공학적 의의:} 복잡한 세상의 현상을 정규 분포라는 단순한 모델로 \textbf{근사(Approximation)}하여 해석할 수 있게 해준다.
 \end{enumerate}
 \end{tcolorbox}
 
 \vspace{0.5cm}
 \textbf{[다음 단원 예고]} \\
-지금까지는 $n \to \infty$로 갈 때의 '분포'를 봤습니다. 이제 시간 $t$가 흐르면서 사건이 발생하는 **'과정(Process)'**을 다룹니다. \\
+지금까지는 $n \to \infty$로 갈 때의 '분포'를 봤습니다. 이제 시간 $t$가 흐르면서 사건이 발생하는 \textbf{'과정(Process)'}을 다룹니다. \\
 다음 장 \textbf{Chapter 8: 베르누이와 포아송 프로세스}에서는 "동전을 영원히 던지는 상황"과 "콜센터 전화가 계속 오는 상황"을 모델링합니다.
 
 \end{document}
@@ -1930,20 +1857,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 %===========================================================
 % 패키지 설정 (일관된 스타일 유지)
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
-\usepackage{tikz}
-\usepackage{colortbl} % 표 색상
+ % 표 색상
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -2013,14 +1927,14 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 \chaptertitle{Unit 3 - Chapter 8}{시간 위의 확률: 사건의 흐름}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 사진(Snapshot)에서 영상(Video)으로}
 
 \textbf{[이전 단계와의 연결]} \\
 지금까지 우리는 주사위를 한 번 던지거나, 시험을 한 번 보는 '정적(Static)'인 상황을 다뤘습니다. 하지만 현실은 시간이 흐릅니다. 1초에 한 번씩 클릭이 발생하고, 불규칙하게 서버 요청이 들어옵니다.
 
-이제 우리는 **시간 축(Time Axis)** 위에 확률 변수를 늘어놓습니다. 이것이 바로 **확률 과정(Random Process)**입니다.
+이제 우리는 \textbf{시간 축(Time Axis)} 위에 확률 변수를 늘어놓습니다. 이것이 바로 \textbf{확률 과정(Random Process)}입니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
@@ -2069,13 +1983,13 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
     \item \textbf{View 1: 카운팅 (Counting)}
     \begin{itemize}
         \item 질문: "$n$번 시도했는데 성공이 몇 번 나왔어?"
-        \item 분포: **이항 분포 (Binomial)** ($n, p$)
+        \item 분포: \textbf{이항 분포 (Binomial)} ($n, p$)
     \end{itemize}
     
     \item \textbf{View 2: 타이밍 (Timing)}
     \begin{itemize}
         \item 질문: "첫 성공이 나올 때까지 몇 번($T$) 기다려야 해?"
-        \item 분포: **기하 분포 (Geometric)** ($p$)
+        \item 분포: \textbf{기하 분포 (Geometric)} ($p$)
         \[ P(T=k) = (1-p)^{k-1}p \]
     \end{itemize}
 \end{itemize}
@@ -2087,10 +2001,10 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 
 
 
-베르누이 과정의 시간 슬롯을 $\Delta \to 0$으로 아주 잘게 쪼개면 **포아송 과정**이 됩니다.
+베르누이 과정의 시간 슬롯을 $\Delta \to 0$으로 아주 잘게 쪼개면 \textbf{포아송 과정}이 됩니다.
 \begin{itemize}
     \item $p$는 아주 작아지고, $n$은 아주 커지지만, 곱($np$)은 $\lambda t$로 일정하게 유지됩니다.
-    \item **예시:** 콜센터 전화, 웹사이트 접속, 방사능 붕괴.
+    \item \textbf{예시:} 콜센터 전화, 웹사이트 접속, 방사능 붕괴.
 \end{itemize}
 
 \subsection{완벽한 대응 (The Rosetta Stone)}
@@ -2111,7 +2025,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 
 \begin{warningbox}{기하 분포와 지수 분포의 관계}
 기하 분포의 막대 그래프 폭을 아주 좁게 만들면 지수 분포의 매끄러운 곡선이 됩니다.
-둘 다 **"무기억성(Memoryless)"**을 가지는 유일한 분포들입니다.
+둘 다 \textbf{"무기억성(Memoryless)"}을 가지는 유일한 분포들입니다.
 \end{conceptbox}
 
 %===========================================================
@@ -2140,7 +2054,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
         \item 스팸 흐름: 속도 $\lambda p$인 포아송 과정
         \item 정상 흐름: 속도 $\lambda(1-p)$인 포아송 과정
     \end{itemize}
-    \item \textbf{직관 파괴 (Independence):} 놀랍게도 스팸 흐름과 정상 흐름은 서로 **독립(Independent)**입니다.
+    \item \textbf{직관 파괴 (Independence):} 놀랍게도 스팸 흐름과 정상 흐름은 서로 \textbf{독립(Independent)}입니다.
     \item \textbf{이유:} 전체 개수가 정해진 게 아니라, 매 순간 독립적으로 주사위를 굴려 분류하기 때문입니다.
 \end{itemize}
 \end{systembox}
@@ -2154,7 +2068,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 \textbf{상황 1: 아이템 강화 (베르누이 - Timing)}
 강화 성공 확률이 1\%($p=0.01$)입니다. 유저가 성공할 때까지 평균 몇 번 시도해야 할까요?
 \begin{itemize}
-    \item 이는 '첫 성공까지의 대기 시간'이므로 **기하 분포**입니다.
+    \item 이는 '첫 성공까지의 대기 시간'이므로 \textbf{기하 분포}입니다.
     \item $E[T] = \frac{1}{p} = \frac{1}{0.01} = 100$번.
     \item "100번 실패했으니 다음엔 되겠지?" $\to$ 틀렸습니다. 여전히 확률은 1\%입니다 (Memoryless).
 \end{itemize}
@@ -2162,7 +2076,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 \textbf{상황 2: 서버 대기열 (포아송 - Counting)}
 평소에는 초당 10명($\lambda=10$)이 접속합니다. 1초 동안 접속자가 15명 이상 폭주하여 렉이 걸릴 확률은?
 \begin{itemize}
-    \item 이는 '정해진 시간 내 발생 횟수'이므로 **포아송 분포**입니다.
+    \item 이는 '정해진 시간 내 발생 횟수'이므로 \textbf{포아송 분포}입니다.
     \item $P(K \ge 15) = 1 - \sum_{k=0}^{14} \frac{10^k e^{-10}}{k!}$ (보통 근사값이나 표 사용)
 \end{itemize}
 \end{storybox}
@@ -2183,7 +2097,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 
 \vspace{0.5cm}
 \textbf{[다음 단원 예고]} \\
-지금까지는 과거가 미래에 영향을 주지 않는(Memoryless) 특수한 상황만 다뤘습니다. 하지만 현실에서는 **"오늘 비가 오면 내일 비가 올 확률이 높다"**처럼 과거 상태가 미래에 영향을 줍니다. \\
+지금까지는 과거가 미래에 영향을 주지 않는(Memoryless) 특수한 상황만 다뤘습니다. 하지만 현실에서는 \textbf{"오늘 비가 오면 내일 비가 올 확률이 높다"}처럼 과거 상태가 미래에 영향을 줍니다. \\
 Unit 3의 마지막 장 \textbf{Chapter 9: 마르코프 체인(Markov Chains)}에서는 "바로 직전의 과거(State)"가 미래를 결정하는 조금 더 현실적인 모델을 배웁니다.
 
 \end{document}
@@ -2193,19 +2107,6 @@ Unit 3의 마지막 장 \textbf{Chapter 9: 마르코프 체인(Markov Chains)}�
 %===========================================================
 % 패키지 설정
 %===========================================================
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{kotex}
-\usepackage{amsmath, amssymb, amsfonts, amsthm}
-\usepackage{geometry}
-\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
-\usepackage{xcolor}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{enumitem}
-\usepackage[most]{tcolorbox}
-\usepackage{tikz}
 
 %===========================================================
 % 커스텀 스타일 정의
@@ -2275,13 +2176,13 @@ Unit 3의 마지막 장 \textbf{Chapter 9: 마르코프 체인(Markov Chains)}�
 \chaptertitle{Unit 3 - Chapter 9}{마르코프 체인: 과거는 잊고 미래로}
 
 %===========================================================
-% 3. 이전 단원과의 연결 & 4. 개요
+% 3. 이전 단원과의 연결 \& 4. 개요
 %===========================================================
 \section*{Intro: 무작위성(Randomness)에 구조(State)를 입히다}
 
 \textbf{[이전 단계와의 연결]} \\
 Chapter 8의 베르누이/포아송 과정은 "매 순간이 똑같다(Memoryless)"는 가정하에 진행되었습니다. 하지만 현실은 다릅니다. '맑음' 뒤에는 '맑음'일 확률이 높고, '비' 뒤에는 '흐림'일 확률이 높습니다.
-이제 우리는 **"현재의 상태(State)가 미래의 확률을 결정하는"** 조금 더 똑똑한 시스템, 마르코프 체인을 배웁니다.
+이제 우리는 \textbf{"현재의 상태(State)가 미래의 확률을 결정하는"} 조금 더 똑똑한 시스템, 마르코프 체인을 배웁니다.
 
 \begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
 \begin{enumerate}
@@ -2331,8 +2232,8 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 확률을 표(Matrix)로 정리합니다.
 \[ P = \begin{bmatrix} p_{11} & p_{12} \\ p_{21} & p_{22} \end{bmatrix} \]
 \begin{itemize}
-    \item **규칙:** 각 행(Row)의 합은 반드시 1이어야 합니다. (어디론가는 가야 하니까요.)
-    \item **n-단계 전이:** $n$번 점프해서 $i \to j$로 갈 확률은 행렬을 $n$번 곱한 $P^n$의 성분과 같습니다. (행렬 연산의 강력함!)
+    \item \textbf{규칙:} 각 행(Row)의 합은 반드시 1이어야 합니다. (어디론가는 가야 하니까요.)
+    \item \textbf{n-단계 전이:} $n$번 점프해서 $i \to j$로 갈 확률은 행렬을 $n$번 곱한 $P^n$의 성분과 같습니다. (행렬 연산의 강력함!)
 \end{itemize}
 
 %===========================================================
@@ -2340,7 +2241,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 %===========================================================
 \section{핵심 개념 2: 구조 파악하기 (Topology)}
 
-계산기를 들기 전에, 반드시 **그림(다이어그램)**을 그려서 화살표를 따라가 봐야 합니다.
+계산기를 들기 전에, 반드시 \textbf{그림(다이어그램)}을 그려서 화살표를 따라가 봐야 합니다.
 
 [Image of Recurrent vs Transient states diagram]
 
@@ -2352,7 +2253,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 
 \begin{warningbox}{접근 가능성(Accessibility) 체크}
 서로 왔다 갔다 할 수 있는 상태끼리 묶어서 '클래스(Class)'라고 부릅니다.
-마르코프 체인 문제를 풀 땐 가장 먼저 **"전체 시스템이 몇 개의 덩어리(Recurrent Classes)로 쪼개져 있는가?"**를 파악해야 합니다.
+마르코프 체인 문제를 풀 땐 가장 먼저 \textbf{"전체 시스템이 몇 개의 덩어리(Recurrent Classes)로 쪼개져 있는가?"}를 파악해야 합니다.
 \end{warningbox}
 
 %===========================================================
@@ -2363,7 +2264,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 시간이 아주 오래 흐르면($n \to \infty$), 내가 어디에 있을지 예측할 수 있을까요?
 
 \subsection{평형 방정식 (Balance Equations)}
-수조의 물 높이가 일정하다면, **"들어오는 물 = 나가는 물"**이어야 합니다.
+수조의 물 높이가 일정하다면, \textbf{"들어오는 물 = 나가는 물"}이어야 합니다.
 
 \begin{conceptbox}{Global Balance Equation}
 상태 $j$에 대해:
@@ -2377,10 +2278,10 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 
 \begin{mathstep}{정상 상태($\pi$) 구하는 법}
 \begin{enumerate}
-    \item **연립 방정식 세우기:** 모든 상태 $j$에 대해 $\pi_j = \sum \pi_k p_{kj}$를 씁니다.
-    \item **정규화 조건 추가:** 위 식만으로는 해가 안 나옵니다. 반드시 아래 식을 추가하세요.
+    \item \textbf{연립 방정식 세우기:} 모든 상태 $j$에 대해 $\pi_j = \sum \pi_k p_{kj}$를 씁니다.
+    \item \textbf{정규화 조건 추가:} 위 식만으로는 해가 안 나옵니다. 반드시 아래 식을 추가하세요.
     \[ \sum_{j} \pi_j = 1 \]
-    \item **풀기:** 연립 방정식을 풀면 유일한 해 $\pi$가 나옵니다. (단, 단일 재귀 클래스일 때)
+    \item \textbf{풀기:} 연립 방정식을 풀면 유일한 해 $\pi$가 나옵니다. (단, 단일 재귀 클래스일 때)
 \end{enumerate}
 \end{mathstep}
 
@@ -2389,7 +2290,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 %===========================================================
 \section{핵심 개념 4: 첫 스텝 분석법 (First Step Analysis)}
 
-MIT 6.431에서 가장 우아하고 강력한 문제 해결 테크닉입니다. 무한 급수를 계산하는 대신, **"딱 한 발자국"**만 생각해서 재귀식을 세웁니다.
+MIT 6.431에서 가장 우아하고 강력한 문제 해결 테크닉입니다. 무한 급수를 계산하는 대신, \textbf{"딱 한 발자국"}만 생각해서 재귀식을 세웁니다.
 
 \textbf{문제:} 상태 $i$에서 시작해서 흡수 상태(Goal)까지 가는 평균 시간 $\mu_i$는?
 \[ \mu_i = 1 + \sum_{j} p_{ij} \mu_j \]
@@ -2435,18 +2336,18 @@ MIT 6.431에서 가장 우아하고 강력한 문제 해결 테크닉입니다. 
 
 \begin{tcolorbox}[colback=mainblue!10, colframe=mainblue, title={\textbf{📝 Unit 3-9 핵심 요약}}]
 \begin{enumerate}
-    \item **모델링:** "상태(State)"를 잘 정의하면 과거를 잊을 수 있다(Markov).
-    \item **구조:** 한번 갇히면 못 나오는 방(Recurrent)과 지나가는 방(Transient)을 구분해라.
-    \item **평형:** $\pi P = \pi$. 들어오는 만큼 나간다. (장기적 확률)
-    \item **첫 스텝 분석:** 무한히 더하지 말고, 재귀 방정식($x = 1 + \sum px$)을 세워라.
+    \item \textbf{모델링:} "상태(State)"를 잘 정의하면 과거를 잊을 수 있다(Markov).
+    \item \textbf{구조:} 한번 갇히면 못 나오는 방(Recurrent)과 지나가는 방(Transient)을 구분해라.
+    \item \textbf{평형:} $\pi P = \pi$. 들어오는 만큼 나간다. (장기적 확률)
+    \item \textbf{첫 스텝 분석:} 무한히 더하지 말고, 재귀 방정식($x = 1 + \sum px$)을 세워라.
 \end{enumerate}
 \end{tcolorbox}
 
 \vspace{0.5cm}
 \textbf{[Final Comment]} \\
 수고하셨습니다! 🎉 \\
-우리는 **불확실성을 집합으로 정의**하는 것부터 시작해(Unit 1), **확률 변수라는 함수**로 세상을 모델링하고(Unit 2), 무한한 데이터 속에서 **극한의 법칙**을 발견하고, 마지막으로 **시간에 따른 변화(Process)**까지 다루었습니다(Unit 3).
+우리는 \textbf{불확실성을 집합으로 정의}하는 것부터 시작해(Unit 1), \textbf{확률 변수라는 함수}로 세상을 모델링하고(Unit 2), 무한한 데이터 속에서 \textbf{극한의 법칙}을 발견하고, 마지막으로 \textbf{시간에 따른 변화(Process)}까지 다루었습니다(Unit 3).
 
-이제 여러분은 "불확실한 세상"을 두려워하는 것이 아니라, **수학적 모델로 구조화하고 예측할 수 있는 눈**을 가지게 되었습니다. 이 지식은 머신러닝, 통계, 금융, 공학 어디서든 가장 든든한 무기가 될 것입니다.
+이제 여러분은 "불확실한 세상"을 두려워하는 것이 아니라, \textbf{수학적 모델로 구조화하고 예측할 수 있는 눈}을 가지게 되었습니다. 이 지식은 머신러닝, 통계, 금융, 공학 어디서든 가장 든든한 무기가 될 것입니다.
 
 \end{document}

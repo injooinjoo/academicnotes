@@ -1,0 +1,251 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 5}
+\fancyhead[R]{Reinforcement Learning Basics}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 시행착오의 과학}}
+\author{Unit 5 (Part A): Reinforcement Learning Fundamentals}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 1~4: Supervised/Unsupervised Learning (정적 데이터 학습)
+    \item \textbf{\textcolor{mainblue}{Unit 5: Reinforcement Learning (현재 단원: 동적 상호작용 학습)}}
+    \begin{itemize}
+        \item 13.1 MDP Framework ($S, A, P, R, \gamma$)
+        \item 13.2 Bellman Equations (가치의 정의)
+        \item 13.3 Solving MDPs: Policy vs Value Iteration
+    \end{itemize}
+    \item Unit 5 (Part B): Q-Learning (환경을 모를 때)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 5 (Part A). 강화 학습 기초 (RL Fundamentals)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지금까지는 "이미지 $\to$ 고양이"처럼 정해진 데이터셋을 학습했습니다. 하지만 자전거 타기를 배울 때 데이터를 보고 배우나요? 아닙니다. 직접 타보고 넘어지면서(Trial and Error) 배웁니다. 이번 단원에서는 에이전트가 환경과 상호작용하며 \textbf{보상(Reward)}을 통해 스스로 최적의 행동을 깨우치는 과정을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+강화 학습은 \textbf{MDP(Markov Decision Process)}라는 수학적 무대 위에서 펼쳐집니다. 이 단원에서는 MDP의 5가지 요소와, 현재의 선택이 미래에 미칠 영향을 계산하는 \textbf{벨만 방정식(Bellman Equation)}을 배웁니다. 또한 환경의 규칙을 완벽히 알 때(Model-based), 최적의 정책을 찾는 두 가지 알고리즘(\textbf{Policy Iteration, Value Iteration})을 비교합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{0.25\textwidth}|p{0.7\textwidth}|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Agent & Environment} & 플레이어(나)와 게임 세상(월드). \\
+\hline
+\textbf{State ($S$)} & 현재 내 상황. (예: HP 50, 보스 앞) \\
+\hline
+\textbf{Action ($A$)} & 내가 할 수 있는 선택. (예: 공격, 회피, 물약) \\
+\hline
+\textbf{Reward ($R$)} & 행동에 대한 즉각적인 점수. (예: 보스 처치 +100) \\
+\hline
+\textbf{Policy ($\pi$)} & 어떤 상황에서 어떻게 할지 적어둔 '공략집'. \\
+\hline
+\textbf{Discount Factor ($\gamma$)} & 인내심. 1에 가까울수록 먼 미래의 보상을 중요시함. \\
+\hline
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 강화 학습의 기본 뼈대: MDP}
+
+
+[Image of reinforcement learning agent environment loop]
+
+
+\begin{conceptbox}{개념 1: 세상을 정의하는 5가지 요소}
+\textbf{한 줄 요약:} 세상은 상태($S$), 행동($A$), 물리 법칙($P$), 보상($R$), 그리고 시간 관념($\gamma$)으로 이루어져 있습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 구성 요소 (Tuple)}
+$$ \text{MDP} = (S, A, P, R, \gamma) $$
+\begin{itemize}
+    \item \textbf{Transition Probability ($P$):} 내가 오른쪽으로 가려 해도($A$), 빙판길이라 미끄러져서 위로 갈 수도 있습니다($S'$). 내 의도대로 세상이 움직이지 않을 확률입니다.
+    \item \textbf{Discount Factor ($\gamma \in [0, 1]$):}
+    \begin{itemize}
+        \item $\gamma \approx 0$ (욜로족): 지금 당장의 보상만 봅니다.
+        \item $\gamma \approx 1$ (투자자): 10년 뒤의 대박을 위해 지금의 고통을 참습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{2) 마르코프 성질 (Markov Property)}
+\textbf{"과거는 묻지 마세요."}
+현재 상태($S_t$)만 알면 미래($S_{t+1}$)를 예측하기에 충분합니다. 내가 이 미로의 막다른 길에 어떻게 들어왔는지는 중요하지 않습니다. 지금 막다른 길에 있다는 사실만이 탈출 경로를 결정합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 벨만 방정식 (Bellman Equations)}
+
+\begin{conceptbox}{개념 2: 가치(Value)의 재귀적 정의}
+\textbf{한 줄 요약:} 어떤 상태의 가치는 "지금 받는 현찰" + "미래에 받을 것으로 예상되는 돈의 현재 가치"입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 가치 함수 (Value Function $V(s)$)}
+상태 $s$에 있는 것이 얼마나 좋은가?
+$$ V(s) = \mathbb{E} [ R_{t+1} + \gamma V(S_{t+1}) | S_t = s ] $$
+이 식은 \textbf{재귀적(Recursive)}입니다. 내 가치를 알려면 다음 상태의 가치를 알아야 하고, 다음 상태는 다다음 상태를... 이렇게 꼬리를 뭅니다.
+
+\subsubsection*{2) 벨만 최적 방정식 (Bellman Optimality Equation)}
+우리의 목표는 최고의 선택(Max)을 하는 것입니다.
+$$ V^*(s) = \max_a \left[ R(s,a) + \gamma \sum_{s'} P(s'|s,a) V^*(s') \right] $$
+"내가 할 수 있는 행동 $a$들 중에서, (즉시 보상 + 미래 가치 기댓값)이 최대가 되는 것을 고르겠다."
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 문제를 푸는 방법: 가치 반복 vs 정책 반복}
+
+
+가정: 우리는 게임의 룰(지도, 확률 $P$)을 모두 알고 있습니다. (Model-based)
+
+\subsubsection*{A. 정책 반복 (Policy Iteration)}
+\begin{itemize}
+    \item \textbf{비유:} "일단 계획(정책)을 세우고, 그 계획대로 쭉 살아본 뒤(평가), 별로면 계획을 수정(발전)하자."
+    \item \textbf{과정:}
+    \begin{enumerate}
+        \item \textbf{Evaluation:} 현재 정책 $\pi$로 했을 때의 가치 $V^\pi$를 끝까지 계산 (연립방정식 풀이).
+        \item \textbf{Improvement:} 계산된 $V$를 보고 더 나은 행동이 있으면 정책 $\pi$를 업데이트.
+    \end{enumerate}
+    \item \textbf{특징:} 정확하지만 한 턴 계산이 오래 걸립니다.
+\end{itemize}
+
+\subsubsection*{B. 가치 반복 (Value Iteration)}
+\begin{itemize}
+    \item \textbf{비유:} "멀리 볼 것 없이, 일단 매 순간 가장 이득이 되는 쪽(Greedy)으로 가치를 갱신하다 보면 정답이 나오겠지."
+    \item \textbf{과정:} 정책 평가를 끝까지 하지 않고, 그냥 최댓값(max)을 한 번 취해서 가치를 갱신해버립니다.
+    $$ V_{k+1}(s) \leftarrow \max_a (R + \gamma \sum P V_k(s')) $$
+    \item \textbf{특징:} 계산이 훨씬 빠르고 간편하여 널리 쓰입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 오토 플레이 AI}
+
+\begin{storybox}{Scenario: 모바일 RPG 자동 사냥}
+당신은 넥슨의 AI 개발자입니다. 신규 RPG 게임의 '자동 사냥' 기능을 강화 학습으로 구현하려 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{MDP 정의:}
+    \begin{itemize}
+        \item \textbf{상태($S$):} [내 HP, 마나, 보스 거리, 보스 스킬 쿨타임]
+        \item \textbf{행동($A$):} [공격, 회피, 물약 사용]
+        \item \textbf{보상($R$):} 보스 처치(+100), 사망(-100), 물약 낭비(-1), 시간 지체(-0.1)
+    \end{itemize}
+    
+    \item \textbf{할인율($\gamma$) 설정:}
+    $\gamma=0.99$로 설정합니다. 당장 물약 아끼는 것(-1 회피)보다, 결국 살아서 보스를 잡는 것(+100)이 중요하기 때문입니다.
+    
+    \item \textbf{학습 (Value Iteration):}
+    AI는 수만 번의 시뮬레이션을 통해 "보스가 광역기를 쓸 때(상태)는 공격보다 회피(행동)하는 것이 기대 가치($V$)가 높다"는 것을 스스로 깨닫게 됩니다.
+    
+    \item \textbf{결과:} 하드코딩된 규칙("체력 30\%면 물약 써")보다 훨씬 유연하고 고수 같은 플레이를 보여줍니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 할인율 $\gamma$는 왜 꼭 1보다 작아야 하나요?]
+    \textbf{A.} 수학적 이유와 현실적 이유가 있습니다.
+    \begin{itemize}
+        \item \textbf{수학:} $\gamma=1$이고 게임이 끝나지 않는다면, 보상의 합이 무한대($\infty$)가 되어 계산이 불가능(발산)해집니다. 수렴을 위해 1보다 작아야 합니다.
+        \item \textbf{현실:} 미래는 불확실합니다. 10년 뒤 100만 원보다 지금 100만 원이 더 가치 있는 것과 같습니다.
+    \end{itemize}
+    
+    \item[Q2. 환경($P$)을 모르면 어떻게 하나요?]
+    \textbf{A.} 이것이 진짜 강화 학습의 시작입니다.
+    지금 배운 MDP 풀이법(Dynamic Programming)은 $P$를 안다고 가정했습니다. 하지만 현실에선 내가 이 행동을 했을 때 세상이 어떻게 변할지 모릅니다.
+    이때는 직접 겪어보며 $P$를 추정하거나 가치를 배우는 \textbf{Q-Learning} 같은 방법을 씁니다. (다음 파트 내용)
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 지금까지는 "게임의 룰(확률 $P$)"을 다 알고 있다고 가정하고 최적의 수를 계산했습니다(Dynamic Programming). 하지만 현실 세계는 룰을 알려주지 않습니다. 다음 \textbf{Unit 5 (Part B)}에서는 맨땅에 헤딩하며 경험으로 학습하는 진짜 강화 학습, \textbf{Q-Learning}을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 5 (Part A) 핵심 요약}
+\begin{itemize}
+    \item \textbf{MDP:} 강화 학습을 수학적으로 정의하는 틀 ($S, A, P, R, \gamma$).
+    \item \textbf{벨만 방정식:} $V(s) = R + \gamma V(s')$. 가치는 재귀적으로 정의된다.
+    \item \textbf{Dynamic Programming:} 환경($P$)을 완벽히 알 때 문제를 푸는 방법.
+    \item \textbf{Policy vs Value Iteration:} '계획 수정' vs '매 순간 최선 선택'. 둘 다 최적해에 도달한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

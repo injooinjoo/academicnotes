@@ -1,0 +1,274 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 2}
+\fancyhead[R]{Linear Classifiers}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 딥러닝의 시작점}}
+\author{Unit 2: Linear Classifiers (Perceptron)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 1: Introduction (학습의 정의)
+    \item \textbf{\textcolor{mainblue}{Unit 2: Linear Classifiers (현재 단원: 선 긋기)}}
+    \begin{itemize}
+        \item 2.1 Geometric Structure (초평면과 법선 벡터)
+        \item 2.2 Perceptron Algorithm (틀릴 때만 고친다)
+        \item 2.3 Geometric Intuition (벡터의 회전)
+        \item 2.4 Linear Separability \& Convergence (수학적 보장)
+    \end{itemize}
+    \item Unit 3: Neural Networks (선형 분류기의 적층)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 2. 선형 분류기 (Linear Classifiers)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 1에서 우리는 "일반화(Generalization)"가 학습의 목표임을 배웠습니다. 그렇다면 가장 단순하면서도 일반화가 잘 되는 모델은 무엇일까요? 바로 '직선'입니다. 이번 단원에서는 컴퓨터가 어떻게 데이터를 보고 스스로 최적의 직선(결정 경계)을 찾아내는지, 그 알고리즘인 \textbf{퍼셉트론(Perceptron)}을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+선형 분류기는 데이터 공간을 \textbf{초평면(Hyperplane)}으로 나누어 분류를 수행합니다. 이를 학습시키는 \textbf{퍼셉트론 알고리즘}은 "틀린 데이터가 나올 때마다 경계를 수정한다"는 단순한 원리로 작동합니다. 이 단원에서는 벡터의 내적과 합을 이용한 학습 원리와, 알고리즘이 언제 멈추는지 보장하는 \textbf{수렴 정리}를 기하학적으로 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Hyperplane (초평면)} & 공간을 반으로 가르는 칼날 (2D에선 직선, 3D에선 평면). \\
+\hline
+\textbf{Normal Vector ($\theta$)} & 칼날의 방향을 결정하는 나침반 (법선 벡터). \\
+\hline
+\textbf{Decision Boundary} & $\theta \cdot x + \theta_0 = 0$ 인 지점. 여기를 넘어가면 판정이 바뀜. \\
+\hline
+\textbf{Linear Separability} & 직선 하나로 데이터를 완벽하게 100\% 가를 수 있는 상태. \\
+\hline
+\textbf{Margin ($\gamma$)} & 경계선과 데이터 사이의 안전거리 (도로의 폭). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 기하학적 구조: 결정 경계 (Decision Boundary)}
+
+\begin{conceptbox}{개념 1: 공간을 가르는 칼}
+\textbf{한 줄 요약:} 법선 벡터 $\theta$는 "정답(Positive)이 있는 방향"을 가리키고, 초평면은 그 $\theta$에 수직인 벽입니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{1) 초평면 (Hyperplane)}
+$d$차원 공간을 두 개의 영역으로 쪼개는 $(d-1)$차원 평면입니다.
+$$ h(x) = \text{sign}(\theta \cdot x + \theta_0) $$
+\begin{itemize}
+    \item $\theta \cdot x + \theta_0 > 0$: $\theta$가 가리키는 방향 (Positive Class, +1)
+    \item $\theta \cdot x + \theta_0 < 0$: $\theta$의 반대 방향 (Negative Class, -1)
+    \item $\theta \cdot x + \theta_0 = 0$: 결정 경계 (Boundary)
+\end{itemize}
+
+\subsubsection*{2) 법선 벡터 ($\theta$)의 의미}
+$\theta$는 단순한 기울기가 아닙니다. 초평면과 \textbf{수직(Orthogonal)}이며, 분류의 \textbf{기준이 되는 방향}입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 퍼셉트론 알고리즘 (Perceptron Algorithm)}
+
+\begin{conceptbox}{개념 2: 실수에서 배운다 (Mistake Driven)}
+\textbf{한 줄 요약:} 맞추면 가만히 있고, 틀렸을 때만 $\theta$를 수정합니다.
+\end{conceptbox}
+
+\subsubsection*{알고리즘 순서}
+\begin{enumerate}
+    \item $\theta = 0$ (혹은 랜덤)으로 초기화.
+    \item 데이터 $x^{(i)}$를 하나 꺼내 예측함: $\hat{y} = \text{sign}(\theta \cdot x^{(i)})$.
+    \item \textbf{Case 1 (정답):} $\hat{y} = y^{(i)}$ $\rightarrow$ 아무것도 안 함 (Pass).
+    \item \textbf{Case 2 (오답):} $\hat{y} \neq y^{(i)}$ $\rightarrow$ $\theta$ 업데이트.
+\end{enumerate}
+
+\subsubsection*{업데이트 규칙 (Update Rule)}
+$$ \theta_{new} = \theta_{old} + y^{(i)} x^{(i)} $$
+\begin{itemize}
+    \item 정답이 $+1$인데 틀렸으면: 더한다 ($\theta + x$)
+    \item 정답이 $-1$인데 틀렸으면: 뺀다 ($\theta - x$)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 업데이트의 기하학적 해석 (Geometric Intuition)}
+
+\begin{conceptbox}{개념 3: 벡터의 회전}
+\textbf{한 줄 요약:} $\theta$에 $x$를 더하면, 벡터의 합 원리에 의해 $\theta$가 $x$ 쪽으로 회전합니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{상황 분석}
+\begin{itemize}
+    \item \textbf{상황:} 정답은 양성($+1$)인데, 현재 $\theta$는 $x$와 둔각($>90^\circ$)을 이뤄 음수로 예측했습니다.
+    \item \textbf{처방:} $\theta \leftarrow \theta + x$
+    \item \textbf{효과:}
+    \begin{enumerate}
+        \item 벡터 덧셈의 평행사변형 법칙을 상상해 보세요.
+        \item 기존 $\theta$와 $x$의 중간 방향으로 새로운 $\theta_{new}$가 생깁니다.
+        \item 즉, $\theta$가 \textbf{$x$를 향해 회전}합니다.
+        \item 각도가 줄어들었으므로, 다음번에 내적을 하면 양수(정답)가 될 확률이 높아집니다.
+    \end{enumerate}
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 선형 분리 가능성 (Linear Separability)}
+
+\begin{conceptbox}{개념 4: 자 하나로 가를 수 있는가?}
+\textbf{한 줄 요약:} 직선 하나로 Red팀과 Blue팀을 완벽히 나눌 수 있어야만 퍼셉트론이 작동합니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{한계: XOR 문제}
+데이터가 대각선 방향끼리 같은 색이라면(XOR), 직선 하나로는 절대 100\% 분류할 수 없습니다.
+이 경우 퍼셉트론 알고리즘은 멈추지 않고 영원히 진동(Oscillate)합니다. (나중에 이를 해결하기 위해 다층 퍼셉트론, 즉 신경망이 등장합니다.)
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{5. 퍼셉트론 수렴 정리 (Perceptron Convergence Theorem)}
+
+\begin{conceptbox}{개념 5: 언제 끝나는가?}
+\textbf{한 줄 요약:} 데이터가 선형 분리만 가능하다면, 퍼셉트론은 유한한 횟수 내에 반드시 정답을 찾습니다. 그 횟수는 "도로 폭($\gamma$)"에 달려 있습니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{핵심 변수}
+\begin{itemize}
+    \item \textbf{반경 (Radius, $R$):} 데이터가 원점에서 얼마나 멀리 퍼져 있는가? (Max Norm)
+    \item \textbf{마진 (Margin, $\gamma$):} 결정 경계와 가장 가까운 데이터 사이의 거리. (도로의 폭)
+\end{itemize}
+
+\subsubsection*{정리 (Theorem)}
+총 실수(업데이트) 횟수 $k$는 다음을 넘지 못합니다.
+$$ k \le \left( \frac{R}{\gamma} \right)^2 $$
+\begin{itemize}
+    \item \textbf{의미 1 (유한성):} 상한선이 존재하므로, 언젠가는 반드시 멈춥니다(수렴).
+    \item \textbf{의미 2 (난이도):} 마진 $\gamma$가 작을수록(도로가 좁을수록), 횟수는 \textbf{제곱}으로 폭증합니다. 즉, 아슬아슬하게 구분되는 문제는 학습이 매우 오래 걸립니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 스팸 메일 필터}
+
+\begin{storybox}{Scenario: 초기 스팸 필터}
+당신은 1990년대 개발자입니다. "광고"라는 단어가 들어가면 스팸($+1$), 아니면 정상($-1$)인 분류기를 만듭니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{초기 상태:} $\theta = 0$.
+    \item \textbf{데이터 1:} "회의록 송부" ($x_1$). 정답 $-1$.
+    \item \textbf{예측:} $\theta \cdot x_1 = 0$. (초기엔 0이라 판정 불가, 틀린 걸로 간주).
+    \item \textbf{업데이트:} $\theta \leftarrow \theta - x_1$. (정상 메일 벡터 방향의 반대로 $\theta$ 이동).
+    \item \textbf{데이터 2:} "광고: 비아그라..." ($x_2$). 정답 $+1$.
+    \item \textbf{예측:} $\theta \cdot x_2 < 0$ (아까 뺐으므로 음수). $\rightarrow$ 오답! (스팸을 정상으로 분류).
+    \item \textbf{업데이트:} $\theta \leftarrow \theta + x_2$. ($\theta$를 스팸 메일 벡터 쪽으로 회전).
+    \item \textbf{결과:} 이제 $\theta$는 "회의록"과는 멀어지고 "광고"와는 가까워진 방향을 가리킵니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 선형 분리가 불가능하면 퍼셉트론은 쓸모없나요?]
+    \textbf{A.} 기본 퍼셉트론은 멈추지 않아서 못 씁니다. 하지만 \textbf{'평균 퍼셉트론(Averaged Perceptron)'}을 쓰거나, 약간의 오차를 허용하는 \textbf{SVM(Support Vector Machine)}을 쓰면 해결됩니다. 혹은 데이터를 고차원으로 보내버리는(Kernel Trick) 방법도 있습니다.
+    
+    \item[Q2. 초기값 $\theta$가 결과에 영향을 미치나요?]
+    \textbf{A.} 네, 미칩니다. 해가 하나가 아니라면(도로 폭이 넓다면), 초기값에 따라 최종적으로 얻어지는 경계선이 조금씩 달라질 수 있습니다. 하지만 선형 분리 가능하다면 "분류를 성공한다"는 사실 자체는 변하지 않습니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 퍼셉트론 하나로는 직선밖에 못 긋습니다(XOR 문제 해결 불가). 그렇다면 \textbf{퍼셉트론을 여러 개 묶어서(Layer)} 사용하면 어떨까요? 직선들을 조합하면 곡선도 만들 수 있지 않을까요? 다음 \textbf{Unit 3}에서는 퍼셉트론을 쌓아 올린 \textbf{신경망(Neural Networks)}으로 진화합니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 2 핵심 요약}
+\begin{itemize}
+    \item \textbf{구조:} $\text{sign}(\theta \cdot x)$. $\theta$는 초평면의 법선 벡터다.
+    \item \textbf{알고리즘:} $\theta_{new} = \theta + yx$. 틀린 데이터를 더해서 벡터를 회전시킨다.
+    \item \textbf{수렴 정리:} 선형 분리 가능하다면 $(R/\gamma)^2$ 횟수 안에 반드시 수렴한다.
+    \item \textbf{한계:} XOR 같이 선형 분리 불가능한 데이터는 영원히 학습하지 못한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

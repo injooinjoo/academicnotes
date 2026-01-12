@@ -1,0 +1,260 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Optimization Algorithms: \\ Learning Rate Decay}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1-5.5 Regularization \& Data Setup \textit{- Completed}
+        \item 5.6 Mini-batch Gradient Descent \textit{- Completed}
+        \item 5.7-5.8 Momentum, RMSprop, Adam \textit{- Completed}
+        \item \textbf{5.9 Learning Rate Decay}
+        \begin{itemize}
+            \item The Parking Problem (Oscillation)
+            \item Decay Schedules (Inverse Time, Exponential, Step)
+            \item Implementation \& Visualization
+        \end{itemize}
+        \item 5.10 Hyperparameter Tuning Strategy \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 Adam Optimizer를 통해 최적화의 정점에 도달했습니다. 하지만 아주 미세한 문제가 하나 남았습니다. 학습 후반부가 되면 손실 함수(Cost)의 최저점 근처에서 모델이 안착하지 못하고 계속 맴도는 \textbf{진동(Oscillation)} 현상이 발생합니다.
+주차장에서 시속 100km로 달리면 절대 주차 칸에 차를 넣을 수 없습니다. 목적지 근처에서는 속도를 줄여야 합니다. 이것이 바로 \textbf{학습률 감쇠(Learning Rate Decay)}가 필요한 이유입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 학습 단계별로 학습률($\alpha$)을 조절하여 모델 성능을 극대화하는 기법을 다룹니다.
+\begin{itemize}
+    \item \textbf{이유:} 고정된 학습률이 최저점 근처에서 수렴하지 못하는 이유를 기하학적으로 이해합니다.
+    \item \textbf{전략:} 시간 기반(Inverse Time), 지수(Exponential), 계단식(Step) 감쇠의 수식적 차이를 파악합니다.
+    \item \textbf{구현:} Python으로 스케줄러를 구현하고 에폭(Epoch)에 따른 변화를 그래프로 확인합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{용어} & \textbf{기호} & \textbf{설명} \\ \hline
+\textbf{Learning Rate} & $\alpha$ & 한 번 업데이트할 때 이동하는 보폭의 크기. \\ \hline
+\textbf{Decay Rate} & $k$ & 학습률을 얼마나 빨리 줄일지 결정하는 계수. \\ \hline
+\textbf{Epoch} & $t$ & 전체 데이터를 한 번 학습한 횟수. (시간 단위) \\ \hline
+\textbf{Initial LR} & $\alpha_0$ & 학습 시작 시점의 초기 학습률. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 속도 조절의 미학}
+
+\subsection{1. The Parking Problem (왜 줄여야 하는가?)}
+
+
+\begin{analogybox}{고속도로와 주차장 비유}
+\begin{itemize}
+    \item \textbf{Early Stage (고속도로):} 최저점이 멀리 있습니다. 이때는 보폭이 커야(High $\alpha$) 빨리 접근할 수 있습니다.
+    \item \textbf{Late Stage (주차장):} 최저점 근처입니다. 이때도 보폭이 크다면 구멍을 지나쳐 버리고(Overshooting), 다시 돌아오려다 또 지나칩니다.
+    \item \textbf{Solution:} 목적지에 가까워질수록 속도를 서서히 줄여서 정밀하게 주차(수렴)해야 합니다.
+\end{itemize}
+\end{analogybox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. Decay Schedules (감쇠 전략)}
+시간($t$, Epoch)이 지날수록 $\alpha$를 줄이는 대표적인 공식들입니다.
+
+\begin{itemize}
+    \item \textbf{1. Inverse Time Decay (시간 기반):}
+    $$ \alpha = \frac{1}{1 + k \cdot t} \alpha_0 $$
+    가장 완만하게 줄어듭니다.
+    
+    \item \textbf{2. Exponential Decay (지수 감쇠):}
+    $$ \alpha = k^t \cdot \alpha_0 \quad (k < 1, \text{예: } 0.95) $$
+    빠르게 0으로 수렴합니다.
+    
+    \item \textbf{3. Step Decay (계단식 감쇠):}
+    10 에폭마다 절반으로 뚝 떨어뜨립니다. (ResNet 등 심층 모델에서 선호)
+    
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Adaptive Methods와의 관계}
+
+"교수님, Adam이 알아서 학습률 조절해주지 않나요?"
+\begin{itemize}
+    \item \textbf{Adam/RMSprop:} 파라미터마다 *개별적으로* 학습률을 조절(Adaptive)하지만, 전체적인 *글로벌 학습률*($\alpha$) 자체는 고정되어 있습니다.
+    \item \textbf{결론:} Adam을 쓰더라도 Learning Rate Decay를 함께 적용하면, 최저점에서의 진동을 줄여 성능을 더 높일 수 있습니다. (SOTA 모델들의 필수 테크닉)
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Decay Scheduler}
+
+직접 스케줄러를 만들고 그래프를 그려봅시다.
+
+\begin{lstlisting}[language=Python, caption=Learning Rate Schedulers, breaklines=true]
+import numpy as np
+import matplotlib.pyplot as plt
+
+class LRScheduler:
+    def __init__(self, init_lr=1.0):
+        self.init_lr = init_lr
+        
+    def inverse_time_decay(self, epoch, k=0.1):
+        """lr = lr0 / (1 + kt)"""
+        return self.init_lr / (1 + k * epoch)
+        
+    def exponential_decay(self, epoch, k=0.95):
+        """lr = lr0 * k^t"""
+        return self.init_lr * np.power(k, epoch)
+        
+    def step_decay(self, epoch, drop=0.5, interval=10):
+        """특정 간격(interval)마다 drop 비율만큼 감소"""
+        exponent = np.floor((1 + epoch) / interval)
+        return self.init_lr * np.power(drop, exponent)
+
+# --- 시각화 ---
+if __name__ == "__main__":
+    epochs = np.arange(0, 100)
+    scheduler = LRScheduler(init_lr=1.0)
+    
+    lr1 = [scheduler.inverse_time_decay(e) for e in epochs]
+    lr2 = [scheduler.exponential_decay(e) for e in epochs]
+    lr3 = [scheduler.step_decay(e) for e in epochs]
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(epochs, lr1, label='Inverse Time')
+    plt.plot(epochs, lr2, label='Exponential')
+    plt.plot(epochs, lr3, label='Step Decay')
+    plt.title('Learning Rate Decay Schedules')
+    plt.xlabel('Epochs')
+    plt.ylabel('Learning Rate')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{tipbox}{ReduceLROnPlateau (실전 꿀팁)}
+가장 실용적인 방법은 수식보다는 \textbf{성능}을 보고 줄이는 것입니다.
+\textbf{"지난 10 에폭 동안 Dev Error가 줄어들지 않았네? (Plateau)"} $\rightarrow$ \textbf{"이제 정밀 타격할 때다. 학습률을 1/10로 줄여라."}
+Keras나 PyTorch에서 `ReduceLROnPlateau` 콜백을 사용하면 됩니다.
+\end{tipbox}
+
+\textbf{Q. $k$(감쇠율)가 너무 크면 어떻게 되나요?} \\
+\textbf{A.} 학습률이 너무 빨리 0이 되어버립니다. 최저점에 도달하기도 전에 모델이 멈춰버리는 \textbf{조기 수렴(Premature Convergence)} 문제가 발생합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 최적화 도구들은 모두 갖췄습니다. 하지만 하이퍼파라미터가 너무 많아졌습니다.
+($\alpha, \beta_1, \beta_2, \epsilon, k, \lambda, \text{batch\_size} \dots$)
+
+이 많은 다이얼을 어떤 순서로, 어떻게 맞춰야 할까요? 사람이 일일이 돌려보기엔 시간이 너무 부족합니다.
+다음 시간에는 \textbf{[Hyperparameter Tuning]} 전략을 통해, 이 복잡한 퍼즐을 체계적으로 푸는 법을 배웁니다. \textbf{Grid Search}와 \textbf{Random Search}의 승부가 펼쳐집니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Need for Decay:} 고정 학습률은 최저점 근처에서 진동한다. 정밀한 수렴을 위해 줄여야 한다.
+    \item \textbf{Schedules:} Inverse Time(완만), Exponential(급격), Step(계단식) 등이 있다.
+    \item \textbf{Best Practice:} Dev Error가 정체될 때 줄이는 \texttt{ReduceLROnPlateau} 방식이 가장 효과적이다.
+    \item \textbf{With Adam:} Adam을 쓰더라도 Decay를 함께 쓰면 성능이 더 좋아진다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

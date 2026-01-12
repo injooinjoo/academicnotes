@@ -1,0 +1,245 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 2 (Part B)}
+\fancyhead[R]{Community Detection}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 네트워크의 파벌 찾기}}
+\author{Module 2 (Part B): Community Detection}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Module 2 (Part A): Centrality Measures (핵심 인물 찾기)
+    \item \textbf{\textcolor{mainblue}{Module 2 (Part B): Community Detection (현재 단원: 파벌 나누기)}}
+    \begin{itemize}
+        \item 2.4 Definition of Community (내부는 빽빽, 외부는 듬성)
+        \item 2.5 Modularity $Q$ (랜덤보다 얼마나 더 뭉쳤나?)
+        \item 2.6 Spectral Partitioning (피들러 벡터를 이용한 절단)
+    \end{itemize}
+    \item Module 2 (Part C): Network Models (그래프 생성 모델)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 2 (Part B). 커뮤니티 탐지 (Community Detection)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지난 시간(Part A)에는 "이 네트워크에서 가장 중요한 인싸는 누구인가?"를 찾았습니다. 이제 시야를 넓혀봅시다. 인싸 주변에는 그를 따르는 무리가 있고, 네트워크는 이런 무리(Community)들의 집합으로 이루어져 있습니다. 이번 시간에는 \textbf{"네트워크를 어떻게 쪼개야 자연스러운 파벌(Clique)이 드러나는가?"}를 수학적으로 정의합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+커뮤니티 탐지는 그래프의 노드들을 "내부 연결은 강하고 외부 연결은 약한" 그룹으로 나누는 기술입니다. 이를 위해 \textbf{모듈성(Modularity)}이라는 객관적인 점수표를 도입하고, 계산 난이도가 높은 그래프 분할 문제를 해결하기 위해 \textbf{스펙트럴 파티셔닝(피들러 벡터)}이라는 선형대수학적 해법을 배웁니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Community} & 끼리끼리 뭉친 그룹. (학교의 '반'이나 '동아리') \\
+\hline
+\textbf{Null Model} & "만약 아무런 규칙 없이 무작위로 연결했다면?" (비교 기준) \\
+\hline
+\textbf{Modularity ($Q$)} & (실제 연결) - (무작위 연결). 이 값이 클수록 끈끈한 그룹임. \\
+\hline
+\textbf{Graph Cut} & 그래프를 가위로 잘라 두 덩어리로 만드는 것. \\
+\hline
+\textbf{Fiedler Vector} & 그래프를 가장 예쁘게 자르는 방법을 알려주는 마법의 벡터 ($\lambda_2$). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 커뮤니티의 정의와 목표}
+
+\begin{conceptbox}{개념 1: 학교 식당 풍경}
+\textbf{한 줄 요약:} 우리끼리는 시끌벅적하게 떠들고(내부 연결 $\uparrow$), 옆 테이블이랑은 가끔 눈인사만 하는(외부 연결 $\downarrow$) 상태입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 정의}
+좋은 커뮤니티 구조란 다음 두 조건을 만족해야 합니다.
+\begin{itemize}
+    \item \textbf{Intra-cluster density:} 같은 그룹 내의 노드끼리는 엣지가 많아야 함.
+    \item \textbf{Inter-cluster density:} 다른 그룹 간의 노드끼리는 엣지가 적어야 함.
+\end{itemize}
+
+\subsubsection*{2) 왜 어려운가?}
+단순히 "자른 엣지 개수(Cut Size)"를 최소화하려 하면, 그래프 전체에서 노드 딱 하나만 떼어내는 것이 수학적으로 최적이 되어버립니다. (이를 방지하기 위해 정규화된 컷(Normalized Cut)이나 모듈성을 사용합니다.)
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 모듈성 (Modularity, $Q$)}
+
+
+\begin{conceptbox}{개념 2: 우연을 가장한 필연 찾기}
+\textbf{한 줄 요약:} "너네 진짜 친해서 뭉친 거야, 아니면 좁은 방에 있다 보니 우연히 옆에 선 거야?"를 판별하는 점수입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 핵심 아이디어}
+우리가 찾은 그룹이 진짜 의미가 있으려면, \textbf{"랜덤하게 섞었을 때(Null Model) 기대되는 연결"}보다 훨씬 더 많이 연결되어 있어야 합니다.
+
+\subsubsection*{2) 수식과 해석}
+$$ Q = \frac{1}{2m} \sum_{i,j} \left( \underbrace{A_{ij}}_{\text{실제 연결}} - \underbrace{\frac{k_i k_j}{2m}}_{\text{기대 연결}} \right) \delta(c_i, c_j) $$
+\begin{itemize}
+    \item $A_{ij}$: 실제 노드 $i, j$가 연결되었으면 1, 아니면 0.
+    \item $\frac{k_i k_j}{2m}$: 노드 $i$와 $j$가 우연히 연결될 확률. (인기 많은 애들($k$가 큼)끼리는 우연히 만날 확률도 높음).
+    \item $\delta(c_i, c_j)$: $i$와 $j$가 같은 팀으로 배정되었을 때만 계산함.
+\end{itemize}
+
+\subsubsection*{3) 계산 예시 (간단 버전)}
+총 엣지 수 $m=10$인 네트워크에서, 노드 A(친구 4명)와 노드 B(친구 5명)가 같은 그룹에 있다고 합시다.
+\begin{itemize}
+    \item \textbf{실제($A_{AB}$):} 둘이 연결됨 (값 = 1).
+    \item \textbf{기대($E$):} $\frac{4 \times 5}{2 \times 10} = \frac{20}{20} = 1$.
+    \item \textbf{기여도:} $1 - 1 = 0$. (인기인끼리 연결된 건 당연한 거라 점수 안 줌)
+    \item 만약 노드 C(친구 1명), D(친구 1명)가 연결되었다면?
+    \item \textbf{기대($E$):} $\frac{1 \times 1}{20} = 0.05$.
+    \item \textbf{기여도:} $1 - 0.05 = 0.95$. (아싸끼리 연결된 건 운명이므로 높은 점수!)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 스펙트럴 파티셔닝 (Spectral Partitioning)}
+
+\begin{conceptbox}{개념 3: 그래프를 수직선 위에 줄 세우기}
+\textbf{한 줄 요약:} 복잡한 얽타래(그래프)를 1차원 직선 위에 쫙 펴서 나열한 뒤, 사이가 가장 먼 곳을 가위로 싹둑 자릅니다.
+\end{conceptbox}
+
+\subsubsection*{1) 피들러 벡터 (Fiedler Vector)}
+그래프 라플라시안 행렬 ($L = D - A$)의 \textbf{두 번째로 작은 고유값($\lambda_2$)에 해당하는 고유벡터($v_2$)}입니다.
+\begin{itemize}
+    \item \textbf{역할:} 각 노드에 실수 값 하나씩을 부여합니다 ($v_2 = [0.1, 0.2, -0.5, \dots]$).
+    \item \textbf{성질:} 서로 강하게 연결된 노드들은 피들러 벡터 값이 서로 비슷합니다.
+\end{itemize}
+
+\subsubsection*{2) 작동 방식}
+
+\begin{enumerate}
+    \item $L$의 고유벡터 $v_2$를 구합니다.
+    \item 노드들을 $v_2$ 값의 크기순으로 정렬합니다.
+    \item 값의 부호가 바뀌는 지점($0$)이나, 차이가 가장 큰 지점(Gap)을 기준으로 두 그룹으로 나눕니다.
+\end{enumerate}
+
+\subsubsection*{3) 치거 부등식 (Cheeger's Inequality)}
+$$ \text{자르기 힘든 정도} \approx \lambda_2 $$
+$\lambda_2$가 0에 가까우면 그래프가 이미 두 덩어리로 거의 나뉘어 있다는 뜻이고(자르기 쉬움), 크면 아주 끈끈하게 뭉쳐있다는 뜻입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 불법 작업장 탐지}
+
+\begin{storybox}{Scenario: 넥슨 게임 내 '작업장' 길드 색출}
+당신은 보안팀 데이터 분석가입니다. 일반 유저 길드와 아이템 파밍용 봇(Bot) 길드(작업장)를 구분해야 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{네트워크 구성:} 유저=노드, 아이템/골드 거래=엣지.
+    \item \textbf{가설:}
+    \begin{itemize}
+        \item \textbf{일반 길드:} 서로서로 복잡하게 거래함 (그물망 구조). 모듈성 $Q$가 높음.
+        \item \textbf{작업장:} 수백 개의 봇이 하나의 '창고 계정'으로만 골드를 보냄 (성게 모양, Star Structure).
+    \end{itemize}
+    \item \textbf{커뮤니티 탐지 수행 (Louvain or Spectral):}
+    전체 유저 네트워크를 커뮤니티 단위로 쪼갭니다.
+    \item \textbf{모듈성 분석:}
+    탐지된 커뮤니티 중, 내부 연결 패턴이 '성게 모양'이면서 모듈성 기여도가 비정상적인 그룹을 찾아냅니다.
+    \item \textbf{결과:} 500개의 작업장 계정을 일망타진합니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. $Q$값이 몇 이상이어야 좋은 건가요?]
+    \textbf{A.} 절대적인 기준은 없지만, 보통 $0.3 \sim 0.7$ 사이면 뚜렷한 커뮤니티 구조가 있다고 봅니다. $Q$가 너무 작으면 랜덤 그래프와 다를 바 없고, 이론적 최댓값은 1입니다.
+    
+    \item[Q2. 왜 두 번째 고유벡터($v_2$)를 쓰나요? 첫 번째는요?]
+    \textbf{A.} 라플라시안 행렬 $L$의 가장 작은 고유값 $\lambda_1$은 항상 0이고, 그 벡터 $v_1$은 $[1, 1, \dots, 1]$입니다. 이는 "모든 노드는 하나의 그래프에 있다"는 뻔한 사실을 말해주므로 정보가가 없습니다. 그래서 그 다음으로 작은 $\lambda_2$ (피들러 값)가 실질적인 분할 정보를 줍니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 지금까지는 "주어진 그래프"를 분석했습니다. 그런데 이 그래프(소셜 네트워크, 인터넷 등)는 도대체 어떤 원리로 생성된 걸까요? 다음 시간에는 랜덤 그래프, 작은 세상 네트워크 등 \textbf{네트워크 생성 모델(Network Models)}을 통해 세상의 연결 법칙을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 2 (Part B) 핵심 요약}
+\begin{itemize}
+    \item \textbf{Community:} 내부 밀도가 높고 외부 밀도가 낮은 노드 집합.
+    \item \textbf{Modularity ($Q$):} 실제 연결과 랜덤 연결(Null Model)의 차이. 군집화의 채점표.
+    \item \textbf{Spectral Partitioning:} 라플라시안 행렬의 피들러 벡터($v_2$)를 이용해 그래프를 수학적으로 최적 절단(Cut)하는 기법.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

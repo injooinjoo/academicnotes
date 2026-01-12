@@ -1,0 +1,254 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{architecturebox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🏗️ #1 (구조 분석)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Various RNN Architectures}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Unit)}
+    \begin{itemize}
+        \item 10.1 Recurrent Neural Networks (RNN Basics) \textit{- Completed}
+        \item \textbf{10.2 Various RNN Architectures}
+        \begin{itemize}
+            \item One-to-Many (Music Generation)
+            \item Many-to-One (Sentiment Analysis)
+            \item Many-to-Many (Synced vs Async)
+            \item Encoder-Decoder Structure
+        \end{itemize}
+        \item 10.3 Language Model \& Sequence Generation \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 RNN의 기본 구조(Basic RNN Cell)를 배웠습니다. 당시에는 입력 길이($T_x$)와 출력 길이($T_y$)가 같은 경우만 가정했습니다.
+하지만 현실은 다릅니다. \textbf{"I love you"(3단어)}를 번역하면 \textbf{"Je t'aime"(2단어)}가 됩니다. 음악 생성은 \textbf{장르 하나(1)}를 주면 \textbf{곡 전체(수백)}를 만듭니다.
+RNN의 강력함은 바로 이 \textbf{입출력 구조의 유연성(Flexibility)}에서 나옵니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 입력($T_x$)과 출력($T_y$)의 조합에 따른 5가지 RNN 아키텍처를 분류하고 이해합니다.
+\begin{itemize}
+    \item \textbf{One-to-Many:} 하나의 입력으로 시퀀스를 생성 (음악, 캡셔닝).
+    \item \textbf{Many-to-One:} 시퀀스를 하나의 결과로 요약 (감성 분석).
+    \item \textbf{Many-to-Many (Same):} 입력마다 즉시 출력 (개체명 인식).
+    \item \textbf{Many-to-Many (Diff):} 다 듣고 말하기 (\textbf{기계 번역, Encoder-Decoder}).
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{구조} & \textbf{입력 : 출력} & \textbf{대표 예시} \\ \hline
+\textbf{One-to-One} & 1 : 1 & 일반적인 신경망 (이미지 분류). \\ \hline
+\textbf{One-to-Many} & 1 : N & 음악 생성, 이미지 캡셔닝. \\ \hline
+\textbf{Many-to-One} & N : 1 & 감성 분석 (리뷰 $\to$ 별점). \\ \hline
+\textbf{Many-to-Many} & N : N & 개체명 인식 (NER). \\ \hline
+\textbf{Seq2Seq} & N : M & 기계 번역 (번역은 문장 끝까지 들어야 함). \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 구조의 다양성}
+
+\subsection{1. One-to-Many ($T_x=1, T_y>1$)}
+
+하나의 씨앗(Seed) 정보를 주면 긴 시퀀스를 생성합니다.
+\begin{itemize}
+    \item \textbf{동작:} 첫 타임 스텝에서 입력 $x$를 받습니다. 그 이후에는 전 단계의 출력 $\hat{y}^{\langle t-1 \rangle}$을 다음 단계의 입력으로 재사용합니다 (Auto-regressive).
+    \item \textbf{예시:} 음악 생성 (장르 $\to$ 멜로디), 이미지 캡셔닝 (이미지 $\to$ "고양이가 잔다").
+\end{itemize}
+
+\subsection{2. Many-to-One ($T_x>1, T_y=1$)}
+
+긴 시퀀스를 읽어서 하나의 결론을 내립니다.
+\begin{itemize}
+    \item \textbf{동작:} 시퀀스를 끝까지 읽으며 은닉 상태($a$)를 업데이트합니다. 출력은 \textbf{마지막 타임 스텝}에서만 나옵니다.
+    \item \textbf{예시:} 영화 리뷰 감성 분석 (텍스트 $\to$ 긍정/부정).
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Many-to-Many (The Tricky Part)}
+
+Many-to-Many는 다시 두 가지로 나뉩니다. 이 차이가 매우 중요합니다.
+
+\subsection{1. Synced Many-to-Many ($T_x = T_y$)}
+
+입력과 출력의 길이가 같고, 타이밍이 일치합니다.
+\begin{itemize}
+    \item \textbf{동작:} 입력이 들어올 때마다 즉시 출력을 뱉습니다.
+    \item \textbf{예시:} 비디오 프레임 분류, 개체명 인식(NER).
+\end{itemize}
+
+\subsection{2. Asynchronous Many-to-Many ($T_x \neq T_y$) - Seq2Seq}
+
+입력과 출력의 길이가 다릅니다. 기계 번역의 표준인 \textbf{Encoder-Decoder} 구조입니다.
+\begin{itemize}
+    \item \textbf{Encoder (Many-to-One):} 입력 문장 전체를 읽어서 하나의 \textbf{문맥 벡터(Context Vector)}로 압축합니다.
+    \item \textbf{Decoder (One-to-Many):} 압축된 벡터를 바탕으로 번역 문장을 생성합니다.
+    \item \textbf{이유:} "나는 너를 사랑해"를 번역하려면 문장 끝까지 들어봐야 어순을 맞출 수 있기 때문입니다.
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Encoder-Decoder Structure}
+
+Keras를 이용해 Seq2Seq 모델의 개념적 구조를 구현해 봅니다.
+
+\begin{lstlisting}[language=Python, caption=Encoder-Decoder Implementation, breaklines=true]
+from tensorflow.keras.layers import Input, LSTM, Dense
+from tensorflow.keras.models import Model
+
+def build_seq2seq(n_x, n_y, Tx, Ty, n_a):
+    """
+    n_x, n_y: 입/출력 단어 사전 크기
+    Tx, Ty: 입/출력 시퀀스 길이
+    n_a: 은닉 상태 크기
+    """
+    
+    # --- 1. Encoder (입력 압축) ---
+    encoder_inputs = Input(shape=(Tx, n_x))
+    
+    # return_state=True: 마지막 상태(h, c)를 반환받음
+    # return_sequences=False: 중간 출력은 필요 없음 (압축이 목적)
+    encoder = LSTM(n_a, return_state=True)
+    
+    _, state_h, state_c = encoder(encoder_inputs)
+    
+    # 이 'encoder_states'가 입력 문장의 모든 정보를 담은 '문맥'
+    encoder_states = [state_h, state_c]
+    
+    # --- 2. Decoder (번역 생성) ---
+    decoder_inputs = Input(shape=(Ty, n_y))
+    
+    # Encoder의 상태를 Decoder의 초기 상태(initial_state)로 주입!
+    decoder_lstm = LSTM(n_a, return_sequences=True, return_state=True)
+    decoder_outputs, _, _ = decoder_lstm(decoder_inputs, 
+                                         initial_state=encoder_states)
+    
+    # 단어 예측 (Softmax)
+    decoder_dense = Dense(n_y, activation='softmax')
+    decoder_outputs = decoder_dense(decoder_outputs)
+    
+    # 모델 정의
+    model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+    return model
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. 입력 문장이 너무 길면 어떻게 되나요?} \\
+\textbf{A.} Encoder가 문장의 모든 정보를 하나의 벡터에 욱여넣어야 하므로, 문장이 길어지면(예: 50단어 이상) 정보 손실이 발생해 성능이 떨어집니다. 이를 해결하기 위해 나중에 \textbf{Attention Mechanism}이 등장합니다.
+
+\textbf{Q. 이미지 캡셔닝은 어떤 구조인가요?} \\
+\textbf{A.} \textbf{One-to-Many}입니다. 입력은 이미지(CNN을 통과한 1개의 벡터), 출력은 텍스트 시퀀스(RNN)입니다. CNN이 Encoder, RNN이 Decoder 역할을 하는 셈입니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+RNN은 이렇게 다양한 구조로 변신할 수 있습니다. 하지만 어떤 구조를 쓰든, 시퀀스가 길어지면 앞의 내용을 잊어버리는 \textbf{'기울기 소실'}이라는 고질병은 여전합니다.
+
+다음 시간에는 이 문제를 해결하기 위해 \textbf{"기억을 저장하는 금고(Cell State)"}와 \textbf{"문의 열쇠(Gate)"}를 도입한 현대적 RNN의 표준, \textbf{[GRU]}와 \textbf{[LSTM]}을 해부하겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Flexibility:} $T_x$와 $T_y$가 달라도 처리할 수 있다.
+    \item \textbf{Many-to-One:} 감성 분석 (정보 요약).
+    \item \textbf{Many-to-Many:} 개체명 인식 (즉시 출력) vs 기계 번역 (다 듣고 출력).
+    \item \textbf{Seq2Seq:} Encoder가 압축하고 Decoder가 생성한다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

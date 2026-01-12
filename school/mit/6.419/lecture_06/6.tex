@@ -1,0 +1,243 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 2 (Part C)}
+\fancyhead[R]{Network Models}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 세상은 어떻게 연결되는가}}
+\author{Module 2 (Part C): Network Models}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Module 2 (Part A): Centrality Measures (중심 인물 찾기)
+    \item Module 2 (Part B): Community Detection (그룹 찾기)
+    \item \textbf{\textcolor{mainblue}{Module 2 (Part C): Network Models (현재 단원: 네트워크의 기원)}}
+    \begin{itemize}
+        \item 2.7 Erdős-Rényi (무작위 그래프)
+        \item 2.8 Stochastic Block Models (SBM - 끼리끼리)
+        \item 2.9 Small-World \& Power Law (현실의 네트워크)
+    \end{itemize}
+    \item Module 3: Time Series \& Spatial Data (시공간 데이터)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 2 (Part C). 네트워크 생성 모델 (Network Models)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{우리는 지난 시간에 '모듈성($Q$)'을 계산할 때, \textbf{"무작위로 연결된 네트워크(Null Model)"}와 비교했습니다. 그 무작위 모델이 바로 이번에 배울 에르되시-레니 모델입니다. 하지만 현실은 무작위가 아닙니다. 현실은 "끼리끼리 뭉치고(SBM)", "친구의 친구를 알고(Small-world)", "유명한 사람이 다 독식하는(Power Law)" 세상입니다. 이 현상들을 수학적으로 모델링해 봅니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 네트워크가 생성되는 3가지 메커니즘을 배웁니다.
+1. 모든 것이 \textbf{우연(Random)}이라고 가정하는 기준점(Erdős-Rényi).
+2. \textbf{그룹(Block)}이 존재한다고 가정하는 SBM.
+3. 현실 세계의 \textbf{부익부 빈익빈(Hub)} 현상을 설명하는 척도 없는 네트워크(Scale-free)와 멱법칙(Power Law).
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Erdős-Rényi ($G(n,p)$)} & 주사위를 던져서 연결 여부를 정하는 완전 랜덤 그래프. \\
+\hline
+\textbf{SBM} & "같은 반끼리는 친하고 다른 반이랑은 덜 친해"를 확률로 정의한 모델. \\
+\hline
+\textbf{Degree Distribution} & "친구가 $k$명인 사람은 전체의 몇 \%인가?"를 그린 그래프. \\
+\hline
+\textbf{Power Law} & "상위 1\%가 전체 연결의 80\%를 차지한다." (부익부 빈익빈) \\
+\hline
+\textbf{Small-World} & "여섯 다리만 건너면 대통령과도 아는 사이." (좁은 세상) \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 에르되시-레니 모델 (Erdős-Rényi Model)}
+
+
+\begin{conceptbox}{개념 1: 눈 감고 선 긋기}
+\textbf{한 줄 요약:} 모든 사람은 평등하고, 누구나 서로 친구가 될 확률($p$)이 똑같습니다. 인싸도 아싸도 없는 평평한 세상입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 정의 $G(n, p)$}
+$n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니다.
+\begin{itemize}
+    \item \textbf{특징:} 허브(Hub)가 없습니다. 모든 노드의 친구 수(Degree)가 평균($\lambda = np$) 근처에 몰려 있습니다.
+    \item \textbf{분포:} 친구 수($k$)의 분포는 \textbf{푸아송 분포(Poisson Distribution)}를 따릅니다. 종 모양의 정규분포와 비슷합니다.
+\end{itemize}
+
+\subsubsection*{2) 한계와 의의}
+현실 세계(예: 인스타 팔로워)는 수백만 명을 거느린 스타가 존재하므로 이 모델과 맞지 않습니다. 하지만, \textbf{"우연히 발생한 패턴인지 아닌지"}를 검증할 때(가설 검정의 Null Hypothesis) 아주 중요한 기준점이 됩니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 스토캐스틱 블록 모델 (SBM)}
+
+
+\begin{conceptbox}{개념 2: 유유상종의 수학화}
+\textbf{한 줄 요약:} 사람들을 몇 개의 그룹(Block)으로 나누고, "같은 그룹끼리 연결될 확률($p_{in}$)"을 "다른 그룹과 연결될 확률($p_{out}$)"보다 높게 설정합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 구조}
+에르되시-레니 모델에 \textbf{'커뮤니티 구조'}를 심은 것입니다.
+\begin{itemize}
+    \item \textbf{생성 원리:} 먼저 노드가 속할 그룹을 정하고, 그 그룹 정보에 따라 확률적으로 엣지를 연결합니다.
+    \item \textbf{활용:} 지난 시간에 배운 \textbf{커뮤니티 탐지(Community Detection)} 알고리즘들은 "이 네트워크가 SBM으로 만들어졌다면, 원래 그룹은 무엇이었을까?"를 역추적하는 과정입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 작은 세상과 멱법칙 (Small-World \& Power Law)}
+
+\begin{conceptbox}{개념 3: 좁은 세상 속 거인들}
+\textbf{한 줄 요약:} 현실 네트워크는 끼리끼리 뭉쳐있으면서도(Small-World), 소수의 거인(Hub)이 전체를 연결하는 불평등한 구조(Power Law)입니다.
+\end{conceptbox}
+
+\subsubsection*{A. 작은 세상 효과 (Small-World Effect)}
+
+\begin{itemize}
+    \item \textbf{Watts-Strogatz 모델:} 규칙적인 격자(내 옆 사람하고만 친구)에서 몇 개의 선을 랜덤하게 반대편으로 연결(Rewiring)합니다.
+    \item \textbf{특징:}
+    \begin{enumerate}
+        \item \textbf{높은 클러스터링:} 내 친구끼리는 서로 친구일 확률이 높음.
+        \item \textbf{짧은 경로:} 몇 단계만 거치면 지구 반대편 사람과도 연결됨. (케빈 베이컨의 법칙)
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection*{B. 멱법칙 분포 (Power Law Distribution)}
+
+\begin{conceptbox}{핵심: 척도 없는 네트워크 (Scale-free)}
+친구 수가 $k$일 확률 $P(k)$가 $k^{-\gamma}$에 비례합니다.
+그래프를 그리면 $L$자 모양(Long Tail)이 나옵니다.
+\end{conceptbox}
+\begin{itemize}
+    \item \textbf{부익부 빈익빈 (Preferential Attachment):} 새로운 노드가 들어올 때, 이미 친구가 많은 '인싸'에게 연결될 확률이 더 높습니다. (Barabási-Albert 모델)
+    \item \textbf{Scale-free의 의미:} 평균(Mean)이 의미가 없습니다. 평균 팔로워가 500명이라도, 1억 명 팔로워를 가진 사람이 평균을 왜곡합니다. 어떤 척도(Scale)로 봐도 모양이 비슷합니다(Fractal).
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 미디어 파트너십 전략}
+
+\begin{storybox}{Scenario: 신작 게임 마케팅 예산 분배}
+당신은 본부장으로서 한정된 마케팅 예산을 인플루언서들에게 분배해야 합니다. 네트워크 모델을 이용해 전략을 짭니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{랜덤 전략 (Erdős-Rényi):}
+    무작위로 100명의 유저에게 쿠폰을 뿌립니다.
+    $\rightarrow$ \textbf{실패.} 전파력이 약합니다. 다들 고만고만한 친구들뿐이라 확산이 안 됩니다.
+    
+    \item \textbf{허브 타겟팅 (Power Law):}
+    팔로워 수 상위 1\%인 '대형 스트리머' 3명에게 몰빵합니다.
+    $\rightarrow$ \textbf{성공 (인지도 확보).} 멱법칙에 의해 이들이 전체 트래픽의 80\%를 장악하고 있으므로, 단기간에 엄청난 노출 효과를 얻습니다.
+    
+    \item \textbf{브릿지 타겟팅 (Small-World):}
+    RPG 커뮤니티와 FPS 커뮤니티 사이를 연결하는 '장르 파괴자' 스트리머를 공략합니다.
+    $\rightarrow$ \textbf{성공 (유저 확장).} 끼리끼리 뭉친(High Clustering) 그룹 사이를 넘어가는 지름길(Short Path) 역할을 하여, RPG 유저를 FPS 게임으로 데려옵니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 내 데이터가 멱법칙을 따르는지 어떻게 아나요?]
+    \textbf{A.} \textbf{Log-Log Plot}을 그려보세요. 가로축(Degree)과 세로축(Frequency)을 모두 로그 스케일로 그렸을 때, 데이터가 \textbf{우하향하는 직선} 형태를 띠면 멱법칙을 따르는 것입니다. (직선의 기울기가 $-\gamma$가 됩니다.)
+    
+    \item[Q2. SBM과 커뮤니티 탐지는 같은 건가요?]
+    \textbf{A.} 동전의 양면입니다.
+    \begin{itemize}
+        \item \textbf{SBM:} "확률 $P$를 줄 테니 그래프를 만들어봐." (생성 모델)
+        \item \textbf{커뮤니티 탐지:} "그래프를 줄 테니 확률 $P$와 그룹을 찾아내봐." (추론)
+    \end{itemize}
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 지금까지는 데이터의 '구조'와 '연결'을 봤습니다. 하지만 데이터는 멈춰있지 않습니다. 주식 가격은 변하고, 위성은 움직입니다. 다음 \textbf{Module 3: 시계열 및 공간 데이터 (Time Series \& Spatial Data)}에서는 시간($t$)과 공간($x,y$) 축을 따라 변하는 데이터를 다루는 법을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 2 (Part C) 핵심 요약}
+\begin{itemize}
+    \item \textbf{Erdős-Rényi:} 완전 랜덤 그래프. 허브가 없다. (Poisson 분포)
+    \item \textbf{SBM:} 그룹 내 연결 확률이 더 높은 모델. 커뮤니티 구조 설명.
+    \item \textbf{Small-World:} 끼리끼리 뭉치지만(Clustering), 몇 단계면 다 통한다(Short Path).
+    \item \textbf{Power Law (Scale-free):} 소수의 허브가 지배하는 불평등한 구조. 현실 세계의 가장 강력한 모델.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

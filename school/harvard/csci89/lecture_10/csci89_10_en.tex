@@ -11,6 +11,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{geometry}
@@ -287,7 +288,7 @@ Rule-based NER uses handcrafted patterns (regular expressions, dictionaries, lin
 
 \subsection{Date Pattern Example}
 
-\begin{lstlisting}[caption={Regular Expression for Dates}]
+\begin{lstlisting}[caption={Regular Expression for Dates}, breaklines=true]
 import re
 
 # Pattern for dates like "11/04/2024" or "November 4, 2024"
@@ -313,7 +314,7 @@ print(dates)  # ['November 4, 2024', '11/04/2024']
 
 \subsection{Person Name Pattern}
 
-\begin{lstlisting}[caption={Pattern for Names with Titles}]
+\begin{lstlisting}[caption={Pattern for Names with Titles}, breaklines=true]
 # Pattern for names with titles
 person_pattern = r'''
     \b
@@ -331,7 +332,7 @@ print(persons)  # ['Mr. Trump', 'Dr. Smith']
 
 \subsection{Organization Pattern}
 
-\begin{lstlisting}[caption={Pattern for Organizations}]
+\begin{lstlisting}[caption={Pattern for Organizations}, breaklines=true]
 # Pattern for company names
 org_pattern = r'''
     \b
@@ -347,7 +348,7 @@ print(orgs)  # ['Apple Inc.']
 
 \subsection{Complete Rule-Based NER System}
 
-\begin{lstlisting}[caption={Simple Rule-Based NER System}]
+\begin{lstlisting}[caption={Simple Rule-Based NER System}, breaklines=true]
 import re
 
 def rule_based_ner(text):
@@ -535,7 +536,7 @@ SpaCy provides pre-trained NER models that are easy to use and highly accurate f
 
 \subsection{Basic SpaCy NER}
 
-\begin{lstlisting}[caption={SpaCy NER Basics}]
+\begin{lstlisting}[caption={SpaCy NER Basics}, breaklines=true]
 import spacy
 from spacy import displacy
 
@@ -565,7 +566,7 @@ Federal Reserve      ORG        94-109
 
 \subsection{Visualizing Entities}
 
-\begin{lstlisting}[caption={Visualize NER with displacy}]
+\begin{lstlisting}[caption={Visualize NER with displacy}, breaklines=true]
 # Render in Jupyter notebook
 displacy.render(doc, style="ent", jupyter=True)
 
@@ -626,7 +627,7 @@ Consider fine-tuning when:
 
 \subsection{Training Data Format}
 
-\begin{lstlisting}[caption={SpaCy Training Data Format}]
+\begin{lstlisting}[caption={SpaCy Training Data Format}, breaklines=true]
 # Training data format: (text, {"entities": [(start, end, label)]})
 train_data = [
     ("Cars in China are selling well",
@@ -645,7 +646,7 @@ train_data = [
 
 \subsection{Fine-Tuning Process}
 
-\begin{lstlisting}[caption={Fine-Tuning SpaCy NER}]
+\begin{lstlisting}[caption={Fine-Tuning SpaCy NER}, breaklines=true]
 import spacy
 from spacy.training import Example
 import random
@@ -726,7 +727,7 @@ TO & ``to'' & to (as in ``to run'') \\
 
 \subsection{POS Tagging with NLTK}
 
-\begin{lstlisting}[caption={POS Tagging with NLTK}]
+\begin{lstlisting}[caption={POS Tagging with NLTK}, breaklines=true]
 import nltk
 from nltk import word_tokenize, pos_tag
 
@@ -752,7 +753,7 @@ print(pos_tags)
 
 \subsection{POS Tagging with SpaCy}
 
-\begin{lstlisting}[caption={POS Tagging with SpaCy}]
+\begin{lstlisting}[caption={POS Tagging with SpaCy}, breaklines=true]
 import spacy
 
 nlp = spacy.load("en_core_web_sm")
@@ -792,7 +793,7 @@ NER features can improve text classification by providing structured information
 
 \subsection{Implementation Example}
 
-\begin{lstlisting}[caption={NER Feature Enhancement}]
+\begin{lstlisting}[caption={NER Feature Enhancement}, breaklines=true]
 import spacy
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -853,7 +854,7 @@ print(f"Accuracy with NER features: {accuracy:.4f}")
 
 \subsection{Entity-Based Binary Features}
 
-\begin{lstlisting}[caption={Binary Entity Indicators}]
+\begin{lstlisting}[caption={Binary Entity Indicators}, breaklines=true]
 def get_entity_dummies(documents):
     """Create binary indicators for each unique entity"""
     all_entities = set()
@@ -919,7 +920,7 @@ entity_features = get_entity_dummies(documents)
 \end{itemize}
 
 \textbf{SpaCy Usage}:
-\begin{lstlisting}[basicstyle=\ttfamily\small]
+\begin{lstlisting}[basicstyle=\ttfamily\small, breaklines=true]
 import spacy
 nlp = spacy.load("en_core_web_sm")
 doc = nlp("Donald Trump visited Tesla.")

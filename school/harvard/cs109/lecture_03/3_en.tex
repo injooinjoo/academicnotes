@@ -297,7 +297,7 @@ You could store data in Python lists and dictionaries, but Pandas offers signifi
 
 The standard convention is to import pandas with the alias \code{pd}:
 
-\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python, breaklines=true]
 import pandas as pd
 import numpy as np  # Often used alongside pandas
 \end{lstlisting}
@@ -327,7 +327,7 @@ A \textbf{Series} is a one-dimensional array with labels (called an \textbf{inde
 
 The simplest way is from a Python list:
 
-\begin{lstlisting}[language=Python, caption={Creating a Series from a list}]
+\begin{lstlisting}[language=Python, caption={Creating a Series from a list}, breaklines=true]
 # Create a simple Series
 my_list = [10, 20, 30, 40, 50]
 s = pd.Series(my_list)
@@ -355,7 +355,7 @@ Notice the output shows:
 
 Every Series has four key attributes:
 
-\begin{lstlisting}[language=Python, caption={Series attributes}]
+\begin{lstlisting}[language=Python, caption={Series attributes}, breaklines=true]
 s = pd.Series([10, 20, 30], index=['a', 'b', 'c'], name='my_series')
 
 print(s.values)   # The actual data (as a NumPy array)
@@ -391,7 +391,7 @@ If you mix types (e.g., integers and strings), pandas will upcast to \code{objec
 
 The index doesn't have to be integers---you can use any labels:
 
-\begin{lstlisting}[language=Python, caption={Custom string index}]
+\begin{lstlisting}[language=Python, caption={Custom string index}, breaklines=true]
 s = pd.Series([100, 200, 300])
 s.index = ['apple', 'banana', 'cherry']
 print(s)
@@ -411,7 +411,7 @@ print(s['banana'])  # Output: 200
 
 Unlike dictionary keys, Series indices can have duplicates:
 
-\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python, breaklines=true]
 s.index = ['a', 'a', 'b']
 print(s['a'])
 # Returns BOTH values with index 'a':
@@ -446,7 +446,7 @@ A \textbf{DataFrame} is a 2-dimensional labeled data structure---like an Excel s
 
 Each dictionary represents one row; keys become column names:
 
-\begin{lstlisting}[language=Python, caption={DataFrame from list of dictionaries}]
+\begin{lstlisting}[language=Python, caption={DataFrame from list of dictionaries}, breaklines=true]
 data = [
     {'fruit': 'apple', 'color': 'red', 'price': 1.50},
     {'fruit': 'banana', 'color': 'yellow', 'price': 0.75},
@@ -469,7 +469,7 @@ print(df)
 
 Each key is a column name; the list becomes that column's values:
 
-\begin{lstlisting}[language=Python, caption={DataFrame from dictionary of lists}]
+\begin{lstlisting}[language=Python, caption={DataFrame from dictionary of lists}, breaklines=true]
 data = {
     'fruit': ['apple', 'banana', 'cherry'],
     'color': ['red', 'yellow', 'red'],
@@ -493,7 +493,7 @@ df = pd.DataFrame(data)
 
 \subsection{DataFrame Attributes}
 
-\begin{lstlisting}[language=Python, caption={DataFrame attributes}]
+\begin{lstlisting}[language=Python, caption={DataFrame attributes}, breaklines=true]
 print(df.shape)    # (rows, columns)
 # Output: (3, 3)
 
@@ -521,7 +521,7 @@ print(df.dtypes)   # Data type of each column
 
 The most common way to get data into pandas:
 
-\begin{lstlisting}[language=Python, caption={Reading a CSV file}]
+\begin{lstlisting}[language=Python, caption={Reading a CSV file}, breaklines=true]
 # Read a CSV file into a DataFrame
 df = pd.read_csv('data/survey_results.csv')
 
@@ -546,7 +546,7 @@ Pandas can read many formats:
 
 After loading data, always inspect it first:
 
-\begin{lstlisting}[language=Python, caption={Inspecting a DataFrame}]
+\begin{lstlisting}[language=Python, caption={Inspecting a DataFrame}, breaklines=true]
 # First 5 rows (default) or specify n
 df.head()
 df.head(2)
@@ -578,7 +578,7 @@ df.dtypes
 
 \subsection{Selecting Columns}
 
-\begin{lstlisting}[language=Python, caption={Selecting columns}]
+\begin{lstlisting}[language=Python, caption={Selecting columns}, breaklines=true]
 # Single column (returns a Series)
 df['fruit']
 
@@ -612,7 +612,7 @@ Pandas provides two ways to select rows:
 \end{itemize}
 \end{definitionbox}
 
-\begin{lstlisting}[language=Python, caption={Using loc and iloc}]
+\begin{lstlisting}[language=Python, caption={Using loc and iloc}, breaklines=true]
 # Create a DataFrame with a non-default index
 df = pd.DataFrame({
     'name': ['Alice', 'Bob', 'Charlie'],
@@ -633,7 +633,7 @@ df.iloc[0, 1]      # Specific cell: row 0, column 1
 \begin{importantbox}{The Index Trap}
 After filtering or sorting, row indices get scrambled:
 
-\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python, breaklines=true]
 df_sorted = df.sort_values('age', ascending=False)
 print(df_sorted)
 #        name  age
@@ -661,7 +661,7 @@ df_sorted.loc[0]   # ERROR! No label '0' exists
 
 A \textbf{boolean mask} is a Series of True/False values that you use to filter rows:
 
-\begin{lstlisting}[language=Python, caption={Creating boolean masks}]
+\begin{lstlisting}[language=Python, caption={Creating boolean masks}, breaklines=true]
 df = pd.DataFrame({
     'name': ['Alice', 'Bob', 'Charlie', 'Diana'],
     'age': [25, 30, 35, 28],
@@ -682,7 +682,7 @@ print(mask)
 
 Use the mask inside brackets to filter:
 
-\begin{lstlisting}[language=Python, caption={Filtering with boolean masks}]
+\begin{lstlisting}[language=Python, caption={Filtering with boolean masks}, breaklines=true]
 # Get rows where age > 27
 df[mask]
 # or directly:
@@ -696,12 +696,12 @@ df[df['age'] > 27]
 
 \subsection{Combining Conditions}
 
-\begin{lstlisting}[language=Python, caption={Combining conditions}]
-# Use & for AND, | for OR, ~ for NOT
+\begin{lstlisting}[language=Python, caption={Combining conditions}, breaklines=true]
+# Use \& for AND, | for OR, ~ for NOT
 # IMPORTANT: Each condition must be in parentheses!
 
 # Age > 27 AND city is NYC
-df[(df['age'] > 27) & (df['city'] == 'NYC')]
+df[(df['age'] > 27) \& (df['city'] == 'NYC')]
 
 # Age > 30 OR city is LA
 df[(df['age'] > 30) | (df['city'] == 'LA')]
@@ -715,12 +715,12 @@ df[~(df['city'] == 'NYC')]
 
 Due to Python operator precedence, you must wrap each condition in parentheses:
 
-\begin{lstlisting}[language=Python]
+\begin{lstlisting}[language=Python, breaklines=true]
 # WRONG:
-df[df['age'] > 27 & df['city'] == 'NYC']  # Error!
+df[df['age'] > 27 \& df['city'] == 'NYC']  # Error!
 
 # CORRECT:
-df[(df['age'] > 27) & (df['city'] == 'NYC')]
+df[(df['age'] > 27) \& (df['city'] == 'NYC')]
 \end{lstlisting}
 \end{warningbox}
 
@@ -732,7 +732,7 @@ df[(df['age'] > 27) & (df['city'] == 'NYC')]
 
 \subsection{Sorting}
 
-\begin{lstlisting}[language=Python, caption={Sorting DataFrames}]
+\begin{lstlisting}[language=Python, caption={Sorting DataFrames}, breaklines=true]
 # Sort by one column
 df.sort_values('age')
 
@@ -750,7 +750,7 @@ df.sort_values('age').reset_index(drop=True)
 
 Count occurrences of unique values:
 
-\begin{lstlisting}[language=Python, caption={Counting values}]
+\begin{lstlisting}[language=Python, caption={Counting values}, breaklines=true]
 # How many people in each city?
 df['city'].value_counts()
 # NYC    2
@@ -771,7 +771,7 @@ df['city'].nunique()
 \textbf{GroupBy} splits data into groups based on a column's values, then applies an aggregation function to each group.
 \end{definitionbox}
 
-\begin{lstlisting}[language=Python, caption={GroupBy operations}]
+\begin{lstlisting}[language=Python, caption={GroupBy operations}, breaklines=true]
 # Average age by city
 df.groupby('city')['age'].mean()
 # city
@@ -792,7 +792,7 @@ df.groupby('city').size()
 
 \subsection{Handling Missing Data}
 
-\begin{lstlisting}[language=Python, caption={Working with missing values}]
+\begin{lstlisting}[language=Python, caption={Working with missing values}, breaklines=true]
 # Check for missing values
 df.isna()           # Boolean mask of NaN locations
 df.isna().sum()     # Count NaNs per column
@@ -810,7 +810,7 @@ df['age'].fillna(df['age'].mean())
 
 \subsection{Renaming Columns}
 
-\begin{lstlisting}[language=Python, caption={Renaming columns}]
+\begin{lstlisting}[language=Python, caption={Renaming columns}, breaklines=true]
 # Rename specific columns
 df.rename(columns={'old_name': 'new_name'})
 
@@ -831,7 +831,7 @@ df.columns = df.columns.str.lower()
 
 Instead of saving intermediate results to variables, you can chain multiple operations together:
 
-\begin{lstlisting}[language=Python, caption={Method chaining example}]
+\begin{lstlisting}[language=Python, caption={Method chaining example}, breaklines=true]
 # Without chaining (verbose)
 df_filtered = df[df['age'] > 25]
 df_sorted = df_filtered.sort_values('age')
@@ -862,7 +862,7 @@ result = (df[df['age'] > 25]
 
 Let's walk through a realistic example using class survey data:
 
-\begin{lstlisting}[language=Python, caption={Complete example workflow}]
+\begin{lstlisting}[language=Python, caption={Complete example workflow}, breaklines=true]
 # 1. Load the data
 df = pd.read_csv('data/survey_raw.csv')
 
@@ -906,7 +906,7 @@ df.to_csv('data/survey_clean.csv', index=False)
 
 Sometimes a column contains comma-separated values that you want to split:
 
-\begin{lstlisting}[language=Python, caption={Exploding comma-separated values}]
+\begin{lstlisting}[language=Python, caption={Exploding comma-separated values}, breaklines=true]
 # Sample data
 df = pd.DataFrame({
     'name': ['Alice', 'Bob'],

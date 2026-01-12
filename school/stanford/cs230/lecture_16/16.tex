@@ -1,0 +1,263 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{tipbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (실전 팁)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Improving Deep Neural Networks: \\ Mini-batch Gradient Descent}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1-5.4 Regularization \& Data Setup \textit{- Completed}
+        \item 5.5 Input Normalization \textit{- Completed}
+        \item \textbf{5.6 Optimization Algorithms 1: Mini-batch Gradient Descent}
+        \begin{itemize}
+            \item Batch vs Stochastic vs Mini-batch
+            \item Epoch vs Iteration Definition
+            \item Why Powers of 2? ($2^n$)
+            \item Implementation: Shuffle and Partition
+        \end{itemize}
+        \item 5.7 Optimization Algorithms 2: Momentum \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 강의까지 우리는 과대적합을 막는 '방어 기술(Regularization)'을 익혔습니다. 이제부터는 모델의 학습 속도를 극한으로 끌어올리는 \textbf{'가속 기술(Optimization)'}을 다룹니다.
+딥러닝의 연료는 데이터입니다. 데이터가 1000만 개라면, 기존 방식(Batch Gradient Descent)으로는 한 걸음 떼는 데 며칠이 걸립니다. 이를 해결하기 위해 데이터를 작은 덩어리로 쪼개서 학습하는 \textbf{미니 배치(Mini-batch)} 기법이 등장했습니다. 이는 현대 딥러닝의 \textbf{사실상 표준(Standard)}입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 대용량 데이터를 효율적으로 학습시키는 \textbf{미니 배치 경사 하강법}을 다룹니다.
+\begin{itemize}
+    \item \textbf{비교:} Batch(전체), Stochastic(1개), Mini-batch(덩어리)의 장단점을 비교합니다.
+    \item \textbf{용어:} 헷갈리기 쉬운 \textbf{Epoch(에폭)}과 \textbf{Iteration(반복)}의 개념을 명확히 합니다.
+    \item \textbf{원리:} 왜 배치 크기를 \textbf{$2^n$ (64, 128 등)}으로 설정해야 하드웨어(CPU/GPU)가 좋아하는지 배웁니다.
+    \item \textbf{구현:} 데이터를 무작위로 섞고(Shuffle) 나누는(Partition) 코드를 작성합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{설명} & \textbf{예시 ($m=1000$, Batch=100)} \\ \hline
+\textbf{Epoch} & 전체 데이터($m$)를 한 번 다 훑는 것. & 책 1권을 1회독 함. \\ \hline
+\textbf{Iteration} & 파라미터를 한 번 업데이트하는 것. & 문제 100개를 풀고 채점함. \\ \hline
+\textbf{Mini-batch} & 한 번의 Iteration에 쓰이는 데이터 묶음. & 1 Epoch = 10 Iterations. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 학습 방식의 스펙트럼}
+
+\subsection{1. The Three Types of Gradient Descent}
+데이터셋 크기가 $m$일 때, 한 번의 업데이트에 몇 개의 데이터를 쓰는가?
+
+\begin{itemize}
+    \item \textbf{Batch Gradient Descent (BGD):} 
+    \begin{itemize}
+        \item 데이터: 전체 $m$개 사용.
+        \item 특징: 안정적이지만 너무 느림. 메모리 부족 위험.
+    \end{itemize}
+    
+    \item \textbf{Stochastic Gradient Descent (SGD):} 
+    \begin{itemize}
+        \item 데이터: 딱 1개 사용.
+        \item 특징: 엄청 빠르지만 벡터화(병렬 처리) 이점이 없음. 진동이 심함.
+    \end{itemize}
+    
+    \item \textbf{Mini-batch Gradient Descent:} 
+    \begin{itemize}
+        \item 데이터: $T$개 사용 (예: 64, 128).
+        \item 특징: \textbf{Sweet Spot.} BGD의 안정성 + SGD의 속도 + 벡터화 효율성을 모두 잡음.
+    \end{itemize}
+\end{itemize}
+
+
+
+\begin{analogybox}{산 내려오기 비유}
+\begin{itemize}
+    \item \textbf{Batch:} 지도를 펼쳐 산 전체를 파악한 뒤, 정확하게 한 발자국 내딛습니다. (너무 신중함)
+    \item \textbf{Stochastic:} 눈을 감고 발끝 감각만으로 미친 듯이 뛰어내려 갑니다. (빠르지만 비틀거림)
+    \item \textbf{Mini-batch:} 100걸음 앞만 보고 방향을 잡아 내려갑니다. (적당히 빠르고 적당히 정확함)
+\end{itemize}
+\end{analogybox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. Why Powers of 2? ($2^n$)}
+"교수님, 배치 크기를 100개나 50개로 하면 안 되나요?"
+\begin{itemize}
+    \item 됩니다. 하지만 \textbf{비효율적}입니다.
+    \item 컴퓨터 메모리(CPU/GPU)의 주소 체계와 캐시는 \textbf{2진수 기반}입니다.
+    \item $32, 64, 128, 256, 512$ 등으로 설정하면 메모리 정렬(Alignment)이 딱 맞아떨어져 연산 속도가 최적화됩니다.
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Shuffle and Partition}
+
+데이터를 섞고(Shuffle) 자르는(Partition) 과정을 구현합니다.
+가장 중요한 점은 \textbf{$X$와 $Y$를 똑같은 순서로 섞어야 한다}는 것입니다.
+
+\begin{lstlisting}[language=Python, caption=Random Mini-batches Generator, breaklines=true]
+import numpy as np
+import math
+
+def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
+    """
+    X: (n_x, m), Y: (1, m)
+    """
+    np.random.seed(seed)            
+    m = X.shape[1]  # 데이터 샘플 수
+    mini_batches = []
+        
+    # Step 1: Shuffle (X, Y)
+    # 0 ~ m-1 까지의 무작위 인덱스 생성
+    permutation = list(np.random.permutation(m))
+    
+    # 중요: X와 Y를 같은 인덱스로 섞음 (열 단위)
+    shuffled_X = X[:, permutation]
+    shuffled_Y = Y[:, permutation].reshape((1, m))
+
+    # Step 2: Partition (나누기)
+    # 꽉 찬 배치의 개수
+    num_complete_minibatches = math.floor(m / mini_batch_size) 
+    
+    for k in range(0, num_complete_minibatches):
+        begin = k * mini_batch_size
+        end = (k + 1) * mini_batch_size
+        
+        mini_batch_X = shuffled_X[:, begin : end]
+        mini_batch_Y = shuffled_Y[:, begin : end]
+        mini_batches.append((mini_batch_X, mini_batch_Y))
+    
+    # Step 3: Handling the Remainder (자투리 처리)
+    # 데이터가 딱 나누어떨어지지 않을 때 마지막 배치를 처리
+    if m % mini_batch_size != 0:
+        begin = num_complete_minibatches * mini_batch_size
+        # 끝까지 다 담기
+        mini_batch_X = shuffled_X[:, begin : ]
+        mini_batch_Y = shuffled_Y[:, begin : ]
+        mini_batches.append((mini_batch_X, mini_batch_Y))
+    
+    return mini_batches
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{Shuffle 시 주의사항}
+시계열 데이터(주식, 날씨, 음성 등)처럼 \textbf{순서(Time)}가 중요한 데이터는 절대 섞으면 안 됩니다! 과거 데이터로 미래를 예측해야 하는데, 섞어버리면 미래를 보고 과거를 맞추는 꼴(Data Leakage)이 됩니다.
+\end{warningbox}
+
+\textbf{Q. 배치 크기가 너무 크면(8192 이상) 어떻게 되나요?} \\
+\textbf{A.} GPU 메모리 부족(OOM Error)이 발생할 수 있습니다. 또한, 모델이 너무 일반화된 패턴만 배워서 성능(Generalization)이 떨어지는 현상(Sharp Minima)이 발생할 수 있습니다. 보통 32~512 사이를 권장합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+미니 배치를 쓰니 학습이 빨라졌습니다. 하지만 비용 함수 그래프를 확대해 보면 여전히 지그재그로 진동하며 내려갑니다.
+
+이 진동을 줄이고, 내리막길에서 공이 굴러가듯 \textbf{관성(Inertia)}을 붙여 더 빠르게 내려가게 할 수는 없을까요?
+다음 시간에는 단순한 경사 하강법을 넘어선 \textbf{[Optimization] Momentum (모멘텀)} 알고리즘에 대해 배우겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Mini-batch GD:} 데이터를 작은 묶음으로 나누어 업데이트한다. (속도 + 안정성)
+    \item \textbf{Power of 2:} 배치 크기는 $2^n$ (32, 64, 128...)이 하드웨어 효율적이다.
+    \item \textbf{Shuffle:} 매 에폭마다 데이터를 섞어주어야 학습이 골고루 된다.
+    \item \textbf{Last Batch:} 데이터가 나누어떨어지지 않을 때, 마지막 자투리 배치를 버리지 말고 처리해야 한다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

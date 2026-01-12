@@ -1,0 +1,253 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{tipbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (실전 팁)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Improving Deep Neural Networks: \\ Data Augmentation \& Early Stopping}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1-5.3 Regularization (L2, Dropout) \textit{- Completed}
+        \item \textbf{5.4 Data Augmentation \& Early Stopping}
+        \begin{itemize}
+            \item Concept: Free Data \& Time Machine
+            \item Augmentation Techniques (Flip, Crop, Rotate)
+            \item Early Stopping Mechanism (Patience)
+            \item Implementation: On-the-fly Generation
+        \end{itemize}
+        \item 5.5 Input Normalization \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 L2 정규화와 드롭아웃이라는 강력한 수학적 기법으로 과대적합(Overfitting)을 억제했습니다.
+오늘은 조금 더 \textbf{'실용적이고(Practical)' '경제적인(Economical)'} 접근법을 다룹니다.
+데이터를 더 모으는 것은 비쌉니다. 하지만 가지고 있는 데이터를 변형해서 \textbf{'공짜 데이터'}를 만드는 기술(Augmentation)과, 학습을 가장 좋은 타이밍에 멈추는 \textbf{'타임머신'} 기술(Early Stopping)은 비용 대비 효과가 엄청납니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 모델의 일반화 성능을 높이는 가장 직관적이고 가성비 좋은 두 가지 기법을 다룹니다.
+\begin{itemize}
+    \item \textbf{Data Augmentation:} 이미지를 변형하여 데이터셋을 뻥튀기하고, 모델에게 \textbf{불변성(Invariance)}을 가르칩니다.
+    \item \textbf{Early Stopping:} 과대적합이 시작되기 직전에 학습을 멈추는 알고리즘을 구현합니다.
+    \item \textbf{On-the-fly:} 디스크 용량을 아끼기 위해 학습 도중 실시간으로 데이터를 변형하는 파이프라인을 이해합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{설명} & \textbf{비유} \\ \hline
+\textbf{Data Augmentation} & 원본 데이터를 변형해 가짜 데이터를 생성 & 복사기로 문제집 복사하기 (근데 약간 비뚤게) \\ \hline
+\textbf{Early Stopping} & 성능 악화 시점에 학습 중단 & 박수 칠 때 떠나라 \\ \hline
+\textbf{Patience} & 성능이 안 좋아져도 기다려주는 횟수 & "한 번만 더 기회를 줄게" \\ \hline
+\textbf{On-the-fly} & 미리 저장하지 않고 필요할 때 즉석 생성 & 주문 들어오면 요리하기 (미리 해두면 상함) \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 공짜 점심은 있다}
+
+\subsection{1. Data Augmentation (데이터 증강)}
+모델에게 \textbf{"고양이는 뒤집어도, 어두워도, 잘려도 고양이다"}라는 사실을 가르칩니다.
+
+\begin{itemize}
+    \item \textbf{Mirroring (Flipping):} 거울처럼 좌우 반전. (숫자 인식 등 방향이 중요한 데이터엔 금지!)
+    \item \textbf{Random Cropping:} 이미지의 일부분을 무작위로 잘라냄.
+    \item \textbf{Rotation / Shearing:} 회전 및 비틀기.
+    \item \textbf{Color Jittering:} 밝기, 채도 등에 노이즈 추가.
+\end{itemize}
+
+
+
+\begin{tipbox}{On-the-fly Generation (실시간 생성)}
+"교수님, 변형된 이미지를 하드디스크에 저장해두고 써야 합니까?"
+\textbf{절대 아닙니다.} 1TB짜리 데이터셋을 10배 증강하면 10TB가 됩니다. 감당할 수 없습니다.
+\textbf{CPU가 학습 도중에 실시간으로 변형}해서 GPU에게 넘겨주는 방식을 사용합니다. 디스크 용량은 그대로 유지됩니다.
+\end{tipbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. Early Stopping (조기 종료)}
+학습 곡선(Learning Curve)을 보다가, Train Error는 줄지만 Dev Error가 다시 올라가려는 순간(과대적합 시작점)에 멈춥니다.
+
+
+
+\begin{itemize}
+    \item \textbf{원리:} 학습을 오래 하면 가중치 $W$가 점점 커져서 복잡한 패턴을 익히게 됩니다. Early Stopping은 $W$가 너무 커지기 전에 멈추므로, 수학적으로 \textbf{L2 정규화와 유사한 효과}를 냅니다.
+    \item \textbf{단점 (Orthogonalization):} Andrew Ng 교수는 이 방식이 'Bias 줄이기'와 'Variance 줄이기'를 동시에 건드리기 때문에(직교화 위배), 튜닝이 복잡해질 수 있다고 지적합니다. 하지만 편해서 많이 씁니다.
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: On-the-fly Pipeline}
+
+데이터 증강은 NumPy로 간단히, 조기 종료는 클래스로 구현하여 원리를 파악합니다.
+
+\begin{lstlisting}[language=Python, caption=Data Augmentation \& Early Stopping, breaklines=true]
+import numpy as np
+import copy
+
+class DataAugmentor:
+    @staticmethod
+    def random_flip(image, p=0.5):
+        """좌우 반전"""
+        if np.random.rand() < p:
+            return np.fliplr(image)
+        return image
+
+    @staticmethod
+    def random_crop(image, crop_size=(200, 200)):
+        """무작위 위치 자르기"""
+        h, w, _ = image.shape
+        top = np.random.randint(0, h - crop_size[0])
+        left = np.random.randint(0, w - crop_size[1])
+        return image[top:top+crop_size[0], left:left+crop_size[1], :]
+
+class EarlyStopping:
+    def __init__(self, patience=5, min_delta=0.0):
+        self.patience = patience # 참을성 (횟수)
+        self.min_delta = min_delta # 최소 개선폭
+        self.counter = 0
+        self.best_loss = np.inf
+        self.best_model = None
+        self.stop = False
+
+    def check(self, val_loss, model_params):
+        if val_loss < (self.best_loss - self.min_delta):
+            # 성능 개선! -> 저장 및 카운터 초기화
+            self.best_loss = val_loss
+            self.counter = 0
+            # 중요: deepcopy로 값 자체를 복사해둬야 함 (참조 복사 금지)
+            self.best_model = copy.deepcopy(model_params)
+        else:
+            # 성능 정체/악화 -> 카운터 증가
+            self.counter += 1
+            print(f"EarlyStopping counter: {self.counter}/{self.patience}")
+            if self.counter >= self.patience:
+                self.stop = True
+    
+    def restore(self):
+        return self.best_model
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{Deep Copy를 안 쓰면 생기는 일}
+파이썬에서 `best_model = model`이라고 쓰면, `best_model`은 `model`을 가리키는 별명이 될 뿐입니다. 학습이 계속 진행되어 `model`이 망가지면 `best_model`도 같이 망가집니다.
+반드시 `copy.deepcopy(model)`을 사용하여 \textbf{그 순간의 스냅샷}을 메모리에 따로 저장해야 합니다.
+\end{warningbox}
+
+\textbf{Q. Data Augmentation을 Test Set에도 적용하나요?} \\
+\textbf{A.} 보통은 안 합니다. 하지만 성능을 극대화하기 위해 'Test Time Augmentation (TTA)'이라는 기법을 쓰기도 합니다. 테스트 이미지를 5가지로 변형해서 예측한 뒤 평균을 내는 것입니다. (대회용 테크닉)
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 과대적합을 막는 모든 무기(L2, Dropout, Augmentation, Early Stopping)를 갖췄습니다. 방어 준비는 끝났습니다.
+
+이제 공격(학습 속도)을 강화할 차례입니다. 경사 하강법(Gradient Descent)은 너무 정직해서 느립니다.
+다음 시간에는 \textbf{[Optimization Algorithms]}으로 넘어가서, 경사 하강법에 가속도를 붙이는 \textbf{Momentum}, 보폭을 조절하는 \textbf{Adam} 등 최신 최적화 기법을 배우겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Augmentation:} 데이터를 변형해 양을 늘리고 불변성(Invariance)을 학습시킨다.
+    \item \textbf{On-the-fly:} 디스크 절약을 위해 학습 도중 실시간으로 변형한다.
+    \item \textbf{Early Stopping:} Dev Error가 오르기 시작하면 멈춘다. (과대적합 방지)
+    \item \textbf{Patience:} 일시적인 성능 저하를 견디기 위해 인내심(Patience) 값을 설정한다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

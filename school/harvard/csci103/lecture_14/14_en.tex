@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Harvard CSCI E-103: Reproducible Machine Learning
-% Lecture 14: Databricks Roadmap & Emerging Features
+% Lecture 14: Databricks Roadmap \& Emerging Features
 % English Version
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -485,7 +485,7 @@ This was possible for data lakes and warehouses, but \textbf{never before for tr
 
 \subsection{Lakebase Architecture}
 
-\begin{lstlisting}[style=sqlstyle, caption={Lakebase PostgreSQL Connection}]
+\begin{lstlisting}[style=sqlstyle, caption={Lakebase PostgreSQL Connection}, breaklines=true]
 -- Connection string format
 psql "postgres://your-lakebase-instance.databricks.com:5432/database_name"
 
@@ -555,7 +555,7 @@ When creating a catalog in Unity Catalog, you now have four options:
     \item Maintains a single source of truth
 \end{itemize}
 
-\begin{lstlisting}[style=sqlstyle]
+\begin{lstlisting}[style=sqlstyle, breaklines=true]
 -- Create table in Unity Catalog
 CREATE TABLE catalog.schema.user_segments (
     user_id INT,
@@ -731,7 +731,7 @@ No coding required---similar to the AutoML experience for machine learning.
 
 \subsection{App Architecture}
 
-\begin{lstlisting}[style=pythonstyle, caption={Simple Streamlit App Example}]
+\begin{lstlisting}[style=pythonstyle, caption={Simple Streamlit App Example}, breaklines=true]
 import streamlit as st
 from databricks import sql
 
@@ -773,7 +773,7 @@ if st.button("Mark as Reviewed"):
 
 \subsection{AI Parse Document}
 
-\begin{lstlisting}[style=sqlstyle, caption={AI Parse Document Example}]
+\begin{lstlisting}[style=sqlstyle, caption={AI Parse Document Example}, breaklines=true]
 -- Extract structured data from PDFs
 SELECT AI_PARSE_DOCUMENT(
     file_path,
@@ -793,7 +793,7 @@ FROM volumes.documents.invoices;
 
 \subsection{AI Query with Multimodal Support}
 
-\begin{lstlisting}[style=sqlstyle, caption={Multimodal AI Query}]
+\begin{lstlisting}[style=sqlstyle, caption={Multimodal AI Query}, breaklines=true]
 -- Filter product catalog for white shoes using AI
 SELECT AI_QUERY(
     'Filter our catalog for white shoes',
@@ -920,7 +920,7 @@ This section reviews key concepts from Quiz 2 that students found challenging.
 
 \subsection{Repartition vs Coalesce}
 
-\begin{lstlisting}[style=pythonstyle, caption={Partition Operations}]
+\begin{lstlisting}[style=pythonstyle, caption={Partition Operations}, breaklines=true]
 # INCREASING partitions (12 -> 24): Use repartition
 df_more = df.repartition(24)  # Full shuffle
 
@@ -943,7 +943,7 @@ df_less = df.coalesce(12)  # No shuffle, more efficient
     \item Always be suspicious of \texttt{collect()} in production code
 \end{itemize}
 
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 # DANGEROUS for large datasets
 all_data = df.collect()  # OOM risk!
 
@@ -969,7 +969,7 @@ Every Delta table has an \texttt{\_delta\_log} folder containing:
 
 \subsection{DataFrame Operations}
 
-\begin{lstlisting}[style=pythonstyle, caption={Common DataFrame Gotchas}]
+\begin{lstlisting}[style=pythonstyle, caption={Common DataFrame Gotchas}, breaklines=true]
 # EXPLODE is NOT a DataFrame method
 # WRONG:
 df.explode("array_column")  # This doesn't exist!
@@ -988,7 +988,7 @@ df.dropDuplicates(["col1", "col2"])  # Pass columns as a list
 
 \subsection{Generated Columns}
 
-\begin{lstlisting}[style=sqlstyle, caption={Generated Always As}]
+\begin{lstlisting}[style=sqlstyle, caption={Generated Always As}, breaklines=true]
 CREATE TABLE transactions (
     transaction_id BIGINT,
     transaction_timestamp TIMESTAMP,
@@ -1053,7 +1053,7 @@ CREATE TABLE transactions (
 \caption{SCD Types Summary}
 \end{table}
 
-\begin{lstlisting}[style=sqlstyle, caption={MERGE for SCD Type 1 with Condition}]
+\begin{lstlisting}[style=sqlstyle, caption={MERGE for SCD Type 1 with Condition}, breaklines=true]
 MERGE INTO target_table t
 USING source_table s
 ON t.id = s.id
@@ -1069,7 +1069,7 @@ WHEN NOT MATCHED THEN
 
 \subsubsection{Trigger Options}
 
-\begin{lstlisting}[style=pythonstyle, caption={Streaming Trigger Options}]
+\begin{lstlisting}[style=pythonstyle, caption={Streaming Trigger Options}, breaklines=true]
 # DEPRECATED - reads all available data at once
 stream.writeStream \
     .trigger(once=True) \  # Don't use this!
@@ -1088,7 +1088,7 @@ stream.writeStream \
 
 \subsubsection{Checkpointing and Exactly-Once Processing}
 
-\begin{lstlisting}[style=pythonstyle, caption={Streaming with Checkpoint}]
+\begin{lstlisting}[style=pythonstyle, caption={Streaming with Checkpoint}, breaklines=true]
 stream = (
     spark.readStream
     .format("kafka")
@@ -1117,7 +1117,7 @@ Achieved through the combination of:
 
 \subsubsection{Reading from Kafka}
 
-\begin{lstlisting}[style=pythonstyle, caption={Kafka Stream Processing}]
+\begin{lstlisting}[style=pythonstyle, caption={Kafka Stream Processing}, breaklines=true]
 from pyspark.sql.functions import from_json, col
 from pyspark.sql.types import StructType, StringType, IntegerType
 
@@ -1147,7 +1147,7 @@ df = (
 
 \subsection{AutoLoader (Cloud Files)}
 
-\begin{lstlisting}[style=pythonstyle, caption={AutoLoader Example}]
+\begin{lstlisting}[style=pythonstyle, caption={AutoLoader Example}, breaklines=true]
 # Read incrementally from cloud storage
 df = (
     spark.readStream
@@ -1169,7 +1169,7 @@ df.writeStream \
 
 \begin{infobox}
 \textbf{AutoLoader SQL Equivalent:} \texttt{COPY INTO}
-\begin{lstlisting}[style=sqlstyle]
+\begin{lstlisting}[style=sqlstyle, breaklines=true]
 COPY INTO bronze.sales
 FROM '/data/sales/'
 FILEFORMAT = CSV
@@ -1188,7 +1188,7 @@ COPY_OPTIONS ('mergeSchema' = 'true');
 \textbf{Hyperopt Deprecation:} The \texttt{hyperopt} library has stopped development. Use \texttt{Optuna} instead for hyperparameter optimization in new projects.
 \end{warningbox}
 
-\begin{lstlisting}[style=pythonstyle, caption={Optuna for Hyperparameter Tuning}]
+\begin{lstlisting}[style=pythonstyle, caption={Optuna for Hyperparameter Tuning}, breaklines=true]
 import optuna
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score

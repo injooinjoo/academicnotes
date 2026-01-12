@@ -1,0 +1,231 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (만능 공식)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Convolutional Neural Networks: \\ CNN Foundations}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-8.] Deep Learning Strategy \& Architecture \textit{- Completed}
+    \item[\textbf{Chapter 9.}] \textbf{Convolutional Neural Networks (Current Part)}
+    \begin{itemize}
+        \item \textbf{9.1 CNN Foundations: Convolution, Padding, Strides}
+        \begin{itemize}
+            \item The Convolution Operation ($*$)
+            \item Padding (Valid vs Same)
+            \item Strides (Downsampling)
+            \item \textbf{The Golden Formula} (Dimension Calculation)
+        \end{itemize}
+        \item 9.2 Pooling Layers (Max/Average) \textit{- Upcoming}
+        \item 9.3 CNN Example: LeNet-5 \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 지금까지 딥러닝 프로젝트를 전략적으로 지휘하는 법(Part 3)을 배웠습니다. 이제 딥러닝이 가장 눈부신 성과를 낸 \textbf{컴퓨터 비전(Part 4)}의 세계로 들어갑니다.
+만약 고화질 이미지를 기존의 FC(Fully Connected) Layer에 넣으면 어떻게 될까요? 파라미터가 수십억 개로 폭발하여 계산이 불가능해집니다.
+우리에겐 이미지의 지역적 특징을 효율적으로 추출하는 새로운 도구가 필요합니다. 바로 \textbf{합성곱(Convolution)}입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 CNN을 구성하는 가장 기초적인 '레고 블록' 세 가지를 마스터합니다.
+\begin{itemize}
+    \item \textbf{Convolution:} 필터를 슬라이딩하며 특징을 추출하는 기본 연산.
+    \item \textbf{Padding:} 이미지 가장자리 정보 손실을 막고 크기를 유지하는 기법.
+    \item \textbf{Strides:} 필터 이동 간격을 조절하여 출력 크기를 줄이는 기법.
+    \item \textbf{Formula:} 입력 크기, 필터, 패딩, 스트라이드가 주어졌을 때 출력 크기를 계산하는 공식을 암기합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{기호} & \textbf{설명} \\ \hline
+\textbf{Filter / Kernel} & $f \times f$ & 이미지를 훑는 작은 윈도우. 학습 대상 파라미터($W$). \\ \hline
+\textbf{Padding} & $p$ & 입력 이미지 테두리에 덧대는 가짜 픽셀(0). \\ \hline
+\textbf{Stride} & $s$ & 필터가 한 번에 이동하는 칸 수(보폭). \\ \hline
+\textbf{Feature Map} & - & 합성곱 연산의 결과물(출력 이미지). \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: CNN의 레고 블록}
+
+\subsection{1. The Convolution Operation ($*$)}
+FC Layer가 이미지 전체를 한 번에 본다면, 합성곱은 작은 \textbf{'손전등'}으로 이미지를 훑는 것과 같습니다.
+
+
+
+\begin{itemize}
+    \item \textbf{과정:} $3 \times 3$ 필터를 이미지 좌측 상단에 겹쳐 놓고, 겹치는 숫자끼리 곱해서 더합니다(내적). 그 결과값 하나가 출력의 픽셀 하나가 됩니다. 옆으로 한 칸씩 이동하며 반복합니다.
+    \item \textbf{의미:} 필터의 값에 따라 수직선, 수평선 같은 \textbf{특정 패턴}이 있는 위치를 찾아냅니다.
+\end{itemize}
+
+\subsection{2. Padding ($p$)}
+
+
+합성곱을 하면 이미지가 점점 작아집니다 ($6 \times 6 \to 4 \times 4 \to \dots$). 또한 가장자리 픽셀은 필터가 덜 지나가서 정보가 소실됩니다.
+이를 막기 위해 테두리에 0을 채웁니다.
+\begin{itemize}
+    \item \textbf{Valid Padding ($p=0$):} 패딩 없음. 크기가 줄어듬.
+    \item \textbf{Same Padding:} 입력과 출력의 크기가 같아지도록 $p$를 설정함.
+    $$ p = \frac{f-1}{2} \quad (\text{단, } s=1) $$
+\end{itemize}
+
+\subsection{3. Strides ($s$)}
+필터를 한 칸씩($s=1$)이 아니라 두 칸씩($s=2$) 듬성듬성 이동합니다.
+\begin{itemize}
+    \item \textbf{효과:} 출력 크기가 대략 $1/s$ 배로 줄어듭니다 (\textbf{Downsampling}).
+    \item \textbf{용도:} 계산량을 줄이거나 넓은 영역을 요약해서 볼 때 씁니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: The Golden Formula (만능 공식)}
+
+이 공식은 CNN 아키텍처를 설계하거나 논문을 읽을 때 필수입니다. 무조건 암기하십시오.
+
+\begin{formulabox}{출력 크기 계산 공식}
+입력 크기가 $n \times n$ 일 때, 출력 크기는 다음과 같습니다.
+$$ n_{out} = \left\lfloor \frac{n + 2p - f}{s} + 1 \right\rfloor $$
+\begin{itemize}
+    \item $n$: 입력 크기
+    \item $p$: 패딩 크기
+    \item $f$: 필터 크기
+    \item $s$: 스트라이드
+    \item $\lfloor \cdot \rfloor$: 바닥 함수 (소수점 내림)
+\end{itemize}
+\end{formulabox}
+
+\begin{examplebox}{계산 예제}
+\textbf{상황:}
+입력 $7 \times 7$ ($n=7$), 필터 $3 \times 3$ ($f=3$), 패딩 없음 ($p=0$), 스트라이드 2 ($s=2$).
+
+\textbf{계산:}
+$$ n_{out} = \left\lfloor \frac{7 + 2(0) - 3}{2} + 1 \right\rfloor = \left\lfloor \frac{4}{2} + 1 \right\rfloor = \lfloor 3 \rfloor = 3 $$
+\textbf{결과:} 출력은 $3 \times 3$ 크기가 됩니다.
+\end{examplebox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Implementation Perspective: 3D Volume}
+
+실제 이미지는 컬러(RGB)이므로 3차원($H \times W \times C$)입니다.
+\begin{itemize}
+    \item \textbf{Rule:} 필터의 채널 수(깊이)는 입력의 채널 수와 \textbf{항상 같아야} 합니다.
+    \item \textbf{예시:} 입력이 $6 \times 6 \times \mathbf{3}$ 이면, 필터는 $3 \times 3 \times \mathbf{3}$ 이어야 합니다.
+    \item \textbf{다중 필터:} 만약 이런 필터를 10개 쓴다면? 출력은 $4 \times 4 \times \mathbf{10}$ 이 됩니다.
+\end{itemize}
+
+\begin{warningbox}{필터 개수 = 출력 채널 수}
+CNN 층을 지난 뒤 데이터의 깊이(Depth)는 입력의 깊이가 아니라 \textbf{필터의 개수}에 의해 결정됩니다. 이것이 채널 수를 조절하는 핵심 메커니즘입니다.
+\end{warningbox}
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+우리는 CNN의 기초 연산(Conv, Padding, Stride)을 마스터했습니다.
+하지만 이것만으로는 부족합니다. 이미지의 크기를 더 과감하게 줄이면서도 중요한 정보(최대값)만 남기는 \textbf{풀링(Pooling)} 계층이 필요합니다.
+
+다음 시간에는 Max Pooling과 Average Pooling에 대해 배우고, 드디어 이 모든 블록을 조립하여 \textbf{첫 번째 완전한 CNN 모델(LeNet-5)}을 만들어보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Convolution:} 필터를 슬라이딩하며 지역적 특징을 추출한다.
+    \item \textbf{Padding:} 가장자리 손실을 막고 크기를 유지한다 (Same Padding).
+    \item \textbf{Stride:} 이동 간격을 넓혀 크기를 줄인다.
+    \item \textbf{Formula:} $n_{out} = \lfloor \frac{n+2p-f}{s} + 1 \rfloor$.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

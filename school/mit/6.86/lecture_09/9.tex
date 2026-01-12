@@ -1,0 +1,241 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 3}
+\fancyhead[R]{Convolutional Neural Networks}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 컴퓨터가 세상을 보는 법}}
+\author{Unit 3 (Part B): Convolutional Neural Networks (CNN)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 3 (Part A): Neural Network Basics (FNN)
+    \item \textbf{\textcolor{mainblue}{Unit 3 (Part B): Convolutional Neural Networks (현재 단원: 이미지 처리의 혁명)}}
+    \begin{itemize}
+        \item 9.1 Convolutional Layer (Filter, Stride, Padding)
+        \item 9.2 Pooling Layer (Max Pooling)
+        \item 9.3 CNN Architecture (Feature Extractor + Classifier)
+    \end{itemize}
+    \item Unit 4: Backpropagation (학습 원리)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 3 (Part B). 합성곱 신경망 (CNN)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Part A에서 배운 일반 신경망(FNN)은 이미지를 처리할 때 치명적인 약점이 있었습니다. $28 \times 28$ 이미지를 $784$개의 1줄짜리 벡터로 펴버리는 순간(Flatten), 픽셀 간의 위아래/좌우 관계가 모두 파괴되기 때문입니다. CNN은 이 문제를 해결하기 위해 \textbf{"이미지를 펼치지 않고, 있는 그대로 훑어보는"} 방식을 사용합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+CNN은 사람의 시각 피질 구조를 모방하여 만들어졌습니다. \textbf{합성곱 층(Convolutional Layer)}을 통해 이미지의 국소적인 특징(선, 면, 패턴)을 감지하고, \textbf{풀링 층(Pooling Layer)}을 통해 중요한 정보만 남기고 압축하여, 위치가 조금 변해도 사물을 잘 알아보는 강건한 모델을 만듭니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Filter (Kernel)} & 이미지를 훑어보는 작은 돋보기 도장 ($3 \times 3$ 행렬). \\
+\hline
+\textbf{Feature Map} & 필터가 훑고 지나간 뒤 남은 '특징들의 지도'. \\
+\hline
+\textbf{Stride} & 필터가 이동하는 보폭. 크면 듬성듬성, 작으면 꼼꼼히. \\
+\hline
+\textbf{Padding} & 이미지 테두리에 0을 채워 크기가 줄어드는 것을 방지. \\
+\hline
+\textbf{Pooling} & 이미지를 축소/요약하는 과정 (해상도 줄이기). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 합성곱 계층 (Convolutional Layer)}
+
+
+\begin{conceptbox}{개념 1: 도장 찍기 (Sliding Window)}
+\textbf{한 줄 요약:} 필터(도장)를 이미지 왼쪽 위부터 오른쪽 아래까지 꾹꾹 눌러가며(Sliding) 특정 패턴이 있는지 검사합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 필터 (Filter / Kernel)}
+\begin{itemize}
+    \item \textbf{정의:} 작은 가중치 행렬(보통 $3 \times 3$). 특징 탐지기(Feature Detector) 역할을 합니다.
+    \item \textbf{작동:} 이미지의 특정 영역과 필터를 내적(곱하고 더함)합니다. 값이 클수록 해당 필터가 찾는 모양(예: 가로선)과 일치한다는 뜻입니다.
+    \item \textbf{학습:} 초반 층 필터는 '선'을 찾고, 깊은 층 필터는 '눈, 코' 같은 복잡한 모양을 찾도록 \textbf{스스로 학습}됩니다.
+\end{itemize}
+
+\subsubsection*{2) 스트라이드 (Stride)}
+필터가 이동하는 간격입니다.
+\begin{itemize}
+    \item \textbf{Stride 1:} 한 칸씩 꼼꼼하게 이동. (출력 크기 유지)
+    \item \textbf{Stride 2:} 두 칸씩 점프하며 이동. (출력 크기가 절반으로 줄어듦 $\to$ Downsampling)
+\end{itemize}
+
+\subsubsection*{3) 패딩 (Padding)}
+필터를 거치면 귀퉁이가 깎여나가 이미지가 점점 작아집니다.
+\begin{itemize}
+    \item \textbf{Zero Padding:} 테두리에 0을 한 바퀴 둘러줍니다.
+    \item \textbf{목적:} 출력 크기를 입력과 똑같이 유지(Same Padding)하여 층을 깊게 쌓을 수 있게 합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 풀링 계층 (Pooling Layer)}
+
+
+\begin{conceptbox}{개념 2: 요약 노트 만들기}
+\textbf{한 줄 요약:} 너무 디테일한 정보는 버리고, "여기에 뭔가 있었다"는 핵심 정보만 남겨서 이미지 사이즈를 줄입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 최대 풀링 (Max Pooling)}
+가장 널리 쓰이는 방식입니다. $2 \times 2$ 영역에서 \textbf{가장 큰 값 하나}만 남기고 나머지는 버립니다.
+\begin{itemize}
+    \item \textbf{의미:} "이 구역에서 가장 강한 특징 하나만 기억해!"
+    \item \textbf{효과:} 노이즈가 제거되고, 데이터 양이 1/4로 줄어 연산 속도가 빨라집니다.
+\end{itemize}
+
+\subsubsection*{2) 이동 불변성 (Translation Invariance)}
+풀링을 하면 이미지가 약간 흔들리거나(Shift), 사물의 위치가 조금 바뀌어도 결과값이 거의 변하지 않습니다. 덕분에 CNN은 고양이가 사진 구석에 있든 중앙에 있든 "고양이"라고 잘 인식합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. CNN의 전체 구조 (Architecture)}
+
+
+\begin{conceptbox}{개념 3: 샌드위치 구조}
+\textbf{한 줄 요약:} [특징 추출]과 [분류]의 두 단계로 나뉩니다.
+\end{conceptbox}
+
+\subsubsection*{1) 특징 추출기 (Feature Extractor)}
+$$ \text{Input} \to [\text{Conv} + \text{ReLU} + \text{Pool}] \times N $$
+\begin{itemize}
+    \item 블록을 반복할수록 이미지는 작아지고(가로/세로 축소), 특징은 풍부해집니다(채널 깊이 증가).
+    \item 예: $224 \times 224 \times 3$ (이미지) $\to \dots \to 7 \times 7 \times 512$ (압축된 특징 맵).
+\end{itemize}
+
+\subsubsection*{2) 분류기 (Classifier)}
+$$ \text{Flatten} \to \text{Fully Connected} \to \text{Softmax} $$
+\begin{itemize}
+    \item 추출된 입체적인 특징 맵을 한 줄로 쫙 펴서(Flatten), 우리가 Unit 3(Part A)에서 배운 일반 신경망에 넣고 최종 확률을 계산합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 에셋 자동 태깅}
+
+\begin{storybox}{Scenario: 수만 개의 아이콘 정리하기}
+당신은 넥슨의 테크 PM입니다. 20년 치 게임 아이콘(검, 방패, 포션 등) 5만 개가 폴더에 뒤섞여 있습니다. 이를 자동으로 분류하는 AI를 만듭니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{입력:} $64 \times 64$ 픽셀 컬러 아이콘 (채널 3).
+    \item \textbf{Conv 1:} $3 \times 3$ 필터로 외곽선(Edge)을 따냅니다. (검의 날카로운 선 감지)
+    \item \textbf{Pool 1:} 해상도를 줄여서 노이즈를 없앱니다.
+    \item \textbf{Conv 2:} 이제 선들이 모여 '손잡이', '칼날' 같은 부분 모양을 인식합니다.
+    \item \textbf{Conv 3:} 부분들이 모여 '십자가 모양(검)', '동그라미(방패)' 같은 전체 형태를 인식합니다.
+    \item \textbf{Classifier:} "이 특징은 98\% 확률로 [전설 등급 한손검]입니다"라고 분류합니다.
+    \item \textbf{결과:} 디자이너들이 "한손검"만 검색해도 수천 개의 검 이미지가 즉시 조회되는 시스템 구축 완료.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 필터의 값(숫자)은 사람이 정해주나요?]
+    \textbf{A.} 아닙니다! 과거에는 사람이 정했지만(SIFT, HOG 등), 딥러닝에서는 \textbf{역전파(Backpropagation)}를 통해 AI가 데이터에 맞는 최적의 필터 값을 스스로 학습합니다.
+    
+    \item[Q2. 채널(Channel)이 정확히 뭔가요?]
+    \textbf{A.} 정보의 두께입니다.
+    \begin{itemize}
+        \item 입력 이미지: R, G, B 3장의 필름이 겹쳐져 있으므로 채널이 3입니다.
+        \item Conv 층 통과 후: 필터를 64개 썼다면, 64가지의 서로 다른 특징(가로선, 세로선, 대각선...)을 찾아낸 64장의 지도가 생기므로 채널이 64가 됩니다.
+    \end{itemize}
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} CNN 덕분에 우리는 "공간(Spatial)" 정보를 다루는 법을 마스터했습니다. 그런데 텍스트나 음성처럼 \textbf{"시간(Temporal)" 순서}가 중요한 데이터는 어떻게 할까요? "나는 밥을 먹었다"와 "먹었다 밥을 나는"은 다르잖아요? 다음 시간에는 순차 데이터를 위한 신경망, \textbf{Unit 5: RNN (Recurrent Neural Networks)}을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 3 (Part B) 핵심 요약}
+\begin{itemize}
+    \item \textbf{CNN:} 이미지를 1줄로 펴지 않고, 도장(Filter)을 찍으며 특징을 찾는다.
+    \item \textbf{Conv Layer:} 특징 탐지기. Stride로 간격 조절, Padding으로 크기 유지.
+    \item \textbf{Pool Layer:} 정보 압축기. Max Pooling으로 중요 정보만 남긴다.
+    \item \textbf{구조:} Conv(특징 추출) 반복 후 FC(분류)로 마무리하는 샌드위치 구조.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

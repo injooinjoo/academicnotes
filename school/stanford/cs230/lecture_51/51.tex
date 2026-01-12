@@ -1,0 +1,205 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (핵심 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ The Transformer Architecture}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1-10.11 RNN, LSTM, Self-Attention \textit{- Completed}
+        \item \textbf{10.12 The Transformer Architecture}
+        \begin{itemize}
+            \item Positional Encoding: Giving Order to Sets
+            \item Encoder Block: Deep Understanding
+            \item Decoder Block: Sequential Generation
+            \item BERT vs GPT: Architectural Philosophy
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 지난 시간에 Self-Attention이라는 트랜스포머의 핵심 엔진을 배웠습니다. 오늘은 이 엔진들을 조립해서 어떻게 BERT나 GPT 같은 거대 모델의 뼈대가 되는 \textbf{트랜스포머 아키텍처(Transformer Architecture)}가 완성되는지 해부해 보겠습니다. 트랜스포머는 크게 정보를 읽어 들이는 \textbf{인코더(Encoder)}와 정보를 생성하는 \textbf{디코더(Decoder)} 두 부분으로 나뉩니다.
+
+
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 현대 AI 시스템의 설계도인 트랜스포머의 구조를 완벽히 이해합니다.
+\begin{itemize}
+    \item \textbf{전체 구조:} 인코더와 디코더의 연결 메커니즘을 파악합니다.
+    \item \textbf{순서 인식:} RNN 없이 순서를 파악하는 \textbf{Positional Encoding}을 배웁니다.
+    \item \textbf{안정성:} 깊은 층을 쌓기 위한 \textbf{Add \& Norm} (잔차 연결 및 정규화) 장치를 확인합니다.
+    \item \textbf{철학의 차이:} 인코더 기반의 \textbf{BERT}와 디코더 기반의 \textbf{GPT} 차이를 이해합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 핵심 구성 요소 ---
+\section{Core Components: 설계도 해부}
+
+\subsection{1. Positional Encoding (위치 정보 주입)}
+트랜스포머는 단어를 한꺼번에 병렬로 입력받기 때문에, "I love you"와 "You love me"를 구분하지 못합니다. 
+
+\begin{mathbox}{위치 신호 주입}
+각 단어 벡터에 고유한 위치 값을 더해줍니다. 주기 함수인 Sine과 Cosine을 활용하여 고차원 공간에서 단어의 상대적/절대적 위치를 입힙니다.
+$$ PE_{(pos, 2i)} = \sin(pos/10000^{2i/d_{model}}) $$
+$$ PE_{(pos, 2i+1)} = \cos(pos/10000^{2i/d_{model}}) $$
+\end{mathbox}
+
+
+
+\subsection{2. Encoder Block (인코더: 이해의 영역)}
+인코더는 입력 문장을 통째로 보고 문맥을 파악합니다.
+\begin{itemize}
+    \item \textbf{Multi-Head Self-Attention:} 단어 사이의 유기적 관계를 계산합니다.
+    \item \textbf{Add \& Norm:} 잔차 연결로 기울기 소실을 막고 Layer Norm으로 학습을 돕습니다.
+    \item \textbf{BERT:} 이 인코더를 쌓아 만든 모델로, 문맥을 양방향(Bi-directional)으로 이해합니다.
+\end{itemize}
+
+\subsection{3. Decoder Block (디코더: 생성의 영역)}
+디코더는 분석된 정보를 바탕으로 단어를 하나씩 생성합니다.
+\begin{itemize}
+    \item \textbf{Masked Self-Attention:} 단어 생성 시 미래 단어를 미리 보고 정답을 유추하지 못하도록 마스킹을 적용합니다.
+    \item \textbf{Encoder-Decoder Attention:} 단어를 뱉을 때마다 인코더가 분석한 원문 정보를 다시 참고합니다.
+    \item \textbf{GPT:} 이 디코더를 쌓아 만든 모델로, 다음 단어 예측(Auto-regressive)에 특화되어 있습니다.
+\end{itemize}
+
+
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: BERT vs GPT}
+
+같은 트랜스포머 뿌리를 두지만, 부품 선택에 따라 성격이 완전히 달라집니다.
+
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.5cm} p{5cm} p{5cm}}
+\toprule
+\textbf{특징} & \textbf{BERT} & \textbf{GPT} \\ \midrule
+\textbf{기반 구조} & 트랜스포머 인코더 & 트랜스포머 디코더 \\
+\textbf{학습 방향} & 양방향 (Bi-directional) & 단방향 (Left-to-Right) \\
+\textbf{주요 목적} & 문장 분류, 질의응답 & 문장 생성, 대화, 창작 \\
+\textbf{비유} & 빈칸 채우기 잘하는 모범생 & 이야기를 지어내는 소설가 \\ \bottomrule
+\end{tabular}
+\end{center}
+
+% --- 7. 구현 관점 ---
+\section{Implementation: Hugging Face Transformers}
+
+현대 개발자들은 사전 학습된 가중치를 불러와서 미세 조정(Fine-tuning)하여 사용합니다.
+
+\begin{lstlisting}[language=Python, caption=Loading Pre-trained Transformers, breaklines=true]
+from transformers import BertModel, GPT2Model
+
+# BERT: 의미 추출 및 문장 분류 시
+bert = BertModel.from_pretrained('bert-base-uncased')
+
+# GPT: 텍스트 생성 및 챗봇 구현 시
+gpt = GPT2Model.from_pretrained('gpt2')
+\end{lstlisting}
+
+% --- 8. 요약 및 마무리 ---
+\section*{🏁 Summary \& Next Step}
+\begin{enumerate}
+    \item \textbf{Transformer:} RNN을 대체한 완벽한 병렬 처리 아키텍처.
+    \item \textbf{Positional Encoding:} 어텐션에 '순서'라는 생명력을 불어넣는 장치.
+    \item \textbf{Functional Split:} 이해를 원하면 인코더(BERT), 생성을 원하면 디코더(GPT).
+\end{enumerate}
+
+이제 여러분은 현대 인공지능이 인간의 언어를 어떻게 처리하는지 그 밑바닥 설계도를 보셨습니다. 이 구조는 이제 언어를 넘어 이미지(ViT), 음성(Whisper) 등으로 무한히 확장되고 있습니다.
+
+\vspace{0.5cm}
+\begin{summarybox}{생각해볼 거리}
+마스킹(Masking)이 없다면 디코더는 왜 학습이 불가능할까요? 잔차 연결(Residual Connection)이 깊은 트랜스포머 층에서 왜 필수적일까요? 궁금한 점이 있다면 언제든 질문해 주세요!
+\end{summarybox}
+
+\end{document}

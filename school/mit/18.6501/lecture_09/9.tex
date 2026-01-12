@@ -1,0 +1,248 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 9}
+\fancyhead[R]{Generalized Linear Models}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 모든 데이터를 위한 통계}}
+\author{Unit 9: Generalized Linear Models (GLM)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 3: Linear Regression (연속형 데이터 예측)
+    \item Unit 7: Goodness of Fit (모델 검증)
+    \item \textbf{\textcolor{mainblue}{Unit 9: Generalized Linear Models (현재 단원: 확장팩 설치)}}
+    \begin{itemize}
+        \item 9.1 Exponential Family (공통의 조상)
+        \item 9.2 Link Function (데이터 범위 해결)
+        \item 9.3 Logistic Regression (이진 분류)
+        \item 9.4 Poisson Regression (카운트 데이터)
+        \item 9.5 IRLS Algorithm (해를 구하는 법)
+    \end{itemize}
+    \item Unit 10: Classification (머신러닝으로의 연결)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 9. 일반화 선형 모형 (GLM)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 3에서 배운 선형 회귀($Y=X\beta$)는 강력하지만 치명적인 약점이 있습니다. $Y$가 정규분포를 따라야 한다는 점이죠. 만약 "내일 비가 올까(0/1)?"를 선형 회귀로 예측했더니 "확률이 120\%"라거나 "-30\%"라는 황당한 답이 나온다면 어떡할까요? GLM은 이 문제를 해결하기 위해 선형 회귀에 \textbf{'유연한 연결고리(Link)'}를 달아주는 과정입니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+GLM은 정규분포, 베르누이 분포, 포아송 분포 등을 \textbf{지수족(Exponential Family)}이라는 하나의 수학적 틀로 묶고, \textbf{연결 함수(Link Function)}를 통해 선형 예측($X\beta$)을 데이터의 특성에 맞는 범위(예: 0~1)로 매핑하는 기법입니다. 이를 통해 분류(Classification)와 회귀(Regression)를 통합적으로 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Exponential Family} & "다르게 생겼지만 사실은 한 가족". 미분과 계산이 편한 분포들의 모임. \\
+\hline
+\textbf{Link Function ($g$)} & $X\beta$(무한대 범위)를 $\mu$(제한된 범위)로 통역해주는 번역기. \\
+\hline
+\textbf{Logit Link} & 확률(0~1)을 $\pm\infty$로 펴주는 함수. (로지스틱 회귀용) \\
+\hline
+\textbf{Log Link} & 양수(0~$\infty$)를 전체 실수로 펴주는 함수. (포아송 회귀용) \\
+\hline
+\textbf{IRLS} & GLM은 공식 한 방에 안 풀리므로, 조금씩 정답을 찾아가는 반복 알고리즘. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 지수족 분포 (Exponential Family)}
+
+\begin{conceptbox}{개념 1: 통계학의 만능 플랫폼}
+\textbf{한 줄 요약:} 정규분포, 베르누이, 포아송 등은 겉보기엔 다르지만, 사실 $f(y) = h(y)e^{\eta T(y) - A(\eta)}$라는 \textbf{공통 DNA}를 가진 가족입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 왜 배우는가?}
+서로 다른 분포들을 매번 따로 연구할 필요가 없습니다. 이 "가족"에 속하기만 하면 다음과 같은 강력한 성질(VIP 혜택)을 공유하기 때문입니다.
+\begin{itemize}
+    \item \textbf{Convexity:} 로그 우도 함수가 항상 위로 볼록(Concave)합니다. 즉, 최적화할 때 \textbf{'가짜 봉우리(Local Optima)'가 없어서} 안심하고 답을 찾을 수 있습니다.
+    \item \textbf{Automatic Moments:} 복잡한 적분 없이 미분만으로 평균과 분산을 구할 수 있습니다. ($A'(\eta) = \text{평균}, A''(\eta) = \text{분산}$)
+\end{itemize}
+
+\subsubsection*{2) 수학적 구조}
+$$ f(y; \theta) = h(y) \exp\left( \eta(\theta) \cdot T(y) - A(\theta) \right) $$
+\begin{itemize}
+    \item $\eta$: 자연 파라미터 (Natural Parameter). 분포의 모양을 결정하는 핵심.
+    \item $T(y)$: 충분 통계량.
+    \item $A(\theta)$: 로그 분배 함수 (정규화 상수). 확률의 합이 1이 되게 맞추는 역할.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 연결 함수 (Link Function)}
+
+
+\begin{conceptbox}{개념 2: 무한의 세계와 유한의 세계를 잇다}
+\textbf{한 줄 요약:} 선형 회귀 결과값 $X\beta$는 $-\infty \sim \infty$ 범위를 가지지만, 우리가 원하는 평균 $\mu$는 범위가 제한적입니다(확률은 0~1). 이 둘을 이어주는 다리입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 로지스틱 회귀 (Logistic Regression)}
+\begin{itemize}
+    \item \textbf{상황:} 합격(1) vs 불합격(0). $Y \sim \text{Bernoulli}(p)$.
+    \item \textbf{문제:} $X\beta = 100$이 나오면 확률이 1을 넘어버림.
+    \item \textbf{해결 (Logit Link):} 확률($p$) 대신 \textbf{로그 오즈(Log-Odds)}를 예측합니다.
+    $$ g(p) = \log \left( \frac{p}{1-p} \right) = X\beta $$
+    \item \textbf{복원:} 역함수를 취하면 그 유명한 \textbf{시그모이드(Sigmoid)} 함수가 됩니다.
+    $$ p = \frac{e^{X\beta}}{1 + e^{X\beta}} = \frac{1}{1 + e^{-X\beta}} $$
+\end{itemize}
+
+\subsubsection*{2) 포아송 회귀 (Poisson Regression)}
+\begin{itemize}
+    \item \textbf{상황:} 하루 교통사고 건수. $Y \in \{0, 1, 2, ...\}$. (음수 불가능)
+    \item \textbf{문제:} 선형 회귀는 음수 값을 예측할 수도 있음.
+    \item \textbf{해결 (Log Link):} 평균($\lambda$)에 로그를 씌워서 예측합니다.
+    $$ g(\lambda) = \log(\lambda) = X\beta \quad \implies \quad \lambda = e^{X\beta} $$
+    \item \textbf{의미:} $X$가 증가하면 $Y$는 \textbf{기하급수적(Multiplicative)}으로 증가합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 추정 알고리즘: IRLS}
+
+\begin{conceptbox}{개념 3: 산을 오르는 반복적인 걸음}
+\textbf{한 줄 요약:} 선형 회귀처럼 한 번에 답($\beta$)이 나오지 않습니다. 직선을 긋고(Linear), 가중치를 조절하고(Reweight), 다시 긋는 과정을 반복(Iterative)합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 문제점}
+GLM의 로그 우도 함수를 미분하면, $\beta$가 지수함수($e^{X\beta}$) 안에 갇혀 있어서 깔끔하게 정리가 안 됩니다 (No closed-form solution).
+
+\subsubsection*{2) 해결책: 뉴턴-랩슨 \& IRLS}
+근사적으로 해를 구하는 수치해석 기법을 씁니다.
+\begin{itemize}
+    \item \textbf{Iteratively Reweighted Least Squares (IRLS):}
+    매 단계마다 분산이 다른 것을 고려하여 \textbf{가중치(Weight)를 둔 선형 회귀(WLS)}를 푸는 문제로 바꿔서 풉니다. 컴퓨터가 아주 빠르게 반복해서 최적의 $\beta$를 찾아냅니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 대학원 합격 예측 (로지스틱)}
+
+\begin{storybox}{Scenario: GPA와 합격률의 관계}
+학생들의 GPA($X$)에 따른 합격 여부($Y \in \{0, 1\}$)를 분석합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터:} GPA 3.0은 불합격, 3.5는 합격... 이런 데이터 100개.
+    \item \textbf{모델링:} $Y \sim \text{Bernoulli}(p)$, $\log(\frac{p}{1-p}) = \beta_0 + \beta_1 X$.
+    \item \textbf{결과:} $\hat{\beta}_0 = -10, \hat{\beta}_1 = 3$.
+    \item \textbf{예측 계산 (GPA 3.8인 학생):}
+    \begin{itemize}
+        \item 선형 예측값: $\eta = -10 + 3(3.8) = -10 + 11.4 = 1.4$.
+        \item 이것은 확률이 아니라 \textbf{로그 오즈}입니다.
+        \item 확률 변환: $p = \frac{1}{1 + e^{-1.4}} \approx \frac{1}{1 + 0.246} \approx 0.80$.
+    \end{itemize}
+    \item \textbf{해석:} GPA가 3.8인 학생은 합격 확률이 약 80\%입니다.
+    \item \textbf{계수 해석:} $\beta_1=3$은 양수이므로, GPA가 높을수록 합격 오즈가 $e^3 \approx 20$배 증가합니다 (매우 강력한 영향).
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 왜 확률을 바로 $X\beta$로 두지 않고 굳이 '오즈'에 로그를 씌우나요?]
+    \textbf{A.} 만약 $P(Y=1) = \beta_0 + \beta_1 X$로 두면, $X$가 아주 커졌을 때 확률이 1.5가 되거나 -0.2가 되는 모순이 발생합니다. 로그 오즈는 범위가 $(-\infty, \infty)$이므로, $X\beta$와 매칭시키기에 수학적으로 가장 안전하고 자연스럽습니다.
+    
+    \item[Q2. 정준 연결 함수(Canonical Link)가 뭔가요?]
+    \textbf{A.} '순정 부품' 같은 겁니다. 수학적으로 가장 깔끔하게 떨어지는 연결 함수 조합입니다.
+    \begin{itemize}
+        \item Normal $\to$ Identity ($Y=X\beta$)
+        \item Bernoulli $\to$ Logit
+        \item Poisson $\to$ Log
+    \end{itemize}
+    다른 걸 써도 되지만(예: Probit), 정준 링크를 쓰면 계산이 편하고 해석이 명확합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 GLM을 통해 $Y$가 0/1인 경우(로지스틱)까지 다루었습니다. 하지만 만약 $Y$가 0/1이 아니라 \textbf{"개, 고양이, 사자"처럼 3개 이상의 범주}라면 어떡할까요? 다음 \textbf{Unit 10}에서는 이를 해결하는 다중 분류(Multiclass Classification)와 현대적 분류 기법들을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 9 핵심 요약}
+\begin{itemize}
+    \item \textbf{지수족(Exponential Family):} GLM의 수학적 기반. 로그 우도가 오목(Concave)하여 최적화가 쉽다.
+    \item \textbf{연결 함수(Link Function):} $g(\mu) = X\beta$. 선형 예측값을 데이터 범위에 맞게 변환한다.
+    \item \textbf{로지스틱 회귀:} $g = \text{logit}$. 이진 분류에 사용. 결과는 로그 오즈.
+    \item \textbf{포아송 회귀:} $g = \log$. 카운트 데이터에 사용.
+    \item \textbf{IRLS:} GLM의 해를 구하는 반복적 알고리즘.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

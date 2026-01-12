@@ -1,0 +1,241 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 5}
+\fancyhead[R]{CNN \& Autoencoders}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 보는 눈과 거르는 체}}
+\author{Module 5 (Part A): CNN Structure \& Autoencoder Applications}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Module 3: Spatial Statistics (위치 데이터)
+    \item Module 4: Causal Inference (원인 분석)
+    \item \textbf{\textcolor{mainblue}{Module 5: Deep Learning Applications (현재 단원: 이미지와 이상 탐지)}}
+    \begin{itemize}
+        \item \textbf{5.1 CNN Architecture (시각 정보 처리)}
+        \item \textbf{5.2 Autoencoders (비지도 특징 추출)}
+        \item \textbf{5.3 Anomaly Detection (이상 징후 포착)}
+    \end{itemize}
+    \item Module 5 (Part B): Generative Models (VAE, GAN)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 5 (Part A). CNN과 오토인코더}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{우리는 1차원 데이터(시계열, 테이블)를 넘어 2차원 이상의 고차원 데이터인 \textbf{이미지}를 다루게 되었습니다. 단순히 픽셀을 나열하는 것(Flatten)으로는 부족합니다. 이미지의 공간적 구조를 이해하는 \textbf{CNN}과, 정답 없이 데이터의 핵심만 요약하는 \textbf{오토인코더}를 통해 AI의 활용 범위를 획기적으로 넓혀봅니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 이미지 데이터의 특성에 맞는 \textbf{전처리(Preprocessing)} 기법과 \textbf{CNN(합성곱 신경망)}의 핵심 블록을 설계하는 법을 배웁니다. 또한, 데이터를 압축했다 복원하는 \textbf{오토인코더(Autoencoder)}를 활용해, 라벨링 없이도 \textbf{'정상'과 '비정상(이상치)'을 구분하는 방법}을 학습합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Data Augmentation} & 데이터를 회전, 반전시켜 문제집의 변형 문제를 잔뜩 만드는 것. (과적합 방지) \\
+\hline
+\textbf{Pooling} & 이미지 사이즈를 줄여서 핵심만 남기는 요약 과정. \\
+\hline
+\textbf{Latent Vector ($Z$)} & 오토인코더가 데이터를 압축해 놓은 '핵심 요약본'. \\
+\hline
+\textbf{Reconstruction Error} & 원본과 복원본의 차이. 이 값이 크면 '이상치(Anomaly)'로 간주함. \\
+\hline
+\textbf{Skip Connection} & 깊은 망에서 신호가 약해지지 않도록 지름길을 뚫어주는 기법. (ResNet) \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 이미지 전처리 및 CNN 구조 설계}
+
+\begin{conceptbox}{개념 1: AI가 보기 좋게 차려주기}
+\textbf{한 줄 요약:} 제각각인 원본 이미지를 규격화(Resizing, Normalization)하고, 데이터를 뻥튀기(Augmentation)해서 모델을 강하게 키웁니다.
+\end{conceptbox}
+
+\subsubsection*{1) 필수 전처리 3단계}
+\begin{enumerate}
+    \item \textbf{Resizing:} $1024 \times 768$도, $500 \times 500$도 모두 $224 \times 224$로 통일합니다.
+    \item \textbf{Normalization:} 픽셀값 $0 \sim 255$를 $0 \sim 1$ 또는 평균 0, 분산 1로 바꿉니다. (학습 속도 향상)
+    \item \textbf{Data Augmentation:} 사진을 살짝 돌리거나($\pm 15^\circ$), 좌우 반전하거나, 밝기를 조절합니다.
+    \begin{itemize}
+        \item \textbf{효과:} 모델이 "고양이는 왼쪽을 봐도, 어두운 곳에 있어도 고양이다"라는 \textbf{불변성(Invariance)}을 학습하게 됩니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{2) CNN 핵심 블록}
+
+\begin{itemize}
+    \item \textbf{Conv Layer:} 특징 탐지. (선, 면, 눈, 코, 입...)
+    \item \textbf{Pooling Layer:} 압축. (해상도를 줄여 연산량 감소 + 위치 불변성 확보)
+    \item \textbf{Skip Connection (Tip):} 층이 깊어지면 학습이 안 되는 문제(기울기 소실)를 해결하기 위해, 입력값을 출력값에 바로 더해주는($x + F(x)$) 지름길을 만듭니다. (ResNet의 핵심)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 오토인코더 (Autoencoder): 압축과 복원}
+
+
+\begin{conceptbox}{개념 2: 기억해서 그려보기}
+\textbf{한 줄 요약:} 사진을 보고($X$), 핵심만 기억했다가($Z$), 다시 그려냅니다($\hat{X}$). 잘 그렸는지 비교해서($Loss$) 학습합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 구조 (모래시계 형태)}
+\begin{itemize}
+    \item \textbf{Encoder:} 입력 $X$를 저차원 벡터 $Z$로 압축합니다.
+    \item \textbf{Bottleneck ($Z$):} 데이터의 \textbf{잠재 특징(Latent Feature)}이 응축된 곳입니다.
+    \item \textbf{Decoder:} $Z$를 이용해 다시 원본 크기의 $\hat{X}$로 복원합니다.
+\end{itemize}
+
+\subsubsection*{2) 학습 목표}
+입력을 그대로 뱉어내는 것이 목표입니다. (Identity Function 학습)
+$$ \text{Minimize } || X - \hat{X} ||^2 $$
+"이게 왜 쓸모 있나요?" $\rightarrow$ 병목 구간($Z$) 때문에, 모델은 데이터의 \textbf{가장 중요한 패턴(압축 정보)}을 강제로 배울 수밖에 없습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 활용: 이상 탐지 (Anomaly Detection)}
+
+\begin{conceptbox}{개념 3: 모르는 건 못 그린다}
+\textbf{한 줄 요약:} 정상 데이터만 보고 자란 오토인코더에게 '비정상 데이터'를 보여주면, 복원을 못 해서 에러가 폭발합니다. 이 에러가 바로 '이상 신호'입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 작동 원리}
+\begin{enumerate}
+    \item \textbf{학습:} 오직 \textbf{정상 데이터(Normal)}만으로 오토인코더를 학습시킵니다. (정상 패턴 마스터)
+    \item \textbf{테스트:} 새로운 데이터가 들어오면 복원해보고, \textbf{재구성 오차(Reconstruction Error)}를 잽니다.
+    \item \textbf{판단:}
+    \begin{itemize}
+        \item 오차가 작음 $\rightarrow$ "내가 아는 패턴이네. \textbf{정상}."
+        \item 오차가 큼 $\rightarrow$ "처음 보는 패턴이라 복원이 안 돼. \textbf{이상(Anomaly)}!"
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{2) 장점}
+비정상 데이터(해킹, 불량품)는 구하기가 매우 힘듭니다. 오토인코더는 \textbf{비정상 데이터가 하나도 없어도} 이상 탐지 모델을 만들 수 있습니다. (Unsupervised Anomaly Detection)
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 보안 및 운영}
+
+\begin{storybox}{Scenario 1: 불건전 프로필 이미지 필터링 (CNN)}
+유저들이 올리는 프로필 사진 중 성인물이나 혐오 이미지를 걸러내고 싶습니다.
+\end{storybox}
+\begin{itemize}
+    \item \textbf{해결:} CNN 기반 분류기(Classifier)를 학습시킵니다.
+    \item \textbf{전처리:} 다양한 해상도의 이미지를 $224 \times 224$로 리사이징하고, 회전/자르기 증강(Augmentation)을 통해 모델을 강건하게 만듭니다.
+    \item \textbf{효과:} 운영자가 일일이 보던 건수의 90\%를 AI가 1차로 필터링하여 운영 비용을 절감합니다.
+\end{itemize}
+
+\begin{storybox}{Scenario 2: 작업장(매크로) 탐지 (Autoencoder)}
+'메이플스토리'에서 사람이 아닌 봇(Bot)이 24시간 사냥하는 것을 잡고 싶습니다. 봇의 패턴은 계속 진화해서 규칙(Rule)으로 잡기 힘듭니다.
+\end{storybox}
+\begin{itemize}
+    \item \textbf{해결:} 일반 유저(정상)의 이동 경로와 스킬 사용 시퀀스만 모아서 오토인코더를 학습시킵니다.
+    \item \textbf{탐지:} 매크로 유저의 행동 데이터가 들어오면, 모델은 이를 '정상 패턴'으로 복원하지 못해 \textbf{재구성 오차가 치솟습니다.}
+    \item \textbf{조치:} 오차가 임계값을 넘는 계정만 추출하여 집중 모니터링하거나 제재합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 오토인코더랑 PCA랑 비슷한가요?]
+    \textbf{A.} 네, 형제 지간입니다!
+    오토인코더에서 활성화 함수를 빼고 선형(Linear)으로만 만들면 \textbf{PCA와 수학적으로 거의 동일}합니다. 오토인코더는 비선형(ReLU 등) 함수를 써서 PCA보다 훨씬 복잡한 데이터 구조를 압축할 수 있는 \textbf{'Deep PCA'}라고 보시면 됩니다.
+    
+    \item[Q2. 오토인코더로 새로운 이미지를 만들 수 있나요?]
+    \textbf{A.} 기본 오토인코더는 복원(압축 해제)만 잘하지, 새로운 창조는 잘 못합니다. (잠재 공간 $Z$가 불연속적이라서요). 새로운 이미지를 생성하려면 \textbf{VAE(Variational Autoencoder)}나 \textbf{GAN}을 써야 합니다. (다음 시간에 배웁니다!)
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 오토인코더는 입력을 '복원'하는 데 그쳤습니다. 이제 AI에게 상상력을 불어넣어 볼까요? 넥슨의 차기작 아트 리소스를 무한대로 생성해낼 수 있는 생성형 AI의 기초, \textbf{VAE와 GAN}을 다음 \textbf{Unit 5 (Part B)}에서 다룹니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 5 (Part A) 핵심 요약}
+\begin{itemize}
+    \item \textbf{Preprocessing:} Resizing, Normalization, Augmentation은 CNN 성능의 8할이다.
+    \item \textbf{CNN:} 이미지의 공간적 특징을 추출(Conv)하고 압축(Pool)하여 분류한다.
+    \item \textbf{Autoencoder:} 데이터의 압축(Encoder)과 복원(Decoder)을 통해 특징을 학습한다.
+    \item \textbf{Anomaly Detection:} 오토인코더의 복원 오차(Reconstruction Error)를 이용해 학습하지 않은 이상 패턴을 잡아낸다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

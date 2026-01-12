@@ -640,7 +640,7 @@ These are two completely different concepts that beginners often confuse.
     \item \textbf{Modern advice}: For data $<$ 1TB, don't partition—let Delta Lake optimize
 \end{itemize}
 
-\begin{lstlisting}[style=sqlstyle, caption={Creating a Partitioned Table}]
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Partitioned Table}, breaklines=true]
 CREATE TABLE sales (
     id INT,
     amount DECIMAL,
@@ -658,7 +658,7 @@ A Delta Lake optimization that co-locates related data on disk based on multiple
 
 \textbf{When to use}: Columns frequently filtered together but not suitable as partition keys.
 
-\begin{lstlisting}[style=sqlstyle, caption={OPTIMIZE with Z-Ordering}]
+\begin{lstlisting}[style=sqlstyle, caption={OPTIMIZE with Z-Ordering}, breaklines=true]
 -- Compact files and organize by ip_address, port
 OPTIMIZE network_logs
 ZORDER BY (ip_address, port);
@@ -681,7 +681,7 @@ Spark automatically selects the most efficient join strategy based on data chara
     \item \textbf{Cons}: Only works with small tables
 \end{itemize}
 
-\begin{lstlisting}[style=pythonstyle, caption={Forcing Broadcast Join}]
+\begin{lstlisting}[style=pythonstyle, caption={Forcing Broadcast Join}, breaklines=true]
 from pyspark.sql.functions import broadcast
 
 # Explicitly broadcast the small table
@@ -755,7 +755,7 @@ A dimension table attribute that changes over time (e.g., customer address). SCD
     \item \textbf{Use case}: Corrections, when history doesn't matter
 \end{itemize}
 
-\begin{lstlisting}[style=sqlstyle, caption={SCD Type 1: Simple Update}]
+\begin{lstlisting}[style=sqlstyle, caption={SCD Type 1: Simple Update}, breaklines=true]
 UPDATE customers
 SET address = 'New Address'
 WHERE customer_id = 123;
@@ -769,7 +769,7 @@ WHERE customer_id = 123;
     \item \textbf{Use case}: Full audit trail, historical analysis
 \end{itemize}
 
-\begin{lstlisting}[style=sqlstyle, caption={SCD Type 2: Historical Record}]
+\begin{lstlisting}[style=sqlstyle, caption={SCD Type 2: Historical Record}, breaklines=true]
 -- Old record
 | customer_id | address     | effective | end_date   | current |
 |-------------|-------------|-----------|------------|---------|
@@ -781,7 +781,7 @@ WHERE customer_id = 123;
 
 Delta Lake's MERGE handles upserts (update or insert) efficiently:
 
-\begin{lstlisting}[style=sqlstyle, caption={MERGE for Upsert Operations}]
+\begin{lstlisting}[style=sqlstyle, caption={MERGE for Upsert Operations}, breaklines=true]
 MERGE INTO target_table t
 USING source_table s
 ON t.id = s.id
@@ -801,7 +801,7 @@ WHEN NOT MATCHED BY SOURCE THEN
 
 \subsection{OPTIMIZE: File Compaction}
 
-\begin{lstlisting}[style=sqlstyle, caption={OPTIMIZE Command}]
+\begin{lstlisting}[style=sqlstyle, caption={OPTIMIZE Command}, breaklines=true]
 -- Compact small files into larger ones
 OPTIMIZE my_table;
 
@@ -813,7 +813,7 @@ OPTIMIZE my_table ZORDER BY (column1, column2);
 
 \subsection{VACUUM: Clean Old Versions}
 
-\begin{lstlisting}[style=sqlstyle, caption={VACUUM Command}]
+\begin{lstlisting}[style=sqlstyle, caption={VACUUM Command}, breaklines=true]
 -- Remove files older than retention period (default 7 days)
 VACUUM my_table;
 
@@ -825,7 +825,7 @@ VACUUM my_table RETAIN 168 HOURS;  -- 7 days
 
 \subsection{Time Travel}
 
-\begin{lstlisting}[style=sqlstyle, caption={Time Travel Queries}]
+\begin{lstlisting}[style=sqlstyle, caption={Time Travel Queries}, breaklines=true]
 -- Query specific version
 SELECT * FROM my_table VERSION AS OF 10;
 
@@ -838,7 +838,7 @@ RESTORE TABLE my_table TO VERSION AS OF 5;
 
 \subsection{Clone: Zero-Copy Duplication}
 
-\begin{lstlisting}[style=sqlstyle, caption={Clone Operations}]
+\begin{lstlisting}[style=sqlstyle, caption={Clone Operations}, breaklines=true]
 -- Shallow clone (metadata only)
 CREATE TABLE my_table_clone SHALLOW CLONE my_table;
 

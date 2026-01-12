@@ -1,0 +1,283 @@
+\documentclass[a4paper, 11pt]{book}
+
+%===========================================================
+% 패키지 설정 (일관된 스타일 유지)
+%===========================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsfonts, amsthm}
+\usepackage{geometry}
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{tikz}
+
+%===========================================================
+% 커스텀 스타일 정의
+%===========================================================
+\definecolor{mainblue}{RGB}{0, 80, 160}
+\definecolor{subgray}{RGB}{240, 240, 240}
+\definecolor{alertred}{RGB}{200, 50, 50}
+\definecolor{examplegreen}{RGB}{50, 150, 50}
+\definecolor{conceptpurple}{RGB}{100, 50, 150}
+\definecolor{skillgold}{RGB}{200, 150, 0}
+
+\newcommand{\chaptertitle}[2]{
+    \begin{tcolorbox}[colback=mainblue, colframe=mainblue, sharp corners, boxrule=0pt, top=10pt, bottom=10pt]
+        \centering \Large \bfseries \textcolor{white}{#1: #2}
+    \end{tcolorbox}
+}
+
+\newtcolorbox{conceptbox}[1]{
+    colback=white, colframe=mainblue, fonttitle=\bfseries,
+    title={💡 #1}, rounded corners, drop shadow
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
+    title={⚠️ 함정 주의 (Trap): #1}, rounded corners
+}
+
+\newtcolorbox{examplebox}[1]{
+    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
+    title={📝 예시: #1}, rounded corners
+}
+
+\newtcolorbox{storybox}[1]{
+    colback=yellow!10!white, colframe=skillgold, fonttitle=\bfseries,
+    title={📖 Story Scenario: #1}, rounded corners, fontupper=\small
+}
+
+\newtcolorbox{mathstep}[1]{
+    colback=conceptpurple!5!white, colframe=conceptpurple, fonttitle=\bfseries,
+    title={🛠️ 문제 해결 스킬: #1}, rounded corners
+}
+
+\begin{document}
+
+%===========================================================
+% 1. 전체 목차 (TOC) - 구조 명시
+%===========================================================
+\tableofcontents
+\newpage
+
+\section*{📚 이 교재의 전체 구조 (Roadmap)}
+\begin{itemize}
+    \item Unit 1: 확률의 기초와 이산 확률 변수 (완료)
+    \item \textbf{Unit 2: 일반 확률 변수 (General Random Variables)}
+    \begin{itemize}
+        \item Chapter 4: 연속 확률 변수와 PDF (완료)
+        \item Chapter 5: 결합 확률 분포 (완료)
+        \item[$\to$] \textbf{\textcolor{mainblue}{Chapter 6: 파생 변수와 관계의 확장 (Derived Distributions) \textit{<-- 현재 위치}}}
+    \end{itemize}
+    \item Unit 3: 확률 과정과 극한 정리
+\end{itemize}
+\vspace{1cm}
+
+%===========================================================
+% 2. 현재 단원 제목
+%===========================================================
+\chaptertitle{Unit 2 - Chapter 6}{변환과 관계: 확률 변수를 요리하다}
+
+%===========================================================
+% 3. 이전 단원과의 연결 \& 4. 개요
+%===========================================================
+\section*{Intro: 관찰을 넘어 조작으로}
+
+\textbf{[이전 단계와의 연결]} \\
+Chapter 5에서는 주어진 변수 $X, Y$를 있는 그대로 관찰했습니다. 하지만 공학 현실은 더 복잡합니다. 전압($X$)을 제곱해서 전력($Y=X^2$)을 구하거나, 신호($X$)와 잡음($Y$)이 섞인 수신 값($Z=X+Y$)을 분석해야 합니다.
+
+이제 우리는 확률 변수를 \textbf{함수에 넣어 변형}하거나, \textbf{서로 더했을 때} 분포가 어떻게 찌그러지고(Distort) 이동하는지 추적하는 기술을 배웁니다.
+
+\begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
+\begin{enumerate}
+    \item \textbf{파생 분포 (Derived):} 입력($X$)이 함수($g$)를 통과할 때 밀도가 어떻게 변하는가? (야코비안의 마법)
+    \item \textbf{합의 분포 (Sum):} 두 변수를 더했을 때의 분포를 구하는 '컨볼루션(Convolution)' 적분.
+    \item \textbf{상관관계 (Correlation):} 두 변수가 얼마나 같이 움직이는지 숫자로 요약하기.
+    \item \textbf{LIE (반복 기댓값):} 어려운 기댓값 문제를 쪼개서 푸는 최강의 무기.
+\end{enumerate}
+\end{tcolorbox}
+
+%===========================================================
+% 5. 용어 정리 표
+%===========================================================
+\section{필수 용어 사전}
+
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\rowcolor{mainblue!20} \textbf{기호} & \textbf{용어} & \textbf{직관적 의미} \\ \hline
+$Y=g(X)$ & 파생 변수 & $X$를 재료로 요리해서 만든 새로운 변수 $Y$ \\ \hline
+CDF Method & 2단계 접근법 & 누적 확률(CDF)을 먼저 구하고 미분하는 안전한 방법 \\ \hline
+Convolution & 합성곱 ($f_X * f_Y$) & 두 함수를 뒤집고 밀어서 겹치는 면적을 구하는 것 ($X+Y$) \\ \hline
+$\rho$ & 상관계수 & 두 변수의 선형 관계 강도 (-1 $\sim$ 1). (단위 없음) \\ \hline
+$E[X|Y]$ & 조건부 기댓값 & $Y$에 따라 값이 변하는 \textbf{확률 변수} (숫자 아님!) \\ \hline
+\end{tabular}
+\end{center}
+
+%===========================================================
+% 6. 핵심 개념 1: 파생 분포 구하기 (Transformation)
+%===========================================================
+\section{핵심 개념 1: 분포 구하기의 정석 (Transformation)}
+
+입력 $X$가 함수 $g(X)$를 통과하면 $Y$의 분포는 어떻게 될까요? 단순히 $X$의 확률을 대입하면 안 됩니다. \textbf{공간이 왜곡(Stretch \& Squeeze)}되기 때문입니다.
+
+
+
+\subsection{2단계 접근법 (The 2-Step Method)}
+MIT에서 권장하는 가장 안전하고 강력한 풀이법입니다.
+
+\begin{mathstep}{CDF 먼저 구하고 미분하라!}
+\textbf{1단계: CDF $F_Y(y)$ 구하기 (Accumulate)} \\
+$Y$의 사건을 $X$의 사건으로 번역합니다.
+\[ F_Y(y) = P(Y \le y) = P(g(X) \le y) = P(X \le g^{-1}(y)) \]
+
+\textbf{2단계: PDF $f_Y(y)$ 구하기 (Differentiate)} \\
+위에서 구한 식을 $y$로 미분합니다.
+\[ f_Y(y) = \frac{d}{dy} F_Y(y) \]
+\end{mathstep}
+
+\subsection{직관: 야코비안 (The Jacobian Intuition)}
+만약 $y=g(x)$가 1:1 대응이라면, 공식을 바로 쓸 수 있습니다.
+\[ f_Y(y) = f_X(x) \cdot \frac{1}{|g'(x)|} \]
+
+\begin{conceptbox}{밀가루 반죽 비유}
+\begin{itemize}
+    \item 밀가루 반죽($X$)을 넓게 펴면($g'$이 큼), 두께(밀도)는 얇아집니다. $\to$ 나누기 $g'$
+    \item 반죽을 좁게 뭉치면($g'$이 작음), 두께(밀도)는 두꺼워집니다.
+    \item \textbf{야코비안($1/|g'|$):} 공간이 늘어난 만큼 밀도를 줄여주는 \textbf{보정 계수}입니다.
+\end{itemize}
+\end{conceptbox}
+
+%===========================================================
+% 7. 핵심 개념 2: 독립 변수의 합 (Convolution)
+%===========================================================
+\section{핵심 개념 2: 두 변수를 더하면? (Sum of Independent RVs)}
+
+$Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼루션(Convolution)} 적분입니다.
+
+
+
+\subsection{분할 정복 논리}
+\begin{itemize}
+    \item $X$가 $x$로 고정되었다고 칩시다.
+    \item $X+Y=z$가 되려면, $Y$는 반드시 $z-x$가 되어야 합니다.
+    \item 확률: $f_X(x) \cdot f_Y(z-x)$
+    \item $X$는 무엇이든 될 수 있으니 모든 $x$에 대해 더합니다($\int$).
+    \[ f_Z(z) = \int_{-\infty}^{\infty} f_X(x) f_Y(z-x) \, dx \]
+\end{itemize}
+
+\begin{conceptbox}{Flip and Drag (뒤집고 밀기)}
+이 적분 식의 기하학적 의미입니다.
+\begin{enumerate}
+    \item \textbf{Flip:} $f_Y$ 그래프를 y축 대칭시킵니다 ($x \to -x$).
+    \item \textbf{Drag:} 그래프를 $z$만큼 옆으로 밉니다.
+    \item \textbf{Area:} $f_X$와 겹치는 부분의 넓이를 구합니다.
+\end{enumerate}
+\end{conceptbox}
+
+%===========================================================
+% 8. 핵심 개념 3: 공분산과 상관계수
+%===========================================================
+\section{핵심 개념 3: 관계의 척도 (Correlation)}
+
+
+
+[Image of scatter plots with different correlation coefficients]
+
+
+\subsection{공분산(Covariance) vs 상관계수(Correlation)}
+\begin{itemize}
+    \item \textbf{공분산:} 방향(+, -)은 알 수 있지만, 크기가 단위에 의존합니다. (키를 m로 재냐 cm로 재냐에 따라 값이 10000배 차이남)
+    \item \textbf{상관계수 ($\rho$):} 표준편차로 나누어 정규화(-1 $\sim$ 1)한 값. 단위가 사라집니다.
+    \begin{itemize}
+        \item $\rho=1$: 완벽한 직선 ($Y=X$)
+        \item $\rho=0$: 선형 관계 없음 (구름 모양)
+    \end{itemize}
+\end{itemize}
+
+\begin{warningbox}{Uncorrelated $\neq$ Independent}
+가장 많이 틀리는 함정입니다.
+\begin{itemize}
+    \item \textbf{Uncorrelated ($\rho=0$):} "직선 관계"가 없다는 뜻입니다.
+    \item \textbf{Independent:} "아무런 관계"가 없다는 뜻입니다.
+    \item \textbf{반례:} $X$가 $-1 \sim 1$ 사이의 값이고, $Y = X^2$이라고 합시다.
+        \begin{itemize}
+            \item $X$를 알면 $Y$를 완벽히 알 수 있으므로 \textbf{종속(Dependent)}입니다.
+            \item 하지만 계산해보면 $\rho = 0$이 나옵니다. (2차 곡선 관계이므로 선형성은 0)
+        \end{itemize}
+    \item \textbf{예외:} 정규 분포(Gaussian)인 경우에만 $\rho=0$이면 독립입니다.
+\end{itemize}
+\end{warningbox}
+
+%===========================================================
+% 9. 핵심 개념 4: 반복 기댓값의 법칙 (LIE)
+%===========================================================
+\section{핵심 개념 4: 통계학의 맥가이버 칼 (LIE)}
+
+\subsection{조건부 기댓값 ($E[X|Y]$)}
+\begin{itemize}
+    \item $E[X]$는 숫자입니다.
+    \item $E[X|Y]$는 \textbf{$Y$에 대한 함수(확률 변수)}입니다.
+    \item 예: $X=$키, $Y=$성별. $E[X|Y]$는 '남자의 평균 키' 또는 '여자의 평균 키'라는 값을 갖는 변수입니다.
+\end{itemize}
+
+
+
+\subsection{반복 기댓값의 법칙 (Law of Iterated Expectations)}
+\[ E[E[X|Y]] = E[X] \]
+"부분의 평균들을 다시 평균 내면 전체 평균이 된다."
+
+\begin{mathstep}{LIE 사용법: Divide and Conquer}
+복잡한 $E[X]$를 구할 때:
+\begin{enumerate}
+    \item 상황을 가르는 변수 $Y$를 찾습니다. (Divide)
+    \item 각 상황별 평균 $E[X|Y=y]$를 구합니다. (Local Average)
+    \item 그 값들의 기댓값을 다시 구합니다. (Global Average)
+\end{enumerate}
+\end{mathstep}
+
+%===========================================================
+% 10. 실전 시나리오
+%===========================================================
+\section{실전 응용: 금융 포트폴리오의 위험 관리}
+
+\begin{storybox}{주식 분산 투자의 원리}
+당신이 주식 A와 B에 절반씩 투자해서 포트폴리오 $Z = 0.5X + 0.5Y$를 만들었습니다.
+\begin{itemize}
+    \item 수익률($E[Z]$)은 단순 평균입니다.
+    \item 하지만 \textbf{위험(분산, $\text{var}(Z)$)}은 다릅니다.
+    \[ \text{var}(Z) = 0.25\text{var}(X) + 0.25\text{var}(Y) + 2(0.5)(0.5)\text{cov}(X,Y) \]
+    \item 만약 두 주식이 \textbf{역의 상관관계($\rho < 0$)}라면?
+    \item 공분산 항이 마이너스가 되어 \textbf{전체 위험(분산)이 줄어듭니다!}
+    \item 이것이 "계란을 한 바구니에 담지 말라"는 격언의 수학적 증명입니다.
+\end{itemize}
+\end{storybox}
+
+%===========================================================
+% 11. 요약 및 다음 단계
+%===========================================================
+\section{요약 및 다음 단계}
+
+\begin{tcolorbox}[colback=mainblue!10, colframe=mainblue, title={\textbf{📝 Unit 2-3 핵심 요약}}]
+\begin{enumerate}
+    \item \textbf{변환:} CDF를 먼저 구하고 미분하는 것이 가장 안전하다.
+    \item \textbf{합:} 독립 변수의 합은 컨볼루션($\int f_X f_Y$)이다.
+    \item \textbf{상관관계:} $\rho=0$이어도 종속일 수 있다. ($Y=X^2$ 기억하기)
+    \item \textbf{LIE:} 어려운 평균 문제는 $E[E[X|Y]]$로 쪼개서 푼다.
+\end{enumerate}
+\end{tcolorbox}
+
+\vspace{0.5cm}
+\textbf{[다음 단원 예고]} \\
+지금까지는 한 번의 실험이나 고정된 시점의 확률을 다뤘습니다. 하지만 주식 가격이나 대기 행렬처럼 \textbf{시간에 따라 변하는 확률}은 어떻게 다룰까요? \\
+이제 Unit 3 \textbf{"확률 과정(Random Processes)"}으로 넘어가 베르누이 프로세스와 포아송 프로세스를 배웁니다. "시간($t$)이 변수로 들어옵니다!"
+
+\end{document}

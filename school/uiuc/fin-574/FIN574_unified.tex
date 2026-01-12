@@ -1,0 +1,502 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIN 574: 기업 수준 경제학 - 통합본
+% UIUC Finance Department
+% 자동 생성됨
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{book}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+\usepackage{kotex}
+\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{adjustbox}
+\renewcommand{\arraystretch}{1.1}
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\leftmark}
+\fancyhead[RE]{FIN 574}
+\renewcommand{\headrulewidth}{0.5pt}
+\setlength{\headheight}{15pt}
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    bookmarks=true,
+    bookmarksnumbered=true
+]{hyperref}
+
+%========================================================================================
+% 색상 정의
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox)
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+    #1
+}
+
+% 일반 박스 (mybox)
+\newtcolorbox{mybox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=#1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+% 핵심 포인트 박스
+\newtcolorbox{keypointbox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=#1,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable,
+}
+
+%========================================================================================
+% 정리 환경
+%========================================================================================
+
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[chapter]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[chapter]
+\newtheorem{example}{예제}[chapter]
+
+%========================================================================================
+% 문서 정보
+%========================================================================================
+
+\title{\textbf{FIN 574: 기업 수준 경제학}}
+\author{통합 강의 노트}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+%=======================================================================
+% Chapter 1: 소비자 및 생산자 행동
+%=======================================================================
+\chapter{소비자 및 생산자 행동}
+\label{ch:lecture1}
+
+\begin{summarybox}
+이 문서는 기업 수준 경제학의 첫 번째 모듈인 '소비자 및 생산자 행동'의 핵심 내용을 정리합니다. 경제학의 근본적인 문제인 \textbf{희소성(scarcity)}에서 출발하여, 자원이 배분되는 방식으로서의 \textbf{시장(market)}과 \textbf{가격(price)}의 역할을 탐구합니다. \textbf{수요(demand)}와 \textbf{공급(supply)} 곡선의 도출 원리와 시장 \textbf{균형(equilibrium)}이 결정되는 과정을 학습합니다. 특히, '곡선 상의 이동'과 '곡선 자체의 이동'을 구분하는 것은 시장 변화를 분석하는 데 가장 중요한 핵심입니다.
+\end{summarybox}
+
+\section{학습 로드맵 (Learning Roadmap)}
+
+이 문서는 다음과 같은 논리적 흐름으로 구성되어 있습니다. 이 순서대로 개념을 정복해 나가는 것이 좋습니다.
+
+\begin{enumerate}
+    \item \textbf{경제학의 근본 문제 (희소성)}: 왜 경제학이 필요한지 이해합니다. "세상에 공짜는 없다"는 말의 진짜 의미를 배웁니다.
+    \item \textbf{핵심 의사결정 도구 (기회비용)}: 모든 선택에 따르는 보이지 않는 비용, 즉 기회비용(opportunity cost)을 계산하는 법을 배웁니다.
+    \item \textbf{구매자의 행동 (수요 곡선)}: 가격이 변할 때 소비자가 어떻게 반응하는지를 나타내는 수요 곡선(demand curve)을 이해합니다.
+    \item \textbf{판매자의 행동 (공급 곡선)}: 가격이 변할 때 기업(생산자)이 어떻게 반응하는지를 나타내는 공급 곡선(supply curve)을 이해합니다.
+    \item \textbf{시장의 작동 (균형)}: 구매자와 판매자가 만나 가격이 결정되고 거래가 이루어지는 '시장 균형(market equilibrium)' 지점을 찾습니다.
+    \item \textbf{시장 변화 분석 (이동과 변동)}: 이 모듈의 최종 목표입니다. 외부 충격(뉴스, 정책, 재해 등)이 발생했을 때, 시장 가격과 거래량이 어떻게 변하는지 예측합니다.
+\end{enumerate}
+
+\section{핵심 용어 정리 (Key Terminology)}
+
+경제학은 용어의 정확한 정의에서 시작합니다. 특히 '수요'와 '수요량'의 구분은 매우 중요합니다.
+
+\begin{table}[h!]
+\centering
+\caption{모듈 1 핵심 용어}
+\label{tab:key_terms}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{3cm}}
+\toprule
+\textbf{용어} \& \textbf{쉬운 설명} \& \textbf{원어 (Eng)} \\
+\midrule
+\textbf{희소성} \& 단순히 '드문 것'이 아니라, '사람들의 욕구에 비해 원하는 만큼 다 가질 수 없는 상태'를 의미합니다. \& Scarcity \\
+\textbf{기회비용} \& 어떤 것을 선택했을 때 포기해야 하는 '차선책(next best alternative)의 가치'. (암묵적 비용 포함) \& Opportunity Cost \\
+\textbf{수요 (Demand)} \& \textbf{모든} 가능한 가격 수준에서 소비자가 구매하려는 의사와 능력을 나타내는 \textbf{관계 전체 (곡선 자체)}. \& Demand \\
+\textbf{수요량} \& \textbf{특정한} 가격 수준에서 소비자가 구매하려는 \textbf{구체적인 양 (곡선 위의 한 점)}. \& Quantity Demanded \\
+\textbf{공급 (Supply)} \& \textbf{모든} 가능한 가격 수준에서 생산자가 판매하려는 의사와 능력을 나타내는 \textbf{관계 전체 (곡선 자체)}. \& Supply \\
+\textbf{공급량} \& \textbf{특정한} 가격 수준에서 생산자가 판매하려는 \textbf{구체적인 양 (곡선 위의 한 점)}. \& Quantity Supplied \\
+\textbf{시장 균형} \& 수요량과 공급량이 정확히 일치하여, 가격이나 거래량이 변할 유인이 없는 안정된 상태. (수요=공급) \& Market Equilibrium \\
+\textbf{초과 공급 (잉여)} \& 가격이 너무 높아 공급량이 수요량을 초과하는 상태. (재고가 쌓임) \& Surplus \\
+\textbf{초과 수요 (부족)} \& 가격이 너무 낮아 수요량이 공급량을 초과하는 상태. (줄을 서야 함) \& Shortage \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{핵심 개념 1: 희소성과 기회비용}
+
+\subsection{희소성 (Scarcity)과 배분 메커니즘}
+
+경제학은 \textbf{희소성(scarcity)}의 문제를 해결하는 학문입니다.
+희소성이란 "모두가 원하는 만큼 가질 수 없는 상태(not enough to go around)"를 의미합니다.
+
+\begin{itemize}
+    \item 희소성은 단순히 '희귀함(rare)'과는 다릅니다. 예를 들어, 레오나르도 다빈치의 '모나리자'는 희귀하지만, 공기 중의 '깨끗한 공기'는 흔해 보이지만 희소합니다.
+    \item 희소성 때문에 우리는 필연적으로 '선택'을 해야 하며, "누가 얼마나 가질 것인가"를 결정할 규칙, 즉 \textbf{배분 메커니즘(Allocation Mechanism)}이 필요합니다.
+    \item 과거에는 왕이나 정부가 모든 것을 결정했습니다(명령 경제, Command Economy).
+    \item 현대 서구 경제에서는 주로 \textbf{시장(Market)}이 이 역할을 합니다.
+\end{itemize}
+
+\begin{mybox}[사례: 1990년의 RAM 가격과 시장의 힘]
+    1990년, Compaq 컴퓨터의 4MB RAM 가격은 약 \$2,600였습니다. 이는 당시 매우 비싼 가격이었습니다. 하지만 오늘날 512MB (4MB의 128배) RAM은 \$4.59에 불과합니다.
+
+    이러한 극적인 가격 하락은 정부의 계획 때문이 아니었습니다.
+    높은 가격($P \uparrow$)을 본 실리콘 밸리의 많은 기업가들이 "저 비용으로 나도 만들 수 있겠다"고 판단하여 시장에 진입(Entry)했습니다.
+    그 결과, 공급자(producers)가 많아지면서 경쟁이 발생했고, \textbf{공급이 증가($S \uparrow$)}하여 \textbf{가격이 하락($P \downarrow$)}했습니다.
+    이것이 바로 시장이 작동하는 방식입니다.
+\end{mybox}
+
+\subsection{가격의 역할: 배급 장치 (Rationing Device)}
+
+시장은 \textbf{가격(Price)}이라는 도구를 사용하여 희소한 자원을 배분합니다.
+가격은 단순히 '비용'이 아니라, 누가 그 재화를 가질 자격이 있는지를 결정하는 \textbf{배급 장치(Rationing Device)}입니다.
+
+\begin{itemize}
+    \item \textbf{가격 상승 ($\uparrow$)}: 재화가 더 희소해지면(e.g., 공급 감소), 가격이 오릅니다.
+        \begin{itemize}
+            \item 일부 소비자는 "이 가격을 낼 가치는 없다"며 구매를 포기합니다 (수요량 감소).
+            \item 일부 생산자는 "수익성이 좋다"며 시장에 진입합니다 (공급량 증가).
+        \end{itemize}
+    \item \textbf{가격 하락 ($\downarrow$)}: 재화가 덜 희소해지면(e.g., 공급 증가), 가격이 내립니다.
+        \begin{itemize}
+            \item 더 많은 소비자가 "이 가격이면 살 만하다"며 구매를 시작합니다 (수요량 증가).
+            \item 일부 생산자는 "수익성이 나쁘다"며 시장을 떠납니다 (공급량 감소).
+        \end{itemize}
+\end{itemize}
+
+\begin{warningbox}
+\textbf{만약 가격이 없다면? $\rightarrow$ 대기 (Queuing)}
+
+미국 듀크(Duke) 대학의 농구팀 티켓은 학생들에게 \$0 (무료)입니다.
+하지만 경기장은 10,000석 미만으로 매우 작아(희소성), 모든 학생이 들어갈 수 없습니다.
+
+가격을 \$0로 정한다고 해서 희소성이 사라지진 않습니다.
+단지 배분 메커니즘이 '가격'에서 '대기(Queuing)'로 바뀌었을 뿐입니다.
+학생들은 티켓을 얻기 위해 몇 주 동안 텐트에서 생활('Krzyzewskiville')해야 합니다.
+즉, '돈' 대신 '시간'이라는 엄청난 비용을 지불하는 것입니다.
+\end{warningbox}
+
+\subsection{기회비용 (Opportunity Cost)}
+
+모든 선택에는 비용이 따릅니다. 경제학에서 말하는 '진짜' 비용은 \textbf{기회비용(Opportunity Cost)}입니다.
+
+\textbf{정의}: "어떤 것을 선택함으로써 포기해야 하는 것 중 가장 가치가 큰 대안 (The value of the next best foregone alternative)"
+
+\begin{itemize}
+    \item 노벨상 수상자인 밀턴 프리드먼(Milton Friedman)은 "세상에 공짜 점심은 없다(There's no such thing as a free lunch)"고 말했습니다.
+    \item 누군가 당신에게 공짜로 점심을 사주더라도, 당신은 그 시간에 친구를 만나거나 넷플릭스를 볼 수 있는 '시간'을 포기해야 합니다. 이 시간이 바로 기회비용입니다.
+\end{itemize}
+
+\begin{keypointbox}[핵심 예시: 명시적 비용 vs. 암묵적 비용(기회비용)]
+    당신이 친구와 함께 차를 사려 한다고 가정합시다.
+
+    \begin{itemize}
+        \item \textbf{당신 (명시적 비용)}: 돈이 없어 은행에서 \$3,000를 대출받고 이자를 냅니다.
+        \item \textbf{친구 (암묵적 비용)}: 모아둔 저축 \$3,000를 인출해서 차를 샀습니다. 친구는 "나는 이자를 내지 않으니 공짜다"라고 주장합니다.
+    \end{itemize}
+
+    \textbf{경제학적 분석}: 친구의 주장은 틀렸습니다.
+    친구가 만약 그 돈 \$3,000를 은행에 계속 저축했다면 이자를 받을 수 있었을 것입니다.
+    차를 사기 위해 돈을 인출하는 순간, 그 '받을 수 있었던 이자'를 포기한 것입니다.
+    이것이 바로 눈에 보이지 않는 \textbf{암묵적 비용(Implicit Cost)}이며, 기회비용의 핵심입니다.
+
+    \textbf{기업의 적용}: 회계 장부상 \$3백만의 '이익(Profit)'을 낸 CEO라도, 경제학적으로는 다음과 같이 생각해야 합니다. "내가 이 자산을 모두 팔고 트윙키(Twinkies)를 만들었다면 \$4백만을 벌 수 있지 않았을까?" 만약 그렇다면, 이 기업은 회계상 흑자임에도 불구하고 경제학적으로는 \$1백만의 손실을 본 것입니다.
+\end{keypointbox}
+
+
+\section{핵심 개념 2: 수요 곡선 (The Demand Curve)}
+
+시장은 \textbf{구매자(Buyers)}와 \textbf{판매자(Sellers)}의 상호작용으로 이루어집니다.
+구매자들의 행동을 요약한 것이 바로 \textbf{수요 곡선(Demand Curve)}입니다. (이 분석은 정부 개입이 없다고 가정합니다.)
+
+\subsection{수요(Demand)의 정의}
+
+\textbf{정의}: "다른 모든 조건이 일정할 때, 각각의 가격 수준에서 소비자들이 구매하고자 하는 재화의 양을 나타내는 점들의 궤적"
+
+\begin{itemize}
+    \item 수학적으로는 $Q = f(P)$ 로 표현할 수 있습니다. 즉, 구매하려는 수량(Quantity, Q)이 가격(Price, P)에 따라 결정됩니다.
+    \item 수요 곡선은 \textbf{우하향(Downward sloping)}합니다.
+    \item \textbf{이유 (수요의 법칙, Law of Demand)}:
+        \begin{itemize}
+            \item 가격이 하락하면($P \downarrow$), 더 적은 '녹색 종이(돈)'를 포기해도 되므로(기회비용 감소), 더 많이 구매합니다($Q \uparrow$).
+            \item 가격이 상승하면($P \uparrow$), 더 많은 것을 포기해야 하므로(기회비용 증가), 더 적게 구매합니다($Q \downarrow$).
+        \end{itemize}
+\end{itemize}
+
+\subsection{수요 곡선의 형태와 관행}
+
+\begin{keypointbox}[주의: 축(Axis)이 반대로 되어 있습니다]
+    수학적으로 $Q = f(P)$ 라면, 독립 변수인 가격(P)이 X축에, 종속 변수인 수량(Q)이 Y축에 있어야 합니다.
+
+    하지만 100여 년 전 경제학자 알프레드 마샬(Alfred Marshall)이 처음 그래프를 그릴 때, 가격(P)을 Y축(세로축)에, 수량(Q)을 X축(가로축)에 두었습니다.
+    이것이 관행으로 굳어져, 오늘날 모든 경제학 교과서가 이 방식을 따릅니다.
+
+    엄밀히 말해 우리가 그리는 것은 $P = f^{-1}(Q)$ 인 \textbf{역수요함수(Inverse Demand Curve)}이지만, 관습적으로 그냥 "수요 곡선"이라고 부릅니다. 이 관행에 익숙해져야 합니다.
+\end{keypointbox}
+
+
+\section{핵심 개념 3: 공급 곡선 (The Supply Curve)}
+
+판매자(Sellers, Firms)의 행동을 요약한 것이 \textbf{공급 곡선(Supply Curve)}입니다.
+
+\subsection{공급(Supply)의 정의}
+
+\textbf{정의}: "다른 모든 조건이 일정할 때, 각각의 가격 수준에서 생산자들이 판매하고자 하는 재화의 양을 나타내는 점들의 궤적"
+
+\begin{itemize}
+    \item 수학적으로는 $Q = h(P)$ 로 표현할 수 있습니다.
+    \item 공급 곡선은 \textbf{우상향(Upward sloping)}합니다.
+    \item \textbf{이유}:
+        \begin{itemize}
+            \item 생산량을 늘리기 위해서는($Q \uparrow$) 추가 노동자를 고용하거나 공장을 더 돌려야 하므로 \textbf{추가 생산 비용이 더 많이 듭니다}.
+            \item 기업이 이처럼 더 비싼 비용을 감수하고 생산량을 늘리도록 유인하려면, 시장에서 더 높은 가격($P \uparrow$)을 보장받아야 합니다.
+        \end{itemize}
+    \item 공급 곡선 역시 수요 곡선과 마찬가지로, 분석의 편의를 위해 \textbf{선형(Linear)}으로 가정합니다.
+\end{itemize}
+
+\section{핵심 개념 4: 시장 균형 (Market Equilibrium)}
+
+수요 곡선(구매자)과 공급 곡선(판매자)을 한 그래프에 합치면, 시장이 어떻게 작동하는지 알 수 있습니다.
+
+\subsection{균형(Equilibrium)의 정의}
+
+\textbf{정의}: "더 이상 변화할 유인이 없는 안정된 상태 (No tendency for change)"
+
+\begin{itemize}
+    \item \textbf{비유 (Cereal Bowl)}: 시리얼 그릇 바닥에 구슬이 멈춰 있는 상태가 '균형'입니다.
+    \item 만약 누군가 그릇을 쳐서(외부 충격, Shock) 구슬이 흔들리더라도, 구슬은 결국 그릇 바닥의 새로운 지점에서 다시 멈출 것입니다. 이것이 '새로운 균형'입니다.
+    \item 경제학자의 목표는 (1) 현재의 균형을 찾고, (2) 충격이 왔을 때, (3) 시장이 어떤 혼란을 거쳐 (4) 어떤 '새로운 균형'으로 이동할지 예측하는 것입니다.
+\end{itemize}
+
+\subsection{균형점의 결정}
+
+\textbf{균형점(E)}: 수요 곡선($D_0$)과 공급 곡선($S_0$)이 교차하는 지점입니다.
+
+\begin{itemize}
+    \item \textbf{균형 가격 ($P_E$)}: 이 교차점의 가격입니다.
+    \item \textbf{균형 거래량 ($Q_E$)}: 이 교차점의 수량입니다.
+    \item \textbf{균형의 의미}: $P_E$ 가격에서는 소비자가 사고 싶어 하는 양(\textbf{수요량, $Q_D$})과 생산자가 팔고 싶어 하는 양(\textbf{공급량, $Q_S$})이 정확히 일치합니다 ($Q_D = Q_S$).
+    \item 이 상태에서는 재고가 쌓이거나 물건이 부족해 줄을 서는 사람이 없습니다. 모든 시장 참여자(구매자, 판매자)가 만족하므로 가격이 변할 유인이 없습니다.
+\end{itemize}
+
+
+\newpage
+
+%=======================================================================
+% Chapter 2: 시장 구조와 완전 경쟁
+%=======================================================================
+\chapter{시장 구조와 완전 경쟁}
+\label{ch:lecture2}
+
+\section{개요}
+
+본 문서는 기업 수준 경제학의 첫 번째 모듈을 요약합니다.
+이전 과정에서 다룬 소비자 행동(수요 곡선)과 기업 행동(공급 곡선)을 바탕으로,
+이제 \textbf{시장 구조(Market Structure)}라는 개념을 도입합니다.
+기업의 의사결정은 동일한 비용 구조를 갖더라도, 경쟁자가 10,000명인지(완전 경쟁) 아니면 0명인지(독점)에 따라 완전히 달라집니다.
+
+본 모듈에서는 완전 경쟁 시장을 중심으로 가격이 결정되는 원리를 파악하고,
+개별 기업의 공급 곡선이 어떻게 도출되며, 이것이 시장 전체의 공급 곡선이 되는 과정을 학습합니다.
+
+\section{시장 구조 (Market Structure)}
+
+시장 구조는 산업의 "경쟁성"을 의미하며, 주로 시장 내 기업의 수(Number of firms)를 기준으로 스펙트럼을 형성합니다.
+
+\begin{enumerate}
+    \item \textbf{독점 (Monopoly):} 기업의 수가 1개입니다. 경쟁자가 전혀 없습니다.
+    \item \textbf{과점 (Oligopoly):} "소수"의 기업 (2, 3, 4...)이 경쟁합니다. (예: 자동차 시장의 도요타와 혼다). 이들은 서로의 행동을 민감하게 관찰하며 전략적 결정을 내립니다.
+    \item \textbf{경쟁 시장 (Competitive Market):} 기업의 수(N)가 "매우 많습니다". (N is very large).
+\end{enumerate}
+
+본 모듈에서는 양 극단의 사례인 \textbf{완전 경쟁}과 \textbf{독점}을 먼저 다루고, 그 중간인 과점을 분석합니다.
+
+\section{완전 경쟁 시장 (Perfect Competition)}
+
+완전 경쟁은 현실에서 정확히 들어맞는 경우는 드물지만(옥수수 시장이 가장 유사함), 시장 분석의 가장 기본이 되는 중요한 이론적 모델입니다. 이 모델이 성립하기 위해서는 4가지 엄격한 가정이 필요합니다.
+
+\begin{mybox}[완전 경쟁의 4가지 조건]
+\begin{enumerate}
+    \item \textbf{수많은 소규모 구매자와 판매자}: 시장에 참여하는 개별 기업이나 소비자가 너무 많고 그 규모가 작아서, 누구도 시장 가격에 영향을 미칠 수 없습니다.
+    \item \textbf{동질적 제품 (Homogeneous products)}: 모든 기업이 \textbf{완전히 동일한(identical)} 제품을 판매합니다.
+    \item \textbf{자유로운 진입과 퇴출 (Free entry and exit)}: 새로운 기업이 시장에 진입하거나 기존 기업이 시장에서 나가는 데 어떠한 법적, 규제적 장벽이 없어야 합니다.
+    \item \textbf{완전한 정보 (Perfect information)}: 모든 구매자와 판매자가 시장의 모든 정보(가격, 품질 등)를 완벽하게 알고 있어, 정보 부족으로 인한 실수를 하지 않습니다.
+\end{enumerate}
+\end{mybox}
+
+\subsection{완전 경쟁의 핵심 결론: 가격 수용자 (Price Taker)}
+
+위 4가지 조건이 모두 충족될 때의 핵심 결론은 다음과 같습니다:
+\textbf{완전 경쟁 시장의 모든 개별 기업은 가격 수용자(Price Taker)입니다.}
+
+즉, 개별 기업은 시장 가격에 아무런 통제력이 없으며, 시장(예: 시카고 상품 거래소)에서 결정된 가격($P_0$)을 \textbf{주어진 것(exogenously given)}으로 받아들여야 합니다.
+
+\section{공급 곡선의 도출}
+
+\subsection{개별 기업의 공급 곡선}
+
+\begin{itemize}
+    \item \textbf{기본 원리 (이윤 극대화):} 모든 기업은 \textbf{한계 수입(MR) = 한계 비용(MC)} 지점에서 생산량을 결정합니다.
+    \item \textbf{완전 경쟁 적용:} 완전 경쟁 기업은 가격 수용자(Price Taker)입니다. 기업이 제품 1개를 더 팔 때 벌어들이는 수입(MR)은 정확히 시장 가격($P_0$)과 같습니다.
+    \item 즉, $MR = P_0$ 입니다.
+    \item \textbf{결론:} 완전 경쟁 기업은 \textbf{$P_0 = MC$}가 되는 지점에서 자신의 생산량($q^*$)을 결정합니다.
+    \item 따라서, \textbf{개별 기업의 공급 곡선 = 한계비용(MC) 곡선}입니다.
+\end{itemize}
+
+\begin{warningbox}
+\textbf{셧다운 조건 (Shutdown Condition)을 고려한 최종 정의}
+
+기업은 생산을 할 때마다 최소한 가변 비용(재료비, 인건비 등)은 회수해야 합니다.
+만약 가격(P)이 \textbf{평균가변비용(AVC)의 최저점}보다 낮아지면, 기업은 물건을 1개 만들 때마다 손해를 봅니다.
+이 경우, 기업은 생산을 아예 중단(shutdown, $q=0$)하는 것이 손실을 최소화하는 길입니다.
+
+따라서 개별 기업의 공급 곡선은 다음과 같이 정의됩니다:
+\textbf{개별 기업 공급(S) 곡선 = 평균가변비용(AVC) 곡선의 최저점보다 \underline{위에 있는} 한계비용(MC) 곡선}
+\end{warningbox}
+
+\subsection{시장 공급 곡선}
+
+시장 공급 곡선(Market Supply Curve, $S$)은 산업 내 모든 개별 기업($i=1$부터 $N$까지)의 공급 곡선(즉, MC 곡선)을 \textbf{수평으로 모두 더한(horizontal summation)} 것입니다.
+
+$$
+\text{시장 공급 곡선 } S = \sum_{i=1}^{N} MC_i \quad (\text{단, } P \ge AVC \text{ 최저점})
+$$
+
+\section{균형 분석: 단기(SR)와 장기(LR)}
+
+\subsection{단기 균형 (Short-Run Equilibrium, SRE)}
+
+단기 균형이 성립하기 위해서는 다음 2가지 조건이 충족되어야 합니다.
+
+\begin{enumerate}
+    \item \textbf{시장 균형:} 시장 수요량($D$)과 시장 공급량($S$)이 일치하는가? ($D=S$)
+    \item \textbf{기업 균형:} 개별 기업이 이윤을 극대화하고 있는가? ($MR=MC$)
+\end{enumerate}
+
+\textbf{단기 이윤($\Pi$) 상태:}
+단기 균형에서는 이윤($\Pi = q \cdot [P - ATC]$)이 0일 필요가 없습니다.
+\begin{itemize}
+    \item $\Pi > 0$ (양의 경제적 이윤): $P > ATC$ 일 때
+    \item $\Pi < 0$ (음의 경제적 이윤 / 손실): $P < ATC$ 일 때
+    \item $\Pi = 0$ (정상 이윤): $P = ATC$ 일 때
+\end{itemize}
+
+\subsection{장기 균형 (Long-Run Equilibrium, LRE)}
+
+단기 균형에서 만약 이윤($\Pi$)이 0이 아니라면, 이 시장은 \textbf{장기적으로} 안정적이지 않습니다.
+왜냐하면 완전 경쟁의 가정 3번, \textbf{자유로운 진입과 퇴출(Free Entry and Exit)}이 작동하기 때문입니다.
+
+\begin{summarybox}
+\textbf{장기 균형(LRE)의 3가지 조건}
+
+따라서 장기 균형은 위 2가지 조건에 '진입/퇴출 유인 없음' 조건이 추가되어야 합니다.
+\begin{enumerate}
+    \item \textbf{시장 균형:} $D = S$
+    \item \textbf{기업 균형:} $MR = MC$
+    \item \textbf{장기 안정 (이윤 = 0):} $\Pi = 0$ (즉, $P = ATC$)
+\end{enumerate}
+장기 균형 상태에서 개별 기업은 \textbf{ATC 곡선의 최저점}에서 생산하게 됩니다 ($P = MC = \min ATC$).
+\end{summarybox}
+
+\section{주요 Q\&A}
+
+\begin{keypointbox}[Q1: 장기 균형에서 "이윤($\Pi$) = 0" 이라는 것은 기업이 돈을 못 번다는 뜻인가요?]
+\textbf{A: 아닙니다.} 이는 \textbf{경제적 이윤(Economic Profit)이 0}이라는 의미입니다.
+
+경제적 이윤 = 회계상 이윤(Accounting Profit) - 기회비용(Opportunity Cost)
+
+경제적 이윤이 0이라는 것은, 이 기업이 회계상으로는 \$20M의 큰 이익을 냈더라도, 이 기업이 할 수 있었던 차선책(기회비용) 역시 \$20M의 가치가 있다는 뜻입니다.
+즉, \textbf{"다른 산업에 갔어도 딱 이만큼 벌 수 있었다"}는 의미이며, 따라서 굳이 이 산업을 떠나거나(퇴출) 다른 기업이 이 산업에 들어올(진입) 유인이 없는 \textbf{안정된 균형 상태}를 의미합니다.
+\end{keypointbox}
+
+\begin{keypointbox}[Q2: 개별 기업의 공급 곡선은 정확히 무엇인가요?]
+\textbf{A: 한계비용(MC) 곡선입니다.}
+더 정확하게는, \textbf{평균가변비용(AVC) 곡선의 최저점보다 위에 있는 MC 곡선 부분}입니다.
+기업은 가격(P)이 AVC보다 낮으면 아예 생산을 중단(shutdown)하기 때문입니다.
+\end{keypointbox}
+
+\begin{keypointbox}[Q3: 주가는 왜 그렇게 변동이 심한가요?]
+\textbf{A: 주가는 현재 실적이 아니라 "미래 이윤에 대한 기대($\Pi_t$)"의 현재가치 합이기 때문입니다.}
+새로운 정보(뉴스, 스캔들, 신기술 발표 등)가 나올 때마다 시장 참여자들은 \textbf{미래의 기대 이윤($\Pi_t$)}을 즉각적으로 재조정합니다. 이 기대치가 변하면 주가 공식의 분자 값이 변하므로 주가가 실시간으로 변동합니다.
+\end{keypointbox}
+
+\end{document}

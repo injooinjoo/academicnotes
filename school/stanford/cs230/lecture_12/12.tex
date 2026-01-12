@@ -1,0 +1,270 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+\usepackage{colortbl} % 표 색상
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{diagnosisbox}[1]{
+    colback=purple!5!white,
+    colframe=purple!80!black,
+    fonttitle=\bfseries,
+    title=🩺 #1 (닥터 딥러닝의 처방전)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Improving Deep Neural Networks: \\ Bias vs Variance Trade-off Analysis}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1 Train / Dev / Test Sets Strategy \textit{- Completed}
+        \item \textbf{5.2 Bias vs Variance Analysis (Diagnosis)}
+        \begin{itemize}
+            \item The Bullseye Analogy
+            \item Diagnosis Recipe (The Gap Analysis)
+            \item Modern Trade-off in Deep Learning
+            \item Implementation: Auto-Diagnosis Class
+        \end{itemize}
+        \item 5.3 Regularization (L2, Dropout) \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 데이터를 Train, Dev, Test로 나누는 전략을 세웠습니다. 이제 모델을 학습시켰고 성적표(Error Rate)를 받았습니다. 그런데 성적이 기대 이하입니다.
+이때 "왜 성능이 안 나오지?"라고 막연해하면 안 됩니다. 머신러닝 엔지니어가 내릴 수 있는 진단은 딱 두 가지입니다. \textbf{"공부를 덜 했거나(High Bias)"} 아니면 \textbf{"문제집만 달달 외웠거나(High Variance)"}. 이 두 가지 병명을 정확히 진단해야 올바른 약(Solution)을 쓸 수 있습니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 모델의 성능 저하 원인을 규명하는 \textbf{'진단(Diagnosis)'} 기술을 다룹니다.
+\begin{itemize}
+    \item \textbf{개념:} 편향(Bias)과 분산(Variance)을 각각 과소적합(Underfitting)과 과대적합(Overfitting)으로 이해합니다.
+    \item \textbf{기준:} \textbf{Bayes Error(최적 오차)}를 기준으로 Train Error와 Dev Error의 격차(Gap)를 분석합니다.
+    \item \textbf{변화:} 딥러닝 시대에 Bias와 Variance를 동시에 줄이는 것이 가능해진 이유를 알아봅니다.
+    \item \textbf{구현:} 학습 곡선(Learning Curve)을 그리고 자동으로 상태를 진단하는 Python 코드를 작성합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{비유 (학생)} \\ \hline
+\textbf{High Bias} & 과소적합 (Underfitting) & 공부를 대충 해서 교과서(Train) 내용도 모름. \\ \hline
+\textbf{High Variance} & 과대적합 (Overfitting) & 교과서 답만 달달 외워서 응용 문제(Dev)는 다 틀림. \\ \hline
+\textbf{Bayes Error} & 이론적 최소 오차 & 인간도 틀릴 수밖에 없는 문제의 난이도 (한계치). \\ \hline
+\textbf{Avoidable Bias} & Train Error - Bayes Error & 우리가 노력으로 줄일 수 있는 편향. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 과녁 맞추기 (Bullseye Analogy)}
+
+
+
+\subsection{1. High Bias (Underfitting)}
+\begin{itemize}
+    \item \textbf{현상:} 화살들이 정중앙에서 멀리 떨어져 있고, 자기들끼리는 뭉쳐 있습니다.
+    \item \textbf{원인:} 모델이 너무 단순해서(예: 직선) 데이터의 복잡한 패턴을 전혀 파악하지 못했습니다.
+\end{itemize}
+
+\subsection{2. High Variance (Overfitting)}
+\begin{itemize}
+    \item \textbf{현상:} 화살들의 평균 위치는 정중앙이지만, 사방으로 흩어져 있습니다.
+    \item \textbf{원인:} 훈련 데이터의 사소한 노이즈까지 과도하게 학습해서, 조금만 다른 데이터가 오면 예측이 널뜁니다.
+\end{itemize}
+
+\subsection{3. The Diagnostic Recipe (진단 레시피)}
+숫자를 보고 진단하는 법입니다. Bayes Error(인간 수준 오차)가 0\%라고 가정합니다.
+
+\begin{diagnosisbox}{증상별 처방전}
+\begin{center}
+\begin{tabular}{c|c|l|l}
+\hline
+\textbf{Train Error} & \textbf{Dev Error} & \textbf{진단 (Diagnosis)} & \textbf{처방 (Prescription)} \\ \hline
+1\% & 11\% & \textbf{High Variance} & 데이터 추가, 정규화(L2/Dropout) \\ \hline
+15\% & 16\% & \textbf{High Bias} & 더 큰 모델(은닉층 추가), 오래 학습 \\ \hline
+15\% & 30\% & \textbf{High Bias \& Variance} & 모델 구조 변경, 데이터 정제 \\ \hline
+0.5\% & 1\% & \textbf{Good Fit} & 현재 상태 유지 \\ \hline
+\end{tabular}
+\end{center}
+\end{diagnosisbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: 딥러닝 시대의 트레이드오프}
+
+\begin{itemize}
+    \item \textbf{과거 (Traditional ML):} Bias를 줄이면 Variance가 늘어나는 '시소' 관계였습니다.
+    \item \textbf{현재 (Deep Learning):}
+    \begin{itemize}
+        \item \textbf{Bias 줄이기:} 네트워크를 더 크게 만듭니다. (데이터가 많다면 Variance를 거의 건드리지 않음)
+        \item \textbf{Variance 줄이기:} 데이터를 더 많이 모읍니다. (Bias를 거의 건드리지 않음)
+    \end{itemize}
+    \item \textbf{결론:} 컴퓨팅 파워와 데이터만 충분하다면, Bias와 Variance를 동시에 잡을 수 있습니다.
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Auto-Diagnosis Tool}
+
+학습 기록(History)을 입력받아 자동으로 병명을 진단해주는 클래스를 만듭니다.
+
+\begin{lstlisting}[language=Python, caption=Model Diagnosis Class, breaklines=true]
+import matplotlib.pyplot as plt
+
+class ModelDiagnostician:
+    def __init__(self, train_acc, dev_acc, human_acc=0.99):
+        # 정확도(Accuracy)를 오차(Error)로 변환
+        self.train_err = 1.0 - train_acc
+        self.dev_err = 1.0 - dev_acc
+        self.human_err = 1.0 - human_acc
+        
+    def diagnose(self):
+        print(f"Human Error: {self.human_err:.2%}")
+        print(f"Train Error: {self.train_err:.2%}")
+        print(f"Dev Error  : {self.dev_err:.2%}")
+        print("-" * 30)
+        
+        # 1. Bias 진단 (Train과 Human의 차이)
+        avoidable_bias = self.train_err - self.human_err
+        
+        # 2. Variance 진단 (Dev와 Train의 차이)
+        variance = self.dev_err - self.train_err
+        
+        threshold = 0.02 # 2% 이상 차이나면 문제로 간주
+        
+        if avoidable_bias > threshold:
+            print("[Diagnosis] High Bias (Underfitting)")
+            print(">> Solution: Bigger Network, Train Longer (Epochs)")
+            
+        elif variance > threshold:
+            print("[Diagnosis] High Variance (Overfitting)")
+            print(">> Solution: More Data, Regularization (Dropout, L2)")
+            
+        else:
+            print("[Diagnosis] Good Fit! Great Job.")
+
+# --- 실행 예제 ---
+if __name__ == "__main__":
+    # 상황: 훈련은 잘 되는데(99%), 검증은 안 됨(89%) -> High Variance
+    train_accuracy = 0.99
+    dev_accuracy = 0.89
+    
+    doctor = ModelDiagnostician(train_accuracy, dev_accuracy)
+    doctor.diagnose()
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{Train Error가 높다고 무조건 High Bias인가요?}
+\textbf{아닙니다!} 비교 대상(Bayes Error)이 중요합니다.
+\begin{itemize}
+    \item \textbf{상황:} 흐릿한 옛날 문서 인식. 사람도 15\% 틀림(Human Error = 15\%).
+    \item \textbf{결과:} 모델의 Train Error가 15\%임.
+    \item \textbf{진단:} 이것은 High Bias가 아닙니다. 이미 사람만큼 잘한 것입니다(Optimal). 이 경우엔 Bias를 줄이려 노력할 필요가 없습니다.
+\end{itemize}
+\end{warningbox}
+
+\textbf{Q. High Bias와 High Variance가 동시에 높으면요?} \\
+\textbf{A.} 최악의 상황입니다. 모델이 정답도 못 맞추면서 예측값은 널뛰기를 합니다. 보통 모델 구조 자체가 데이터에 맞지 않거나, 데이터에 심각한 오류가 있을 때 발생합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+진단 결과, 만약 여러분의 모델이 \textbf{High Variance(과대적합)} 판정을 받았다면 어떻게 해야 할까요?
+"데이터를 더 모으세요"라는 조언은 쉽지만, 현실에서는 돈과 시간이 듭니다. 데이터를 늘리지 않고도 과대적합을 치료하는 마법의 알약이 있습니다.
+
+다음 시간에는 \textbf{[Regularization]} 유닛에서 \textbf{L2 정규화}와 \textbf{Dropout}이라는 강력한 치료법을 배워보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{High Bias:} Train Error가 높다. $\rightarrow$ 모델을 키워라(Bigger Network).
+    \item \textbf{High Variance:} Dev Error가 Train Error보다 훨씬 높다. $\rightarrow$ 데이터를 모으거나 정규화(Regularization)하라.
+    \item \textbf{Reference:} 절대적인 수치가 아니라 \textbf{Bayes Error(Human-level)}와의 차이(Gap)를 봐야 한다.
+    \item \textbf{Priority:} 보통 Bias를 먼저 잡고, 그 다음 Variance를 잡는 순서로 진행한다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

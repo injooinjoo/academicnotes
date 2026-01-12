@@ -1,0 +1,260 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 3}
+\fancyhead[R]{Asymptotic Properties}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 무한한 데이터의 힘}}
+\author{Unit 3: Asymptotic Properties (점근적 성질)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 1: Modeling (무대 세팅)
+    \item Unit 2: Point Estimation (범인 지목)
+    \item \textbf{\textcolor{mainblue}{Unit 3: Asymptotic Properties (현재 단원: 무한대로 확장)}}
+    \begin{itemize}
+        \item 3.1 Consistency (일치성)
+        \item 3.2 Asymptotic Normality (점근적 정규성)
+        \item 3.3 Fisher Information \& CRLB (추정의 한계)
+        \item 3.4 Delta Method (함수의 추정)
+    \end{itemize}
+    \item Unit 4: Hypothesis Testing (가설 검정)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 3. 점근적 성질 (Asymptotic Properties)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 2에서 우리는 $\hat{\theta}$라는 '추정량'을 만들었습니다. 하지만 데이터 개수($n$)가 적을 때는 이 추정량이 얼마나 정확한지 계산하기 어렵습니다(분산 공식이 복잡함). 그래서 우리는 질문을 바꿉니다. \textbf{"만약 데이터가 무한히 많아진다면($n \to \infty$), 이 추정량은 결국 정답을 맞히게 될까?"} 이것이 통계적 추론의 이론적 보증수표가 됩니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 데이터의 크기 $n$이 커질 때 추정량이 가지는 극한의 성질을 다룹니다. 추정량이 참값으로 수렴하는지(\textbf{Consistency}), 오차의 분포가 정규분포를 따르는지(\textbf{Asymptotic Normality}) 확인하고, 추정 정밀도의 절대적 한계선(\textbf{CRLB})을 수학적으로 규명합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Consistency (일치성)} & 데이터를 많이 모으면, 결국 정답을 찾아내는가? \\
+\hline
+\textbf{Asymptotic Normality} & 오차의 모양이 종 모양(정규분포)으로 예쁘게 모이는가? \\
+\hline
+\textbf{Fisher Information ($I$)} & 데이터 하나가 파라미터에 대해 주는 힌트의 양 (곡률). \\
+\hline
+\textbf{CRLB} & 신(God)도 이보다 더 정확하게 추정할 순 없다 (분산의 하한선). \\
+\hline
+\textbf{Delta Method} & $\hat{\theta}$의 분포를 알 때, $f(\hat{\theta})$의 분포를 근사하는 기술. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 일치성 (Consistency)}
+
+
+\begin{conceptbox}{개념 1: 좋은 추정량의 최소 자격 요건}
+\textbf{한 줄 요약:} 데이터가 쌓일수록 추정값의 오차가 0으로 줄어들어, 결국 참값과 같아져야 합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 디지털 사진의 해상도}
+\begin{itemize}
+    \item \textbf{$n$이 작을 때:} 저화질 픽셀 사진. 무엇인지 흐릿하게 보입니다.
+    \item \textbf{$n \to \infty$:} 고화질 4K 사진. 실제 피사체(참값 $\theta^*$)와 완전히 똑같이 보입니다.
+    \item 만약 데이터를 무한히 모았는데도 사진이 흐릿하다면? 그 카메라는 고장난 것입니다(Inconsistent).
+\end{itemize}
+
+\subsubsection*{2) 기술적 정의: 확률적 수렴}
+추정량 $\hat{\theta}_n$이 참값 $\theta^*$로 \textbf{확률 수렴(Converge in Probability)}해야 합니다.
+$$ \forall \epsilon > 0, \quad \lim_{n \to \infty} P(|\hat{\theta}_n - \theta^*| > \epsilon) = 0 $$
+의미: 오차가 $\epsilon$보다 클 가능성이, 데이터가 늘어날수록 0이 된다.
+(주로 \textbf{대수의 법칙(LLN)}에 의해 보장됩니다.)
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 점근적 정규성 (Asymptotic Normality)}
+
+
+\begin{conceptbox}{개념 2: 모든 길은 정규분포로 통한다}
+\textbf{한 줄 요약:} 원래 데이터 분포가 무엇이든 상관없이, "추정 오차"의 분포는 종 모양(Bell Curve)을 따릅니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 돋보기로 확대하기}
+$n$이 커지면 $\hat{\theta}_n$은 $\theta^*$라는 한 점으로 뭉칩니다(분산 $\to 0$). 분포를 보려면 이 오차를 \textbf{확대}해야 합니다.
+\begin{itemize}
+    \item 그냥 오차: $\hat{\theta}_n - \theta^* \to 0$ (너무 작아서 안 보임)
+    \item $\sqrt{n}$배 확대: $\sqrt{n}(\hat{\theta}_n - \theta^*)$ (이제 모양이 보임 $\to$ 정규분포!)
+\end{itemize}
+
+\subsubsection*{2) 기술적 정의}
+$$ \sqrt{n}(\hat{\theta}_n - \theta^*) \xrightarrow{d} \mathcal{N}(0, \sigma^2_{asymp}) $$
+여기서 $\sigma^2_{asymp}$를 \textbf{점근 분산(Asymptotic Variance)}이라고 합니다. 이것을 알아야 신뢰구간을 만들 수 있습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 피셔 정보와 크래머-라오 하한 (CRLB)}
+
+
+\begin{conceptbox}{개념 3: 추정 정밀도의 물리적 한계선}
+\textbf{한 줄 요약:} 정보가 많을수록(곡선이 뾰족할수록) 분산은 작아지며, 그 한계는 피셔 정보의 역수입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 산봉우리의 뾰족함}
+로그 우도 함수(Likelihood)를 산이라고 생각합시다.
+\begin{itemize}
+    \item \textbf{뾰족한 산 (High Curvature):} 정상(최대값)의 위치가 아주 명확합니다. $\to$ \textbf{정보 많음, 분산 작음.}
+    \item \textbf{평평한 산 (Low Curvature):} 어디가 정상인지 헷갈립니다. $\to$ \textbf{정보 적음, 분산 큼.}
+\end{itemize}
+
+\subsubsection*{2) 공식 및 계산 예시 (동전 던지기)}
+파라미터 $\theta$에 대해 우도 함수의 '볼록한 정도(2계 도함수)'가 정보량입니다.
+$$ I(\theta) = - \mathbb{E}\left[ \frac{\partial^2}{\partial \theta^2} \log f(X; \theta) \right] $$
+\textbf{예시: 베르누이 분포 ($f(x;p) = p^x(1-p)^{1-x}$)}
+\begin{enumerate}
+    \item 로그 우도: $\log f = x \log p + (1-x) \log (1-p)$
+    \item 1차 미분: $\frac{x}{p} - \frac{1-x}{1-p}$
+    \item 2차 미분: $-\frac{x}{p^2} - \frac{1-x}{(1-p)^2}$
+    \item 기댓값 ($E[X]=p$): $I(p) = \frac{p}{p^2} + \frac{1-p}{(1-p)^2} = \frac{1}{p} + \frac{1}{1-p} = \frac{1}{p(1-p)}$
+\end{enumerate}
+\textbf{결과 (CRLB):} 어떤 비편향 추정량도 분산이 $\frac{1}{n I(p)} = \frac{p(1-p)}{n}$ 보다 작을 순 없습니다.
+(참고: 표본평균 $\bar{X}$의 분산이 정확히 이 값입니다. 즉, $\bar{X}$는 가장 효율적인 추정량입니다!)
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. 델타 방법 (Delta Method)}
+
+\begin{conceptbox}{개념 4: 함수를 통과한 추정량의 분포}
+\textbf{한 줄 요약:} $\hat{\theta}$가 정규분포라면, $g(\hat{\theta})$도 (근사적으로) 정규분포이며, 분산은 '기울기 제곱'만큼 변합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 지구는 둥글지만 운동장은 평평하다}
+지구($g(\theta)$ 곡선)는 둥글지만, 우리가 서 있는 좁은 공간에서는 평평한 직선처럼 보입니다.
+이 성질(선형 근사)을 이용해 분산을 예측합니다.
+
+\subsubsection*{2) 공식}
+$$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\theta)]^2 \cdot \sigma^2) $$
+원래 분산 $\sigma^2$에 \textbf{변환 함수의 미분값의 제곱($[g'(\theta)]^2$)}을 곱해주면 됩니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 모바일 게임 리텐션(재접속률) 예측}
+
+\begin{storybox}{Scenario: 대규모 업데이트의 성패}
+넥슨에서 대규모 업데이트를 진행했습니다. 전체 유저의 재접속률 $p$를 추정하려 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터 수집:} $n=10,000$명의 유저 로그를 분석했더니 $\hat{p} = 0.6$ (60\%)이 나왔습니다.
+    \item \textbf{목표:} 우리는 단순히 $p$가 아니라, \textbf{오즈(Odds) $\frac{p}{1-p}$} (접속할 확률이 접속 안 할 확률의 몇 배인가?)에 관심이 있습니다.
+    \item \textbf{문제:} $\hat{p}$의 분산은 알겠는데, 오즈 $\frac{\hat{p}}{1-\hat{p}}$의 신뢰구간은 어떻게 구하죠?
+    \item \textbf{해결 (델타 방법):}
+    \begin{itemize}
+        \item 변환 함수: $g(p) = \frac{p}{1-p}$
+        \item 미분: $g'(p) = \frac{1}{(1-p)^2}$
+        \item 새로운 분산: 원래 분산 $\frac{p(1-p)}{n}$에 $[g'(p)]^2$를 곱함.
+        \item 결론: 복잡한 시뮬레이션 없이도, 미분 한 번으로 오즈 값의 오차 범위를 즉시 계산할 수 있습니다.
+    \end{itemize}
+\end{enumerate}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 데이터가 적으면($n$이 작으면) 이 이론들은 쓸모 없나요?]
+    \textbf{A.} 완전히 쓸모없는 건 아닙니다. 통계학에서는 보통 $n \ge 30$ 정도면 중심극한정리가 작동한다고 봅니다. 하지만 $n$이 작을 때는 정규분포 근사가 부정확할 수 있으므로, t-분포를 쓰거나 부트스트랩(Bootstrap) 같은 시뮬레이션 방법을 쓰는 것이 안전합니다.
+    
+    \item[Q2. 왜 하필 $\sqrt{n}$을 곱하나요? 그냥 $n$을 곱하면 안 되나요?]
+    \textbf{A.} 좋은 질문입니다! 
+    \begin{itemize}
+        \item 오차($\hat{\theta} - \theta$)는 대략 $\frac{1}{\sqrt{n}}$의 속도로 줄어듭니다.
+        \item 그냥 두면 0이 되고, $n$을 곱하면 발산($\infty$)해 버립니다.
+        \item 딱 균형을 맞춰서 안정적인 분포(정규분포)를 만들기 위해 역수인 $\sqrt{n}$을 곱하는 것입니다.
+    \end{itemize}
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 이제 우리는 추정량 $\hat{\theta}$가 정규분포를 따른다는 강력한 무기를 얻었습니다. 그렇다면 "이 추정값이 0.5라고 주장하는 것이 타당한가?"를 판단할 수 있겠죠? 다음 \textbf{Unit 4}에서는 이 분포를 이용해 가설을 검증하는 \textbf{가설 검정(Hypothesis Testing)}으로 넘어갑니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 3 핵심 요약}
+\begin{itemize}
+    \item \textbf{Consistency:} $n \to \infty$이면 추정량은 참값이 된다.
+    \item \textbf{Asymptotic Normality:} 추정 오차는 $\sqrt{n}$ 스케일에서 정규분포 $\mathcal{N}(0, I(\theta)^{-1})$를 따른다.
+    \item \textbf{Fisher Info \& CRLB:} 분산의 하한선은 정보량의 역수다. MLE는 이 한계에 도달하는 최적의 추정량(Efficient Estimator)이다.
+    \item \textbf{Delta Method:} 변환된 추정량 $g(\hat{\theta})$의 분산은 $g'(\theta)^2 \times \text{Var}(\hat{\theta})$이다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

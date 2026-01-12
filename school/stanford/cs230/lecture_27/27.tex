@@ -1,0 +1,275 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{strategybox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧭 #1 (전략 가이드)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Structuring Machine Learning Projects: \\ Transfer Learning \& Multi-task Learning}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-6.] ML Strategy Basics \textit{- Completed}
+    \item[\textbf{Chapter 7.}] \textbf{Advanced Learning Strategies (Current Unit)}
+    \begin{itemize}
+        \item 7.1 Error Analysis \textit{- Completed}
+        \item 7.2 Data Mismatch \textit{- Completed}
+        \item \textbf{7.3 Transfer Learning \& Multi-task Learning}
+        \begin{itemize}
+            \item Concept: Standing on the Shoulders of Giants
+            \item Fine-tuning Strategies (Freeze vs Unfreeze)
+            \item Multi-task Learning (Shared Representation)
+            \item Implementation: Keras Code
+        \end{itemize}
+    \end{itemize}
+    \item[Chapter 8.] End-to-End Deep Learning \textit{- Upcoming}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지금까지 우리는 모델을 밑바닥부터(Scratch) 학습시키는 법을 배웠습니다. 하지만 현실 세계의 엔지니어는 \textbf{"아무것도 없는 상태에서 시작하지 않습니다."}
+책을 읽을 때마다 '가나다라'부터 다시 배우지 않듯, AI 모델도 남이 이미 학습해둔 지식(Knowledge)을 빌려와서 자신의 문제를 해결할 수 있습니다. 이것이 \textbf{전이 학습(Transfer Learning)}이며, 현대 딥러닝 성공의 90\%는 여기에 기인합니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 '데이터 부족'을 해결하고 학습 효율을 극대화하는 두 가지 패러다임을 다룹니다.
+\begin{itemize}
+    \item \textbf{Transfer Learning:} 대규모 데이터(ImageNet)로 학습된 모델을 가져와 내 문제(X-ray)에 적용하는 법을 배웁니다.
+    \item \textbf{Fine-tuning:} 가중치를 고정(Freeze)하거나 미세 조정(Unfreeze)하는 단계별 전략을 익힙니다.
+    \item \textbf{Multi-task Learning:} 하나의 모델이 여러 작업을 동시에 수행하며 지능을 높이는 원리를 이해합니다.
+    \item \textbf{구현:} Keras를 활용해 Pre-trained Model을 로드하고 커스터마이징하는 코드를 작성합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{비유} \\ \hline
+\textbf{Transfer Learning} & 지식 전이 (A $\to$ B) & 영어 잘하는 사람이 불어도 빨리 배움. \\ \hline
+\textbf{Pre-trained Model} & 사전 학습된 모델 (Source) & 이미 박사 학위를 받은 전문가. \\ \hline
+\textbf{Fine-tuning} & 미세 조정 & 전문가에게 우리 회사의 업무 매뉴얼만 가르침. \\ \hline
+\textbf{Multi-task Learning} & 동시 학습 (A \& B) & 수학과 물리를 동시에 배우면 시너지가 남. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 지식의 재활용}
+
+\subsection{1. Transfer Learning (전이 학습)}
+
+
+데이터가 풍부한 \textbf{Task A(Source)}에서 배운 지식을 데이터가 적은 \textbf{Task B(Target)}로 옮깁니다.
+\begin{itemize}
+    \item \textbf{앞단 (Early Layers):} 엣지, 곡선, 질감 등 보편적인 특징을 배웁니다. (재활용 가능)
+    \item \textbf{뒷단 (Later Layers):} 구체적인 사물(고양이, 자동차)을 배웁니다. (새로 학습 필요)
+\end{itemize}
+
+\subsection{2. Multi-task Learning (다중 작업 학습)}
+
+
+하나의 신경망이 여러 작업(Task A, B, C)을 동시에 수행합니다.
+\begin{itemize}
+    \item \textbf{Shared Layers:} 모든 작업에 공통적으로 필요한 저수준 특징(Low-level features)을 공유합니다.
+    \item \textbf{효과:} 서로 다른 작업들이 일종의 노이즈(Regularization) 역할을 하여 과대적합을 막고 일반화 성능을 높입니다.
+    \item \textbf{예시:} 자율주행 (표지판 인식 + 신호등 인식 + 보행자 감지).
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Fine-tuning Strategies}
+
+"데이터가 얼마나 있느냐"에 따라 전략이 달라집니다.
+
+\begin{strategybox}{데이터 규모별 전략}
+\begin{enumerate}
+    \item \textbf{Small Data (데이터 매우 적음):}
+    \begin{itemize}
+        \item \textbf{전략:} Backbone 전체 고정 (\textbf{Freeze}).
+        \item \textbf{행동:} 마지막 분류기(Head)만 떼어내고 새로 학습시킵니다.
+    \end{itemize}
+    
+    \item \textbf{Medium Data (적당함):}
+    \begin{itemize}
+        \item \textbf{전략:} 앞단 일부 고정, 뒷단 일부 해제 (\textbf{Fine-tuning}).
+        \item \textbf{행동:} 상위 층(Later Layers)의 가중치를 미세하게 업데이트합니다.
+    \end{itemize}
+    
+    \item \textbf{Big Data (데이터 많음):}
+    \begin{itemize}
+        \item \textbf{전략:} 전체 재학습 (\textbf{Retrain All}).
+        \item \textbf{행동:} 사전 학습된 가중치를 초기값(Initialization)으로만 쓰고 전체를 다 학습합니다.
+    \end{itemize}
+\end{enumerate}
+\end{strategybox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Transfer Learning with Keras}
+
+MobileNetV2를 가져와서 커스텀 분류기를 만드는 코드입니다.
+
+\begin{lstlisting}[language=Python, caption=Transfer Learning Pipeline, breaklines=true]
+import tensorflow as tf
+from tensorflow.keras import layers, models
+
+def build_transfer_model(input_shape, num_classes):
+    # 1. Load Pre-trained Model (MobileNetV2)
+    # include_top=False: 1000개 클래스 분류기(Head)는 버림
+    # weights='imagenet': ImageNet으로 학습된 가중치 사용
+    base_model = tf.keras.applications.MobileNetV2(
+        input_shape=input_shape,
+        include_top=False, 
+        weights='imagenet'
+    )
+    
+    # 2. Freeze the Base Model (핵심!)
+    # 역전파 시 이 모델의 가중치는 변하지 않도록 잠금
+    base_model.trainable = False
+    
+    # 3. Add Custom Head
+    model = models.Sequential([
+        base_model,
+        layers.GlobalAveragePooling2D(), # 특징맵을 벡터로 변환
+        layers.Dropout(0.2),             # 과대적합 방지
+        layers.Dense(num_classes, activation='softmax') # 내 문제에 맞는 출력층
+    ])
+    
+    return model
+
+# --- 실행 및 Fine-tuning ---
+if __name__ == "__main__":
+    model = build_transfer_model((160, 160, 3), 10)
+    
+    # 1단계: Head만 학습 (Base는 고정)
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
+    # model.fit(...) 
+    
+    # 2단계: Fine-tuning (Base의 일부를 품)
+    base_model = model.layers[0]
+    base_model.trainable = True
+    
+    # 앞쪽 100개 층은 계속 고정, 나머지 뒤쪽만 학습
+    fine_tune_at = 100
+    for layer in base_model.layers[:fine_tune_at]:
+        layer.trainable = False
+        
+    # 중요: 미세 조정 시에는 학습률을 아주 낮게(1/10 ~ 1/100) 잡아야 함
+    model.compile(optimizer=tf.keras.optimizers.RMSprop(lr=1e-5),
+                  loss='categorical_crossentropy', metrics=['acc'])
+    # model.fit(...)
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{처음부터 Fine-tuning을 하면 안 되나요?}
+\textbf{절대 안 됩니다.}
+새로 붙인 Head(분류기)는 랜덤 초기화 상태라 엉뚱한 오차(Gradient)를 뿜어냅니다. Base Model을 고정하지 않으면, 이 큰 오차 때문에 잘 학습되어 있던 Base Model의 가중치가 다 망가져버립니다 (\textbf{Catastrophic Forgetting}).
+반드시 \textbf{Head를 먼저 학습시켜 안정화한 뒤}, Base Model을 풀어야 합니다.
+\end{warningbox}
+
+\textbf{Q. 입력 이미지 크기가 달라도 되나요?} \\
+\textbf{A.} CNN의 특성상 가능은 하지만, 성능을 위해 사전 학습 모델이 사용했던 크기(예: 224x224)로 리사이징(Resize)해서 넣는 것을 권장합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이것으로 '머신러닝 프로젝트 구조화 전략' 파트를 마칩니다. 여러분은 이제 데이터를 다루는 전략부터, 남의 지식을 빌려오는 전략까지 모두 갖춘 \textbf{전략가}가 되었습니다.
+
+다음 챕터부터는 딥러닝을 더욱 깊이 있게 만드는 \textbf{[End-to-End Deep Learning]}의 개념과, 이것이 전통적인 파이프라인 방식과 어떻게 다른지 비교 분석하며 시작해 보겠습니다. 수고하셨습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Transfer Learning:} 빅데이터 모델(Source)을 소량 데이터 문제(Target)에 재활용한다.
+    \item \textbf{Freeze:} 초기 학습 시에는 Backbone을 고정하고 Head만 학습한다.
+    \item \textbf{Fine-tune:} 데이터가 충분하면 Backbone의 일부를 풀어 미세 조정한다. (Low LR 필수)
+    \item \textbf{Multi-task:} 여러 작업을 동시에 배우면 일반화 성능이 좋아진다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

@@ -1,0 +1,243 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 1 (Part B)}
+\fancyhead[R]{Advanced Clustering}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 연결과 계층의 발견}}
+\author{Module 1 (Part B): Spectral \& Hierarchical Clustering}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Module 1 (Part A): Dimensionality Reduction (시각화)
+    \item \textbf{\textcolor{mainblue}{Module 1 (Part B): Advanced Clustering (현재 단원: 구조적 군집화)}}
+    \begin{itemize}
+        \item 1.5 Limits of K-Means (구형 가정의 한계)
+        \item 1.6 Spectral Clustering (그래프 컷과 라플라시안)
+        \item 1.7 Hierarchical Clustering (덴드로그램과 연결법)
+    \end{itemize}
+    \item Module 2: Analysis of Networks (네트워크 과학)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 1 (Part B). 고급 군집화 (Advanced Clustering)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지난 시간 t-SNE를 통해 복잡하게 꼬인 데이터를 눈으로 확인했습니다. 그런데 K-Means 알고리즘을 돌려보니, 눈으로 보기엔 분명히 다른 그룹인데 하나로 묶어버리는 실수를 범합니다. 왜 그럴까요? K-Means는 단순한 '거리'만 보기 때문입니다. 이제 우리는 \textbf{"친구의 친구는 친구다"}라는 \textbf{연결성(Connectivity)}을 이용해 복잡한 구조를 풀어내는 방법을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 K-Means의 기하학적 한계(볼록성 가정)를 극복하기 위해, 데이터를 그래프 관점에서 해석하는 \textbf{스펙트럴 클러스터링(Spectral Clustering)}과 데이터의 계층적 구조를 파악하는 \textbf{계층적 군집화(Hierarchical Clustering)}를 다룹니다. 특히 스펙트럴 클러스터링의 핵심인 \textbf{라플라시안 행렬}과 \textbf{고유값 분해}의 연결고리를 이해하는 것이 핵심입니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Convex Cluster} & 공처럼 둥글고 꽉 찬 형태의 군집. (K-Means가 좋아하는 것) \\
+\hline
+\textbf{Adjacency Matrix ($W$)} & 누가 누구랑 연결되었는지(유사한지) 나타내는 친구 관계표. \\
+\hline
+\textbf{Laplacian Matrix ($L$)} & $D - W$. 그래프의 구조적 성질을 담고 있는 핵심 행렬. \\
+\hline
+\textbf{Graph Cut} & 그래프를 가위로 잘라서 그룹을 나누는 행위. \\
+\hline
+\textbf{Dendrogram} & 데이터가 합쳐지는 순서를 기록한 족보(Tree) 그림. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. K-Means의 한계 (The Convexity Assumption)}
+
+
+\begin{conceptbox}{개념 1: 둥근 구멍에 네모난 못}
+\textbf{한 줄 요약:} K-Means는 "모든 클러스터는 둥근 공 모양이다"라고 가정합니다. 초승달 모양이나 도넛 모양 데이터는 절대 구분하지 못합니다.
+\end{conceptbox}
+
+\subsubsection*{한계 상황}
+\begin{itemize}
+    \item \textbf{Two Moons:} 두 개의 초승달이 서로 맞물려 있는 경우. K-Means는 가운데를 수직으로 뚝 잘라서 반반씩 섞어버립니다.
+    \item \textbf{Concentric Circles:} 계란 노른자와 흰자처럼 안팎으로 감싸는 경우. K-Means는 파이 조각처럼 잘라버립니다.
+    \item \textbf{이유:} 유클리드 거리상으로는 흰자 끝과 끝보다, 흰자와 노른자가 더 가깝기 때문입니다. \textbf{연결성}을 무시한 결과입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 스펙트럴 클러스터링 (Spectral Clustering)}
+
+\begin{conceptbox}{개념 2: 다리 끊기 (Graph Cut)}
+\textbf{한 줄 요약:} 데이터를 공간상의 점이 아니라 \textbf{'노드와 엣지로 이루어진 그래프'}로 봅니다. 그룹 간의 연결 다리를 끊어서(Cut) 섬을 만드는 것이 목표입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 알고리즘 단계 (The Recipe)}
+\begin{enumerate}
+    \item \textbf{유사도 그래프 생성 ($W$):} 거리($d$)가 가까우면 1, 멀면 0인 인접 행렬을 만듭니다. (또는 가우시안 커널 사용)
+    \item \textbf{라플라시안 행렬 계산 ($L$):} 그래프의 성질을 요약합니다.
+    $$ L = D - W $$
+    ($D$: 차수 행렬, 각 노드가 친구가 몇 명인지 대각선에 적음)
+    \item \textbf{고유값 분해 (Spectral Embedding):} $L$의 고유벡터를 구합니다.
+    \item \textbf{K-Means 적용:} 고유벡터로 변환된 공간(Spectral Domain)에서는 초승달 모양이 둥근 공 모양으로 펴집니다. 여기서 K-Means를 돌립니다.
+\end{enumerate}
+
+\subsubsection*{2) 왜 라플라시안($L$)인가?}
+
+우리의 목표는 \textbf{"그룹 간 연결은 끊고(Min Cut), 그룹 내부는 뭉치게 하는"} 것입니다.
+수학적으로 이 최적화 문제(Normalized Cut)를 풀면, 그 해답이 놀랍게도 \textbf{$L$ 행렬의 두 번째로 작은 고유벡터(Fiedler Vector)}와 같다는 것이 증명되어 있습니다.
+\begin{itemize}
+    \item 즉, 복잡한 그래프 자르기 문제를 \textbf{선형대수(행렬 분해)} 문제로 바꿔서 푸는 것입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 계층적 군집화 (Hierarchical Clustering)}
+
+
+\begin{conceptbox}{개념 3: 족보 만들기 (Family Tree)}
+\textbf{한 줄 요약:} 처음엔 모두가 남남이었다가, 가장 친한 사람끼리 짝을 짓고, 그 커플끼리 또 합치면서 거대한 가족(트리)을 만듭니다.
+\end{conceptbox}
+
+\subsubsection*{1) 병합형 (Agglomerative) 방식}
+\begin{itemize}
+    \item 시작: 데이터 $N$개가 각각 1개의 클러스터.
+    \item 반복: 가장 가까운 두 클러스터를 합침 ($N \to N-1 \to \dots \to 1$).
+    \item 결과: \textbf{덴드로그램(Dendrogram)}이라는 트리 구조가 나옵니다. 원하는 높이에서 자르면($K$) 클러스터가 나뉩니다.
+\end{itemize}
+
+\subsubsection*{2) 연결법 (Linkage Methods): 거리의 정의}
+"점과 점 사이의 거리는 아는데, \textbf{그룹과 그룹 사이의 거리}는 어떻게 재나요?"
+\begin{table}[h]
+\centering
+\begin{tabular}{l|l|l}
+\toprule
+\textbf{방법} & \textbf{정의 (Distance between clusters)} & \textbf{특징} \\
+\midrule
+\textbf{Single} & 가장 가까운 멤버끼리의 거리 (최단) & 길게 늘어진 뱀 모양 잘 찾음. 노이즈에 약함. \\
+\textbf{Complete} & 가장 먼 멤버끼리의 거리 (최장) & 둥글고 컴팩트한 군집 형성. \\
+\textbf{Average} & 모든 멤버 간 거리의 평균 & 무난하고 안정적임. \\
+\textbf{Ward} & 합쳤을 때 \textbf{분산의 증가량} & 가장 널리 쓰임. 크기가 고른 군집 선호. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 길드(Guild) 분석}
+
+\begin{storybox}{Scenario: 적대 길드와 동맹 길드 파악}
+당신은 '리니지'와 같은 MMORPG의 데이터 분석가입니다. 수천 개의 길드가 서로 전쟁하거나 동맹을 맺고 있습니다. 이 복잡한 정치 지형도를 그려야 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터:} 길드 간 PK 횟수, 파티 사냥 횟수, 채팅 빈도.
+    \item \textbf{문제:} 단순히 "전투력이 비슷한 길드"끼리 묶는 것(K-Means)은 의미가 없습니다. 전투력이 달라도 서로 친하면 같은 편입니다. \textbf{"관계(Relation)"}가 중요합니다.
+    \item \textbf{스펙트럴 클러스터링 적용:}
+    \begin{itemize}
+        \item \textbf{노드:} 각 길드.
+        \item \textbf{엣지($W$):} 파티 사냥이 많으면 가중치 높음(친함), PK가 많으면 가중치 낮음(적대).
+        \item \textbf{라플라시안($L$):} 그래프 구조 계산.
+        \item \textbf{결과:} 2차원 평면에 투영하니, 거대한 두 세력(공성측 vs 수성측)이 양극단으로 뚜렷하게 나뉩니다.
+    \end{itemize}
+    \item \textbf{인사이트:} "전투력은 낮지만 인맥으로 연결된 '제3세력'이 존재함"을 발견합니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 스펙트럴 클러스터링은 만능인가요?]
+    \textbf{A.} 성능은 강력하지만 계산 비용이 비쌉니다. $N \times N$ 크기의 행렬을 만들고 고유값 분해를 해야 하므로, 데이터가 수만 개를 넘어가면($N > 10,000$) 매우 느려집니다. 이때는 Nyström 근사 같은 기법을 써야 합니다.
+    
+    \item[Q2. 덴드로그램은 어떻게 읽나요?]
+    \textbf{A.} 아래(Leaf)는 개별 데이터, 위(Root)는 전체 데이터입니다. 세로축은 \textbf{"합쳐질 때의 거리(비용)"}를 의미합니다. 세로선이 길다는 것은, 두 그룹이 아주 멀리 떨어져 있는데 억지로 합쳤다는 뜻입니다. 보통 이 긴 선을 자르는(Cut) 위치가 최적의 $K$가 됩니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 데이터를 점(Point)이 아닌 연결된 구조(Graph)로 보기 시작했습니다. 그렇다면 이 '네트워크' 자체를 본격적으로 분석할 수는 없을까요? 누가 중심 인물(Hub)이고, 정보는 어떻게 전파될까요? 다음 \textbf{Module 2: 네트워크 분석 (Analysis of Networks)}에서 그래프 이론의 심화를 다룹니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 1 (Part B) 핵심 요약}
+\begin{itemize}
+    \item \textbf{한계:} K-Means는 볼록(Convex)한 형태만 찾을 수 있다.
+    \item \textbf{Spectral Clustering:} 데이터를 그래프로 보고, 라플라시안 행렬의 고유벡터를 이용해 비볼록 구조를 분리한다. (Graph Cut)
+    \item \textbf{Hierarchical Clustering:} 데이터를 계층적 트리(Dendrogram)로 시각화한다.
+    \item \textbf{Linkage:} 클러스터 간 거리를 정의하는 방법(Ward, Single, Complete)에 따라 결과가 달라진다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

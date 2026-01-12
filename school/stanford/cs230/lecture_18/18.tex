@@ -1,0 +1,258 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Optimization Algorithms: \\ Adam Optimizer}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1-5.5 Regularization \& Data Setup \textit{- Completed}
+        \item 5.6 Mini-batch Gradient Descent \textit{- Completed}
+        \item 5.7 Momentum \& RMSprop \textit{- Completed}
+        \item \textbf{5.8 Adam Optimizer}
+        \begin{itemize}
+            \item The Ultimate Fusion: Momentum + RMSprop
+            \item Bias Correction Mechanism
+            \item Hyperparameter Standards ($\alpha, \beta_1, \beta_2, \epsilon$)
+            \item Implementation from Scratch
+        \end{itemize}
+        \item 5.9 Hyperparameter Tuning Strategy \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 지난 두 강의를 통해 '관성'을 이용해 속도를 높이는 \textbf{Momentum}과, '보폭'을 조절해 진동을 줄이는 \textbf{RMSprop}을 배웠습니다.
+그렇다면 자연스러운 질문이 생깁니다. \textbf{"이 두 가지 장점을 모두 합칠 수는 없을까?"}
+그 해답이 바로 \textbf{Adam (Adaptive Moment Estimation)}입니다. Adam은 현재 딥러닝 학계와 현업에서 \textbf{'Default Optimizer(기본 설정)'}로 통합니다. 어떤 옵티마이저를 쓸지 고민될 때, 일단 Adam을 쓰면 80점 이상은 갑니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 현대 딥러닝의 표준인 \textbf{Adam Optimizer}의 내부 구조를 해부합니다.
+\begin{itemize}
+    \item \textbf{통합:} Adam이 Momentum의 평균(1차)과 RMSprop의 분산(2차)을 어떻게 결합하는지 수식으로 이해합니다.
+    \item \textbf{보정:} 학습 초기에 0으로 쏠리는 현상을 막기 위한 \textbf{편향 보정(Bias Correction)}을 익힙니다.
+    \item \textbf{표준:} $\beta_1, \beta_2, \epsilon$ 등 하이퍼파라미터의 국룰(Standard Value)을 배웁니다.
+    \item \textbf{구현:} Python으로 편향 보정이 포함된 전체 알고리즘을 밑바닥부터 구현합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{기호} & \textbf{표준값} & \textbf{역할} \\ \hline
+$\alpha$ & 튜닝 필요 & \textbf{학습률 (Learning Rate)}. 가장 중요함. \\ \hline
+$\beta_1$ & 0.9 & \textbf{Momentum 계수}. (기울기의 지수 평균) \\ \hline
+$\beta_2$ & 0.999 & \textbf{RMSprop 계수}. (기울기 제곱의 지수 평균) \\ \hline
+$\epsilon$ & $10^{-8}$ & \textbf{안정성 상수}. 0으로 나누기 방지. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 최강의 융합}
+
+\subsection{1. The Fusion Algorithm}
+Adam은 매 스텝($t$)마다 다음 4단계를 수행합니다.
+
+\begin{enumerate}
+    \item \textbf{Momentum ($v$):} 속도를 계산합니다. (1차 모멘트)
+    $$ v_t = \beta_1 v_{t-1} + (1 - \beta_1) dW $$
+    
+    \item \textbf{RMSprop ($s$):} 가속도 제어(마찰력)를 계산합니다. (2차 모멘트)
+    $$ s_t = \beta_2 s_{t-1} + (1 - \beta_2) dW^2 $$
+    
+    \item \textbf{Bias Correction (핵심):} 초기 0으로 쏠린 값을 보정합니다.
+    $$ v^{corr}_t = \frac{v_t}{1 - \beta_1^t}, \quad s^{corr}_t = \frac{s_t}{1 - \beta_2^t} $$
+    
+    \item \textbf{Update:} 파라미터를 갱신합니다.
+    $$ W = W - \alpha \frac{v^{corr}_t}{\sqrt{s^{corr}_t} + \epsilon} $$
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Bias Correction (편향 보정)}
+
+"교수님, 왜 굳이 $(1 - \beta^t)$로 나눠주나요?"
+이것은 Adam의 정교함을 보여주는 대목입니다.
+
+\begin{mathbox}{초기값 0의 저주}
+우리는 $v_0 = 0$으로 시작합니다. 첫 번째 스텝($t=1$)을 봅시다.
+($\beta_1 = 0.9$ 가정)
+
+$$ v_1 = 0.9 \times 0 + 0.1 \times dW = 0.1 dW $$
+
+\textbf{문제점:} 실제 기울기($dW$)의 \textbf{10분의 1(0.1)}밖에 반영되지 않습니다. 학습 초반에 거북이처럼 느려집니다.
+
+\textbf{해결책 (보정):}
+$$ 1 - \beta_1^1 = 1 - 0.9 = 0.1 $$
+$$ v^{corr}_1 = \frac{v_1}{0.1} = \frac{0.1 dW}{0.1} = dW $$
+
+\textbf{결과:} 보정 덕분에 초기에도 기울기를 100\% 반영할 수 있습니다.
+$t$가 커지면 $\beta^t \to 0$이 되어, 분모가 1이 되므로 보정 효과는 자연스럽게 사라집니다.
+\end{mathbox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Adam from Scratch}
+
+Adam 구현 시 가장 중요한 것은 현재 반복 횟수 \textbf{$t$}를 추적하는 것입니다.
+
+\begin{lstlisting}[language=Python, caption=Adam Optimizer Implementation, breaklines=true]
+import numpy as np
+
+def update_parameters_with_adam(parameters, grads, v, s, t, learning_rate=0.01,
+                                beta1=0.9, beta2=0.999, epsilon=1e-8):
+    """
+    t: 현재 iteration count (1부터 시작해야 함!)
+    v, s: 이전 스텝까지 누적된 Momentum, RMSprop 변수
+    """
+    L = len(parameters) // 2
+    v_corrected = {} 
+    s_corrected = {} 
+    
+    for l in range(1, L + 1):
+        # --- 1. Momentum (v) ---
+        v["dW" + str(l)] = beta1 * v["dW" + str(l)] + (1 - beta1) * grads["dW" + str(l)]
+        v["db" + str(l)] = beta1 * v["db" + str(l)] + (1 - beta1) * grads["db" + str(l)]
+        
+        # --- 2. Bias Correction (v) ---
+        # 1 - beta^t 로 나눔
+        v_corrected["dW" + str(l)] = v["dW" + str(l)] / (1 - np.power(beta1, t))
+        v_corrected["db" + str(l)] = v["db" + str(l)] / (1 - np.power(beta1, t))
+        
+        # --- 3. RMSprop (s) ---
+        # 기울기 제곱(square) 주의!
+        s["dW" + str(l)] = beta2 * s["dW" + str(l)] + (1 - beta2) * np.square(grads["dW" + str(l)])
+        s["db" + str(l)] = beta2 * s["db" + str(l)] + (1 - beta2) * np.square(grads["db" + str(l)])
+        
+        # --- 4. Bias Correction (s) ---
+        s_corrected["dW" + str(l)] = s["dW" + str(l)] / (1 - np.power(beta2, t))
+        s_corrected["db" + str(l)] = s["db" + str(l)] / (1 - np.power(beta2, t))
+        
+        # --- 5. Update Parameters ---
+        # 분모: sqrt(s_corr) + epsilon
+        parameters["W" + str(l)] -= learning_rate * (v_corrected["dW" + str(l)] / (np.sqrt(s_corrected["dW" + str(l)]) + epsilon))
+        parameters["b" + str(l)] -= learning_rate * (v_corrected["db" + str(l)] / (np.sqrt(s_corrected["db" + str(l)]) + epsilon))
+        
+    return parameters, v, s
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{Iteration Count $t$ 주의}
+함수를 호출할 때 $t$는 반드시 1부터 시작해야 합니다. 만약 $t=0$이면 $1 - \beta^0 = 1 - 1 = 0$이 되어 \textbf{ZeroDivisionError}가 발생합니다.
+\end{warningbox}
+
+\textbf{Q. Adam이 항상 최고인가요?} \\
+\textbf{A.} 대부분의 경우(CV, NLP, GAN) 그렇습니다. 하지만 아주 정교한 수렴이 필요할 때(SOTA 논문 등)는 일반 SGD+Momentum이 더 좋은 성능을 낼 때도 있습니다. 그래도 시작은 무조건 Adam을 추천합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이로써 우리는 최적화 알고리즘의 정점인 Adam을 정복했습니다. 이제 여러분은 어떤 모델이든 빠르고 안정적으로 학습시킬 수 있는 엔진을 갖췄습니다.
+
+하지만 엔진 성능이 좋아도, 기어 변속(하이퍼파라미터 설정)을 잘못하면 차가 나가지 않습니다. $\alpha$, $\beta$, 배치 크기, 은닉층 개수... 도대체 무엇부터 조절해야 할까요?
+다음 시간에는 이 수많은 다이얼을 어떤 순서로 돌려야 하는지, \textbf{[Hyperparameter Tuning]}의 체계적인 전략(Random Search vs Grid Search)을 알려드리겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Adam:} Momentum(속도) + RMSprop(가속도 제어) + Bias Correction(초기 보정).
+    \item \textbf{Standard Params:} $\alpha$(튜닝), $\beta_1(0.9)$, $\beta_2(0.999)$, $\epsilon(10^{-8})$.
+    \item \textbf{Bias Correction:} 학습 초반에 파라미터 업데이트가 너무 작아지는 것을 막아준다.
+    \item \textbf{Memory:} $v$와 $s$를 따로 저장해야 하므로 일반 SGD보다 메모리를 더 쓴다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

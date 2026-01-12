@@ -1,0 +1,269 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{diagnosisbox}[1]{
+    colback=purple!5!white,
+    colframe=purple!80!black,
+    fonttitle=\bfseries,
+    title=🩺 #1 (닥터 딥러닝의 진단표)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Structuring Machine Learning Projects: \\ Data Mismatch \& Train-Dev Set}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-6.] ML Strategy Basics \textit{- Completed}
+    \item[\textbf{Chapter 7.}] \textbf{Error Analysis \& Data Mismatch (Current Unit)}
+    \begin{itemize}
+        \item 7.1 Manual Error Analysis \textit{- Completed}
+        \item \textbf{7.2 Training vs Dev/Test Distribution Mismatch}
+        \begin{itemize}
+            \item The Web vs Mobile Image Problem
+            \item New Dataset: "Train-Dev Set"
+            \item Diagnostic Logic Table
+            \item Artificial Data Synthesis
+        \end{itemize}
+        \item 7.3 Transfer Learning (Next Chapter)
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 에러 분석을 통해 '무엇을 고칠지' 우선순위를 정했습니다.
+그런데 만약 여러분이 수집한 \textbf{20만 장의 '고화질 웹 이미지'}로 학습시켰는데, 정작 서비스할 \textbf{'저화질 모바일 이미지'}에서는 모델이 전혀 동작하지 않는다면 어떨까요?
+이것은 단순한 과대적합(Variance) 문제가 아닙니다. 공부한 책과 시험 과목이 아예 다른 상황, 즉 \textbf{데이터 불일치(Data Mismatch)}입니다. 오늘은 이 까다로운 문제를 해결하는 비밀 무기인 \textbf{'Train-Dev Set'}을 배웁니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 학습 데이터와 실전 데이터의 분포가 다를 때 발생하는 문제를 해결합니다.
+\begin{itemize}
+    \item \textbf{진단:} 과대적합(Variance)과 데이터 불일치(Mismatch)를 구분하기 위해 \textbf{Train-Dev Set}을 도입합니다.
+    \item \textbf{논리:} Train, Train-Dev, Dev 에러 간의 격차(Gap)를 분석하여 모델 상태를 판별합니다.
+    \item \textbf{해결:} \textbf{인공 데이터 합성(Data Synthesis)}을 통해 학습 데이터를 실전 분포에 맞추는 법을 배웁니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{데이터셋} & \textbf{구성 (Source)} & \textbf{역할} \\ \hline
+\textbf{Train Set} & 웹 이미지 (20만 장) & 모델 파라미터 학습 \\ \hline
+\textbf{Train-Dev Set} & \textbf{웹 이미지 (일부 떼어냄)} & \textbf{Variance 진단용 (학습 X)} \\ \hline
+\textbf{Dev Set} & 모바일 이미지 (5천 장) & 타겟 성능 검증 및 Mismatch 진단 \\ \hline
+\textbf{Test Set} & 모바일 이미지 (5천 장) & 최종 성능 평가 \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 새로운 진단 도구}
+
+\subsection{1. The Trap of Standard Split (함정)}
+웹 이미지 20만 장 + 모바일 이미지 1만 장이 있습니다.
+\begin{itemize}
+    \item \textbf{나쁜 방법:} 전부 섞어서(Shuffle) 나눈다. $\rightarrow$ Dev Set의 95\%가 웹 이미지가 됨. 실전(모바일) 성능을 측정할 수 없음.
+    \item \textbf{좋은 방법:} Dev/Test는 \textbf{오직 모바일 이미지}로만 구성한다. (Target 고정). Train에는 웹 이미지를 몰아준다.
+\end{itemize}
+
+\subsection{2. Introducing "Train-Dev Set"}
+위의 '좋은 방법'을 쓰면 Train과 Dev의 분포가 달라집니다. 이때 에러가 높으면 \textbf{"과대적합 때문인가? 아니면 데이터가 달라서인가?"}를 알 수 없습니다.
+이를 구분하기 위해 \textbf{Train-Dev Set}을 만듭니다.
+\begin{itemize}
+    \item \textbf{정의:} Train Set에서 무작위로 떼어낸 일부 데이터. 학습에는 쓰지 않음.
+    \item \textbf{특징:} Train Set과 \textbf{분포가 완벽히 동일}함.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: The Logic of Diagnosis}
+
+이 표가 오늘 강의의 핵심입니다. \textbf{에러의 차이(Gap)}가 어디서 벌어지는지 봐야 합니다.
+
+\begin{diagnosisbox}{Mismatch 진단 로직}
+\begin{center}
+\begin{tabular}{l|c|l}
+\hline
+\textbf{비교 대상} & \textbf{Gap의 의미} & \textbf{진단명 (Diagnosis)} \\ \hline
+\textbf{Train} vs \textbf{Human} & Avoidable Bias & \textbf{High Bias} (모델이 너무 단순함) \\ \hline
+\textbf{Train-Dev} vs \textbf{Train} & Variance Gap & \textbf{High Variance} (과대적합) \\ \hline
+\textbf{Dev} vs \textbf{Train-Dev} & \textbf{Mismatch Gap} & \textbf{Data Mismatch} (분포 차이) \\ \hline
+\textbf{Test} vs \textbf{Dev} & Overfitting to Dev & Dev Set 과적합 \\ \hline
+\end{tabular}
+\end{center}
+\end{diagnosisbox}
+
+\begin{analogybox}{시나리오 분석}
+\textbf{상황:} Train Error 1\%.
+\begin{itemize}
+    \item \textbf{Case A:} Train-Dev 9\%, Dev 10\%.
+    \begin{itemize}
+        \item Train과 Train-Dev(같은 분포) 사이에서 에러가 폭증했습니다.
+        \item \textbf{진단:} \textbf{High Variance (과대적합).} 정규화가 필요합니다.
+    \end{itemize}
+    \item \textbf{Case B:} Train-Dev 1.5\%, Dev 10\%.
+    \begin{itemize}
+        \item 같은 분포(Train-Dev)에서는 잘하는데, 다른 분포(Dev)에 가니 못합니다.
+        \item \textbf{진단:} \textbf{Data Mismatch.} 데이터를 합성하거나 더 모아야 합니다.
+    \end{itemize}
+\end{itemize}
+\end{analogybox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Automated Diagnosis}
+
+자동으로 데이터를 분할하고 문제를 진단하는 코드를 작성합니다.
+
+\begin{lstlisting}[language=Python, caption=Data Mismatch Diagnosis Tool, breaklines=true]
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+class MismatchDiagnostician:
+    def __init__(self, X_web, y_web, X_mobile, y_mobile):
+        # 1. Target(Dev/Test)은 모바일로 고정
+        self.X_dev, self.X_test, self.y_dev, self.y_test = train_test_split(
+            X_mobile, y_mobile, test_size=0.5, random_state=1
+        )
+        
+        # 2. Train Set은 웹 데이터 사용
+        X_train_all, y_train_all = X_web, y_web
+        
+        # 3. [핵심] Train Set에서 Train-Dev Set을 떼어냄 (같은 분포)
+        self.X_train, self.X_train_dev, self.y_train, self.y_train_dev = train_test_split(
+            X_train_all, y_train_all, test_size=0.02, random_state=1
+        )
+
+    def diagnose(self, train_err, train_dev_err, dev_err):
+        print("--- Diagnosis Report ---")
+        variance_gap = train_dev_err - train_err
+        mismatch_gap = dev_err - train_dev_err
+        
+        print(f"Variance Gap (TrainDev - Train): {variance_gap:.2%}")
+        print(f"Mismatch Gap (Dev - TrainDev):   {mismatch_gap:.2%}")
+        
+        if variance_gap > mismatch_gap:
+            print(">> Diagnosis: High Variance (Overfitting)")
+            print(">> Action: More Data, Regularization, Dropout")
+        else:
+            print(">> Diagnosis: Data Mismatch (Distribution Shift)")
+            print(">> Action: Artificial Data Synthesis, Collect Target Data")
+
+# --- 실행 ---
+if __name__ == "__main__":
+    # 더미 데이터 (웹 5만, 모바일 2천)
+    X_w, y_w = np.zeros((50000, 10)), np.zeros(50000)
+    X_m, y_m = np.zeros((2000, 10)), np.zeros(2000)
+    
+    doctor = MismatchDiagnostician(X_w, y_w, X_m, y_m)
+    
+    # 시나리오: Train 1%, Train-Dev 1.5%, Dev 10%
+    doctor.diagnose(0.01, 0.015, 0.10)
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. Train-Dev Set을 Dev Set에서 떼어내면 안 되나요?} \\
+\textbf{A.} \textbf{절대 안 됩니다.} 그러면 Train-Dev와 Dev의 분포가 같아집니다. Train-Dev는 반드시 \textbf{Train Set의 부분집합}이어야 "학습 데이터 분포에서의 일반화 성능"을 측정할 수 있습니다.
+
+\textbf{Q. Data Mismatch 해결책인 '데이터 합성'은 어떻게 하나요?} \\
+\textbf{A.} 깨끗한 음성(Train)에 자동차 소음(Noise)을 섞어서 시끄러운 음성(Dev와 비슷함)을 만드는 식입니다. 단, 너무 적은 종류의 소음만 반복해서 쓰면 모델이 그 소음 패턴에 과적합될 수 있으니 주의해야 합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이것으로 앤드류 응 교수의 \textbf{'머신러닝 프로젝트 구조화 전략'} 파트를 마칩니다. 여러분은 이제 단순히 코딩만 하는 엔지니어가 아니라, 프로젝트의 방향을 지휘하는 \textbf{전략가(Strategist)}가 되었습니다.
+
+다음 시간부터는 다시 모델링의 세계로 돌아옵니다. 컴퓨터 비전(Computer Vision)의 혁명을 일으킨 \textbf{[Convolutional Neural Networks (CNN)]}의 기초부터 심화까지, 이미지 처리의 마법을 수학적으로 파헤쳐 보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Problem:} 학습 데이터(Web)와 실전 데이터(Mobile)의 분포가 다르면 성능이 떨어진다.
+    \item \textbf{Tool:} \textbf{Train-Dev Set} (Train과 분포는 같으나 학습엔 안 씀).
+    \item \textbf{Logic:} Train-Dev 에러가 낮고 Dev 에러가 높다면 \textbf{Data Mismatch}다.
+    \item \textbf{Action:} 인공 데이터 합성(Synthesis) 등을 통해 Train을 Dev스럽게 만들어라.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

@@ -1,0 +1,268 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 증명)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Improving Deep Neural Networks: \\ Regularization (L2 / Weight Decay)}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1 Train / Dev / Test Sets Strategy \textit{- Completed}
+        \item 5.2 Bias vs Variance Analysis \textit{- Completed}
+        \item \textbf{5.3 Regularization (L1/L2)}
+        \begin{itemize}
+            \item Why Regularize? (Penalizing Complexity)
+            \item L2 Regularization (Ridge) Formula
+            \item Math: Why is it called "Weight Decay"?
+            \item Implementation
+        \end{itemize}
+        \item 5.4 Dropout Regularization \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 모델이 \textbf{High Variance(과대적합)}라는 병에 걸렸음을 진단했습니다. 모델이 학습 데이터에만 너무 집착해서(암기해서), 실전 문제(Dev Set)를 못 푸는 상황입니다.
+이제 처방전을 쓸 차례입니다. 과대적합을 치료하는 가장 전통적이고 강력한 항생제는 바로 \textbf{'정규화(Regularization)'}입니다. 정규화는 모델에게 \textbf{"정답을 맞추되, 너무 꼼수(큰 가중치)는 쓰지 마라"}라고 제약(Penalty)을 거는 것입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 모델의 복잡도를 억제하여 일반화 성능을 높이는 \textbf{L2 정규화}를 집중적으로 다룹니다.
+\begin{itemize}
+    \item \textbf{개념:} 비용 함수 $J$에 가중치 크기($||W||^2$)에 비례하는 벌점을 추가합니다.
+    \item \textbf{수학:} 역전파 과정에서 가중치가 스스로 줄어드는 \textbf{Weight Decay(가중치 감쇠)} 현상을 수식으로 증명합니다.
+    \item \textbf{구현:} 정규화 항이 포함된 Forward 및 Backward 코드를 작성합니다.
+    \item \textbf{비교:} L1 정규화(Lasso)와의 차이점(희소성)을 이해합니다.
+  \end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{기호} & \textbf{핵심 의미} \\ \hline
+\textbf{L2 Regularization} & Ridge & 가중치의 제곱합을 벌점으로 사용. $W \to 0$ (작아짐). \\ \hline
+\textbf{L1 Regularization} & Lasso & 가중치의 절댓값 합을 벌점으로 사용. $W = 0$ (사라짐/희소성). \\ \hline
+\textbf{Lambda} & $\lambda$ & 정규화 강도. 클수록 모델이 단순해짐(Underfitting 위험). \\ \hline
+\textbf{Weight Decay} & - & 매 업데이트마다 가중치가 일정 비율씩 감소하는 현상. \\ \hline
+\textbf{Frobenius Norm} & $||W||_F^2$ & 행렬의 모든 원소를 제곱해서 더한 값. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 벌점 시스템}
+
+\subsection{1. The Idea of Penalty}
+우리의 목표는 비용 $J$를 최소화하는 것입니다. 여기에 \textbf{"가중치 $W$가 커지면 벌점을 주겠다"}는 새로운 규칙을 추가합니다.
+
+$$ J_{regularized}(W, b) = \underbrace{J_{original}(W, b)}_{\text{오차 (Cross Entropy)}} + \underbrace{\frac{\lambda}{2m} \sum_{l} ||W^{[l]}||_F^2}_{\text{벌점 (L2 Penalty)}} $$
+
+\begin{itemize}
+    \item $\lambda$ (Lambda): 벌점의 강도입니다. 하이퍼파라미터입니다.
+    \item $m$: 데이터 개수.
+    \item $2m$: 미분할 때 제곱($^2$)이 내려와서 2와 약분되라고 미리 2로 나눠둡니다. (수학적 편의)
+\end{itemize}
+
+\subsection{2. L1 vs L2 (Which one to use?)}
+\begin{itemize}
+    \item \textbf{L2 (Standard):} 가중치를 0에 가깝게 만듭니다. 모든 특성을 골고루 사용하게 합니다. \textbf{딥러닝의 기본값(Default)}입니다.
+    \item \textbf{L1 (Sparse):} 가중치를 완전히 0으로 만듭니다. 불필요한 특성을 제거(Feature Selection)하고 싶을 때 쓰지만, 미분이 까다로워 잘 안 씁니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Why "Weight Decay"?}
+
+이 섹션은 L2 정규화를 왜 \textbf{'가중치 감쇠'}라고 부르는지 수학적으로 증명합니다.
+
+\begin{mathbox}{역전파 수식 유도}
+비용 함수 $J_{reg}$를 $W$에 대해 미분해 봅시다.
+
+$$ \frac{\partial J_{reg}}{\partial W} = \frac{\partial J_{orig}}{\partial W} + \frac{\partial}{\partial W} \left( \frac{\lambda}{2m} W^2 \right) $$
+$$ dW_{reg} = dW_{orig} + \frac{\lambda}{m} W $$
+(분모의 2가 미분되면서 사라졌습니다!)
+
+이제 경사 하강법 업데이트 식에 대입합니다.
+$$ W_{new} = W - \alpha \cdot dW_{reg} $$
+$$ W_{new} = W - \alpha \left( dW_{orig} + \frac{\lambda}{m} W \right) $$
+
+이 식을 $W$로 묶으면 놀라운 결과가 나옵니다:
+$$ W_{new} = \underbrace{\left( 1 - \frac{\alpha \lambda}{m} \right)}_{\text{Decay Factor } (< 1)} W - \alpha \cdot dW_{orig} $$
+\end{mathbox}
+
+\textbf{결론:} 매 업데이트마다 가중치 $W$는 원래 학습 방향($-\alpha dW$)으로 가기 전에, 자기 자신의 크기를 $(1 - \frac{\alpha \lambda}{m})$ 비율만큼 줄입니다. 즉, 가만히 있어도 \textbf{스스로 감소(Decay)}합니다.
+
+% --- 7. 구현 코드 ---
+\section{Implementation: L2 Regularization}
+
+정규화는 Forward(비용 계산)와 Backward(기울기 계산) 양쪽에 모두 코드를 추가해야 합니다.
+
+\begin{lstlisting}[language=Python, caption=L2 Regularization Implementation, breaklines=true]
+import numpy as np
+
+class L2Regularizer:
+    def __init__(self, lambd):
+        self.lambd = lambd
+
+    def compute_cost(self, cost_cross_entropy, parameters, m):
+        """
+        J_total = J_cross_entropy + (lambda / 2m) * sum(W^2)
+        """
+        L = len(parameters) // 2
+        L2_cost = 0
+        
+        for l in range(1, L + 1):
+            W = parameters['W' + str(l)]
+            # Frobenius Norm 제곱 계산
+            L2_cost += np.sum(np.square(W))
+            
+        L2_cost *= (self.lambd / (2 * m)) # 2m으로 나눔 주의!
+        
+        return cost_cross_entropy + L2_cost
+
+    def backward(self, dW_orig, W, m):
+        """
+        dW_reg = dW_orig + (lambda / m) * W
+        """
+        # 정규화 항의 기울기 추가 (여기서는 m으로 나눔!)
+        dW_reg = dW_orig + ((self.lambd / m) * W)
+        
+        return dW_reg
+
+# --- 실행 예제 ---
+if __name__ == "__main__":
+    m = 1000
+    lambd = 0.7
+    reg = L2Regularizer(lambd)
+    
+    # 가상의 W (Weight)
+    W = np.array([[0.5, -0.2], [0.1, 0.8]])
+    dW_orig = np.array([[0.01, 0.02], [-0.01, 0.05]]) # 원래 기울기
+    
+    # 역전파 적용
+    dW_final = reg.backward(dW_orig, W, m)
+    
+    print("Original dW:\n", dW_orig)
+    print("Regularized dW:\n", dW_final)
+    # dW 값이 W 부호 방향으로 조금 더 커짐 -> W를 0쪽으로 더 세게 밈
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{편향(Bias) $b$는 정규화 안 하나요?}
+\textbf{보통 안 합니다.}
+$b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따라서 모델의 복잡도에 큰 영향을 주지 않습니다. $W$만 정규화해도 충분합니다.
+\end{warningbox}
+
+\textbf{Q. Lambda($\lambda$) 값은 어떻게 정하나요?} \\
+\textbf{A.} 하이퍼파라미터입니다. 여러 값을 시도해보고 Dev Set의 오차가 가장 낮은 값을 찾아야 합니다. 보통 0.01, 0.001 처럼 로그 스케일로 탐색합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+우리는 L2 정규화를 통해 가중치가 너무 커지는 것을 막아 과대적합을 억제했습니다.
+
+하지만 때로는 더 과격한 방법이 필요할 때가 있습니다. 가중치를 줄이는 게 아니라, 아예 \textbf{뉴런을 무작위로 꺼버리는(Shutdown)} 방법입니다. "어떻게 뇌세포를 죽이는데 학습이 더 잘 되나요?"
+다음 시간에는 딥러닝에서 가장 독특하고 강력한 정규화 기법인 \textbf{[Regularization] Dropout (드롭아웃)}을 배우겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{L2 Regularization:} 가중치 제곱합($W^2$)을 비용 함수에 추가하여 큰 가중치에 벌점을 준다.
+    \item \textbf{Weight Decay:} 역전파 시 $W$가 매번 조금씩 0을 향해 줄어든다.
+    \item \textbf{Effect:} $W$가 작아지면 모델이 선형(Linear)에 가까워져 복잡도가 줄어든다. (과대적합 해결)
+    \item \textbf{Tip:} Cost 계산 시엔 $2m$, Gradient 계산 시엔 $m$으로 나눈다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

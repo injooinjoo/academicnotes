@@ -6,6 +6,7 @@
 \usepackage[english]{babel}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{geometry}
@@ -764,7 +765,7 @@ The expensive pre-training is done once. Fine-tuning is fast and cheap.
 
 \subsection{Transformer in Code}
 
-\begin{lstlisting}[style=pythonstyle,caption={Multi-Head Attention Layer}]
+\begin{lstlisting}[style=pythonstyle,caption={Multi-Head Attention Layer}, breaklines=true]
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -820,7 +821,7 @@ class MultiHeadAttention(layers.Layer):
 
 \subsection{Positional Encoding Implementation}
 
-\begin{lstlisting}[style=pythonstyle,caption={Positional Encoding}]
+\begin{lstlisting}[style=pythonstyle,caption={Positional Encoding}, breaklines=true]
 import numpy as np
 
 def get_positional_encoding(max_seq_len, d_model):
@@ -843,7 +844,7 @@ pos_encoding = get_positional_encoding(max_len, d_model)
 
 \subsection{Creating the Attention Mask}
 
-\begin{lstlisting}[style=pythonstyle,caption={Creating Look-Ahead Mask for Decoder}]
+\begin{lstlisting}[style=pythonstyle,caption={Creating Look-Ahead Mask for Decoder}, breaklines=true]
 def create_look_ahead_mask(size):
     """Create mask to prevent attending to future positions."""
     # Upper triangular matrix with ones above diagonal

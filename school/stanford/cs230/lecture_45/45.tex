@@ -1,0 +1,233 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (핵심 수식)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Debiasing Word Embeddings}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1-10.6 RNN, LSTM, Word2Vec, GloVe \textit{- Completed}
+        \item \textbf{10.7 Debiasing Word Embeddings}
+        \begin{itemize}
+            \item The Problem: "Man is to Computer Programmer..."
+            \item Geometry of Bias: Identifying the Bias Axis
+            \item Neutralize Algorithm (Projection)
+            \item Equalize Algorithm (Equidistance)
+        \end{itemize}
+    \end{itemize}
+    \item[Chapter 11.] Attention Mechanism \textit{- Next Part}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 배운 Word2Vec은 놀라웠습니다. 하지만 2016년, 연구자들은 충격적인 사실을 발견했습니다.
+\textbf{"남자에게 프로그래머가 있다면, 여자에게는 누가 있는가?"}
+모델의 대답은 \textbf{"가정주부(Homemaker)"}였습니다.
+이는 모델의 잘못이 아닙니다. 모델은 인간이 쓴 텍스트의 편향(Gender Bias)을 그대로 학습했을 뿐입니다. 오늘은 AI 윤리의 핵심, \textbf{임베딩 편향 제거}를 배웁니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 학습된 임베딩 벡터에서 사회적 편향을 수학적으로 제거하는 알고리즘을 다룹니다.
+\begin{itemize}
+    \item \textbf{식별:} 편향 방향(Gender Axis)을 벡터 공간에서 찾아냅니다.
+    \item \textbf{중화 (Neutralize):} 의사, 간호사 등 중립 단어에서 편향 성분을 제거합니다 (투영).
+    \item \textbf{균형화 (Equalize):} 할머니, 할아버지 등 성별 단어가 중립 단어와 같은 거리를 갖도록 조정합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{예시} \\ \hline
+\textbf{Bias Axis} & 성별을 나타내는 벡터 방향. & $\vec{he} - \vec{she}$ 의 평균. \\ \hline
+\textbf{Neutral Words} & 성별과 무관해야 하는 단어. & Doctor, Nurse, Teacher. \\ \hline
+\textbf{Gender Specific} & 성별이 정의상 필요한 단어. & Grandfather, Queen, Girl. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 편향의 기하학}
+
+\subsection{1. Identifying Bias (편향 식별)}
+임베딩 공간에서 성별 편향은 다음과 같이 나타납니다.
+$$ Man : Woman :: King : Queen \quad (\text{적절함}) $$
+$$ Man : Woman :: Doctor : \textbf{Nurse} \quad (\text{부적절함 - 고정관념}) $$
+
+\subsection{2. The Debiasing Algorithm (3단계)}
+
+
+\subsubsection{Step 1: Identify Bias Direction (축 찾기)}
+성별을 나타내는 단어 쌍들의 차이를 평균 내어 \textbf{성별 축(Gender Axis) $g$}를 정의합니다.
+$$ g \approx \text{Average}(\vec{he}-\vec{she}, \vec{male}-\vec{female}, \dots) $$
+
+\subsubsection{Step 2: Neutralize (중화)}
+"Doctor" 같은 중립 단어는 성별 축 성분을 가져서는 안 됩니다.
+\textbf{Action:} 단어 벡터 $w$를 성별 축 $g$에 투영(Project)하여 편향 성분을 뺍니다.
+
+\begin{formulabox}{중화 공식 (Projection)}
+$$ w_{debiased} = w - \frac{w \cdot g}{\|g\|^2} g $$
+벡터 $w$에서 성별 축 방향의 \textbf{그림자(성분)}를 제거하여, 성별 축과 수직이 되게 만듭니다.
+\end{formulabox}
+
+\subsubsection{Step 3: Equalize (균형화)}
+"Grandmother"와 "Grandfather"는 성별 정보를 가져야 하므로 중화하면 안 됩니다. 하지만 "Babysitter"와의 거리는 공평해야 합니다.
+\textbf{Action:} 두 단어가 중립 축에서 \textbf{등거리(Equidistant)}에 위치하도록 미세 조정합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Implementation: Neutralize Function}
+
+벡터 투영을 통해 편향을 제거하는 함수입니다.
+
+\begin{lstlisting}[language=Python, caption=Neutralize Implementation, breaklines=true]
+import numpy as np
+
+def neutralize(curr_embedding, g):
+    """
+    curr_embedding: 중화할 단어 벡터 (예: doctor)
+    g: 편향 방향 벡터 (bias axis)
+    """
+    # 1. 편향 성분 계산 (Projection)
+    # (w . g / ||g||^2) * g
+    norm_sq = np.linalg.norm(g) ** 2
+    projection = (np.dot(curr_embedding, g) / norm_sq) * g
+    
+    # 2. 원본에서 편향 제거
+    debiased_embedding = curr_embedding - projection
+    
+    return debiased_embedding
+
+# --- 검증 ---
+if __name__ == "__main__":
+    g = np.array([1.0, 0.0]) # x축이 성별 축이라고 가정
+    doctor = np.array([2.0, 4.0]) # 성별 성분(2.0)이 포함됨
+    
+    # 중화
+    doctor_debiased = neutralize(doctor, g)
+    
+    print(f"Original: {doctor}")
+    print(f"Debiased: {doctor_debiased}") 
+    # 예상: [0.0, 4.0] (성별 성분이 0이 됨)
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{모든 단어를 중화하면 안 됩니다!}
+"King", "Queen", "Actor", "Actress" 같은 단어는 성별 정보가 그 단어의 핵심 의미입니다. 이런 단어들을 중화해버리면 "King"과 "Queen"이 똑같은 단어가 되어버립니다.
+따라서 \textbf{성별 정의 단어(Gender Definition Words)}를 분류하는 작업이 선행되어야 합니다.
+\end{warningbox}
+
+\textbf{Q. 이 방법으로 모든 편향이 사라지나요?} \\
+\textbf{A.} 완벽하진 않습니다. 'Hard Debiasing'은 벡터의 방향만 수정하지만, 단어들이 뭉쳐 있는 클러스터링 구조 등 간접적인 편향은 남을 수 있습니다. 하지만 매우 효과적인 첫걸음입니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 단어를 윤리적으로 올바른 벡터로 표현하는 법까지 배웠습니다. 준비는 끝났습니다.
+
+이제 단어들을 조합해 문장을 통째로 번역하거나 요약하는 거대한 모델을 만들어 봅시다.
+다음 시간에는 입력 시퀀스를 압축했다가 다시 풀어내는 \textbf{[Seq2Seq Model]}과, 긴 문장 처리에 필수적인 \textbf{[Beam Search]} 알고리즘에 대해 다루겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Bias:} 학습 데이터의 사회적 편향이 임베딩 벡터에 반영된다.
+    \item \textbf{Neutralize:} 중립 단어(직업 등)를 성별 축에 수직이 되도록 투영한다.
+    \item \textbf{Equalize:} 성별 단어(할머니/할아버지)가 중립 단어와 등거리에 있게 한다.
+    \item \textbf{Ethics:} AI 모델 배포 전 편향 제거는 필수적인 전처리 과정이다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

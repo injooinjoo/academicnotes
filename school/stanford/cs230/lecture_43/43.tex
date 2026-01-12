@@ -1,0 +1,246 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Word Representation (Embedding)}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1-10.4 RNN, GRU, LSTM \textit{- Completed}
+        \item \textbf{10.5 Word Representation}
+        \begin{itemize}
+            \item One-hot Encoding (The Old Way)
+            \item Word Embedding (The New Way)
+            \item Analogy Reasoning (King - Man + Woman)
+            \item Embedding Matrix \& Lookup Table
+        \end{itemize}
+        \item 10.6 Word2Vec \& GloVe \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간 우리는 시퀀스 데이터를 처리하는 강력한 엔진인 \textbf{LSTM}을 만들었습니다. 이제 이 엔진에 연료를 넣을 차례입니다.
+컴퓨터는 '사과'나 '왕'이라는 글자를 이해하지 못합니다. 오직 숫자만 이해하죠. 그렇다면 단어를 어떻게 숫자로 바꿔야 할까요?
+단순히 번호를 매기면(1번 사과, 2번 배) 엉뚱한 수학적 관계가 생깁니다. 우리는 단어의 \textbf{의미(Meaning)}를 숫자 속에 담고 싶습니다. 오늘은 NLP의 혁명, \textbf{단어 임베딩(Word Embedding)}을 배웁니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 컴퓨터가 인간의 언어를 이해하는 척하게 만든 핵심 기술을 다룹니다.
+\begin{itemize}
+    \item \textbf{One-hot:} 전통적인 방식의 희소성(Sparsity)과 의미 부재 문제를 이해합니다.
+    \item \textbf{Embedding:} 단어를 실수 벡터(Dense Vector)로 표현하여 의미를 담는 원리를 파악합니다.
+    \item \textbf{Analogy:} 벡터 연산을 통해 "남자 - 여자 = 왕 - 여왕" 관계를 도출해봅니다.
+    \item \textbf{Matrix:} 임베딩 층이 실제로는 거대한 룩업 테이블(Lookup Table)임을 이해합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{형태} & \textbf{특징} \\ \hline
+\textbf{One-hot Encoding} & $[0, 0, 1, 0, \dots]$ & 희소함. 단어 간 거리가 모두 같음 (관계 없음). \\ \hline
+\textbf{Word Embedding} & $[0.1, -0.5, 0.9, \dots]$ & 밀집함. 비슷한 단어끼리 거리가 가까움. \\ \hline
+\textbf{Embedding Matrix} & $E \in \mathbb{R}^{V \times D}$ & 모든 단어의 벡터를 담고 있는 행렬. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 숫자에 의미를 담다}
+
+\subsection{1. The Old Way: One-hot Encoding}
+단어 사전 크기가 10,000개라면 10,000차원 벡터를 만듭니다.
+\begin{itemize}
+    \item \textbf{Man (5391번):} $[0, \dots, 1(\text{5391번째}), \dots, 0]$
+    \item \textbf{Woman (9853번):} $[0, \dots, 1(\text{9853번째}), \dots, 0]$
+    \item \textbf{문제점:} 두 벡터의 내적(Dot Product)은 0입니다. 컴퓨터 입장에서 Man은 Woman과도 다르고 Apple과도 다릅니다. \textbf{유사성을 알 수 없습니다.}
+\end{itemize}
+
+\subsection{2. The New Way: Word Embedding}
+단어를 훨씬 작은 차원(예: 300차원)의 \textbf{실수 벡터(Real-valued Vector)}로 표현합니다. 각 차원은 우리가 알 수 없는(혹은 추상적인) '특징(Feature)'을 나타냅니다.
+
+\begin{analogybox}{가상의 특징표 (Featurized Representation)}
+\begin{center}
+\begin{tabular}{l|c|c|c|c}
+\hline
+\textbf{Feature} & \textbf{Man} & \textbf{Woman} & \textbf{King} & \textbf{Queen} \\ \hline
+Gender & -1 & 1 & -0.95 & 0.97 \\ 
+Royal & 0.01 & 0.02 & 0.93 & 0.95 \\ 
+Age & 0.03 & 0.02 & 0.70 & 0.60 \\ \hline
+\end{tabular}
+\end{center}
+이제 "Man"과 "Woman" 벡터를 비교하면, Gender를 제외한 나머지 수치들이 매우 비슷합니다. 내적을 하면 값이 크게 나옵니다. \textbf{유사성을 계산할 수 있습니다.}
+\end{analogybox}
+
+\subsection{3. Analogy Reasoning (유추 추론)}
+
+
+단어 임베딩의 가장 유명한 예시입니다.
+$$ e_{Man} - e_{Woman} \approx \begin{bmatrix} -2 \\ 0 \\ 0 \end{bmatrix} \quad (\text{Gender 차이만 남음}) $$
+$$ e_{King} - e_{Queen} \approx \begin{bmatrix} -2 \\ 0 \\ 0 \end{bmatrix} \quad (\text{Gender 차이만 남음}) $$
+따라서 다음 등식이 성립합니다.
+$$ e_{Man} - e_{Woman} \approx e_{King} - e_{Queen} $$
+$$ e_{King} - e_{Man} + e_{Woman} \approx e_{Queen} $$
+컴퓨터에게 "왕 - 남자 + 여자"를 계산하라면, 놀랍게도 \textbf{"여왕"}에 해당하는 벡터를 찾아냅니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Implementation Details}
+
+\subsection{Embedding Layer as a Lookup Table}
+수학적으로는 원-핫 벡터 $O_j$와 임베딩 행렬 $E$를 곱하는 것($E \cdot O_j$)입니다.
+하지만 $O_j$는 하나만 1이고 나머지가 0이므로, 이는 결국 행렬 $E$의 \textbf{$j$번째 열(Column)을 꺼내오는 것}과 같습니다.
+딥러닝 프레임워크는 이를 행렬 곱셈이 아닌, \textbf{인덱스 접근(Lookup)}으로 구현하여 속도를 높입니다.
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Keras Embedding}
+
+\begin{lstlisting}[language=Python, caption=Embedding Layer Usage, breaklines=true]
+import tensorflow as tf
+from tensorflow.keras.layers import Embedding
+
+# 설정
+vocab_size = 10000  # 단어 사전 크기 (V)
+embedding_dim = 300 # 임베딩 차원 (D)
+input_length = 10   # 입력 문장 길이 (T)
+
+# 모델 정의
+model = tf.keras.Sequential()
+
+# Embedding Layer
+# 이 층은 (10000, 300) 크기의 행렬 E를 가집니다.
+# 학습 초반에는 랜덤 값이지만, 역전파를 통해 '의미'를 학습해갑니다.
+model.add(Embedding(input_dim=vocab_size, 
+                    output_dim=embedding_dim, 
+                    input_length=input_length))
+
+# 모델 요약
+model.summary()
+
+# --- 입력 데이터 예시 ---
+# "I love you" -> [1, 539, 23, 0, 0...] (정수 인덱스로 변환)
+# 입력 shape: (Batch, 10)
+# 출력 shape: (Batch, 10, 300) -> 각 단어가 300차원 벡터로 변함
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. 임베딩 값은 어떻게 학습하나요?} \\
+\textbf{A.} 두 가지 방법이 있습니다.
+1. \textbf{End-to-End:} 내 문제(예: 감성 분석)를 풀면서 임베딩 층도 같이 학습시킵니다. 데이터가 많아야 합니다.
+2. \textbf{Pre-trained:} \textbf{Word2Vec}이나 \textbf{GloVe}처럼 위키피디아 같은 방대한 텍스트로 미리 학습된 임베딩 행렬을 가져와서 씁니다. (전이 학습, 추천!)
+
+\textbf{Q. 임베딩 차원(300 등)은 어떻게 정하나요?} \\
+\textbf{A.} 하이퍼파라미터입니다. 보통 50, 100, 300 등을 많이 씁니다. 차원이 클수록 더 정교한 의미를 담을 수 있지만, 메모리와 계산량이 늘어납니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 단어를 벡터로 바꾸는 '개념'을 알았습니다. 그렇다면 이 벡터 값(숫자들)은 도대체 어떻게 구하는 걸까요? 사람이 일일이 입력할 수는 없습니다.
+
+컴퓨터가 방대한 텍스트를 읽으면서 \textbf{"단어의 의미는 그 주변 단어들에 의해 결정된다"}는 원리를 이용해 스스로 학습하게 해야 합니다.
+다음 시간에는 임베딩 학습 알고리즘의 양대 산맥, \textbf{[Word2Vec (Skip-gram, CBOW)]}과 \textbf{[GloVe]}에 대해 알아보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{One-hot:} 단어 간 유사성을 표현하지 못하는 희소 벡터.
+    \item \textbf{Embedding:} 단어 간 유사성을 내적(거리)으로 계산할 수 있는 밀집 벡터.
+    \item \textbf{Analogy:} 벡터 연산으로 단어 관계(성별, 시제 등)를 추론 가능함.
+    \item \textbf{Layer:} 임베딩 층은 거대한 룩업 테이블(Lookup Table)이다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

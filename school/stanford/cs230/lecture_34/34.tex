@@ -1,0 +1,254 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Convolutional Neural Networks: \\ Object Detection \& Sliding Windows}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-8.] Deep Learning Strategy \& Architecture \textit{- Completed}
+    \item[\textbf{Chapter 9.}] \textbf{Convolutional Neural Networks (Current Part)}
+    \begin{itemize}
+        \item 9.1-9.5 CNN Basics, Classic Nets, ResNet, Inception \textit{- Completed}
+        \item \textbf{9.6 Object Detection Introduction}
+        \begin{itemize}
+            \item Classification vs Detection
+            \item Sliding Windows Algorithm (The Old Way)
+            \item \textbf{Convolutional Implementation (The Fast Way)}
+        \end{itemize}
+        \item 9.7 YOLO Algorithm (You Only Look Once) \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 지금까지 "이 이미지가 고양이인가?"를 맞추는 \textbf{분류(Classification)} 문제를 풀었습니다.
+하지만 자율주행차라면 어떨까요? "전방에 차가 있다"는 것만으로는 부족합니다. \textbf{"전방 50m 왼쪽 차선에 있다"}는 위치 정보가 필요하며, 동시에 보행자, 신호등도 찾아야 합니다.
+이것이 \textbf{객체 탐지(Object Detection)}입니다. 오늘은 그 시초인 슬라이딩 윈도우 알고리즘과, 이를 획기적으로 가속화한 합성곱 구현법을 배웁니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 객체 탐지의 기본 개념과 속도 문제를 해결하는 핵심 기술을 다룹니다.
+\begin{itemize}
+    \item \textbf{개념:} 분류(Classification)와 탐지(Detection)의 차이를 이해합니다.
+    \item \textbf{고전:} 윈도우를 이동시키며 찾는 슬라이딩 윈도우 방식의 한계를 파악합니다.
+    \item \textbf{혁신:} FC 층을 Conv 층으로 변환하여, \textbf{단 한 번의 연산}으로 모든 윈도우를 처리하는 기술을 익힙니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{질문} & \textbf{출력 예시} \\ \hline
+\textbf{Classification} & 무엇인가? & Cat (1) \\ \hline
+\textbf{Localization} & 무엇이고 어디에 있는가? (단일 객체) & Cat, $b_x, b_y, b_h, b_w$ \\ \hline
+\textbf{Detection} & 무엇들이 각각 어디에 있는가? (다중 객체) & Cat(x,y..), Dog(x,y..) \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 찾을 때까지 뒤진다}
+
+\subsection{1. Sliding Windows Algorithm (Basic)}
+
+
+가장 원시적인 방법입니다.
+1. 이미지 왼쪽 상단부터 작은 윈도우를 잘라냅니다.
+2. 잘라낸 이미지를 ConvNet에 넣어 예측합니다.
+3. 옆으로 한 칸 이동(Stride)해서 반복합니다.
+4. 다 끝나면 윈도우 크기를 키워서 다시 처음부터 합니다.
+
+\begin{warningbox}{치명적 단점: 속도}
+이 방식은 계산 비용이 폭발합니다.
+작은 스트라이드 $\rightarrow$ 수만 번 ConvNet 실행 $\rightarrow$ \textbf{너무 느림.}
+큰 스트라이드 $\rightarrow$ 듬성듬성 봄 $\rightarrow$ \textbf{정확도 하락.}
+\end{warningbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Convolutional Implementation}
+
+"어떻게 하면 for-loop 없이 한 번에 처리할까?"
+이 섹션이 오늘 강의의 하이라이트입니다.
+
+\subsection{1. Turning FC into Conv layers}
+전통적인 CNN의 마지막은 평탄화(Flatten) 후 FC 층이었습니다. 이를 \textbf{$1 \times 1$ Conv 층}으로 바꿉니다.
+
+\begin{itemize}
+    \item \textbf{기존:} $5 \times 5 \times 16 \xrightarrow{Flatten} 400 \xrightarrow{FC} 400$
+    \item \textbf{변환:} $5 \times 5 \times 16 \xrightarrow{Conv(5\times5, 400)} \mathbf{1 \times 1 \times 400}$
+\end{itemize}
+수학적으로 값은 완벽히 동일하지만, 이제는 \textbf{공간적 위치 정보}를 유지할 수 있게 되었습니다.
+
+\subsection{2. Running on the Whole Image}
+이제 이미지를 자르지 않고 통째로 넣습니다.
+
+\begin{mathbox}{연산 공유의 마법}
+학습 모델 입력이 $14 \times 14$라고 가정합시다.
+테스트 때 $16 \times 16$ 이미지를 통째로 넣으면 어떻게 될까요?
+
+\begin{itemize}
+    \item \textbf{기존:} 4번 잘라서 4번 실행.
+    \item \textbf{Conv 방식:} $16 \times 16$ 이미지가 네트워크를 통과하면, 최종 출력이 \textbf{$2 \times 2$ 크기}로 나옵니다.
+    \item \textbf{해석:} $(0,0)$은 좌상단 윈도우 결과, $(0,1)$은 우상단 윈도우 결과입니다.
+    \item \textbf{결과:} \textbf{공통 영역의 연산을 공유}하므로 속도가 수십 배 빨라집니다.
+\end{itemize}
+\end{mathbox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Fully Convolutional Network}
+
+Keras를 이용해 FC 층을 Conv 층으로 대체하는 모델을 만듭니다.
+
+\begin{lstlisting}[language=Python, caption=Fully Convolutional Model, breaklines=true]
+import tensorflow as tf
+from tensorflow.keras import layers, models
+
+def create_fcn_model(input_shape, num_classes):
+    inputs = layers.Input(shape=input_shape)
+    
+    # Feature Extractor
+    x = layers.Conv2D(16, (5, 5), activation='relu')(inputs)
+    x = layers.MaxPooling2D((2, 2), strides=2)(x)
+    x = layers.Conv2D(32, (5, 5), activation='relu')(x)
+    x = layers.MaxPooling2D((2, 2), strides=2)(x)
+    
+    # --- 핵심 변환 부분 ---
+    # Flatten 대신 Conv2D 사용
+    # 마지막 특성맵 크기가 5x5라고 가정할 때, 5x5 커널 사용
+    x = layers.Conv2D(256, (5, 5), activation='relu')(x) 
+    
+    # 마지막 분류기 (1x1 Conv)
+    outputs = layers.Conv2D(num_classes, (1, 1), activation='softmax')(x)
+    
+    model = models.Model(inputs, outputs)
+    return model
+
+# --- 실행 ---
+if __name__ == "__main__":
+    # 1. 학습용 (작은 이미지)
+    train_model = create_fcn_model((28, 28, 3), 4)
+    print(train_model.output_shape) # (None, 1, 1, 4)
+    
+    # 2. 테스트용 (큰 이미지 통째로 입력)
+    test_input = tf.random.normal((1, 32, 32, 3))
+    test_output = train_model(test_input)
+    print(test_output.shape) # (1, 2, 2, 4) -> 4개 윈도우 결과 동시 출력
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. 이렇게 하면 바운딩 박스 위치가 정확한가요?} \\
+\textbf{A.} \textbf{아니요.} 윈도우가 고정된 간격(Stride)으로만 움직이기 때문에, 객체가 윈도우 사이에 걸쳐 있거나 크기가 안 맞으면 정확히 잡아내지 못합니다. 이 문제를 해결하기 위해 다음 시간에 배울 \textbf{YOLO}가 필요합니다.
+
+\textbf{Q. 입력 이미지 크기가 계속 바뀌어도 되나요?} \\
+\textbf{A.} 네, Fully Convolutional Network는 고정된 크기의 FC 층이 없으므로 입력 크기에 제한이 없습니다. 입력이 커지면 출력 맵($H \times W$)도 커질 뿐입니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+우리는 슬라이딩 윈도우를 빠르게 만드는 법을 배웠습니다. 하지만 여전히 \textbf{"정확한 박스 위치"}를 잡지 못하는 한계가 있습니다.
+
+객체가 어디에 있든 정확하게 박스를 쳐주고(Regression), 심지어 하나의 셀에서 여러 객체를 동시에 찾아내는 실시간 탐지의 끝판왕.
+다음 시간에는 \textbf{[YOLO (You Only Look Once)]} 알고리즘을 통해 \textbf{IOU}와 \textbf{Non-max Suppression}의 개념을 정복하겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Detection:} 무엇이(What) 어디에(Where) 있는지 찾는 문제.
+    \item \textbf{Sliding Window:} 윈도우를 이동하며 찾음. 너무 느림.
+    \item \textbf{Conv Implementation:} FC 층을 Conv 층으로 바꾸면 연산을 공유할 수 있다.
+    \item \textbf{Result:} 큰 이미지를 한 번만 통과시키면(One pass) 모든 윈도우 결과가 나온다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

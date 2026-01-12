@@ -1,0 +1,270 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 1 (Part C)}
+\fancyhead[R]{Multiple Hypothesis Testing}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 우연을 걸러내는 기술}}
+\author{Module 1 (Part C): Multiple Hypothesis Testing}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Module 1 (Part A): Dimensionality Reduction (시각화)
+    \item Module 1 (Part B): Clustering (구조 파악)
+    \item \textbf{\textcolor{mainblue}{Module 1 (Part C): Multiple Hypothesis Testing (현재 단원: 가짜 발견 제어)}}
+    \begin{itemize}
+        \item 1.8 The Multiple Testing Problem ($p$-hacking의 위험)
+        \item 1.9 FWER \& Bonferroni Correction (보수적 접근)
+        \item 1.10 FDR \& Benjamini-Hochberg (실용적 접근)
+    \end{itemize}
+    \item Module 2: Analysis of Networks (네트워크 과학)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 1 (Part C). 다중 가설 검정 (Multiple Hypothesis Testing)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{앞서 우리는 수만 개의 유전자 데이터나 고객 행동 로그를 군집화하여 의미 있는 그룹을 찾았습니다. 그런데 누군가 묻습니다. \textbf{"이 그룹들이 진짜 의미가 있는 거야, 아니면 그냥 우연히 뭉친 거야?"} 이 질문에 답하기 위해 우리는 $P < 0.05$라는 전통적인 기준을 넘어, 빅데이터 시대에 맞는 새로운 검증 기준을 세워야 합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 변수가 많은 고차원 데이터에서 통계적 검정을 수행할 때 발생하는 \textbf{다중 검정의 문제(False Positive 폭증)}를 다룹니다. 이를 해결하기 위한 두 가지 주요 전략인 \textbf{FWER(본페로니 교정)}과 \textbf{FDR(벤자미니-호크버그 절차)}의 원리를 배우고, 연구 목적에 따라 어떤 방법을 선택해야 하는지 학습합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Type I Error ($\alpha$)} & 늑대가 없는데 "늑대다!"라고 외치는 실수. (거짓 양성) \\
+\hline
+\textbf{Multiple Testing Problem} & 주사위를 수만 번 던지면, 6이 연속 10번 나오는 '기적'도 우연히 발생한다는 문제. \\
+\hline
+\textbf{FWER (Family-Wise Error Rate)} & "전체 실험 중 단 하나의 실수도 용납하지 않겠다." \\
+\hline
+\textbf{Bonferroni Correction} & 유의 수준을 $1/N$로 나눠버리는 아주 엄격한 기준. \\
+\hline
+\textbf{FDR (False Discovery Rate)} & "건져 올린 물고기 중 쓰레기가 5\% 정도 섞여 있어도 괜찮다." \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 문제의 배경: 왜 $P < 0.05$로는 부족한가?}
+
+\begin{conceptbox}{개념 1: 로또 당첨의 함정}
+\textbf{한 줄 요약:} 한 번 시도해서 성공할 확률이 희박하더라도, 수만 번 시도하면 누군가는 반드시 성공합니다. 그걸 '실력'이라고 착각하면 안 됩니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 동전 던지기 대회}
+\begin{itemize}
+    \item 1명이 동전을 10번 던져서 전부 앞면이 나올 확률은 약 $0.001$ ($0.1\%$)입니다. 매우 희박하죠.
+    \item 하지만 \textbf{10,000명이 동시에 동전을 던진다면?}
+    \item 확률적으로 약 \textbf{10명}은 동전 10개 모두 앞면이 나옵니다.
+    \item \textbf{오류:} 연구자는 이 10명을 보고 "초능력자다!"라고 결론 내립니다. 하지만 이들은 그냥 \textbf{운 좋은 일반인(False Positive)}입니다.
+\end{itemize}
+
+\subsubsection*{2) 실제 문제 (유전체 분석)}
+\begin{itemize}
+    \item 유전자 20,000개를 검사합니다 ($m=20,000$).
+    \item 유의 수준 $\alpha = 0.05$를 적용합니다.
+    \item 아무런 효과가 없어도(귀무가설 참), $20,000 \times 0.05 = 1,000$개의 유전자가 '유의미하다'고 나옵니다.
+    \item 결과: \textbf{1,000개의 가짜 암 유전자 후보}가 발견됩니다. 연구비 낭비의 시작입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 해결책 1: FWER 제어 (본페로니 교정)}
+
+\begin{conceptbox}{개념 2: 철통 보안 검색대}
+\textbf{한 줄 요약:} 단 하나의 위험물도 비행기에 태우지 않겠다며, 모든 승객을 현미경으로 검사하는 방식입니다. 안전하지만, 비행기를 탈 수 있는 사람이 거의 없습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 본페로니 교정 (Bonferroni Correction)}
+전체 가설 중 \textbf{하나라도} 틀릴 확률(FWER)을 0.05로 맞추려면, 개별 가설의 기준을 $N$배 엄격하게 해야 합니다.
+$$ \alpha_{new} = \frac{\alpha}{m} $$
+
+\subsubsection*{2) 계산 예시}
+유전자 20,000개를 검사할 때 ($\alpha=0.05$):
+$$ P_{threshold} = \frac{0.05}{20,000} = 0.0000025 $$
+\begin{itemize}
+    \item \textbf{장점:} 가짜(False Positive)가 나올 확률이 거의 0에 가깝습니다. (확실한 것만 잡음)
+    \item \textbf{단점:} 기준이 너무 높아서, \textbf{진짜 중요한 유전자(True Positive)까지 다 탈락}시킵니다. (검정력 Power 급락)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 해결책 2: FDR 제어 (벤자미니-호크버그)}
+
+\begin{conceptbox}{개념 3: 섞여도 괜찮아, 비율만 맞춰}
+\textbf{한 줄 요약:} 금을 캘 때 돌멩이가 좀 섞여 있어도, 금이 훨씬 많으면 성공입니다. "내가 찾았다고 주장한 것 중 가짜의 비율(FDR)"을 5\%로 유지합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 벤자미니-호크버그 (BH) 절차}
+매우 우아하고 실용적인 알고리즘입니다. P값들을 줄 세워서 동적으로 커트라인을 정합니다.
+
+\textbf{알고리즘 순서:}
+\begin{enumerate}
+    \item 모든 가설의 P값을 오름차순으로 정렬합니다: $P_{(1)} \le P_{(2)} \le \dots \le P_{(m)}$.
+    \item 각 $k$번째 P값에 대해, 다음 기준선(Line) 아래에 있는지 확인합니다.
+    $$ P_{(k)} \le \frac{k}{m} \times \alpha $$
+    (순위 $k$가 커질수록, 즉 뒤로 갈수록 기준을 널널하게 봐줍니다.)
+    \item 위 조건을 만족하는 \textbf{가장 큰 $k$}를 찾습니다.
+    \item $1$등부터 $k$등까지 모든 가설을 "유의미하다"고 선언합니다.
+\end{enumerate}
+
+\subsubsection*{2) 숫자 대입 계산 예시}
+총 5개의 가설을 검정했고 ($m=5$), 목표 FDR $\alpha=0.05$입니다.
+P값 결과: $[0.001, 0.009, 0.04, 0.045, 0.6]$
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|c|c|c}
+\toprule
+\textbf{순위 ($k$)} & \textbf{P값 ($P_{(k)}$)} & \textbf{기준선 ($\frac{k}{5} \times 0.05$)} & \textbf{통과 여부 ($P \le \text{기준}$)} \\
+\midrule
+1 & 0.001 & $0.01$ & Pass ($\checkmark$) \\
+2 & 0.009 & $0.02$ & Pass ($\checkmark$) \\
+3 & 0.040 & $0.03$ & \textbf{Fail} ($\times$) \\
+4 & \textbf{0.045} & \textbf{0.04} & \textbf{Fail} ($\times$) - 잠깐! \\
+\bottomrule
+\end{tabular}
+\end{table}
+*(수정: 예시 수치를 BH 절차의 극적인 효과를 위해 재조정합니다)*
+
+\textbf{재조정된 예시:} $P = [0.001, 0.015, 0.025, 0.05, 0.6]$, $\alpha=0.05$.
+\begin{itemize}
+    \item $k=1$: $0.001 \le 0.01$ (Pass)
+    \item $k=2$: $0.015 \le 0.02$ (Pass)
+    \item $k=3$: $0.025 \le 0.03$ (Pass) $\rightarrow$ \textbf{여기까지가 최대!}
+    \item $k=4$: $0.05 > 0.04$ (Fail)
+\end{itemize}
+\textbf{결론:} 3번째 가설까지 모두 유의미하다고 인정합니다. (본페로니였다면 $0.01$ 기준이라 $k=1$만 통과했을 것입니다. BH 덕분에 2, 3번도 구제받았습니다.)
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 신약 후보 물질 발굴}
+
+\begin{storybox}{Scenario: 수만 개의 화합물 스크리닝}
+당신은 제약회사의 데이터 과학자입니다. 10,000개의 화합물 중 암세포를 죽이는 효과가 있는 후보를 추려야 합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{상황:} 10,000번의 실험을 통해 각각 P값을 얻었습니다.
+    \item \textbf{본페로니 적용 시:}
+    \begin{itemize}
+        \item 기준: $0.05 / 10,000 = 0.000005$.
+        \item 결과: 후보 물질이 \textbf{2개} 나옵니다.
+        \item 평가: 너무 적습니다. 놓친 후보 중에 진짜 대박 신약이 있을 수 있습니다.
+    \end{itemize}
+    \item \textbf{FDR (BH) 적용 시:}
+    \begin{itemize}
+        \item 목표: "후보 중 5\% 정도는 꽝이어도 된다."
+        \item 결과: 후보 물질이 \textbf{150개} 나옵니다.
+        \item 평가: 이 150개를 가지고 2차 정밀 실험을 진행합니다. 가짜가 7~8개 섞여 있겠지만, 나머지 142개의 진짜 후보를 건졌으니 훨씬 이득입니다.
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 언제 FWER을 쓰고 언제 FDR을 쓰나요?]
+    \textbf{A.} 목적에 따라 다릅니다.
+    \begin{itemize}
+        \item \textbf{FWER (본페로니):} 최종 임상 시험처럼 \textbf{"단 하나의 실수도 치명적일 때"} 씁니다. (보수적)
+        \item \textbf{FDR (BH):} 초기 탐색 단계, 유전체 분석, 추천 시스템 A/B 테스트처럼 \textbf{"많은 후보를 발굴하고 싶을 때"} 씁니다. (현대 데이터 과학의 표준)
+    \end{itemize}
+    
+    \item[Q2. P값을 정렬하는 것만으로 어떻게 오류가 제어되나요?]
+    \textbf{A.} 수학적으로 증명되어 있습니다. $y=x$ 그래프를 그렸을 때, P값들이 대각선 아래에 위치한다는 것은 "우연히 발생할 확률보다 더 드물게 발생했다"는 증거가 됩니다. BH 절차는 이 경계선을 동적으로 조정하여 가짜의 비율(Area)을 제어합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 고차원 데이터의 '시각화(Part A)', '군집화(Part B)', 그리고 '가설 검정(Part C)'까지 마쳤습니다. 이제 데이터 포인트들이 서로 독립적이지 않고 복잡하게 얽혀 있다면 어떨까요? 다음 \textbf{Module 2: 네트워크 분석 (Analysis of Networks)}에서는 그래프 이론을 통해 데이터 간의 관계를 분석합니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 1 (Part C) 핵심 요약}
+\begin{itemize}
+    \item \textbf{다중 검정 문제:} 가설 검정을 많이 할수록 우연에 의한 가짜 발견(False Positive)이 폭증한다.
+    \item \textbf{FWER (본페로니):} $\alpha/m$. 매우 엄격하다. 진짜도 놓칠 위험이 크다.
+    \item \textbf{FDR (벤자미니-호크버그):} 발견된 것 중 가짜의 비율을 제어한다. $P_{(k)} \le \frac{k}{m}\alpha$.
+    \item \textbf{트렌드:} 빅데이터 분석에서는 너무 보수적인 FWER보다 실용적인 \textbf{FDR}을 주로 사용한다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

@@ -1,0 +1,287 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{orange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (핵심 주의사항)
+}
+
+\newtcolorbox{examplebox}[1]{
+    colback=orange!5!white,
+    colframe=orange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (실전 계산)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Foundations of Neural Networks: \\ Cost Function \& Gradient Descent}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1.] Deep Learning Big Picture \textit{- Completed}
+    \item[Chapter 2.] Logistic Regression as a Neural Network
+    \begin{itemize}
+        \item 2.1 Architecture \& Forward Propagation \textit{- Completed}
+        \item \textbf{2.2 Cost Function \& Gradient Descent (Current Unit)}
+        \begin{itemize}
+            \item Overview: Loss vs. Cost
+            \item The Engine: Gradient Descent
+            \item Why Log Loss? (Convexity)
+            \item Implementation
+        \end{itemize}
+    \end{itemize}
+    \item[Chapter 3.] Shallow Neural Networks \textit{- Upcoming}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 지난 시간에 로지스틱 회귀의 '뇌 구조(Architecture)'를 만들고, 입력 신호를 흘려보내는 '순전파(Forward Propagation)'를 설계했습니다. 하지만 지금 이 신경망은 갓 태어난 아기와 같습니다. 세상에 대해 아무것도 모르죠(파라미터가 초기화된 상태). 이제 이 아이를 가르칠 시간입니다. 학습이란 \textbf{"내가 얼마나 틀렸는지 확인하고(Cost), 고쳐 나가는(Gradient Descent) 과정"}입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 유닛은 머신러닝의 \textbf{'엔진(Engine)'}을 다룹니다. 차체(모델 구조)가 좋아도 엔진(학습 알고리즘)이 없으면 움직이지 않습니다.
+\begin{itemize}
+    \item \textbf{구분:} 데이터 하나에 대한 오차(Loss)와 전체 성적표(Cost)를 구분합니다.
+    \item \textbf{이유:} 왜 MSE 대신 \textbf{Log Loss(Binary Cross-Entropy)}를 써야 하는지 '지형(Topology)' 관점에서 이해합니다.
+    \item \textbf{원리:} 산에서 내려오는 방법인 \textbf{경사 하강법(Gradient Descent)}의 원리를 배웁니다.
+    \item \textbf{조절:} 학습률(Learning Rate)이 학습 속도에 미치는 영향을 분석합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{기호} & \textbf{한 줄 핵심 요약} \\ \hline
+\textbf{손실 함수 (Loss)} & $L(\hat{y}, y)$ & 데이터 \textbf{샘플 1개}에 대한 오차 (작을수록 좋음) \\ \hline
+\textbf{비용 함수 (Cost)} & $J(w, b)$ & 전체 학습 데이터($m$개)에 대한 \textbf{Loss의 평균} \\ \hline
+\textbf{볼록성 (Convexity)} & - & 밥그릇처럼 매끄러운 모양 (최소점이 하나뿐인 안전한 지형) \\ \hline
+\textbf{기울기 (Gradient)} & $dw, db$ & 현재 위치에서 가장 가파른 경사의 방향 \\ \hline
+\textbf{학습률 (Learning Rate)} & $\alpha$ & 한 번 업데이트할 때 이동하는 보폭의 크기 \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 학습의 매커니즘}
+
+\subsection{1. Loss vs. Cost (오차의 정의)}
+\textbf{한 줄 요약:} Loss는 '쪽지시험 점수', Cost는 '학기말 평균 성적'입니다.
+
+\begin{analogybox}{시험 점수 비유}
+\begin{itemize}
+    \item \textbf{Loss Function ($L$):} 1번 학생이 문제를 틀렸습니다. 이 학생 하나의 오차입니다.
+    \item \textbf{Cost Function ($J$):} 우리 반 30명 전체의 평균 오차입니다. 선생님(모델)의 목표는 특정 학생만 잘 가르치는 게 아니라, 반 전체의 평균 성적($J$)을 좋게 만드는 것입니다.
+\end{itemize}
+\end{analogybox}
+
+$$ J(w, b) = \frac{1}{m} \sum_{i=1}^{m} L(\hat{y}^{(i)}, y^{(i)}) $$
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. Why Log Loss? (MSE의 함정)}
+\textbf{한 줄 요약:} 로지스틱 회귀에서 MSE를 쓰면 함정이 많은 산이 되지만, Log Loss를 쓰면 매끄러운 밥그릇이 됩니다.
+
+\textbf{기술적 정의:}
+선형 회귀와 달리 Sigmoid 함수가 포함된 로지스틱 회귀에 MSE($\frac{1}{2}(\hat{y}-y)^2$)를 적용하면 비용 함수가 \textbf{비볼록(Non-Convex)} 형태가 됩니다. 이는 수많은 \textbf{국소 최적해(Local Optima)}를 만듭니다.
+
+
+
+\begin{warningbox}{MSE를 쓰면 안 되는 이유}
+위 그림의 오른쪽(Non-Convex)을 보세요. 울퉁불퉁한 지형에서는 구슬을 굴렸을 때 가장 깊은 바닥(Global Minimum)이 아니라, 중간에 있는 작은 웅덩이(Local Minimum)에 갇혀버립니다. 학습이 망했다는 뜻입니다.
+반면, \textbf{로그 손실(Log Loss)}을 사용하면 왼쪽(Convex)처럼 매끄러운 그릇 모양이 되어, 어디서 시작하든 바닥으로 수렴합니다.
+\end{warningbox}
+
+\textbf{우리가 사용할 공식 (Binary Cross-Entropy):}
+$$ L(\hat{y}, y) = -(y \log(\hat{y}) + (1-y) \log(1-\hat{y})) $$
+\begin{itemize}
+    \item 정답($y$)이 1일 때: 예측($\hat{y}$)이 1이면 비용 0, 0이면 비용 $\infty$.
+    \item 틀렸을 때 무한대의 벌점을 주어 빠르게 고치도록 유도합니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. Gradient Descent (경사 하강법)}
+\textbf{한 줄 요약:} 눈을 가린 채 산에서 가장 낮은 골짜기로 내려가는 방법입니다.
+
+
+
+\begin{analogybox}{안개 낀 산 하산하기}
+당신은 짙은 안개가 낀 산 정상에 서 있습니다. 앞이 보이지 않습니다.
+가장 낮은 곳(비용 최소화 지점)으로 가려면 어떻게 해야 할까요?
+\begin{enumerate}
+    \item 발로 땅을 더듬어 경사가 가장 급하게 내려가는 방향을 찾습니다. (\textbf{Gradient 계산})
+    \item 그 방향으로 한 발자국 내딛습니다. (\textbf{Update})
+    \item 바닥에 도착할 때까지 반복합니다.
+\end{enumerate}
+\end{analogybox}
+
+\textbf{업데이트 공식:}
+$$ w := w - \alpha \frac{\partial J}{\partial w} $$
+$$ b := b - \alpha \frac{\partial J}{\partial b} $$
+\begin{itemize}
+    \item \textbf{빼기($-$)의 의미:} 기울기가 양수(오르막)라면 $w$를 줄여야(왼쪽으로 가야) 내려갈 수 있습니다. 반대 방향으로 가야 하므로 뺍니다.
+    \item \textbf{$\alpha$ (Learning Rate):} 한 발자국의 크기입니다.
+\end{itemize}
+
+% --- 7. 예시 시나리오 ---
+\section{Practical Scenario: 학습률 $\alpha$의 중요성}
+
+학습률(Learning Rate) $\alpha$는 모델의 운명을 결정하는 가장 중요한 숫자(Hyperparameter)입니다.
+
+\begin{itemize}
+    \item \textbf{Case A: $\alpha$가 너무 작을 때 (0.00001)} \\
+    개미처럼 기어갑니다. 해가 질 때까지(학습 종료까지) 산 중턱에도 못 갑니다. (수렴 속도 매우 느림)
+    
+    \item \textbf{Case B: $\alpha$가 너무 클 때 (10.0)} \\
+    거인의 점프입니다. 골짜기를 향해 뛰었는데 너무 멀리 뛰어서 반대편 산등성이에 처박힙니다. 오히려 더 높은 곳으로 올라갈 수도 있습니다. (\textbf{Overshooting / Divergence})
+\end{itemize}
+
+% --- 8. 공식/절차 + 예시 계산 ---
+\section{Numerical Example: 비용 계산 해보기}
+
+\begin{examplebox}{비용 함수 계산 실습}
+\textbf{상황:} 고양이 사진($y=1$)을 보여줬는데, 모델이 0.8(80\%)로 예측했습니다.
+$$ y = 1, \quad \hat{y} = 0.8 $$
+
+\textbf{1. 손실(Loss) 계산:}
+공식: $L = -(1 \cdot \log(0.8) + 0 \cdot \log(0.2))$
+$$ L = -\log(0.8) \approx -(-0.223) = 0.223 $$
+
+\textbf{상황 변경:} 만약 모델이 0.1(10\%)로 잘못 예측했다면?
+$$ L = -\log(0.1) \approx -(-2.30) = 2.30 $$
+$\rightarrow$ 예측이 틀릴수록 벌점(Loss)이 0.223에서 2.30으로 10배 넘게 커졌습니다! 이것이 Log Loss의 위력입니다.
+\end{examplebox}
+
+% --- 9. 구현 코드 ---
+\section{Implementation (Python)}
+
+이론을 `numpy` 코드로 옮겨봅시다.
+
+\begin{lstlisting}[language=Python, caption=Cost Function and Optimization, breaklines=true]
+import numpy as np
+
+def compute_cost(A, Y):
+    """
+    A: 예측값 (1, m), Y: 실제값 (1, m)
+    """
+    m = Y.shape[1]
+    
+    # log(0) 방지를 위해 아주 작은 값(epsilon)을 더해주는 것이 안전합니다.
+    epsilon = 1e-5 
+    
+    # Binary Cross-Entropy 수식 (Element-wise multiplication)
+    cost = -1/m * np.sum(Y * np.log(A + epsilon) + (1-Y) * np.log(1-A + epsilon))
+    
+    return float(np.squeeze(cost)) # 배열을 스칼라로 변환
+
+def update_parameters(w, b, dw, db, learning_rate):
+    """
+    경사 하강법 업데이트 단계
+    """
+    # 현재 위치에서 기울기(dw, db)의 반대 방향으로 alpha만큼 이동
+    w = w - learning_rate * dw
+    b = b - learning_rate * db
+    
+    return w, b
+\end{lstlisting}
+
+% --- 10. FAQ ---
+\section{FAQ: 초심자가 자주 묻는 질문}
+\begin{itemize}
+    \item \textbf{Q1. 경사 하강법 공식에서 왜 더하지 않고 빼나요?} \\
+    \textbf{A.} 기울기(Gradient)는 함수가 '증가하는' 방향을 가리킵니다. 우리는 비용을 '줄여야' 하므로 기울기의 반대 방향으로 가야 합니다. 그래서 뺍니다.
+    
+    \item \textbf{Q2. 비용 함수가 0이 되면 좋은 건가요?} \\
+    \textbf{A.} 이론적으로는 완벽하지만, 현실에서는 \textbf{과적합(Overfitting)}을 의심해야 합니다. 문제집 답을 달달 외운 상태일 수 있어서, 새로운 문제(Test Set)는 못 풀 수도 있습니다.
+\end{itemize}
+
+% --- 11. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 \textbf{구조(Architecture)}를 만들었고, \textbf{학습 방법(Optimizer)}까지 장착했습니다. 
+다음 장에서는 이 모든 부품을 조립하여 실제 데이터를 입력받아 학습하고 예측하는 \textbf{전체 모델(Full Model)}을 완성하겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Cost Function:} 전체 데이터의 오차 평균($J$)을 최소화하는 것이 목표다.
+    \item \textbf{Log Loss:} 로지스틱 회귀에는 MSE 대신 Log Loss를 써야 Convex(볼록)해진다.
+    \item \textbf{Gradient Descent:} $w_{new} = w_{old} - \alpha \cdot dw$. 경사를 타고 내려가는 알고리즘.
+    \item \textbf{Learning Rate:} 너무 크면 발산, 너무 작으면 느리다. 적절한 튜닝이 필요하다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

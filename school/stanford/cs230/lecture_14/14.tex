@@ -1,0 +1,271 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 원리)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Improving Deep Neural Networks: \\ Dropout Regularization}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-4.] Neural Networks Basics \textit{- Completed}
+    \item[\textbf{Chapter 5.}] \textbf{Practical Aspects of Deep Learning (Current Unit)}
+    \begin{itemize}
+        \item 5.1 Train / Dev / Test Sets Strategy \textit{- Completed}
+        \item 5.2 Bias vs Variance Analysis \textit{- Completed}
+        \item 5.3 Regularization (L1/L2) \textit{- Completed}
+        \item \textbf{5.4 Dropout Regularization}
+        \begin{itemize}
+            \item The Concept: Killing Neurons
+            \item Why does it work? (Ensemble Effect)
+            \item Inverted Dropout (Scaling)
+            \item Implementation Details
+        \end{itemize}
+        \item 5.5 Input Normalization \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 가중치($W$)의 크기를 강제로 줄여버리는 \textbf{L2 정규화(Weight Decay)}를 배웠습니다.
+오늘 배울 기법은 조금 더 '과격'합니다. 모델의 과대적합(Overfitting)을 막기 위해, 학습 과정에서 멀쩡한 뉴런들을 무작위로 \textbf{'제거(Kill)'}해버립니다. 바로 \textbf{드롭아웃(Dropout)}입니다.
+"뇌세포를 죽이는데 뇌가 더 똑똑해진다니?"라는 의문이 들겠지만, 이것이 현대 딥러닝에서 가장 강력한 정규화 기법입니다. 그 역설적인 원리를 파헤쳐 보겠습니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 신경망의 강건함(Robustness)을 높이는 \textbf{드롭아웃}의 원리와 구현을 다룹니다.
+\begin{itemize}
+    \item \textbf{원리:} 드롭아웃이 어떻게 특정 뉴런에 대한 의존도(Co-adaptation)를 낮추는지 이해합니다.
+    \item \textbf{수학:} 학습과 테스트 시의 출력값 차이를 보정하는 \textbf{Inverted Dropout} 기술을 익힙니다.
+    \item \textbf{규칙:} 드롭아웃은 오직 \textbf{학습(Training)} 때만 켜고, 테스트(Test) 때는 끈다는 원칙을 명심합니다.
+    \item \textbf{구현:} NumPy를 사용하여 마스크 행렬(Mask Matrix)을 만들고 적용해봅니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{변수} & \textbf{설명} \\ \hline
+\textbf{Dropout} & - & 학습 시 뉴런을 무작위로 삭제(0으로 설정)하는 기법. \\ \hline
+\textbf{Keep Probability} & \texttt{keep\_prob} & 뉴런을 \textbf{'살려둘'} 확률. (예: 0.8 = 20\% 삭제). \\ \hline
+\textbf{Inverted Dropout} & - & 학습 시 값을 \texttt{keep\_prob}로 나누어 스케일을 보정하는 표준 방식. \\ \hline
+\textbf{Ensemble} & - & 여러 모델의 예측을 평균 내는 것. 드롭아웃은 이 효과를 냄. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 무작위 삭제의 미학}
+
+\subsection{1. 직관적 해석 (Why does it work?)}
+
+
+\begin{analogybox}{천재에게 의존하는 팀 프로젝트}
+\begin{itemize}
+    \item \textbf{상황 (No Dropout):} 팀에 천재 한 명(특정 뉴런)이 있습니다. 다른 팀원들은 그 천재만 믿고 일을 안 합니다. 만약 천재가 결근하면(새로운 데이터), 프로젝트는 망합니다. (과대적합)
+    \item \textbf{상황 (Dropout):} 매일 무작위로 팀원을 출근시키지 않습니다. 천재가 결근할 수도 있습니다.
+    \item \textbf{결과:} 팀원들은 누구에게도 의존할 수 없으므로, \textbf{모두가 업무 전반을 익히게 됩니다.} 결국 팀 전체가 강력하고 유연해집니다.
+\end{itemize}
+\end{analogybox}
+드롭아웃을 적용하면 뉴런들이 특정 입력(친구)에만 의존하지 않고, \textbf{가중치를 골고루 분산(Spread out)}시키게 됩니다. 이는 L2 정규화와 비슷한 효과를 냅니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Inverted Dropout (역 드롭아웃)}
+
+이 섹션은 면접 단골 질문인 "왜 학습 때 값을 나누나요?"에 대한 답입니다.
+
+\begin{mathbox}{The Scale Problem}
+\texttt{keep\_prob = 0.5} (50\% 삭제)라고 가정합시다.
+
+\textbf{1. 학습 단계 (Train):}
+뉴런의 절반이 0이 되므로, 다음 층으로 전달되는 합계($Z = \sum w_i a_i$)도 대략 \textbf{절반}으로 줄어듭니다.
+
+\textbf{2. 테스트 단계 (Test):}
+테스트 때는 드롭아웃을 끕니다(모든 뉴런 사용). $Z$ 값이 학습 때보다 \textbf{2배 뻥튀기} 됩니다. 예측값이 완전히 달라집니다.
+
+\textbf{3. 해결책 (Inverted Dropout):}
+학습 단계에서 살아남은 뉴런의 값을 미리 \textbf{2배로 키워줍니다 ($A /= 0.5$)}.
+이렇게 하면 학습 때의 기댓값($E[A]$)이 테스트 때와 비슷하게 유지됩니다. 테스트 때는 아무런 연산도 할 필요가 없어집니다.
+\end{mathbox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Dropout Layer}
+
+가장 중요한 것은 `is_training` 플래그입니다. 테스트 때는 드롭아웃을 적용하면 안 됩니다.
+
+\begin{lstlisting}[language=Python, caption=Inverted Dropout Implementation, breaklines=true]
+import numpy as np
+
+class Dropout:
+    def __init__(self, keep_prob=0.8):
+        self.keep_prob = keep_prob
+        self.mask = None # 역전파용 마스크 저장
+
+    def forward(self, A, is_training=True):
+        """
+        A: Activation values
+        """
+        if is_training:
+            # 1. 마스크 생성 (0 ~ 1 난수 < keep_prob)
+            # keep_prob보다 작으면 True(1), 크면 False(0)
+            D = np.random.rand(A.shape[0], A.shape[1])
+            D = (D < self.keep_prob).astype(int)
+            self.mask = D
+            
+            # 2. 뉴런 끄기 (Shut down)
+            A = A * D
+            
+            # 3. 스케일 보정 (Inverted Dropout 핵심!)
+            A = A / self.keep_prob
+            
+        return A
+
+    def backward(self, dA):
+        """
+        역전파: 죽은 뉴런은 미분값도 0이어야 함
+        """
+        # 1. 마스크 적용
+        dA = dA * self.mask
+        
+        # 2. 스케일 보정 (순전파 때 나눴으니 여기서도 나눠야 함)
+        dA = dA / self.keep_prob
+        
+        return dA
+
+# --- 실행 예제 ---
+if __name__ == "__main__":
+    np.random.seed(1)
+    A = np.ones((5, 3)) * 10 # 모든 값이 10인 행렬
+    
+    dropout = Dropout(keep_prob=0.8)
+    
+    # Train Mode
+    A_train = dropout.forward(A, is_training=True)
+    print("Train Output:\n", A_train)
+    # 일부는 0, 나머지는 12.5 (10 / 0.8)가 됨
+    
+    # Test Mode
+    A_test = dropout.forward(A, is_training=False)
+    print("\nTest Output:\n", A_test)
+    # 원본 그대로 10 유지
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\begin{warningbox}{비용 함수(Cost Function) 진동 문제}
+드롭아웃을 쓰면 매번 네트워크 구조가 무작위로 바뀝니다. 따라서 비용 함수 $J$가 매끄럽게 내려가지 않고 \textbf{톱니바퀴처럼 진동}할 수 있습니다.
+디버깅할 때는 잠시 `keep_prob = 1.0`(드롭아웃 끄기)으로 설정하여 $J$가 잘 내려가는지 확인한 후, 다시 켜는 것이 좋습니다.
+\end{warningbox}
+
+\textbf{Q. 입력층(Input Layer)에도 드롭아웃을 쓰나요?} \\
+\textbf{A.} 보통은 안 씁니다. 원본 데이터($X$)를 지워버리면 정보 손실이 너무 크기 때문입니다. 주로 파라미터가 많은 은닉층(FC Layer)에 사용합니다.
+
+\textbf{Q. \texttt{keep\_prob}는 어떻게 정하나요?} \\
+\textbf{A.} 과대적합이 심할 것 같은 층(뉴런이 많은 층)은 낮게(0.5), 그렇지 않은 층은 높게(0.8~1.0) 설정합니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 과대적합을 막는 두 가지 강력한 방패(L2, Dropout)를 얻었습니다. 
+하지만 모델 학습이 너무 느리다면 어떨까요? 아무리 좋은 모델도 학습에 1년이 걸린다면 무용지물입니다.
+
+다음 시간에는 학습 속도를 비약적으로 높여주는 \textbf{[Optimization]} 기술로 넘어갑니다. 그 첫 번째 열쇠인 \textbf{'입력 정규화(Input Normalization)'}가 왜 경사 하강법의 속도를 높이는지 기하학적으로 살펴보겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Dropout:} 학습 시 무작위로 뉴런을 끈다. (Ensemble 효과, 과대적합 방지)
+    \item \textbf{Inverted Dropout:} 학습 시 출력값을 \texttt{keep\_prob}로 나눠주어 기댓값을 유지한다.
+    \item \textbf{Test Time:} 테스트 시에는 절대 드롭아웃을 쓰지 않는다.
+    \item \textbf{Caution:} Cost 그래프가 진동할 수 있으니 디버깅 시엔 끄고 확인한다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

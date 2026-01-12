@@ -1,0 +1,264 @@
+\documentclass[a4paper, 11pt]{book}
+
+%===========================================================
+% 패키지 설정 (일관된 스타일 유지)
+%===========================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsfonts, amsthm}
+\usepackage{geometry}
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{tikz}
+\usepackage{colortbl} % 표 색상
+
+%===========================================================
+% 커스텀 스타일 정의
+%===========================================================
+\definecolor{mainblue}{RGB}{0, 80, 160}
+\definecolor{subgray}{RGB}{240, 240, 240}
+\definecolor{alertred}{RGB}{200, 50, 50}
+\definecolor{examplegreen}{RGB}{50, 150, 50}
+\definecolor{conceptpurple}{RGB}{100, 50, 150}
+\definecolor{systemorange}{RGB}{255, 140, 0}
+
+\newcommand{\chaptertitle}[2]{
+    \begin{tcolorbox}[colback=mainblue, colframe=mainblue, sharp corners, boxrule=0pt, top=10pt, bottom=10pt]
+        \centering \Large \bfseries \textcolor{white}{#1: #2}
+    \end{tcolorbox}
+}
+
+\newtcolorbox{conceptbox}[1]{
+    colback=white, colframe=mainblue, fonttitle=\bfseries,
+    title={💡 #1}, rounded corners, drop shadow
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
+    title={⚠️ 잠깐! 오해하기 쉬워요: #1}, rounded corners
+}
+
+\newtcolorbox{examplebox}[1]{
+    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
+    title={📝 예시: #1}, rounded corners
+}
+
+\newtcolorbox{storybox}[1]{
+    colback=yellow!10!white, colframe=systemorange, fonttitle=\bfseries,
+    title={📖 실전 시나리오: #1}, rounded corners, fontupper=\small
+}
+
+\newtcolorbox{systembox}[1]{
+    colback=systemorange!5!white, colframe=systemorange, fonttitle=\bfseries,
+    title={⚙️ 시스템 공학: #1}, rounded corners
+}
+
+\begin{document}
+
+%===========================================================
+% 1. 전체 목차 (TOC) - 구조 명시
+%===========================================================
+\tableofcontents
+\newpage
+
+\section*{📚 이 교재의 전체 구조 (Roadmap)}
+\begin{itemize}
+    \item Unit 1: 확률의 기초와 이산 확률 변수 (완료)
+    \item Unit 2: 일반 확률 변수 (완료)
+    \item \textbf{Unit 3: 확률 과정과 극한 정리 (Random Processes \& Limit Theorems)}
+    \begin{itemize}
+        \item Chapter 7: 극한 정리와 통계적 추론 (완료)
+        \item[$\to$] \textbf{\textcolor{mainblue}{Chapter 8: 베르누이와 포아송 프로세스 (Bernoulli \& Poisson) \textit{<-- 현재 위치}}}
+        \item Chapter 9: 마르코프 체인 (Markov Chains)
+    \end{itemize}
+\end{itemize}
+\vspace{1cm}
+
+%===========================================================
+% 2. 현재 단원 제목
+%===========================================================
+\chaptertitle{Unit 3 - Chapter 8}{시간 위의 확률: 사건의 흐름}
+
+%===========================================================
+% 3. 이전 단원과의 연결 \& 4. 개요
+%===========================================================
+\section*{Intro: 사진(Snapshot)에서 영상(Video)으로}
+
+\textbf{[이전 단계와의 연결]} \\
+지금까지 우리는 주사위를 한 번 던지거나, 시험을 한 번 보는 '정적(Static)'인 상황을 다뤘습니다. 하지만 현실은 시간이 흐릅니다. 1초에 한 번씩 클릭이 발생하고, 불규칙하게 서버 요청이 들어옵니다.
+
+이제 우리는 \textbf{시간 축(Time Axis)} 위에 확률 변수를 늘어놓습니다. 이것이 바로 \textbf{확률 과정(Random Process)}입니다.
+
+\begin{tcolorbox}[colback=subgray, title={\textbf{📌 이 단원의 핵심 개요 (Overview)}}]
+\begin{enumerate}
+    \item \textbf{베르누이 과정 (Discrete):} 시계가 똑딱거릴 때마다 동전을 던지는 '디지털' 세상.
+    \item \textbf{포아송 과정 (Continuous):} 시간 간격을 0으로 보내서 만든 '아날로그' 세상.
+    \item \textbf{Fresh Start (무기억성):} "과거는 잊어라." 확률 과정 해석의 가장 강력한 도구.
+    \item \textbf{시스템 결합:} 두 개의 확률 흐름을 합치거나(Merge) 쪼개는(Split) 방법.
+\end{enumerate}
+\end{tcolorbox}
+
+%===========================================================
+% 5. 용어 정리 표
+%===========================================================
+\section{필수 용어 사전}
+
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\rowcolor{mainblue!20} \textbf{기호} & \textbf{용어} & \textbf{직관적 의미} \\ \hline
+Slot & 시간 슬롯 & 베르누이 과정의 최소 시간 단위 (1초, 1프레임 등) \\ \hline
+$\lambda$ (Lambda) & 도착률 (Arrival Rate) & 단위 시간당 평균 발생하는 사건의 수 (예: 5회/초) \\ \hline
+Inter-arrival & 대기 시간 & 사건과 사건 사이의 간격 (Wait Time) \\ \hline
+Memoryless & 무기억성 & "지금까지 안 나왔다고 해서 곧 나올 확률이 높지는 않다." \\ \hline
+Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 것 \\ \hline
+\end{tabular}
+\end{center}
+
+%===========================================================
+% 6. 핵심 개념 1: 베르누이 과정 (이산 시간)
+%===========================================================
+\section{핵심 개념 1: 디지털 시계의 심장박동 (Bernoulli)}
+
+
+
+\begin{conceptbox}{정의: 매 순간의 동전 던지기}
+시간 $t=1, 2, 3, \dots$ 마다 독립적으로 성공($p$) 또는 실패($1-p$)가 결정됩니다.
+\begin{itemize}
+    \item \textbf{핵심 성질 (Fresh Start):} 매 슬롯은 독립입니다. 과거에 실패가 100번 연속 나왔어도, 이번 슬롯의 성공 확률은 여전히 $p$입니다. (도박사의 오류 방지)
+\end{itemize}
+\end{conceptbox}
+
+\subsection{두 가지 관점: 세느냐(Count), 기다리느냐(Time)?}
+베르누이 과정을 바라보는 시각은 딱 두 가지입니다.
+
+\begin{itemize}
+    \item \textbf{View 1: 카운팅 (Counting)}
+    \begin{itemize}
+        \item 질문: "$n$번 시도했는데 성공이 몇 번 나왔어?"
+        \item 분포: \textbf{이항 분포 (Binomial)} ($n, p$)
+    \end{itemize}
+    
+    \item \textbf{View 2: 타이밍 (Timing)}
+    \begin{itemize}
+        \item 질문: "첫 성공이 나올 때까지 몇 번($T$) 기다려야 해?"
+        \item 분포: \textbf{기하 분포 (Geometric)} ($p$)
+        \[ P(T=k) = (1-p)^{k-1}p \]
+    \end{itemize}
+\end{itemize}
+
+%===========================================================
+% 7. 핵심 개념 2: 포아송 과정 (연속 시간)
+%===========================================================
+\section{핵심 개념 2: 빗방울처럼 떨어지는 사건들 (Poisson)}
+
+
+
+베르누이 과정의 시간 슬롯을 $\Delta \to 0$으로 아주 잘게 쪼개면 \textbf{포아송 과정}이 됩니다.
+\begin{itemize}
+    \item $p$는 아주 작아지고, $n$은 아주 커지지만, 곱($np$)은 $\lambda t$로 일정하게 유지됩니다.
+    \item \textbf{예시:} 콜센터 전화, 웹사이트 접속, 방사능 붕괴.
+\end{itemize}
+
+\subsection{완벽한 대응 (The Rosetta Stone)}
+이 표를 머릿속에 넣는 것이 이번 단원의 목표입니다. 이산과 연속은 쌍둥이입니다.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{c|c|c}
+\toprule
+\rowcolor{subgray} \textbf{질문 (Perspective)} & \textbf{베르누이 (Discrete)} & \textbf{포아송 (Continuous)} \\ \midrule
+매개변수 & 확률 $p$ (성공/슬롯) & 빈도 $\lambda$ (회/시간) \\ \hline
+\textbf{Counting} (몇 번?) & 이항 분포 (Binomial) & \textbf{포아송 분포 (Poisson PMF)} \\ 
+(일정 시간 내 발생 횟수) & $P(K=k) = \binom{n}{k}p^k(1-p)^{n-k}$ & $P(k; \tau) = \frac{(\lambda \tau)^k e^{-\lambda \tau}}{k!}$ \\ \hline
+\textbf{Timing} (얼마나?) & 기하 분포 (Geometric) & \textbf{지수 분포 (Exponential PDF)} \\
+(다음 사건까지 대기) & $P(T=k) = (1-p)^{k-1}p$ & $f_T(t) = \lambda e^{-\lambda t}$ \\ \bottomrule
+\end{tabular}
+\end{center}
+
+\begin{warningbox}{기하 분포와 지수 분포의 관계}
+기하 분포의 막대 그래프 폭을 아주 좁게 만들면 지수 분포의 매끄러운 곡선이 됩니다.
+둘 다 \textbf{"무기억성(Memoryless)"}을 가지는 유일한 분포들입니다.
+\end{conceptbox}
+
+%===========================================================
+% 8. 핵심 개념 3: 시스템 병합과 분할
+%===========================================================
+\section{핵심 개념 3: 흐름을 합치고 나누기 (System Ops)}
+
+여러 개의 확률 흐름(Stream)이 만날 때 어떤 일이 벌어질까요?
+
+\begin{systembox}{1. 병합 (Merging)}
+
+\begin{itemize}
+    \item \textbf{상황:} PC 접속자 흐름($\lambda_1$)과 모바일 접속자 흐름($\lambda_2$)이 서버로 들어옵니다.
+    \item \textbf{결과:} 합쳐진 흐름도 포아송 과정이며, 속도는 단순 합입니다.
+    \[ \lambda_{total} = \lambda_1 + \lambda_2 \]
+    \item \textbf{확률:} 방금 들어온 요청이 PC일 확률은? $\frac{\lambda_1}{\lambda_1 + \lambda_2}$ (속도에 비례)
+\end{itemize}
+\end{systembox}
+
+\begin{systembox}{2. 분할 (Splitting)}
+
+\begin{itemize}
+    \item \textbf{상황:} 전체 트래픽($\lambda$) 중 스팸 메일을 확률 $p$로 걸러냅니다.
+    \item \textbf{결과:}
+    \begin{itemize}
+        \item 스팸 흐름: 속도 $\lambda p$인 포아송 과정
+        \item 정상 흐름: 속도 $\lambda(1-p)$인 포아송 과정
+    \end{itemize}
+    \item \textbf{직관 파괴 (Independence):} 놀랍게도 스팸 흐름과 정상 흐름은 서로 \textbf{독립(Independent)}입니다.
+    \item \textbf{이유:} 전체 개수가 정해진 게 아니라, 매 순간 독립적으로 주사위를 굴려 분류하기 때문입니다.
+\end{itemize}
+\end{systembox}
+
+%===========================================================
+% 9. 실전 시나리오
+%===========================================================
+\section{실전 응용: 게임 아이템과 서버 관리}
+
+\begin{storybox}{Nexon 게임 기획 및 서버 운영}
+\textbf{상황 1: 아이템 강화 (베르누이 - Timing)}
+강화 성공 확률이 1\%($p=0.01$)입니다. 유저가 성공할 때까지 평균 몇 번 시도해야 할까요?
+\begin{itemize}
+    \item 이는 '첫 성공까지의 대기 시간'이므로 \textbf{기하 분포}입니다.
+    \item $E[T] = \frac{1}{p} = \frac{1}{0.01} = 100$번.
+    \item "100번 실패했으니 다음엔 되겠지?" $\to$ 틀렸습니다. 여전히 확률은 1\%입니다 (Memoryless).
+\end{itemize}
+
+\textbf{상황 2: 서버 대기열 (포아송 - Counting)}
+평소에는 초당 10명($\lambda=10$)이 접속합니다. 1초 동안 접속자가 15명 이상 폭주하여 렉이 걸릴 확률은?
+\begin{itemize}
+    \item 이는 '정해진 시간 내 발생 횟수'이므로 \textbf{포아송 분포}입니다.
+    \item $P(K \ge 15) = 1 - \sum_{k=0}^{14} \frac{10^k e^{-10}}{k!}$ (보통 근사값이나 표 사용)
+\end{itemize}
+\end{storybox}
+
+%===========================================================
+% 10. 요약 및 다음 단계
+%===========================================================
+\section{요약 및 다음 단계}
+
+\begin{tcolorbox}[colback=mainblue!10, colframe=mainblue, title={\textbf{📝 Unit 3-2 핵심 요약}}]
+\begin{enumerate}
+    \item \textbf{관점의 전환:} 실험(Experiment)에서 흐름(Process)으로.
+    \item \textbf{대응 관계:} 이산(베르누이-이항-기하) $\leftrightarrow$ 연속(포아송-포아송-지수).
+    \item \textbf{무기억성:} 확률 과정 해석의 핵심 키워드. "시스템은 매 순간 리셋된다."
+    \item \textbf{시스템:} 병합은 더하고($+$), 분할은 곱한다($\times p$). 분할된 흐름은 독립이다.
+\end{enumerate}
+\end{tcolorbox}
+
+\vspace{0.5cm}
+\textbf{[다음 단원 예고]} \\
+지금까지는 과거가 미래에 영향을 주지 않는(Memoryless) 특수한 상황만 다뤘습니다. 하지만 현실에서는 \textbf{"오늘 비가 오면 내일 비가 올 확률이 높다"}처럼 과거 상태가 미래에 영향을 줍니다. \\
+Unit 3의 마지막 장 \textbf{Chapter 9: 마르코프 체인(Markov Chains)}에서는 "바로 직전의 과거(State)"가 미래를 결정하는 조금 더 현실적인 모델을 배웁니다.
+
+\end{document}

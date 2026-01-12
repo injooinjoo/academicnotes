@@ -396,7 +396,7 @@
 
 %========================================================================================
 \begin{summarybox}
-이 문서는 자연어 처리(NLP)의 고급 모델들을 다룹니다. 문장의 순서와 구조를 이해하는 **순차 레이블링 모델**(HMM, CRF, BiLSTM-CRF)부터, 새로운 데이터(텍스트나 이미지)를 생성하는 **생성 모델**(VAE, GAN)까지의 핵심 원리를 다룹니다.
+이 문서는 자연어 처리(NLP)의 고급 모델들을 다룹니다. 문장의 순서와 구조를 이해하는 \textbf{순차 레이블링 모델}(HMM, CRF, BiLSTM-CRF)부터, 새로운 데이터(텍스트나 이미지)를 생성하는 \textbf{생성 모델}(VAE, GAN)까지의 핵심 원리를 다룹니다.
 
 각 모델이 \textbf{왜 등장했는지} (이전 모델의 한계), \textbf{어떻게 작동하는지} (핵심 아이디어), 그리고 \textbf{어떤 단점이 있는지} (다음 모델의 등장 배경)를 중심으로 설명합니다. 이 문서 하나만으로 각 모델의 개념을 잡고 서로 비교할 수 있도록 구성되었습니다.
 \end{summarybox}
@@ -681,7 +681,7 @@ BiLSTM의 각 시점 출력(H\_t)에 Softmax를 적용하여 바로 레이블을
 
 BiLSTM-CRF 모델은 \texttt{torch}와 \texttt{pytorch-crf} 같은 라이브러리를 사용하여 구현할 수 있습니다. (코드는 개념 이해를 위한 의사 코드(pseudo-code)에 가깝게 단순화되었습니다.)
 
-\begin{lstlisting}[language=Python, caption={BiLSTM-CRF 모델 클래스 정의 (PyTorch 예시)}, label={lst:bilstm-crf}]
+\begin{lstlisting}[language=Python, caption={BiLSTM-CRF 모델 클래스 정의 (PyTorch 예시)}, label={lst:bilstm-crf}, breaklines=true]
 import torch
 import torch.nn as nn
 from TorchCRF import CRF
@@ -745,7 +745,7 @@ class BiLSTM_CRF(nn.Module):
 \section{핵심 개념 4: Variational Autoencoders (VAEs)}
 %========================================================================================
 
-지금까지는 주어진 입력(X)에서 레이블(Y)을 맞히는 '판별 모델' 또는 '순차 모델'을 다뤘습니다. 이제부터는 모델이 스스로 무언가를 '생성'해내는 **생성 모델(Generative Models)**을 다룹니다.
+지금까지는 주어진 입력(X)에서 레이블(Y)을 맞히는 '판별 모델' 또는 '순차 모델'을 다뤘습니다. 이제부터는 모델이 스스로 무언가를 '생성'해내는 \textbf{생성 모델(Generative Models)}을 다룹니다.
 
 \subsection{시작하기: 일반 오토인코더 (Autoencoder, AE)}
 
@@ -809,7 +809,7 @@ VAE는 "잠재 공간을 점이 아닌, 확률 분포(영역)로 만들어서 �
 \end{itemize}
 \end{qabox}
 
-이 꼼수를 막기 위해 VAE는 두 번째 손실 함수, 즉 **잠재 손실**을 도입합니다.
+이 꼼수를 막기 위해 VAE는 두 번째 손실 함수, 즉 \textbf{잠재 손실}을 도입합니다.
 
 \begin{infobox}
 \textbf{잠재 손실 (Latent Loss)}: (정확히는 쿨백-라이블러 발산, $D_{KL}$)

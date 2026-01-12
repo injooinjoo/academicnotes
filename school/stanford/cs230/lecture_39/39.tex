@@ -1,0 +1,273 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 정의)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Recurrent Neural Networks (RNN)}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item \textbf{10.1 Recurrent Neural Networks (RNN)}
+        \begin{itemize}
+            \item Why Sequence Models? (Time \& Order)
+            \item RNN Architecture (Unrolled View)
+            \item Forward Propagation Formulas
+            \item BPTT (Backpropagation Through Time)
+        \end{itemize}
+        \item 10.2 GRU \& LSTM (Gated Units) \textit{- Upcoming}
+        \item 10.3 NLP \& Word Embeddings \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 지금까지 고정된 크기의 이미지($H \times W$)를 처리하는 CNN을 다뤘습니다. 하지만 세상의 많은 데이터는 \textbf{'순서(Sequence)'}와 \textbf{'시간(Time)'}을 가지고 있습니다.
+"나는 프랑스에 가서..."라는 말을 들으면, 뒤에 "프랑스어"라는 말이 나올 확률이 높다는 것을 우리는 압니다. 이는 앞선 단어들의 \textbf{문맥(Context)}을 기억하기 때문입니다.
+기존 신경망은 이 '기억' 능력이 없습니다. 오늘은 기억을 가진 신경망, \textbf{RNN}의 세계로 들어갑니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 시계열 데이터를 처리하는 RNN의 기본 원리와 학습 알고리즘을 다룹니다.
+\begin{itemize}
+    \item \textbf{구조:} 은닉 상태(Hidden State)를 통해 과거 정보를 현재로 전달하는 루프 구조를 이해합니다.
+    \item \textbf{수식:} $a^{\langle t \rangle} = g(W_{aa}a^{\langle t-1 \rangle} + W_{ax}x^{\langle t \rangle})$ 공식을 마스터합니다.
+    \item \textbf{공유:} 모든 시간 단계에서 \textbf{파라미터($W$)를 공유}하여 일반화 성능을 높이는 원리를 파악합니다.
+    \item \textbf{학습:} 시간을 거슬러 올라가는 역전파, \textbf{BPTT}의 개념을 익힙니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{기호} & \textbf{용어} & \textbf{설명} \\ \hline
+$x^{\langle t \rangle}$ & Input & 시간 $t$에서의 입력 (예: $t$번째 단어). \\ \hline
+$a^{\langle t \rangle}$ & Hidden State & 시간 $t$에서의 은닉 상태. \textbf{(기억)} \\ \hline
+$y^{\langle t \rangle}$ & Output & 시간 $t$에서의 출력 (예: 다음 단어 예측). \\ \hline
+$W_{aa}$ & Weight (Hidden) & 과거 기억을 현재로 가져오는 가중치. \\ \hline
+$W_{ax}$ & Weight (Input) & 현재 입력을 받아들이는 가중치. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 순환의 마법}
+
+\subsection{1. RNN Architecture (Unrolled)}
+RNN은 자신을 가리키는 화살표(Loop)를 가집니다. 이를 시간축으로 펼치면 다음과 같습니다.
+
+
+
+\begin{itemize}
+    \item \textbf{입력:} 매 시점 $t$마다 $x^{\langle t \rangle}$가 들어옵니다.
+    \item \textbf{전달:} 이전 시점의 기억 $a^{\langle t-1 \rangle}$이 현재 시점 $t$로 전달됩니다.
+    \item \textbf{출력:} 두 정보를 합쳐서 $y^{\langle t \rangle}$를 출력하고, 다음 시점 $t+1$로 기억 $a^{\langle t \rangle}$를 넘깁니다.
+\end{itemize}
+
+\subsection{2. Forward Propagation Formulas}
+RNN의 핵심은 \textbf{"현재 입력과 과거 기억을 섞어서 새로운 기억을 만든다"}는 것입니다.
+
+\begin{formulabox}{은닉 상태 업데이트 (기억 갱신)}
+$$ a^{\langle t \rangle} = \tanh(W_{aa}a^{\langle t-1 \rangle} + W_{ax}x^{\langle t \rangle} + b_a) $$
+\begin{itemize}
+    \item $W_{aa}a^{\langle t-1 \rangle}$: 과거의 기억 반영.
+    \item $W_{ax}x^{\langle t \rangle}$: 현재의 정보 반영.
+    \item $\tanh$: 값을 -1 ~ 1 사이로 압축하여 폭발 방지 (주로 사용).
+\end{itemize}
+\end{formulabox}
+
+\begin{formulabox}{출력 계산}
+$$ \hat{y}^{\langle t \rangle} = \text{softmax}(W_{ya}a^{\langle t \rangle} + b_y) $$
+\begin{itemize}
+    \item 현재의 기억($a^{\langle t \rangle}$)을 바탕으로 예측을 수행합니다.
+\end{itemize}
+\end{formulabox}
+
+\textbf{Key Point (Parameter Sharing):}
+$t=1$이든 $t=100$이든, $W_{aa}, W_{ax}, W_{ya}$는 \textbf{모두 똑같은 행렬}을 재사용합니다. 이것이 RNN이 길이 제한 없이 문장을 처리할 수 있는 비결입니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Backpropagation Through Time (BPTT)}
+
+RNN의 학습은 시간을 거슬러 올라갑니다.
+
+\begin{itemize}
+    \item \textbf{Loss:} 전체 손실 $L$은 각 시간 단계별 손실의 합입니다. $L = \sum L^{\langle t \rangle}$.
+    \item \textbf{Gradient:} $t=100$ 시점의 오차를 수정하려면, $t=99, 98, \dots, 1$ 시점의 상태까지 영향을 미쳐야 합니다.
+    \item \textbf{Problem:} 미분값이 계속 곱해지면서($W_{aa}^{100}$), 값이 0으로 사라지거나(Vanishing) 무한대로 커지는(Exploding) 문제가 발생합니다. 이로 인해 기본 RNN은 \textbf{장기 의존성(Long-term Dependency)}을 학습하기 어렵습니다.
+\end{itemize}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: RNN Step \& Loop}
+
+NumPy로 RNN의 내부 동작을 구현해 봅니다.
+
+\begin{lstlisting}[language=Python, caption=RNN Forward Pass Implementation, breaklines=true]
+import numpy as np
+
+def rnn_cell_forward(xt, a_prev, parameters):
+    """
+    단일 타임 스텝 (t) 처리
+    """
+    Wax = parameters["Wax"]
+    Waa = parameters["Waa"]
+    Wya = parameters["Wya"]
+    ba = parameters["ba"]
+    by = parameters["by"]
+
+    # 1. 다음 은닉 상태 계산 (Tanh 사용)
+    # a_next = tanh(Waa*a_prev + Wax*xt + ba)
+    a_next = np.tanh(np.dot(Waa, a_prev) + np.dot(Wax, xt) + ba)
+    
+    # 2. 현재 출력 예측 (Softmax 가정)
+    yt_pred = softmax(np.dot(Wya, a_next) + by)
+    
+    return a_next, yt_pred
+
+def rnn_forward(x, a0, parameters):
+    """
+    전체 시퀀스 처리 (Time Loop)
+    """
+    n_x, m, T_x = x.shape  # T_x: 시간 길이 (Timesteps)
+    n_y, n_a = parameters["Wya"].shape
+    
+    a = np.zeros((n_a, m, T_x))      # 모든 기억 저장용
+    y_pred = np.zeros((n_y, m, T_x)) # 모든 출력 저장용
+    
+    a_next = a0 # 초기 기억
+    
+    # 시간 순서대로 루프 (RNN의 핵심)
+    for t in range(T_x):
+        xt = x[:, :, t] # t번째 입력
+        
+        # 셀 업데이트
+        a_next, yt_pred = rnn_cell_forward(xt, a_next, parameters)
+        
+        # 저장
+        a[:, :, t] = a_next
+        y_pred[:, :, t] = yt_pred
+        
+    return a, y_pred
+
+def softmax(x):
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum(axis=0)
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. 왜 ReLU 대신 Tanh를 쓰나요?} \\
+\textbf{A.} RNN은 같은 가중치를 수십, 수백 번 반복해서 곱합니다. ReLU를 쓰면 값이 계속 커져서 발산(Exploding)하기 쉽습니다. Tanh는 값을 -1~1 사이로 묶어두어(Bounding) 안정적인 학습을 돕습니다.
+
+\textbf{Q. RNN은 병렬 처리가 안 되나요?} \\
+\textbf{A.} 네, 구조적으로 어렵습니다. $t$ 시점의 계산을 하려면 반드시 $t-1$ 시점의 결과가 나와야 하기 때문입니다(Sequential). 이것이 트랜스포머(Transformer)가 등장하게 된 배경 중 하나입니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+기본 RNN은 이론적으로 훌륭하지만, 문장이 조금만 길어져도(10단어 이상) 앞부분 내용을 까먹는 \textbf{기울기 소실 문제}가 있습니다.
+
+이를 해결하기 위해 딥러닝 연구자들은 \textbf{"기억을 얼마나 오래 유지할지 스스로 결정하는 게이트(Gate)"}를 만들었습니다.
+다음 시간에는 현대 NLP의 근간이 된 \textbf{[GRU (Gated Recurrent Unit)]}와 \textbf{[LSTM (Long Short-Term Memory)]}에 대해 다루겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Structure:} 입력($x$) + 이전 기억($a$) $\rightarrow$ 새 기억 $\rightarrow$ 출력($y$).
+    \item \textbf{Sharing:} 모든 시점에서 동일한 파라미터($W_{ax}, W_{aa}$)를 쓴다.
+    \item \textbf{Formula:} $a^{\langle t \rangle} = \tanh(W_{aa}a^{\langle t-1 \rangle} + W_{ax}x^{\langle t \rangle} + b_a)$.
+    \item \textbf{Limit:} 긴 시퀀스에서는 기울기가 소실되어(Vanishing Gradient) 초기 기억을 잃는다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

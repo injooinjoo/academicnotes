@@ -11,6 +11,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{geometry}
@@ -567,7 +568,7 @@ EM handles this missing information elegantly.
 
 \subsection{Using scikit-learn}
 
-\begin{lstlisting}[caption={LDA with scikit-learn}]
+\begin{lstlisting}[caption={LDA with scikit-learn}, breaklines=true]
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 
@@ -608,7 +609,7 @@ Since this document is mostly Topic 2, and it's about cats, Topic 2 is likely th
 
 \subsection{Extracting Top Words per Topic}
 
-\begin{lstlisting}[caption={Display top words for each topic}]
+\begin{lstlisting}[caption={Display top words for each topic}, breaklines=true]
 def display_topics(model, feature_names, num_top_words=5):
     for topic_idx, topic in enumerate(model.components_):
         top_words_idx = topic.argsort()[:-num_top_words-1:-1]
@@ -629,7 +630,7 @@ display_topics(lda, feature_names)
 A better way to understand topics: look at documents with highest topic prevalence, not just top words.
 \end{importantbox}
 
-\begin{lstlisting}[caption={Find most representative documents}]
+\begin{lstlisting}[caption={Find most representative documents}, breaklines=true]
 # For each topic, find documents with highest prevalence
 for topic_idx in range(n_topics):
     # Sort documents by topic prevalence
@@ -754,7 +755,7 @@ NMF's $W$ matrix entries are just non-negative numbers, not probabilities:
 
 \subsection{NMF Implementation}
 
-\begin{lstlisting}[caption={NMF in Python}]
+\begin{lstlisting}[caption={NMF in Python}, breaklines=true]
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -830,7 +831,7 @@ Coherence and exclusivity often compete:
 \end{enumerate}
 \end{importantbox}
 
-\begin{lstlisting}[caption={Coherence calculation with gensim}]
+\begin{lstlisting}[caption={Coherence calculation with gensim}, breaklines=true]
 from gensim.models.coherencemodel import CoherenceModel
 
 # After training LDA model
@@ -877,7 +878,7 @@ R has excellent support for topic modeling, especially for Structural Topic Mode
 
 \subsection{Basic R Syntax for LDA}
 
-\begin{lstlisting}[caption={LDA in R}, language=R]
+\begin{lstlisting}[caption={LDA in R}, language=R, breaklines=true]
 # Install and load packages
 install.packages("topicmodels")
 library(topicmodels)

@@ -1,0 +1,280 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{strategybox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧭 #1 (전략 가이드)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Structuring Machine Learning Projects: \\ Orthogonalization Strategy}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-5.] Deep Learning Fundamentals \textit{- Completed}
+    \item[\textbf{Chapter 6.}] \textbf{Structuring ML Projects (Current Unit)}
+    \begin{itemize}
+        \item \textbf{6.1 Orthogonalization Strategy}
+        \begin{itemize}
+            \item Concept: One Knob for One Function
+            \item The 4-Step Chain of Assumptions
+            \item Mapping Tools to Problems
+            \item Why Early Stopping is problematic?
+        \end{itemize}
+        \item 6.2 Evaluation Metric (Single Number) \textit{- Upcoming}
+        \item 6.3 Train/Dev/Test Distributions \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+우리는 지금까지 딥러닝 모델을 만들고(Build), 학습시키고(Train), 최적화(Optimize)하는 기술적인 방법론을 배웠습니다.
+하지만 여러분이 현업에서 리더가 되어 팀을 이끌게 되면 이런 질문에 봉착합니다.
+\textbf{"교수님, 성능이 안 나오는데 데이터를 더 모을까요, 층을 더 쌓을까요, 아니면 하이퍼파라미터를 튜닝할까요?"}
+이때 "일단 다 해봐"라고 말하면 프로젝트는 망합니다. 자원은 유한하기 때문입니다. 오늘 배울 \textbf{직교화(Orthogonalization)}는 복잡한 문제 상황에서 무엇부터 해결해야 할지 알려주는 나침반입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 머신러닝 프로젝트를 효율적으로 이끄는 \textbf{전략적 사고방식}을 다룹니다.
+\begin{itemize}
+    \item \textbf{개념:} 시스템의 변수들을 서로 독립적으로(Orthogonal) 제어하여 원하는 효과를 정밀 타격하는 원리를 배웁니다.
+    \item \textbf{진단:} 프로젝트 성공을 위한 \textbf{4단계 가정(Chain of Assumptions)}을 확립합니다.
+    \item \textbf{도구:} 각 문제(Bias, Variance 등)를 해결하기 위한 \textbf{'직교화된 도구'}를 매핑합니다.
+    \item \textbf{주의:} 조기 종료(Early Stopping)가 왜 직교화 원칙에 위배되는지 분석합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{비유} \\ \hline
+\textbf{Orthogonalization} & 변수 간 독립성 확보 & 핸들은 방향만, 페달은 속도만 조절함. \\ \hline
+\textbf{Chain of Assumptions} & 순차적 해결 단계 & 1단계(Train) $\to$ 2단계(Dev) $\to$ 3단계(Test). \\ \hline
+\textbf{Orthogonal Tool} & 한 가지 문제만 해결하는 도구 & Bigger Network (Bias만 잡음). \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 한 번에 하나씩}
+
+\subsection{1. What is Orthogonalization? (직교화란?)}
+
+
+수학적으로 두 벡터가 직교(90도)하면, 한 벡터를 조절해도 다른 벡터에는 영향을 주지 않습니다. 엔지니어링에서도 마찬가지입니다. \textbf{"하나의 다이얼은 하나의 기능만 조절해야 한다"}는 원칙입니다.
+
+\begin{analogybox}{자동차 운전 비유}
+\begin{itemize}
+    \item \textbf{Orthogonal (좋은 설계):}
+    \begin{itemize}
+        \item 핸들 $\rightarrow$ 방향 조절 (속도 영향 X)
+        \item 페달 $\rightarrow$ 속도 조절 (방향 영향 X)
+        \item 운전하기 쉽습니다. 원하는 대로 제어 가능합니다.
+    \end{itemize}
+    \item \textbf{Non-Orthogonal (나쁜 설계):}
+    \begin{itemize}
+        \item 핸들을 꺾을 때마다 브레이크가 걸리고 라디오 볼륨이 커진다면?
+        \item 운전이 불가능합니다. 튜닝도 마찬가지입니다.
+    \end{itemize}
+\end{itemize}
+\end{analogybox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. The Chain of Assumptions (4단계 진단)}
+머신러닝 프로젝트는 다음 4단계를 순서대로 통과해야 합니다. 앞 단계가 해결되지 않으면 뒷 단계는 의미가 없습니다.
+
+\begin{enumerate}
+    \item \textbf{Fit Training Set:} 훈련 데이터에서 인간 수준 성능을 낸다. (Bias 문제)
+    \item \textbf{Fit Dev Set:} 훈련된 모델이 검증 데이터에서도 잘한다. (Variance 문제)
+    \item \textbf{Fit Test Set:} 검증 데이터 성능이 테스트 데이터와 비슷하다. (Data Mismatch)
+    \item \textbf{Perform in Real World:} 실제 사용자가 만족한다. (Cost Function 오류)
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: 도구 매핑 (Tool Mapping)}
+
+각 단계에서 문제가 발생했을 때, 다른 단계에 부작용을 주지 않고 해당 문제만 해결하는 \textbf{직교화된 도구}를 써야 합니다.
+
+\begin{strategybox}{Dr. Ng's Prescription Table}
+\begin{center}
+\begin{tabular}{l|l|l}
+\hline
+\textbf{문제 (Problem)} & \textbf{직교화된 도구 (Good)} & \textbf{비추천 도구 (Bad)} \\ \hline
+\textbf{1. High Bias} & \textbf{Bigger Network} & Early Stopping \\
+(Train 성능 낮음) & Adam Optimizer & (Bias/Var 둘 다 건드림) \\ \hline
+\textbf{2. High Variance} & \textbf{More Data} & Early Stopping \\
+(Dev 성능 낮음) & Regularization (L2, Dropout) & \\ \hline
+\textbf{3. Test Mismatch} & Bigger Dev Set & - \\ \hline
+\textbf{4. Real World Fail} & Change Cost Function & - \\ \hline
+\end{tabular}
+\end{center}
+\end{strategybox}
+
+\begin{warningbox}{Early Stopping의 딜레마}
+Early Stopping은 학습을 중간에 멈춥니다.
+\begin{itemize}
+    \item 비용함수 $J$ 최소화 중단 $\rightarrow$ \textbf{Bias 악화}
+    \item 가중치 $W$ 증가 억제 $\rightarrow$ \textbf{Variance 개선}
+\end{itemize}
+두 가지 효과가 섞여 있어(Coupled), 문제가 생겼을 때 원인을 파악하기 어렵게 만듭니다. 직교화 관점에서는 \textbf{"Bias는 네트워크 크기로 잡고, Variance는 정규화로 잡는 것"}이 더 명확합니다.
+\end{warningbox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Automated Strategist}
+
+직교화는 코드가 아니라 \textbf{판단 로직}입니다. 이를 자동화된 진단 클래스로 구현해봅시다.
+
+\begin{lstlisting}[language=Python, caption=ML Project Diagnosis Logic, breaklines=true]
+class MLStrategist:
+    def __init__(self, human_err, train_err, dev_err, test_err):
+        self.human = human_err
+        self.train = train_err
+        self.dev = dev_err
+        self.test = test_err
+        self.threshold = 0.02 # 2% 이상 차이면 문제
+
+    def diagnose(self):
+        print("--- Diagnosis Report ---")
+        
+        # 1. Bias Check
+        avoidable_bias = self.train - self.human
+        if avoidable_bias > self.threshold:
+            print("[Problem] High Bias (Underfitting)")
+            print("[Action] Increase Network Size, Train Longer.")
+            return # 앞 단계 해결 전엔 뒤를 보지 않음 (Orthogonal)
+
+        # 2. Variance Check
+        variance = self.dev - self.train
+        if variance > self.threshold:
+            print("[Problem] High Variance (Overfitting)")
+            print("[Action] Get More Data, Add Regularization.")
+            return
+
+        # 3. Mismatch Check
+        mismatch = self.test - self.dev
+        if mismatch > self.threshold:
+            print("[Problem] Overfitting to Dev Set")
+            print("[Action] Collect More Dev/Test Data.")
+            return
+
+        print("[Result] Good Job! Ready for Deployment.")
+
+# --- 실행 ---
+if __name__ == "__main__":
+    # 시나리오: 훈련도 안 된 상태
+    strategist = MLStrategist(0.01, 0.15, 0.16, 0.17)
+    strategist.diagnose()
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. Cost Function은 언제 바꾸나요?} \\
+\textbf{A.} 모델의 수치적 성능(Accuracy)은 좋은데, 실제 앱 사용자들의 불만(Real World)이 많을 때입니다. 예를 들어, 고양이 분류기가 야한 사진을 고양이로 분류했다면 정확도가 높아도 치명적입니다. 이때는 Cost Function에 '야한 사진 패널티'를 추가해야 합니다. (과녁 자체를 수정)
+
+\textbf{Q. Bias를 잡으려고 Regularization을 쓰면 안 되나요?} \\
+\textbf{A.} 비추천합니다. Regularization은 모델을 단순하게 만들어 Variance를 줄이는 도구입니다. 부작용으로 Bias가 약간 높아질 수 있습니다. Bias를 잡을 때는 그냥 \textbf{더 큰 네트워크(Bigger Network)}를 쓰는 것이 부작용 없는(Orthogonal) 해결책입니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 문제 해결의 순서와 전략을 알았습니다.
+그런데 모델 A는 정확도가 높은데 속도가 느리고, 모델 B는 정확도는 조금 낮은데 속도가 빠릅니다. 도대체 무엇을 선택해야 할까요?
+
+다음 시간에는 애매모호한 상황을 숫자 하나로 정리하여 의사결정 속도를 높이는 \textbf{[Single Number Evaluation Metric]}에 대해 배우겠습니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Orthogonalization:} 변수들을 독립적으로 제어하여 튜닝을 명확하게 만드는 전략.
+    \item \textbf{Sequence:} Train Fit $\to$ Dev Fit $\to$ Test Fit 순서로 해결한다.
+    \item \textbf{Bias Tool:} Bigger Network, Adam Optimizer.
+    \item \textbf{Variance Tool:} More Data, Regularization.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

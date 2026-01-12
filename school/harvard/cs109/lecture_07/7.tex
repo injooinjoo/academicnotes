@@ -407,16 +407,16 @@
 %====================
 \section{개요}
 
-이 문서는 머신러닝 모델의 성능을 평가하고 개선하는 핵심 원리인 **일반화(Generalization)**, **편향-분산 트레이드오프(Bias-Variance Tradeoff)**, 그리고 **정규화(Regularization)** 기법에 대해 다룹니다.
+이 문서는 머신러닝 모델의 성능을 평가하고 개선하는 핵심 원리인 \textbf{일반화(Generalization)}, \textbf{편향-분산 트레이드오프(Bias-Variance Tradeoff)}, 그리고 \textbf{정규화(Regularization)} 기법에 대해 다룹니다.
 
-우리의 최종 목표는 훈련(training) 데이터에만 잘 맞는 모델이 아니라, 한 번도 본 적 없는 새로운 데이터(test data)에서도 좋은 성능을 내는 **'일반화 성능이 뛰어난'** 모델을 만드는 것입니다.
+우리의 최종 목표는 훈련(training) 데이터에만 잘 맞는 모델이 아니라, 한 번도 본 적 없는 새로운 데이터(test data)에서도 좋은 성능을 내는 \textbf{'일반화 성능이 뛰어난'} 모델을 만드는 것입니다.
 
 모델이 너무 단순하면 훈련 데이터조차 제대로 학습하지 못하며(과소적합, High Bias),
 모델이 너무 복잡하면 훈련 데이터의 노이즈까지 암기해버려 새로운 데이터에서 형편없는 성능을 보입니다(과대적합, High Variance).
 
-이 문서는 과대적합의 주된 증상(모델 계수의 폭주)을 진단하고, 이를 해결하기 위해 손실 함수(Loss Function)에 **'패널티'**를 부과하는 정규화 기법, 특히 **릿지(Ridge, L2)**와 **라쏘(Lasso, L1)**를 중점적으로 설명합니다.
+이 문서는 과대적합의 주된 증상(모델 계수의 폭주)을 진단하고, 이를 해결하기 위해 손실 함수(Loss Function)에 \textbf{'패널티'}를 부과하는 정규화 기법, 특히 \textbf{릿지(Ridge, L2)}와 \textbf{라쏘(Lasso, L1)}를 중점적으로 설명합니다.
 
-마지막으로, 이 패널티의 강도를 조절하는 하이퍼파라미터 **$\lambda$ (람다)**를 찾기 위한 체계적인 절차로 **검증 세트(Validation Set)**와 **교차 검증(Cross-Validation)** 방법을 단계별로 학습합니다.
+마지막으로, 이 패널티의 강도를 조절하는 하이퍼파라미터 \textbf{$\lambda$ (람다)}를 찾기 위한 체계적인 절차로 \textbf{검증 세트(Validation Set)}와 \textbf{교차 검증(Cross-Validation)} 방법을 단계별로 학습합니다.
 
 \newpage
 
@@ -471,11 +471,11 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \subsection{모델 오차의 두 가지 근원}
 
 \begin{tcolorbox}[title=1. 환원 불가능한 오차 (Irreducible Error)]
-이 오차는 데이터 자체에 내재된 **'무작위 노이즈'** 때문에 발생합니다.
+이 오차는 데이터 자체에 내재된 \textbf{'무작위 노이즈'} 때문에 발생합니다.
 아무리 완벽한 모델을 만들어도 이 오차는 절대 0이 될 수 없습니다.
 
 \begin{examplebox}
-**비유 (Aleatoric Error):**
+\textbf{비유 (Aleatoric Error):}
 아무리 비싼 최고급 마이크($\approx$모델)를 사용해도, 녹음실 주변의 공사장 소음($\approx$노이즈)까지 함께 녹음되는 것과 같습니다. 이 소음은 마이크 성능으로 제거할 수 없습니다.
 
 우리는 이 오차의 존재를 인정하고, 우리가 줄일 수 있는 오차에 집중해야 합니다.
@@ -483,7 +483,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \end{tcolorbox}
 
 \begin{tcolorbox}[title=2. 환원 가능한 오차 (Reducible Error)]
-이 오차는 우리가 **'모델을 잘못 선택'**했기 때문에 발생합니다.
+이 오차는 우리가 \textbf{'모델을 잘못 선택'}했기 때문에 발생합니다.
 우리의 임무는 이 오차를 최소화하는 것이며, 이 오차는 다시 '편향'과 '분산'이라는 두 가지 요소로 분해됩니다.
 \end{tcolorbox}
 
@@ -492,7 +492,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 모델의 성능을 사격에 비유하여 편향과 분산을 이해할 수 있습니다.
 
 \begin{tcolorbox}[title=편향 (Bias): 과녁을 놓치다 (부정확성)]
-**편향**은 모델의 예측값이 실제 정답(과녁의 중심)과 평균적으로 얼마나 멀리 떨어져 있는지를 나타냅니다.
+\textbf{편향}은 모델의 예측값이 실제 정답(과녁의 중심)과 평균적으로 얼마나 멀리 떨어져 있는지를 나타냅니다.
 
 \begin{itemize}
     \item \textbf{High Bias (높은 편향):} 모델이 너무 단순하여 데이터의 복잡한 패턴을 전혀 학습하지 못합니다. (예: S자 곡선 데이터를 직선으로 예측하려는 시도)
@@ -502,7 +502,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \end{tcolorbox}
 
 \begin{tcolorbox}[title=분산 (Variance): 탄착군이 흩어지다 (비일관성)]
-**분산**은 훈련 데이터가 조금만 바뀌어도 모델의 예측이 얼마나 크게 변동하는지를 나타냅니다.
+\textbf{분산}은 훈련 데이터가 조금만 바뀌어도 모델의 예측이 얼마나 크게 변동하는지를 나타냅니다.
 
 \begin{itemize}
     \item \textbf{High Variance (높은 분산):} 모델이 너무 복잡하여 훈련 데이터의 사소한 노이즈까지 '암기'해버립니다.
@@ -512,7 +512,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \end{tcolorbox}
 
 \begin{examplebox}
-**시뮬레이션 예시 (스파게티 면발):**
+\textbf{시뮬레이션 예시 (스파게티 면발):}
 서로 다른 2,000개의 샘플 데이터셋을 뽑아서 모델을 2,000번 학습시켰다고 가정해봅시다.
 
 \begin{itemize}
@@ -524,7 +524,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 
 \subsection{트레이드오프(Tradeoff) 관계}
 
-편향과 분산은 한쪽이 줄어들면 다른 한쪽이 늘어나는 **'시소 관계'**에 있습니다.
+편향과 분산은 한쪽이 줄어들면 다른 한쪽이 늘어나는 \textbf{'시소 관계'}에 있습니다.
 
 \begin{tcolorbox}[title=⭐ 모델 복잡도에 따른 오차의 변화]
 \textbf{모델 복잡도(X축) vs. 총 오차(Y축)}
@@ -601,10 +601,10 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 
 \textbf{답변: "모델의 계수(coefficients, $\beta$) 값을 확인하면 됩니다."}
 
-모델이 과대적합 상태일 때, 즉 훈련 데이터의 노이즈에 과민하게 반응할 때, 모델의 **계수($\beta_j$) 값들은 비정상적으로 커지거나 극단적으로 불안정한 값**을 갖게 됩니다.
+모델이 과대적합 상태일 때, 즉 훈련 데이터의 노이즈에 과민하게 반응할 때, 모델의 \textbf{계수($\beta_j$) 값들은 비정상적으로 커지거나 극단적으로 불안정한 값}을 갖게 됩니다.
 
 \begin{examplebox}
-**계수 값 분포 비교 (Violin Plots):**
+\textbf{계수 값 분포 비교 (Violin Plots):}
 서로 다른 2,000개의 샘플 데이터로 2,000개의 모델을 학습시킨 경우의 계수 분포입니다.
 
 \begin{itemize}
@@ -671,7 +671,7 @@ $\lambda$ (람다)는 패널티의 '강도'를 조절하는 하이퍼파라미�
 패널티 항($L_{\text{reg}}$)을 어떻게 정의하느냐에 따라 릿지(Ridge)와 라쏘(Lasso)로 나뉩니다.
 
 \begin{tcolorbox}[title=1. L2 정규화: 릿지 회귀 (Ridge Regression)]
-\textbf{패널티 항:} 계수의 **제곱의 합** ($L_2$ Norm) $\rightarrow L_{\text{reg}} = \sum_{j=1}^{J} \beta_j^2$
+\textbf{패널티 항:} 계수의 \textbf{제곱의 합} ($L_2$ Norm) $\rightarrow L_{\text{reg}} = \sum_{j=1}^{J} \beta_j^2$
 
 \textbf{최종 손실 함수:}
 $$
@@ -689,7 +689,7 @@ $$
 \end{tcolorbox}
 
 \begin{tcolorbox}[title=2. L1 정규화: 라쏘 회귀 (Lasso Regression)]
-\textbf{패널티 항:} 계수의 **절대값의 합** ($L_1$ Norm) $\rightarrow L_{\text{reg}} = \sum_{j=1}^{J} |\beta_j|$
+\textbf{패널티 항:} 계수의 \textbf{절대값의 합} ($L_1$ Norm) $\rightarrow L_{\text{reg}} = \sum_{j=1}^{J} |\beta_j|$
 
 \textbf{최종 손실 함수:}
 $$
@@ -700,7 +700,7 @@ $$
     \item \textbf{특징:} 
         중요하지 않은 변수의 계수는 '정확히 0'으로 만들어 버립니다. 이는 모델에서 해당 변수를 아예 '제거'하는 것과 같은 효과를 줍니다.
     \item \textbf{장점:} 
-        모델의 복잡도를 근본적으로 낮추는 **자동 변수 선택(Feature Selection)** 기능이 있습니다. 해석하기 쉬운 단순한 모델을 만듭니다.
+        모델의 복잡도를 근본적으로 낮추는 \textbf{자동 변수 선택(Feature Selection)} 기능이 있습니다. 해석하기 쉬운 단순한 모델을 만듭니다.
     \item \textbf{적합한 상황:} 
         수백, 수천 개의 변수 중 실제 중요한 변수는 몇 개 안 된다고 의심될 때 매우 유용합니다.
 \end{itemize}
@@ -802,7 +802,7 @@ $\lambda$는 하이퍼파라미터입니다. 즉, 모델이 스스로 학습하�
 
 단일 검증 세트는 데이터가 어떻게 분할되었느냐에 따라 '운' 좋게 특정 $\lambda$에 유리한 결과가 나올 수 있습니다. (e.g., 검증 데이터가 우연히 직선 형태)
 
-**K-Fold 교차 검증(CV)**은 이 '운'의 요소를 제거하여 더 안정적이고 신뢰할 수 있는 $\lambda$를 찾는, 더 강력한 방법입니다.
+\textbf{K-Fold 교차 검증(CV)}은 이 '운'의 요소를 제거하여 더 안정적이고 신뢰할 수 있는 $\lambda$를 찾는, 더 강력한 방법입니다.
 
 \begin{enumerate}
     \item \textbf{Step 1: 데이터 분할 (Split Data)}

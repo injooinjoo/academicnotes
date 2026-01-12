@@ -1,0 +1,254 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{mathbox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (수학적 증명)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Structuring Machine Learning Projects: \\ Single Number Evaluation Metric (F1 Score)}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-5.] Deep Learning Fundamentals \textit{- Completed}
+    \item[\textbf{Chapter 6.}] \textbf{Structuring ML Projects (Current Unit)}
+    \begin{itemize}
+        \item 6.1 Orthogonalization Strategy \textit{- Completed}
+        \item \textbf{6.2 Single Number Evaluation Metric}
+        \begin{itemize}
+            \item Confusion Matrix (TP, TN, FP, FN)
+            \item Precision vs Recall Trade-off
+            \item Why Harmonic Mean? (F1 Score)
+            \item Implementation
+        \end{itemize}
+        \item 6.3 Satisficing and Optimizing Metrics \textit{- Upcoming}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 우리는 프로젝트의 방향을 잡는 '직교화' 전략을 배웠습니다. 하지만 방향을 잡았다고 끝이 아닙니다.
+팀원이 두 개의 모델을 들고 왔습니다.
+\textbf{"A는 정밀도가 높은데 재현율이 낮고, B는 정밀도는 낮은데 재현율이 높습니다. 뭘 쓸까요?"}
+여기서 머뭇거리면 프로젝트가 멈춥니다. 앤드류 응 교수는 \textbf{"평가 지표는 하나여야 한다(Single Number Metric)"}고 강조합니다. 그래야 수많은 실험 결과를 한 줄로 세우고, 1등을 바로 뽑을 수 있기 때문입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 불균형 데이터에서 모델 성능을 정확히 평가하는 \textbf{F1 Score}를 다룹니다.
+\begin{itemize}
+    \item \textbf{정의:} 정밀도(Precision)와 재현율(Recall)의 개념을 오차 행렬을 통해 익힙니다.
+    \item \textbf{이유:} 왜 단순 평균이 아닌 \textbf{조화 평균(Harmonic Mean)}을 써야 하는지 증명합니다.
+    \item \textbf{관계:} 임계값 변화에 따라 두 지표가 반대로 움직이는 \textbf{Trade-off} 관계를 파악합니다.
+    \item \textbf{구현:} Python으로 직접 지표를 계산하고 분석합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology: Confusion Matrix}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{구분} & \textbf{예측: Positive (1)} & \textbf{예측: Negative (0)} \\ \hline
+\textbf{실제: Positive (1)} & \textbf{TP} (정답) & \textbf{FN} (놓침/미검출) \\ \hline
+\textbf{실제: Negative (0)} & \textbf{FP} (오해/거짓 알람) & \textbf{TN} (정답) \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 두 마리 토끼 잡기}
+
+\subsection{1. Precision (정밀도)}
+
+\textbf{질문:} "모델이 찾은 것 중에 진짜는 얼마나 되는가?"
+$$ P = \frac{TP}{TP + FP} $$
+\begin{analogybox}{깐깐한 미식가}
+"나는 맛없는 건 절대 안 먹어." (FP 싫어함)
+맛있는 것(TP)을 좀 놓치더라도, 내 입에 들어오는 건 무조건 맛있어야 합니다.
+\textbf{활용:} 스팸 메일 분류 (정상 메일을 스팸통에 넣으면 치명적임).
+\end{analogybox}
+
+\subsection{2. Recall (재현율)}
+
+\textbf{질문:} "실제 존재하는 것 중에 모델이 얼마나 찾았는가?"
+$$ R = \frac{TP}{TP + FN} $$
+\begin{analogybox}{그물망 어선}
+"쓰레기가 좀 섞여도 좋으니, 물고기는 다 잡아라." (FN 싫어함)
+잡동사니(FP)가 걸려도 괜찮지만, 물고기(TP)를 놓치면 안 됩니다.
+\textbf{활용:} 암 진단 (암 환자를 정상이라 하면 생명이 위험함), 도둑 탐지.
+\end{analogybox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: Why Harmonic Mean? (F1 Score)}
+
+왜 두 지표를 그냥 더해서 2로 나누면(산술 평균) 안 될까요?
+
+\begin{mathbox}{바보 모델의 함정}
+암 환자가 1\%인 데이터가 있습니다.
+어떤 모델이 \textbf{"무조건 암이다(1)"}라고 예측한다고 합시다. (Recall = 1.0, Precision $\approx$ 0.01)
+
+\textbf{1. 산술 평균 (Arithmetic Mean):}
+$$ \frac{P + R}{2} = \frac{0.01 + 1.0}{2} \approx \textbf{0.5} $$
+$\rightarrow$ 말도 안 되는 모델에게 50점이나 줍니다. 과대평가입니다.
+
+\textbf{2. 조화 평균 (Harmonic Mean, F1 Score):}
+$$ F1 = \frac{2}{\frac{1}{P} + \frac{1}{R}} = 2 \frac{P \times R}{P + R} $$
+$$ 2 \frac{0.01 \times 1.0}{0.01 + 1.0} \approx \textbf{0.019} $$
+$\rightarrow$ 둘 중 하나라도 낮으면 점수를 확 깎아버립니다. 이것이 우리가 원하는 평가 방식입니다.
+\end{mathbox}
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Metric Calculation}
+
+`scikit-learn`을 쓰면 쉽지만, 원리 이해를 위해 `numpy`로 직접 구현해 봅시다.
+
+\begin{lstlisting}[language=Python, caption=Precision, Recall, F1 Implementation, breaklines=true]
+import numpy as np
+
+def calculate_metrics(y_true, y_pred):
+    """
+    y_true: 실제값 (0 or 1)
+    y_pred: 예측값 (0 or 1)
+    """
+    # 불리언 인덱싱으로 TP, FP, FN 계산 (Vectorized)
+    TP = np.sum((y_true == 1) \& (y_pred == 1))
+    FP = np.sum((y_true == 0) \& (y_pred == 1))
+    FN = np.sum((y_true == 1) \& (y_pred == 0))
+    
+    # 0으로 나누기 방지용 엡실론
+    epsilon = 1e-7
+    
+    # Precision \& Recall
+    precision = TP / (TP + FP + epsilon)
+    recall = TP / (TP + FN + epsilon)
+    
+    # F1 Score (Harmonic Mean)
+    f1 = 2 * (precision * recall) / (precision + recall + epsilon)
+    
+    return precision, recall, f1
+
+# --- 실행 ---
+if __name__ == "__main__":
+    # 암환자(1) 2명, 정상(0) 8명
+    y_true = np.array([0, 1, 0, 0, 1, 0, 0, 0, 0, 0])
+    
+    # 모델 예측: 1명은 맞췄지만, 정상인 1명을 오진함
+    y_pred = np.array([0, 1, 0, 0, 0, 1, 0, 0, 0, 0])
+    
+    p, r, f1 = calculate_metrics(y_true, y_pred)
+    
+    print(f"Precision: {p:.2f}") # 0.50 (2번 예측해서 1번 맞음)
+    print(f"Recall:    {r:.2f}") # 0.50 (실제 2명 중 1명 찾음)
+    print(f"F1 Score:  {f1:.2f}") # 0.50
+\end{lstlisting}
+
+% --- 8. FAQ ---
+\section{FAQ \& Pitfalls}
+
+\textbf{Q. Accuracy(정확도)는 언제 쓰나요?} \\
+\textbf{A.} 데이터 클래스 비율이 50:50으로 균형 잡혀 있을 때만 씁니다. 불균형 데이터(99:1)에서는 무조건 0으로 찍어도 정확도가 99\%가 나오므로 무의미합니다.
+
+\textbf{Q. Recall이 Precision보다 훨씬 중요한 경우는요?} \\
+\textbf{A.} F1 Score는 두 지표를 1:1로 봅니다. Recall을 더 중요하게 보고 싶다면 \textbf{F2 Score}(Recall에 가중치)를 쓰면 됩니다. 반대는 F0.5 Score입니다.
+
+% --- 9. 다음 단원 연결 ---
+\section*{🔗 다음 단계 (Next Step)}
+이제 우리는 성능을 평가하는 단일 숫자(F1 Score)를 얻었습니다.
+그런데 현실에서는 성능뿐만 아니라 제약 조건도 있습니다. \textbf{"정확도는 높아야 하지만, 실행 시간은 10ms 이내여야 한다."}
+
+이런 복잡한 요구사항을 어떻게 단일 지표로 정리할까요? 다음 시간에는 \textbf{[Satisficing and Optimizing Metrics]}를 통해, '최적화해야 할 것'과 '만족시켜야 할 것'을 구분하는 전략을 배웁니다.
+
+\vspace{0.5cm}
+
+\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{enumerate}
+    \item \textbf{Need:} 불균형 데이터에서는 정확도 대신 Precision/Recall을 봐야 한다.
+    \item \textbf{Trade-off:} Precision과 Recall은 반비례 관계다. 둘 다 높은 게 최고다.
+    \item \textbf{F1 Score:} 조화 평균이다. 극단적인 값(하나만 높은 경우)에 페널티를 주어 균형을 잡는다.
+    \item \textbf{Single Number:} 지표를 하나로 합쳐야 빠른 의사결정이 가능하다.
+\end{enumerate}
+\end{summarybox}
+
+\end{document}

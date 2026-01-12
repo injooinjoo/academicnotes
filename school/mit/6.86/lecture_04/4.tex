@@ -1,0 +1,251 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 4}
+\fancyhead[R]{Optimization (GD \& SGD)}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 가장 낮은 곳을 향하여}}
+\author{Unit 4: Optimization (최적화)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 2, 3: Modeling (목적 함수 $J(\theta)$ 정의)
+    \item \textbf{\textcolor{mainblue}{Unit 4: Optimization (현재 단원: $J(\theta)$를 최소화하는 $\theta^*$ 찾기)}}
+    \begin{itemize}
+        \item 4.1 Gradient Descent (안개 낀 산 내려오기)
+        \item 4.2 Stochastic Gradient Descent (빠르고 거친 이동)
+        \item 4.3 Convergence \& Learning Rate (멈추는 기술)
+    \end{itemize}
+    \item Unit 5: Non-linear Classification (Neural Nets)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 4. 최적화 방법론 (Optimization)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 3에서 우리는 "마진을 최대화하라"는 멋진 목표(목적 함수)를 세웠습니다. 하지만 목표만 있다고 문제가 풀리지는 않습니다. 서울(현재 파라미터)에서 부산(최적 파라미터)을 가야 하는데, 지도도 없고 나침반(기울기)만 하나 덜렁 있는 상황입니다. 이번 단원에서는 이 나침반 하나에 의지해 가장 낮은 계곡을 찾아가는 알고리즘을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 손실 함수 $J(\theta)$의 최솟값을 찾기 위한 두 가지 핵심 알고리즘, \textbf{경사 하강법(GD)}과 \textbf{확률적 경사 하강법(SGD)}을 다룹니다. 특히 딥러닝의 표준인 SGD가 왜 수학적으로 정당한지(Unbiased Estimator), 그리고 진동하는 SGD를 어떻게 수렴시킬 것인지(Learning Rate Decay)에 대한 이론적 배경을 학습합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Gradient ($\nabla J$)} & 현재 위치에서 가장 가파르게 올라가는 방향. (우리는 반대로 감) \\
+\hline
+\textbf{Learning Rate ($\eta$)} & 한 걸음의 보폭. 너무 크면 발산하고 너무 작으면 느리다. \\
+\hline
+\textbf{Batch GD} & 한 걸음 갈 때마다 모든 데이터를 다 읽고 신중하게 가는 방법. \\
+\hline
+\textbf{SGD} & 데이터 하나만 보고 "이쪽인 것 같아!" 하고 뛰어가는 방법. \\
+\hline
+\textbf{Epoch} & 전체 데이터를 한 번 훑어보는 단위. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 경사 하강법 (Gradient Descent, GD)}
+
+\begin{conceptbox}{개념 1: 안개 낀 산에서 내려오기}
+\textbf{한 줄 요약:} 현재 위치에서 발밑을 더듬어 경사가 가장 급한 쪽으로 한 걸음씩 내려갑니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{1) 알고리즘}
+전체 데이터셋 $S_n$에 대한 평균 손실 함수의 기울기를 계산합니다.
+$$ \theta_{t+1} = \theta_t - \eta \nabla_\theta J(\theta_t) $$
+\begin{itemize}
+    \item \textbf{마이너스($-$)의 의미:} 기울기는 '올라가는' 방향이므로, 내려가기 위해 반대로 이동합니다.
+    \item \textbf{수학적 원리:} 테일러 급수 1차 근사(선형 근사)에 의해, $\eta$가 충분히 작다면 함수값 감소가 보장됩니다.
+\end{itemize}
+
+\subsubsection*{2) 치명적인 단점 (Computational Bottleneck)}
+한 걸음($t \to t+1$)을 떼기 위해 $n$개의 데이터를 모두 미분해야 합니다.
+\begin{itemize}
+    \item $n=1,000,000$이면, 1보 전진을 위해 100만 번 계산해야 합니다. ($O(n)$ Cost)
+    \item 너무 느려서 빅데이터 학습에는 사용할 수 없습니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 확률적 경사 하강법 (Stochastic Gradient Descent, SGD)}
+
+\begin{conceptbox}{개념 2: 술 취한 사람의 귀가}
+\textbf{한 줄 요약:} 전체의 의견을 듣지 않고, 지나가는 사람(데이터) 한 명 붙잡고 길을 물어서 갑니다. 비틀거리지만(Noisy), 결국 집(최적해)으로 갑니다.
+\end{conceptbox}
+
+\subsubsection*{1) 아이디어}
+"기울기의 평균을 구하나, 샘플 하나만 뽑아서 구하나, 기댓값은 같지 않을까?"
+
+\subsubsection*{2) 업데이트 규칙}
+랜덤하게 데이터 $i$를 하나 뽑아서 업데이트합니다.
+$$ \theta_{t+1} = \theta_t - \eta_t \nabla_\theta Loss(x^{(i)}, y^{(i)}; \theta_t) $$
+\begin{itemize}
+    \item \textbf{비용:} $O(n) \to O(1)$로 획기적 감소.
+    \item \textbf{속도:} GD가 1걸음 갈 때, SGD는 $n$걸음을 갈 수 있습니다.
+\end{itemize}
+
+\subsubsection*{3) 수학적 정당성 (Unbiased Estimator)}
+개별 데이터의 기울기는 전체 기울기의 \textbf{비편향 추정량(Unbiased Estimator)}입니다.
+$$ \mathbb{E}[\nabla Loss(x^{(i)})] = \nabla J(\theta) $$
+즉, 한 번 한 번은 엉뚱한 방향일 수 있어도(High Variance), 평균적으로는 올바른 방향을 가리킵니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. SGD의 수렴성과 학습률 스케줄링}
+
+\begin{conceptbox}{개념 3: 멈추는 법을 배워라}
+\textbf{한 줄 요약:} GD는 바닥에 오면 알아서 멈추지만, SGD는 바닥에서도 계속 진동합니다. 따라서 갈수록 보폭($\eta$)을 줄여야 합니다.
+\end{conceptbox}
+
+
+
+\subsubsection*{1) GD vs SGD의 경로 비교}
+\begin{itemize}
+    \item \textbf{GD:} 등고선의 수직 방향으로 부드러운 곡선을 그리며 최솟값에 안착.
+    \item \textbf{SGD:} 지그재그로 요동치며(Fluctuation) 이동. 최솟값 근처에서도 멈추지 않고 주변을 맴돔.
+\end{itemize}
+
+\subsubsection*{2) 로빈스-몬로 조건 (Robbins-Monro Conditions)}
+SGD가 수학적으로 수렴하기 위한 학습률 $\eta_t$의 조건입니다.
+\begin{enumerate}
+    \item $\sum \eta_t = \infty$: \textbf{(도달 가능성)} 보폭의 합은 무한대여야 합니다. (시작점이 아무리 멀어도 갈 수 있어야 함).
+    \item $\sum \eta_t^2 < \infty$: \textbf{(수렴 가능성)} 보폭 제곱의 합은 유한해야 합니다. (점점 줄어들어 진동이 멈춰야 함).
+\end{enumerate}
+\textbf{대표적인 스케줄:} $\eta_t = \frac{1}{t}$ 또는 $\eta_t = \frac{C}{t + \text{offset}}$.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넷플릭스 추천 시스템 학습}
+
+\begin{storybox}{Scenario: 수억 명의 시청 기록 학습}
+당신은 전 세계 2억 명의 유저 데이터를 이용해 추천 알고리즘을 학습시킵니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{Batch GD 시도:}
+    파라미터를 한 번 업데이트하려면 2억 개의 로그를 다 읽어야 합니다.
+    $\rightarrow$ 1 Epoch 도는 데 일주일 걸림. 학습 불가.
+    
+    \item \textbf{SGD 적용:}
+    유저가 영상을 클릭할 때마다 즉시 그 데이터 하나로 파라미터를 미세 조정합니다.
+    $\rightarrow$ 실시간으로 모델이 학습되며, 1시간 만에 괜찮은 성능에 도달.
+    
+    \item \textbf{문제 발생 (진동):}
+    학습 후반부에 정확도가 오르락내리락하며 불안정합니다.
+    
+    \item \textbf{해결 (Learning Rate Decay):}
+    학습률을 처음엔 0.1로 하다가, 에폭마다 0.1배씩 줄여나갑니다(Annealing).
+    $\rightarrow$ 진동이 잦아들며 최고 성능(Global Minima 근처)에 안착.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. SGD가 GD보다 정확도는 떨어지나요?]
+    \textbf{A.} 이론적으로는 GD가 더 정밀하게 최솟값을 찾을 수 있습니다. 하지만 SGD의 '노이즈'가 오히려 장점이 되기도 합니다. GD는 얕은 함정(Local Minima)에 빠지면 못 나오지만, SGD는 비틀거리는 특성 덕분에 함정을 탈출하여 더 좋은 해(Global Minima)를 찾을 확률이 높습니다.
+    
+    \item[Q2. Mini-batch는 뭔가요?]
+    \textbf{A.} GD(전체)와 SGD(1개)의 절충안입니다. 데이터 32개나 64개씩 묶어서 업데이트하는 방식입니다.
+    \begin{itemize}
+        \item SGD보다 노이즈가 적어 안정적이고,
+        \item 행렬 연산(GPU)을 활용해 속도도 빠릅니다.
+        \item 현대 딥러닝은 99\% 이 \textbf{Mini-batch SGD}를 사용합니다.
+    \end{itemize}
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 최적화라는 엔진을 달았으니, 이제 더 복잡한 모델을 만들어볼까요? 직선(선형 분류기)으로는 XOR 문제를 풀 수 없습니다. 다음 \textbf{Unit 5}에서는 선형 분류기를 여러 층 쌓아서 곡선 경계를 만드는 \textbf{신경망(Neural Networks)}과 딥러닝의 기초를 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 4 핵심 요약}
+\begin{itemize}
+    \item \textbf{Gradient Descent (GD):} 전체 데이터 사용. 안정적이지만 $O(n)$으로 느리다.
+    \item \textbf{Stochastic GD (SGD):} 데이터 1개 사용. $O(1)$로 빠르지만 불안정(Noisy)하다.
+    \item \textbf{Unbiased Estimator:} SGD의 기댓값은 GD와 같다. (평균적으로는 바른 방향).
+    \item \textbf{Step Size Schedule:} SGD의 진동을 잡기 위해 학습률 $\eta_t$를 점점 줄여야 한다 (Decay).
+\end{itemize}
+\end{summarybox}
+
+\end{document}

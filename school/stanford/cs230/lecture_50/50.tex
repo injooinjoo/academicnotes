@@ -1,0 +1,229 @@
+\documentclass[a4paper, 11pt]{article}
+
+% --- 패키지 설정 ---
+\usepackage{kotex} % 한글 지원
+\usepackage{geometry} % 여백 설정
+\geometry{left=25mm, right=25mm, top=25mm, bottom=25mm}
+\usepackage{amsmath, amssymb, amsfonts} % 수식 패키지
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절 % 이미지 삽입
+\usepackage{hyperref} % 하이퍼링크
+\usepackage{xcolor} % 색상 지원
+\usepackage{listings} % 코드 블록
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable} % 박스 디자인
+\usepackage{enumitem} % 리스트 스타일
+\usepackage{booktabs} % 표 디자인
+\usepackage{array} % 표 정렬
+
+% --- 색상 정의 ---
+\definecolor{conceptblue}{RGB}{60, 100, 160}
+\definecolor{analogygreen}{RGB}{80, 160, 100}
+\definecolor{alertred}{RGB}{200, 60, 60}
+\definecolor{exampleorange}{RGB}{230, 120, 30}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
+
+% --- 코드 스타일 설정 ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{analogygreen},
+    keywordstyle=\color{conceptblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{exampleorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- 박스 스타일 정의 ---
+\newtcolorbox{summarybox}[1]{
+    colback=conceptblue!5!white,
+    colframe=conceptblue!80!black,
+    fonttitle=\bfseries,
+    title=📌 #1
+}
+
+\newtcolorbox{analogybox}[1]{
+    colback=analogygreen!5!white,
+    colframe=analogygreen!80!black,
+    fonttitle=\bfseries,
+    title=💡 #1 (직관적 비유)
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=alertred!5!white,
+    colframe=alertred!80!black,
+    fonttitle=\bfseries,
+    title=⚠️ #1 (오해 방지 가이드)
+}
+
+\newtcolorbox{formulabox}[1]{
+    colback=exampleorange!5!white,
+    colframe=exampleorange!80!black,
+    fonttitle=\bfseries,
+    title=🧮 #1 (핵심 메커니즘)
+}
+
+% --- 문서 정보 ---
+\title{\textbf{[CS230] Sequence Models: \\ Transformers \& Self-Attention}}
+\author{Lecturer: Gemini (Integrated Editor)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% --- 1. 전체 목차 (TOC) ---
+\section*{📚 Course Table of Contents}
+\begin{itemize}
+    \item[Chapter 1-9.] Deep Learning Fundamentals \& CNNs \textit{- Completed}
+    \item[\textbf{Chapter 10.}] \textbf{Sequence Models (Current Part)}
+    \begin{itemize}
+        \item 10.1-10.11 RNN, LSTM, Attention Mechanism \textit{- Completed}
+        \item \textbf{10.12 Transformers \& Modern Attention}
+        \begin{itemize}
+            \item Self-Attention: Understanding Relationships
+            \item The Q, K, V Framework (Query, Key, Value)
+            \item Multi-Head Attention: Parallel Perspectives
+            \item Beyond Transformers: LLM and ViT
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm}
+
+% --- 3. 이전 단원 연결 ---
+\section*{🔗 지난 시간 복습 및 연결}
+지난 시간에 배운 '어텐션'이 RNN이라는 엔진의 성능을 높여주는 보조 장치였다면, 오늘 배울 \textbf{트랜스포머(Transformer)}는 그 엔진 자체를 통째로 갈아치운 혁명입니다. 
+구글의 2017년 논문 \textbf{"Attention Is All You Need"}는 순차적 처리(RNN)를 버리고 오직 어텐션만으로 문장을 이해할 수 있음을 증명했습니다. 이것이 바로 ChatGPT와 모든 거대 언어 모델(LLM)의 탄생 지점입니다.
+
+% --- 4. 개요 ---
+\section{Unit Overview}
+\begin{summarybox}{핵심 목표}
+이 단원은 현대 AI 시스템의 중추인 트랜스포머 아키텍처의 핵심 원리를 다룹니다.
+\begin{itemize}
+    \item \textbf{Self-Attention:} 문장 내 단어들이 서로 어떤 관계를 맺고 있는지 스스로 학습하는 원리를 배웁니다.
+    \item \textbf{Q, K, V:} 정보 검색의 관점에서 어텐션을 계산하는 세 가지 구성 요소(Query, Key, Value)를 파악합니다.
+    \item \textbf{Multi-Head:} 여러 개의 어텐션을 병렬로 수행하여 다각적인 문맥을 추출하는 이유를 학습합니다.
+    \item \textbf{병렬성:} RNN과 달리 문장 전체를 동시에 처리함으로써 얻는 계산 효율성을 이해합니다.
+\end{itemize}
+\end{summarybox}
+
+% --- 5. 용어 정리 ---
+\section{Essential Terminology: The QKV Framework}
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{용어} & \textbf{의미} & \textbf{역할} \\ \hline
+\textbf{Query (Q)} & 질문 & "지금 내가 찾고 싶은 정보는 무엇인가?" \\ \hline
+\textbf{Key (K)} & 인덱스/색인 & "내가 가진 정보의 키워드는 무엇인가?" \\ \hline
+\textbf{Value (V)} & 내용 & "키워드에 해당하는 실제 값은 무엇인가?" \\ \hline
+\textbf{Scaled Dot-Product} & 유사도 계산 & Q와 K를 곱해 점수를 내고 루트 차원으로 나눔. \\ \hline
+\end{tabular}
+\end{center}
+
+% --- 6. 핵심 개념 상세 설명 ---
+\section{Core Concepts: 자기 자신을 돌아보기}
+
+\subsection{1. Self-Attention: 대명사 해결}
+RNN은 단어를 순서대로 읽었지만, 트랜스포머는 문장 안의 모든 단어 쌍 사이의 관계를 \textbf{한 번에} 계산합니다.
+
+\begin{analogybox}{"it"은 누구인가?}
+\textbf{"The animal didn't cross the street because it was too tired."} \\
+Self-Attention은 "it"이라는 단어를 처리할 때 문장의 모든 단어를 훑습니다.
+모델은 "animal"과의 어텐션 점수를 가장 높게 주어, \textbf{"it = animal"}임을 스스로 깨닫게 됩니다.
+\end{analogybox}
+
+
+
+\subsection{2. Multi-Head Attention}
+하나의 어텐션만으로는 복잡한 문맥을 다 담기 어렵습니다. 트랜스포머는 여러 개의 '헤드'를 병렬로 운영합니다.
+
+\begin{itemize}
+    \item \textbf{Head 1:} 주어와 동사의 관계에 집중
+    \item \textbf{Head 2:} 형용사와 명사의 관계에 집중
+    \item \textbf{Head 3:} 대명사와 선행사의 관계에 집중
+\end{itemize}
+이 다양한 관점들을 나중에 하나로 합쳐(\textbf{Concatenate}) 풍부한 이해력을 갖게 됩니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{Deep Dive: The Attention Math}
+
+트랜스포머의 심장인 Scaled Dot-Product Attention의 수식입니다.
+
+\begin{formulabox}{Scaled Dot-Product Attention}
+$$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$
+\begin{itemize}
+    \item $QK^T$: Query와 Key 사이의 유사도 점수.
+    \item $\sqrt{d_k}$: 차원이 커질 때 점수가 너무 커져 Softmax 기울기가 소실되는 것을 방지하는 \textbf{Scaling} 계수.
+    \item $V$: 최종적으로 가중치를 곱해 정보를 취합할 실제 값.
+\end{itemize}
+\end{formulabox}
+
+
+
+% --- 7. 구현 코드 ---
+\section{Implementation: Conceptual Logic}
+
+TensorFlow를 이용한 어텐션의 핵심 로직입니다.
+
+\begin{lstlisting}[language=Python, caption=Scaled Dot-Product Attention, breaklines=true]
+import tensorflow as tf
+
+def scaled_dot_product_attention(q, k, v, mask=None):
+    # 1. 유사도 Score 계산
+    matmul_qk = tf.matmul(q, k, transpose_b=True)
+
+    # 2. Scaling (루트 차원만큼 나누기)
+    dk = tf.cast(tf.shape(k)[-1], tf.float32)
+    scaled_logits = matmul_qk / tf.math.sqrt(dk)
+
+    # 3. Softmax를 통해 가중치 결정
+    attention_weights = tf.nn.softmax(scaled_logits, axis=-1)
+
+    # 4. Value를 가중 합하여 최종 출력
+    output = tf.matmul(attention_weights, v)
+
+    return output, attention_weights
+\end{lstlisting}
+
+% --- 8. 현대적 트렌드 ---
+\section{Modern Trends: Beyond Transformers}
+
+트랜스포머 이후 AI의 패러다임은 크게 확장되었습니다.
+
+\begin{itemize}
+    \item \textbf{LLM (거대 언어 모델):} GPT, Llama 등 트랜스포머 블록을 수백 개 쌓아 인간 수준의 추론을 수행합니다.
+    \item \textbf{ViT (Vision Transformer):} 이미지도 패치로 나누어 어텐션을 적용합니다. 이제 컴퓨터 비전에서도 트랜스포머가 대세입니다.
+    \item \textbf{Efficiency:} 문장이 길어질 때 계산량이 $N^2$으로 폭발하는 문제를 해결하기 위한 FlashAttention 등이 활발히 연구됩니다.
+\end{itemize}
+
+
+
+% --- 9. 요약 및 마무리 ---
+\section*{🏁 Course Conclusion}
+\begin{summarybox}{최종 요약}
+\begin{enumerate}
+    \item \textbf{Self-Attention:} 단어 간의 유기적 관계를 한 번에 파악하는 혁신적 방식.
+    \item \textbf{No More RNN:} 병렬 처리가 가능해져 모델의 거대화가 가능해짐.
+    \item \textbf{Versatility:} 텍스트를 넘어 이미지, 오디오 등 모든 도메인으로 확장 중.
+\end{enumerate}
+\end{summarybox}
+
+축하합니다! Seq2Seq에서 시작해 어텐션을 거쳐, 세상을 바꾸고 있는 트랜스포머의 원리까지 모두 마스터하셨습니다. 여러분은 이제 현대 딥러닝의 정점에 서 있습니다.
+
+\end{document}

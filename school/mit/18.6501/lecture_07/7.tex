@@ -1,0 +1,250 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 7}
+\fancyhead[R]{Goodness of Fit}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 모델 자체에 대한 의심}}
+\author{Unit 7: Goodness of Fit (적합도 검정)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 5, 6: Parametric Hypothesis Testing (모델을 믿고 $\theta$ 검정)
+    \item \textbf{\textcolor{mainblue}{Unit 7: Goodness of Fit (현재 단원: 모델 $\mathcal{P}$ 자체를 검증)}}
+    \begin{itemize}
+        \item 7.1 Discrete Setting \& Multinomial Distribution
+        \item 7.2 Pearson's $\chi^2$ Test (핵심 공식)
+        \item 7.3 Composite Hypothesis (파라미터를 모를 때)
+        \item 7.4 CDF-based Test (KS Test)
+    \end{itemize}
+    \item Unit 8: General Linear Models (회귀 분석의 확장)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 7. 적합도 검정 (Goodness of Fit)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 6까지 우리는 "이 데이터는 정규분포를 따른다"는 가정하에 평균이 0인지 아닌지를 싸웠습니다(LRT, Wald, Score). 하지만 누군가 근본적인 질문을 던집니다. \textbf{"애초에 데이터가 정규분포가 아니면 어떡할 건데?"} 이번 단원에서는 특정 파라미터가 아니라, 데이터의 분포 모양 자체가 이론과 맞는지 확인하는 법을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+적합도 검정은 \textbf{"관측된 데이터(Reality)"}와 \textbf{"모델이 예측한 데이터(Theory)"} 사이의 거리를 측정하는 과정입니다. 데이터를 범주(Bin)로 나누어 \textbf{다항 분포} 문제로 치환하고, \textbf{피어슨 카이제곱 통계량}을 사용해 오차를 분석합니다. 이때 파라미터를 추정해서 검정할 경우 자유도가 감소하는 원리까지 다룹니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Multinomial Dist.} & 주사위 던지기. 데이터가 여러 칸(Bin) 중 하나에 들어감. \\
+\hline
+\textbf{Observed ($O_j$)} & 실제 데이터가 각 칸에 들어간 횟수 ($N_j$). \\
+\hline
+\textbf{Expected ($E_j$)} & 이론적으로 들어갔어야 할 횟수 ($n p_j$). \\
+\hline
+\textbf{$\chi^2$ Statistic} & $\sum \frac{(O-E)^2}{E}$. 현실과 이론의 괴리감 점수. \\
+\hline
+\textbf{Degrees of Freedom (df)} & 자유롭게 움직일 수 있는 데이터의 개수 ($K-1-d$). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 이산 데이터와 다항 분포 (The Setup)}
+
+\begin{conceptbox}{개념 1: 연속을 이산으로 (Discretization)}
+\textbf{한 줄 요약:} 모양을 비교하기 가장 쉬운 방법은, 구간(Bin)을 나누어 각 구간에 몇 개가 들어갔는지 세는 것입니다. (히스토그램 만들기)
+\end{conceptbox}
+
+
+\subsubsection*{1) 설정 (Setup)}
+데이터가 $K$개의 범주(Category) 중 하나에 떨어집니다.
+\begin{itemize}
+    \item 예: 혈액형 (A, B, O, AB $\rightarrow K=4$)
+    \item 예: 키 (160이하, 160-170, 170-180, 180이상 $\rightarrow K=4$)
+\end{itemize}
+각 범주에 관측된 횟수를 $N_1, ..., N_K$라고 하면, 이 벡터는 \textbf{다항 분포(Multinomial Distribution)}를 따릅니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 피어슨의 카이제곱 검정 (Pearson's $\chi^2$ Test)}
+
+\begin{conceptbox}{개념 2: 현실(Observed)과 이론(Expected)의 거리}
+\textbf{한 줄 요약:} 단순히 차이를 제곱해서 더하는 게 아니라, "기대값이 큰 곳은 오차도 크다"는 점을 감안하여 \textbf{표준화}한 거리입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 시험 점수 보정}
+\begin{itemize}
+    \item 수학(평균 50점)에서 10점 차이 나는 것과,
+    \item 체육(평균 90점)에서 10점 차이 나는 것은 무게감이 다릅니다.
+    \item 오차의 절대적인 크기($(O-E)^2$)가 아니라, 그 동네의 규모($E$) 대비 얼마나 큰지를 봐야 합니다.
+\end{itemize}
+
+\subsubsection*{2) 핵심 공식 ($T_n$)}
+$$ T_n = \sum_{j=1}^K \frac{(N_j - n p_j^0)^2}{n p_j^0} = \sum_{j=1}^K \frac{(\text{Obs} - \text{Exp})^2}{\text{Exp}} $$
+\begin{itemize}
+    \item \textbf{분자 $(O-E)^2$:} 오차의 크기.
+    \item \textbf{분모 $E$:} 분산(Variance) 역할. (포아송/다항분포에서 분산은 평균과 비례함).
+    \item \textbf{의미:} $\frac{\text{오차}}{\text{표준편차}} \approx Z$ (표준정규분포)가 되므로, 이것의 제곱 합은 $\chi^2$가 됩니다.
+\end{itemize}
+
+
+
+\subsubsection*{3) 점근적 성질 (Asymptotic Property)}
+$n \to \infty$일 때,
+$$ T_n \xrightarrow{d} \chi^2_{K-1} $$
+\textbf{왜 $K$가 아니라 $K-1$인가?}
+데이터의 총합은 반드시 $n$이어야 합니다 ($\sum N_j = n$). 마지막 칸($N_K$)은 앞의 $K-1$개 값이 정해지면 자동으로 결정되므로 자유가 없습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 복합 가설 검정 (Composite Goodness of Fit)}
+
+\begin{conceptbox}{개념 3: 옷을 몸에 맞췄다면, 심사 기준을 높여라}
+\textbf{한 줄 요약:} 파라미터를 몰라서 데이터로 추정($\hat{\theta}$)한 뒤 검정할 때는, 이미 데이터를 한 번 훔쳐본 셈이므로 자유도(df)를 깎아서 패널티를 줍니다.
+\end{conceptbox}
+
+\subsubsection*{1) 문제 상황}
+"이 데이터가 포아송 분포를 따르는가?"라고 묻지만, $\lambda$가 3인지 5인지 모릅니다.
+\begin{itemize}
+    \item 해결: 데이터에서 먼저 MLE $\hat{\lambda}$를 구합니다.
+    \item 적용: 그 $\hat{\lambda}$를 이용해 기대 확률 $p_j(\hat{\lambda})$를 계산합니다.
+\end{itemize}
+
+\subsubsection*{2) 자유도의 변화 (핵심 이론)}
+$$ T_n = \sum \frac{(N_j - n p_j(\hat{\theta}))^2}{n p_j(\hat{\theta})} \xrightarrow{d} \chi^2_{K-1-d} $$
+\begin{itemize}
+    \item $d$: 추정한 파라미터의 개수.
+    \item \textbf{직관:} 파라미터를 추정하는 과정에서 데이터의 정보(자유도)를 $d$만큼 소모했습니다. 모델을 데이터에 "끼워 맞췄기(Fitting)" 때문에, 오차($O-E$)가 자연 상태보다 인위적으로 줄어듭니다. 이를 보정하기 위해 분포의 기준을 더 빡빡하게($df$ 감소) 잡는 것입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 확률형 아이템(가챠) 조작 의혹 검증}
+
+\begin{storybox}{Scenario: 유저들의 봉기}
+당신은 넥슨의 게임 운영자입니다. 유저들이 "전설/영웅/일반 아이템 확률이 공지된 것과 다르다!"고 소송을 제기했습니다.
+공지 확률: 전설(10\%), 영웅(30\%), 일반(60\%). ($K=3$)
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터 수집:} 100회 뽑기 결과 ($n=100$)
+    \begin{itemize}
+        \item 관측($O$): 전설 5개, 영웅 25개, 일반 70개.
+    \end{itemize}
+    \item \textbf{기대값 계산 ($E$):}
+    \begin{itemize}
+        \item 전설: $100 \times 0.1 = 10$
+        \item 영웅: $100 \times 0.3 = 30$
+        \item 일반: $100 \times 0.6 = 60$
+    \end{itemize}
+    \item \textbf{카이제곱 통계량 계산:}
+    $$ \chi^2 = \frac{(5-10)^2}{10} + \frac{(25-30)^2}{30} + \frac{(70-60)^2}{60} $$
+    $$ = \frac{25}{10} + \frac{25}{30} + \frac{100}{60} = 2.5 + 0.83 + 1.67 = 5.0 $$
+    \item \textbf{판정 (자유도 $K-1 = 2$):}
+    유의수준 5\%에서 $\chi^2_2$의 임계값은 \textbf{5.99}입니다.
+    $$ 5.0 < 5.99 \quad (\text{기각 실패}) $$
+    \item \textbf{결론:} "관측된 차이가 다소 있긴 하지만(전설이 적게 나옴), 통계적으로 '조작'이라 단정할 만큼 극단적이진 않습니다. 우연의 범위 내입니다." (유저들의 분노는 가라앉지 않겠지만, 수학적으론 무죄입니다.)
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 데이터가 적어도 이 방법을 쓸 수 있나요?]
+    \textbf{A.} 위험합니다. 보통 각 칸(Bin)의 기대 빈도($E_j$)가 최소 5 이상은 되어야 카이제곱 분포 근사가 잘 맞습니다. 만약 기대 빈도가 너무 작으면, 인접한 칸들을 합쳐서(Merge) $E \ge 5$를 만들어야 합니다.
+    
+    \item[Q2. 그냥 $(O-E)$만 보면 안 되나요? 왜 제곱하고 나누나요?]
+    \textbf{A.} $(O-E)$를 그냥 더하면 양수와 음수가 상쇄되어 항상 0이 됩니다. 그래서 제곱을 합니다. 그리고 $E$로 나누는 것은 "가중치" 때문입니다. 1000개 중 10개 차이나는 것과, 20개 중 10개 차이나는 것은 다르기 때문입니다.
+    
+    \item[Q3. 연속형 데이터는 어떻게 하나요?]
+    \textbf{A.} 카이제곱 검정을 쓰려면 강제로 구간(Bin)을 나눠야 합니다(정보 손실 발생). 그게 싫다면 구간을 나누지 않고 누적 분포 함수(CDF) 자체를 비교하는 \textbf{콜모고로프-스미르노프(KS) 검정}을 사용하면 됩니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 우리는 이제 $\theta$를 찾는 것(Unit 2~6)을 넘어 모델 전체를 검증(Unit 7)했습니다. 통계학의 기초는 끝났습니다. 이제 통계학의 꽃이자 머신러닝의 시초인 \textbf{Unit 8: 선형 회귀 분석 (Linear Regression)}으로 넘어가, 변수와 변수 사이의 관계($X \to Y$)를 모델링합니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 7 핵심 요약}
+\begin{itemize}
+    \item \textbf{관점 전환:} 파라미터 값이 아니라 분포의 모양(Shape)을 검정한다.
+    \item \textbf{카이제곱 통계량:} $\sum \frac{(O-E)^2}{E}$. 관측값과 기대값의 표준화된 거리.
+    \item \textbf{자유도(df):} 기본적으로 $K-1$. 단, 파라미터를 데이터로 추정했다면 $K-1-(\text{추정 파라미터 수})$로 줄어든다.
+    \item \textbf{주의점:} 각 칸의 기대 빈도가 너무 작으면(5 미만) 신뢰할 수 없다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

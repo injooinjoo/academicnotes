@@ -623,7 +623,7 @@ Additionally, use \code{option("badRecordsPath", "path")} to save corrupt record
 %------------------------------
 
 \textbf{Duplicates:}
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 df.dropDuplicates(["id", "color"])  # Remove duplicates based on keys
 \end{lstlisting}
 
@@ -731,7 +731,7 @@ With DLT, developers focus on \textbf{business logic} (transformations), while t
     \item Great for dashboards and reporting
 \end{itemize}
 
-\begin{lstlisting}[style=sqlstyle, caption={DLT SQL Examples}]
+\begin{lstlisting}[style=sqlstyle, caption={DLT SQL Examples}, breaklines=true]
 -- Streaming Table from Autoloader
 CREATE STREAMING TABLE bronze_transactions
 AS SELECT * FROM cloud_files("/path/data", "json");
@@ -753,7 +753,7 @@ GROUP BY category;
 
 The most powerful DLT feature: automatically handling Insert, Update, Delete operations from source data.
 
-\begin{lstlisting}[style=pythonstyle, caption={DLT CDC Pipeline Example}]
+\begin{lstlisting}[style=pythonstyle, caption={DLT CDC Pipeline Example}, breaklines=true]
 import dlt
 from pyspark.sql.functions import col, expr
 
@@ -811,7 +811,7 @@ def silver_transactions():
 
 DLT allows declaring data quality rules directly in pipeline definitions:
 
-\begin{lstlisting}[style=pythonstyle, caption={DLT Expectations Example}]
+\begin{lstlisting}[style=pythonstyle, caption={DLT Expectations Example}, breaklines=true]
 import dlt
 
 # Drop rows that fail this expectation
@@ -900,7 +900,7 @@ When running structured streaming (not DLT), you may encounter checkpoint errors
 \end{itemize}
 
 \textbf{Manual Solution:}
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 checkpoint_path = "/path/to/checkpoint"
 dbutils.fs.rm(checkpoint_path, recurse=True)  # Delete old checkpoint
 # Then restart your streaming query

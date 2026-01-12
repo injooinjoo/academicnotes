@@ -405,7 +405,7 @@
 
 % 1. 개요
 \section*{개요 (Overview)}
-이번 강의는 현대 자연어 처리(NLP)의 가장 중요한 분기점인 **Attention Mechanism(어텐션 메커니즘)**과 이를 기반으로 한 **Transformer(트랜스포머)** 모델을 다룹니다.
+이번 강의는 현대 자연어 처리(NLP)의 가장 중요한 분기점인 \textbf{Attention Mechanism(어텐션 메커니즘)}과 이를 기반으로 한 \textbf{Transformer(트랜스포머)} 모델을 다룹니다.
 
 기존 순환 신경망(RNN/LSTM)이 가진 한계점(병목 현상, 기울기 소실, 병렬화 불가)을 극복하기 위해 어텐션이 어떻게 등장했는지 살펴보고, 나아가 "순환(Recurrence)을 완전히 제거한" 트랜스포머 아키텍처의 작동 원리(Self-Attention, Multi-Head Attention, Positional Encoding)를 학습합니다. 마지막으로 이 구조가 어떻게 BERT와 GPT로 발전했는지 이해합니다.
 
@@ -453,7 +453,7 @@
 \section{RNN의 한계와 어텐션의 등장}
 
 \subsection{기존 RNN/LSTM의 문제점}
-과거 번역 모델(Encoder-Decoder)은 RNN을 사용했습니다. 입력 문장을 인코더가 읽어서 하나의 **고정된 크기의 벡터(Context Vector)**로 압축하고, 디코더가 이를 풀어서 번역문을 만들었습니다.
+과거 번역 모델(Encoder-Decoder)은 RNN을 사용했습니다. 입력 문장을 인코더가 읽어서 하나의 \textbf{고정된 크기의 벡터(Context Vector)}로 압축하고, 디코더가 이를 풀어서 번역문을 만들었습니다.
 
 \begin{itemize}
     \item \textbf{정보 병목(Information Bottleneck):} 100단어짜리 긴 문장을 겨우 128차원 벡터 하나에 압축해야 합니다. 정보 손실이 발생할 수밖에 없습니다.
@@ -467,15 +467,15 @@ RNN이 "문장 전체를 외운 뒤 한 번에 번역하는 통역사"라면, \\
 어텐션은 \textbf{"번역할 때마다 원문을 다시 힐끔힐끔 쳐다보는 통역사"}입니다.
 \end{conceptbox}
 
-어텐션 메커니즘은 디코더가 단어를 출력할 때마다 인코더의 **모든 입력 단어**를 다시 참고합니다. 단, 그냥 보는 것이 아니라 **"지금 번역할 단어와 관련된 부분"**에 가중치(Attention Weight)를 두어 봅니다.
+어텐션 메커니즘은 디코더가 단어를 출력할 때마다 인코더의 \textbf{모든 입력 단어}를 다시 참고합니다. 단, 그냥 보는 것이 아니라 \textbf{"지금 번역할 단어와 관련된 부분"}에 가중치(Attention Weight)를 두어 봅니다.
 
 \subsection{수식 없는 어텐션 작동 원리}
-1. **스코어 계산(Alignment Score):** 현재 디코더의 상태와 인코더의 각 단어가 얼마나 관련 있는지 계산합니다.
-2. **확률 변환(Softmax):** 스코어를 0~1 사이의 확률값(합이 1)으로 바꿉니다. 이것이 '어텐션 가중치'입니다.
+1. \textbf{스코어 계산(Alignment Score):} 현재 디코더의 상태와 인코더의 각 단어가 얼마나 관련 있는지 계산합니다.
+2. \textbf{확률 변환(Softmax):} 스코어를 0~1 사이의 확률값(합이 1)으로 바꿉니다. 이것이 '어텐션 가중치'입니다.
    \begin{itemize}
        \item 예: "Zone(프랑스어)"을 번역할 때, "Area(영어)"에 0.7, "Economic"에 0.2의 가중치를 둠.
    \end{itemize}
-3. **가중합(Weighted Sum):** 인코더의 정보들에 가중치를 곱해 더합니다. 이것이 새로운 동적 문맥 벡터(Dynamic Context Vector)가 됩니다.
+3. \textbf{가중합(Weighted Sum):} 인코더의 정보들에 가중치를 곱해 더합니다. 이것이 새로운 동적 문맥 벡터(Dynamic Context Vector)가 됩니다.
 
 \begin{figure}[h!]
     \centering
@@ -493,14 +493,14 @@ RNN이 "문장 전체를 외운 뒤 한 번에 번역하는 통역사"라면, \\
 % 4. 트랜스포머 아키텍처
 \section{트랜스포머 (Transformer)}
 
-2017년 구글은 \textit{"Attention Is All You Need"}라는 논문을 통해 **RNN을 완전히 제거한** 모델인 트랜스포머를 제안합니다.
+2017년 구글은 \textit{"Attention Is All You Need"}라는 논문을 통해 \textbf{RNN을 완전히 제거한} 모델인 트랜스포머를 제안합니다.
 
 \subsection{왜 RNN을 버렸는가?}
 RNN은 순서대로 계산해야 하므로 느립니다. 트랜스포머는 문장 전체를 한 번에 행렬로 입력받아 병렬 처리가 가능합니다. 이를 통해 학습 속도를 비약적으로 높이고, 더 많은 데이터를 학습할 수 있게 되었습니다(GPT, BERT의 탄생 배경).
 
 \subsection{핵심 1: 포지셔널 인코딩 (Positional Encoding)}
-RNN이 없으면 단어의 **순서 정보**가 사라집니다. "I love you"와 "You love I"를 구별할 수 없게 됩니다.
-따라서, 단어 벡터에 **위치 정보(Positional Encoding)**를 더해줍니다.
+RNN이 없으면 단어의 \textbf{순서 정보}가 사라집니다. "I love you"와 "You love I"를 구별할 수 없게 됩니다.
+따라서, 단어 벡터에 \textbf{위치 정보(Positional Encoding)}를 더해줍니다.
 \begin{itemize}
     \item 사인(sin)과 코사인(cos) 함수를 이용해 각 위치마다 고유한 패턴의 값을 더해줍니다.
     \item 이를 통해 모델은 단어의 상대적/절대적 위치를 파악할 수 있습니다.
@@ -534,7 +534,7 @@ RNN이 없으면 단어의 **순서 정보**가 사라집니다. "I love you"와
 \subsection{핵심 3: 멀티 헤드 어텐션 (Multi-Head Attention)}
 한 번만 어텐션을 수행하는 것이 아니라, 여러 개의 헤드(Head)로 나누어 병렬로 수행합니다.
 \begin{itemize}
-    \item **비유:** 같은 문장을 읽을 때, 한 명은 문법을 보고, 한 명은 의미를 보고, 한 명은 대명사 지칭을 봅니다. 나중에 이들의 통찰을 합칩니다.
+    \item \textbf{비유:} 같은 문장을 읽을 때, 한 명은 문법을 보고, 한 명은 의미를 보고, 한 명은 대명사 지칭을 봅니다. 나중에 이들의 통찰을 합칩니다.
     \item 이를 통해 모델은 다양한 관점(Representation Subspaces)에서 문장을 이해할 수 있습니다.
 \end{itemize}
 
@@ -543,8 +543,8 @@ RNN이 없으면 단어의 **순서 정보**가 사라집니다. "I love you"와
 \subsection{핵심 4: 마스킹 (Masking)}
 트랜스포머의 디코더(Decoder) 학습 시 사용됩니다.
 \begin{itemize}
-    \item **문제:** 디코더는 정답 문장을 생성해야 하는데, 학습 시 정답 전체를 한 번에 입력받습니다. 모델이 뒤에 올 정답 단어를 미리 "컨닝(Cheating)"하면 안 됩니다.
-    \item **해결:** 현재 위치보다 뒤에 있는 단어들의 점수를 $-\infty$(음의 무한대)로 만들어 Softmax 결과가 0이 되게 합니다. 이를 **Look-ahead Mask**라고 합니다.
+    \item \textbf{문제:} 디코더는 정답 문장을 생성해야 하는데, 학습 시 정답 전체를 한 번에 입력받습니다. 모델이 뒤에 올 정답 단어를 미리 "컨닝(Cheating)"하면 안 됩니다.
+    \item \textbf{해결:} 현재 위치보다 뒤에 있는 단어들의 점수를 $-\infty$(음의 무한대)로 만들어 Softmax 결과가 0이 되게 합니다. 이를 \textbf{Look-ahead Mask}라고 합니다.
 \end{itemize}
 
 % 5. 실습 코드 설명
@@ -552,7 +552,7 @@ RNN이 없으면 단어의 **순서 정보**가 사라집니다. "I love you"와
 
 다음은 Keras를 이용한 어텐션 레이어 구현의 핵심 로직입니다.
 
-\begin{lstlisting}[caption={사용자 정의 Attention Layer 핵심 로직}, label={lst:attention}]
+\begin{lstlisting}[caption={사용자 정의 Attention Layer 핵심 로직}, label={lst:attention}, breaklines=true]
 class AttentionLayer(Layer):
     def call(self, inputs):
         # 1. 스코어 계산 (tanh 사용)
@@ -601,8 +601,8 @@ class AttentionLayer(Layer):
 \end{table}
 
 \begin{itemize}
-    \item **BERT (Bidirectional Encoder Representations from Transformers):** 문맥을 양쪽에서 파악하므로 "이해(Understanding)" 능력이 뛰어납니다.
-    \item **GPT (Generative Pre-trained Transformer):** 다음 단어를 예측하는 방식으로 학습하므로 "생성(Generation)" 능력이 뛰어납니다.
+    \item \textbf{BERT (Bidirectional Encoder Representations from Transformers):} 문맥을 양쪽에서 파악하므로 "이해(Understanding)" 능력이 뛰어납니다.
+    \item \textbf{GPT (Generative Pre-trained Transformer):} 다음 단어를 예측하는 방식으로 학습하므로 "생성(Generation)" 능력이 뛰어납니다.
 \end{itemize}
 
 \newpage
@@ -622,7 +622,7 @@ class AttentionLayer(Layer):
 \subsection{자주 묻는 질문 (FAQ)}
 
 \textbf{Q1. 어텐션(Attention)과 셀프 어텐션(Self-Attention)은 다른 건가요?} \\
-A. 원리는 같지만 **대상**이 다릅니다. 일반 어텐션(Seq2Seq)은 디코더가 인코더를 보는 것이고(서로 다른 문장 간 관계), 셀프 어텐션은 문장 내에서 자기 자신 안의 단어들끼리의 관계를 보는 것입니다(예: 'I'와 'am'의 관계).
+A. 원리는 같지만 \textbf{대상}이 다릅니다. 일반 어텐션(Seq2Seq)은 디코더가 인코더를 보는 것이고(서로 다른 문장 간 관계), 셀프 어텐션은 문장 내에서 자기 자신 안의 단어들끼리의 관계를 보는 것입니다(예: 'I'와 'am'의 관계).
 
 \textbf{Q2. 왜 Q, K, V를 따로 만드나요? 그냥 단어 벡터 그대로 쓰면 안 되나요?} \\
 A. 가능은 하지만, 유연성(Flexibility)이 떨어집니다. 같은 단어라도 "질문할 때의 나(Query)", "비교 대상으로서의 나(Key)", "정보 제공자로서의 나(Value)"의 역할에 따라 다르게 표현될 수 있도록 별도의 가중치 행렬($W^Q, W^K, W^V$)을 학습시키는 것이 성능이 훨씬 좋습니다.
@@ -636,12 +636,12 @@ A. HMM은 바로 이전 상태(State)에만 의존한다고 가정하지만, CRF
 \section*{빠르게 훑어보기 (1분 요약)}
 \begin{tcolorbox}[colback=white, colframe=black, title=Summary]
 \begin{itemize}
-    \item **문제:** RNN은 느리고, 긴 문장을 까먹음.
-    \item **해결 1 (Attention):** 문장을 요약하지 말고, 필요할 때마다 원문을 다시 보자.
-    \item **해결 2 (Transformer):** RNN을 버리고 어텐션만 쓰자. 병렬 처리로 속도 UP.
-    \item **Self-Attention:** $Attention(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V$
-    \item **BERT:** 인코더 사용, 문맥 이해(양방향).
-    \item **GPT:** 디코더 사용, 문장 생성(단방향).
+    \item \textbf{문제:} RNN은 느리고, 긴 문장을 까먹음.
+    \item \textbf{해결 1 (Attention):} 문장을 요약하지 말고, 필요할 때마다 원문을 다시 보자.
+    \item \textbf{해결 2 (Transformer):} RNN을 버리고 어텐션만 쓰자. 병렬 처리로 속도 UP.
+    \item \textbf{Self-Attention:} $Attention(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V$
+    \item \textbf{BERT:} 인코더 사용, 문맥 이해(양방향).
+    \item \textbf{GPT:} 디코더 사용, 문장 생성(단방향).
 \end{itemize}
 \end{tcolorbox}
 

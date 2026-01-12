@@ -391,7 +391,7 @@
 \maketitle
 \thispagestyle{firstpage}
 
-\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 08}{Anindita Mahapatra & Eric Gieseke}{Lecture 08의 핵심 개념 학습}
+\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 08}{Anindita Mahapatra \& Eric Gieseke}{Lecture 08의 핵심 개념 학습}
 
 
 \tableofcontents
@@ -1040,7 +1040,7 @@ MLOps는 이 모든 것을 통합하여, 데이터 수집부터 모델 배포 �
 
 이 실습은 하이퍼파라미터 튜닝 라이브러리인 \texttt{Optuna}와 MLflow를 \textbf{중첩(Nested) 실행}하는 방법을 보여줍니다.
 
-\begin{lstlisting}[language=Python, caption={Optuna와 MLflow 중첩 실행}, label=lst:optuna]
+\begin{lstlisting}[language=Python, caption={Optuna와 MLflow 중첩 실행}, label=lst:optuna, breaklines=true]
 import mlflow
 import optuna
 from sklearn.metrics import mean_squared_error
@@ -1064,7 +1064,7 @@ def objective(trial):
         mlflow.log_params(params)
         
         # 모델 훈련 (XGBoost)
-        model = XGBRegressor(**params)
+        model = XGBRegressor(\textbf{params)
         model.fit(X_train, y_train)
         
         # 예측 및 평가
@@ -1117,7 +1117,7 @@ with mlflow.start_run(run_name="XGBoost Tuning"):
 \end{enumerate}
 \end{warningbox}
 
-\begin{lstlisting}[language=Python, caption={Hyperopt와 MLflow autolog() 사용 (수정 사항 적용)}, label=lst:hyperopt]
+\begin{lstlisting}[language=Python, caption={Hyperopt와 MLflow autolog() 사용 (수정 사항 적용)}, label=lst:hyperopt, breaklines=true]
 import mlflow
 from hyperopt import fmin, tpe, hp, Trials # SparkTrials 대신 Trials
 from sklearn.ensemble import GradientBoostingClassifier
@@ -1143,7 +1143,7 @@ search_space = {
 def train_model(params):
     # autolog()가 켜져 있으므로, start_run()만 호출하면 됨
     with mlflow.start_run(nested=True):
-        model = GradientBoostingClassifier(**params)
+        model = GradientBoostingClassifier(}params)
         model.fit(X_train, y_train)
         
         # ... (평가 로직) ...

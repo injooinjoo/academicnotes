@@ -388,7 +388,7 @@
 
 \begin{document}
 
-\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 14}{Anindita Mahapatra & Eric Gieseke}{Lecture 14의 핵심 개념 학습}
+\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 14}{Anindita Mahapatra \& Eric Gieseke}{Lecture 14의 핵심 개념 학습}
 
 % 3.1 첫 페이지 구조 통일
 \thispagestyle{plain}
@@ -435,7 +435,7 @@
 \end{table}
 
 \subsection{Lakebase (Managed Postgres)}
-기존의 Databricks는 OLAP(분석용)에 최적화되어 있었으나, **Lakebase**의 도입으로 OLTP(트랜잭션용) 워크로드까지 커버하게 되었습니다.
+기존의 Databricks는 OLAP(분석용)에 최적화되어 있었으나, \textbf{Lakebase}의 도입으로 OLTP(트랜잭션용) 워크로드까지 커버하게 되었습니다.
 
 \begin{itemize}
     \item \textbf{구조적 특징}: Compute와 Storage가 분리되어 있습니다.
@@ -471,8 +471,8 @@
     \item \textbf{Spark 최적화 4대 요소}: Data Skew, Shuffle, Spill, Small Files.
     \item \textbf{Broadcast Variables}:
         \begin{itemize}
-            \item **Immutable (불변)**: 생성 후 변경할 수 없습니다.
-            \item **Local to Workers**: 클러스터 간 공유되는 것이 아니라, 각 워커 노드에 복사본이 저장됩니다.
+            \item \textbf{Immutable (불변)}: 생성 후 변경할 수 없습니다.
+            \item \textbf{Local to Workers}: 클러스터 간 공유되는 것이 아니라, 각 워커 노드에 복사본이 저장됩니다.
         \end{itemize}
     \item \textbf{Repartition vs Coalesce}:
         \begin{itemize}
@@ -489,7 +489,7 @@
 \subsection{Delta Lake Internals}
 \begin{itemize}
     \item \textbf{Transaction Log}: `_delta_log` 폴더 내에 저장됩니다.
-    \item \textbf{구조}: 각 트랜잭션은 **개별 JSON 파일**로 기록됩니다. (하나의 JSON이 아님). 10번째 트랜잭션마다 Checkpoint(Parquet) 파일이 생성됩니다.
+    \item \textbf{구조}: 각 트랜잭션은 \textbf{개별 JSON 파일}로 기록됩니다. (하나의 JSON이 아님). 10번째 트랜잭션마다 Checkpoint(Parquet) 파일이 생성됩니다.
     \item \textbf{Time Travel}: 별도의 복사본을 만드는 것이 아니라, 트랜잭션 로그를 통해 과거 시점의 데이터 상태를 조회합니다.
 \end{itemize}
 

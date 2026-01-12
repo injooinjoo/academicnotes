@@ -732,15 +732,15 @@ The ABAC workflow in Databricks:
     \item \textbf{Automatic Enforcement:} Policies apply whenever tagged data is accessed
 \end{enumerate}
 
-\begin{lstlisting}[style=sqlstyle, caption={Creating a Column Masking Function}]
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Column Masking Function}, breaklines=true]
 -- Step 1: Create a masking function
 CREATE FUNCTION ssn_mask(ssn STRING)
 RETURNS STRING
 RETURN
     CASE
         WHEN is_account_group_member('admin_group') THEN ssn
-        WHEN is_account_group_member('analyst_group') THEN CONCAT('***-**-', RIGHT(ssn, 4))
-        ELSE '***-**-****'
+        WHEN is_account_group_member('analyst_group') THEN CONCAT('*\textbf{-}-', RIGHT(ssn, 4))
+        ELSE '*\textbf{-}-**\textbf{'
     END;
 
 -- Step 2: Apply mask to a column
@@ -755,7 +755,7 @@ SET MASK ssn_mask;
 Restrict which \textbf{rows} a user can see based on a condition.
 
 \textbf{Example:} Sales reps can only see customers in their assigned region.
-\begin{lstlisting}[style=sqlstyle]
+\begin{lstlisting}[style=sqlstyle, breaklines=true]
 -- Only show rows where region matches user's region
 CREATE FUNCTION region_filter()
 RETURNS BOOLEAN
@@ -766,7 +766,7 @@ RETURN region = current_user_region();
 \begin{definitionbox}{Column-Level Masking}
 Transform or hide \textbf{column values} based on user permissions.
 
-\textbf{Example:} Non-admin users see email as \texttt{j***@company.com}
+\textbf{Example:} Non-admin users see email as \texttt{j}*@company.com}
 \end{definitionbox}
 
 \subsection{Automatic Data Classification}
@@ -922,7 +922,7 @@ Connect external databases to Unity Catalog \textbf{without copying data}. Query
     \item \textbf{Unified Governance:} Same grant statements, same ABAC policies
 \end{enumerate}
 
-\begin{lstlisting}[style=sqlstyle, caption={Creating a Federated Connection}]
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Federated Connection}, breaklines=true]
 -- Create connection to external Snowflake
 CREATE CONNECTION snowflake_conn
 TYPE snowflake

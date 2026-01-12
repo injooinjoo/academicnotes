@@ -1,0 +1,233 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.86x Unit 4}
+\fancyhead[R]{Clustering (Unsupervised)}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.86x: 정답 없는 세계의 질서}}
+\author{Unit 4: Unsupervised Learning - Clustering}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 1~3: Supervised Learning (정답 $y$가 있는 학습)
+    \item \textbf{\textcolor{mainblue}{Unit 4: Unsupervised Learning (현재 단원: 정답 $y$가 없는 학습)}}
+    \begin{itemize}
+        \item \textbf{11.1 K-Means Algorithm (좌표 하강법 관점)}
+        \item 11.2 K-Medoids (이상치에 강건한 방법)
+        \item 11.3 Hierarchy Clustering (계층적 군집화)
+    \end{itemize}
+    \item Unit 5: Generative Models (데이터 생성)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 4. 군집화 (Clustering)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{지금까지 우리는 선생님이 채점해주는(Label이 있는) 문제를 풀었습니다. 하지만 현실 세계 데이터의 90\%는 정답지가 없습니다. 넥슨의 로그 데이터도 "이 유저는 하드코어 유저다"라고 써붙여져 있지 않죠. 이제 우리는 아무도 가르쳐주지 않은 상태에서, \textbf{데이터끼리 뭉쳐있는 구조(Structure)}를 스스로 찾아내는 방법을 배웁니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+군집화는 유사한 데이터끼리 그룹을 묶는 기술입니다. 가장 대표적인 \textbf{K-Means} 알고리즘을 단순한 반복 절차가 아닌 \textbf{좌표 하강법(Coordinate Descent)}이라는 최적화 이론으로 해석하고, 평균(Mean)의 한계를 극복하기 위한 \textbf{K-Medoids} 알고리즘을 비교 학습합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Centroid ($\mu$)} & 클러스터의 중심점. (무게 중심) \\
+\hline
+\textbf{Assignment ($r$)} & "너는 A팀, 쟤는 B팀"이라고 배정하는 변수. \\
+\hline
+\textbf{Inertia (Cost $J$)} & 각 팀원들이 중심점으로부터 떨어진 거리의 제곱 합. (응집도) \\
+\hline
+\textbf{Coordinate Descent} & $x, y$를 동시에 못 찾으니, $x$ 고정하고 $y$ 찾고, $y$ 고정하고 $x$ 찾는 전략. \\
+\hline
+\textbf{Medoid} & 클러스터를 대표하는 \textbf{실제 데이터 포인트}. (반장) \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. K-Means 알고리즘과 좌표 하강법}
+
+
+\begin{conceptbox}{개념 1: 깃발 꽂기 게임}
+\textbf{한 줄 요약:} 깃발(중심)을 꽂고 사람들이 가장 가까운 깃발로 모입니다. 사람이 모인 곳의 한가운데로 깃발을 다시 옮깁니다. 이를 반복합니다.
+\end{conceptbox}
+
+\subsubsection*{1) 작동 원리 (The Iterative Process)}
+\begin{enumerate}
+    \item \textbf{초기화:} $K$개의 중심점($\mu$)을 랜덤하게 찍습니다.
+    \item \textbf{할당 (Assignment):} 모든 데이터는 가장 가까운 중심점 소속이 됩니다.
+    \item \textbf{업데이트 (Update):} 각 그룹의 무게중심(평균)으로 중심점을 이동시킵니다.
+    \item \textbf{반복:} 중심이 안 움직일 때까지 2~3번을 반복합니다.
+\end{enumerate}
+
+\subsubsection*{2) 수학적 해석: 좌표 하강법 (Coordinate Descent)}
+이 직관적인 과정은 사실 엄밀한 수학적 최적화입니다.
+$$ J(r, \mu) = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_n - \mu_k||^2 $$
+이 함수 $J$를 최소화해야 하는데, 변수 $r$(소속)과 $\mu$(위치)가 서로 얽혀 있어서 미분이 불가능합니다. 그래서 \textbf{하나를 고정(Freeze)하고 나머지를 최적화}하는 전략을 씁니다.
+
+\begin{itemize}
+    \item \textbf{Step 1 ($r$ 최적화):} $\mu$를 고정.
+    $$ \min_r J \implies \text{각 데이터를 가장 가까운 } \mu_k \text{에 할당.} $$
+    \item \textbf{Step 2 ($\mu$ 최적화):} $r$을 고정.
+    $$ \min_\mu J \implies \mu_k \text{를 해당 그룹 데이터들의 평균(Mean)으로 이동.} $$
+\end{itemize}
+이 과정은 $J$값을 계단식으로 계속 낮추며, 더 이상 낮아지지 않는 \textbf{지역 최적해(Local Minimum)}에 반드시 수렴합니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. K-Medoids 알고리즘}
+
+
+\begin{conceptbox}{개념 2: 평균의 함정과 실제 대표 선출}
+\textbf{한 줄 요약:} K-Means는 허공에 있는 평균을 중심으로 잡지만, K-Medoids는 실제 데이터 중 하나를 대장(Representative)으로 뽑습니다.
+\end{conceptbox}
+
+\subsubsection*{1) K-Means의 치명적 약점 (Outliers)}
+데이터가 $(1,1), (2,2), (3,3)$ 그리고 저 멀리 $(100,100)$에 하나 있다고 합시다.
+\begin{itemize}
+    \item \textbf{K-Means ($\mu$):} 평균은 약 $(26, 26)$이 됩니다. 중심점이 데이터가 모인 곳을 떠나 엉뚱한 곳에 위치하게 됩니다. (이상치에 민감)
+    \item \textbf{K-Medoids:} 중간값인 $(2,2)$ 혹은 $(3,3)$을 대표로 삼습니다. $(100,100)$은 무시됩니다. (강건함)
+\end{itemize}
+
+\subsubsection*{2) 비교 분석}
+\begin{table}[h]
+\centering
+\begin{tabular}{l|l|l}
+\toprule
+\textbf{특징} & \textbf{K-Means} & \textbf{K-Medoids (PAM)} \\
+\midrule
+\textbf{중심점} & 평균 (가상의 좌표) & Medoid (실제 데이터) \\
+\textbf{계산 속도} & 매우 빠름 ($O(N)$) & 느림 ($O(N^2)$) \\
+\textbf{이상치} & 매우 민감함 (취약) & 강건함 (Robust) \\
+\textbf{적용} & 일반적인 대용량 데이터 & 노이즈가 많은 데이터 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 유저 세분화 (User Segmentation)}
+
+\begin{storybox}{Scenario: 고래(Whale) 유저와 일반 유저 분류}
+당신은 게임 내 유저들을 '과금러', '즐겜러', '폐인' 등으로 자동 분류하고 싶습니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터:} [플레이 시간, 결제 금액]
+    \item \textbf{K-Means 적용 시도:}
+    \begin{itemize}
+        \item 한 명의 '슈퍼 과금러(10억 원 결제)'가 데이터에 포함되어 있습니다.
+        \item K-Means의 중심점(평균)이 이 사람 쪽으로 쭈욱 끌려갑니다.
+        \item 결과: 일반 과금 유저(10만 원)들이 '무과금 그룹'으로 잘못 분류되고, '고래 그룹'은 범위가 너무 넓어집니다.
+    \end{itemize}
+    \item \textbf{K-Medoids 전환:}
+    \begin{itemize}
+        \item 중심점을 실제 유저 중에서 뽑습니다.
+        \item 슈퍼 과금러는 그냥 하나의 점일 뿐, 중심(대표 유저)을 바꾸지 못합니다.
+        \item 결과: 대다수의 일반 유저 패턴을 반영한 합리적인 그룹핑이 완성됩니다.
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. K(그룹 개수)는 어떻게 정하나요?]
+    \textbf{A.} 가장 어려운 문제입니다. 보통 \textbf{Elbow Method}를 씁니다. $K$를 1부터 늘려가며 $J$(거리 제곱 합)를 그려봅니다. $K$가 늘면 $J$는 무조건 줄어드는데, 줄어드는 폭이 급격히 둔화되어 팔꿈치처럼 꺾이는 지점을 선택합니다.
+    
+    \item[Q2. K-Means는 항상 정답을 찾나요?]
+    \textbf{A.} 아닙니다. \textbf{초기값}을 어디에 찍느냐에 따라 결과가 달라집니다(Local Optima 문제). 그래서 보통 `K-Means++` 같은 초기화 기법을 쓰거나, 랜덤 초기화로 여러 번 돌려서 가장 좋은 결과를 선택합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} K-Means는 데이터를 "너는 A팀, 너는 B팀"식으로 딱 잘라 말합니다(Hard Clustering). 하지만 "이 유저는 A팀 성향 70\%, B팀 성향 30\%야"라고 확률적으로 말할 순 없을까요? 다음 시간에는 통계적 군집화 방법인 \textbf{GMM (Gaussian Mixture Models)}과 이를 푸는 \textbf{EM 알고리즘}을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 4 핵심 요약}
+\begin{itemize}
+    \item \textbf{Clustering:} 정답 없이 데이터의 구조를 찾는 비지도 학습.
+    \item \textbf{K-Means:} 중심 할당 $\leftrightarrow$ 중심 이동을 반복하는 좌표 하강법 알고리즘.
+    \item \textbf{Coordinate Descent:} 변수들을 한 번에 최적화하기 어려울 때, 하나씩 번갈아 가며 최적화하는 기법.
+    \item \textbf{K-Medoids:} 평균 대신 실제 데이터를 대표로 사용하여 이상치에 강하다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

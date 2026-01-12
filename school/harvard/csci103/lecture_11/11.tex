@@ -388,7 +388,7 @@
 
 \begin{document}
 
-\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 11}{Anindita Mahapatra & Eric Gieseke}{Lecture 11의 핵심 개념 학습}
+\metainfo{CSCI E-103: 재현 가능한 머신러닝}{Lecture 11}{Anindita Mahapatra \& Eric Gieseke}{Lecture 11의 핵심 개념 학습}
 
 \tableofcontents
 \newpage
@@ -505,10 +505,10 @@ AI 기술은 갑자기 튀어나온 것이 아니라, 수십 년간 발전해 �
 % ------------------------------------------------------------------------------
 \section{기술 심화: RAG (검색 증강 생성)}
 
-LLM의 가장 큰 약점인 **"최신 정보 부재"**와 **"할루시네이션(거짓말)"**을 해결하는 가장 현실적인 기술입니다.
+LLM의 가장 큰 약점인 \textbf{"최신 정보 부재"}와 \textbf{"할루시네이션(거짓말)"}을 해결하는 가장 현실적인 기술입니다.
 
 \subsection{1. 왜 RAG가 필요한가?}
-LLM은 학습이 끝난 시점(예: 2023년) 이후의 정보는 모릅니다. 또한, 우리 회사의 비공개 문서는 당연히 본 적이 없습니다. 이를 해결하기 위해 모델을 재학습시키는 것은 너무 비쌉니다. RAG는 **"외부 지식 검색"**을 통해 이 문제를 해결합니다.
+LLM은 학습이 끝난 시점(예: 2023년) 이후의 정보는 모릅니다. 또한, 우리 회사의 비공개 문서는 당연히 본 적이 없습니다. 이를 해결하기 위해 모델을 재학습시키는 것은 너무 비쌉니다. RAG는 \textbf{"외부 지식 검색"}을 통해 이 문제를 해결합니다.
 
 \subsection{2. RAG의 작동 원리 (Workflow)}
 RAG 시스템은 크게 \textbf{데이터 준비(Ingestion)}와 \textbf{검색 및 답변(Retrieval \& Generation)} 두 단계로 나뉩니다.
@@ -518,7 +518,7 @@ RAG 시스템은 크게 \textbf{데이터 준비(Ingestion)}와 \textbf{검색 �
     \begin{enumerate}
         \item 문서를 잘게 쪼갭니다 (Chunking). (예: 800~1200자 단위)
         \item 쪼갠 문서를 AI가 이해하는 숫자 배열(Vector/Embedding)로 변환합니다.
-        \item 이 숫자를 **Vector DB**에 저장합니다. (유사도 검색을 위해)
+        \item 이 숫자를 \textbf{Vector DB}에 저장합니다. (유사도 검색을 위해)
     \end{enumerate}
     
     \item \textbf{단계 2: 실제 질문 시 (실시간)}
@@ -526,7 +526,7 @@ RAG 시스템은 크게 \textbf{데이터 준비(Ingestion)}와 \textbf{검색 �
         \item 사용자가 질문을 합니다. ("우리 회사의 재택근무 규정이 뭐야?")
         \item 질문을 숫자(Vector)로 변환합니다.
         \item Vector DB에서 질문과 숫자가 가장 비슷한(의미가 유사한) 문서 조각을 찾아냅니다.
-        \item 찾아낸 문서 조각을 **프롬프트에 붙여서** LLM에게 보냅니다.
+        \item 찾아낸 문서 조각을 \textbf{프롬프트에 붙여서} LLM에게 보냅니다.
         \item LLM은 "아래 문서를 참고해서 답변해"라는 지시를 받고 정확한 답을 생성합니다.
     \end{enumerate}
 \end{itemize}
@@ -537,7 +537,7 @@ A. 아닙니다! RAG는 LLM에게 잠시 참고자료를 보여주는 것뿐입�
 \end{warnbox}
 
 % ------------------------------------------------------------------------------
-% 5. 실무: Databricks 도구 활용 (Agents & LLMOps)
+% 5. 실무: Databricks 도구 활용 (Agents \& LLMOps)
 % ------------------------------------------------------------------------------
 \section{실무: Databricks 도구를 활용한 구현}
 
@@ -563,7 +563,7 @@ Databricks 플랫폼은 LLM 애플리케이션 개발을 위한 통합 도구를
 \subsection{3. AI Functions (SQL에서 AI 쓰기)}
 복잡한 파이썬 코드 없이, SQL 쿼리 안에서 바로 LLM 기능을 호출할 수 있습니다.
 
-\begin{lstlisting}[caption={AI Functions 활용 예시}, label={lst:aifunc}]
+\begin{lstlisting}[caption={AI Functions 활용 예시}, label={lst:aifunc}, breaklines=true]
 -- 고객 리뷰의 감정을 분석하고 요약하는 SQL 쿼리
 SELECT 
     review_text,
@@ -574,7 +574,7 @@ WHERE date > '2025-01-01';
 \end{lstlisting}
 
 \subsection{4. LLMOps (LLM 운영)}
-기존 MLOps(머신러닝 운영)에 **"언어적 특성"**이 추가된 개념입니다.
+기존 MLOps(머신러닝 운영)에 \textbf{"언어적 특성"}이 추가된 개념입니다.
 \begin{itemize}
     \item \textbf{모델 평가:} 답변이 정확한지, 독성이 없는지 평가 (LLM을 심판으로 사용하기도 함).
     \item \textbf{피드백 루프 (RLHF):} 사용자의 "좋아요/싫어요" 버튼 클릭을 모아 모델을 개선.
@@ -606,7 +606,7 @@ LLM은 강력하지만 위험 요소도 큽니다. 이를 관리하는 것이 �
 \end{table}
 
 \begin{infobox}{ESG와 AI}
-최근 기업은 **ESG(환경, 사회, 지배구조)** 관점에서 AI를 평가합니다. 
+최근 기업은 \textbf{ESG(환경, 사회, 지배구조)} 관점에서 AI를 평가합니다. 
 AI 모델 학습에 막대한 전기가 소모(환경)되거나, AI가 차별적 발언(사회)을 하는 것은 기업 가치에 치명적입니다. 따라서 "윤리적 AI"는 선택이 아닌 필수입니다.
 \end{infobox}
 

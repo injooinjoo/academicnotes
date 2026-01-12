@@ -717,7 +717,7 @@ All three provide similar ACID guarantees. Delta and Iceberg are working on inte
 
     \item \textbf{Time Travel:}
     Every change is logged in \_delta\_log, enabling queries like:
-    \begin{lstlisting}[style=sqlstyle]
+    \begin{lstlisting}[style=sqlstyle, breaklines=true]
 -- Query data as it was at version 5
 SELECT * FROM my_table VERSION AS OF 5;
 
@@ -727,7 +727,7 @@ SELECT * FROM my_table TIMESTAMP AS OF '2025-10-26 03:00:00';
 
     \item \textbf{DML Operations:}
     Direct SQL operations on lake files:
-    \begin{lstlisting}[style=sqlstyle]
+    \begin{lstlisting}[style=sqlstyle, breaklines=true]
 UPDATE my_table SET column = 'value' WHERE condition;
 DELETE FROM my_table WHERE condition;
 MERGE INTO target USING source ON condition
@@ -1014,7 +1014,7 @@ This section covers hands-on Delta Lake operations from the lab.
 
 Converting existing Parquet data to Delta Lake format is straightforward:
 
-\begin{lstlisting}[style=sqlstyle, caption={Creating a Delta table from Parquet data}]
+\begin{lstlisting}[style=sqlstyle, caption={Creating a Delta table from Parquet data}, breaklines=true]
 -- Create a Delta table from existing Parquet data
 CREATE TABLE IF NOT EXISTS loans_by_state_delta
 USING delta
@@ -1032,7 +1032,7 @@ DESCRIBE DETAIL loans_by_state_delta;
 
 One of Delta Lake's powerful features is allowing simultaneous streaming reads and batch writes:
 
-\begin{lstlisting}[style=pythonstyle, caption={Reading Delta table as a stream}]
+\begin{lstlisting}[style=pythonstyle, caption={Reading Delta table as a stream}, breaklines=true]
 # Start a streaming read from the Delta table
 streaming_query = (
     spark.readStream
@@ -1044,7 +1044,7 @@ streaming_query = (
 )
 \end{lstlisting}
 
-\begin{lstlisting}[style=sqlstyle, caption={Batch inserts while streaming is active}]
+\begin{lstlisting}[style=sqlstyle, caption={Batch inserts while streaming is active}, breaklines=true]
 -- Insert batch data while streaming is running
 INSERT INTO loans_by_state_delta VALUES ('IA', 450);
 INSERT INTO loans_by_state_delta VALUES ('IA', 450);
@@ -1058,7 +1058,7 @@ INSERT INTO loans_by_state_delta VALUES ('IA', 450);
 
 Operations impossible on raw Parquet files work seamlessly on Delta tables:
 
-\begin{lstlisting}[style=sqlstyle, caption={Row-level delete operation}]
+\begin{lstlisting}[style=sqlstyle, caption={Row-level delete operation}, breaklines=true]
 -- Delete specific rows (impossible on plain Parquet!)
 DELETE FROM loans_by_state_delta WHERE state = 'IA';
 \end{lstlisting}
@@ -1069,7 +1069,7 @@ DELETE FROM loans_by_state_delta WHERE state = 'IA';
 
 The MERGE command provides atomic ``upsert'' (update or insert) functionality:
 
-\begin{lstlisting}[style=sqlstyle, caption={MERGE operation for upserting data}]
+\begin{lstlisting}[style=sqlstyle, caption={MERGE operation for upserting data}, breaklines=true]
 MERGE INTO loans_by_state_delta AS target
 USING new_updates_table AS source
 ON target.state = source.state
@@ -1089,7 +1089,7 @@ WHEN NOT MATCHED THEN
 
 Delta Lake enforces schema by default but allows intentional evolution:
 
-\begin{lstlisting}[style=pythonstyle, caption={Enabling schema evolution during write}]
+\begin{lstlisting}[style=pythonstyle, caption={Enabling schema evolution during write}, breaklines=true]
 # Without mergeSchema, this fails if 'amount' column is new
 df.write \
     .format("delta") \
@@ -1104,7 +1104,7 @@ df.write \
 
 Every change is recorded, enabling historical queries:
 
-\begin{lstlisting}[style=sqlstyle, caption={Viewing table history and time travel}]
+\begin{lstlisting}[style=sqlstyle, caption={Viewing table history and time travel}, breaklines=true]
 -- View all changes to the table
 DESCRIBE HISTORY loans_by_state_delta;
 -- Shows: version, timestamp, operation, operationParameters
@@ -1160,13 +1160,13 @@ TIMESTAMP AS OF '2025-10-26 03:00:00';
 Workflows support two types of parameters:
 
 \textbf{Job Parameters:} Global to the entire workflow
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 # Access job parameter in notebook
 job_param = dbutils.widgets.get("job_param1")
 \end{lstlisting}
 
 \textbf{Task Parameters:} Specific to individual tasks
-\begin{lstlisting}[style=pythonstyle]
+\begin{lstlisting}[style=pythonstyle, breaklines=true]
 # Access task parameter in notebook
 task_param = dbutils.widgets.get("param1")
 \end{lstlisting}

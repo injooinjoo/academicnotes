@@ -1,0 +1,252 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{bm}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 6.419x Module 1}
+\fancyhead[R]{High-Dimensional Data Analysis}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 6.419x: 고차원의 바다를 항해하는 법}}
+\author{Module 1: Dimensionality Reduction \& Visualization}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item \textbf{\textcolor{mainblue}{Module 1: High-Dimensional Data (현재 단원: 데이터 압축과 시각화)}}
+    \begin{itemize}
+        \item 1.1 The Curse of Dimensionality ($p \gg n$의 공포)
+        \item 1.2 PCA via SVD (효율적인 선형 압축)
+        \item 1.3 MDS (거리 보존 시각화)
+        \item 1.4 t-SNE (비선형 구조 시각화)
+    \end{itemize}
+    \item Module 2: Clustering \& Networks (군집과 연결)
+    \item Module 3: Time Series \& Spatial Data (시간과 공간)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Module 1. 고차원 데이터 분석과 시각화}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{이전의 기초 통계학이나 머신러닝 기초 과정에서는 "변수 3개, 데이터 1000개" 같은 예쁜 데이터를 다뤘습니다. 하지만 현실(특히 유전체학, 텍스트 마이닝)은 "변수 2만 개, 데이터 50개" 같은 괴상한 형태입니다. 통계적 추론이 불가능해 보이는 이 상황에서, 우리는 데이터를 \textbf{압축}하여 눈으로 \textbf{확인(Visualization)}하는 것부터 시작합니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+이 단원에서는 고차원 데이터가 가지는 희소성 문제(차원의 저주)를 이해하고, 이를 해결하기 위한 3가지 핵심 도구를 배웁니다. 분산을 보존하는 \textbf{PCA(SVD 기반)}, 거리를 보존하는 \textbf{MDS}, 그리고 복잡하게 꼬인 비선형 구조를 풀어내는 \textbf{t-SNE}를 통해 데이터를 2차원 화면에 시각화하는 방법을 마스터합니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Curse of Dimensionality} & 차원이 늘어나면 공간이 너무 넓어져서, 데이터가 텅텅 비게 되는 현상. \\
+\hline
+\textbf{SVD (Singular Value Decomposition)} & 행렬 분해의 끝판왕. PCA를 가장 빠르고 안정적으로 계산하는 도구. \\
+\hline
+\textbf{MDS (Multi-Dimensional Scaling)} & "서울-부산 거리 400km" 같은 거리표만 주고 지도를 그려내는 기술. \\
+\hline
+\textbf{t-SNE} & 고차원에서 뭉쳐있는 데이터들을, 저차원에서도 겹치지 않게 잘 펼쳐주는 시각화 알고리즘. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 차원의 저주 (Curse of Dimensionality)}
+
+\begin{conceptbox}{개념 1: 사막에서 바늘 찾기}
+\textbf{한 줄 요약:} 변수($p$)가 늘어날수록 공간의 부피는 기하급수적으로 늘어나고, 데이터 포인트들 사이의 거리는 의미가 없어질 정도로 멀어집니다.
+\end{conceptbox}
+
+\subsubsection*{직관적 비유}
+\begin{itemize}
+    \item \textbf{1차원(선):} 10미터 선 위에 동전 10개를 놓으면 꽉 찹니다.
+    \item \textbf{2차원(면):} $10 \times 10$ 방바닥에 동전 10개를 놓으면 듬성듬성합니다.
+    \item \textbf{100차원:} 우주 공간 같은 허공에 동전 10개가 떠다닙니다. 서로 만날 일이 없습니다.
+    \item \textbf{결과:} "가깝다/멀다"의 개념이 붕괴하여, 유클리드 거리 기반 알고리즘(KNN, K-Means)이 작동하지 않습니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. PCA의 심화: SVD 관점}
+
+
+\begin{conceptbox}{개념 2: 공분산 행렬을 만들지 마라}
+\textbf{한 줄 요약:} 변수가 10만 개일 때 공분산 행렬($10만 \times 10만$)을 만들면 컴퓨터가 멈춥니다. SVD를 쓰면 이를 우회하여 바로 주성분을 구할 수 있습니다.
+\end{conceptbox}
+
+\subsubsection*{1) SVD의 정의}
+모든 행렬 $X$ ($n \times p$)는 다음과 같이 분해됩니다.
+$$ X = U \Sigma V^T $$
+\begin{itemize}
+    \item \textbf{$U$ (Left Singular Vectors):} 데이터 포인트들의 새로운 좌표 (Principal Component Scores).
+    \item \textbf{$\Sigma$ (Singular Values):} 대각 행렬. 각 축의 중요도(분산의 크기 $\sigma$).
+    \item \textbf{$V$ (Right Singular Vectors):} 각 변수(유전자, 픽셀)가 주성분에 기여하는 가중치 (Loadings).
+\end{itemize}
+
+\subsubsection*{2) PCA와의 관계}
+공분산 행렬 $X^T X$의 고유값 분해를 할 필요 없이, SVD의 $V$가 바로 주성분 방향(Eigenvectors)이 되고, $\Sigma^2$이 고유값(Eigenvalues)에 비례합니다.
+$$ \text{Eigenvalue } \lambda_i = \frac{\sigma_i^2}{n-1} $$
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 다차원 척도법 (MDS)}
+
+\begin{conceptbox}{개념 3: 거리표로 지도 복원하기}
+\textbf{한 줄 요약:} 데이터의 절대 좌표는 몰라도 됩니다. "누가 누구랑 얼마나 먼가(Distance Matrix)"만 알면 지도를 그릴 수 있습니다.
+\end{conceptbox}
+
+\subsubsection*{1) 목표: Stress 최소화}
+고차원(원래 공간)에서의 거리 $d_{ij}$와 저차원(압축된 공간)에서의 거리 $||z_i - z_j||$를 최대한 비슷하게 만듭니다.
+$$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
+
+\subsubsection*{2) 활용 예시}
+유전자 서열 데이터는 좌표가 없습니다. 하지만 "유전자 A와 B는 90\% 일치한다(거리가 가깝다)"는 알 수 있습니다. 이 \textbf{유사도(Similarity) 행렬}을 MDS에 넣으면 유전자 지도를 그릴 수 있습니다.
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{4. t-SNE (t-Distributed Stochastic Neighbor Embedding)}
+
+
+\begin{conceptbox}{개념 4: 구겨진 종이 펴기 \& 거리두기}
+\textbf{한 줄 요약:} 고차원에서 '이웃'이었던 관계는 유지하되, 저차원으로 올 때 너무 빽빽해지는 것을 막기 위해 \textbf{t-분포(꼬리가 두꺼운 분포)}를 사용하여 점들을 밀어냅니다.
+\end{conceptbox}
+
+\subsubsection*{1) PCA/MDS의 한계}
+이들은 \textbf{선형(Linear)} 변환입니다. 스위스 롤(Swiss Roll)처럼 돌돌 말려있는 데이터는 펴지 못하고 찌그러뜨립니다.
+
+\subsubsection*{2) t-SNE의 마법: Crowding Problem 해결}
+
+\begin{itemize}
+    \item \textbf{고차원:} 공간이 넓어서 데이터들이 여유롭게 퍼져 있습니다. (정규분포로 이웃 확률 계산)
+    \item \textbf{저차원:} 공간이 좁아서 데이터들이 서로 겹치려고 합니다. (Crowding)
+    \item \textbf{해결:} 저차원에서는 \textbf{t-분포}를 사용합니다. t-분포는 정규분포보다 꼬리(Tail)가 두꺼워서, 적당히 멀리 있는 점들을 더 멀리 밀어내는 성질이 있습니다. 덕분에 군집(Cluster) 간의 경계가 아주 뚜렷하게 시각화됩니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: 넥슨 게임 로그 분석}
+
+\begin{storybox}{Scenario: 유저 행동 패턴 시각화}
+당신은 '메이플스토리' 데이터 분석가입니다. 500명의 VIP 유저가 수행한 10,000종류의 행동 로그(사냥, 채팅, 거래, 강화 등)를 분석해 유저 유형을 파악하고 싶습니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터 상황:} $n=500, p=10,000$. 전형적인 고차원 데이터($p \gg n$).
+    \item \textbf{PCA 적용:}
+    \begin{itemize}
+        \item 전체 분산의 50\%만 설명하는 데도 주성분 100개가 필요합니다.
+        \item 2차원으로 그렸더니 모든 유저가 한 덩어리로 뭉쳐서 구분이 안 됩니다. (선형 변환의 한계)
+    \end{itemize}
+    \item \textbf{t-SNE 적용:}
+    \begin{itemize}
+        \item 고차원 공간에서의 행동 유사도(확률)를 보존하며 2차원으로 압축합니다.
+        \item 결과: 화면에 3개의 뚜렷한 섬(Cluster)이 나타납니다.
+    \end{itemize}
+    \item \textbf{인사이트 발견:}
+    \begin{itemize}
+        \item 섬 A: 채팅과 거래만 하는 '장사꾼 유저'
+        \item 섬 B: 특정 보스만 반복해서 잡는 '쌀먹 유저'
+        \item 섬 C: 모든 콘텐츠를 즐기는 '진성 유저'
+    \end{itemize}
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. PCA와 MDS는 뭐가 다른가요?]
+    \textbf{A.} 입력이 다릅니다.
+    \begin{itemize}
+        \item \textbf{PCA:} 데이터 좌표 자체($X$)가 필요합니다. 분산(Variance)을 보존합니다.
+        \item \textbf{MDS:} 데이터 간의 거리 행렬($D$)만 있으면 됩니다. 거리(Distance)를 보존합니다. (유클리드 거리를 쓰면 PCA와 결과가 같습니다.)
+    \end{itemize}
+    
+    \item[Q2. t-SNE 결과에서 클러스터 간의 거리가 의미가 있나요?]
+    \textbf{A.} \textbf{주의하세요!} t-SNE는 국소적인 이웃 관계(Local Structure)만 보존하려고 노력합니다. 멀리 떨어진 클러스터 간의 거리나, 클러스터의 크기는 실제 데이터와 다를 수 있습니다. 시각적으로 분리되었다는 사실에만 집중해야 합니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 데이터를 시각화하여 눈으로 확인했으니, 이제 본격적으로 통계적 모델링을 할 차례입니다. 다음 시간에는 비슷한 데이터끼리 묶는 \textbf{군집화(Clustering)}와, 데이터 간의 복잡한 연결 고리를 파악하는 \textbf{네트워크 분석(Network Analysis)}을 다룹니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Module 1 핵심 요약}
+\begin{itemize}
+    \item \textbf{Curse of Dimensionality:} $p \gg n$이면 공간이 희소해져서 기존 방법이 안 통한다.
+    \item \textbf{SVD:} PCA를 수행하는 가장 효율적인 계산법 ($X = U \Sigma V^T$).
+    \item \textbf{MDS:} 좌표 없이 '거리(Distance)' 정보만으로 지도를 그린다.
+    \item \textbf{t-SNE:} t-분포를 이용해 고차원의 복잡한 구조를 겹치지 않게 펼쳐주는 최고의 시각화 도구.
+\end{itemize}
+\end{summarybox}
+
+\end{document}

@@ -1,0 +1,253 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{kotex}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{adjustbox}  % 표/박스 크기 조절
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{breakable}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+
+% 페이지 설정
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+\pagestyle{fancy}
+\fancyhead[L]{MIT 18.6501 Unit 4}
+\fancyhead[R]{Confidence Intervals}
+
+% 색상 정의
+\definecolor{mainblue}{RGB}{0, 51, 102}
+\definecolor{subblue}{RGB}{230, 240, 255}
+\definecolor{warningred}{RGB}{204, 0, 0}
+\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\definecolor{storypurple}{RGB}{102, 0, 102}
+
+% 박스 스타일 정의
+\newtcolorbox{summarybox}[1]{
+  colback=subblue, colframe=mainblue, 
+  title=\textbf{#1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm
+}
+
+\newtcolorbox{warningbox}[1]{
+  colback=white, colframe=warningred, 
+  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=0mm,
+  coltitle=white
+}
+
+\newtcolorbox{conceptbox}[1]{
+  colback=white, colframe=conceptgreen, 
+  title=\textbf{💡 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\newtcolorbox{storybox}[1]{
+  colback=white, colframe=storypurple, 
+  title=\textbf{🎬 #1}, fonttitle=\bfseries,
+  boxrule=0.5mm, arc=2mm,
+  coltitle=white
+}
+
+\title{\textbf{MIT 18.6501: 불확실성의 수치화}}
+\author{Unit 4: Confidence Intervals (신뢰 구간)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% 1. 전체 목차 (TOC)
+\tableofcontents
+\vspace{1cm}
+\hrule
+\vspace{1cm}
+
+\section*{Course Structure \& Current Focus}
+\begin{itemize}
+    \item Unit 2: Point Estimation (범인 지목)
+    \item Unit 3: Asymptotic Properties (이론적 무기 확보)
+    \item \textbf{\textcolor{mainblue}{Unit 4: Confidence Intervals (현재 단원: 수사망 펼치기)}}
+    \begin{itemize}
+        \item 4.1 Concept \& Philosophy (빈도주의적 해석)
+        \item 4.2 Construction with MLE (구간 만드는 법)
+        \item 4.3 Conservative CI (보수적 접근)
+    \end{itemize}
+    \item Unit 5: Hypothesis Testing (최종 판결)
+\end{itemize}
+
+\newpage
+
+% 2. 현재 단원 제목
+\section{Unit 4. 신뢰 구간 (Confidence Intervals)}
+
+% 3. 이전 단원과의 연결
+\begin{quote}
+\textit{Unit 2에서 우리는 $\hat{\theta}$라는 하나의 값(Point)을 구했고, Unit 3에서는 데이터가 많을수록 이 값이 정규분포를 그리며 참값에 다가간다는 사실을 증명했습니다. 이제 이 정규분포라는 지도를 펼쳐놓고, \textbf{"그래서 참값이 어디부터 어디 사이에 있는데?"}라는 질문에 답할 차례입니다.}
+\end{quote}
+
+% 4. 개요
+\subsection*{📌 개요 (Overview)}
+신뢰 구간은 점 추정값의 \textbf{'오차 범위(Margin of Error)'}를 수학적으로 계산하는 도구입니다. 이 단원에서는 신뢰 구간의 올바른 해석(철학), 중심극한정리를 이용한 구간 구성법(레시피), 그리고 미지의 파라미터를 처리하는 수학적 기법(Slutsky's Theorem)을 배웁니다.
+
+% 5. 용어 정리 표
+\subsection*{📝 핵심 용어 사전}
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{|p{0.28\textwidth}|X|}
+\hline
+\textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
+\hline
+\textbf{Confidence Level ($1-\alpha$)} & 신뢰 수준. 보통 95\%($0.95$)를 사용합니다. \\
+\hline
+\textbf{Significance Level ($\alpha$)} & 유의 수준. 틀릴 확률의 허용치 (보통 5\%). \\
+\hline
+\textbf{Quantile ($q_{\alpha/2}$)} & 정규분포에서 꼬리를 자르는 기준점 (예: 1.96). \\
+\hline
+\textbf{Pivot} & 분포가 $\theta$에 의존하지 않는 통계량 (예: Z-score). \\
+\hline
+\textbf{Slutsky's Theorem} & $n$이 클 땐, 모르는 참값 대신 추정값을 써도 된다는 허가증. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+% 6. 핵심 개념 상세 설명
+\subsection{1. 신뢰 구간의 정의와 철학}
+
+
+\begin{conceptbox}{개념 1: 움직이는 것은 '고리(구간)'이지 '기둥(참값)'이 아니다}
+\textbf{한 줄 요약:} 참값 $\theta$는 신만이 아는 고정된 상수입니다. 우리가 데이터를 뽑을 때마다 변하는 것은 신뢰 구간입니다.
+\end{conceptbox}
+
+\subsubsection*{1) 직관적 비유: 고리 던지기 (Ring Toss)}
+\begin{itemize}
+    \item \textbf{기둥 ($\theta$):} 바닥에 박혀 있습니다. 절대 움직이지 않습니다.
+    \item \textbf{고리 (Interval):} 사람이 던집니다(데이터 수집). 던질 때마다 고리의 위치가 바뀝니다.
+    \item \textbf{신뢰 수준 95\%:} "내가 고리를 100번 던지면, 그중 95번은 기둥에 걸린다"는 뜻입니다.
+    \item \textbf{주의:} 이미 바닥에 떨어진 고리(계산된 구간)를 보고 "기둥이 이 안에 들어올 확률 95\%"라고 말하면 안 됩니다. 기둥은 들어와 있거나(1), 안 들어와 있거나(0) 둘 중 하나입니다.
+\end{itemize}
+
+\begin{warningbox}{오개념 주의: Frequentist View}
+"이 구간 $[0.4, 0.6]$ 안에 참값이 있을 확률은 95\%다" $\rightarrow$ \textbf{틀렸습니다!} \\
+"수많은 평행우주에서 실험을 반복했을 때, 만들어진 구간들의 95\%가 참값을 포함한다" $\rightarrow$ \textbf{맞습니다.}
+\end{warningbox}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{2. 점근적 신뢰 구간 구성법 (The Recipe)}
+
+
+\begin{conceptbox}{개념 2: 정규분포를 역이용하여 구간 만들기}
+\textbf{한 줄 요약:} $\hat{\theta}$가 정규분포를 따른다는 사실(Unit 3)을 이용해, 거꾸로 $\theta$의 범위를 추적합니다.
+\end{conceptbox}
+
+\subsubsection*{Step 1: 정규성 확보 (From Unit 3)}
+MLE $\hat{\theta}_n$은 점근적으로 정규분포를 따릅니다.
+$$ \sqrt{n}(\hat{\theta}_n - \theta) \xrightarrow{d} \mathcal{N}\left(0, \frac{1}{I(\theta)}\right) $$
+
+\subsubsection*{Step 2: 피벗(Pivot) 구성}
+위 식을 표준정규분포 $Z \sim \mathcal{N}(0, 1)$ 형태로 만듭니다.
+$$ \sqrt{n I(\theta)} (\hat{\theta}_n - \theta) \approx Z $$
+
+\subsubsection*{Step 3: 부등식 세우기}
+표준정규분포의 95\%가 들어있는 구간은 $[-1.96, 1.96]$입니다. ($q_{0.025} \approx 1.96$)
+$$ P\left( -q_{\alpha/2} \le \sqrt{n I(\theta)} (\hat{\theta}_n - \theta) \le q_{\alpha/2} \right) \approx 1 - \alpha $$
+
+\subsubsection*{Step 4: 슬루츠키 정리 (Slutsky's Theorem) - 결정적 단계}
+위 식의 $I(\theta)$에는 여전히 모르는 값 $\theta$가 들어있습니다. 계산을 위해 \textbf{$I(\theta)$를 $I(\hat{\theta}_n)$으로 바꿔치기(Plug-in)} 합니다.
+\begin{itemize}
+    \item \textbf{논리:} 일치성(Consistency)에 의해 $\hat{\theta}_n \to \theta$이므로, $I(\hat{\theta}_n) \to I(\theta)$입니다.
+    \item \textbf{결과:} $n$이 충분히 크면 이 바꿔치기는 수학적으로 정당합니다.
+\end{itemize}
+
+\subsubsection*{Step 5: 최종 공식 ($\theta$에 대해 정리)}
+$$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\theta}_n)}}, \quad \hat{\theta}_n + \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\theta}_n)}} \right] $$
+\begin{itemize}
+    \item \textbf{중심:} 점 추정값 $\hat{\theta}_n$
+    \item \textbf{폭(Width):} $\frac{1}{\sqrt{n}}$ (데이터 많으면 좁아짐) $\times$ $\frac{1}{\sqrt{I}}$ (정보 많으면 좁아짐)
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\subsection{3. 보수적 신뢰 구간 (Conservative CI)}
+
+\begin{conceptbox}{개념 3: 잘 모를 땐 최악의 상황을 가정하라}
+\textbf{한 줄 요약:} $I(\theta)$를 정확히 계산하기 귀찮거나 데이터가 적을 때, 분산이 가장 커지는 경우(Worst Case)를 대입하여 넓은 구간을 잡습니다.
+\end{conceptbox}
+
+\subsubsection*{예시: 선거 여론조사 (베르누이 분포)}
+지지율 $p$에 대한 신뢰 구간을 구할 때, 분산 항은 $p(1-p)$입니다.
+\begin{itemize}
+    \item \textbf{문제:} 아직 $p$를 모릅니다. $\hat{p}$를 대입하자니 오차가 걱정됩니다.
+    \item \textbf{해결:} $p(1-p)$는 $p=0.5$일 때 최댓값 $0.25$를 가집니다.
+    \item \textbf{보수적 구간:} 그냥 무조건 $0.25$를 대입합니다.
+    $$ \hat{p} \pm 1.96 \frac{\sqrt{0.25}}{\sqrt{n}} = \hat{p} \pm \frac{0.98}{\sqrt{n}} \approx \hat{p} \pm \frac{1}{\sqrt{n}} $$
+    \item \textbf{실전 팁:} 언론에서 흔히 말하는 "표본오차 $\pm 3.1\%$" 같은 표현이 이 보수적 구간(주로 $n=1000$일 때 $\approx 3.1\%$)을 사용한 것입니다.
+\end{itemize}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{실전 시나리오: A/B 테스트 신뢰 구간}
+
+\begin{storybox}{Scenario: 웹사이트 배너 클릭률 비교}
+당신은 e커머스 앱의 PM입니다. 기존 배너(A)와 신규 배너(B)의 클릭률(CTR) 차이를 분석합니다.
+\end{storybox}
+
+\begin{enumerate}
+    \item \textbf{데이터:} \begin{itemize}
+        \item A안: 1000명 중 50명 클릭 ($\hat{p}_A = 0.05$)
+        \item B안: 1000명 중 70명 클릭 ($\hat{p}_B = 0.07$)
+        \item 차이: $\Delta = 0.02$ (2\% 상승)
+    \end{itemize}
+    
+    \item \textbf{질문:} 이 2\% 차이가 진짜 실력 차이일까요, 아니면 우연일까요?
+    
+    \item \textbf{신뢰 구간 계산 (95\%):}
+    두 비율 차이의 표준오차(SE) $\approx \sqrt{\frac{p(1-p)}{n} + \frac{p(1-p)}{n}}$
+    $$ \text{SE} \approx \sqrt{\frac{0.05 \times 0.95}{1000} + \frac{0.07 \times 0.93}{1000}} \approx 0.011 $$
+    $$ 95\% \text{ CI} = [0.02 - 1.96(0.011), \quad 0.02 + 1.96(0.011)] = [-0.001, 0.041] $$
+    
+    \item \textbf{해석:} 구간 $[-0.1\%, 4.1\%]$ 사이에 \textbf{0이 포함}되어 있습니다.
+    즉, "차이가 0일 수도 있다(효과가 없다)"는 가능성을 배제할 수 없습니다. 통계적으로 유의미한 차이가 아닙니다.
+\end{enumerate}
+
+\vspace{0.5cm}\hrule\vspace{0.5cm}
+
+\section{자주 묻는 질문 (FAQ)}
+
+\begin{description}
+    \item[Q1. 신뢰 구간을 좁히려면 어떻게 해야 하나요?]
+    \textbf{A.} 두 가지 방법이 있습니다.
+    \begin{enumerate}
+        \item 데이터를 더 많이 모읍니다 ($n$ 증가 $\to$ 분모 커짐 $\to$ 폭 감소). 가장 확실한 방법입니다.
+        \item 신뢰 수준을 낮춥니다 (99\% $\to$ 90\%). 하지만 틀릴 위험(Risk)이 커집니다.
+    \end{enumerate}
+    
+    \item[Q2. Slutsky 정리는 왜 중요한가요?]
+    \textbf{A.} 이론과 현실을 이어주는 다리이기 때문입니다. 이론적으로 분산 공식에는 참값 $\theta$가 들어가야 하지만, 현실에선 $\theta$를 모릅니다. Slutsky 정리가 "데이터가 많으면 추정값 $\hat{\theta}$를 대신 써도 괜찮아!"라고 수학적으로 허락해주기 때문에 우리가 실제로 숫자를 대입해서 계산할 수 있는 것입니다.
+\end{description}
+
+% 10. 다음 단원 연결
+\vspace{1cm}
+\begin{quote}
+\textbf{Next Step:} 신뢰 구간을 구했더니 $[0.4, 0.6]$이 나왔습니다. 누군가 "평균이 0.5입니까?"라고 묻는다면 "그럴싸하다"고 답할 수 있겠죠. 하지만 "평균이 0.7입니까?"라고 묻는다면 "아니오"라고 할 것입니다. 이처럼 신뢰 구간은 주장의 옳고 그름을 판별하는 도구가 됩니다. 다음 \textbf{Unit 5}에서는 이를 공식화한 \textbf{가설 검정(Hypothesis Testing)}을 배웁니다.
+\end{quote}
+
+% 11. 단원 요약 박스
+\begin{summarybox}{Unit 4 핵심 요약}
+\begin{itemize}
+    \item \textbf{철학:} 신뢰 구간은 랜덤한 구간이며, 참값 $\theta$는 고정되어 있다. "95\% 확률로 포함한다"는 것은 반복 실험 시의 성공률을 의미한다.
+    \item \textbf{구성법:} $\hat{\theta} \pm 1.96 \times \text{Standard Error}$.
+    \item \textbf{Slutsky's Theorem:} 표준오차(Standard Error) 계산 시 미지의 $\theta$ 대신 $\hat{\theta}$를 대입할 수 있게 해주는 정리.
+    \item \textbf{보수적 구간:} 분산의 최댓값을 사용하여 계산. 안정적이지만 구간이 넓다.
+\end{itemize}
+\end{summarybox}
+
+\end{document}
