@@ -1,0 +1,593 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIN 574: 기업 수준 경제학 - 요약 노트
+% UIUC Finance Department
+% 5개 파트 통합본
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{book}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% 한글 지원 (XeLaTeX + fontspec)
+\usepackage{fontspec}
+\setmainfont{AppleGothic}
+\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+% \usepackage{adjustbox}  % 기본 설치에 없음
+% \usepackage{multirow}  % 기본 설치에 없음
+\renewcommand{\arraystretch}{1.3}
+
+% \usepackage{enumitem}
+% \setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\leftmark}
+\fancyhead[RE]{FIN 574 요약 노트}
+\renewcommand{\headrulewidth}{0.5pt}
+\setlength{\headheight}{15pt}
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    bookmarks=true,
+    bookmarksnumbered=true
+]{hyperref}
+
+%========================================================================================
+% 색상 정의
+%========================================================================================
+
+\usepackage[dvipsnames,table]{xcolor}
+
+\definecolor{mainblue}{RGB}{0, 70, 140}
+\definecolor{alertred}{RGB}{200, 50, 50}
+\definecolor{examplegreen}{RGB}{0, 100, 50}
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+
+%========================================================================================
+% 박스 환경 (기본 환경 사용)
+%========================================================================================
+
+% 요약 박스
+\newenvironment{summarybox}[1][]{%
+    \par\medskip\noindent
+    \fcolorbox{mainblue}{mainblue!10}{\begin{minipage}{0.93\textwidth}
+    \textbf{#1}\par\smallskip
+}{\end{minipage}}\par\medskip}
+
+% 주의사항 박스
+\newenvironment{alertbox}[1][]{%
+    \par\medskip\noindent
+    \fcolorbox{alertred}{alertred!10}{\begin{minipage}{0.93\textwidth}
+    \textbf{#1}\par\smallskip
+}{\end{minipage}}\par\medskip}
+
+% 예시 박스
+\newenvironment{examplebox}[1][]{%
+    \par\medskip\noindent
+    \fcolorbox{examplegreen}{examplegreen!10}{\begin{minipage}{0.93\textwidth}
+    \textbf{#1}\par\smallskip
+}{\end{minipage}}\par\medskip}
+
+%========================================================================================
+% 문서 정보
+%========================================================================================
+
+\title{
+    \vspace{-2cm}
+    {\LARGE\bfseries FIN 574: 기업 수준 경제학}\\[0.5cm]
+    {\Large 핵심 요약 노트}\\[1cm]
+    {\large UIUC Finance Department}
+}
+\author{}
+\date{\today}
+
+%========================================================================================
+% 문서 시작
+%========================================================================================
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+%========================================================================================
+% Part 1. 기초 용어 및 수요와 공급
+%========================================================================================
+
+\chapter{기초 용어 및 수요와 공급}
+
+\begin{summarybox}[단원 개요]
+이 단원에서는 경제학의 가장 기초가 되는 언어(용어)를 익히고, 시장 가격이 형성되는 기본 원리인 '수요와 공급' 모형을 다룹니다. 그래프가 움직이는 원리를 이해하는 것이 핵심 목표입니다.
+\end{summarybox}
+
+\section{필수 용어 정리}
+
+경제를 처음 접하는 사람도 이해할 수 있도록 핵심 용어를 풀이했습니다.
+
+\begin{table}[h!]
+\centering
+\caption{미시경제학 핵심 용어 사전}
+\label{tab:terminology}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l l l l@{}}
+\toprule
+\textbf{용어 (한글)} & \textbf{원어} & \textbf{직관적 설명} & \textbf{비고} \\ \midrule
+희소성 & Scarcity & 모두가 원하는 만큼 가질 수는 없는 상태 & 경제학의 출발점 \\
+기회비용 & Opportunity Cost & 선택함(A)으로써 포기한 것(B) 중 가장 큰 가치 & "공짜 점심은 없다" \\
+한계 & Marginal & '추가적인', '하나 더 했을 때의 변화량' & 미분 개념과 유사 \\
+효용 & Utility & 소비자가 얻는 만족감 & 주관적 만족의 크기 \\
+이윤 & Profit & 총수입(매출) - 총비용 & 기업의 존재 목적 \\
+균형 & Equilibrium & 수요와 공급이 일치하여 가격이 변하지 않는 상태 & "변할 유인이 없는 상태" \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\section{수요와 공급: 가격 결정의 원리}
+
+시장은 \textbf{물건을 사는 사람(소비자)}과 \textbf{파는 사람(생산자)}이 만나는 곳입니다. 이 둘의 줄다리기가 가격을 결정합니다.
+
+\subsection{수요 (Demand)}
+소비자가 특정 가격에 물건을 얼마나 사고 싶어 하는지를 나타냅니다.
+\begin{itemize}
+    \item \textbf{수요의 법칙:} 가격이 비싸지면 덜 사고, 싸지면 더 산다. (우하향 곡선)
+    \item \textbf{직관:} 마트에서 삼겹살이 50\% 세일하면 평소보다 더 많이 담게 되는 것과 같습니다.
+\end{itemize}
+
+\begin{alertbox}[주의: 수요량의 변화 vs 수요의 변화]
+많은 초심자가 틀리는 부분입니다. 반드시 구별해야 합니다.
+\begin{itemize}
+    \item \textbf{수요량의 변화 (Quantity Demanded):}
+    \begin{itemize}
+        \item 원인: 해당 재화의 \textbf{가격}이 변할 때.
+        \item 결과: 그래프 \textbf{곡선 위에서 점이 이동}합니다. (가격 인상 $\rightarrow$ 구매 감소)
+    \end{itemize}
+    \item \textbf{수요의 변화 (Demand):}
+    \begin{itemize}
+        \item 원인: 가격 이외의 요인 (유행, 소득, 대체재 가격 등).
+        \item 결과: \textbf{그래프 자체가 왼쪽이나 오른쪽으로 이동}합니다.
+    \end{itemize}
+\end{itemize}
+\end{alertbox}
+
+\subsection{공급 (Supply)}
+기업이 특정 가격에 물건을 얼마나 팔고 싶어 하는지를 나타냅니다.
+\begin{itemize}
+    \item \textbf{공급의 법칙:} 가격이 비싸지면 돈을 더 벌 수 있으니 더 많이 생산한다. (우상향 곡선)
+    \item \textbf{비용과의 관계:} 물건을 더 많이 만들려면 추가 비용(야근 수당 등)이 들기 때문에, 더 높은 가격을 받아야만 생산량을 늘립니다.
+\end{itemize}
+
+\subsection{시장 균형 (Market Equilibrium)}
+수요 곡선과 공급 곡선이 만나는 지점(X자 교차점)입니다.
+\begin{itemize}
+    \item \textbf{초과 공급 (Surplus):} 가격이 너무 높으면 물건이 팔리지 않고 남습니다. $\rightarrow$ 가격 하락 압력 발생
+    \item \textbf{초과 수요 (Shortage):} 가격이 너무 낮으면 물건이 부족해 줄을 섭니다. $\rightarrow$ 가격 상승 압력 발생
+    \item \textbf{균형:} 남지도 부족하지도 않은 상태. 외부 충격이 없다면 가격은 여기서 멈춥니다.
+\end{itemize}
+
+%========================================================================================
+% Part 2. 기업의 생산과 비용 구조
+%========================================================================================
+
+\chapter{기업의 생산과 비용 구조}
+
+\begin{summarybox}[단원 개요]
+기업의 목표는 \textbf{이윤 극대화(Profit Maximization)}입니다. 이윤은 '번 돈(매출)'에서 '쓴 돈(비용)'을 뺀 것입니다. 이 단원에서는 물건을 만들 때 비용이 어떤 규칙으로 발생하는지, 왜 많이 만들수록 개당 비용이 변하는지를 분석합니다.
+\end{summarybox}
+
+\section{생산의 기초: 단기와 장기}
+
+물건을 만들기 위해서는 재료와 노동력이 필요합니다.
+
+\subsection{단기와 장기의 구분 (Time Frames)}
+경제학에서 시간은 달력의 날짜가 아니라, \textbf{'생산 요소를 바꿀 수 있는가'}로 구분합니다.
+\begin{itemize}
+    \item \textbf{단기 (Short Run):}
+    \begin{itemize}
+        \item 공장 크기나 기계 설비 같은 \textbf{고정 요소(Capital, K)}는 바꿀 수 없습니다.
+        \item 오직 \textbf{가변 요소(Labor, L)}인 직원 수나 재료만 조절 가능합니다.
+    \end{itemize}
+    \item \textbf{장기 (Long Run):}
+    \begin{itemize}
+        \item 공장을 확장하거나 폐쇄하는 등 \textbf{모든 요소}를 바꿀 수 있는 충분한 시간입니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{수확 체감의 법칙 (Law of Diminishing Marginal Product)}
+단기에 발생하는 아주 중요한 현상입니다.
+
+\begin{examplebox}[비유: 좁은 주방의 요리사]
+\begin{itemize}
+    \item 주방 크기(고정 요소)는 그대로인데, 요리사(가변 요소)를 계속 늘린다고 가정해 봅시다.
+    \item 처음 1~2명은 서로 도와서 효율이 급격히 오릅니다.
+    \item 하지만 10명이 넘어가면? 서로 동선이 꼬이고 부딪혀서 \textbf{1명당 생산 효율이 떨어집니다.}
+    \item 이를 \textbf{한계 생산 체감}이라고 하며, 비용이 급격히 증가하는 원인이 됩니다.
+\end{itemize}
+\end{examplebox}
+
+\section{비용 곡선의 종류와 특징}
+
+기업의 비용은 크게 고정된 것과 변하는 것으로 나뉩니다.
+
+\begin{table}[h!]
+\centering
+\caption{필수 비용 개념 정리}
+\label{tab:costs}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l l l@{}}
+\toprule
+\textbf{용어} & \textbf{공식/정의} & \textbf{특징} \\ \midrule
+\textbf{고정 비용 (FC)} & Fixed Cost & 생산량이 0이어도 나가는 돈 (월세, 설비비). 수평선. \\
+\textbf{가변 비용 (VC)} & Variable Cost & 생산량에 따라 늘어나는 돈 (인건비, 재료비). 우상향. \\
+\textbf{총 비용 (TC)} & $FC + VC$ & 전체 비용. \\ \midrule
+\textbf{한계 비용 (MC)} & $\Delta TC / \Delta Q$ & \textbf{하나 더 만들 때 추가로 드는 비용}. \\
+\textbf{평균 총비용 (ATC)} & $TC / Q$ & 제품 1개당 단가. U자 형태. \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{한계 비용 (Marginal Cost, MC)}
+
+경제학에서 가장 중요한 곡선입니다. 나이키 로고($\checkmark$)처럼 생겼습니다.
+\begin{itemize}
+    \item 처음에는 효율성 때문에 비용이 줄어들지만, 수확 체감의 법칙 때문에 결국 급격히 상승합니다.
+    \item 기업은 이 비용과 시장 가격을 비교해 생산 여부를 결정합니다.
+\end{itemize}
+
+\subsection{평균 비용 (Average Total Cost, ATC)}
+우리가 흔히 말하는 '단가'입니다. 넓은 U자 형태를 그립니다.
+\begin{itemize}
+    \item 초기 하락 구간: 고정 비용(FC)이 여러 제품에 분산되기 때문입니다.
+    \item 후기 상승 구간: 한계 비용(MC)이 너무 커져서 평균을 끌어올리기 때문입니다.
+\end{itemize}
+
+\begin{alertbox}[핵심 원리: MC와 ATC의 관계 (학점 비유)]
+\textbf{Q. 왜 MC 곡선은 항상 ATC 곡선의 가장 낮은 점(최저점)을 통과하나요?}
+\begin{itemize}
+    \item \textbf{ATC = 전체 평점 (GPA)} / \textbf{MC = 이번 학기 성적}
+    \item 이번 학기 성적(MC)이 평점(ATC)보다 낮으면 $\rightarrow$ 평점은 내려갑니다 (ATC 하락 구간).
+    \item 이번 학기 성적(MC)이 평점(ATC)보다 높으면 $\rightarrow$ 평점은 올라갑니다 (ATC 상승 구간).
+    \item 따라서, 평점이 내려가다가 올라가는 그 전환점(최저점)에서 둘은 만납니다.
+\end{itemize}
+\end{alertbox}
+
+%========================================================================================
+% Part 3. 이윤 극대화와 완전 경쟁 시장
+%========================================================================================
+
+\chapter{이윤 극대화와 완전 경쟁 시장}
+
+\begin{summarybox}[단원 개요]
+모든 기업은 '이윤 극대화'를 위해 움직입니다. 이 단원에서는 기업이 생산량을 결정하는 \textbf{절대 규칙($MR=MC$)}을 배웁니다. 또한, 가장 이상적인 시장 형태인 \textbf{'완전 경쟁 시장'}에서 가격이 어떻게 형성되고, 경쟁이 기업의 이윤을 어떻게 0으로 수렴시키는지 분석합니다.
+\end{summarybox}
+
+\section{이윤 극대화의 황금률}
+
+기업의 종류(독점, 경쟁)와 상관없이 모든 기업이 지키는 생산량 결정 규칙입니다.
+
+\subsection{한계 수입과 한계 비용}
+
+\begin{itemize}
+    \item \textbf{한계 수입 (Marginal Revenue, MR):} 물건을 \textbf{하나 더 팔았을 때} 들어오는 추가 수입.
+    \item \textbf{한계 비용 (Marginal Cost, MC):} 물건을 \textbf{하나 더 만들 때} 드는 추가 비용.
+\end{itemize}
+
+\subsection{최적 생산량 결정 규칙 ($MR = MC$)}
+기업은 $MR$과 $MC$가 같아지는 지점에서 생산을 멈춥니다.
+\begin{itemize}
+    \item 만약 $MR > MC$: 하나 더 만들면 이익이 남으므로 \textbf{더 생산해야 함}.
+    \item 만약 $MR < MC$: 하나 더 만들면 손해이므로 \textbf{생산을 줄여야 함}.
+    \item 따라서 $MR = MC$인 지점이 이윤이 가장 큽니다(혹은 손실이 가장 적습니다).
+\end{itemize}
+
+\section{완전 경쟁 시장 (Perfect Competition)}
+
+세상에는 다양한 형태의 시장이 존재합니다. 경제학자들은 이를 '기업의 수'로 구분합니다.
+
+\subsection{시장 구조의 스펙트럼}
+\begin{itemize}
+    \item \textbf{독점 (Monopoly):} 기업 1개. (예: 지역 전력 회사)
+    \item \textbf{과점 (Oligopoly):} 기업 소수. (예: 자동차, 통신사)
+    \item \textbf{완전 경쟁 (Perfect Competition):} 기업 무수히 많음. (예: 옥수수 시장)
+\end{itemize}
+
+\subsection{완전 경쟁 시장의 4가지 조건}
+이 조건들이 모두 충족되어야 '완전 경쟁'이라고 부릅니다.
+
+\begin{table}[h!]
+\centering
+\caption{완전 경쟁 시장의 4대 조건}
+\label{tab:perfect_comp}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l l@{}}
+\toprule
+\textbf{조건} & \textbf{설명 및 예시} \\ \midrule
+\textbf{1. 수많은 참여자} & 구매자와 판매자가 너무 많아서, 누구도 시장 가격을 좌지우지할 수 없음. \\
+\textbf{2. 동질적 제품} & 모든 제품이 똑같음. (예: A농장 옥수수나 B농장 옥수수나 차이 없음) \\
+\textbf{3. 자유로운 진입/퇴출} & 장사가 잘되면 누구나 들어오고, 안 되면 언제든 나갈 수 있음. \\
+\textbf{4. 완전한 정보} & 누구나 가격과 품질을 다 알고 있음. (바가지 쓸 일이 없음) \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{가격 수용자 (Price Taker)}
+완전 경쟁 시장의 개별 기업은 힘이 없습니다.
+\begin{itemize}
+    \item 내가 옥수수 가격을 10원이라도 올리면? 손님들은 옆집으로 갑니다(제품이 똑같으니까).
+    \item 내가 가격을 내릴 필요가 있나? 시장 가격에 다 팔 수 있는데 굳이 내릴 이유가 없습니다.
+    \item \textbf{결론:} 기업은 시장 가격($P$)을 그대로 받아들입니다. ($P = MR$)
+\end{itemize}
+
+\section{장기 균형: 진입과 퇴출의 마법}
+
+단기적으로는 이익을 볼 수도 있고 손해를 볼 수도 있습니다. 하지만 '장기(Long Run)'에는 놀라운 일이 벌어집니다.
+
+\subsection{진입과 퇴출 (Entry and Exit)}
+
+시장의 자동 조절 기능입니다.
+\begin{itemize}
+    \item \textbf{상황 A (초과 이윤 발생):} 시장 가격이 높아서 기존 기업들이 돈을 법니다.
+        \begin{itemize}
+            \item $\rightarrow$ 소문을 듣고 새로운 기업들이 진입합니다.
+            \item $\rightarrow$ 공급 곡선이 오른쪽으로 이동(증가)합니다.
+            \item $\rightarrow$ 가격이 떨어져서 이윤이 줄어듭니다.
+        \end{itemize}
+    \item \textbf{상황 B (손실 발생):} 시장 가격이 낮아서 기업들이 손해를 봅니다.
+        \begin{itemize}
+            \item $\rightarrow$ 못 버티는 기업들이 퇴출(폐업)합니다.
+            \item $\rightarrow$ 공급 곡선이 왼쪽으로 이동(감소)합니다.
+            \item $\rightarrow$ 가격이 올라서 남은 기업의 숨통이 트입니다.
+        \end{itemize}
+\end{itemize}
+
+\subsection{장기 균형의 결론: 경제적 이윤 = 0}
+진입과 퇴출이 멈추는 시점은 언제일까요? 바로 \textbf{'초과 이윤이 0'}이 될 때입니다.
+
+\begin{alertbox}[오해 금지: 이윤이 0이면 사장님은 굶나요?]
+\textbf{아닙니다!} 경제학에서 말하는 비용에는 \textbf{'기회비용(사장님의 월급)'}이 포함되어 있습니다.
+\begin{itemize}
+    \item \textbf{회계적 이윤:} 장부상 남는 돈. (당연히 플러스여야 함)
+    \item \textbf{경제적 이윤:} 회계적 이윤 - 기회비용.
+    \item \textbf{결론:} 경제적 이윤이 0이라는 말은, "다른 사업을 하는 것만큼은 딱 벌고 있다(본전 이상은 한다)"는 뜻입니다.
+\end{itemize}
+\end{alertbox}
+
+%========================================================================================
+% Part 4. 독점과 과점 (게임 이론)
+%========================================================================================
+
+\chapter{독점과 과점 (게임 이론)}
+
+\begin{summarybox}[단원 개요]
+경쟁자가 없거나(독점) 소수만 있는(과점) 시장은 완전 경쟁 시장과 전혀 다르게 작동합니다. 이 단원에서는 독점 기업이 어떻게 가격을 결정하여 사회적 손실을 초래하는지, 그리고 과점 기업들이 왜 서로 협력하지 못하고 배신하게 되는지(게임 이론)를 분석합니다.
+\end{summarybox}
+
+\section{독점 (Monopoly): 혼자만의 시장}
+
+경쟁자가 없는 유일한 판매자입니다. (예: 지역 내 유일한 수도 공급자, 특허 신약)
+
+\subsection{독점의 발생 원인}
+진입 장벽(Barriers to Entry)이 핵심입니다. 아무나 들어올 수 없어야 독점이 유지됩니다.
+\begin{itemize}
+    \item \textbf{자원 독점:} 핵심 원료를 혼자 가지고 있음. (과거 알루미늄 시장의 Alcoa)
+    \item \textbf{정부 허가:} 특허권(Patent), 저작권 등 법적 보호.
+    \item \textbf{자연 독점 (Natural Monopoly):} 초기 투자 비용이 너무 커서, 여러 기업보다 한 기업이 공급하는 게 더 싼 경우. (수도, 전력망)
+\end{itemize}
+
+\subsection{독점의 가격 결정 ($MR < P$)}
+독점 기업은 \textbf{가격 설정자(Price Maker)}입니다.
+
+\begin{alertbox}[핵심 원리: 왜 한계 수입(MR)이 가격(P)보다 낮을까?]
+\textbf{상황:} 독점 기업이 물건 1개를 더 팔려면 어떻게 해야 할까요?
+\begin{itemize}
+    \item 수요의 법칙에 따라 \textbf{가격을 낮춰야만} 더 팔 수 있습니다.
+    \item 문제는, 새로 파는 1개뿐만 아니라 \textbf{기존에 비싸게 팔던 물건들도 가격을 깎아줘야} 한다는 것입니다.
+    \item 따라서, 하나 더 팔아서 들어오는 추가 수입(MR)은 판매 가격(P)보다 항상 낮습니다.
+\end{itemize}
+\end{alertbox}
+
+\subsection{독점의 결과: 비효율성}
+
+완전 경쟁 시장과 비교했을 때 독점은 나쁜 결과를 낳습니다.
+\begin{itemize}
+    \item \textbf{생산량 감소:} 가격을 높게 받기 위해 일부러 적게 만듭니다. ($Q_{monopoly} < Q_{competitive}$)
+    \item \textbf{가격 상승:} 경쟁 시장보다 더 비쌉니다. ($P_{monopoly} > P_{competitive}$)
+    \item \textbf{사중손실 (Deadweight Loss):} 거래가 이루어졌다면 사회적으로 이득이었을 부분이 사라집니다.
+\end{itemize}
+
+\section{과점 (Oligopoly): 소수의 눈치 게임}
+
+소수의 기업이 시장을 지배하는 형태입니다. (예: 통신 3사, 자동차 제조사)
+
+\subsection{특징: 상호 의존성 (Interdependence)}
+완전 경쟁이나 독점과 달리, \textbf{'상대방의 행동'}이 나에게 큰 영향을 미칩니다.
+\begin{itemize}
+    \item 내가 가격을 내리면 경쟁사도 따라 내릴 것이고, 결국 둘 다 손해를 봅니다.
+    \item 따라서 전략적 판단이 매우 중요해지며, 이를 분석하기 위해 \textbf{게임 이론}을 사용합니다.
+\end{itemize}
+
+\subsection{담합과 카르텔 (Cartel)}
+과점 기업들은 서로 싸우기보다 뭉쳐서 독점 기업처럼 행동하고 싶어 합니다.
+\begin{itemize}
+    \item \textbf{카르텔:} 기업들이 모여 생산량을 줄이고 가격을 올리기로 약속하는 것. (예: OPEC)
+    \item \textbf{배신의 유인 (Cheating Incentive):} "남들은 약속을 지킬 때, 나만 몰래 생산을 늘리면 떼돈을 벌 수 있지 않을까?" 이 유혹 때문에 카르텔은 붕괴하기 쉽습니다.
+\end{itemize}
+
+\section{게임 이론 (Game Theory)}
+
+상대방의 반응을 고려하여 자신의 최적 전략을 선택하는 수학적 분석 방법입니다.
+
+\subsection{죄수의 딜레마 (Prisoner's Dilemma)}
+개인의 합리적인 선택이 전체 집단에는 최악의 결과를 가져오는 역설적인 상황입니다.
+
+\begin{examplebox}[보수 행렬 (Payoff Matrix) 예시]
+(용의자 A의 형량, 용의자 B의 형량) - 숫자가 작을수록 좋음 (단위: 년)
+
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{l|c|c|}
+\cline{2-3}
+ & \textbf{B: 침묵} & \textbf{B: 자백} \\ \hline
+\textbf{A: 침묵} & (1년, 1년) & (20년, 0년) \\ \hline
+\textbf{A: 자백} & (0년, 20년) & \textbf{(5년, 5년)} \\ \hline
+\end{tabular}
+\end{center}
+
+\textbf{분석:}
+\begin{enumerate}
+    \item \textbf{최선의 결과:} 둘 다 침묵하면 (1년, 1년)으로 총 형량이 가장 적습니다.
+    \item \textbf{우월 전략:} 상대가 뭘 하든 \textbf{'자백'}하는 것이 무조건 유리합니다.
+    \item \textbf{내쉬 균형:} 결국 둘 다 자백을 선택하여 (5년, 5년)을 살게 됩니다.
+\end{enumerate}
+\end{examplebox}
+
+\subsection{경제학적 시사점}
+\begin{itemize}
+    \item 기업들도 가격을 높게 유지하기로 담합(침묵)하면 좋지만, 배신의 유인 때문에 결국 경쟁 가격(자백)으로 돌아가게 됩니다.
+    \item 이를 막기 위해 정부는 \textbf{반독점법(예: 셔먼법)}을 통해 담합을 불법으로 규정합니다.
+\end{itemize}
+
+%========================================================================================
+% Part 5. 정부 개입과 후생 경제학
+%========================================================================================
+
+\chapter{정부 개입과 후생 경제학}
+
+\begin{summarybox}[단원 개요]
+시장은 보통 효율적이지만, 정부가 개입해야 할 때도 있습니다. 이 단원에서는 정부가 가격을 통제하거나 세금을 부과할 때 시장에 어떤 변화(비효율)가 생기는지 분석합니다. 또한 '누가 세금을 실질적으로 부담하는가'는 법이 아니라 '탄력성'이 결정한다는 사실을 배웁니다.
+\end{summarybox}
+
+\section{후생 경제학: 사회적 행복의 크기}
+
+경제학의 목표는 사회 전체의 이익(파이의 크기)을 최대화하는 것입니다.
+
+\subsection{자비로운 독재자 (Benevolent Dictator) 개념}
+누가 얼마나 가져가는지(분배)는 신경 쓰지 않고, \textbf{오직 사회 전체의 이익 총합(효율성)}만 생각하는 가상의 존재입니다.
+\begin{itemize}
+    \item \textbf{소비자 잉여 (Consumer Surplus):} (내가 내려는 돈) - (실제 낸 돈). "와, 싸게 샀다!" 하는 이득.
+    \item \textbf{생산자 잉여 (Producer Surplus):} (실제 받은 돈) - (원가). "마진 남았다!" 하는 이득.
+    \item \textbf{사회적 총잉여 (Social Gain):} 소비자 잉여 + 생산자 잉여.
+\end{itemize}
+
+\begin{alertbox}[결론: 완전 경쟁이 최고다]
+자비로운 독재자가 보기에 가장 흐뭇한 상태는 \textbf{완전 경쟁 시장}입니다. 독점이나 정부 개입이 발생하면 거래량이 줄어들어 사회적 총잉여가 감소하는데, 이를 \textbf{사중손실(Deadweight Loss)}이라고 합니다.
+\end{alertbox}
+
+\section{가격 통제: 정부가 가격을 정할 때}
+
+정부가 법으로 가격의 상한선이나 하한선을 강제하는 경우입니다. 의도는 좋으나 부작용이 따릅니다.
+
+\subsection{가격 상한제 (Price Ceiling)}
+"이 가격 이상 받지 마!" (예: 임대료 규제, 티켓 가격 제한)
+\begin{itemize}
+    \item \textbf{조건:} 시장 균형 가격보다 \textbf{낮게} 설정해야 효과가 있음.
+    \item \textbf{결과:} \textbf{초과 수요 (Shortage)} 발생.
+    \item \textbf{부작용:} 사고 싶은 사람은 많은데 물건이 없습니다. 줄 서기, 암시장 형성, 품질 저하가 발생합니다.
+\end{itemize}
+
+\subsection{가격 하한제 (Price Floor)}
+"이 가격 이하로 주지 마!" (예: 최저임금, 농산물 가격 지지)
+\begin{itemize}
+    \item \textbf{조건:} 시장 균형 가격보다 \textbf{높게} 설정해야 효과가 있음.
+    \item \textbf{결과:} \textbf{초과 공급 (Surplus)} 발생.
+    \item \textbf{예시 (정부 치즈):} 과거 미국 정부가 우유 가격을 높게 유지하자 농가들이 우유를 너무 많이 생산했습니다.
+\end{itemize}
+
+\section{세금과 조세 귀착 (Tax Incidence)}
+
+정부가 물건 하나당 세금(Excise Tax)을 부과하면 누가 그 돈을 낼까요?
+
+\subsection{세금의 효과}
+\begin{itemize}
+    \item 공급자에게 세금을 부과하면, 공급 곡선이 \textbf{세금 액수만큼 위로 수직 이동}합니다.
+    \item 결과적으로 \textbf{시장 가격은 오르고, 거래량은 줄어듭니다.}
+    \item 줄어든 거래량 때문에 사회적 손실(사중손실)이 발생합니다.
+\end{itemize}
+
+\subsection{누가 더 많이 내나? (탄력성의 싸움)}
+세금 부담은 \textbf{'도망가기 힘든 사람(비탄력적인 쪽)'}이 더 많이 집니다.
+
+\begin{examplebox}[비유: 담배 세금 인상]
+\begin{itemize}
+    \item \textbf{수요(흡연자):} 중독되어 있어서 가격이 올라도 담배를 끊기 어렵습니다. (비탄력적)
+    \item \textbf{공급(담배회사):} 세금 오르면 공장 돌리기 부담스러워 생산을 줄이기 쉽습니다. (상대적 탄력적)
+    \item \textbf{결과:} 정부가 담배 회사에 세금을 물려도, 회사는 담배 가격을 확 올려버립니다. 즉, \textbf{소비자가 세금의 대부분을 부담}합니다.
+\end{itemize}
+\end{examplebox}
+
+\begin{table}[h!]
+\centering
+\caption{탄력성과 세금 부담의 관계}
+\label{tab:tax_incidence}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l l l@{}}
+\toprule
+\textbf{탄력성 비교} & \textbf{소비자 부담} & \textbf{생산자 부담} \\ \midrule
+수요가 더 비탄력적 (예: 담배, 휘발유) & \textbf{소비자가 덤탱이} & 적음 \\
+공급이 더 비탄력적 (예: 주택 공급, 토지) & 적음 & \textbf{생산자가 덤탱이} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+%========================================================================================
+% 부록: 전체 강의 한 장 요약 (Cheat Sheet)
+%========================================================================================
+
+\chapter*{부록: 전체 강의 한 장 요약}
+\addcontentsline{toc}{chapter}{부록: 전체 강의 한 장 요약}
+
+시험 직전, 이 표 하나만 보고 들어가세요.
+
+\begin{table}[h!]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}l l l@{}}
+\toprule
+\textbf{주제} & \textbf{핵심 개념} & \textbf{기억할 한 문장} \\ \midrule
+\textbf{기초} & 기회비용 & 세상에 공짜 점심은 없다. (선택=포기) \\
+\textbf{수요/공급} & 변화 vs 양의 변화 & 가격 변하면 곡선 위 이동, 딴 게 변하면 곡선 자체 이동. \\
+\textbf{비용} & MC와 ATC & 한계비용(MC)은 항상 평균비용(ATC)의 최저점을 뚫고 올라간다. \\ \midrule
+\textbf{이윤 극대화} & \textbf{$MR = MC$} & 모든 기업은 한계수입=한계비용 지점에서 생산한다. \\ \midrule
+\textbf{완전 경쟁} & $P = MR$ & 기업은 가격 수용자다. 장기 이윤은 0이다. \\
+\textbf{독점} & $MR < P$ & 가격 설정자다. 생산량 줄이고 가격 올려서 사중손실 발생. \\
+\textbf{과점} & 게임 이론 & 죄수의 딜레마: 개인의 합리적 선택이 전체의 배신을 부른다. \\ \midrule
+\textbf{가격 통제} & 상한제/하한제 & 억지로 막으면 줄을 서거나(부족) 물건이 남아돈다(잉여). \\
+\textbf{세금} & 조세 귀착 & 탄력성이 작은(도망 못 가는) 쪽이 세금을 더 많이 낸다. \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\vfill
+\begin{center}
+\textbf{수고하셨습니다!}\\[0.5em]
+이 노트는 FIN574 강의의 방대한 내용을 핵심만 추려 재구성한 것입니다. \\
+여러분의 A+를 응원합니다.
+\end{center}
+
+\end{document}
