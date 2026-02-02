@@ -10,23 +10,24 @@
 %========================================================================================
 
 \usepackage{kotex}
-\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
-\usepackage{amsmath, amssymb, amsthm}
-\usepackage{graphicx}
+% --- 표 관련 ---
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{adjustbox}
+\usepackage{colortbl}
 \renewcommand{\arraystretch}{1.1}
 
-\usepackage{enumitem}
-\setlist{nosep, leftmargin=*, itemsep=0.3em}
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -35,15 +36,7 @@
 \fancyhead[LO]{\leftmark}
 \fancyhead[RE]{CS109A}
 \renewcommand{\headrulewidth}{0.5pt}
-\setlength{\headheight}{15pt}
-
-\usepackage[
-    colorlinks=true,
-    linkcolor=blue!80!black,
-    urlcolor=blue!80!black,
-    bookmarks=true,
-    bookmarksnumbered=true
-]{hyperref}
+\renewcommand{\footrulewidth}{0.3pt}
 
 %========================================================================================
 % 색상 정의
@@ -60,16 +53,29 @@
 \definecolor{boxgray}{gray}{0.95}
 \definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
 \definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
 \definecolor{darkblue}{RGB}{50, 80, 150}
 \definecolor{darkgreen}{RGB}{40, 120, 70}
 \definecolor{darkorange}{RGB}{200, 100, 30}
 \definecolor{darkpurple}{RGB}{100, 60, 150}
+
+% MIT/Harvard 추가 색상
+\definecolor{mainblue}{RGB}{50, 80, 150}
+\definecolor{subgray}{RGB}{180, 180, 180}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{boxbgcolor}{RGB}{245, 245, 250}
+
+% Stanford CS230 스타일 색상
+\definecolor{myblue}{RGB}{50, 100, 180}
+\definecolor{sblue}{RGB}{70, 130, 180}
+\definecolor{wgray}{RGB}{245, 245, 245}
+\definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 %========================================================================================
-% 박스 환경 (tcolorbox)
+% 박스 환경
 %========================================================================================
 
 \usepackage[most]{tcolorbox}
@@ -80,13 +86,9 @@
     colback=lightpurple,
     colframe=darkpurple,
     fonttitle=\bfseries\large,
-    title=📚 강의 개요,
+    title=강의 개요,
     arc=3mm,
     boxrule=1pt,
-    left=8pt,
-    right=8pt,
-    top=8pt,
-    bottom=8pt,
     breakable,
     #1
 }
@@ -96,13 +98,9 @@
     colback=lightblue,
     colframe=darkblue,
     fonttitle=\bfseries,
-    title=📝 핵심 요약,
+    title=핵심 요약,
     arc=2mm,
     boxrule=0.7pt,
-    left=6pt,
-    right=6pt,
-    top=6pt,
-    bottom=6pt,
     breakable,
     #1
 }
@@ -112,13 +110,9 @@
     colback=lightgreen,
     colframe=darkgreen,
     fonttitle=\bfseries,
-    title=💡 핵심 정보,
+    title=핵심 정보,
     arc=2mm,
     boxrule=0.7pt,
-    left=6pt,
-    right=6pt,
-    top=6pt,
-    bottom=6pt,
     breakable,
     #1
 }
@@ -128,13 +122,9 @@
     colback=lightyellow,
     colframe=darkorange,
     fonttitle=\bfseries,
-    title=⚠️ 주의사항,
+    title=주의,
     arc=2mm,
     boxrule=0.7pt,
-    left=6pt,
-    right=6pt,
-    top=6pt,
-    bottom=6pt,
     breakable,
     #1
 }
@@ -144,14 +134,11 @@
     colback=lightgray,
     colframe=black!60,
     fonttitle=\bfseries,
-    title=📖 예제: #1,
+    title=예제,
     arc=2mm,
     boxrule=0.7pt,
-    left=6pt,
-    right=6pt,
-    top=6pt,
-    bottom=6pt,
     breakable,
+    #1
 }
 
 \newtcolorbox{definitionbox}[1][]{
@@ -159,14 +146,11 @@
     colback=lightpink,
     colframe=purple!70!black,
     fonttitle=\bfseries,
-    title=📌 정의: #1,
+    title=정의,
     arc=2mm,
     boxrule=0.7pt,
-    left=6pt,
-    right=6pt,
-    top=6pt,
-    bottom=6pt,
     breakable,
+    #1
 }
 
 \newtcolorbox{importantbox}[1][]{
@@ -174,26 +158,191 @@
     colback=boxred,
     colframe=red!70!black,
     fonttitle=\bfseries,
-    title=⚠️ 매우 중요: #1,
+    title=매우 중요,
     arc=2mm,
     boxrule=0.7pt,
-    left=6pt,
-    right=6pt,
-    top=6pt,
-    bottom=6pt,
     breakable,
+    #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=개념,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced,
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=비유,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+% mybox 환경 (UIUC용)
+\newtcolorbox{mybox}[1]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title={#1},
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable
+}
+
+% 추가 환경 (Gemini 생성 콘텐츠에서 사용)
+\newtcolorbox{tipbox}[1][]{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=팁, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{solutionbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=풀이, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{downloadbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=다운로드, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{practicebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=연습, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keypointbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=핵심 포인트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{storybox}[1][]{enhanced, colback=lightyellow, colframe=darkorange!80!black, fonttitle=\bfseries, title=이야기, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathstep}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학 단계, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{systembox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=시스템, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{toolbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=도구, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{bayesbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=베이즈, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{formulabox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=공식, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{strategybox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=전략, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{diagnosisbox}[1][]{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=진단, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{featurebox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=특징, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{faqbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=FAQ, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{notebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=노트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{codeexamplebox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=코드 예제, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keyconceptbox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 개념, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{termbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=용어, arc=2mm, boxrule=0.7pt, breakable, #1}
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% 커스텀 명령어 (Gemini 생성 콘텐츠에서 사용)
+\newcommand{\excel}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\concept}[1]{\textbf{#1}}
+\newcommand{\formula}[1]{\textit{#1}}
+\providecommand{\captionof}[2]{\textbf{#2}}
+\newcommand{\chaptertitle}[2]{\section*{#1: #2}}
+\providecommand{\newsection}{\section}
+
+%========================================================================================
+% 코드 블록
+%========================================================================================
+
+\usepackage{listings}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{
+    style=mystyle,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt
 }
 
 %========================================================================================
-% 사용자 정의 명령어
+% 수학
 %========================================================================================
 
-\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
-\newcommand{\keyword}[1]{\textbf{#1}}
-\newcommand{\term}[1]{\textit{#1}}
-\newcommand{\code}[1]{\texttt{#1}}
-\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
-\newcommand{\newsection}[1]{\newpage\section{#1}}
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[chapter]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[chapter]
+\newtheorem{example}{예제}[chapter]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    bookmarks=true,
+    bookmarksnumbered=true
+]{hyperref}
+
+%========================================================================================
+% 기타
+%========================================================================================
+
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{url}
+\urlstyle{same}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
 \newcommand{\metainfo}[4]{
 \begin{tcolorbox}[
     colback=lightpurple,
@@ -206,10 +355,10 @@
     bottom=8pt
 ]
 \begin{tabular}{@{}rl@{}}
-▣ \textbf{강의명:} & #1 \\[0.3em]
-▣ \textbf{주차:} & #2 \\[0.3em]
-▣ \textbf{교수명:} & #3 \\[0.3em]
-▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\textbf{강의명:} & #1 \\[0.3em]
+\textbf{주차:} & #2 \\[0.3em]
+\textbf{교수명:} & #3 \\[0.3em]
+\textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
 \end{tabular}
 \end{tcolorbox}
 }
@@ -226,11 +375,10 @@
 
 \maketitle
 \tableofcontents
-\newpage
 
 
 %=======================================================================
-% Chapter 1: 과정 개요 (Course Overview)
+% Lecture 1: 과정 개요 (Course Overview)
 %=======================================================================
 \chapter{과정 개요 (Course Overview)}
 \label{ch:lecture1}
@@ -244,9 +392,6 @@
 마지막으로, 파이썬(Python)을 활용한 웹 스크레이핑(Web Scraping) 기초 실습을 단계별로 상세히 안내하여 이론과 실습을 연결합니다.
 \end{summarybox}
 
-
-
-\newpage
 
 %========================================
 \section{과정 개요 (Course Overview)}
@@ -278,7 +423,6 @@
     \item \textbf{영향력 (Impact)}: 데이터 과학을 사용해 실제 문제를 해결하고, 그 과정에서 발생할 수 있는 사회적, 윤리적 영향을 평가합니다.
 \end{itemize}
 
-\newpage
 
 %========================================
 \section{데이터 과학(Data Science)이란 무엇인가?}
@@ -340,7 +484,7 @@
 \subsection{데이터 과학의 잠재력과 위험성}
 데이터 과학은 강력한 도구이며, 그에 따른 잠재력과 위험성을 동시에 가집니다.
 
-\begin{tcolorbox}[colback=green!5, colframe=green!50!black, title=👍 데이터 과학의 잠재력]
+\begin{tcolorbox}[colback=green!5, colframe=green!50!black, title={👍 데이터 과학의 잠재력}]
 \begin{itemize}
     \item \textbf{질병 진단}: 혈액 도말 샘플 이미지로 말라리아 감염 여부 진단.
     \item \textbf{신약 개발}: 언어 모델(LM)을 활용하여 새로운 약물 조합 발견.
@@ -349,7 +493,7 @@
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=red!5, colframe=red!50!black, title=👎 데이터 과학의 위험성과 윤리]
+\begin{tcolorbox}[colback=red!5, colframe=red!50!black, title={👎 데이터 과학의 위험성과 윤리}]
 \begin{itemize}
     \item \textbf{성별 편향 (Gender Bias)}: 특정 직군(예: 엔지니어) 채용 모델이 남성 지원자에게 유리하게 작동.
     \item \textbf{인종 편향 (Racial Bias)}: 미국 법원에서 사용되는 재범 위험도 예측 모델이 유색인종에게 불리하게 편향됨.
@@ -358,7 +502,6 @@
 
 이러한 위험성 때문에 우리는 데이터 과학을 맹목적으로 사용해서는 안 되며, 항상 \textbf{비판적 사고(Critical Thinking)}를 견지하고 모델의 공정성과 윤리성을 점검해야 합니다.
 
-\newpage
 
 %========================================
 \section{데이터 과학의 5단계 프로세스}
@@ -394,7 +537,6 @@
     \end{itemize}
 \end{enumerate}
 
-\newpage
 
 %========================================
 \section{CS109A 과정 상세 안내}
@@ -433,7 +575,6 @@ CS109A도 마찬가지입니다.
     \item \textbf{교수진 (Email)}: 매우 사적인 문제나 민감한 사안.
 \end{enumerate}
 
-\newpage
 
 %========================================
 \section{평가 및 주요 정책}
@@ -507,7 +648,6 @@ HW0는 다음 3가지 영역에 대한 준비 상태를 점검합니다.
 \end{itemize}
 \end{warningbox}
 
-\newpage
 
 %========================================
 \section{실습 (Section 1): 웹 스크레이핑 입문}
@@ -676,7 +816,6 @@ df.to_csv('nobel_prizes.csv', index=False)
 
 이는 서버의 "Rate Limit"(요청 제한)을 존중하면서도 효율적으로 데이터를 수집하기 위해 사용됩니다. (예: "1초에 5개씩" 또는 "한 번에 10개씩 묶어서(batch) 요청")
 
-\newpage
 
 %========================================
 \section{자주 묻는 질문 (FAQ)}
@@ -699,11 +838,9 @@ df.to_csv('nobel_prizes.csv', index=False)
     \item A: 네, 가능합니다. 단, \textbf{데이터가 공개(public)되어 있어야 하며, 3-5명의 그룹 프로젝트}로 진행해야 합니다.
 \end{itemize}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 2: 핵심 용어 정리
+% Lecture 2: 핵심 용어 정리
 %=======================================================================
 \chapter{핵심 용어 정리}
 \label{ch:lecture2}
@@ -721,9 +858,6 @@ df.to_csv('nobel_prizes.csv', index=False)
 이 자료는 데이터 과학 프로세스의 2, 3단계(수집 및 탐색)의 기초를 다룹니다.
 \end{summarybox}
 
-
-
-\newpage
 
 % --- 용어 정리 ---
 \section{핵심 용어 정리}
@@ -764,7 +898,6 @@ EDA & 시각화와 통계를 통해 데이터의 패턴을 탐색하는 과정. 
 \end{tabular}
 \end{table}
 
-\newpage
 
 % --- 핵심 개념 1: 데이터란 무엇인가? ---
 \section{핵심 개념 1: 데이터란 무엇인가? (What is Data?)}
@@ -842,7 +975,6 @@ EDA & 시각화와 통계를 통해 데이터의 패턴을 탐색하는 과정. 
 항상 데이터를 수집하기 전에 "이 데이터를 사용해도 되는가?"를 먼저 질문해야 합니다.
 \end{warningbox}
 
-\newpage
 
 % --- 핵심 개념 2: 데이터의 유형과 구조 ---
 \section{핵심 개념 2: 데이터의 유형과 구조}
@@ -938,7 +1070,7 @@ imdb.head()
     \item \textbf{지저분한 데이터 (Messy Data):} 데이터가 분석하기 어려운 형태로 되어있습니다.
 \end{itemize}
 
-\begin{examplebox}[지저분한(Messy) 데이터 변환하기]
+\begin{examplebox}[title={지저분한(Messy) 데이터 변환하기}]
 다음은 주말 농산물 배송 횟수를 기록한 "지저분한" 표입니다.
 
 \textbf{Before: (지저분한 형식)}
@@ -994,7 +1126,6 @@ imdb.head()
 \end{itemize}
 \end{examplebox}
 
-\newpage
 
 % --- 핵심 개념 3: 탐색적 데이터 분석 (EDA) ---
 \section{핵심 개념 3: 탐색적 데이터 분석 (EDA)}
@@ -1026,7 +1157,7 @@ EDA는 "데이터와 친해지는 과정"이며, 데이터 과학 프로세스�
     특정 주제에 열성적인 사람들(예: 앱 얼리 어답터)만 자발적으로 참여하는 경우.
 \end{description}
 
-\begin{examplebox}[잘못된 표본 추출 예시]
+\begin{examplebox}[title={잘못된 표본 추출 예시}]
 \textbf{사례 1: 수업 출석률}
 \begin{itemize}
     \item \textbf{목표:} CS109A 전체 학생의 평균 만족도 조사.
@@ -1044,7 +1175,6 @@ EDA는 "데이터와 친해지는 과정"이며, 데이터 과학 프로세스�
 \end{itemize}
 \end{examplebox}
 
-\newpage
 
 % --- 절차/방법 1: 기술 통계 ---
 \section{절차/방법 1: 기술 통계 (Descriptive Statistics)}
@@ -1118,7 +1248,7 @@ EDA는 "데이터와 친해지는 과정"이며, 데이터 과학 프로세스�
     \item 범주형 데이터는 순서가 없으므로 평균이나 중앙값을 계산하는 것이 의미가 없습니다.
 \end{itemize}
 
-\begin{examplebox}[어느 것이 더 빠를까? (Mean vs Median)]
+\begin{examplebox}[title={어느 것이 더 빠를까? (Mean vs Median)}]
 \textbf{질문:} 수십억 개의 데이터가 있을 때, 평균과 중앙값 중 무엇이 더 빠를까요?
 
 \textbf{답변:} \textbf{평균}이 훨씬 빠릅니다.
@@ -1153,7 +1283,7 @@ EDA는 "데이터와 친해지는 과정"이며, 데이터 과학 프로세스�
     \item \textbf{단점:} 값을 '제곱'했기 때문에, 원래 데이터와 단위가 맞지 않습니다. (예: 키(cm)의 분산은 $cm^2$가 됨)
 \end{itemize}
 
-\begin{examplebox}[Q\&A: 왜 $n$이 아니라 $n-1$로 나누나요?]
+\begin{examplebox}[title={Q\&A: 왜 $n$이 아니라 $n-1$로 나누나요?}]
 \textbf{질문:} 평균은 $n$으로 나누는데, 왜 분산은 $n-1$로 나누나요?
 
 \textbf{답변 (직관):} "퍼짐(spread)"을 측정하려면 최소 몇 개의 데이터가 필요할까요?
@@ -1173,7 +1303,6 @@ EDA는 "데이터와 친해지는 과정"이며, 데이터 과학 프로세스�
     \item \textbf{직관:} "데이터가 평균으로부터 '평균적으로' 이 정도(s) 떨어져 있다."
 \end{itemize}
 
-\newpage
 
 % --- 절차/방법 2: 기본 시각화 ---
 \section{절차/방법 2: 기본 시각화 (Basic Visualizations)}
@@ -1285,7 +1414,7 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
     X축과 Y축 외에, \textbf{색상(Color)}, \textbf{크기(Size)}, \textbf{모양(Shape)}, \textbf{애니메이션(Animation)} 등 추가적인 시각 요소를 사용하여 변수를 표현합니다.
 \end{itemize}
 
-\begin{examplebox}[사례 연구: 갭마인더(Gapminder)의 5변수 시각화]
+\begin{examplebox}[title={사례 연구: 갭마인더(Gapminder)의 5변수 시각화}]
 한스 로슬링의 "Wealth \& Health of Nations" 시각화는 5개의 변수를 하나의 차트에 훌륭하게 녹여냈습니다.
 
 \begin{center}
@@ -1309,7 +1438,6 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
 \end{itemize}
 \end{examplebox}
 
-\newpage
 
 % --- 부록 1: 데이터 시각화의 역사 ---
 \section{부록 1: 데이터 시각화의 역사 (Historical Interlude)}
@@ -1343,7 +1471,6 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
     \textit{[이미지 플레이스홀더: 미나르의 나폴레옹 행군도]}
 \end{center}
 
-\newpage
 
 % --- 부록 2: 효과적인 시각화 원칙 ---
 \section{부록 2: 효과적인 시각화 원칙 (Effective Visualization)}
@@ -1354,7 +1481,7 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
 
 \textbf{"데이터로 거짓말을 하지 말아야 합니다."}
 
-\begin{examplebox}[잘못된 예: 2020년 미국 대선 지도]
+\begin{examplebox}[title={잘못된 예: 2020년 미국 대선 지도}]
 \begin{itemize}
     \item \textbf{지리적 면적 지도 (A):} 각 '카운티(County)'의 면적을 기준으로 승리한 정당(빨간색/파란색)을 칠합니다. $\rightarrow$ \textit{결과: 미국 전역이 빨갛게 보입니다.}
     \item \textbf{인구 기반 지도 (B):} 각 카운티의 '인구 수'에 비례하여 원의 크기를 조정한 점(dot) 지도를 만듭니다. $\rightarrow$ \textit{결과: 인구가 밀집된 해안가와 도시에 파란색 점이 집중되고, 인구가 적은 중부 내륙에 빨간색 점이 흩어져 보입니다.}
@@ -1409,7 +1536,6 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
     \item \textbf{설명적(Explanatory):} 청중에게 특정 메시지나 주장을 전달하기 위한 (의견이 담긴) 시각화. (예: 신문 기사의 "이라크의 피의 대가" 그래프)
 \end{itemize}
 
-\newpage
 
 % --- 체크리스트 ---
 \section{학습 체크리스트}
@@ -1432,12 +1558,11 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
     \item [ ] '차트 정크'를 피하고, 색상을 전략적으로 사용해야 함을 이해했는가?
 \end{itemize}
 
-\newpage
 
 % --- 1페이지 요약 ---
 \section{빠르게 훑어보기 (1-Page Summary)}
 
-\begin{tcolorbox}[title=\textbf{1. 데이터 수집 (Getting Data)}, colback=gray!10]
+\begin{tcolorbox}[title={\textbf{1. 데이터 수집 (Getting Data)}, colback=gray!10}]
 \begin{itemize}
     \item \textbf{API:} 공식적이고 안정적인 창구 (유료/제한 있음)
     \item \textbf{RSS:} 블로그/뉴스 스트림 (무료, 요약본)
@@ -1445,7 +1570,7 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=\textbf{2. 데이터 구조 (Data Structure)}, colback=gray!10]
+\begin{tcolorbox}[title={\textbf{2. 데이터 구조 (Data Structure)}, colback=gray!10}]
 \textbf{정형 데이터 (Tidy Data)가 목표!}
 \begin{itemize}
     \item 1 행 = 1 관측치 (Observation)
@@ -1455,7 +1580,7 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
 \textit{지저분한(Messy) 데이터는 이 원칙에 맞게 변형(Tidying)해야 함!}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=\textbf{3. 변수 유형 (Variable Types) - (중요!)}, colback=gray!10]
+\begin{tcolorbox}[title={\textbf{3. 변수 유형 (Variable Types) - (중요!)}, colback=gray!10}]
 \begin{itemize}
     \item \textbf{수량형 (Quantitative):} 숫자로 연산 가능.
     \begin{itemize}
@@ -1470,7 +1595,7 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=\textbf{4. 기술 통계 (Descriptive Statistics)}, colback=gray!10]
+\begin{tcolorbox}[title={\textbf{4. 기술 통계 (Descriptive Statistics)}, colback=gray!10}]
 \begin{description}
     \item[중심 (Center):]
     \begin{itemize}
@@ -1486,7 +1611,7 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
 \end{description}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=\textbf{5. 핵심 시각화 (Key Visualizations)}, colback=gray!10]
+\begin{tcolorbox}[title={\textbf{5. 핵심 시각화 (Key Visualizations)}, colback=gray!10}]
 \begin{description}
     \item[앤스컴 4중주 (Anscombe's Quartet)]
     \textit{교훈: "숫자(통계)만 보지 말고, 항상 그래프를 그려라!"}
@@ -1508,21 +1633,15 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
 \end{description}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 3: Lecture 3
+% Lecture 3: Lecture 3
 %=======================================================================
 \chapter{Lecture 3}
 \label{ch:lecture3}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 03}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 03의 핵심 개념 학습}
 
-
-\newpage
-
-\newpage
 
 \section{개요}
 
@@ -1538,13 +1657,12 @@ EDA의 꽃은 시각화입니다. 숫자는 우리를 속일 수 있지만, 그�
     \item 데이터를 검사하고 요약하는 기본 방법 익히기 (`head`, `info`, `describe` 등)
     \item 데이터 정제 기법 배우기 (컬럼명 변경, 타입 변환, 결측치 및 중복값 처리 등)
     \item Boolean indexing, \texttt{loc}, \texttt{iloc}을 이용한 데이터 선택 및 필터링
-    \item 데이터 정렬, 집계, 그룹화 기초 (`sort\_values`, `groupby`, `agg`)
-    \item 정제된 데이터를 파일로 저장하기 (`to\_csv`)
+    \item 데이터 정렬, 집계, 그룹화 기초 (\texttt{sort\\_values}, `groupby`, `agg`)
+    \item 정제된 데이터를 파일로 저장하기 (\texttt{to\\_csv})
 \end{itemize}
 
 \textbf{참고:} 이 노트는 실제 강의 내용과 코드를 바탕으로 재구성되었으며, 추가적인 설명과 예시가 포함되어 있습니다.
 
-\newpage
 
 \section{용어 정리}
 
@@ -1575,7 +1693,6 @@ Explode & 하나의 셀에 리스트 형태로 들어있는 값을 여러 행으
 \caption{Pandas 주요 용어 정리}
 \label{tab:pandas_terms}
 
-\newpage
 
 \section{핵심 개념: Pandas 자료구조}
 
@@ -1583,7 +1700,7 @@ Pandas는 파이썬에서 기본적으로 제공하지 않는, 데이터 분석�
 
 \subsection{Series: 1차원 데이터의 마법 지팡이}
 
-\begin{tcolorbox}[title=Series란?]
+\begin{tcolorbox}[title={Series란?}]
 \texttt{Series}는 마치 라벨(이름표)이 붙어 있는 1차원 배열과 같습니다. 엑셀 시트의 한 열(column)이나, 키(key)와 값(value)으로 이루어진 사전(dictionary)을 떠올리면 이해하기 쉽습니다. 각 데이터 값에는 고유한 이름표, 즉 \textbf{인덱스(index)}가 붙어 있어 데이터를 쉽게 찾고 다룰 수 있습니다.
 \end{tcolorbox}
 
@@ -1732,11 +1849,10 @@ dtype: float64
     \item \texttt{describe()}: 수치형 데이터의 경우 개수(count), 평균(mean), 표준편차(std), 최솟값(min), 사분위수(25%, 50%, 75%), 최댓값(max) 등 주요 기술 통계량을 요약하여 보여줍니다. (문자열 데이터의 경우 다른 요약 정보를 보여줍니다.)
 \end{itemize}
 
-\newpage
 
 \subsection{DataFrame: 2차원 데이터의 강력한 테이블}
 
-\begin{tcolorbox}[title=DataFrame란?]
+\begin{tcolorbox}[title={DataFrame란?}]
 \texttt{DataFrame}은 여러 개의 \texttt{Series}가 같은 인덱스를 공유하며 모여 있는 2차원 표 형태의 자료구조입니다. 엑셀 스프레드시트나 데이터베이스 테이블과 매우 유사합니다. 각 열(column)은 하나의 \texttt{Series}에 해당하며, 고유한 컬럼 이름을 가집니다. 각 행(row)은 인덱스로 식별됩니다.
 \end{tcolorbox}
 
@@ -1913,7 +2029,6 @@ max      2.308703    1.638069
     \item \texttt{describe()}: 수치형 컬럼들에 대한 기술 통계량을 계산하여 보여줍니다. 데이터의 분포를 빠르게 파악할 수 있습니다.
 \end{itemize}
 
-\newpage
 
 \section{절차/방법: 데이터 다루기 실전}
 
@@ -1994,7 +2109,6 @@ print(df.describe())
     \item \texttt{describe()}: 현재는 'Rate your current Pandas skill level.' 컬럼에 대한 통계만 보여줍니다. 평균 2.5, 표준편차 1.1 정도임을 알 수 있습니다.
 \end{itemize}
 
-\newpage
 
 \subsection{2단계: 데이터 정제}
 
@@ -2189,7 +2303,6 @@ print(f"최종 데이터 크기: {df.shape}")
 결측치 처리는 분석 결과에 큰 영향을 미칠 수 있으므로 신중하게 결정해야 합니다. 무조건 제거하거나 특정 값으로 채우기보다는, 데이터의 특성과 분석 목적을 고려하여 가장 적절한 방법을 선택해야 합니다. 경우에 따라서는 결측치 자체를 하나의 정보로 활용할 수도 있습니다.
 \end{warningbox}
 
-\newpage
 
 \subsection{3단계: 데이터 선택, 필터링, 정렬}
 
@@ -2282,7 +2395,6 @@ print(df_sorted_skill[['program', 'pandas_skill']].head())
 
 \textbf{주의:} 정렬 후에는 인덱스가 뒤섞이게 됩니다. 필요하다면 \texttt{reset\_index(drop=True)}를 사용하여 인덱스를 0부터 다시 부여하는 것이 좋습니다.
 
-\newpage
 
 \subsection{4단계: 데이터 변환 및 집계}
 
@@ -2400,7 +2512,6 @@ print(os_darkmode_crosstab)
 \end{lstlisting}
 \end{codeexamplebox}
 
-\newpage
 
 \subsection{5단계: 데이터 저장}
 
@@ -2417,7 +2528,6 @@ except Exception as e:
 \end{lstlisting}
 \end{codeexamplebox}
 
-\newpage
 
 \section{실습 코드 종합 예제}
 
@@ -2489,7 +2599,6 @@ print(program_summary_filtered)
 # print("\n정제된 데이터가 'survey_final.csv'로 저장되었습니다.")
 \end{lstlisting}
 
-\newpage
 
 \section{체크리스트}
 
@@ -2509,7 +2618,6 @@ Pandas를 사용하여 데이터를 처리할 때 다음 사항들을 점검하�
     \item[\checkmark] \textbf{결과 저장:} 최종적으로 정제되거나 분석된 데이터를 저장할 필요가 있는가? (\texttt{to\_csv})
 \end{itemize}
 
-\newpage
 
 \section{FAQ (자주 묻는 질문)}
 
@@ -2556,11 +2664,10 @@ Pandas를 처음 배울 때 흔히 궁금해하거나 혼동하는 부분들을 
     \item 요약하면, NumPy는 고성능 수치 계산의 기반이고, Pandas는 NumPy를 활용하여 표 형태의 데이터를 편리하게 분석할 수 있도록 확장한 도구입니다.
 \end{itemize}
 
-\newpage
 
 \section{빠르게 훑어보기 (1페이지 요약)}
 
-\begin{tcolorbox}[title=Pandas 핵심 요약]
+\begin{tcolorbox}[title={Pandas 핵심 요약}]
 \textbf{Pandas?} 파이썬에서 표(테이블) 데이터를 다루는 강력하고 편리한 라이브러리.
 
 \textbf{주요 자료구조}
@@ -2615,7 +2722,6 @@ Pandas를 처음 배울 때 흔히 궁금해하거나 혼동하는 부분들을 
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
 
 \section{부록: 환경 설정 및 추가 정보}
 
@@ -2670,11 +2776,9 @@ Harvard OnDemand는 제한된 자원이므로, 로컬 환경 설정이 가능한
     \item \textbf{강의 플랫폼(Ed) 자료:} Bedrock Data Science, Bedrock Codecasts \& Tutorials 섹션의 추가 Pandas 자료 확인
 \end{itemize}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 4: Lecture 4
+% Lecture 4: Lecture 4
 %=======================================================================
 \chapter{Lecture 4}
 \label{ch:lecture4}
@@ -2684,9 +2788,6 @@ Harvard OnDemand는 제한된 자원이므로, 로컬 환경 설정이 가능한
 
 % 제목 페이지에는 헤더/푸터 없음
 
-
-
-\newpage
 
 \section{개요}
 
@@ -2728,7 +2829,6 @@ kNN은 "가장 유사한 과거 사례(이웃)를 찾아 그들의 평균값으�
     \end{tabular}
 \end{adjustbox}
 
-\newpage
 
 \section{통계 모델링 시작하기}
 
@@ -2773,7 +2873,7 @@ kNN은 "가장 유사한 과거 사례(이웃)를 찾아 그들의 평균값으�
     \item \textbf{$y$ (반응 벡터, Response Vector):} $n$개의 관측치에 대한 $n$개의 반응 변수 값을 가진 벡터입니다.
 \end{itemize}
 
-\begin{examplebox}{데이터의 형태: $X$와 $y$}
+\begin{examplebox}[title={데이터의 형태: $X$와 $y$}]
 만약 5개의 관측치($n=5$)와 3개의 예측 변수($p=3$)가 있다면 데이터는 다음과 같습니다.
 
 \textbf{$X$ (설계 행렬, $5 \times 3$)}
@@ -2817,7 +2917,6 @@ kNN은 "가장 유사한 과거 사례(이웃)를 찾아 그들의 평균값으�
 \end{itemize}
 \end{cautionbox}
 
-\newpage
 
 \section{모델이란 무엇인가?}
 
@@ -2825,7 +2924,7 @@ kNN은 "가장 유사한 과거 사례(이웃)를 찾아 그들의 평균값으�
 
 데이터 $X$와 $y$ 사이의 관계를 찾는 것을 '모델링'이라고 합니다.
 
-\begin{analogybox}{아이스크림 비유}
+\begin{analogybox}[title={아이스크림 비유}]
 \begin{itemize}
     \item \textbf{진짜(True) 모델, $f$:} 세상에 존재하는 '완벽한 아이스크림' 레시피. 모든 맛의 조합을 정확히 알고 있습니다. 하지만 우리는 이 레시피를 절대 알 수 없습니다.
     \item \textbf{통계(Statistical) 모델, $\hat{f}$:} 우리가 가진 재료(데이터)로 그 '완벽한 아이스크림'을 따라 만들려는 *시도*입니다.
@@ -2863,7 +2962,6 @@ $$ Y = f(X) + \epsilon $$
 
 이 강의에서는 먼저 이해하기 쉬운 \textbf{예측} 모델인 kNN부터 다룹니다.
 
-\newpage
 
 \section{k-최근접 이웃 (kNN) 알고리즘}
 
@@ -2881,7 +2979,7 @@ $$ \hat{y} = \bar{y} = \frac{1}{n}\sum_{i=1}^{n}y_{i} $$
 
 kNN은 평균 모델보다 훨씬 똑똑한, 매우 직관적인 아이디어에 기반합니다.
 
-\begin{analogybox}{의사의 진단 비유}
+\begin{analogybox}[title={의사의 진단 비유}]
 환자가 "배가 아프다"고 하며 병원에 왔습니다.
 의사는 머릿속으로 '이번 주에 배가 아프다고 왔던 다른 환자 10명'을 떠올립니다.
 "그 10명은 모두 특정 푸드트럭 음식을 먹고 장염에 걸렸었지. 이 환자도 장염일 가능성이 높다."
@@ -2935,7 +3033,6 @@ kNN은 \textbf{비모수(Non-parametric)} 모델입니다.
 
 \textbf{질문:} $k=1$, $k=10$, $k=70$ 중에서 "최고의" $k$는 어떻게 찾을 수 있을까요?
 
-\newpage
 
 \section{모델 평가하기 (Error Evaluation)}
 
@@ -2948,7 +3045,7 @@ $k$값에 따라 수많은 모델이 나옵니다. "최고의" 모델을 고르�
 
 모델의 오류를 공정하게 평가하려면 데이터를 명확한 목적에 따라 나눠야 합니다.
 
-\begin{analogybox}{시험 공부 비유}
+\begin{analogybox}[title={시험 공부 비유}]
 \begin{itemize}
     \item \textbf{훈련 세트 (Train Set):} 모델을 \textbf{학습}시키는 데 사용합니다. (kNN에서는 이웃을 찾기 위한 데이터 풀)
         \begin{itemize}
@@ -2974,7 +3071,7 @@ $k$값에 따라 수많은 모델이 나옵니다. "최고의" 모델을 고르�
 모델 선택(검증)에는 \textbf{검증 세트}만 사용하고, \textbf{테스트 세트}는 최종 평가 전까지 절대 열어보지 않아야 합니다.
 \end{cautionbox}
 
-\begin{examplebox}{scikit-learn의 \texttt{train\_test\_split}}
+\begin{examplebox}[title={scikit-learn의 \texttt{train\_test\_split}}]
 파이썬 라이브러리인 scikit-learn은 데이터를 두 개로 쪼개는 \texttt{train\_test\_split()} 함수만 제공합니다.
 훈련/검증/테스트 세 개로 나누려면 이 함수를 \textbf{두 번} 호출해야 합니다.
 
@@ -2994,7 +3091,7 @@ $k$값에 따라 수많은 모델이 나옵니다. "최고의" 모델을 고르�
     \item \textbf{해결책:} 오류를 모두 양수로 만들기 위해 제곱하거나 절댓값을 사용합니다.
 \end{itemize}
 
-\begin{defbox}{주요 손실 함수}
+\begin{defbox}[title={주요 손실 함수}]
 \begin{enumerate}
     \item \textbf{평균 제곱 오차 (Mean Squared Error, MSE)}
         \begin{itemize}
@@ -3014,7 +3111,6 @@ $k$값에 따라 수많은 모델이 나옵니다. "최고의" 모델을 고르�
 \end{enumerate}
 \end{defbox}
 
-\newpage
 
 \section{최고의 모델 선택 및 최종 평가}
 
@@ -3063,7 +3159,7 @@ $k=3$이 이 특정 분할에서는 최고였지만, 다른 분할에서는 $k=5
 우리는 $k=3$이 "우리가 가진 모델 중 최고"라는 것을 알아냈습니다.
 하지만 이 최고 모델이 "쓸 만한" 모델일까요?
 
-\begin{analogybox}{NBA 선수 선발 비유}
+\begin{analogybox}[title={NBA 선수 선발 비유}]
 제가 "저는 우리 학과 교수팀에서 최고의 농구 선수입니다!" ( $\leftarrow$ $k=3$이 다른 $k$보다 낫다)
 라고 말한다고 해서, NBA 팀이 저를 스카웃해야 할까요?
 
@@ -3083,7 +3179,7 @@ MSE 값 자체는 단위에 의존하므로, 모델이 "얼마나 좋은지" 직
 우리는 단위에 의존하지 않는, 0점(최악)에서 1점(최고) 사이의 표준화된 점수가 필요합니다.
 이것이 바로 \textbf{$R^2$ (R-squared, 결정 계수)}입니다.
 
-\begin{defbox}{$R^2$ (R-squared)}
+\begin{defbox}[title={$R^2$ (R-squared)}]
 $R^2$는 우리의 모델($\hat{f}$)이 "가장 단순한 모델"(평균 모델, $\bar{y}$)에 비해 얼마나 오류를 줄였는지를 비율로 나타냅니다.
 
 \begin{itemize}
@@ -3101,7 +3197,6 @@ $$ R^2 = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y}_i)^2} = 1 - \fr
 \end{itemize}
 \end{defbox}
 
-\newpage
 
 \section{kNN의 한계: 차원의 저주}
 
@@ -3144,7 +3239,6 @@ kNN은 직관적이고 강력하지만, 예측 변수의 수($p$), 즉 \textbf{�
 
 \textbf{결론:} kNN은 차원이 낮을 때($p$가 작을 때) 매우 효과적이고 직관적인 모델이지만, 차원이 높은 데이터에는 적합하지 않을 수 있습니다.
 
-\newpage
 
 \section{학습 목표 요약 (Checklist)}
 
@@ -3165,11 +3259,9 @@ kNN은 직관적이고 강력하지만, 예측 변수의 수($p$), 즉 \textbf{�
     \item 차원의 저주가 무엇인지, 그리고 특성 스케일링이 왜 kNN에 필수적인지 설명할 수 있다.
 \end{itemize}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 5: 개요 (Overview)
+% Lecture 5: 개요 (Overview)
 %=======================================================================
 \chapter{개요 (Overview)}
 \label{ch:lecture5}
@@ -3177,10 +3269,7 @@ kNN은 직관적이고 강력하지만, 예측 변수의 수($p$), 즉 \textbf{�
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 05}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 05의 핵심 개념 학습}
 
 
-
-
 \part{선형 회귀의 기초}
-\newpage
 
 \section{개요 (Overview)}
 
@@ -3314,7 +3403,7 @@ $$ \hat{Y} = \hat{\beta}_0 + \hat{\beta}_1 X $$
 
 기계 학습의 핵심 3단계를 기억하세요.
 
-\begin{tcolorbox}[title=기계 학습의 핵심 3단계 프로세스]
+\begin{tcolorbox}[title={기계 학습의 핵심 3단계 프로세스}]
     \begin{enumerate}
         \item \textbf{모델 정의 (Define Model):} $ \hat{Y} = \beta_0 + \beta_1 X $ (직선이라고 가정)
         \item \textbf{손실 정의 (Define Loss):} $ \text{MSE} = \frac{1}{n} \sum (Y_i - \hat{Y}_i)^2 $ (틀린 정도를 측정)
@@ -3341,7 +3430,7 @@ $$ \frac{\partial L}{\partial \beta_0} = 0 \quad \text{and} \quad \frac{\partial
 
 이 두 방정식을 연립하여 풀면, MSE를 최소화하는 $\hat{\beta}_0$와 $\hat{\beta}_1$의 공식을 유도할 수 있습니다. 이를 \textbf{정규 방정식 (Normal Equation)} 또는 \textbf{최소 제곱법 (Least Squares)}이라고 합니다.
 
-\begin{tcolorbox}[title=단순 선형 회귀의 정규 방정식 (Closed-form Solution)]
+\begin{tcolorbox}[title={단순 선형 회귀의 정규 방정식 (Closed-form Solution)}]
 복잡한 미분 과정(연쇄 법칙 포함)을 거치면 다음과 같은 깔끔한 공식을 얻을 수 있습니다.
 
 $$ \hat{\beta}_1 = \frac{\sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})}{\sum_{i=1}^{n} (X_i - \bar{X})^2} $$
@@ -3356,7 +3445,6 @@ $$ \hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X} $$
 
 
 \part{다중 선형 회귀로의 확장}
-\newpage
 
 \section{다중 선형 회귀 (Multi-Linear Regression, MLR)}
 
@@ -3422,7 +3510,7 @@ $$ L(\beta) = \text{MSE} = \frac{1}{n} ||Y - X\beta||^2 = \frac{1}{n} (Y - X\bet
 
 이 손실 함수를 $\beta$ 벡터에 대해 미분하여 0으로 놓고 풀면 (선형 대수 연산 필요), $\hat{\beta}$를 구하는 강력한 공식을 얻습니다.
 
-\begin{tcolorbox}[title=다중 선형 회귀의 정규 방정식 (The Normal Equation)]
+\begin{tcolorbox}[title={다중 선형 회귀의 정규 방정식 (The Normal Equation)}]
 MSE를 최소화하는 계수 벡터 $\hat{\beta}$는 다음 공식으로 한 번에 계산됩니다.
 
 $$ \hat{\beta} = (X^T X)^{-1} X^T Y $$
@@ -3435,7 +3523,6 @@ $$ \hat{\beta} = (X^T X)^{-1} X^T Y $$
 \end{tcolorbox}
 
 \part{모델 활용 및 해석}
-\newpage
 
 \section{Python \texttt{scikit-learn}을 이용한 실습}
 
@@ -3585,7 +3672,6 @@ $$ x_{\text{is\_Asian}} = \begin{cases} 1 & \text{if Asian} \\ 0 & \text{else} \
 $\rightarrow \beta_0$는 기준선(African American)의 평균 $Y$가 되고, $\beta_1$과 $\beta_2$는 각각 기준선과의 차이를 나타냅니다.
 
 \part{학습 점검}
-\newpage
 
 \section{핵심 학습 체크리스트}
 
@@ -3622,10 +3708,10 @@ $\rightarrow \beta_0$는 기준선(African American)의 평균 $Y$가 되고, $\
 \textbf{A:} $k$개를 모두 사용하면 완벽한 다중공선성(Dummy Variable Trap)이 발생합니다. 예를 들어 $x_{\text{Asian}}$, $x_{\text{Caucasian}}$, $x_{\text{AfricanAmerican}}$ 3개를 모두 만들면, $x_{\text{Asian}} + x_{\text{Caucasian}} + x_{\text{AfricanAmerican}} = 1$ 이라는 완벽한 선형 관계가 생깁니다. 이는 $X$ 행렬의 역행렬 $(X^T X)^{-1}$을 계산할 수 없게 만듭니다. 따라서 하나를 기준선(Baseline)으로 제외하여 이 문제를 피합니다.
 \end{warningbox}
 
-\newpage
+
 \section{빠르게 훑어보기 (1-Page Summary)}
 
-\begin{tcolorbox}[title=기계 학습 3단계 프로세스]
+\begin{tcolorbox}[title={기계 학습 3단계 프로세스}]
 모든 지도 학습은 이 3단계를 따릅니다.
 \begin{enumerate}
     \item \textbf{모델 정의:} 데이터의 관계를 어떤 함수(예: 직선)로 가정할지 선택합니다.
@@ -3650,7 +3736,7 @@ $\rightarrow \beta_0$는 기준선(African American)의 평균 $Y$가 되고, $\
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=모델 해석의 3대 함정]
+\begin{tcolorbox}[title={모델 해석의 3대 함정}]
 \begin{enumerate}
     \item \textbf{스케일링 문제 (Apple vs Orange):}
     단위(스케일)가 다른 변수들의 $\beta$ 계수 크기는 직접 비교할 수 없다. $\rightarrow$ \textbf{해결: 표준화(Standardization) 후 비교}
@@ -3663,21 +3749,15 @@ $\rightarrow \beta_0$는 기준선(African American)의 평균 $Y$가 되고, $\
 \end{enumerate}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 6: Lecture 6
+% Lecture 6: Lecture 6
 %=======================================================================
 \chapter{Lecture 6}
 \label{ch:lecture6}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 06}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 06의 핵심 개념 학습}
 
-
-
-
-\newpage
 
 \section{개요}
 
@@ -3689,7 +3769,6 @@ $\rightarrow \beta_0$는 기준선(African American)의 평균 $Y$가 되고, $\
 '모델 선택'은 이 복잡성과 일반화 성능 사이의 균형점을 찾는 과정입니다.
 \textbf{'교차 검증(Cross-Validation)'}은 단일 검증 세트의 함정을 피하고 모델의 일반화 성능을 신뢰성 있게 추정하는 표준적인 방법입니다.
 
-\newpage
 
 \section{핵심 용어 정리}
 
@@ -3720,7 +3799,6 @@ $\rightarrow \beta_0$는 기준선(African American)의 평균 $Y$가 되고, $\
 \end{adjustbox}
 \end{table}
 
-\newpage
 
 \section{모델 평가와 과적합의 문제}
 
@@ -3776,7 +3854,6 @@ TV 광고 예산(X)과 매출(Y)의 관계를 모델링한 두 가지 경우입�
 단순히 숫자에만 의존하지 말고, 모델이 현실을 잘 설명하는지 항상 비판적으로 검토해야 합니다.
 \end{examplebox}
 
-\newpage
 
 \section{선형 회귀의 확장: 비선형성 다루기}
 
@@ -3870,7 +3947,6 @@ $Y = \beta_0 + \beta_1 X_1 + \beta_2 \tilde{X}_2 + \dots + \beta_M \tilde{X}_M$
     \item \textbf{M이 너무 높으면 (예: 50차)}: 데이터의 모든 노이즈를 통과하는 구불구불한 선이 됨 (과적합, Overfitting)
 \end{itemize}
 
-\newpage
 
 \section{최적의 모델 찾기: 모델 선택 (Model Selection)}
 
@@ -3879,7 +3955,7 @@ $Y = \beta_0 + \beta_1 X_1 + \beta_2 \tilde{X}_2 + \dots + \beta_M \tilde{X}_M$
 \subsection{데이터 3-분할: 학습, 검증, 테스트}
 
 이를 위해 데이터를 3가지 용도로 나눕니다.
-\begin{tcolorbox}[title=데이터의 3가지 역할]
+\begin{tcolorbox}[title={데이터의 3가지 역할}]
     \begin{itemize}
         \item \textbf{학습 세트 (Training Set)}: 모델을 학습(훈련)시키는 데 사용. (모델의 $\beta$ 계수들을 찾는 데 사용)
         \item \textbf{검증 세트 (Validation Set)}: 학습된 모델들 중 최적의 하이퍼파라미터(예: 다항식 차수 $M$)를 \textbf{선택}하는 데 사용.
@@ -3929,7 +4005,6 @@ $M=1, 2, 3, \dots, 10$까지의 모델을 모두 \textbf{학습 세트}로 학�
 \end{itemize}
 우리는 이 검증 오차 그래프(U자형 커브)에서 \textbf{오차가 최소가 되는 지점(Minimum)}의 차수 $M$을 최적의 하이퍼파라미터로 선택합니다.
 
-\newpage
 
 \section{신뢰할 수 있는 평가: 교차 검증 (Cross-Validation)}
 
@@ -4028,30 +4103,29 @@ cv_results = cross_validate(
 final_cv_mse = -cv_results['test_score'].mean()
 \end{lstlisting}
 
-\newpage
 
 \section{빠르게 훑어보기 (1페이지 요약)}
 
-\begin{tcolorbox}[title=모델링 핵심 요약 카드]
+\begin{tcolorbox}[title={모델링 핵심 요약 카드}]
     
-    \begin{tcolorbox}[colback=white, title=\textbf{1. 목표: 일반화 (Generalization)}]
+    \begin{tcolorbox}[colback=white, title={\textbf{1. 목표: 일반화 (Generalization)}}]
     모델의 진짜 성능은 '처음 보는' 데이터(Unseen Data)에서 나옵니다.
     이때의 오차(일반화 오차)를 최소화하는 것이 목표입니다. 학습 데이터 오차(Training Error)는 중요하지 않습니다.
     \end{tcolorbox}
 
-    \begin{tcolorbox}[colback=white, title=\textbf{2. 적: 과적합 (Overfitting)}]
+    \begin{tcolorbox}[colback=white, title={\textbf{2. 적: 과적합 (Overfitting)}}]
     모델이 너무 복잡해져서(예: 너무 높은 차수, 너무 많은 변수) 학습 데이터의 '노이즈'까지 암기하는 현상입니다.
     \textbf{증상}: 학습 오차는 매우 낮지만, 검증 오차(일반화 오차)는 매우 높습니다.
     \end{tcolorbox}
     
-    \begin{tcolorbox}[colback=white, title=\textbf{3. 확장: 비선형 모델링}]
+    \begin{tcolorbox}[colback=white, title={\textbf{3. 확장: 비선형 모델링}}]
     \begin{itemize}
         \item \textbf{상호작용 항 ($X_1 X_2$)}: 한 변수의 효과가 다른 변수에 따라 달라지는 '시너지' 효과를 모델링합니다.
         \item \textbf{다항 회귀 ($X, X^2, X^3$)}: 데이터의 곡선 트렌드를 잡습니다. (주의: 스케일링 필수!)
     \end{itemize}
     \end{tcolorbox}
 
-    \begin{tcolorbox}[colback=white, title=\textbf{4. 전략: 모델 선택 (Model Selection)}]
+    \begin{tcolorbox}[colback=white, title={\textbf{4. 전략: 모델 선택 (Model Selection)}}]
     과소적합(너무 단순)과 과적합(너무 복잡) 사이의 균형점을 찾는 과정입니다.
     \begin{itemize}
         \item \textbf{데이터 3-분할}: \textbf{학습}(훈련), \textbf{검증}(모델 선택/튜닝), \textbf{테스트}(최종 보고).
@@ -4059,14 +4133,13 @@ final_cv_mse = -cv_results['test_score'].mean()
     \end{itemize}
     \end{tcolorbox}
 
-    \begin{tcolorbox}[colback=white, title=\textbf{5. 무기: K-겹 교차 검증 (K-Fold CV)}]
+    \begin{tcolorbox}[colback=white, title={\textbf{5. 무기: K-겹 교차 검증 (K-Fold CV)}}]
     단일 검증 세트는 '우연'에 의해 잘못된 모델을 선택할 수 있습니다. (검증 세트에 과적합)
     \textbf{해결}: 데이터를 K조각으로 나눠, K번의 (학습/검증)을 반복하고 그 오차를 \textbf{평균}냅니다.
     이 CV 점수를 기준으로 하이퍼파라미터를 선택하는 것이 가장 신뢰할 수 있습니다.
     \end{tcolorbox}
 \end{tcolorbox}
 
-\newpage
 
 \section{초심자 FAQ}
 
@@ -4094,18 +4167,15 @@ A: 항상 필수는 아니지만, 사용하는 것이 훨씬 안전합니다.
 단순 선형 회귀($Y=\beta_0+\beta_1 X$)에서는 스케일링이 결과에 영향을 주지 않습니다.
 하지만 \textbf{다항 회귀}($X^2, X^3...$), \textbf{정규화 회귀}(Ridge, Lasso), \textbf{KNN}, \textbf{SVM}, \textbf{신경망} 등 대부분의 고급 머신러닝 모델은 특성 간의 스케일 차이에 매우 민감합니다. 따라서 모델링 전 스케일링을 적용하는 것을 습관화하는 것이 좋습니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 7: Lecture 7
+% Lecture 7: Lecture 7
 %=======================================================================
 \chapter{Lecture 7}
 \label{ch:lecture7}
 
 % 제목/저자/날짜
 }
-
 
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 07}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 07의 핵심 개념 학습}
@@ -4115,7 +4185,6 @@ A: 항상 필수는 아니지만, 사용하는 것이 훨씬 안전합니다.
 
  % 목차 생성
 
-\newpage
 
 %====================
 % 1. 개요
@@ -4133,7 +4202,6 @@ A: 항상 필수는 아니지만, 사용하는 것이 훨씬 안전합니다.
 
 마지막으로, 이 패널티의 강도를 조절하는 하이퍼파라미터 \textbf{$\lambda$ (람다)}를 찾기 위한 체계적인 절차로 \textbf{검증 세트(Validation Set)}와 \textbf{교차 검증(Cross-Validation)} 방법을 단계별로 학습합니다.
 
-\newpage
 
 %====================
 % 2. 용어 정리
@@ -4174,7 +4242,6 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \end{adjustbox}
 \end{table}
 
-\newpage
 
 %====================
 % 3. 핵심 개념: 편향-분산 트레이드오프
@@ -4185,7 +4252,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 
 \subsection{모델 오차의 두 가지 근원}
 
-\begin{tcolorbox}[title=1. 환원 불가능한 오차 (Irreducible Error)]
+\begin{tcolorbox}[title={1. 환원 불가능한 오차 (Irreducible Error)}]
 이 오차는 데이터 자체에 내재된 \textbf{'무작위 노이즈'} 때문에 발생합니다.
 아무리 완벽한 모델을 만들어도 이 오차는 절대 0이 될 수 없습니다.
 
@@ -4197,7 +4264,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \end{examplebox}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=2. 환원 가능한 오차 (Reducible Error)]
+\begin{tcolorbox}[title={2. 환원 가능한 오차 (Reducible Error)}]
 이 오차는 우리가 \textbf{'모델을 잘못 선택'}했기 때문에 발생합니다.
 우리의 임무는 이 오차를 최소화하는 것이며, 이 오차는 다시 '편향'과 '분산'이라는 두 가지 요소로 분해됩니다.
 \end{tcolorbox}
@@ -4206,7 +4273,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 
 모델의 성능을 사격에 비유하여 편향과 분산을 이해할 수 있습니다.
 
-\begin{tcolorbox}[title=편향 (Bias): 과녁을 놓치다 (부정확성)]
+\begin{tcolorbox}[title={편향 (Bias): 과녁을 놓치다 (부정확성)}]
 \textbf{편향}은 모델의 예측값이 실제 정답(과녁의 중심)과 평균적으로 얼마나 멀리 떨어져 있는지를 나타냅니다.
 
 \begin{itemize}
@@ -4216,7 +4283,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=분산 (Variance): 탄착군이 흩어지다 (비일관성)]
+\begin{tcolorbox}[title={분산 (Variance): 탄착군이 흩어지다 (비일관성)}]
 \textbf{분산}은 훈련 데이터가 조금만 바뀌어도 모델의 예측이 얼마나 크게 변동하는지를 나타냅니다.
 
 \begin{itemize}
@@ -4241,7 +4308,7 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 
 편향과 분산은 한쪽이 줄어들면 다른 한쪽이 늘어나는 \textbf{'시소 관계'}에 있습니다.
 
-\begin{tcolorbox}[title=⭐ 모델 복잡도에 따른 오차의 변화]
+\begin{tcolorbox}[title={⭐ 모델 복잡도에 따른 오차의 변화}]
 \textbf{모델 복잡도(X축) vs. 총 오차(Y축)}
 
 \begin{itemize}
@@ -4273,39 +4340,30 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 \textbf{High Bias (높은 편향 / 정확도 $\downarrow$)} &
   \begin{minipage}{0.45\textwidth}
     \textbf{과소적합 (Underfitting)}
-    \begin{itemize}
-        \item 과녁의 중심은 못 맞추지만, 쏜 지점에 계속 일관되게 쏨.
-        \item (예: 단순 선형 모델)
-    \end{itemize}
+    \textbullet~과녁의 중심은 못 맞추지만, 쏜 지점에 계속 일관되게 쏨. \\
+\textbullet~(예: 단순 선형 모델)
   \end{minipage} &
   \begin{minipage}{0.45\textwidth}
     \textbf{최악의 모델 (Worst)}
-    \begin{itemize}
-        \item 과녁의 중심도 못 맞추고, 쏠 때마다 아무데나 흩어짐.
-    \end{itemize}
+    \textbullet~과녁의 중심도 못 맞추고, 쏠 때마다 아무데나 흩어짐.
   \end{minipage} \\
 \addlinespace
 \textbf{Low Bias (낮은 편향 / 정확도 $\uparrow$)} &
   \begin{minipage}{0.45\textwidth}
     \textbf{이상적인 모델 (Ideal)}
-    \begin{itemize}
-        \item 과녁의 중심(정답)에 정확하고 일관되게 쏨.
-        \item \textbf{우리의 목표!}
-    \end{itemize}
+    \textbullet~과녁의 중심(정답)에 정확하고 일관되게 쏨. \\
+\textbullet~\textbf{우리의 목표!}
   \end{minipage} &
   \begin{minipage}{0.45\textwidth}
     \textbf{과대적합 (Overfitting)}
-    \begin{itemize}
-        \item 평균적으로 과녁 중심 근처에 맞지만(훈련 데이터), 쏠 때마다 탄착군이 너무 흩어짐.
-        \item (예: 고차 다항식 모델)
-    \end{itemize}
+    \textbullet~평균적으로 과녁 중심 근처에 맞지만(훈련 데이터), 쏠 때마다 탄착군이 너무 흩어짐. \\
+\textbullet~(예: 고차 다항식 모델)
   \end{minipage} \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
-\newpage
 
 %====================
 % 4. 문제 진단
@@ -4338,7 +4396,6 @@ $\lambda$ (람다) & Lambda & 정규화의 '강도'를 조절하는 하이퍼파
 이것이 바로 '정규화(Regularization)'의 핵심 아이디어입니다.
 \end{warningbox}
 
-\newpage
 
 %====================
 % 5. 해결책: 정규화
@@ -4385,7 +4442,7 @@ $\lambda$ (람다)는 패널티의 '강도'를 조절하는 하이퍼파라미�
 
 패널티 항($L_{\text{reg}}$)을 어떻게 정의하느냐에 따라 릿지(Ridge)와 라쏘(Lasso)로 나뉩니다.
 
-\begin{tcolorbox}[title=1. L2 정규화: 릿지 회귀 (Ridge Regression)]
+\begin{tcolorbox}[title={1. L2 정규화: 릿지 회귀 (Ridge Regression)}]
 \textbf{패널티 항:} 계수의 \textbf{제곱의 합} ($L_2$ Norm) $\rightarrow L_{\text{reg}} = \sum_{j=1}^{J} \beta_j^2$
 
 \textbf{최종 손실 함수:}
@@ -4403,7 +4460,7 @@ $$
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=2. L1 정규화: 라쏘 회귀 (Lasso Regression)]
+\begin{tcolorbox}[title={2. L1 정규화: 라쏘 회귀 (Lasso Regression)}]
 \textbf{패널티 항:} 계수의 \textbf{절대값의 합} ($L_1$ Norm) $\rightarrow L_{\text{reg}} = \sum_{j=1}^{J} |\beta_j|$
 
 \textbf{최종 손실 함수:}
@@ -4459,7 +4516,6 @@ $L_1, L_2$ 패널티 항은 $\beta_1$부터 $\beta_J$까지만 적용됩니다.
 \end{adjustbox}
 \end{table}
 
-\newpage
 
 %====================
 % 6. 절차: 최적의 람다 찾기
@@ -4542,7 +4598,7 @@ $\lambda$는 하이퍼파라미터입니다. 즉, 모델이 스스로 학습하�
     4단계가 끝나면, 각 $\lambda$ 후보마다 K개의 MSE 값 (예: $\lambda=0.1$일 때 5개의 MSE)이 쌓입니다.
     각 $\lambda$별로 K개의 MSE 값의 \textbf{평균}을 계산합니다.
     
-    (예: `Avg_MSE[$\lambda=0.1$] = (MSE_k1 + ... + MSE_k5) / 5`)
+    (예: \texttt{Avg\_MSE[$\lambda=0.1$] = (MSE\_k1 + ... + MSE\_k5) / 5})
 
     \item \textbf{Step 6: 최적 $\lambda^*$ 선정 (Select Best $\lambda$)}
     5단계에서 계산한 \textbf{평균 MSE} 값들 중, \textbf{가장 낮은 평균 MSE}를 기록한 $\lambda$를 최종 $\lambda^*$로 선정합니다.
@@ -4557,7 +4613,6 @@ $\lambda$는 하이퍼파라미터입니다. 즉, 모델이 스스로 학습하�
     지금까지 단 한 번도 사용하지 않은 \textbf{테스트(Test) 데이터}로 7단계의 최종 모델 성능을 평가하고 보고합니다.
 \end{enumerate}
 
-\newpage
 
 %====================
 % 7. FAQ
@@ -4595,7 +4650,6 @@ $K$ 역시 하이퍼파라미터지만, $K$ 값을 튜닝하기 위해 또 CV를
 $K=5$ 또는 $K=10$ 정도로도 충분히 안정적인 $\lambda$ 값을 찾을 수 있습니다.
 \end{tcolorbox}
 
-\newpage
 
 %====================
 % 8. 1페이지 요약
@@ -4607,26 +4661,26 @@ $K=5$ 또는 $K=10$ 정도로도 충분히 안정적인 $\lambda$ 값을 찾을 
 훈련 데이터가 아닌, '새로운 데이터'를 잘 맞추는 모델을 원한다.
 \end{summarybox}
 
-\begin{tcolorbox}[title=1. 문제: 편향 vs. 분산 (Bias vs. Variance)]
+\begin{tcolorbox}[title={1. 문제: 편향 vs. 분산 (Bias vs. Variance)}]
 \begin{itemize}
     \item \textbf{High Bias (과소적합):} 모델이 너무 단순함. (예측이 정답과 멂)
     \item \textbf{High Variance (과대적합):} 모델이 너무 복잡함. (예측이 데이터마다 널뛰기함)
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=2. 진단: 과대적합의 징후]
+\begin{tcolorbox}[title={2. 진단: 과대적합의 징후}]
 모델의 \textbf{계수($\beta$) 값}이 비정상적으로 \textbf{크고 불안정}해진다.
 ($\rightarrow$ "계수 값을 줄여야 한다!")
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=3. 해결: 정규화 (Regularization)]
+\begin{tcolorbox}[title={3. 해결: 정규화 (Regularization)}]
 손실 함수에 '패널티 항'을 추가하여 계수 값이 커지는 것을 억제한다.
 $$
 \text{New Loss} = \text{MSE} + \lambda \times (\text{Penalty})
 $$
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=4. 방법: Ridge (L2) vs. Lasso (L1)]
+\begin{tcolorbox}[title={4. 방법: Ridge (L2) vs. Lasso (L1)}]
 \begin{itemize}
     \item \textbf{Ridge (L2) $\rightarrow \sum \beta_j^2$:} 
         계수를 0에 \textbf{가깝게} 줄인다. (안정성 $\uparrow$)
@@ -4635,7 +4689,7 @@ $$
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=5. 튜닝: 최적의 $\lambda$ 찾기 (by CV)]
+\begin{tcolorbox}[title={5. 튜닝: 최적의 $\lambda$ 찾기 (by CV)}]
 \begin{enumerate}
     \item $\lambda$ 후보 목록을 만든다. (e.g., [0.01, 0.1, 1, 10])
     \item 각 $\lambda$마다 K-Fold CV를 실행하여 \textbf{평균 검증 MSE}를 계산한다.
@@ -4645,11 +4699,9 @@ $$
 \end{enumerate}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 8: 개요: 왜 '추론'이 필요한가?
+% Lecture 8: 개요: 왜 '추론'이 필요한가?
 %=======================================================================
 \chapter{개요: 왜 '추론'이 필요한가?}
 \label{ch:lecture8}
@@ -4664,9 +4716,6 @@ $$
 데이터에 존재하는 불확실성을 이해하고, '부트스트래핑'이라는 시뮬레이션 기법을 통해 회귀 계수($\hat{\beta}$)의 분포를 추정합니다. 이를 바탕으로 신뢰구간을 계산하고, $\hat{t}$-검정 및 p-값을 이용해 각 예측 변수의 중요도와 통계적 유의성을 검증하는 방법을 배웁니다. 마지막으로 모델의 '평균 예측'에 대한 신뢰구간과 '개별 예측'에 대한 예측구간의 차이점을 명확히 구분합니다.
 \end{summarybox}
 
-
-
-\newpage
 
 % ======================================================
 \section{개요: 왜 '추론'이 필요한가?}
@@ -4687,7 +4736,6 @@ $$
     \item \textbf{예측 불확실성 (Prediction Uncertainty):} 모델이 예측한 값 $\hat{y}$는 얼마나 믿을 수 있는가? (3부)
 \end{itemize}
 
-\newpage
 
 % ======================================================
 \section{핵심 용어 정리}
@@ -4721,7 +4769,6 @@ $$
 \end{adjustbox}
 \end{table}
 
-\newpage
 
 % ======================================================
 \section{1부: 추정치의 정확성 평가 (Accuracy of Estimates)}
@@ -4826,7 +4873,6 @@ $\hat{\beta}$의 변동성을 알려면 "평행 우주"에서 데이터를 여�
 부트스트래핑에서는 $\hat{\beta}$ 샘플들의 표준편차를 표준 오차(SE)로 사용합니다.
 \end{warningbox}
 
-\newpage
 
 % ======================================================
 \section{2부: 예측 변수의 유의성 평가 (Significance)}
@@ -4938,7 +4984,6 @@ $\hat{t}$-test로 '가장 중요한' 변수(MedInc)를 찾았습니다. 하지�
 
 \textbf{유의 수준 (Significance Level):} 통상적으로 $p < 0.05$ (5\%)를 $H_0$ 기각의 기준으로 삼습니다.
 
-\newpage
 
 % ======================================================
 \section{3부: 예측의 불확실성 (Uncertainty in Predictions)}
@@ -4995,7 +5040,6 @@ Figure \ref{fig:ci_vs_pi}에서 볼 수 있듯이, 신뢰구간과 예측구간�
 
 \textbf{이유:} 회귀선은 데이터의 중심($\bar{x}, \bar{y}$)을 축으로 회전하는 경향이 있습니다. $\hat{\beta}_1$(기울기)의 작은 불확실성이라도, 중심에서 멀어질수록 $\hat{y}$ 예측값에 큰 차이를 만들어내기 때문입니다.
 
-\newpage
 
 % ======================================================
 \section{빠르게 훑어보기 (1-Page Summary)}
@@ -5040,11 +5084,9 @@ Figure \ref{fig:ci_vs_pi}에서 볼 수 있듯이, 신뢰구간과 예측구간�
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 9: 문제 정의 및 데이터 탐색 (EDA)
+% Lecture 9: 문제 정의 및 데이터 탐색 (EDA)
 %=======================================================================
 \chapter{문제 정의 및 데이터 탐색 (EDA)}
 \label{ch:lecture9}
@@ -5052,13 +5094,9 @@ Figure \ref{fig:ci_vs_pi}에서 볼 수 있듯이, 신뢰구간과 예측구간�
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 09}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 09의 핵심 개념 학습}
 
 
-
-
-\newpage
-
 \part{개요}
 
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=강의 핵심 요약]
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title={강의 핵심 요약}]
 이번 강의는 데이터 과학의 핵심인 \textbf{선형 회귀} 모델을 \textbf{확률론적 관점}에서 재해석합니다.
 
 \begin{itemize}
@@ -5104,7 +5142,6 @@ p-value & 귀무가설($H_0$)이 '맞다'고 가정할 때, 지금 관찰된 데
 \label{table:terms}
 
 
-\newpage
 \part{데이터 분석 예시: 주택 가격 예측}
 \label{part:example}
 
@@ -5178,7 +5215,7 @@ p-value & 귀무가설($H_0$)이 '맞다'고 가정할 때, 지금 관찰된 데
 
 여러 예측 변수를 모두 포함한 다중 선형 회귀 모델을 피팅했습니다.
 
-\begin{tcolorbox}[colback=gray!10!white, colframe=black, title=다중 회귀 모델 결과 (일부)]
+\begin{tcolorbox}[colback=gray!10!white, colframe=black, title={다중 회귀 모델 결과 (일부)}]
 \begin{verbatim}
 ==================================================================
                  coef    std err          t      P>|t|
@@ -5213,7 +5250,7 @@ baths          198.4646    31.332      6.334      0.000
     \item 이는 특히 범주형 변수(type)를 다룰 때 자동으로 더미 변수(dummy variable)를 생성해주는 등 편리함을 제공합니다.
 \end{itemize}
 
-\newpage
+
 \part{복습: 모델 검증 및 규제}
 \label{part:review}
 
@@ -5221,7 +5258,7 @@ baths          198.4646    31.332      6.334      0.000
 
 \section{교차 검증 (Cross-Validation)의 활용}
 
-\begin{tcolorbox}[colback=green!5!white, colframe=green!60!black, title=Q: 교차 검증(CV)은 언제 사용하나요?]
+\begin{tcolorbox}[colback=green!5!white, colframe=green!60!black, title={Q: 교차 검증(CV)은 언제 사용하나요?}]
 교차 검증은 특정 모델에 국한된 기술이 아니라, \textbf{모델 선택(Model Selection)과 관련된 모든 의사결정}에 사용할 수 있는 일반적인 도구입니다.
 
 \begin{itemize}
@@ -5250,7 +5287,7 @@ baths          198.4646    31.332      6.334      0.000
 
 Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화시킬 때, 각 변수의 회귀 계수($\beta$)가 어떻게 변하는지 그린 그래프입니다.
 
-\begin{tcolorbox}[colback=yellow!5!white, colframe=yellow!75!black, title=Lasso vs. Ridge 궤적도]
+\begin{tcolorbox}[colback=yellow!5!white, colframe=yellow!75!black, title={Lasso vs. Ridge 궤적도}]
 \begin{itemize}
     \item \textbf{Lasso (라쏘)}: $\lambda$가 커지면 계수가 정확히 \textbf{0}이 됩니다. 0이 된 변수는 모델에서 '탈락'한 것이므로, \textbf{특성 선택(Feature Selection)}에 유용합니다.
     \item \textbf{Ridge (릿지)}: $\lambda$가 커져도 계수가 0에 가까워질 뿐, 정확히 0이 되지는 않습니다. 모든 변수를 유지하되 영향력을 줄입니다.
@@ -5269,7 +5306,6 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 \end{itemize}
 
 
-\newpage
 \part{확률론의 기초}
 \label{part:probability}
 
@@ -5302,7 +5338,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 
 확률 변수는 크게 두 종류로 나뉘며, 이에 따라 확률을 기술하는 방식이 달라집니다.
 
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=이산형 확률 변수 (Discrete RV)]
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title={이산형 확률 변수 (Discrete RV)}]
 \begin{itemize}
     \item \textbf{정의}: 변수가 가질 수 있는 값이 '셀 수 있는' 경우 (예: 0, 1, 2, ... 또는 정수 값).
     \item \textbf{확률 함수}: \textbf{확률 질량 함수 (Probability Mass Function, PMF)}.
@@ -5311,7 +5347,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title=연속형 확률 변수 (Continuous RV)]
+\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title={연속형 확률 변수 (Continuous RV)}]
 \begin{itemize}
     \item \textbf{정의}: 변수가 특정 범위 내의 '모든 실수' 값을 가질 수 있는 경우.
     \item \textbf{확률 함수}: \textbf{확률 밀도 함수 (Probability Density Function, PDF)}.
@@ -5352,7 +5388,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
     \item \textbf{표준화 (Standardization)}: 어떤 정규 분포 $X \sim N(\mu, \sigma^2)$라도, $Z = \frac{X - \mu}{\sigma}$ 공식을 통해 표준 정규 분포로 변환할 수 있습니다. $Z$값은 "평균에서 몇 표준편차만큼 떨어져 있는가?"를 의미합니다.
 \end{itemize}
 
-\begin{tcolorbox}[colback=yellow!5!white, colframe=yellow!75!black, title=핵심 원리: 중심극한정리 (Central Limit Theorem, CLT)]
+\begin{tcolorbox}[colback=yellow!5!white, colframe=yellow!75!black, title={핵심 원리: 중심극한정리 (Central Limit Theorem, CLT)}]
 \textbf{Q: 왜 정규 분포가 이렇게 중요한가요?}\\
 \textbf{A: 중심극한정리(CLT) 때문입니다.}
 
@@ -5371,7 +5407,6 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 \end{tcolorbox}
 
 
-\newpage
 \part{최대가능도추정 (MLE)과 선형 회귀의 연결}
 \label{part:mle}
 
@@ -5381,7 +5416,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 
 확률과 통계적 추론은 동전의 양면과 같습니다.
 
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=확률 (Probability) vs. 추론 (Inference)]
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title={확률 (Probability) vs. 추론 (Inference)}]
 \begin{itemize}
     \item \textbf{확률 (Deduction)}: \textbf{모델(파라미터) $\to$ 데이터}
         \begin{itemize}
@@ -5439,7 +5474,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 
 이제, 왜 우리가 선형 회귀에서 손실 함수로 \textbf{평균제곱오차(MSE)}를 사용했는지에 대한 확률론적 정당성을 찾게 됩니다.
 
-\begin{tcolorbox}[colback=yellow!5!white, colframe=red!75!black, title=핵심 결론: OLS는 MLE의 특별한 경우이다]
+\begin{tcolorbox}[colback=yellow!5!white, colframe=red!75!black, title={핵심 결론: OLS는 MLE의 특별한 경우이다}]
 \textbf{가정}: 선형 회귀 모델 $Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$ 에서, \textbf{잔차(error term) $\epsilon_i$가 서로 독립이며 평균이 0인 정규 분포 $\epsilon_i \sim N(0, \sigma^2)$를 따른다고 가정}하자.
 
 \begin{enumerate}
@@ -5473,7 +5508,6 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 \end{tcolorbox}
 
 
-\newpage
 \part{통계적 추론: 불확실성 정량화}
 \label{part:inference}
 
@@ -5548,7 +5582,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 
 주택 가격 예시(\texttt{price \textasciitilde{} sqft})로 돌아가, 두 가지 방법으로 계산된 $\beta_1$(sqft의 계수)의 95\% 신뢰 구간을 비교합니다.
 
-\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title=가정 위반의 결과: 부트스트래핑의 승리]
+\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title={가정 위반의 결과: 부트스트래핑의 승리}]
 \begin{itemize}
     \item \textbf{방법 1 (부트스트래핑 결과)}:
         \begin{itemize}
@@ -5581,11 +5615,10 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 \end{tcolorbox}
 
 
-\newpage
 \part{빠르게 훑어보기 (1페이지 요약)}
 \label{part:summary}
 
-\begin{tcolorbox}[colback=yellow!5!white, colframe=yellow!75!black, title=1. 핵심 연결: OLS = MLE (가장 중요한 결론)]
+\begin{tcolorbox}[colback=yellow!5!white, colframe=yellow!75!black, title={1. 핵심 연결: OLS = MLE (가장 중요한 결론)}]
 \textbf{최소제곱법(OLS)}을 사용하여 \textbf{MSE(오차제곱합)}를 최소화하는 것은,
 만약 \textbf{"잔차가 정규 분포를 따른다"}고 가정한다면,
 확률론적인 \textbf{최대가능도추정(MLE)}을 수행하는 것과
@@ -5594,7 +5627,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 이것이 우리가 회귀 모델의 손실 함수로 MSE를 사용하는 강력한 이론적 근거입니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=2. PMF vs. PDF (핵심 구분)]
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title={2. PMF vs. PDF (핵심 구분)}]
 \begin{itemize}
     \item \textbf{PMF (확률 질량 함수)}: \textbf{이산형} (셀 수 있음, 예: 방 개수).
     \begin{itemize}
@@ -5610,7 +5643,7 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=gray!10!white, colframe=black, title=3. 중심극한정리 (CLT)]
+\begin{tcolorbox}[colback=gray!10!white, colframe=black, title={3. 중심극한정리 (CLT)}]
 \textbf{왜 정규 분포(종 모양)가 중요한가?}
 
 모집단이 주사위처럼 생긴 분포(Uniform)이든, 삐딱한 분포(Skewed)이든 상관없이,
@@ -5618,14 +5651,14 @@ Lasso와 Ridge 모델에서 규제 강도($\lambda$ 또는 $\alpha$)를 변화�
 $n$이 충분히 크다면 \textbf{무조건 정규 분포}를 따릅니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=gray!10!white, colframe=black, title=4. 다중공선성 (Collinearity) 함정]
+\begin{tcolorbox}[colback=gray!10!white, colframe=black, title={4. 다중공선성 (Collinearity) 함정}]
 \textbf{"침실 수(\texttt{beds})의 계수가 음수(-89.9)가 나왔습니다. 오류인가요?"}
 
 아닙니다. 이는 \texttt{beds}와 \texttt{sqft}가 강하게 연관(collinear)되어 있기 때문입니다.
 \textbf{해석}: "다른 변수, 특히 \textbf{총 면적(\texttt{sqft})을 고정한 채로} 침실 수만 1개 늘리면 (즉, 방을 억지로 쪼개면) 집값이 \$89.9k 하락한다"는 합리적인 의미입니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title=5. 이분산성 (Heteroscedasticity)과 추론]
+\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title={5. 이분산성 (Heteroscedasticity)과 추론}]
 \textbf{"모델의 신뢰 구간(CI)은 어떤 방법을 믿어야 하나요?"}
 
 \begin{itemize}
@@ -5637,11 +5670,9 @@ $n$이 충분히 크다면 \textbf{무조건 정규 분포}를 따릅니다.
 따라서 가정이 깨졌을 때는 \textbf{부트스트래핑}이 더 신뢰할 수 있는 불확실성 추정 방법입니다.
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 10: 핵심 용어 정리
+% Lecture 10: 핵심 용어 정리
 %=======================================================================
 \chapter{핵심 용어 정리}
 \label{ch:lecture10}
@@ -5658,13 +5689,11 @@ $n$이 충분히 크다면 \textbf{무조건 정규 분포}를 따릅니다.
 \end{summarybox}
 
 
-
-\newpage
 \section{핵심 용어 정리}
 
 본격적인 학습에 앞서, 이번 강의에서 사용되는 핵심 용어들을 정리합니다.
 
-\begin{tcolorbox}[title=핵심 용어집 (Glossary)]
+\begin{tcolorbox}[title={핵심 용어집 (Glossary)}]
 \begin{adjustbox}{width=\textwidth}
 \begin{tabular}{lp{6cm}ll}
     \toprule
@@ -5691,7 +5720,6 @@ $n$이 충분히 크다면 \textbf{무조건 정규 분포}를 따릅니다.
 \end{tcolorbox}
 
 
-\newpage
 \section{통계적 추론 복습 (Inference Review)}
 
 데이터 분석은 샘플(표본)을 통해 모집단의 특성을 알아내는 '추론' 과정입니다.
@@ -5800,7 +5828,7 @@ $\sigma_\epsilon$를 추정하는 과정에서 추가적인 불확실성이 발�
     \item \textbf{E}qual Variance (등분산성): 오차의 분산은 $X$ 값에 상관없이 일정하다. (중요)
 \end{itemize}
 
-\begin{tcolorbox}[title=사례: 공식(statsmodels) vs. 부트스트랩]
+\begin{tcolorbox}[title={사례: 공식(statsmodels) vs. 부트스트랩}]
     강의에서 주택 가격 데이터($n=592$)를 분석한 결과, 잔차 그림에서 $X$가 커질수록 분산이 커지는 '부채꼴 모양(fanning out)'이 나타났습니다. 이는 \textbf{등분산성(E) 가정이 위반}되었음을 의미합니다.
 
     이때 두 방법으로 구한 $\beta_1$ (sqft)의 95\% CI는 다음과 같습니다.
@@ -5812,7 +5840,6 @@ $\sigma_\epsilon$를 추정하는 과정에서 추가적인 불확실성이 발�
 \end{tcolorbox}
 
 
-\newpage
 \section{신뢰 구간 vs. 예측 구간 (CI vs. PI)}
 
 통계적 추론에서 가장 혼동하기 쉬운 두 가지 '구간'이 있습니다.
@@ -5845,8 +5872,6 @@ $\sigma_\epsilon$를 추정하는 과정에서 추가적인 불확실성이 발�
 \end{warningbox}
 
 
-
-\newpage
 \section{가능도 (Likelihood)}
 
 베이즈 추론을 이해하기 위한 핵심 구성요소인 '가능도'에 대해 알아봅니다.
@@ -5906,7 +5931,6 @@ $$ L(\theta | \text{data}) = P(\text{data} | \theta) $$
 \end{summarybox}
 
 
-\newpage
 \section{베이즈 정리 (Bayes' Rule)}
 
 베이즈 추론의 기반이 되는 베이즈 정리는 '조건부 확률'을 뒤집는 방법을 제공합니다.
@@ -5957,7 +5981,6 @@ $$ P(A|B) = \frac{P(B|A) P(A)}{P(B)} $$
 \end{examplebox}
 
 
-\newpage
 \section{베이즈 추론 (Bayesian Inference)}
 
 이제 베이즈 정리를 통계적 모수($\theta$) 추론에 적용합니다.
@@ -6089,12 +6112,11 @@ $$ \hat{\mu}_{\text{posterior}} = \frac{(\sigma^2 \cdot \mu_0) + (n \sigma_0^2 \
 \end{warningbox}
 
 
-\newpage
 \section{참고: `statsmodels` 결과표 분석}
 
 강의에서 사용된 `statsmodels` (Python 라이브러리)의 OLS 회귀분석 결과표를 해석하는 방법입니다.
 
-\begin{tcolorbox}[title=단순 선형 회귀: `price ~ sqft`]
+\begin{tcolorbox}[title={단순 선형 회귀: `price ~ sqft`}]
 \begin{lstlisting}[language={}, caption={단순 선형 회귀(OLS) 결과}, label={lst:ols_simple}, breaklines=true]
 ==============================================================================
 Dep. Variable:                  price   R-squared:                       0.519
@@ -6129,7 +6151,7 @@ sqft           0.5898      0.023     25.211      0.000       0.544       0.636
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=다중 선형 회귀: `price ~ sqft + dist + ... + type`]
+\begin{tcolorbox}[title={다중 선형 회귀: `price ~ sqft + dist + ... + type`}]
 \begin{lstlisting}[language={}, caption={다중 선형 회귀(OLS) 결과 (일부)}, label={lst:ols_multi}, breaklines=true]
 ... (R-squared: 0.733, Adj. R-squared: 0.729) ...
 ======================================================================================
@@ -6156,12 +6178,11 @@ year                   1.2300      0.388      3.169      0.002       0.468      
 \end{tcolorbox}
 
 
-\newpage
 \section{학습 체크리스트}
 
 이 강의를 통해 다음 질문에 답할 수 있는지 확인해 보세요.
 
-\begin{tcolorbox}[title=최소 학습 목표 (Checklist)]
+\begin{tcolorbox}[title={최소 학습 목표 (Checklist)}]
     \begin{itemize}
         \item [$\square$] 모집단 모델($\beta_1$)과 표본 모델($\hat{\beta}_1$)의 차이를 설명할 수 있는가?
         \item [$\square$] 표준 오차(SE)가 무엇인지, 그리고 SE를 줄이는 3가지 방법을 아는가?
@@ -6206,11 +6227,10 @@ year                   1.2300      0.388      3.169      0.002       0.468      
 \end{examplebox}
 
 
-\newpage
 \section{한눈에 훑어보기 (1-Page Summary)}
 
 
-\begin{tcolorbox}[title=신뢰 구간 (Mean) vs. 예측 구간 (Single)]
+\begin{tcolorbox}[title={신뢰 구간 (Mean) vs. 예측 구간 (Single)}]
     \begin{itemize}
         \item \textbf{신뢰 구간 (CI):} "2860 sqft 집들의 \textbf{평균} 가격은?"
             (불확실성 1개: 모델)
@@ -6220,14 +6240,14 @@ year                   1.2300      0.388      3.169      0.002       0.468      
     \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=OLS = MLE]
+\begin{tcolorbox}[title={OLS = MLE}]
     선형 회귀에서 오차($\epsilon$)가 \textbf{정규분포}를 따른다고 가정하면,
     \textbf{오차 제곱합을 최소화(OLS)}하는 것은
     \textbf{가능도를 최대화(MLE)}하는 것과
     수학적으로 동일합니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=베이즈 정리의 핵심 흐름]
+\begin{tcolorbox}[title={베이즈 정리의 핵심 흐름}]
     \textbf{사전 믿음 (Prior)}
     ($P(D+)=30\%$)
     $\quad + \quad$
@@ -6238,19 +6258,19 @@ year                   1.2300      0.388      3.169      0.002       0.468      
     ($P(D+|T+)=97.7\%$)
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=베이즈 추론의 심장]
+\begin{tcolorbox}[title={베이즈 추론의 심장}]
     $$ \underbrace{f(\theta | X)}_{\text{사후 분포}} \propto \underbrace{f(X | \theta)}_{\text{가능도}} \times \underbrace{f(\theta)}_{\text{사전 분포}} $$
     (Posterior $\propto$ Likelihood $\times$ Prior)
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=빈도주의 vs. 베이지안]
+\begin{tcolorbox}[title={빈도주의 vs. 베이지안}]
     \begin{itemize}
         \item \textbf{빈도주의자:} 모수($\theta$)는 \textbf{고정된 값}. 나의 추정치($\hat{\theta}$)가 확률적.
         \item \textbf{베이지안:} 모수($\theta$)는 \textbf{확률 변수}(분포). 나의 믿음이 데이터에 따라 갱신됨.
     \end{itemize}
 \end{tcolorbox}
 
-\newpage
+
 \section{부록: 몬티 홀 문제 (Monty Hall Problem)}
 
 강의에서 간단히 언급된 몬티 홀 문제는 조건부 확률과 베이즈 정리의 직관을 보여주는 유명한 예시입니다.
@@ -6292,11 +6312,9 @@ year                   1.2300      0.388      3.169      0.002       0.468      
     진행자의 행동($P(\text{염소 문 열기} | \text{내 선택})$)은 새로운 정보를 제공하며, 이 정보가 조건부 확률을 변경하여 바꾸는 것의 승률을 2/3로 높여줍니다. (100개 문으로 확장하면, 99/100의 확률로 이길 수 있습니다.)
 \end{examplebox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 11: 베이지안 용어 정리
+% Lecture 11: 베이지안 용어 정리
 %=======================================================================
 \chapter{베이지안 용어 정리}
 \label{ch:lecture11}
@@ -6305,12 +6323,11 @@ year                   1.2300      0.388      3.169      0.002       0.468      
 
 
 \fancypagestyle{plain}{ % title 페이지에도 헤더/푸터 적용
-    \fancyhf{}
-    \fancyhead[L]{베이지안 모델링 기초}
-    \fancyhead[R]{CS109A 데이터 사이언스 입문}
-    \fancyfoot[C]{\thepage}
+    
+    
+    
+    
 }
-
 
 
 \begin{summarybox}
@@ -6351,7 +6368,6 @@ year                   1.2300      0.388      3.169      0.002       0.468      
 \end{tabular}
 \end{adjustbox}
 
-\newpage
 
 \section{베이지안 추론이란 무엇인가?}
 
@@ -6365,7 +6381,7 @@ year                   1.2300      0.388      3.169      0.002       0.468      
 * \textbf{데이터:} 이 '참 값'을 알기 위해 우리가 뽑는 표본(데이터, $X$)이 \textbf{무작위(random)}입니다.
 * \textbf{목표:} 데이터를 많이 뽑아서 저 '고정된 참 값'($\theta$)을 정확히 \textbf{추정(estimate)}하는 것입니다.
 
-\begin{examplebox}[빈도주의 비유: 고정된 보물 찾기]
+\begin{examplebox}[title={빈도주의 비유: 고정된 보물 찾기}]
     어딘가에 \textbf{하나의 '보물'($\theta$)}이 숨겨져 있습니다.
     
     우리는 이 보물의 위치를 모르지만, 보물에 대한 \textbf{힌트($X$, 데이터)}를 여러 번 얻을 수 있습니다.
@@ -6381,7 +6397,7 @@ year                   1.2300      0.388      3.169      0.002       0.468      
 * \textbf{파라미터:} 오히려 우리가 모르는 파라미터($\theta$)가 \textbf{무작위(random)}이며, 확률 분포를 가집니다.
 * \textbf{목표:} 데이터($X$)를 관찰함으로써, 파라미터 $\theta$에 대한 우리의 \textbf{믿음(belief)을 업데이트}하는 것입니다.
 
-\begin{examplebox}[베이지안 비유: 확률적인 보물 지도]
+\begin{examplebox}[title={베이지안 비유: 확률적인 보물 지도}]
     베이지안은 보물이 "어디쯤 있을지"에 대한 \textbf{'믿음의 지도'(사전 확률)}로 시작합니다.
     (예: "A 지역 60\%, B 지역 40\%")
     
@@ -6411,7 +6427,6 @@ year                   1.2300      0.388      3.169      0.002       0.468      
     베이지안의 '신용 구간'이 우리가 일상적으로 "확률"을 이해하는 방식과 더 가깝습니다.
 \end{tcolorbox}
 
-\newpage
 
 \section{베이즈 정리: 믿음을 업데이트하는 공식}
 
@@ -6455,7 +6470,7 @@ $$ P(\theta | X) = \frac{P(X | \theta) P(\theta)}{P(X)} $$
     $f(\theta | X) \propto f(X | \theta) f(\theta)$
 \end{summarybox}
 
-\begin{examplebox}[동전 뒤집기 예제 (이산 확률)]
+\begin{examplebox}[title={동전 뒤집기 예제 (이산 확률)}]
     주머니 속에 3개의 동전이 있습니다:
     \begin{itemize}
         \item 동전 A: 앞면이 나올 확률 $p=0.1$ (불량 동전)
@@ -6502,7 +6517,6 @@ $$ P(\theta | X) = \frac{P(X | \theta) P(\theta)}{P(X)} $$
     우리는 이제 이 동전이 $p=0.9$ 동전(C)이라고 가장 강하게 믿게 되었습니다.
 \end{examplebox}
 
-\newpage
 
 \section{사전분포(Prior) 선택하기}
 
@@ -6561,7 +6575,6 @@ $$ P(\theta | X) = \frac{P(X | \theta) P(\theta)}{P(X)} $$
     \end{tabular}
 \end{tcolorbox}
 
-\newpage
 
 \section{핵심 예제: 정규-정규 모델 (Normal-Normal Model)}
 
@@ -6652,7 +6665,6 @@ $$ \mu_n = \frac{\sigma^2 \mu_0 + n \sigma_0^2 \overline{X}}{\sigma^2 + n \sigma
     \end{itemize}
 \end{warningbox}
 
-\newpage
 
 \section{베이지안 선형 회귀 (Bayesian Linear Regression)}
 
@@ -6693,7 +6705,7 @@ $y_i \sim N(\mu_i, \sigma^2)$, 여기서 $\mu_i = \beta_0 + \beta_1 x_i$
     \end{itemize}
 \end{summarybox}
 
-\begin{examplebox}[범주형 변수(더미 변수) 해석하기]
+\begin{examplebox}[title={범주형 변수(더미 변수) 해석하기}]
     한 강의의 수강생 그룹(4개)에 따라 숙제 시간을 예측하는 회귀 모델이 있습니다.
     
     $\hat{y} = 11.0 - 2.0x_{cs_{1090}} + 3.5x_{csci_{e109}} + 5.0x_{stat_{109}}$
@@ -6717,7 +6729,6 @@ $y_i \sim N(\mu_i, \sigma^2)$, 여기서 $\mu_i = \beta_0 + \beta_1 x_i$
     \end{itemize}
 \end{examplebox}
 
-\newpage
 
 \section{심화: 릿지(Ridge)와 라쏘(Lasso)의 베이지안 해석}
 
@@ -6804,7 +6815,6 @@ $f(\beta) \propto \exp(-\frac{|\beta|}{b}) \implies -\log(f(\beta)) \propto |\be
     (슬라이드 37의 두 그래프에 대한 텍스트 설명입니다.)
 \end{tcolorbox}
 
-\newpage
 
 \section{계산 방법: MCMC와 깁스 샘플링}
 
@@ -6865,7 +6875,6 @@ MCMC의 대표적인 알고리즘 중 하나로, \textbf{다차원 파라미터}
     (슬라이드 48의 그림에 대한 텍스트 설명입니다.)
 \end{tcolorbox}
 
-\newpage
 
 \section{자주 묻는 질문 (FAQ) 및 점검}
 
@@ -6929,11 +6938,9 @@ MCMC의 대표적인 알고리즘 중 하나로, \textbf{다차원 파라미터}
     \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 12: 강의 개요
+% Lecture 12: 강의 개요
 %=======================================================================
 \chapter{강의 개요}
 \label{ch:lecture12}
@@ -6943,13 +6950,8 @@ MCMC의 대표적인 알고리즘 중 하나로, \textbf{다차원 파라미터}
 %===============
 
 
-
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 12}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 12의 핵심 개념 학습}
 
-
-
-
-\newpage
 
 %===============
 % 1. 개요
@@ -6963,7 +6965,7 @@ MCMC의 대표적인 알고리즘 중 하나로, \textbf{다차원 파라미터}
 마지막으로 중간고사를 대비하여 \textbf{가설 검정}, \textbf{p-value}, \textbf{순열 검정} 등 핵심 통계 개념을 복습합니다.
 \end{summarybox}
 
-\begin{keyconcept}{이번 주 학습 목표}
+\begin{keyconcept}[title={이번 주 학습 목표}]
 \begin{itemize}
     \item 복잡한 후험 분포(Posterior)를 시뮬레이션하는 MCMC 기법의 원리를 이해합니다.
     \item '고차원성의 저주'가 무엇인지, 왜 'P가 큰' 데이터가 문제가 되는지 설명할 수 있습니다.
@@ -6973,7 +6975,6 @@ MCMC의 대표적인 알고리즘 중 하나로, \textbf{다차원 파라미터}
 \end{itemize}
 \end{keyconcept}
 
-\newpage
 
 %===============
 % 2. 강의 공지 (Transcript 기반)
@@ -7020,7 +7021,6 @@ MCMC의 대표적인 알고리즘 중 하나로, \textbf{다차원 파라미터}
     \item 시험 전까지 모든 코드를 완벽하게 정리할 필요는 없지만, 내용을 읽고 시도해보는 것이 시험에 유리합니다.
 \end{itemize}
 
-\newpage
 
 %===============
 % 3. 용어 정리
@@ -7051,7 +7051,6 @@ MCMC & 복잡한 후험 분포에서 샘플을 추출하는 시뮬레이션 기�
 \label{tab:terms}
 \end{table}
 
-\newpage
 
 %===============
 % 4. 베이즈 시뮬레이션
@@ -7067,7 +7066,7 @@ MCMC & 복잡한 후험 분포에서 샘플을 추출하는 시뮬레이션 기�
     \item \textbf{복잡한 경우:} 하지만 현실의 모델(예: 다중 선형 회귀)에서는 파라미터가 매우 많습니다 (예: $\beta_0, \beta_1, ..., \beta_p$ 그리고 $\sigma^2$). 이 모든 파라미터들의 \textit{결합(joint)} 후험 분포는 매우 복잡하고 다차원적인 형태를 띠게 됩니다. 이런 분포는 수학 공식 하나로 깔끔하게 표현하거나 적분하기가 거의 불가능합니다.
 \end{itemize}
 
-\begin{keyconcept}{복잡한 분포를 이해하는 방법: 시뮬레이션}
+\begin{keyconcept}[title={복잡한 분포를 이해하는 방법: 시뮬레이션}]
 수학 공식으로 풀 수 없다면, 컴퓨터의 힘을 빌려 그 분포에서 \textbf{수천, 수만 개의 샘플을 직접 뽑아보면} 됩니다. 이렇게 뽑힌 샘플들의 분포(히스토그램)를 관찰하면, 원래의 복잡한 후험 분포가 어떻게 생겼는지 근사적으로 파악할 수 있습니다.
 
 이처럼 복잡한 분포에서 샘플을 추출하는 계산(computational) 기법들을 \textbf{MCMC(Markov Chain Monte Carlo)}라고 부릅니다.
@@ -7094,7 +7093,7 @@ MCMC는 복잡한 분포의 정확한 모양(수식)을 몰라도, 특정 지점
         가장 유명한 MCMC 알고리즘 중 하나입니다.
 \end{itemize}
 
-\begin{analogybox}{메트로폴리스-헤이스팅스: 안대 쓴 등산가}
+\begin{analogybox}[title={메트로폴리스-헤이스팅스: 안대 쓴 등산가}]
 복잡한 확률 분포를 '산맥'이라고 상상해봅시다. 우리는 이 산맥의 지형도(분포의 전체 형태)는 모르지만, 현재 위치의 '고도(확률 밀도)'는 측정할 수 있습니다.
 
 \begin{enumerate}
@@ -7115,7 +7114,6 @@ MCMC는 복잡한 분포의 정확한 모양(수식)을 몰라도, 특정 지점
 \textbf{결과:} 이 '등산가'는 높은 고도(확률이 높은 지역)에서 더 많은 시간을 보내고, 낮은 고도(확률이 낮은 지역)에서는 적은 시간을 보내게 됩니다. 이 등산가의 발자취(방문한 위치 목록)를 모으면, 그것이 바로 우리가 원하던 후험 분포의 샘플이 됩니다.
 \end{analogybox}
 
-\newpage
 
 %===============
 % 5. 빅데이터와 고차원성
@@ -7155,7 +7153,7 @@ N(행)은 적당히 있지만 P(열, 예측 변수)가 N에 가깝거나 N보다
     \item \textbf{차원의 저주 (Curse of Dimensionality):} P가 커질 때 발생하는 근본적인 문제입니다.
 \end{itemize}
 
-\begin{warningbox}{차원의 저주(Curse of Dimensionality)란?}
+\begin{warningbox}[title={차원의 저주(Curse of Dimensionality)란?}]
 차원이 증가할수록(P가 커질수록) 데이터가 존재하는 공간의 부피(Volume)가 기하급수적으로 커집니다.
 이로 인해 동일한 N개의 데이터라도, 차원이 높아지면 데이터 포인트들은 서로에게서 엄청나게 멀리 떨어져 \textbf{희소(sparse)하게} 흩어지게 됩니다.
 
@@ -7175,7 +7173,6 @@ N(행)은 적당히 있지만 P(열, 예측 변수)가 N에 가깝거나 N보다
 \end{itemize}
 \end{warningbox}
 
-\newpage
 
 %===============
 % 6. PCA
@@ -7191,7 +7188,7 @@ PCA는 'P가 큰' 고차원성 문제를 해결하기 위한 강력한 \textbf{�
     \item \textbf{해결책 (PCA):} PCA는 원본 변수들의 \textbf{선형 조합(linear combination)}을 통해, 데이터의 \textbf{분산(Variance)을 가장 크게 설명하는} 새로운 축을 순서대로 찾아냅니다.
 \end{itemize}
 
-\begin{analogybox}{PCA: 데이터 구름의 '최적의 축' 찾기}
+\begin{analogybox}[title={PCA: 데이터 구름의 '최적의 축' 찾기}]
 2개의 변수($X_1, X_2$)가 있고, 이들의 산점도(scatter plot)가 마치 '길고 얇게 기울어진 타원형 구름'처럼 보인다고 상상해봅시다.
 
 \begin{itemize}
@@ -7223,11 +7220,10 @@ PCA는 원본 예측 변수 $X$의 \textbf{공분산 행렬($X^T X$)}에 대해 
 \end{itemize}
 PCA는 \textbf{가장 큰 고유값}을 가진 고유벡터를 \textbf{제1 주성분(PC1)}으로, 두 번째로 큰 것을 제2 주성분(PC2)으로 순서대로 선택합니다.
 
-\begin{keyconcept}{PCA는 '회전'이다}
+\begin{keyconcept}[title={PCA는 '회전'이다}]
 PCA는 기존의 $X_1, X_2$ 축을 데이터 분산이 최대가 되는 $Z_1, Z_2$ 축으로 \textbf{회전(rotation)시키는 선형 변환(linear transformation)}입니다.
 \end{keyconcept}
 
-\newpage
 
 %===============
 % 7. PCA 활용
@@ -7245,7 +7241,7 @@ PCA는 기존의 $X_1, X_2$ 축을 데이터 분산이 최대가 되는 $Z_1, Z_
     \item \textbf{펭귄 데이터 예시:} 4개의 측정치(bill length, bill depth 등)를 PCA로 2차원(PC1, PC2)으로 축소하여 시각화했더니, 3종류의 펭귄(Adelie, Chinstrap, Gentoo)이 잘 분리되어 보이는 것을 확인할 수 있었습니다.
 \end{itemize}
 
-\begin{warningbox}{PCA는 Y(라벨)를 모른다 (Unsupervised)}
+\begin{warningbox}[title={PCA는 Y(라벨)를 모른다 (Unsupervised)}]
 PCA는 시각화 시 데이터의 '종류'(예: 펭귄 종류, 옷 종류)를 전혀 고려하지 않습니다. PCA는 오직 $X$ 변수들의 '퍼짐(분산)'만 보고 축을 정합니다.
 
 그럼에도 불구하고 PCA 2D 플롯에서 라벨별로 군집이 잘 분리되었다면, 이는 $X$ 변수들이 $Y$를 예측하는 데 유용한 정보를 담고 있다는 강력한 신호입니다.
@@ -7296,7 +7292,6 @@ PCA는 유용하지만 만능은 아닙니다.
 \label{tab:pca_pros_cons}
 \end{table}
 
-\newpage
 
 %===============
 % 8. 중간고사 복습
@@ -7323,7 +7318,7 @@ PCA는 유용하지만 만능은 아닙니다.
         \end{itemize}
 \end{enumerate}
 
-\begin{keyconcept}{p-value란 무엇인가?}
+\begin{keyconcept}[title={p-value란 무엇인가?}]
 \textbf{p-value}란, "만약 귀무가설($H_0$)이 사실이라면, 우리가 관찰한 검정 통계량(예: $t=2.5$)보다 \textbf{같거나 더 극단적인} 값이 나올 확률"을 의미합니다.
 
 \begin{itemize}
@@ -7396,7 +7391,6 @@ PCA는 유용하지만 만능은 아닙니다.
 \label{tab:ci_vs_pi}
 \end{table}
 
-\newpage
 
 %===============
 % 9. 체크리스트
@@ -7425,29 +7419,28 @@ PCA는 유용하지만 만능은 아닙니다.
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
 
 %===============
 % 10. FAQ
 %===============
 \section{초심자를 위한 FAQ}
 
-\begin{keyconcept}{Q: PCA는 지도학습인가요, 비지도학습인가요?}
+\begin{keyconcept}[title={Q: PCA는 지도학습인가요, 비지도학습인가요?}]
 \textbf{A: 완벽한 비지도 학습(Unsupervised Learning)입니다.}
 PCA는 차원을 축소하기 위해 오직 예측 변수($X$)의 정보(분산, 공분산)만을 사용합니다. 반응 변수($Y$, 라벨)는 PCA 계산 과정에서 전혀 고려되지 않습니다.
 \end{keyconcept}
 
-\begin{keyconcept}{Q: 주성분(PC)은 원본 변수와 다른가요?}
+\begin{keyconcept}[title={Q: 주성분(PC)은 원본 변수와 다른가요?}]
 \textbf{A: 완전히 다릅니다.}
 PC1(제1 주성분)은 $Z_1 = w_{11}X_1 + w_{12}X_2 + ... + w_{1p}X_p$ 처럼 모든 원본 변수($X_1$부터 $X_p$까지)가 조금씩 섞인 \textbf{새로운 변수}입니다. 원본 변수 중 하나(예: $X_1$)를 선택하는 것(Feature Selection)과는 근본적으로 다릅니다.
 \end{keyconcept}
 
-\begin{keyconcept}{Q: PC1이 항상 Y를 가장 잘 예측하나요?}
+\begin{keyconcept}[title={Q: PC1이 항상 Y를 가장 잘 예측하나요?}]
 \textbf{A: 절대 아닙니다.}
 PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는 데 가장 중요한 정보가 $X$ 분산의 1\%만 설명하는 PC10에 들어있을 수도 있습니다. 이것이 PCA의 한계입니다. (이와 달리 Y 정보까지 고려하여 축을 찾는 것을 '부분 최소 제곱, PLS'라고 부릅니다.)
 \end{keyconcept}
 
-\begin{keyconcept}{Q: t-검정과 순열 검정 중 무엇을 써야 하나요?}
+\begin{keyconcept}[title={Q: t-검정과 순열 검정 중 무엇을 써야 하나요?}]
 \textbf{A: 데이터의 가정을 먼저 확인해야 합니다.}
 \begin{itemize}
     \item \textbf{t-검정:} 데이터가 (특히 잔차가) 정규성을 따르고 등분산성을 만족하는 등, 고전적 통계 가정을 잘 만족할 때 사용합니다. 더 적은 계산으로 강력한 결과를 줍니다.
@@ -7455,14 +7448,13 @@ PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는
 \end{itemize}
 \end{keyconcept}
 
-\newpage
 
 %===============
 % 11. 1페이지 요약
 %===============
 \section{빠르게 훑어보기 (1-Page Summary)}
 
-\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=베이즈 시뮬레이션 (MCMC)]
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title={베이즈 시뮬레이션 (MCMC)}]
 \begin{itemize}
     \item \textbf{Why?} 모델이 복잡해지면 '후험 분포'를 수학 공식으로 풀 수 없다.
     \item \textbf{What?} 공식 대신, 분포에서 수천 개의 '샘플'을 뽑아 분포의 모양을 근사한다.
@@ -7471,7 +7463,7 @@ PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title=고차원성의 문제 (P is Big)]
+\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title={고차원성의 문제 (P is Big)}]
 \begin{itemize}
     \item \textbf{Problem?} 예측 변수(P)가 관측치(N)만큼 많거나 더 많은 상황.
     \item \textbf{Curse of Dimensionality:} 차원이 높아질수록 공간의 부피가 커져 데이터가 '희소(sparse)'해지고 모든 점이 서로 '멀어지는' 현상.
@@ -7479,7 +7471,7 @@ PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title=주성분 분석 (PCA)]
+\begin{tcolorbox}[colback=green!5!white, colframe=green!75!black, title={주성분 분석 (PCA)}]
 \begin{itemize}
     \item \textbf{Goal:} 고차원($P$가 큼) 데이터의 '정보(분산)'를 최대한 보존하며 저차원으로 '압축'.
     \item \textbf{Idea:} 데이터의 분산이 '최대'가 되는 새 축(방향)을 찾는다 ( $=Z_1$, PC1).
@@ -7490,7 +7482,7 @@ PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는
 \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=orange!5!white, colframe=orange!75!black, title=가설 검정 복습]
+\begin{tcolorbox}[colback=orange!5!white, colframe=orange!75!black, title={가설 검정 복습}]
 \begin{itemize}
     \item \textbf{p-value:} $H_0$(효과 없음)이 사실일 때, 내 관찰값보다 더 극단적인 값이 나올 확률. (낮으면 $H_0$ 기각)
     \item \textbf{Permutation Test:} $H_0$을 시뮬레이션($Y$ 셔플링)하여 p-value를 계산. (t-검정 가정이 깨졌을 때 사용)
@@ -7499,21 +7491,15 @@ PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 13: 개요 (Overview)
+% Lecture 13: 개요 (Overview)
 %=======================================================================
 \chapter{개요 (Overview)}
 \label{ch:lecture13}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 13}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 13의 핵심 개념 학습}
 
-
-
-
-\newpage
 
 % --- 개요 ---
 \section*{개요 (Overview)}
@@ -7541,7 +7527,7 @@ PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는
 \end{summarybox}
 
 % --- 용어 정리 ---
-\newpage
+
 \section*{주요 용어 정리 (Terminology)}
 
 본격적인 학습에 앞서, 오늘 다룰 핵심 용어들을 정리합니다.
@@ -7577,7 +7563,7 @@ PC1은 $X$의 '분산'을 가장 잘 설명할 뿐입니다. $Y$를 예측하는
 \end{table}
 
 % --- 복습 섹션 ---
-\newpage
+
 \section{복습: 선형 회귀와 통계적 추론 (Review)}
 
 분류 모델을 배우기에 앞서, 선형 회귀 모델의 통계적 추론 방식을 복습합니다.
@@ -7675,7 +7661,7 @@ $$ \text{price} = \beta_0 + \beta_1 \cdot \text{sqft} + \beta_2 \cdot \text{type
 \end{itemize}
 
 % --- 분류(Classification)란? ---
-\newpage
+
 \section{분류 (Classification)란 무엇인가?}
 
 \subsection{회귀 vs. 분류 (Regression vs. Classification)}
@@ -7740,7 +7726,7 @@ Y값이 2개의 범주(binary)만 가질 때(예: 심장병 Yes=1, No=0)는 순�
 \end{center}
 
 % --- 로지스틱 회귀 ---
-\newpage
+
 \section{로지스틱 회귀 (Logistic Regression)}
 
 \subsection{핵심 아이디어: S-커브 (The S-Curve)}
@@ -7766,7 +7752,7 @@ $$ p = P(Y=1) = \frac{1}{1 + e^{-h}} = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X)}} 
     \item $h = 0$ 이면, $e^{0} = 1$, 따라서 $p \to \frac{1}{1+1} = 0.5$
 \end{itemize}
 
-\begin{tcolorbox}[colback=gray!5, colframe=gray!60, title=로지스틱 회귀의 이름]
+\begin{tcolorbox}[colback=gray!5, colframe=gray!60, title={로지스틱 회귀의 이름}]
     이름은 '회귀(Regression)'이지만, 하는 일은 \textbf{'분류(Classification)'}입니다.
     이는 모델이 확률이라는 '연속적인 숫자'를 예측한 뒤, 그 확률을 기준으로 '범주'를 결정하기 때문입니다.
 \end{tcolorbox}
@@ -7858,7 +7844,7 @@ $$ \text{Loss} = -l(\beta) = -\sum_{i=1}^n \left[ y_i \log(p_i) + (1-y_i) \log(1
 \end{warningbox}
 
 % --- 다중 로지스틱 회귀와 결정 경계 ---
-\newpage
+
 \section{다중 로지스틱 회귀와 결정 경계}
 
 \subsection{다중 로지스틱 회귀 (Multiple Logistic Regression)}
@@ -7928,7 +7914,7 @@ $$ \textbf{결정 경계:} \quad \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \
 \end{warningbox}
 
 % --- 실습 코드 ---
-\newpage
+
 \section{실습 코드 예제 (Python)}
 
 강의에서 사용된 \texttt{statsmodels} 및 \texttt{scikit-learn} 코드 예제입니다.
@@ -8034,33 +8020,33 @@ print('Estimated beta0: \n', logreg_poly.intercept_)
 
 
 % --- 1페이지 요약 ---
-\newpage
+
 \section*{빠르게 훑어보기 (1-Page Summary)}
 
-\begin{tcolorbox}[colback=white, colframe=black!70, title=분류(Classification)와 로지스틱 회귀 핵심 요약]
+\begin{tcolorbox}[colback=white, colframe=black!70, title={분류(Classification)와 로지스틱 회귀 핵심 요약}]
     
-    \begin{tcolorbox}[colback=blue!5, colframe=blue!60, title=1. 문제 정의: 회귀 vs. 분류]
+    \begin{tcolorbox}[colback=blue!5, colframe=blue!60, title={1. 문제 정의: 회귀 vs. 분류}]
         \begin{itemize}
             \item \textbf{회귀 (Regression):} \textbf{숫자} 예측 (예: 가격, 온도). \textit{Tool: 선형 회귀}
             \item \textbf{분류 (Classification):} \textbf{범주} 예측 (예: Yes/No, 스팸/정상). \textit{Tool: 로지스틱 회귀}
         \end{itemize}
     \end{tcolorbox}
     
-    \begin{tcolorbox}[colback=red!5, colframe=red!60, title=2. 왜 선형 회귀는 분류에 실패하는가?]
+    \begin{tcolorbox}[colback=red!5, colframe=red!60, title={2. 왜 선형 회귀는 분류에 실패하는가?}]
         \begin{itemize}
             \item \textbf{이유 1 (다중 클래스):} \texttt{1=CS}, \texttt{2=Stats} 처럼 강제 인코딩 시, 무의미한 \textbf{순서}와 \textbf{간격}을 가정하게 됨.
             \item \textbf{이유 2 (이진 클래스):} 예측값이 \textbf{확률의 범위 [0, 1]을 벗어남} (예: 110\% 또는 -10\%).
         \end{itemize}
     \end{tcolorbox}
     
-    \begin{tcolorbox}[colback=green!5, colframe=green!70, title=3. 해결책: 로지스틱 회귀와 시그모이드]
+    \begin{tcolorbox}[colback=green!5, colframe=green!70, title={3. 해결책: 로지스틱 회귀와 시그모이드}]
         \begin{itemize}
             \item 선형 회귀의 결과($h = \beta_0 + \beta_1 X$)를 \textbf{시그모이드(Sigmoid) 함수}에 넣어 0~1 사이의 확률값($p$)으로 '압축'시킴.
             $$ p = P(Y=1) = \frac{1}{1 + e^{-h}} $$
         \end{itemize}
     \end{tcolorbox}
     
-    \begin{tcolorbox}[colback=orange!5, colframe=orange!70, title=4. 핵심 해석: 로그-오즈 (Log-Odds)]
+    \begin{tcolorbox}[colback=orange!5, colframe=orange!70, title={4. 핵심 해석: 로그-오즈 (Log-Odds)}]
         \begin{itemize}
             \item 모델의 공식을 변형하면 \textbf{로그-오즈(Logit)}가 X에 대한 선형 함수임을 알 수 있음.
             $$ \ln\left( \frac{p}{1-p} \right) = \beta_0 + \beta_1 X $$
@@ -8069,7 +8055,7 @@ print('Estimated beta0: \n', logreg_poly.intercept_)
         \end{itemize}
     \end{tcolorbox}
     
-    \begin{tcolorbox}[colback=purple!5, colframe=purple!70, title=5. 학습 원리: MLE와 BCE]
+    \begin{tcolorbox}[colback=purple!5, colframe=purple!70, title={5. 학습 원리: MLE와 BCE}]
         \begin{itemize}
             \item \textbf{가정:} Y는 \textbf{베르누이 분포}를 따름 (동전 던지기).
             \item \textbf{목표:} 관측된 데이터가 나타날 \textbf{가능도(Likelihood)}를 \textbf{최대}로 만드는 $\beta$를 찾음 (MLE).
@@ -8077,7 +8063,7 @@ print('Estimated beta0: \n', logreg_poly.intercept_)
         \end{itemize}
     \end{tcolorbox}
 
-    \begin{tcolorbox}[colback=gray!5, colframe=gray!70, title=6. 결정 경계 (Decision Boundary)]
+    \begin{tcolorbox}[colback=gray!5, colframe=gray!70, title={6. 결정 경계 (Decision Boundary)}]
         \begin{itemize}
             \item 모델이 0과 1을 나누는 경계선. (즉, $p=0.5$ 또는 $\text{Log-Odds}=0$이 되는 지점)
             \item \textbf{기본 모델:} $\beta_0 + \beta_1 X_1 + \beta_2 X_2 = 0 \implies$ \textbf{직선} 경계.
@@ -8087,11 +8073,9 @@ print('Estimated beta0: \n', logreg_poly.intercept_)
     
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 14: 로지스틱 회귀 복습 (Review)
+% Lecture 14: 로지스틱 회귀 복습 (Review)
 %=======================================================================
 \chapter{로지스틱 회귀 복습 (Review)}
 \label{ch:lecture14}
@@ -8112,9 +8096,6 @@ print('Estimated beta0: \n', logreg_poly.intercept_)
 민감도, 특이도, ROC 커브, AUC의 개념을 상세히 설명합니다.
 \end{summarybox}
 
-
-
-\newpage
 
 %================================================================================
 \section{로지스틱 회귀 복습 (Review)}
@@ -8174,7 +8155,6 @@ $$ \text{Loss (Binary Cross-Entropy)} = - \sum_{i=1}^{n} \left[ y_i \ln(p_i) + (
 선형 회귀와 달리 한 번에 풀리는 해(Closed-form solution)가 없으며,
 \textbf{경사 하강법(Gradient Descent)}과 같은 수치 최적화(Numerical Optimization) 기법을 사용해 $\beta$ 값을 반복적으로 찾아나갑니다.
 
-\newpage
 
 %================================================================================
 \section{로지스틱 회귀의 추론 (Inference)}
@@ -8254,7 +8234,6 @@ $\beta$ 값 자체보다 $e^{\beta}$ (지수 변환) 값이 훨씬 직관적입�
   이는 기준이 되는 확률(baseline probability)에 따라 그 변화량이 달라지는 비선형(non-linear) 관계입니다.
 \end{warningbox}
 
-\newpage
 
 %================================================================================
 \section{다중 로지스틱 회귀와 상호작용}
@@ -8304,7 +8283,6 @@ $$ \ln\left(\frac{P}{1-P}\right) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots +
   만약 $\beta_3$가 0이라면 (상호작용이 없다면), 두 그룹의 나이 기울기는 $\beta_1$로 동일할 것입니다.
 \end{examplebox}
 
-\newpage
 
 %================================================================================
 \section{분류와 결정 경계 (Classification \& Decision Boundary)}
@@ -8363,7 +8341,6 @@ $$ \ln(\text{Odds}) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p = 0 $$
 
 \textit{[이미지 삽입: 왼쪽은 직선으로 두 클래스를 나누는 결정 경계, 오른쪽은 곡선(원형)으로 두 클래스를 나누는 결정 경계를 보여줌]}
 
-\newpage
 
 %================================================================================
 \section{정규화 (Regularization)}
@@ -8392,7 +8369,7 @@ $$ \text{Loss}_{\text{Regularized}} = \underbrace{\text{Loss (Binary Cross-Entro
 \begin{warningbox}
   \textbf{sklearn의 `C` 파라미터 이해하기}
 
-  `sklearn.linear_model.LogisticRegression`에서는 $\lambda$ 대신 $C$라는 파라미터를 사용합니다.
+  \texttt{sklearn.linear\_model.LogisticRegression}에서는 $\lambda$ 대신 $C$라는 파라미터를 사용합니다.
   $C$는 $\lambda$의 역수 ($C = 1/\lambda$) 개념입니다.
 
   \begin{itemize}
@@ -8420,7 +8397,6 @@ grid_search = GridSearchCV(LogisticRegression(penalty='l2'), params, cv=5)
 # print(grid_search.best_params_)
 \end{lstlisting}
 
-\newpage
 
 %================================================================================
 \section{다중 클래스 로지스틱 회귀 (Multiclass)}
@@ -8439,7 +8415,7 @@ $Y$의 범주가 3개 이상일 때 (예: 'CS', 'Stat', 'Other') 사용하는 �
   \item \textbf{분류기 3:} 'Other' vs 'Not Other' (즉, 'CS' + 'Stat')
 \end{itemize}
 
-새로운 데이터가 들어오면, 3개의 분류기를 모두 돌려서 각각의 확률(또는 점수)을 계산한 뒤, 가장 높은 확률(점수)을 보인 클래스로 예측합니다. (`sklearn`의 `multi_class='ovr'`)
+새로운 데이터가 들어오면, 3개의 분류기를 모두 돌려서 각각의 확률(또는 점수)을 계산한 뒤, 가장 높은 확률(점수)을 보인 클래스로 예측합니다. (`sklearn`의 \texttt{multi\_class='ovr'})
 
 \subsection{접근법 2: 다항 로지스틱 회귀 (Multinomial)}
 
@@ -8451,7 +8427,7 @@ OvR과 달리, $K$개의 클래스를 한 번에 처리하는 단일 모델을 �
   \item \textbf{모델 1:} $\ln\left(\frac{P(\text{CS})}{P(\text{Other})}\right) = \beta_0^{(1)} + \beta_1^{(1)} X + \dots$
   \item \textbf{모델 2:} $\ln\left(\frac{P(\text{Stat})}{P(\text{Other})}\right) = \beta_0^{(2)} + \beta_1^{(2)} X + \dots$
 \end{itemize}
-(`sklearn`의 `multi_class='multinomial'`)
+(`sklearn`의 \texttt{multi\_class='multinomial'})
 
 \subsection{Softmax: 점수를 확률로 변환하기}
 
@@ -8473,7 +8449,6 @@ Softmax를 통해 계산된 $K$개의 확률 중, \textbf{가장 높은 확률�
 $\implies$ 가장 높은 확률이 0.4로 두 개이므로, 둘 중 하나를 선택 (혹은 추가 규칙 적용).
 만약 $P(\text{Stat})=0.41$, $P(\text{Other})=0.39$ 였다면 $\hat{Y} = \text{Stat}$로 예측.
 
-\newpage
 
 %================================================================================
 \section{분류 모델 평가 (Evaluation)}
@@ -8535,7 +8510,6 @@ $\implies$ 가장 높은 확률이 0.4로 두 개이므로, 둘 중 하나를 �
   대부분이 False Positive이기 때문입니다.
 \end{warningbox}
 
-\newpage
 
 \subsection{임계값(Threshold)의 트레이드오프}
 
@@ -8595,7 +8569,6 @@ $\implies$ 가장 높은 확률이 0.4로 두 개이므로, 둘 중 하나를 �
 \end{itemize}
 AUC는 임계값에 상관없이 모델이 'Positive' 샘플을 'Negative' 샘플보다 얼마나 더 높은 확률로 예측하는지(순서)를 나타내는 지표입니다.
 
-\newpage
 
 %================================================================================
 \section{핵심 용어 정리}
@@ -8629,7 +8602,6 @@ AUC & Area Under the Curve & ROC 커브 아래 면적. 1에 가까울수록 좋�
 \end{adjustbox}
 \end{table}
 
-\newpage
 
 %================================================================================
 \section{학습 체크리스트}
@@ -8655,7 +8627,6 @@ AUC & Area Under the Curve & ROC 커브 아래 면적. 1에 가까울수록 좋�
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
 
 %================================================================================
 \section{1페이지 요약 (1-Page Summary)}
@@ -8705,22 +8676,14 @@ $X$의 1차항만 있으면 직선, 다항식/상호작용 항이 있으면 곡�
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 15: 핵심 용어 정리
+% Lecture 15: 핵심 용어 정리
 %=======================================================================
 \chapter{핵심 용어 정리}
 \label{ch:lecture15}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 15}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 15의 핵심 개념 학습}
-
-
-
-\newpage
-
-
 
 
 \begin{abstract}
@@ -8732,7 +8695,6 @@ $X$의 1차항만 있으면 직선, 다항식/상호작용 항이 있으면 곡�
 마지막으로, 파라미터를 확률 분포로 간주하는 \textbf{베이즈(Bayesian) 추론}의 기본 개념과, 이항 분포의 켤레 사전 확률인 \textbf{베타 분포(Beta Distribution)}를 활용한 \textbf{베타-이항 모델}을 살펴보고, \textbf{계층 모델(Hierarchical Model)}의 필요성을 소개합니다.
 \end{abstract}
 
-\newpage
 
 %--- 용어 정리 ---
 \section{핵심 용어 정리}
@@ -8770,7 +8732,6 @@ $X$의 1차항만 있으면 직선, 다항식/상호작용 항이 있으면 곡�
 \end{itemize}
 \end{defbox}
 
-\newpage
 
 %================================================================================
 \section{다중 클래스 로지스틱 회귀 (Multiclass Logistic Regression)}
@@ -8908,7 +8869,6 @@ $$ P_k = \frac{e^{s_k}}{\sum_{j=1}^{K} e^{s_j}} $$
 이진 분류의 손실 함수를 \textbf{Binary Cross-Entropy}라고 불렀습니다.
 다중 클래스 분류의 손실 함수는 이를 일반화한 \textbf{Cross-Entropy} (또는 Multinomial Logistic Loss)라고 부릅니다. 이 손실 함수에 Ridge(L2)나 Lasso(L1) 페널티 항을 추가하여 \textbf{정규화(Regularization)}를 수행할 수 있습니다.
 
-\newpage
 
 %================================================================================
 \section{분류 모델 평가 (Evaluating Classifiers)}
@@ -9014,7 +8974,6 @@ ROC 곡선은 모델의 전체적인 성능을 보여주지만, 두 모델의 �
 
 AUC는 임계값에 관계없이 모델이 얼마나 Positive와 Negative 샘플을 잘 구별하는지 나타내는 지표입니다. AUC가 높을수록 좋은 모델입니다.
 
-\newpage
 
 %================================================================================
 \section{베이즈 추론 (Bayesian Inference)}
@@ -9134,7 +9093,6 @@ $$ f(p | X) \propto p^{(\alpha + \Sigma x_i) - 1} \cdot (1-p)^{(\beta + n - \Sig
 \end{itemize}
 \end{examplebox}
 
-\newpage
 
 %================================================================================
 \section{베이즈 로지스틱 회귀와 계층 모델}
@@ -9199,21 +9157,15 @@ $$ \log\left(\frac{p_{ij}}{1-p_{ij}}\right) = \alpha_j + \beta_1 X_{ij} $$
 즉, 데이터가 부족한 관측치(신인 선수)의 추정값을 리그 평균 쪽으로 당겨와(shrink) 더 안정적인 추론을 가능하게 합니다.
 \end{examplebox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 16: Lecture 16
+% Lecture 16: Lecture 16
 %=======================================================================
 \chapter{Lecture 16}
 \label{ch:lecture16}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 16}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 16의 핵심 개념 학습}
 
-
-
-
-\newpage
 
 % ====================================================================
 % 섹션 1: 개요
@@ -9232,7 +9184,6 @@ $$ \log\left(\frac{p_{ij}}{1-p_{ij}}\right) = \alpha_j + \beta_1 X_{ij} $$
 마지막으로, 복잡한 모델(계층 모델)의 해를 구하기 위한 강력한 시뮬레이션 도구인 MCMC와 Metropolis-Hastings 알고리즘의 원리를 학습합니다.
 \end{summarybox}
 
-\newpage
 
 % ====================================================================
 % 섹션 2: 용어 정리
@@ -9261,7 +9212,6 @@ MCMC & 사후 확률 분포가 복잡해서 수식으로 풀 수 없을 때, 샘
 \end{tabular}
 \end{adjustbox}
 
-\newpage
 
 % ====================================================================
 % 섹션 3: 핵심 개념 및 원리
@@ -9424,7 +9374,6 @@ $$ \underbrace{P(\theta | D)}_{\text{사후 확률}} \propto \underbrace{P(D | \
     이 과정을 수천 번 반복하면, 등산가가 머물렀던 위치(발자국)의 분포가 정확히 산맥의 형태(사후분포)와 일치하게 됩니다.
 \end{itemize}
 
-\newpage
 
 % ====================================================================
 % 섹션 4: 절차 및 방법 (scikit-learn)
@@ -9529,7 +9478,6 @@ grid_search = GridSearchCV(
     \item \textbf{\texttt{plt.contourf}}: 예측 결과(0 또는 1)에 따라 격자점을 다른 색으로 칠하여, 모델이 만든 경계선을 시각화합니다.
 \end{itemize}
 
-\newpage
 
 % ====================================================================
 % 섹션 5: 실습, 코드, 오류 (pymc)
@@ -9613,7 +9561,6 @@ MCMC 샘플링 후, \texttt{az.summary(trace)}는 다음과 같은 요약 통계
     \item \textbf{r\_hat ($\hat{R}$):} \textbf{가장 중요한 진단 지표.} 여러 개의 MCMC 체인(무작위 탐색가)들이 모두 같은 결과(분포)로 수렴했는지를 봅니다. \textbf{정확히 1.0}이거나 1.01 미만이어야만 결과를 신뢰할 수 있습니다. 1.1 이상이면 샘플링이 실패했다는 뜻입니다.
 \end{itemize}
 
-\newpage
 
 % ====================================================================
 % 섹션 6: 학습 체크리스트
@@ -9633,7 +9580,6 @@ MCMC 샘플링 후, \texttt{az.summary(trace)}는 다음과 같은 요약 통계
     \item[\textendash] MCMC 결과에서 $\hat{R}$ (r\_hat) 지표가 1.0에 가까워야 하는 이유를 아는가?
 \end{itemize}
 
-\newpage
 
 % ====================================================================
 % 섹션 7: FAQ (자주 묻는 질문)
@@ -9675,8 +9621,6 @@ $$ \underbrace{\ln(\frac{p}{1-p})}_{\text{범위: } (-\infty, \infty)} = \underb
 \end{itemize}
 \end{tcolorbox}
 
-
-\newpage
 
 % ====================================================================
 % 섹션 8: 빠르게 훑어보기 (1페이지 요약)
@@ -9729,100 +9673,615 @@ $$ \underbrace{\ln(\frac{p}{1-p})}_{\text{범위: } (-\infty, \infty)} = \underb
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 17: 핵심 용어 정리
+% Lecture 17: Lecture 17
 %=======================================================================
-\chapter{핵심 용어 정리}
+\chapter{Lecture 17}
 \label{ch:lecture17}
 
-\metainfo{CS109A: 데이터 과학 입문}{Lecture 17}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 17의 핵심 개념 학습}
+\metainfo{CS109A: Introduction to Data Science}{Lecture 17}{UIUC Student}{베이즈 분석의 사후 분포 샘플링 기법과 결측치 처리 전략 학습}
 
 
-\begin{summarybox}
-본 강의는 MCMC (Markov Chain Monte Carlo)와 결측치 처리 방법을 다룹니다. MCMC는 복잡한 확률 분포에서 샘플을 추출하는 강력한 방법이며, 메트로폴리스-헤이스팅스 알고리즘의 원리와 번인(Burn-in), $\hat{R}$ 수렴 진단 방법을 학습합니다. 또한 데이터셋의 결측치를 적절히 처리하는 대치(Imputation) 기법과 그 한계를 이해합니다.
+\begin{overviewbox}
+이 문서는 베이즈(Bayes) 분석에서 복잡한 사후 분포(Posterior Distribution)를 다루는 방법과 데이터의 결측치(Missing Data)를 효과적으로 처리하는 전략을 다룹니다.
+주요 목표는 사후 분포의 특성을 추정하기 위한 몬테카를로(Monte Carlo) 시뮬레이션 기법, 특히 거부 샘플링(Rejection Sampling)과 마르코프 체인 몬테카를로(MCMC)의 메트로폴리스-헤이스팅스(Metropolis-Hastings) 알고리즘을 이해하는 것입니다.
+또한, 데이터 분석 시 흔히 발생하는 결측치의 유형을 파악하고, 통계적 편향을 최소화하면서 데이터를 활용하는 다양한 처리 방안을 학습합니다.
+이론적 배경과 실제 코드 예시를 통해 비전공자도 쉽게 접근할 수 있도록 설명합니다.
+\end{overviewbox}
+
+\newsection{용어 정리}
+데이터 과학에서 사용되는 주요 용어들을 정리했습니다. 각 용어의 개념과 중요성을 이해하는 데 도움이 될 것입니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+사전 분포 & 데이터를 관찰하기 전, 모수에 대한 우리의 믿음 & Prior Distribution & 베이즈 추론의 시작점 \\
+가능도 & 주어진 모수에서 현재 데이터가 관찰될 확률 & Likelihood & 데이터가 모수에 대해 알려주는 정보 \\
+사후 분포 & 데이터를 관찰한 후, 모수에 대한 업데이트된 믿음 & Posterior Distribution & 베이즈 추론의 최종 결과 \\
+켤레 사전 분포 & 사후 분포가 사전 분포와 같은 형태를 유지하게 하는 사전 분포 & Conjugate Prior & 수학적 계산을 단순화 \\
+몬테카를로 방법 & 무작위 샘플링을 통해 분포의 특성을 추정하는 시뮬레이션 기법 & Monte Carlo Methods & 복잡한 문제 해결에 유용 \\
+거부 샘플링 & 제안 분포에서 샘플을 생성하고, 특정 기준에 따라 일부를 버려 목표 분포를 따르는 샘플을 얻는 방법 & Rejection Sampling & 고차원에서는 비효율적일 수 있음 \\
+마르코프 체인 & 다음 상태가 현재 상태에만 의존하고 과거 상태에는 독립적인 확률 과정 & Markov Chain & "기억 상실" 속성 \\
+MCMC & 마르코프 체인을 사용하여 목표 분포에서 샘플을 생성하는 몬테카를로 방법 & Markov Chain Monte Carlo & 복잡한 사후 분포 샘플링에 널리 사용 \\
+메트로폴리스-헤이스팅스 & MCMC의 한 종류로, 제안된 샘플을 수락하거나 거부하는 확률적 규칙을 사용 & Metropolis-Hastings Algorithm & MCMC의 핵심 알고리즘 중 하나 \\
+번인 기간 & MCMC 체인이 목표 분포에 수렴하기까지 초기 샘플을 버리는 기간 & Burn-in Period & 초기화 지점의 영향을 줄임 \\
+트레이스 플롯 & MCMC 샘플이 시간(반복)에 따라 어떻게 변화하는지 보여주는 시계열 그래프 & Trace Plot & 수렴 여부 진단에 사용 \\
+유효 샘플 크기 & MCMC 샘플의 독립적인 정보량을 나타내는 지표 & Effective Sample Size (ESS) & 샘플 간 상관관계를 고려 \\
+R-hat & MCMC 체인의 수렴 여부를 진단하는 통계량 & R-hat & 1에 가까울수록 수렴을 의미 \\
+결측치 & 데이터셋에 값이 없는 경우 & Missing Data & 데이터 분석의 일반적인 문제 \\
+MCAR & 결측이 다른 변수나 결측 자체와 완전히 무관하게 발생 & Missing Completely At Random & 가장 이상적인 결측 유형 \\
+MAR & 결측이 관측된 다른 변수와 관련되어 발생 & Missing At Random & 관측된 변수로 결측을 설명 가능 \\
+MNAR & 결측이 관측되지 않은 변수나 결측 자체의 값과 관련되어 발생 & Missing Not At Random & 가장 다루기 어려운 결측 유형 \\
+대체 (결측치) & 결측된 값을 다른 값으로 채우는 과정 & Imputation & 데이터 손실을 줄이는 방법 \\
+결측 지시 변수 & 특정 값이 결측되었음을 나타내는 이진 변수 & Missingness Indicator Variable & 결측의 영향을 모델링 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newsection{강의 공지 및 중간고사 리뷰}
+
+\begin{infobox}[title=11월 첫 수업 공지]
+11월의 첫 수업에 오신 것을 환영합니다! 할로윈 주말은 잘 보내셨기를 바랍니다.
+가끔은 즐거운 시간을 보내는 것도 중요합니다. 저는 아이들과 함께 트릭 오어 트릿을 다녀왔고, 두 개의 베개 커버를 가득 채웠습니다.
+작은 아이는 20파운드, 큰 아이는 10파운드 정도의 사탕을 모았습니다.
+제 아이들은 사탕을 잘 먹지 않으니, 이번 주 언제든 제 사무실에 들러 사탕을 가져가세요!
+\end{infobox}
+
+\begin{infobox}[title=이번 주 마감 기한]
+\begin{itemize}
+    \item \textbf{프로젝트 마일스톤}: 프로젝트 주제를 업데이트하는 것입니다. 데이터를 탐색하고 프로젝트 질문을 재정의하는 시간을 가지세요.
+    \item \textbf{과제 (Problem Set)}: 내일(수업 다음 날)까지 제출해야 하는 과제가 있습니다. 모델링, 결과 해석, 그리고 베이즈(Bayes) 개념이 포함됩니다. 오피스 아워에 참여하여 도움을 받으세요.
+\end{itemize}
+\end{infobox}
+
+\begin{tcolorbox}[infobox, title={강의 중 언급: 오늘의 비밀 단어}]
+오늘의 비밀 단어는 \textbf{Rainbow}입니다.
+\end{tcolorbox}
+
+\subsection*{중간고사 성적 분포 및 평가 기준}
+중간고사 성적 분포와 전반적인 평가 기준에 대해 안내합니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-midterm-grades.png}  % Image not found: example-midterm-grades.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{CS109A 및 CS209 중간고사 성적 분포 (백분율)}
+    \label{fig:midterm_grades}
+\end{figure}
+
+\begin{infobox}[title=중간고사 성적 요약]
+\begin{itemize}
+    \item \textbf{CS109A}: 평균 75점, 중앙값 77점, 표준편차 13점. 최고점은 100점.
+    \item \textbf{CS209}: 평균 77.5점 (109A보다 약 2.5점 높음).
+    \item \textbf{분포 특징}: 두 과목 모두 왼쪽으로 치우친(Left-skewed) 분포를 보입니다. 이는 평균이 50점 이상일 때 흔히 나타나는 현상입니다. 80~90점대에 데이터가 집중되어 있습니다.
+    \item \textbf{이봉성(Bimodality) 가능성}: 분포에서 두 개의 봉우리(mode)가 나타날 수 있으며, 이는 그룹 내에 잠재적인 하위 그룹이 존재할 수 있음을 시사합니다.
+    \item \textbf{점수 조정}: Canvas에는 80점 만점으로 표시되지만, 이는 코딩 부분이 아직 반영되지 않았기 때문입니다. 코딩 부분(총점의 20\%)이 추가되면 대부분의 성적이 상향 조정될 것입니다.
+\end{itemize}
+\end{infobox}
+
+\begin{infobox}[title=성적 평가 철학]
+\begin{itemize}
+    \item \textbf{목표}: 학생들의 이해도와 숙련도를 정확하게 반영하는 성적을 부여하는 것이 목표입니다. 성적을 인위적으로 낮추려는 시도는 없습니다.
+    \item \textbf{최종 성적 기여 요소}: 중간고사는 최종 성적의 한 부분일 뿐입니다. 과제(Problem Sets), 퀴즈(Quizzes), 기말고사(Final Exam), 프로젝트(Project) 등 모든 요소가 최종 성적에 기여합니다.
+    \item \textbf{등급 기준}:
+    \begin{itemize}
+        \item 90점 이상: A- 또는 A
+        \item 80점대: B 범위
+    \end{itemize}
+    \item \textbf{경계 조정}: 등급 경계는 자연스러운 점수 간의 간격(gap)을 찾아 미세하게 조정될 수 있습니다. 예를 들어, 90점과 89.99점 사이의 학생은 동일한 수준으로 간주하여 등급 경계를 유연하게 적용합니다.
+    \item \textbf{과거 이력}: 과거에는 대다수의 학생들이 A 또는 A-를 받았고, 그 다음으로 B를 받았으며, 그 이하의 성적을 받은 학생은 소수였습니다.
+\end{itemize}
+성적에 대해 궁금한 점이 있다면 언제든지 저희에게 문의해 주세요. 중간고사 해답은 Ed에 게시되어 있습니다.
+\end{infobox}
+
+\newsection{핵심 개념·원리: 사후 분포 샘플링}
+
+\subsection*{베이즈 분석과 사후 분포의 중요성}
+베이즈 분석은 사전 믿음(prior belief)과 데이터를 통해 얻은 가능도(likelihood)를 결합하여 모수(parameter)에 대한 사후 분포(posterior distribution)를 도출하는 통계적 접근 방식입니다. 이 사후 분포는 미지의 모수를 확률 변수처럼 취급하며, 모수에 대한 우리의 업데이트된 믿음을 나타냅니다.
+
+\begin{infobox}[title=사후 분포의 활용]
+\begin{itemize}
+    \item \textbf{모수 추정}: 미지의 모수에 대한 분포를 제공합니다.
+    \item \textbf{미래 관측치 예측}: 수집된 데이터를 바탕으로 미래 관측치가 어디에 있을지 예측하는 데 사용됩니다. 이는 모수의 자연적인 변동성과 분포를 모두 고려해야 하므로 복잡한 과정입니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{켤레 사전 분포(Conjugate Prior)의 편리함}
+베이즈 분석에서 사전 분포와 가능도를 결합했을 때 사후 분포가 사전 분포와 동일한 형태를 가지는 경우, 이를 켤레 사전 분포라고 합니다. 이는 수학적 계산을 매우 편리하게 만들어 줍니다.
+
+\begin{examplebox}[title=켤레 사전 분포의 예시]
+\begin{itemize}
+    \item \textbf{회귀 문제 (정규 분포 응답 변수)}:
+    \begin{itemize}
+        \item 모수 $\mu$ 또는 $\beta$에 정규 분포(Normal Distribution) 사전 분포를 사용하면, 사후 분포도 정규 분포가 됩니다.
+        \item 분산(variance)의 역수(inverse)에 감마 분포(Gamma Distribution) 사전 분포를 사용하면, 사후 분포도 감마 분포가 됩니다.
+    \end{itemize}
+    \item \textbf{분류 문제 (이항 분포 응답 변수)}:
+    \begin{itemize}
+        \item 이항 분포(Binomial Distribution)의 모수 $P$에 베타 분포(Beta Distribution) 사전 분포를 사용하면, 사후 분포도 베타 분포가 됩니다. (베타-이항 모델)
+    \end{itemize}
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{켤레 사전 분포가 깨지는 경우: 로지스틱 회귀}
+하지만 모든 경우에 켤레 사전 분포를 사용할 수 있는 것은 아닙니다. 특히 로지스틱 회귀(Logistic Regression)와 같이 비선형 함수(logistic function)를 통해 모수와 확률을 연결하는 모델에서는 켤레 사전 분포의 이점이 사라집니다.
+
+\begin{warningbox}[title=로지스틱 회귀의 문제점]
+로지스틱 회귀에서는 미지의 $\beta$ 모수에 정규 분포 사전 분포를 사용하더라도, 사후 분포는 특정 이름이 없는 복잡한 형태를 가지게 됩니다.
+이러한 경우, 사후 분포의 수학적 형태를 직접적으로 알 수 없으므로, 이 분포에서 샘플을 추출하는 것이 어려워집니다.
+\end{warningbox}
+
+\subsection*{사후 분포 샘플링의 필요성: 몬테카를로 방법}
+사후 분포가 복잡하여 명확한 수학적 형태를 가지지 않을 때, 우리는 시뮬레이션을 통해 이 분포의 특성을 추정해야 합니다. 이를 위해 몬테카를로(Monte Carlo) 방법이 사용됩니다. 몬테카를로는 무작위 샘플링을 통해 분포의 평균, 중앙값, 신뢰 구간(credible interval) 등을 추정하는 기법입니다.
+
+\begin{infobox}[title=몬테카를로 방법의 핵심]
+\begin{itemize}
+    \item \textbf{무작위 샘플 생성}: 분포에서 무작위로 많은 샘플을 생성합니다.
+    \item \textbf{경험적 추정}: 생성된 샘플들의 히스토그램을 통해 분포의 모양을 파악하고, 샘플 통계량(평균, 중앙값, 분위수 등)을 계산하여 분포의 특성을 추정합니다.
+    \item \textbf{유사 사례}: 부트스트랩(Bootstrapping)이나 순열 검정(Permutation Testing)과 같이 확률 이론을 직접 적용하기 어려울 때 분포를 경험적으로 추정하는 방식과 유사합니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{두 가지 주요 샘플링 접근 방식}
+복잡한 사후 분포에서 샘플을 추출하기 위한 두 가지 주요 몬테카를로 접근 방식은 다음과 같습니다.
+\begin{enumerate}
+    \item \textbf{거부 샘플링 (Rejection Sampling)}: 다트 던지기와 유사한 방식으로 샘플을 수락하거나 거부합니다.
+    \item \textbf{마르코프 체인 몬테카를로 (Markov Chain Monte Carlo, MCMC)}: 특히 메트로폴리스-헤이스팅스(Metropolis-Hastings) 알고리즘을 사용하여 마르코프 체인을 따라 분포를 탐색합니다.
+\end{enumerate}
+
+\newsection{절차/방법: 사후 분포 샘플링 기법}
+
+\subsection*{1. 거부 샘플링 (Rejection Sampling)}
+거부 샘플링은 목표 분포(target distribution)에서 직접 샘플링하기 어려울 때, 더 쉽게 샘플링할 수 있는 제안 분포(proposal distribution)를 사용하여 목표 분포를 따르는 샘플을 얻는 방법입니다.
+
+\begin{examplebox}[title=거부 샘플링 비유: 다트 던지기]
+단위 원(unit circle)에서 샘플링하고 싶지만, 단위 사각형(unit square)에서만 샘플을 얻을 수 있다고 가정해 봅시다.
+\begin{enumerate}
+    \item 단위 사각형 내에서 무작위로 점(다트)을 던집니다.
+    \item 만약 그 점이 단위 원 안에 떨어지면(목표에 맞으면), 그 점을 유지합니다.
+    \item 만약 그 점이 단위 원 밖에 떨어지면(목표를 벗어나면), 그 점을 버립니다.
+\end{enumerate}
+이 과정을 반복하면, 단위 원 안에 있는 점들만 남게 되어 단위 원의 분포를 따르는 샘플을 얻을 수 있습니다.
+\end{examplebox}
+
+\subsubsection*{거부 샘플링의 원리}
+\begin{enumerate}
+    \item \textbf{목표 분포 ($P(x)$)}: 우리가 샘플링하고자 하는 복잡한 사후 분포입니다.
+    \item \textbf{제안 분포 ($Q(x)$)}: 우리가 쉽게 샘플링할 수 있는 알려진 분포입니다 (예: 정규 분포).
+    \item \textbf{스케일링}: 제안 분포 $Q(x)$에 상수 $M$을 곱하여 $M \cdot Q(x)$가 목표 분포 $P(x)$의 모든 지점에서 $P(x)$보다 크거나 같도록 만듭니다. 즉, $P(x) \le M \cdot Q(x)$를 만족해야 합니다.
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-rejection-sampling.png}  % Image not found: example-rejection-sampling.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{거부 샘플링의 시각적 원리: 제안 분포(빨간색)와 목표 분포(검은색)}
+    \label{fig:rejection_sampling_visual}
+\end{figure}
+
+\subsubsection*{거부 샘플링 절차}
+\begin{enumerate}
+    \item \textbf{샘플 제안}: 제안 분포 $Q(x)$에서 후보 샘플 $x^*$를 추출합니다.
+    \item \textbf{균일 분포 샘플링}: 0과 1 사이의 균일 분포(Uniform Distribution)에서 무작위 값 $u$를 추출합니다.
+    \item \textbf{수락/거부 결정}:
+    \begin{itemize}
+        \item 만약 $u < \frac{P(x^*)}{M \cdot Q(x^*)}$ 이면, $x^*$를 수락(accept)합니다.
+        \item 그렇지 않으면, $x^*$를 거부(reject)하고 1단계로 돌아갑니다.
+    \end{itemize}
+\end{enumerate}
+이 과정을 충분히 반복하면, 수락된 샘플들은 목표 분포 $P(x)$를 따르게 됩니다.
+
+\begin{examplebox}[title=쿠키 몬스터 예시: 다봉형 분포 샘플링]
+쿠키 몬스터가 여러 종류의 쿠키(초콜릿 칩, 오트밀 건포도, 땅콩 버터, 설탕) 직경 분포를 알고 싶어 합니다. 각 쿠키 종류는 다른 정규 분포를 따르며, 이들을 합치면 여러 개의 봉우리(peak)를 가진 복잡한 분포(예: 3개의 봉우리)가 됩니다. 이 복잡한 분포에서 샘플링하는 것이 목표입니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-cookie-monster-pdf.png}  % Image not found: example-cookie-monster-pdf.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{쿠키 직경의 목표 분포 (검은색)와 제안 분포 (빨간색 정규 분포)}
+    \label{fig:cookie_monster_pdf}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{목표 분포}: 여러 정규 분포가 결합된 복잡한 쿠키 직경 분포 (검은색 곡선).
+    \item \textbf{제안 분포}: 단일 정규 분포 (빨간색 곡선). 이 제안 분포는 목표 분포를 완전히 덮도록 스케일링됩니다.
+    \item \textbf{샘플링 과정}:
+    \begin{enumerate}
+        \item 빨간색 제안 분포에서 쿠키 직경 값 $x^*$를 샘플링합니다.
+        \item 0~1 사이의 균일 분포에서 $u$를 샘플링합니다.
+        \item $x^*$ 지점에서 검은색 곡선의 높이와 빨간색 곡선의 높이를 비교합니다.
+        \item 만약 $u$가 $\frac{\text{검은색 곡선 높이}(x^*)}{\text{빨간색 곡선 높이}(x^*)}$보다 작으면 $x^*$를 유지하고, 그렇지 않으면 버립니다.
+    \end{enumerate}
+    \item \textbf{결과}: 이 과정을 반복하면, 수락된 샘플들의 히스토그램은 검은색 목표 분포의 모양을 정확하게 반영하게 됩니다. 이 히스토그램을 통해 사후 평균, 95\% 신뢰 구간(credible interval) 등을 추정할 수 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{거부 샘플링의 한계}
+\begin{itemize}
+    \item \textbf{계산 비효율성}: 고차원 모수 공간(예: 20개 이상의 모수)에서는 제안 분포가 목표 분포를 완전히 덮도록 스케일링하기가 매우 어렵습니다. 이 경우 대부분의 샘플이 거부되어 수락률이 극히 낮아지고, 매우 많은 샘플을 생성해야 하므로 계산 비용이 커집니다 (차원의 저주, Curse of Dimensionality).
+    \item \textbf{제안 분포의 선택}: 제안 분포를 목표 분포와 유사하게 설정하는 것이 중요하지만, 이는 쉽지 않은 문제입니다.
+\end{itemize}
+
+\subsection*{2. 마르코프 체인 몬테카를로 (MCMC)}
+MCMC는 거부 샘플링의 비효율성을 극복하기 위해 고안된 방법입니다. 특히 메트로폴리스-헤이스팅스(Metropolis-Hastings) 알고리즘은 복잡한 사후 분포에서 샘플을 추출하는 데 널리 사용됩니다.
+
+\subsubsection*{마르코프 체인 (Markov Chain)의 개념}
+\begin{infobox}[title=마르코프 속성 (Markovian Property): 기억 상실]
+마르코프 체인은 "기억 상실(memoryless)" 속성을 가진 확률 과정입니다. 이는 다음 상태(time $t+1$)가 오직 현재 상태(time $t$)에만 의존하며, 그 이전의 과거 상태(time $t-1, t-2, \dots$)에는 의존하지 않는다는 의미입니다.
+\end{infobox}
+
+\begin{examplebox}[title=마르코프 속성 비유]
+\begin{itemize}
+    \item \textbf{날씨 예측}: 내일의 날씨를 예측하기 위해 오늘 날씨만 알면 충분하다고 가정한다면, 이는 마르코프 속성을 따릅니다. 과거의 모든 날씨 기록을 알 필요는 없습니다.
+    \item \textbf{주식 시장}: 오늘 주식 가격이 어제 주식 가격에만 의존하고, 그 이전의 가격 변동 과정에는 의존하지 않는다고 가정한다면, 이는 마르코프 과정으로 볼 수 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{MCMC의 목표}
+MCMC는 마르코프 체인을 구성하여 이 체인이 충분히 오랜 시간 동안 진화하면, 체인의 상태들이 우리가 샘플링하고자 하는 목표 분포(사후 분포)를 따르게 하는 것을 목표로 합니다. 즉, 분포를 통해 무작위 걸음(random walk)을 수행하는 것입니다.
+
+\subsubsection*{메트로폴리스-헤이스팅스 (Metropolis-Hastings) 알고리즘}
+메트로폴리스-헤이스팅스 알고리즘은 MCMC의 핵심으로, 현재 위치에서 다음 위치로 이동할지 여부를 확률적으로 결정하여 목표 분포를 탐색합니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-metropolis-hastings-walk.png}  % Image not found: example-metropolis-hastings-walk.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{메트로폴리스-헤이스팅스 알고리즘의 무작위 걸음 개념}
+    \label{fig:metropolis_hastings_walk}
+\end{figure}
+
+\begin{infobox}[title=메트로폴리스-헤이스팅스 알고리즘의 핵심 아이디어]
+\begin{enumerate}
+    \item \textbf{현재 위치}: 분포 내의 현재 모수 값($\theta_t$)을 알고 있습니다.
+    \item \textbf{새로운 위치 제안}: 제안 분포($Q(\theta' | \theta_t)$)를 사용하여 새로운 모수 값($\theta'$)을 제안합니다. 이 제안 분포는 현재 위치 $\theta_t$에 따라 달라질 수 있습니다.
+    \item \textbf{수락/거부 결정}: 제안된 $\theta'$로 이동할지 말지를 확률적으로 결정합니다. 이 결정은 목표 분포(사후 분포)의 높이와 제안 분포의 확률을 고려합니다.
+\end{enumerate}
+\end{infobox}
+
+\subsubsection*{메트로폴리스-헤이스팅스 절차}
+\begin{enumerate}
+    \item \textbf{초기화}: 모수 $\theta$의 초기 값 $\theta_0$를 설정합니다.
+    \item \textbf{반복}: $t=0, 1, 2, \dots$에 대해 다음을 반복합니다.
+    \begin{enumerate}
+        \item \textbf{새로운 값 제안}: 현재 값 $\theta_t$에서 제안 분포 $Q(\theta' | \theta_t)$를 사용하여 새로운 후보 값 $\theta'$를 샘플링합니다. (예: $\theta_t$를 중심으로 하는 정규 분포에서 샘플링)
+        \item \textbf{수락 확률 계산}: 다음 수락 확률 $\alpha$를 계산합니다.
+        \[ \alpha = \min \left( 1, \frac{P(\theta' | \text{data}) \cdot Q(\theta_t | \theta')}{P(\theta_t | \text{data}) \cdot Q(\theta' | \theta_t)} \right) \]
+        여기서 $P(\theta | \text{data})$는 목표 사후 분포의 밀도 함수입니다. 중요한 점은 사후 분포의 정규화 상수(normalizing constant)를 몰라도 비율 계산에는 문제가 없다는 것입니다.
+        \item \textbf{수락/거부}: 0과 1 사이의 균일 분포에서 무작위 값 $u$를 샘플링합니다.
+        \begin{itemize}
+            \item 만약 $u < \alpha$ 이면, 새로운 값 $\theta'$를 수락합니다. 즉, $\theta_{t+1} = \theta'$.
+            \item 그렇지 않으면, 새로운 값을 거부하고 현재 값에 머무릅니다. 즉, $\theta_{t+1} = \theta_t$.
+        \end{itemize}
+    \end{enumerate}
+\end{enumerate}
+
+\begin{infobox}[title=수락 확률 $\alpha$의 직관적 의미]
+\begin{itemize}
+    \item \textbf{확률이 더 높은 곳으로 이동}: 만약 제안된 $\theta'$의 사후 확률 밀도가 현재 $\theta_t$보다 높다면 (즉, "언덕 위로" 이동한다면), $\alpha$는 1에 가까워져 거의 항상 수락됩니다.
+    \item \textbf{확률이 더 낮은 곳으로 이동}: 만약 제안된 $\theta'$의 사후 확률 밀도가 현재 $\theta_t$보다 낮다면 (즉, "언덕 아래로" 이동한다면), $\alpha$는 1보다 작아져 특정 확률로만 수락됩니다. 이는 체인이 지역 최댓값(local maximum)에 갇히지 않고 분포 전체를 탐색할 수 있도록 돕습니다.
+    \item \textbf{제안 분포의 영향}: $Q(\theta_t | \theta')$와 $Q(\theta' | \theta_t)$ 항은 제안 분포가 대칭적이지 않을 때 편향을 보정하는 역할을 합니다.
+\end{itemize}
+\end{infobox}
+
+\newsection{실습/코드/오류와 해결: MCMC를 이용한 로지스틱 회귀}
+
+\subsection*{예시: 스키틀즈(Skittles) 맛 선호도 모델링}
+스키틀즈에서 새로운 망고 맛을 출시하려고 합니다. 각 배치에 들어갈 망고 에센스 재료의 양(dosage, X)이 맛 선호도(Y)에 미치는 영향을 파악하여 최적의 레시피를 찾고자 합니다.
+
+\begin{infobox}[title=데이터 및 모델 설정]
+\begin{itemize}
+    \item \textbf{독립 변수 (X)}: 망고 에센스 재료의 양 (연속형 수치).
+    \item \textbf{종속 변수 (Y)}: 맛을 좋아하는 사람의 수.
+    \item \textbf{데이터 구조}: 각 재료 양(X)에 대해 $N$명의 테스터가 맛을 보고, 그 중 $Y$명이 맛을 좋아한다고 응답한 데이터.
+    \item \textbf{데이터 생성 과정}: 각 테스터의 응답은 베르누이 분포(Bernoulli Distribution)를 따르며, 이를 합산한 $Y$는 이항 분포(Binomial Distribution)를 따릅니다.
+    \item \textbf{모델}: 로지스틱 회귀 모델을 사용하여 재료 양(X)과 맛을 좋아할 확률($P$) 사이의 관계를 모델링합니다.
+    \[ \text{logit}(P) = \log\left(\frac{P}{1-P}\right) = \alpha + \beta X \]
+    여기서 $\alpha$는 절편(intercept), $\beta$는 기울기(slope)입니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{베이즈적 접근: 사전 분포 설정}
+$\alpha$와 $\beta$는 미지의 모수이므로, 베이즈적 접근을 위해 이들에 대한 사전 분포를 설정해야 합니다. 로짓 스케일에서 $\alpha$와 $\beta$는 무한한 값을 가질 수 있으므로, 무한한 범위를 가지는 정규 분포(Normal Distribution)를 사전 분포로 사용합니다.
+
+\begin{infobox}[title=사전 분포 설정 예시]
+\begin{itemize}
+    \item \textbf{기울기 $\beta$}: 관계가 없을 것이라는 중립적인 믿음으로 평균 0을 설정합니다. 사전 정보가 많지 않으므로, 분산(표준편차)을 매우 크게 설정하여 비정보적(non-informative) 사전 분포를 만듭니다.
+    \item \textbf{절편 $\alpha$}: 재료 양이 0일 때 50:50의 확률로 맛을 좋아할 것이라는 믿음으로 평균 0을 설정하고, 마찬가지로 큰 분산을 부여합니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{사후 분포의 형태}
+이항 분포 가능도와 정규 분포 사전 분포를 결합하면, 사후 분포는 복잡한 형태를 가지며, 켤레 사전 분포가 아니므로 명확한 수학적 이름이 없습니다.
+\[ P(\alpha, \beta | \text{data}) \propto P(\text{data} | \alpha, \beta) \cdot P(\alpha) \cdot P(\beta) \]
+\[ P(\alpha, \beta | \text{data}) \propto \left( \prod_{i=1}^{N} \binom{n_i}{y_i} p_i^{y_i} (1-p_i)^{n_i-y_i} \right) \cdot N(\alpha | \mu_\alpha, \sigma_\alpha^2) \cdot N(\beta | \mu_\beta, \sigma_\beta^2) \]
+여기서 $p_i = \frac{e^{\alpha + \beta x_i}}{1 + e^{\alpha + \beta x_i}}$ 입니다.
+이 사후 분포의 정확한 형태는 모르지만, 주어진 $\alpha$와 $\beta$ 값에 대해 사후 분포의 "높이" (정규화 상수를 제외한 부분)는 계산할 수 있습니다.
+
+\subsubsection*{\texttt{pymc}를 이용한 MCMC 샘플링}
+Python의 \texttt{pymc}와 같은 라이브러리는 메트로폴리스-헤이스팅스 알고리즘을 사용하여 복잡한 사후 분포에서 샘플을 추출하는 과정을 자동화합니다.
+
+\begin{lstlisting}[style=pythonstyle, caption={\texttt{pymc}를 이용한 MCMC 모델 설정 및 샘플링 예시}, label={lst:pymc_mcmc}]
+import pymc as pm
+import numpy as np
+
+# 가상의 데이터 (강의 자료의 표와 유사)
+# dosage (X), total_testers (N), liked_flavor (Y)
+data = {
+    'X': np.array([1.88, 1.86, 1.89, 1.90, 1.87, 1.85, 1.91, 1.84]),
+    'N': np.array([60, 62, 58, 61, 59, 60, 63, 57]),
+    'Y': np.array([50, 51, 48, 52, 49, 50, 53, 47])
+}
+
+with pm.Model() as skittles_model:
+    # 1. 사전 분포 정의 (Priors)
+    # 비정보적 사전 분포를 위해 큰 표준편차를 가진 정규 분포 사용
+    alpha = pm.Normal("alpha", mu=0, sigma=100) # 절편
+    beta = pm.Normal("beta", mu=0, sigma=100)   # 기울기
+
+    # 2. 로지스틱 모델 정의 (Likelihood Link)
+    # logit(p) = alpha + beta * X
+    # p = exp(alpha + beta * X) / (1 + exp(alpha + beta * X))
+    p = pm.Deterministic("p", pm.math.invlogit(alpha + beta * data['X']))
+
+    # 3. 데이터의 가능도 정의 (Likelihood of Data)
+    # Y는 이항 분포를 따름 (N, p)
+    observed_data = pm.Binomial("observed_data", n=data['N'], p=p, observed=data['Y'])
+
+    # 4. MCMC 샘플링 수행
+    # draw: 샘플링할 반복 횟수
+    # tune: 번인(burn-in) 기간 (초기 불안정한 샘플 버림)
+    trace = pm.sample(draws=2000, tune=2000, cores=1) # cores=1은 단일 체인 실행
+\end{lstlisting}
+
+\begin{infobox}[title=MCMC 샘플링 과정의 주요 파라미터]
+\begin{itemize}
+    \item \textbf{\texttt{draws}}: 번인 기간 이후에 수집할 샘플의 수입니다. 이 샘플들이 사후 분포를 추정하는 데 사용됩니다.
+    \item \textbf{\texttt{tune} (번인 기간, Burn-in Period)}: MCMC 체인이 목표 분포에 수렴하기까지 초기 불안정한 샘플들을 버리는 기간입니다. 초기화 지점의 영향을 최소화하고 안정적인 샘플을 얻기 위함입니다.
+    \item \textbf{\texttt{cores}}: 병렬로 실행할 MCMC 체인의 수입니다. 여러 체인을 실행하면 수렴 진단에 도움이 됩니다.
+\end{itemize}
+\end{infobox}
+
+\subsection*{MCMC 결과 해석}
+
+\subsubsection*{1. 트레이스 플롯 (Trace Plot)}
+MCMC 샘플링이 완료되면, 각 모수(여기서는 $\alpha$와 $\beta$)에 대한 트레이스 플롯을 확인하여 체인의 수렴 여부를 진단합니다. 트레이스 플롯은 각 반복(iteration)마다 모수 값이 어떻게 변화했는지 보여주는 시계열 그래프입니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-mcmc-trace-plot.png}  % Image not found: example-mcmc-trace-plot.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{MCMC 트레이스 플롯 예시 (alpha 및 beta)}
+    \label{fig:mcmc_trace_plot}
+\end{figure}
+
+\begin{infobox}[title=트레이스 플롯 해석]
+\begin{itemize}
+    \item \textbf{안정성}: 이상적인 트레이스 플롯은 "EKG"처럼 특별한 패턴 없이 무작위로 진동하는 모습을 보여야 합니다. 이는 체인이 목표 분포에 도달하여 안정적으로 샘플링하고 있음을 의미합니다.
+    \item \textbf{수렴 실패 징후}: 만약 트레이스 플롯이 특정 방향으로 추세(trend)를 보이거나, 특정 값에 머무르는 등 패턴을 보인다면, 체인이 아직 수렴하지 않았을 수 있습니다. 이 경우 번인 기간을 늘리거나, 샘플링 횟수를 늘리거나, 초기화 지점을 변경하는 등의 조치가 필요할 수 있습니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{2. 사후 분포 히스토그램 (Posterior Distribution Histogram)}
+트레이스 플롯과 함께 각 모수의 사후 분포 히스토그램(또는 밀도 플롯)을 확인합니다. 이는 MCMC 샘플들이 형성하는 분포의 모양을 보여줍니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-mcmc-posterior-hist.png}  % Image not found: example-mcmc-posterior-hist.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{MCMC 샘플을 이용한 사후 분포 히스토그램 (alpha 및 beta)}
+    \label{fig:mcmc_posterior_hist}
+\end{figure}
+
+\begin{infobox}[title=히스토그램 해석]
+\begin{itemize}
+    \item \textbf{모수 $\beta$}: 스키틀즈 예시에서 $\beta$의 사후 분포는 약 25에서 42 사이의 양수 값을 가집니다. 이는 망고 에센스 재료의 양(X)이 맛 선호도(Y)에 긍정적인 영향을 미친다는 강력한 증거입니다.
+    \item \textbf{중심 경향성}: 분포의 중심(예: 사후 평균)을 파악할 수 있습니다. $\beta$의 경우 약 33~34 정도입니다.
+    \item \textbf{신뢰 구간 (Credible Interval)}: 분포의 95\% 분위수를 찾아 95\% 신뢰 구간을 추정할 수 있습니다. $\beta$의 경우 약 28에서 40 사이가 될 수 있습니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{3. 사후 분포 요약 통계 (Summary Statistics)}
+\texttt{pymc}는 각 모수에 대한 사후 분포의 요약 통계량을 제공합니다.
+
+\begin{lstlisting}[caption={\texttt{pymc} 사후 분포 요약 출력 예시}, label={lst:pymc_summary}]
+# pm.summary(trace) 결과 예시 (강의 자료 기반)
+#                 mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+# alpha        -62.11  10.23  -81.05  -43.02       0.23     0.16    2000.0    1800.0   1.00
+# beta          34.05   5.14   28.01   40.12       0.11     0.08    2000.0    1900.0   1.00
+\end{lstlisting}
+
+\begin{infobox}[title=주요 요약 통계량 설명]
+\begin{itemize}
+    \item \textbf{\texttt{mean} (사후 평균)}: 사후 분포의 평균입니다. $\beta$의 경우 약 34.05입니다.
+    \item \textbf{\texttt{sd} (사후 표준편차)}: 사후 분포의 표준편차입니다. $\beta$의 경우 약 5.14입니다.
+    \item \textbf{\texttt{hdi\_3%}, \texttt{hdi\_97%} (최고 밀도 구간, Highest Density Interval)}: 사후 분포의 94\% 신뢰 구간입니다 (기본값). $\beta$의 경우 약 28.01에서 40.12 사이입니다.
+    \item \textbf{\texttt{mcse\_mean} (MCMC 표준 오차)}: 사후 평균 추정치의 표준 오차입니다. MCMC 샘플이 독립적이지 않기 때문에 단순히 표준편차를 $\sqrt{N}$으로 나눈 것보다 더 정확한 추정치입니다.
+    \item \textbf{\texttt{ess\_bulk}, \texttt{ess\_tail} (유효 샘플 크기, Effective Sample Size, ESS)}: MCMC 샘플이 독립적인 관측치와 동일한 정보를 제공하는 정도를 나타냅니다. MCMC 샘플은 서로 상관관계가 있기 때문에, 실제 샘플 수(예: 2000개)보다 ESS가 작습니다. ESS가 클수록 추정치의 신뢰도가 높습니다.
+    \item \textbf{\texttt{r\_hat} (R-hat)}: MCMC 체인의 수렴 여부를 진단하는 통계량입니다. 이 값이 \textbf{1에 가까울수록} 체인이 잘 수렴했음을 나타냅니다. 1보다 훨씬 큰 값은 수렴 실패를 의미합니다.
+\end{itemize}
+\end{infobox}
+
+\newsection{결측치 처리 (Missing Data Handling)}
+
+데이터 과학에서 결측치(missing data)는 흔히 발생하는 문제이며, 이를 어떻게 처리하느냐에 따라 분석 결과에 큰 영향을 미칠 수 있습니다.
+
+\subsection*{결측치의 형태 및 \texttt{pandas}, \texttt{sklearn}의 동작}
+\begin{itemize}
+    \item \textbf{표시}: Excel 스프레드시트에서는 빈 셀로 나타나거나, CSV 파일에서는 공백으로 표시될 수 있습니다.
+    \item \textbf{\texttt{pandas}}: Python의 \texttt{pandas} 라이브러리는 이러한 결측치를 \texttt{NaN} (Not a Number) 또는 \texttt{NA} (Not Available)와 같은 특수 값으로 처리합니다.
+    \item \textbf{\texttt{sklearn}}: \texttt{scikit-learn}은 기본적으로 \texttt{NaN} 값을 처리하지 못하며, 결측치가 포함된 데이터가 입력되면 오류를 발생시킵니다. 따라서 \texttt{sklearn} 모델을 사용하기 전에 결측치를 명시적으로 처리해야 합니다.
+\end{itemize}
+
+\subsection*{결측치 처리의 기본 전략}
+결측치를 처리하는 가장 기본적인 두 가지 전략은 다음과 같습니다.
+
+\begin{enumerate}
+    \item \textbf{결측치 제거 (Dropping Missing Values)}:
+    \begin{itemize}
+        \item \textbf{행 제거}: 결측치가 포함된 행(관측치) 전체를 제거합니다 (\texttt{df.dropna(axis=0)}).
+        \item \textbf{열 제거}: 결측치가 많은 열(변수) 전체를 제거합니다.
+        \item \textbf{장점}: 구현이 간단합니다.
+        \item \textbf{단점}: 데이터 손실이 발생하여 표본 크기가 줄어들고, 중요한 정보가 유실될 수 있습니다. 특히 결측이 무작위가 아닐 경우 편향된 결과를 초래할 수 있습니다.
+    \end{itemize}
+    \item \textbf{결측치 대체 (Imputation)}:
+    \begin{itemize}
+        \item \textbf{평균/중앙값 대체}: 결측된 값을 해당 변수의 평균(mean) 또는 중앙값(median)으로 채웁니다 (\texttt{df.fillna(df.mean())}).
+        \item \textbf{장점}: 데이터 손실이 없어 표본 크기를 유지할 수 있습니다.
+        \item \textbf{단점}:
+        \begin{itemize}
+            \item 분포의 왜곡: 특히 평균 대체는 데이터의 분산을 과소평가하고, 분포의 모양을 실제와 다르게 만들 수 있습니다.
+            \item 통계적 편향: 추론(inference)을 목표로 할 때 통계적 편향을 유발할 수 있습니다. 예측(prediction)을 목표로 할 때는 상대적으로 덜 심각할 수 있지만, 여전히 문제가 될 수 있습니다.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{결측치 처리의 권장 방법: 결측 지시 변수 (Missingness Indicator Variable)}
+통계적 편향을 최소화하면서 결측치를 처리하는 간단하면서도 효과적인 방법은 \textbf{결측 지시 변수(missingness indicator variable)}를 생성하는 것입니다.
+
+\begin{infobox}[title=결측 지시 변수 생성 절차]
+\begin{enumerate}
+    \item \textbf{결측치 대체}: 결측된 값을 특정 값(예: 0 또는 해당 변수의 평균/중앙값)으로 대체하여 새로운 변수(예: \texttt{X1\_star})를 만듭니다.
+    \item \textbf{지시 변수 생성}: 원래 변수에서 결측치가 있었던 위치를 나타내는 새로운 이진 변수(예: \texttt{X1\_miss})를 생성합니다. 결측치가 있었으면 1, 없었으면 0의 값을 가집니다.
+    \item \textbf{모델에 포함}: 분석 시 \texttt{X1\_star}와 \texttt{X1\_miss} 두 변수를 모두 모델에 포함합니다.
+\end{enumerate}
+\end{infobox}
+
+\begin{examplebox}[title=결측 지시 변수 활용 예시]
+\begin{itemize}
+    \item \textbf{수치형 변수}: 원래 변수 \texttt{X1}에 결측치가 있다면, \texttt{X1\_star} (결측치를 0으로 대체)와 \texttt{X1\_miss} (결측 여부 지시)를 함께 사용합니다. 이를 통해 모델은 결측치가 0으로 대체된 값의 효과와, 해당 값이 원래 결측이었다는 사실의 효과를 동시에 추정할 수 있습니다.
+    \item \textbf{범주형 변수}: 원래 범주형 변수 \texttt{X2} (예: 0 또는 1)에 결측치가 있다면, \texttt{X2\_star} (결측치를 새로운 범주, 예: -1 또는 'missing'으로 대체)와 \texttt{X2\_miss} (결측 여부 지시)를 함께 사용합니다. 이는 사실상 결측치를 하나의 새로운 범주로 취급하는 것과 유사합니다.
+\end{itemize}
+이 방법은 결측치가 단순히 "없음"이 아니라, 그 자체가 중요한 정보일 수 있다는 점을 모델에 반영할 수 있게 해줍니다.
+\end{examplebox}
+
+\subsection*{결측치의 유형 (Types of Missingness)}
+결측치가 발생하는 메커니즘은 크게 세 가지 유형으로 나눌 수 있으며, 이는 결측치 처리 전략을 선택하는 데 중요한 고려 사항입니다. 하지만 실제로는 어떤 유형인지 정확히 알기 어려운 경우가 많습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.2\textwidth} p{0.75\textwidth}}
+\toprule
+\textbf{유형} & \textbf{설명} \\
+\midrule
+\textbf{완전히 무작위 결측 (MCAR)} & \textbf{Missing Completely At Random} \\
+& 결측이 다른 어떤 변수와도 관련이 없고, 결측된 값 자체와도 무관하게 발생합니다. \\
+& 예: 데이터 입력 중 실수로 일부 값이 무작위로 누락된 경우. \\
+& \textit{가장 이상적인 경우이지만, 실제로는 드뭅니다.} \\
+\midrule
+\textbf{무작위 결측 (MAR)} & \textbf{Missing At Random} \\
+& 결측이 \textbf{관측된 다른 변수}와 관련되어 발생하지만, 결측된 값 자체와는 무관합니다. \\
+& 예: 남성보다 여성이 특정 설문 문항에 응답하지 않는 경향이 있지만, 그 응답하지 않은 내용 자체는 성별 외의 다른 요인과 무관한 경우. \\
+& \textit{관측된 변수를 통해 결측 메커니즘을 설명할 수 있습니다.} \\
+\midrule
+\textbf{비무작위 결측 (MNAR)} & \textbf{Missing Not At Random} \\
+& 결측이 \textbf{관측되지 않은 변수}나 \textbf{결측된 값 자체}와 관련되어 발생합니다. \\
+& 예: 소득이 높은 사람들이 자신의 소득을 기입하지 않는 경향이 있는 경우 (결측된 소득 값 자체가 결측 여부에 영향을 미침). \\
+& 예: 특정 질병을 가진 사람들이 병원 방문 기록을 숨기는 경우 (관측되지 않은 질병이 결측 여부에 영향을 미침). \\
+& \textit{가장 다루기 어려운 유형이며, 편향을 유발할 가능성이 가장 높습니다.} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{warningbox}[title=결측치 유형의 불확실성]
+실제 데이터 분석에서는 결측치가 어떤 유형에 속하는지 정확히 알기 어렵습니다. 따라서 결측 지시 변수를 사용하는 것과 같이, 결측 메커니즘의 영향을 모델에 포함하려는 노력이 중요합니다.
+\end{warningbox}
+
+\newsection{체크리스트}
+
+이 문서를 학습하고 활용하는 데 도움이 되는 체크리스트입니다.
+
+\begin{infobox}[title=학습 점검 체크리스트]
+\begin{itemize}
+    \item \textbf{베이즈 기본 개념}: 사전 분포, 가능도, 사후 분포의 관계를 이해했는가?
+    \item \textbf{켤레 사전 분포}: 켤레 사전 분포가 무엇이며, 왜 유용한지 설명할 수 있는가?
+    \item \textbf{MCMC 필요성}: 로지스틱 회귀와 같이 켤레 사전 분포가 깨질 때 MCMC가 왜 필요한지 설명할 수 있는가?
+    \item \textbf{거부 샘플링}: 거부 샘플링의 원리(다트 비유, 제안/목표 분포)와 절차를 이해했는가?
+    \item \textbf{MCMC 원리}: 마르코프 체인 속성(기억 상실)과 MCMC의 기본 아이디어를 이해했는가?
+    \item \textbf{메트로폴리스-헤이스팅스}: 알고리즘의 단계(제안, 수락 확률 계산, 수락/거부)를 설명할 수 있는가?
+    \item \textbf{MCMC 결과 해석}: 트레이스 플롯, 사후 분포 히스토그램, 요약 통계(ESS, R-hat)를 보고 MCMC 수렴 여부와 모수 추정치를 해석할 수 있는가?
+    \item \textbf{결측치 유형}: MCAR, MAR, MNAR의 차이점을 설명하고 각 유형의 의미를 이해했는가?
+    \item \textbf{결측치 처리 전략}: 결측치 제거, 단순 대체(평균/중앙값), 결측 지시 변수 사용의 장단점을 비교할 수 있는가?
+    \item \textbf{결측 지시 변수}: 결측 지시 변수를 사용하는 이유와 방법을 설명할 수 있는가?
+\end{itemize}
+\end{infobox}
+
+\begin{infobox}[title=코드 활용 체크리스트]
+\begin{itemize}
+    \item \textbf{\texttt{pymc} 모델 설정}: \texttt{pm.Model()} 내에서 사전 분포, 가능도 링크, 관측 데이터를 올바르게 정의할 수 있는가?
+    \item \textbf{\texttt{pm.sample()}}: \texttt{draws}, \texttt{tune} 파라미터의 의미를 이해하고 적절히 설정할 수 있는가?
+    \item \textbf{결과 시각화}: \texttt{pymc} trace plot 및 사후 분포 히스토그램을 생성하고 해석할 수 있는가?
+    \item \textbf{결측치 처리 구현}: \texttt{pandas}를 사용하여 결측치를 확인하고, \texttt{dropna()}, \texttt{fillna()}를 적용하거나 결측 지시 변수를 생성할 수 있는가?
+\end{itemize}
+\end{infobox}
+
+\newsection{FAQ (자주 묻는 질문)}
+
+\begin{tcolorbox}[infobox, title={Q: 왜 베이즈 분석에서 사후 분포를 샘플링해야 하나요?}]
+\textbf{A:} 베이즈 분석의 핵심은 모수에 대한 사후 분포를 얻는 것입니다. 하지만 사전 분포와 가능도를 결합했을 때, 사후 분포가 우리가 아는 정규 분포나 베타 분포처럼 예쁜 형태를 가지지 않는 경우가 많습니다. 이런 경우, 사후 분포의 평균, 중앙값, 신뢰 구간 등을 직접 계산하기 어렵기 때문에, 분포에서 많은 샘플을 추출하여 이 샘플들의 통계량을 통해 분포의 특성을 '경험적으로' 추정해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: 거부 샘플링과 MCMC의 주요 차이점은 무엇인가요?}]
+\textbf{A:} 거부 샘플링은 각 샘플이 독립적으로 생성되고 수락/거부됩니다. 목표 분포를 완전히 덮는 제안 분포가 필요하며, 고차원에서는 대부분의 샘플이 거부되어 비효율적입니다. 반면 MCMC는 마르코프 체인을 따라 샘플을 생성하며, 다음 샘플이 이전 샘플에 의존합니다. 목표 분포를 덮는 제안 분포가 필요 없고, 고차원에서도 비교적 효율적이지만, 샘플 간의 상관관계 때문에 '번인' 기간과 수렴 진단이 필요합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: MCMC에서 '번인(Burn-in)' 기간은 왜 필요한가요?}]
+\textbf{A:} MCMC 체인은 초기화 지점에서 시작하여 목표 사후 분포를 향해 '걸어갑니다'. 이 초기 단계에서는 체인이 아직 목표 분포에 도달하지 못하고 불안정한 상태일 수 있습니다. 번인 기간은 이러한 초기 불안정한 샘플들을 버려서, 체인이 목표 분포에 수렴한 후의 샘플들만을 사용하여 정확한 추론을 할 수 있도록 보장하는 역할을 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: MCMC 결과에서 'R-hat' 값이 1보다 크면 어떻게 해야 하나요?}]
+\textbf{A:} R-hat 값은 MCMC 체인의 수렴 여부를 나타내는 중요한 진단 통계량입니다. R-hat이 1에 가까울수록 체인이 잘 수렴하여 안정적인 샘플을 생성하고 있음을 의미합니다. 만약 R-hat이 1보다 크다면 (일반적으로 1.01 이상), 체인이 아직 수렴하지 않았을 가능성이 높습니다. 이 경우, 샘플링 반복 횟수를 늘리거나, 번인 기간을 늘리거나, 여러 개의 체인을 시작하여 초기화 지점의 영향을 줄이는 등의 조치를 취해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: 결측치를 단순히 평균으로 대체하는 것이 왜 문제가 될 수 있나요?}]
+\textbf{A:} 결측치를 평균으로 대체하면 데이터의 표본 크기를 유지할 수 있지만, 여러 가지 문제가 발생할 수 있습니다. 첫째, 데이터의 분산이 과소평가되어 표준 오차가 실제보다 작게 추정될 수 있습니다. 둘째, 데이터 분포의 모양이 왜곡될 수 있습니다. 셋째, 특히 통계적 추론(예: 가설 검정, 신뢰 구간)을 수행할 때 편향된 결과를 초래할 수 있습니다. 평균 대체는 결측치에 대한 어떠한 정보도 반영하지 못하고, 모든 결측치를 동일한 값으로 처리하기 때문입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: 결측 지시 변수를 사용하는 것이 왜 더 나은 방법인가요?}]
+\textbf{A:} 결측 지시 변수를 사용하면 결측치가 단순히 '없음'이 아니라, 그 자체가 중요한 정보일 수 있다는 점을 모델에 반영할 수 있습니다. 예를 들어, 특정 질문에 응답하지 않은 것이 그 사람의 어떤 특성과 관련이 있을 수 있습니다. 결측 지시 변수를 모델에 포함함으로써, 우리는 결측 메커니즘이 종속 변수에 미치는 영향을 직접적으로 추정할 수 있으며, 이는 단순한 평균 대체보다 통계적 편향을 줄이는 데 도움이 됩니다.
+\end{tcolorbox}
+
+\newsection{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{summarybox}[title={베이즈 사후 분포 샘플링}]
+\textbf{목표}: 복잡한 사후 분포의 특성(평균, 신뢰 구간 등) 추정.
+\textbf{문제}: 로지스틱 회귀처럼 켤레 사전 분포가 아닐 때 사후 분포의 형태를 알 수 없음.
+\textbf{해결}: 몬테카를로(Monte Carlo) 시뮬레이션.
+\begin{itemize}
+    \item \textbf{거부 샘플링}: 제안 분포에서 샘플 생성 후, 목표 분포와의 높이 비율에 따라 수락/거부. 고차원에서는 비효율적.
+    \item \textbf{MCMC (메트로폴리스-헤이스팅스)}: 마르코프 체인(기억 상실)을 따라 분포를 무작위 탐색. 현재 상태에 기반해 다음 상태 제안 및 확률적으로 수락/거부.
+\end{itemize}
+\textbf{MCMC 진단}:
+\begin{itemize}
+    \item \textbf{번인(Burn-in)}: 초기 불안정한 샘플 버림.
+    \item \textbf{트레이스 플롯}: 수렴 여부 시각적 확인 (패턴 없이 무작위 진동).
+    \item \textbf{R-hat}: 수렴 진단 통계량 (1에 가까워야 함).
+    \item \textbf{ESS}: 유효 샘플 크기 (샘플 간 상관관계 고려).
+\end{itemize}
+\end{summarybox}
+
+\vspace{1em}
+
+\begin{summarybox}[title={결측치 처리 전략}]
+\textbf{문제}: 데이터에 값이 없는 경우 (NaN, NA). \texttt{sklearn}은 기본적으로 처리 불가.
+\textbf{기본 전략}:
+\begin{itemize}
+    \item \textbf{제거}: 행/열 삭제. 데이터 손실, 편향 위험.
+    \item \textbf{대체}: 평균/중앙값 등으로 채움. 표본 크기 유지, 분포 왜곡 및 편향 위험.
+\end{itemize}
+\textbf{권장 전략}: \textbf{결측 지시 변수(Missingness Indicator Variable)}
+\begin{itemize}
+    \item 결측치를 특정 값으로 대체한 변수(\texttt{X\_star})와, 결측 여부를 나타내는 이진 변수(\texttt{X\_miss})를 함께 모델에 포함.
+    \item 결측 메커니즘의 영향을 모델링하여 편향 감소.
+\end{itemize}
+\textbf{결측치 유형}:
+\begin{itemize}
+    \item \textbf{MCAR (완전히 무작위)}: 결측이 다른 변수나 결측 자체와 무관.
+    \item \textbf{MAR (무작위)}: 결측이 \textbf{관측된 다른 변수}와 관련.
+    \item \textbf{MNAR (비무작위)}: 결측이 \textbf{관측되지 않은 변수}나 \textbf{결측된 값 자체}와 관련. (가장 다루기 어려움)
+\end{itemize}
+\textbf{주의}: 실제 결측치 유형은 알기 어려우므로, 결측 지시 변수 사용이 유연한 대안.
 \end{summarybox}
 
 
-
-\newpage
-
-\section{핵심 용어 정리}
-
-\begin{table}[h!]
-\caption{Lecture 17 핵심 용어}
-\label{tab:terms}
-\begin{adjustbox}{width=\textwidth, center}
-  \begin{tabular}{@{}llll@{}}
-    \toprule
-    \textbf{용어} & \textbf{원어} & \textbf{쉬운 설명} & \textbf{비고 (등장 위치)} \\
-    \midrule
-    MCMC & Markov Chain Monte Carlo & 마르코프 체인을 이용해 복잡한 분포에서 샘플을 뽑는 방법. & MCMC \\
-    메트로폴리스-헤이스팅스 & Metropolis-Hastings & MCMC의 대표적인 알고리즘. "언덕 오르기" 비유. & MCMC \\
-    번인 (Burn-in) & Burn-in & MCMC가 안정적인 분포에 도달하기 전까지의 초기 샘플(버려야 함). & MCMC \\
-    $\hat{R}$ (R-hat) & R-hat & MCMC가 수렴했는지 판단하는 지표. 1.0에 가까워야 함. & MCMC \\
-    결측치 & Missing Data & 데이터셋에 값이 누락된 상태. (e.g., `NaN`, `NA`) & 결측치 \\
-    대치 (대체) & Imputation & 결측치를 추정된 값으로 채우는 것. & 결측치 \\
-    \bottomrule
-  \end{tabular}
-\end{adjustbox}
-\end{table}
-
-\newpage
-
-\section{MCMC 상세 설명}
-
-\subsection{R-hat ($\hat{R}$) 통계량}
-MCMC는 보통 여러 개의 체인(로봇 여러 대)을 동시에 돌립니다. $\hat{R}$은 이 체인들이 모두 같은 산봉우리(안정적인 분포)에 수렴했는지 확인하는 지표입니다.
-\begin{warningbox}
-  \textbf{$\hat{R} \approx 1.0$ 이어야 합니다.}
-
-  만약 $\hat{R} > 1.1$ (혹은 1.05) 이라면, 체인들이 아직 수렴하지 못했거나(e.g., 번인이 부족), 서로 다른 곳(e.g., 어떤 로봇은 A봉우리, 어떤 로봇은 B봉우리)에 가있다는 뜻입니다.
-\end{warningbox}
-
-\section{학습 체크리스트}
-
-\begin{itemize}[label=$\square$]
-  \item 켤레성(Conjugacy)의 의미와, 켤레성이 깨졌을 때(e.g., 로지스틱 회귀) 왜 MCMC가 필요한지 설명할 수 있는가?
-  \item MCMC 추적(Trace) 플롯이 안정적인지(수렴했는지) 시각적으로 판단할 수 있는가?
-  \item $\hat{R}$ (R-hat) 통계량이 1.0에 가까워야 하는 이유는 무엇인가?
-  \item 결측치를 단순히 제거(`dropna`)하면 안 되는 이유는 무엇인가? (편향 문제)
-\end{itemize}
-
-\section{FAQ}
-
-\begin{tcolorbox}[breakable, title={\textbf{Q: $\mathbf{\hat{R}}$ (R-hat)이 1.0이 아니고 1.3 처럼 나오면 어떻게 해야 하나요?}}]
-  \textbf{A:} 이는 MCMC가 "수렴에 실패했음"을 알리는 심각한 경고입니다. 여러 대의 로봇(체인)이 서로 다른 산봉우리에 가있거나, 아직 산을 다 오르지도 못했다는 뜻입니다.
-
-  해결 방법:
-  \begin{enumerate}
-    \item 번인(Burn-in) 기간을 늘린다
-    \item 체인 실행 횟수를 늘린다
-    \item 더 좋은 초기값(Starting Point)을 설정한다
-  \end{enumerate}
-\end{tcolorbox}
-
-\section{결측치 대치 방법}
-
-\subsection{단순하지만 나은 방법}
-  \begin{itemize}
-    \item \textbf{지시 변수 (Indicator):} `X\_imputed` (0으로 채움) + `X\_was\_missing` (1/0)
-  \end{itemize}
-
-\subsection{가장 좋은 방법}
-  \begin{itemize}
-    \item \textbf{확률론적 모델 대치 (Stochastic Imputation)}
-    \item $\text{Imputed Value} = \text{Model.Predict()} + \text{Random Noise}(\epsilon)$
-    \item (분류 문제의 경우: `predict\_proba()` 결과로 \textbf{편향된 동전 던지기})
-  \end{itemize}
-
-\newpage
-
-
 %=======================================================================
-% Chapter 18: 개요: 왜 로지스틱 회귀가 아닌 결정 트리인가?
+% Lecture 18: 개요: 왜 로지스틱 회귀가 아닌 결정 트리인가?
 %=======================================================================
 \chapter{개요: 왜 로지스틱 회귀가 아닌 결정 트리인가?}
 \label{ch:lecture18}
@@ -9841,9 +10300,6 @@ MCMC는 보통 여러 개의 체인(로봇 여러 대)을 동시에 돌립니다
     \end{itemize}
 \end{summarybox}
 
-
-
-\newpage
 
 \section{개요: 왜 로지스틱 회귀가 아닌 결정 트리인가?}
 
@@ -9873,7 +10329,7 @@ MCMC는 보통 여러 개의 체인(로봇 여러 대)을 동시에 돌립니다
     이 모든 것을 만족하는 모델이 바로 \textbf{결정 트리(Decision Tree)}입니다.
 \end{tcolorbox}
 
-\newpage
+
 \section{용어 정리}
 결정 트리를 이해하기 위해 사용되는 주요 용어들입니다.
 
@@ -9901,7 +10357,7 @@ MCMC는 보통 여러 개의 체인(로봇 여러 대)을 동시에 돌립니다
     \end{adjustbox}
 \end{table}
 
-\newpage
+
 \section{핵심 원리 1: 결정 트리는 어떻게 작동하는가?}
 
 \subsection{직관: 공학용 순서도 (Engineering Flowchart)}
@@ -9977,7 +10433,7 @@ MCMC는 보통 여러 개의 체인(로봇 여러 대)을 동시에 돌립니다
     \textbf{결론}: 이 과일은 '오렌지'로 예측됩니다.
 \end{examplebox}
 
-\newpage
+
 \section{핵심 원리 2: 트리는 어떻게 "학습"하는가?}
 
 예측은 간단합니다. 하지만 \texttt{height > 6.5}나 \texttt{width > 6.0} 같은 "최적의 질문"은 어떻게 찾아내는 것일까요?
@@ -10095,7 +10551,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
     \item \textbf{중지}: 특정 \textbf{중지 조건}이 만족되면 분할을 멈추고 해당 노드를 리프 노드로 선언합니다.
 \end{enumerate}
 
-\newpage
+
 \section{핵심 원리 3: 과적합 방지 (Overfitting)}
 
 \subsection{문제점: 멈추지 않는 트리}
@@ -10120,9 +10576,9 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 \begin{tcolorbox}{주요 중지 조건 (Hyperparameters)}
     \begin{itemize}
-        \item \textbf{\texttt{max\_depth} (최대 깊이)}: 트리가 몇 단계까지 내려갈 수 있는지 제한합니다. (예: `max_depth=3`) 가장 흔하고 강력한 규제입니다.
-        \item \textbf{\texttt{min\_samples\_leaf} (리프 노드 최소 샘플 수)}: 리프 노드가 되기 위해 필요한 최소한의 샘플 수를 지정합니다. (예: `min_samples_leaf=4`) 만약 어떤 분할이 이 숫자보다 적은 샘플을 가진 리프를 만든다면, 그 분할은 수행되지 않습니다.
-        \item \textbf{\texttt{max\_leaf\_nodes} (최대 리프 노드 수)}: 트리 전체의 리프 노드 개수를 제한합니다. (예: `max_leaf_nodes=5`)
+        \item \textbf{\texttt{max\_depth} (최대 깊이)}: 트리가 몇 단계까지 내려갈 수 있는지 제한합니다. (예: \texttt{max\_depth=3}) 가장 흔하고 강력한 규제입니다.
+        \item \textbf{\texttt{min\_samples\_leaf} (리프 노드 최소 샘플 수)}: 리프 노드가 되기 위해 필요한 최소한의 샘플 수를 지정합니다. (예: \texttt{min\_samples\_leaf=4}) 만약 어떤 분할이 이 숫자보다 적은 샘플을 가진 리프를 만든다면, 그 분할은 수행되지 않습니다.
+        \item \textbf{\texttt{max\_leaf\_nodes} (최대 리프 노드 수)}: 트리 전체의 리프 노드 개수를 제한합니다. (예: \texttt{max\_leaf\_nodes=5})
         \item \textbf{\texttt{min\_impurity\_decrease} (최소 불순도 감소량)}: 분할을 통해 얻는 불순도 감소(정보 획득)가 이 임계값보다 커야만 분할을 수행합니다.
         \item \textbf{순수 노드}: 분할하려는 노드가 이미 100\% 순수하다면(Gini=0) 더 이상 분할할 이유가 없으므로 중지합니다.
     \end{itemize}
@@ -10176,7 +10632,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 우리는 \texttt{max\_depth}를 2, 3, 4, ..., 10 등으로 바꿔가며 교차 검증을 수행하고, 검증 세트(Validation Set)에서 가장 성능이 좋았던 \texttt{max\_depth} 값을 최종 모델의 하이퍼파라미터로 선택합니다.
 
-\newpage
+
 \section{학습 체크리스트}
 
 \begin{tcolorbox}{결정 트리 학습 점검표}
@@ -10212,7 +10668,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
     \end{itemize}
 \end{tcolorbox}
 
-\newpage
+
 \section{FAQ (주요 질문 및 답변)}
 
 \begin{tcolorbox}{Q: Gini 불순도와 Entropy 중 무엇을 사용해야 하나요?}
@@ -10237,7 +10693,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 \section{1페이지 요약: 결정 트리 핵심}
 
-\begin{tcolorbox}[title=결정 트리(Decision Tree) 한눈에 보기]
+\begin{tcolorbox}[title={결정 트리(Decision Tree) 한눈에 보기}]
     \subsection*{1. 모델 정의: 스무고개 (직관적)}
     \begin{itemize}
         \item \textbf{아이디어}: "예/아니오" 질문(예: \texttt{height > 6.5?})을 반복하여 데이터를 분류하는 나무 구조의 모델.
@@ -10268,21 +10724,18 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
                 \item \texttt{max\_depth}: 트리의 최대 깊이 제한.
                 \item \texttt{min\_samples\_leaf}: 리프 노드가 가져야 할 최소 샘플 수.
             \end{itemize}
-        \item \textbf{튜닝}: 최적의 하이퍼파라미터(예: 최적의 `max_depth`)는 \textbf{교차 검증(Cross-Validation)}을 통해 찾음.
+        \item \textbf{튜닝}: 최적의 하이퍼파라미터(예: 최적의 \texttt{max\_depth})는 \textbf{교차 검증(Cross-Validation)}을 통해 찾음.
     \end{itemize}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 19: 개요: 결정 트리 학습의 두 가지 핵심
+% Lecture 19: 개요: 결정 트리 학습의 두 가지 핵심
 %=======================================================================
 \chapter{개요: 결정 트리 학습의 두 가지 핵심}
 \label{ch:lecture19}
 
 % --- 제목 페이지 ---
-
 
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 19}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 19의 핵심 개념 학습}
@@ -10291,8 +10744,6 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 % --- 목차 ---
 
 
-
-\newpage
 %===============
 % 개요
 %===============
@@ -10341,7 +10792,6 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 \label{tab:terms}
 
 
-\newpage
 %===============
 % 1. 회귀 트리 (Regression Trees)
 %===============
@@ -10351,7 +10801,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 그렇다면 "이 사람의 나이는 몇 살인가?" 또는 "이 집의 가격은 얼마인가?"처럼 \textbf{연속적인 숫자(Continuous Variable)}를 예측해야 하는 \textbf{회귀(Regression)} 문제에는 결정 트리를 어떻게 적용할 수 있을까요?
 
-\begin{boxDefinition}{회귀 트리 (Regression Tree)란?}
+\begin{boxDefinition}[title={회귀 트리 (Regression Tree)란?}]
     회귀 트리는 예측 결과값이 범주(Category)가 아닌 \textbf{연속적인 숫자}인 결정 트리 모델입니다.
 
     \begin{itemize}
@@ -10390,7 +10840,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 여기서 "값이 얼마나 흩어져 있는가(분산)"를 측정하는 가장 좋은 지표가 바로 \textbf{MSE(Mean Squared Error, 평균 제곱 오차)}입니다.
 
-\begin{boxDefinition}{회귀 트리의 분할 기준: MSE 최소화}
+\begin{boxDefinition}[title={회귀 트리의 분할 기준: MSE 최소화}]
     회귀 트리는 분할 후 생성될 두 자식 노드($R_1$, $R_2$)의 \textbf{MSE의 가중 평균}을 최소화하는 지점(변수 $p$와 임계값 $t_p$)을 찾습니다.
 
     각 노드 $R$의 MSE는 해당 노드의 \textbf{분산(Variance)}과 같습니다.
@@ -10418,8 +10868,8 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
     \item \textbf{중단 (Stopping Conditions):}
     미리 정해둔 중단 조건에 도달하면 성장을 멈춥니다.
     \begin{itemize}
-        \item `max_depth`: 트리의 최대 깊이
-        \item `min_samples_leaf`: 단말 노드가 가져야 할 최소 샘플 수
+        \item \texttt{max\_depth}: 트리의 최대 깊이
+        \item \texttt{min\_samples\_leaf}: 단말 노드가 가져야 할 최소 샘플 수
         \item \textbf{Accuracy Gain (MSE Reduction):} 분할로 인해 MSE가 줄어드는 양(`Gain(R)`)이 정해진 임계값(Threshold)보다 작으면 더 이상 분할하지 않습니다.
             $$ Gain(R) = MSE(R_{\text{parent}}) - \left( \frac{N_1}{N} MSE(R_1) + \frac{N_2}{N} MSE(R_2) \right) $$
     \end{itemize}
@@ -10430,7 +10880,6 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 \end{enumerate}
 
 
-\newpage
 %===============
 % 2. 범주형 변수 처리
 %===============
@@ -10460,7 +10909,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 범주의 각 값(Category)을 자신만의 새로운 \textbf{이진(Binary) 변수}로 만드는 것입니다.
 
-\begin{boxDefinition}{원-핫 인코딩 (OHE)}
+\begin{boxDefinition}[title={원-핫 인코딩 (OHE)}]
     'Color'라는 하나의 변수를 'is\_Yellow', 'is\_Red', 'is\_Purple' 이라는 여러 개의 0 또는 1 값을 갖는 변수로 변환합니다.
 \end{boxDefinition}
 
@@ -10491,12 +10940,11 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
     
     `sklearn.tree.DecisionTreeClassifier` 나 `DecisionTreeRegressor`는 \textbf{범주형 변수를 자동으로 처리해주지 않습니다.}
     
-    모델에 데이터를 넣기 전에, 사용자가 직접 Pandas의 `get_dummies`나 `sklearn.preprocessing.OneHotEncoder`를 사용하여 OHE 전처리를 \textbf{반드시} 수행해야 합니다.
+    모델에 데이터를 넣기 전에, 사용자가 직접 Pandas의 \texttt{get\_dummies}나 `sklearn.preprocessing.OneHotEncoder`를 사용하여 OHE 전처리를 \textbf{반드시} 수행해야 합니다.
     (참고: XGBoost, LightGBM, CatBoost 같은 다른 라이브러리들은 범주형 변수를 자체적으로 처리하는 기능을 지원하기도 합니다.)
 \end{boxWarning}
 
 
-\newpage
 %===============
 % 3. 가지치기 (Pruning)
 %===============
@@ -10519,7 +10967,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 \begin{enumerate}
     \item \textbf{사전 중단 (Pre-stopping):}
-    트리가 성장하는 \textit{중에} 멈추는 방식입니다. (`max_depth`, `min_samples_leaf` 등)
+    트리가 성장하는 \textit{중에} 멈추는 방식입니다. (\texttt{max\_depth}, \texttt{min\_samples\_leaf} 등)
     \begin{itemize}
         \item \textbf{문제점:} 최적의 중단 시점을 미리 알기 어렵습니다. 너무 일찍 멈추면 \textbf{과소적합(Underfitting)}이, 너무 늦게 멈추면 \textbf{과적합(Overfitting)}이 발생합니다.
     \end{itemize}
@@ -10536,7 +10984,7 @@ $$ \text{Entropy} = - \sum_{k} \Psi(k|R) \log_{2}(\Psi(k|R)) $$
 
 CCP는 모델의 \textbf{오류(Error)}와 \textbf{복잡도(Complexity)} 사이에 균형점을 찾는 정규화(Regularization) 기법입니다.
 
-\begin{boxDefinition}{비용 복잡도 (Cost Complexity) 공식}
+\begin{boxDefinition}[title={비용 복잡도 (Cost Complexity) 공식}]
     CCP는 트리의 '비용' $C(T)$를 최소화하는 것을 목표로 합니다.
     
     $$ C(T) = \text{Error}(T) + \alpha \cdot |T| $$
@@ -10609,7 +11057,6 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
 \end{enumerate}
 
 
-\newpage
 %===============
 % 4. FAQ 및 자가 점검
 %===============
@@ -10659,29 +11106,21 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
 \end{boxExample}
 
 \begin{boxExample}
-    \textbf{Q5: `max_depth=1`로 설정된 결정 트리의 결정 경계(Decision Boundary)는 선형(Linear)인가요, 비선형(Non-linear)인가요?}
+    \textbf{Q5: \texttt{max\_depth=1}로 설정된 결정 트리의 결정 경계(Decision Boundary)는 선형(Linear)인가요, 비선형(Non-linear)인가요?}
     
     \textbf{A: 선형(Linear)입니다.}
-    `max_depth=1`은 트리가 \textbf{단 하나의 분할}만 수행한다는 의미입니다. (예: "x > 6.5")
+    \texttt{max\_depth=1}은 트리가 \textbf{단 하나의 분할}만 수행한다는 의미입니다. (예: "x > 6.5")
     이는 전체 데이터 공간을 단 하나의 축에 수직인 직선(또는 초평면)으로 나누는 것과 같으므로, 결정 경계는 선형입니다. 트리의 깊이가 2 이상이 되어야 계단 형태의 비선형 경계가 만들어집니다.
 \end{boxExample}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 20: 용어 정리
+% Lecture 20: 용어 정리
 %=======================================================================
 \chapter{용어 정리}
 \label{ch:lecture20}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 20}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 20의 핵심 개념 학습}
-
-
-
-\newpage
-
-
 
 
 \begin{summarybox}
@@ -10691,7 +11130,6 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
 2.  \textbf{모델 시각화:} k-NN이나 의사결정나무처럼 해석이 어려운 '블랙박스' 모델의 작동 방식을 이해하기 위해 \textbf{부분 의존성 플롯(Partial Dependence Plots, PDP)}을 사용하는 방법을 배웁니다. PDP를 통해 특정 변수가 모델의 예측에 어떤 영향을 미치는지, 변수 간 상호작용은 없는지 시각적으로 확인할 수 있습니다.
 \end{summarybox}
 
-\newpage
 
 %===================================
 \section{용어 정리}
@@ -10723,7 +11161,6 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
     \label{tab:terms}
 \end{table}
 
-\newpage
 
 %===================================
 \section{결측치(Missingness)란 무엇인가?}
@@ -10764,7 +11201,6 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
 
 이러한 순진한 방법들은 데이터의 귀중한 정보를 손실시키고 편향을 유발하므로, 왜 결측치가 발생했는지 먼저 파악하는 것이 중요합니다.
 
-\newpage
 
 %===================================
 \section{결측의 3가지 유형 (MCAR, MAR, MNAR)}
@@ -10832,7 +11268,6 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
     \label{tab:mar_types}
 \end{table}
 
-\newpage
 
 %===================================
 \section{결측치 처리(Imputation) 방법론}
@@ -10863,7 +11298,7 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
     3.  \(X_{1,miss}\) (표시자 변수): \(X_1\)에서 값이 누락되었으면 1, 아니면 0을 갖는 이진(binary) 변수를 만듭니다.
     4.  모델을 학습시킬 때, 원래 변수인 \(X_1\) 대신 이 두 변수(\(X_1^*\)와 \(X_{1,miss}\))를 함께 사용합니다.
 
-\begin{examplebox}{예제}
+\begin{examplebox}[title={예제}]
     \textbf{예시: 결측치 표시자 변수 생성}
 
     아래 표는 \texttt{X1}과 \texttt{X2}의 결측치를 0으로 대체하고, 결측 여부를 \texttt{X1\_miss}, \texttt{X2\_miss}로 표시한 예입니다.
@@ -10909,7 +11344,7 @@ CCP의 알고리즘은 복잡해 보이지만, 본질은 \textbf{2단계 교차 
     2.  학습용 데이터로 \(X_2, X_3, ... \to X_1\)을 예측하는 모델(예: k-NN, 선형 회귀, 의사결정나무)을 학습시킵니다.
     3.  학습된 모델을 예측용 데이터에 적용하여, 누락된 \(X_1\) 값을 예측하고 그 값으로 채워 넣습니다.
 
-\begin{examplebox}{예제}
+\begin{examplebox}[title={예제}]
     \textbf{예시: k-NN을 사용한 대체}
 
     색깔(X, 관측됨)을 이용해 Y값(결측 존재)을 대체해봅시다. (k=2, 즉 가장 가까운 2개 사용)
@@ -10988,7 +11423,6 @@ imputer_knn = KNNImputer(n_neighbors=5)
 imputer_iterative = IterativeImputer(max_iter=10, random_state=0)
 \end{lstlisting}
 
-\newpage
 
 %===================================
 \section{블랙박스 모델 해석 및 시각화}
@@ -11027,7 +11461,7 @@ imputer_iterative = IterativeImputer(max_iter=10, random_state=0)
 
 \textbf{PDP}는 "다른 모든 변수들을 평균(또는 특정 값)으로 고정했을 때, 내가 관심 있는 변수 하나(\(X_1\))를 변화시키면 모델의 예측값이 어떻게 변하는가?"를 보여주는 그래프입니다.
 
-\begin{examplebox}{예제}
+\begin{examplebox}[title={예제}]
     \textbf{PDP의 직관적 비유: 오디오 믹서}
 
     PDP는 오디오 믹서(Mixer)와 같습니다. 훌륭한 음악(모델 예측)은 보컬, 드럼, 베이스(여러 변수)가 조합된 결과입니다.
@@ -11079,7 +11513,6 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
     * `MaxHR`이 높을 때는 (오른쪽, > 160) 나이의 영향이 커집니다. 젊은 환자(빨간색, 최소값)는 확률이 15\%까지 떨어지지만, 나이 많은 환자(초록색, 최대값)는 확률이 25\% 정도로 상대적으로 높게 유지됩니다.
     * \textbf{결론:} 이 모델에 따르면, 최대 심박수가 높은 것(운동)은 젊은 사람에게 더 큰 심장병 예방 효과가 있습니다.
 
-\newpage
 
 %===================================
 \section{효과적인 시각화의 원칙 (부록)}
@@ -11116,18 +11549,17 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
 5.  \textbf{청중 파악 (Know your audience):} 청중이 무엇을 알고 싶어 하는지에 따라 설명의 수준과 깊이를 조절해야 합니다.
 6.  \textbf{스토리텔링 (Tell a story):} 시각화에는 '시작-중간-끝'의 흐름이 있어야 합니다. 청중의 눈길을 어디로 이끌지(Annotations, Call Out Boxes) 설계해야 합니다.
 
-\newpage
 
 %===================================
 \section{빠르게 훑어보기 (1-Page Summary)}
 %===================================
 
-\begin{tcolorbox}[title=1. 결측치(Missingness)란?]
+\begin{tcolorbox}[title={1. 결측치(Missingness)란?}]
 데이터에 값이 누락된 '구멍' (\texttt{NaN}).
 그냥 삭제하거나 평균값으로 채우면 \textbf{편향(Bias)}이 발생하여 모델이 현실을 잘못 예측하게 됨.
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=2. 결측의 3유형 (원인)]
+\begin{tcolorbox}[title={2. 결측의 3유형 (원인)}]
     \begin{itemize}
         \item \textbf{MCAR (완전 임의):} 완전 무작위 (예: 오타). 삭제해도 편향 없음 (데이터는 손실됨).
         \item \textbf{MAR (임의):} \textit{관측된} 변수(예: 성별)와 관련됨. 모델링으로 해결 가능.
@@ -11136,7 +11568,7 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
     \textbf{현실:} 어떤 유형인지 증명 불가. 보통 MAR로 가정하고 모델링.
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=3. 결측치 처리(Imputation) 전략]
+\begin{tcolorbox}[title={3. 결측치 처리(Imputation) 전략}]
     \begin{itemize}
         \item \textbf{표시자 변수 (Indicator):} "결측됨" 자체를 정보로 활용. (결측=1, 아닌=0인 새 변수 추가)
         \item \textbf{모델 기반 대체 (k-NN, Regression):} 다른 변수들로 결측치를 '예측'하여 채움.
@@ -11145,7 +11577,7 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
     \end{itemize}
 \end{tcolorbox}
 
-\begin{tcolorbox}[title=4. 블랙박스 모델 해석 (PDP)]
+\begin{tcolorbox}[title={4. 블랙박스 모델 해석 (PDP)}]
     \textbf{PDP (부분 의존성 플롯):} 복잡한 모델(k-NN, 트리 등)을 해석하는 도구.
 
     "다른 변수들은 '평균'으로 고정하고, 관심 변수 X 하나만 바꿨을 때 모델의 예측 Y가 어떻게 변하는지" 보여주는 그래프.
@@ -11153,11 +11585,9 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
     만약 '나이(A) 그룹'별로 그린 PDP와 '나이(B) 그룹'별로 그린 PDP의 모양이 다르다면, 모델이 '나이'와 '관심 변수 X' 간의 \textbf{상호작용(Interaction)}을 학습했다는 의미.
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 21: 개요: 배깅(Bagging) 기법 및 OOB 오류
+% Lecture 21: 개요: 배깅(Bagging) 기법 및 OOB 오류
 %=======================================================================
 \chapter{개요: 배깅(Bagging) 기법 및 OOB 오류}
 \label{ch:lecture21}
@@ -11165,20 +11595,17 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 21}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 21의 핵심 개념 학습}
 
 
-\newpage
-
-
 \section{개요: 배깅(Bagging) 기법 및 OOB 오류}
 \label{sec:overview}
 
-\begin{summarybox}{문서 핵심 요약}
+\begin{summarybox}[title={문서 핵심 요약}]
 배깅($\mathbf{Bagging}$, \textbf{B}ootstrap \textbf{Agg}regat\textbf{ing})은 여러 모델의 예측을 결합하여 성능을 높이는 \textbf{앙상블 학습(Ensemble Learning)} 기법입니다.
 단일 결정 트리의 \textbf{높은 분산(High Variance)}과 \textbf{과적합(Overfitting)} 문제를 해결하기 위해 도입되었습니다.
 핵심은 \textbf{부트스트랩(Bootstrap)}을 통해 원본 데이터셋으로부터 여러 개의 새로운 훈련 데이터셋을 생성하고, 각각의 데이터셋으로 모델을 훈련시킨 후, 그 결과를 \textbf{집계(Aggregating)}하여 최종 예측을 도출하는 것입니다.
 특히, \textbf{OOB 오류(Out-of-Bag Error)}는 부트스트랩 과정에서 모델 훈련에 사용되지 않은 데이터를 활용하여 별도의 \textbf{검증 세트} 없이도 모델의 성능을 평가할 수 있게 해줍니다.
 \end{summarybox}
 
-\newpage
+
 \section{용어 정리}
 \label{sec:terms}
 
@@ -11201,7 +11628,7 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
 \end{adjustbox}
 \end{table}
 
-\newpage
+
 \section{앙상블 학습의 배경 및 원리}
 \label{sec:ensemble_principle}
 
@@ -11222,7 +11649,7 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
 앙상블 학습은 단일 모델의 한계를 극복하기 위해 다수의 모델을 결합하는 기법입니다.
 직관적으로, 이는 한 명의 전문가(단일 모델)에게만 의존하는 것이 아니라, 여러 전문가에게서 의견을 듣고 \textbf{종합적인 결론}을 내리는 것과 같습니다.
 
-\begin{examplebox}{현실 비유: MRI 진단}
+\begin{examplebox}[title={현실 비유: MRI 진단}]
 뇌종양 진단을 위해 환자의 MRI 스캔을 여러 의사(모델)에게 보냅니다.
 \begin{itemize}
     \item 각 의사는 각기 다른 훈련 데이터(병원 A, B, C의 사례)로 학습했습니다.
@@ -11259,7 +11686,7 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
 \end{tabular}
 \end{table}
 
-\newpage
+
 \section{배깅(Bagging)의 원리: 부트스트랩 + 집계}
 \label{sec:bagging_principle}
 
@@ -11319,7 +11746,7 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
 따라서, 배깅에서도 \textbf{교차 검증(Cross-Validation)}을 통해 개별 트리의 적절한 깊이(Complexity)를 결정해야 합니다.
 \end{cautionbox}
 
-\newpage
+
 \section{배깅의 성능 제어 하이퍼파라미터}
 \label{sec:hyperparameters}
 
@@ -11360,7 +11787,7 @@ PDP의 진정한 힘은 '평균적인 환자'가 아닌 '특정 그룹'에 대�
 이 모든 조합을 \textbf{K-겹 교차 검증(K-Fold CV)}으로 최적화하려면 수천 개의 트리를 훈련해야 하므로 \textbf{계산 비용(Computational Cost)}이 매우 커집니다. 이는 OOB 오류 개념이 필요한 주요 배경입니다.
 \end{cautionbox}
 
-\newpage
+
 \section{OOB 오류 (Out-of-Bag Error)}
 \label{sec:oob_error}
 
@@ -11415,7 +11842,7 @@ OOB 오류는 \textbf{검증 세트}를 대체하는 수단입니다. OOB 오류
 최종적으로 모델의 성능을 평가하고 대중에게 공개할 때는, 훈련과 검증에 \textbf{전혀 사용되지 않은} 독립적인 \textbf{테스트 세트(Test Set)}를 반드시 사용해야 합니다. 테스트 세트는 모델 성능 평가를 위한 '마지막 보루'로 끝까지 따로 보관해야 합니다.
 \end{cautionbox}
 
-\newpage
+
 \section{배깅의 주요 단점 및 다음 과제}
 \label{sec:drawbacks}
 
@@ -11447,7 +11874,7 @@ OOB 오류는 \textbf{검증 세트}를 대체하는 수단입니다. OOB 오류
     \item \textbf{결과}: 모든 트리가 비슷한 모양으로 시작되어 예측이 \textbf{매우 유사해집니다.} 이는 분산 감소 효과를 저해하고, 결과적으로 예측 성능 향상에 한계가 생깁니다.
 \end{itemize}
 
-\begin{examplebox}{트리의 상관관계 예시}
+\begin{examplebox}[title={트리의 상관관계 예시}]
 당뇨병 예측 모델을 만들 때, 혈당 수치(\texttt{Glucose})가 압도적으로 중요한 특성이라고 가정해 봅시다.
 
 \begin{itemize}
@@ -11458,10 +11885,10 @@ OOB 오류는 \textbf{검증 세트}를 대체하는 수단입니다. OOB 오류
 모든 트리가 동일한 첫 번째 분할을 하기 때문에, 그 이후의 구조가 달라도 \textbf{서로 높은 상관관계}를 가지게 됩니다. 이 문제는 \textbf{랜덤 포레스트}에서 \textbf{특성 랜덤성(Feature Randomness)}을 추가하여 해결하게 됩니다.
 \end{examplebox}
 
-\newpage
+
 \section{빠르게 훑어보기: 핵심 체크리스트}
 
-\begin{summarybox}{배깅(Bagging) 및 OOB 핵심 정리}
+\begin{summarybox}[title={배깅(Bagging) 및 OOB 핵심 정리}]
 \begin{itemize}
     \item \textbf{배깅이란?} \textbf{B}ootstrap \textbf{Agg}regat\textbf{ing}의 줄임말. 깊은 트리를 \textbf{병렬}로 훈련 후 결과를 \textbf{평균/다수결}로 집계하여 최종 예측을 수행합니다.
     \item \textbf{도입 목적}: 단일 결정 트리의 \textbf{높은 분산(Variance)}과 \textbf{과적합(Overfitting)} 문제 해결.
@@ -11478,11 +11905,9 @@ OOB 오류는 \textbf{검증 세트}를 대체하는 수단입니다. OOB 오류
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 22: 개요: 랜덤 포레스트와 변수 중요도
+% Lecture 22: 개요: 랜덤 포레스트와 변수 중요도
 %=======================================================================
 \chapter{개요: 랜덤 포레스트와 변수 중요도}
 \label{ch:lecture22}
@@ -11490,14 +11915,9 @@ OOB 오류는 \textbf{검증 세트}를 대체하는 수단입니다. OOB 오류
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 22}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 22의 핵심 개념 학습}
 
 
-\newpage
-
-
-
-
 \section*{개요: 랜덤 포레스트와 변수 중요도}
 
-\begin{tcolorbox}[infobox, title=문서 핵심 요약]
+\begin{tcolorbox}[infobox, title={문서 핵심 요약}]
 랜덤 포레스트(\emph{Random Forest})는 배깅(\emph{Bagging})의 변형으로, 다수의 결정 트리(\emph{Decision Tree})를 훈련하고 결과를 집계하여 예측의 분산(\emph{Variance})을 줄이는 앙상블 학습 기법입니다.
 핵심은 각 트리의 분할 시마다 전체 특징(\emph{Feature}, 변수)의 부분집합을 무작위로 선택하여, 트리 간의 상관관계를 낮춰 성능을 극대화하는 것입니다.
 트리 간의 낮은 상관관계는 모델의 안정성(\emph{Robustness})을 높이고 과적합(\emph{Overfitting}) 위험을 줄입니다.
@@ -11505,10 +11925,10 @@ OOB 오류는 \textbf{검증 세트}를 대체하는 수단입니다. OOB 오류
 또한, 불균형 데이터(\emph{Imbalanced Data}) 문제와 결측값(\emph{Missing Data}) 처리 방법도 함께 다룹니다.
 \end{tcolorbox}
 
-\newpage
+
 \section{용어 정리}
 
-\begin{tcolorbox}[infobox, title=주요 용어 및 직관적 설명]
+\begin{tcolorbox}[infobox, title={주요 용어 및 직관적 설명}]
 \begin{table}[h]
 \centering
 \begin{adjustbox}{width=\textwidth,center}
@@ -11532,7 +11952,7 @@ OOB 오류 & 부트스트랩 시 사용되지 않은 데이터를 검증에 사�
 \end{table}
 \end{tcolorbox}
 
-\newpage
+
 \section{핵심 개념: 랜덤 포레스트의 원리}
 
 \subsection{배깅(\emph{Bagging})의 한계: 트리의 상관관계}
@@ -11540,7 +11960,7 @@ OOB 오류 & 부트스트랩 시 사용되지 않은 데이터를 검증에 사�
 배깅은 부트스트랩 샘플(\emph{Bootstrap Sample})을 사용하여 다수의 결정 트리를 학습하고 그 결과를 집계(\emph{Aggregate})하여 분산을 줄이는 앙상블 기법입니다.
 그러나 배깅에서 생성된 트리는 서로 \textbf{상관관계(\emph{Correlation})가 높게} 나타나는 경향이 있습니다.
 
-\begin{tcolorbox}[examplebox, title=상관관계가 높은 이유에 대한 비유]
+\begin{tcolorbox}[examplebox, title={상관관계가 높은 이유에 대한 비유}]
 강력한 예측 변수(\emph{Strong Predictor})가 있는 경우, 모든 부트스트랩 샘플에서도 이 예측 변수가 가장 높은 불순도 감소 효과를 보일 것입니다.
 마치 모든 의사(\emph{Estimator})가 동일한 환자 데이터를 기반으로 훈련받고, '휴식, 수분 섭취'와 같은 가장 확실한 조언을 첫 번째 조치로 내리는 것과 같습니다.
 따라서, 대부분의 트리는 \textbf{최상위 노드(\emph{Root Node})}에서 동일한 특징으로 분할을 시작하게 되어, 트리가 서로 비슷한 구조와 예측을 하게 됩니다.
@@ -11552,7 +11972,7 @@ OOB 오류 & 부트스트랩 시 사용되지 않은 데이터를 검증에 사�
 랜덤 포레스트는 배깅을 개선하여 트리 간의 상관관계를 낮추는 방법입니다.
 트리의 상관관계를 낮추는 것이 분산(\emph{Variance})을 효과적으로 줄이는 핵심입니다.
 
-\begin{tcolorbox}[infobox, title=랜덤 포레스트의 핵심 아이디어]
+\begin{tcolorbox}[infobox, title={랜덤 포레스트의 핵심 아이디어}]
 \textbf{각 분할 노드(\emph{Split Node})마다, 전체 특징 $J$개 중 무작위로 선택된 $J' < J$개의 특징 부분집합만 고려합니다.}
 즉, 트리가 자라날 때마다 최고의 특징을 선택할 때 \textbf{전체 특징이 아닌} 일부 특징 중에서만 선택하게 강제합니다.
 이로 인해 강력한 특징이 매번 선택될 확률이 낮아지고, 결과적으로 트리가 다양해지고 서로 덜 유사해집니다.
@@ -11575,7 +11995,7 @@ OOB 오류 & 부트스트랩 시 사용되지 않은 데이터를 검증에 사�
 
 랜덤 포레스트는 여러 개의 하이퍼파라미터를 가지며, 이는 모델의 성능과 훈련 속도에 영향을 미칩니다.
 
-\begin{tcolorbox}[infobox, title=주요 하이퍼파라미터]
+\begin{tcolorbox}[infobox, title={주요 하이퍼파라미터}]
 \begin{itemize}
     \item \textbf{분할 시 무작위 선택할 특징의 개수 $J'$}: 트리 간의 상관관계를 조절하는 가장 중요한 파라미터입니다.
     \item \textbf{앙상블 내 트리의 총 개수 $B$}: 분산 감소량을 결정합니다. 트리가 많을수록 분산은 줄어들지만 계산 시간이 늘어납니다.
@@ -11598,7 +12018,7 @@ OOB 오류 & 부트스트랩 시 사용되지 않은 데이터를 검증에 사�
 \subsubsection*{OOB 오류를 활용한 검증}
 랜덤 포레스트는 OOB(Out-of-Bag) 샘플, 즉 부트스트랩 과정에서 특정 트리 훈련에 사용되지 않은 데이터 포인트들을 사용하여 \textbf{별도의 검증 세트 없이} 모델을 평가할 수 있습니다. 이것이 교차 검증을 대체할 수 있는 효율적인 방법입니다.
 
-\newpage
+
 \section{변수 중요도(\emph{Variable Importance}) 평가}
 
 앙상블 모델은 단일 결정 트리처럼 쉬운 규칙(\emph{Rule}) 형태로 해석하기 어렵기 때문에, 어떤 특징이 예측에 가장 큰 영향을 미쳤는지 평가하여 모델의 \textbf{해석력(\emph{Interpretability})}을 높여야 합니다.
@@ -11653,18 +12073,18 @@ MDI는 특정 특징이 트리의 불순도(예: 지니 불순도)를 평균적�
 트리 간 상관관계가 높은 \textbf{배깅(\emph{Bagging})}은 소수의 강력한 예측 변수(예: \texttt{ChestPain}, \texttt{Ca})에 중요도가 \textbf{집중}되는 경향을 보입니다.
 반면, 비상관화 과정을 거친 \textbf{랜덤 포레스트(\emph{Random Forest})}의 중요도는 여러 특징에 걸쳐 \textbf{더 부드럽고 분산된} 분포를 보여줍니다. 이는 트리들이 다양한 특징을 고려하도록 강제되었기 때문입니다.
 
-\begin{tcolorbox}[cautionbox, title=랜덤 포레스트가 잘 작동하지 않는 경우]
+\begin{tcolorbox}[cautionbox, title={랜덤 포레스트가 잘 작동하지 않는 경우}]
 전체 특징의 수가 매우 많지만, \textbf{실제로 중요한 특징의 수가 적을 때} (예: 1000개의 특징 중 10개만 중요), 랜덤 포레스트는 오히려 성능이 떨어질 수 있습니다.
 각 분할에서 무작위로 선택된 특징 부분집합에 중요한 특징이 포함되지 않을 확률이 높아지기 때문에, 생성된 트리들이 대부분 '약한 모델'이 될 수 있습니다.
 이 경우 PCA나 다른 특징 선택 기법을 사용해 불필요한 특징을 미리 제거하는 것이 좋습니다.
 \end{tcolorbox}
 
-\newpage
+
 \section{불균형 데이터(\emph{Class Imbalance}) 처리}
 
 데이터셋에서 특정 클래스(소수 클래스)의 샘플 수가 다른 클래스(다수 클래스)에 비해 현저히 적을 때 발생하는 문제입니다. 이 경우 모델이 다수 클래스만 예측해도 높은 '정확도'를 얻을 수 있어, 실제로는 소수 클래스 예측 능력이 매우 낮아집니다.
 
-\begin{tcolorbox}[cautionbox, title=불균형 데이터 문제 진단]
+\begin{tcolorbox}[cautionbox, title={불균형 데이터 문제 진단}]
 \textbf{정확도(\emph{Accuracy})는 좋은 평가 지표가 아닙니다.}
 99\% 대 1\%의 클래스 불균형에서 모델이 항상 99\%의 다수 클래스만 예측해도 정확도는 99\%가 나옵니다.
 따라서, 불균형 데이터셋에서는 \textbf{F1-점수}나 \textbf{ROC 곡선 하 면적(\emph{AUC})}과 같은 지표를 사용해야 합니다.
@@ -11694,11 +12114,11 @@ MDI는 특정 특징이 트리의 불순도(예: 지니 불순도)를 평균적�
     \end{itemize}
 \end{enumerate}
 
-\begin{tcolorbox}[examplebox, title=실제 사용 전략]
+\begin{tcolorbox}[examplebox, title={실제 사용 전략}]
 데이터 균형을 맞출 때에는 세 가지 방법(언더샘플링, 오버샘플링, 가중치) 중 하나 또는 그 조합을 사용합니다. 예를 들어, 오버샘플링과 언더샘플링을 결합하거나, 데이터 재조정 후 클래스 가중치를 적용할 수 있습니다. 중요한 것은 \textbf{항상 데이터를 균형 있게 처리}하는 것입니다 (40\%/60\% 불균형에서도 적용 권장).
 \end{tcolorbox}
 
-\newpage
+
 \section{결측값(\emph{Missing Data}) 처리: 서러게이트 분할}
 
 결정 트리 기반 모델은 결측값을 처리하는 독특한 방법인 \textbf{서로게이트 분할(\emph{Surrogate Split})}을 사용할 수 있습니다.
@@ -11718,7 +12138,7 @@ MDI는 특정 특징이 트리의 불순도(예: 지니 불순도)를 평균적�
     \item \textbf{예측 시 사용}: 실제 예측 시점에 입력 데이터의 $P_{opt}$ 값이 결측이면, 미리 정의된 순위에 따라 가장 유사한 서러게이트 분할 특징을 대신 사용하여 데이터를 분할합니다.
 \end{enumerate}
 
-\begin{tcolorbox}[examplebox, title=서러게이트 분할 예시]
+\begin{tcolorbox}[examplebox, title={서러게이트 분할 예시}]
 주요 특징이 '\texttt{Arteries Blocked}'라고 가정합니다. 이 특징으로 분할했을 때, 환자들의 '심장병 유무' 분포가 나옵니다.
 \begin{itemize}
     \item \textbf{최적 분할 특징 (\texttt{Arteries Blocked})}: \texttt{FALSE} $\rightarrow$ [3 \texttt{No}, 1 \texttt{Yes}], \texttt{TRUE} $\rightarrow$ [0 \texttt{No}, 2 \texttt{Yes}]
@@ -11735,7 +12155,7 @@ MDI는 특정 특징이 트리의 불순도(예: 지니 불순도)를 평균적�
     \item \textbf{명시적 대체 불필요}: 데이터 분석가가 별도의 결측값 대체(\emph{Imputation}) 방법을 고민할 필요 없이, 트리가 자체적으로 결측값을 처리할 수 있습니다.
 \end{itemize}
 
-\newpage
+
 \section{FAQ 및 초심자 체크리스트}
 
 \subsection{자주 묻는 질문 (FAQ)}
@@ -11760,7 +12180,7 @@ MDI는 특정 특징이 트리의 불순도(예: 지니 불순도)를 평균적�
 
 \subsection{학습 및 구현 체크리스트}
 
-\begin{tcolorbox}[infobox, title=랜덤 포레스트 구현 전 점검 사항]
+\begin{tcolorbox}[infobox, title={랜덤 포레스트 구현 전 점검 사항}]
 \begin{itemize}
     \item \textbf{핵심 원리 이해}: 랜덤 포레스트가 배깅과의 차이점(특징 무작위 부분집합 선택)과 분산 감소 메커니즘을 명확히 설명할 수 있는가?
     \item \textbf{하이퍼파라미터 튜닝}: 가장 중요한 하이퍼파라미터 $J'$와 $B$의 역할 및 권장 기본값($\sqrt{N_j}$, $N_j/3$)을 아는가?
@@ -11771,352 +12191,417 @@ MDI는 특정 특징이 트리의 불순도(예: 지니 불순도)를 평균적�
 \end{itemize}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 23: 필수 용어 정리
+% Lecture 23: 용어 정리
 %=======================================================================
-\chapter{필수 용어 정리}
+\chapter{용어 정리}
 \label{ch:lecture23}
 
-\metainfo{CS109A: 데이터 과학 입문}{Lecture 23}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 23의 핵심 개념 학습}
+\metainfo{CS109A}{Lecture 23}{UIUC Student}{본 문서는 CS109A Lecture 23 강의 내용을 바탕으로 부스팅(Boosting) 기법을 심층적으로 다룹니다. 랜덤 포레스트(Random Forest)와의 비교를 통해 부스팅의 동기를 이해하고, 약한 학습기(Weak Learner)를 순차적으로 결합하여 모델의 편향(Bias)을 줄이는 원리를 설명합니다. 특히 그래디언트 부스팅(Gradient Boosting)의 작동 방식을 회귀 예시로 상세히 다루며, 이를 그래디언트 하강(Gradient Descent)의 관점에서 수학적으로 정당화합니다. 표 형식 데이터(Tabular Data)에서 부스팅의 강력한 성능과 학습률(\texttt{\lambda}) 튜닝의 중요성을 강조합니다.}
 
 
-\newpage
+\section{용어 정리} % section* -> section으로 변경하여 목차에 포함
+다음은 강의에서 다루는 주요 개념들을 쉽게 설명하고 원어를 병기한 표입니다.
 
-
-% 제목 섹션
-\begin{center}
-    \LARGE \textbf{부스팅(Boosting)과 그레디언트 부스팅(Gradient Boosting)} \\
-    \large \textit{약한 모델들을 모아 강력한 모델을 만드는 앙상블 기법 완전 정복}
-\end{center}
-
-\vspace{0.5cm}
-
-% ------------------------------------------------------------------------
-% 0. 개요 (Abstract)
-% ------------------------------------------------------------------------
-\begin{summarybox}{문서 핵심 요약}
-이 문서는 머신러닝의 강력한 앙상블 기법인 '부스팅(Boosting)'의 개념부터 '그레디언트 부스팅(Gradient Boosting)'의 수학적 원리까지 다룹니다.
-\begin{itemize}
-    \item \textbf{핵심 아이디어:} 단순한 모델(Weak Learner)을 순차적으로 연결하여, 앞선 모델의 실수를 뒤따르는 모델이 바로잡습니다.
-    \item \textbf{목표:} 편향(Bias)을 줄여 예측 성능을 극대화합니다. (랜덤 포레스트가 분산(Variance)을 줄이는 것과 대조적)
-    \item \textbf{원리:} 잔차(Residual)를 새로운 모델의 목표값(Target)으로 학습하며, 이는 수학적으로 경사 하강법(Gradient Descent)과 동일합니다.
-    \item \textbf{실전:} 학습률(Learning Rate) 조정을 통해 과적합(Overfitting)을 방지하는 것이 중요합니다.
-\end{itemize}
-\end{summarybox}
-
-\vspace{1cm}
-
-% ------------------------------------------------------------------------
-% 1. 용어 정리
-% ------------------------------------------------------------------------
-\section{필수 용어 정리}
-본격적인 학습에 앞서, 아래 용어들을 먼저 숙지하면 이해가 훨씬 수월합니다.
-
-\begin{table}[h]
-\centering
-\begin{adjustbox}{width=\textwidth}
-\begin{tabular}{l l l l}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
 \toprule
-\textbf{용어 (한글)} & \textbf{원어 (English)} & \textbf{쉬운 설명} & \textbf{비고} \\ 
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
 \midrule
-약한 학습기 & Weak Learner & 성능이 턱걸이 수준인 단순한 모델 (예: 깊이가 1인 트리) & 부스팅의 재료 \\ 
-\midrule
-강한 학습기 & Strong Learner & 약한 학습기를 모아 만든 고성능 모델 & 최종 결과물 \\ 
-\midrule
-잔차 & Residual & 정답과 내 예측값의 차이 ($y - \hat{y}$), 즉 '오차' & 다음 모델의 목표 \\ 
-\midrule
-앙상블 & Ensemble & 여러 모델을 조합하여 성능을 높이는 기법 & 협동 작업 \\ 
-\midrule
-스텀프 & Stump & 가지가 딱 한 번만 뻗은 아주 얕은 결정 트리 & 깊이(Depth)=1 \\ 
-\midrule
-학습률 & Learning Rate & 모델을 업데이트할 때 얼마나 반영할지 결정하는 보폭 ($\lambda$) & 과적합 방지용 \\ 
+부스팅 & 여러 약한 모델을 순차적으로 학습시켜 이전 모델의 실수를 보완하며 강력한 모델을 만드는 앙상블 기법. & Boosting & \\
+랜덤 포레스트 & 여러 결정 트리를 독립적으로 학습시킨 후 결과를 평균하여 분산을 줄이는 앙상블 기법. & Random Forest & \\
+약한 학습기 & 단독으로는 성능이 좋지 않지만, 여러 개를 모으면 강력해지는 간단한 모델. & Weak Learner & 주로 깊이가 얕은 결정 트리(Stump) \\
+스텀프 & 깊이가 1인 결정 트리. 즉, 단 한 번의 분할만 수행하는 가장 단순한 트리. & Stump & \\
+잔차 & 실제 값과 모델의 예측 값 사이의 차이. 모델이 틀린 정도를 나타냄. & Residual & \\
+학습률 & 그래디언트 하강이나 부스팅에서 모델 업데이트 시 얼마나 크게 스텝을 밟을지 결정하는 상수. & Learning Rate (\texttt{\lambda} 또는 \texttt{\eta}) & \\
+그래디언트 하강 & 함수의 최솟값을 찾기 위해 기울기(Gradient)의 반대 방향으로 조금씩 이동하는 최적화 알고리즘. & Gradient Descent & \\
+편향 & 모델이 실제 관계를 너무 단순하게 가정하여 발생하는 오차. 과소적합(Underfitting)과 관련. & Bias & \\
+분산 & 모델이 훈련 데이터의 작은 변화에도 예측이 크게 달라지는 정도. 과대적합(Overfitting)과 관련. & Variance & \\
+편향-분산 트레이드오프 & 모델 복잡도를 높이면 편향은 줄지만 분산은 늘고, 그 반대도 마찬가지인 관계. & Bias-Variance Trade-off & \\
+표 형식 데이터 & 행과 열로 구성된 테이블 형태의 데이터. 이미지, 텍스트, 오디오와 대비됨. & Tabular Data & \\
+과대적합 & 모델이 훈련 데이터에 너무 맞춰져서 새로운 데이터에 대한 예측 성능이 떨어지는 현상. & Overfitting & \\
+비모수 모델 & 데이터의 특정 분포를 가정하지 않거나, 고정된 수의 파라미터로 정의되지 않는 모델. & Non-parametric Model & 결정 트리가 대표적 \\
+추론 (ML) & 머신러닝 모델이 새로운 데이터에 대해 예측을 수행하는 과정. & Inference (ML) & 통계적 추론과 구분 \\
 \bottomrule
 \end{tabular}
+\caption{강의 주요 용어 정리}
+\label{tab:glossary}
 \end{adjustbox}
-\caption{부스팅 학습을 위한 필수 용어 사전}
-\label{tab:terms}
-\end{table}
 
-\newpage
 
-% ------------------------------------------------------------------------
-% 2. 부스팅(Boosting)의 기초와 직관
-% ------------------------------------------------------------------------
-\section{부스팅(Boosting)이란 무엇인가?}
+\section{부스팅(Boosting) 개요}
 
-\subsection{왜 필요한가? (배경)}
-우리는 이전에 \textbf{랜덤 포레스트(Random Forest)}와 \textbf{배깅(Bagging)}을 배웠습니다. 이들은 깊고 복잡한 트리(Overfitting 되기 쉬움)를 여러 개 만들어 평균을 냄으로써 \textbf{분산(Variance)}을 줄이는 전략을 썼습니다.
+\subsection{강의 소개 및 중요성}
+오늘 강의는 매우 흥미로운 내용으로 구성되어 있습니다. 처음에는 재미있고 직관적인 개념부터 시작하여, 중간에는 좀 더 구체적인 방법론을 다루고, 마지막에는 수학적인 깊이 있는 내용을 탐구합니다. 온라인으로 시청하는 분들은 현장의 열기를 놓치고 있지만, 이 강의는 모든 것을 담고 있습니다.
 
-하지만 \textbf{부스팅}은 정반대의 접근을 취합니다.
-\begin{itemize}
-    \item 아주 단순하고 멍청한 모델(High Bias, Low Variance)에서 시작합니다.
-    \item 이 모델의 \textbf{실수(편향, Bias)}를 줄이는 방향으로 모델을 계속 추가합니다.
-    \item 결과적으로 \textbf{편향을 획기적으로 줄여} 강력한 예측 모델을 만듭니다.
-\end{itemize}
+특히, 부스팅은 데이터 과학 분야에서 매우 중요한 기법입니다. 이미지, 텍스트, 오디오와 같은 비정형 데이터가 아닌, 행과 열로 잘 정리된 \textbf{표 형식 데이터(Tabular Data)}를 다룰 때, 부스팅과 랜덤 포레스트(Random Forest)는 신경망(Neural Network)보다 더 좋은 성능을 보이거나 최소한 동등한 성능을 냅니다. Kaggle과 같은 데이터 과학 경진대회에서도 표 형식 데이터 부문에서는 부스팅이나 랜덤 포레스트가 거의 항상 우승을 차지합니다. 따라서 이 방법론들을 배우는 것은 매우 중요합니다.
 
-\begin{tipbox}{직관적 비유: 어려운 시험 통과하기}
-여러분이 통과하기 매우 어려운 시험을 앞두고 있다고 상상해 봅시다. 한 명의 천재가 문제를 다 푸는 것이 아니라, 평범한 학생들의 지혜를 모으는 방식입니다.
-
-\begin{enumerate}
-    \item \textbf{학생 1 (단순한 규칙):} "일단 기출문제를 보니, 4번은 정답이 아니야." $\rightarrow$ 정확도 60\%
-    \item \textbf{학생 2 (실수 보완):} "학생 1이 틀린 문제들을 보니, 보기에 '과적합'이라는 단어가 있으면 그게 정답이더라." $\rightarrow$ 정확도 65\%
-    \item \textbf{학생 3 (추가 보완):} "학생 1, 2가 틀린 걸 보니, '교차 검증'이 답인 경우가 많아." $\rightarrow$ 정확도 70\%
-\end{enumerate}
-
-이 세 학생의 의견을 적절히 합치면(가중치 부여), 혼자서는 풀 수 없던 문제를 90점 이상으로 통과할 수 있습니다. 이것이 바로 \textbf{부스팅}입니다.
+\begin{tipbox}[title={신경망 vs. 부스팅/랜덤 포레스트}] % 마스터 템플릿의 tipbox 사용
+신경망이 모든 문제에 대한 만능 해결책은 아닙니다. 특히 표 형식 데이터에서는 부스팅이나 랜덤 포레스트가 더 효율적이고 강력한 성능을 발휘하는 경우가 많습니다. 복잡한 딥러닝 모델이 항상 필요한 것은 아니며, 문제의 특성에 맞는 적절한 도구를 선택하는 것이 중요합니다.
 \end{tipbox}
 
-\subsection{부스팅의 핵심 메커니즘}
-부스팅은 \textbf{순차적(Iterative)}이고 \textbf{덧셈적(Additive)}인 과정입니다.
-
-\[
-T_{final}(x) = \sum_{h \in H} \lambda_h T_h(x)
-\]
+\subsection{이전 학습 내용 복습: 결정 트리와 앙상블}
+지금까지 우리는 여러 머신러닝 모델을 학습했습니다.
 
 \begin{itemize}
-    \item $T_h$: 약한 학습기 (개별 학생의 의견)
-    \item $\lambda_h$: 가중치 (그 학생의 의견을 얼마나 신뢰할 것인가)
-    \item $T_{final}$: 최종 모델 (강한 학습기)
+    \item \textbf{결정 트리(Decision Trees):} 데이터를 분할하여 예측하는 모델입니다.
+    \item \textbf{배깅(Bagging):} 부트스트랩(Bootstrap) 샘플링을 통해 여러 트리를 만들고, 이들의 예측을 평균하여 분산(Variance)을 줄이는 방법입니다.
+    \item \textbf{랜덤 포레스트(Random Forest):} 배깅의 한 종류로, 각 분할(Split)마다 전체 특성(Predictors) 중 일부를 무작위로 선택하여 트리를 만듭니다. 이는 트리 간의 상관관계를 줄여 다양성(Diversity)을 높이고, 결과적으로 분산을 더욱 효과적으로 감소시킵니다.
 \end{itemize}
 
-\textbf{중요한 점:} 한 번에 모든 모델을 만드는 것이 아니라, \textbf{앞선 모델이 저지른 실수를 다음 모델이 해결}하도록 순서대로 만듭니다.
+랜덤 포레스트는 분산 감소에 탁월하지만, 여전히 일반화 성능(Generalization)이 높을 수 있습니다.
 
-\newpage
+\subsection{부스팅의 동기: 편향 감소에 집중}
+단일 결정 트리의 단점을 해결하는 다른 방법은 없을까요? 랜덤 포레스트는 깊은 트리를 여러 개 만들어 분산을 줄이는 데 초점을 맞췄습니다. 부스팅은 이와 반대 방향에서 접근합니다.
 
-% ------------------------------------------------------------------------
-% 3. 그레디언트 부스팅(Gradient Boosting)
-% ------------------------------------------------------------------------
-\section{그레디언트 부스팅 (Gradient Boosting)}
+\begin{tcolorbox}[summary, title={부스팅의 핵심 동기}] % 마스터 템플릿의 summary 스타일 사용
+\begin{itemize}
+    \item \textbf{얕은 트리(Shallow Trees)의 활용:} 깊이가 얕은 트리는 \textbf{높은 편향(High Bias)}과 \textbf{낮은 분산(Low Variance)}을 가집니다. 즉, 모델이 너무 단순하여 데이터의 복잡한 패턴을 잘 학습하지 못하고(과소적합, Underfitting), 훈련 데이터가 바뀌어도 예측이 크게 변하지 않습니다.
+    \item \textbf{편향 감소 목표:} 부스팅은 이러한 얕은 트리의 높은 편향을 줄이는 데 집중합니다.
+    \item \textbf{실수로부터 학습:} 이전 모델이 틀린 부분(실수)을 다음 모델이 학습하여 보완하는 방식으로 모델을 점진적으로 개선합니다.
+\end{itemize}
+\end{tcolorbox}
 
-부스팅 중에서도 가장 널리 쓰이고 강력한 방법이 \textbf{그레디언트 부스팅}입니다. 이름이 어렵게 들리지만, 원리는 간단합니다. \textbf{"이전 모델의 오차(잔차)를 새로운 모델이 학습한다"}는 것입니다.
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-bias-variance-tradeoff.png}  % Image not found: example-bias-variance-tradeoff.png % Placeholder for actual image
+    \caption{모델 복잡도에 따른 편향-분산 트레이드오프 (가상의 이미지)}
+    \label{fig:bias_variance_tradeoff}
+\end{figure}
 
-\subsection{핵심 원리: 잔차(Residual) 학습하기}
+위 그림 \ref{fig:bias_variance_tradeoff}에서 볼 수 있듯이, 모델 복잡도가 증가함에 따라 편향은 감소하고 분산은 증가합니다. 얕은 트리는 복잡도가 낮아 높은 편향과 낮은 분산을 가집니다. 부스팅은 이러한 얕은 트리를 활용하여 편향을 줄이는 방향으로 나아갑니다.
 
-\begin{tipbox}{비유: 골프 퍼팅}
-목표 지점(홀컵)까지 공을 보내야 합니다.
+\subsection{직관적 이해: 시험 통과 비유}
+부스팅의 아이디어를 쉽게 이해하기 위해 시험 통과 비유를 들어보겠습니다. 여러분은 최종 시험에서 A학점(90점)을 받아야 합니다.
+
+\begin{tcolorbox}[example, title={시험 통과 비유}] % 마스터 템플릿의 example 스타일 사용
 \begin{enumerate}
-    \item \textbf{첫 번째 샷 ($T_0$):} 공을 쳤는데 홀컵까지 10m가 남았습니다. (잔차 = 10m)
-    \item \textbf{두 번째 샷 ($T_1$):} 이제 목표는 홀컵이 아니라, '남은 거리 10m'를 보내는 것입니다. 쳤는데 2m가 남았습니다. (잔차 = 2m)
-    \item \textbf{세 번째 샷 ($T_2$):} 이제 목표는 '남은 거리 2m'입니다.
+    \item \textbf{첫 번째 약한 학습기:} 친구에게 "시험 잘 보는 팁"을 물어봅니다. 친구는 "절대 D 옵션을 선택하지 마!"라고 조언합니다. 이 규칙은 단순하고 완벽하지 않지만, 시험 점수를 60\%까지 올릴 수 있습니다. (높은 편향, 낮은 분산의 약한 학습기)
+    \item \textbf{두 번째 약한 학습기 (실수로부터 학습):} 60점으로는 A학점을 받을 수 없으므로, 이번에는 조교에게 조언을 구합니다. 조교는 "과대적합(Overfitting)이 보기에 있으면 그게 정답일 가능성이 높아!"라고 조언합니다. 이때 중요한 것은, 조교의 조언은 \textbf{이전 규칙으로 틀린 문제에 집중}하여 보완하는 것입니다.
+    \item \textbf{세 번째 약한 학습기 (실수로부터 학습):} 여전히 부족하여 교수님께 조언을 구합니다. 교수님은 "교차 검증(Cross Validation)이 답인 경우가 많아!"라고 조언합니다. 이 역시 이전 규칙들로 틀린 문제에 집중합니다.
+    \item \textbf{최종 결합:} 이제 세 가지 규칙("D 옵션 피하기", "과대적합 선택", "교차 검증 선택")을 각각의 중요도에 따라 가중치(Weights)를 부여하여 결합합니다. 예를 들어, "D 옵션 피하기"는 가중치를 낮게, "교차 검증 선택"은 가중치를 높게 부여하는 식입니다.
+    \item \textbf{결과:} 이 세 가지 약한 규칙을 적절히 결합한 결과, 최종 시험에서 90점을 받아 A학점을 받습니다.
 \end{enumerate}
-이렇게 계속 남은 거리(잔차)를 메우는 샷을 더해나가는 것이 그레디언트 부스팅입니다.
+\end{tcolorbox}
+
+이 비유에서 각 조언은 \textbf{약한 학습기(Weak Learner)}에 해당합니다. 이들은 단독으로는 완벽하지 않지만, \textbf{이전 모델의 실수로부터 학습}하여 \textbf{순차적으로(Iteratively)} \textbf{가중치를 부여하여 결합(Additively Combine)}함으로써 강력한 \textbf{강한 학습기(Strong Learner)}를 만들어냅니다.
+
+
+\section{그래디언트 부스팅(Gradient Boosting)의 작동 원리}
+
+\subsection{핵심 아이디어: 약한 학습기의 점진적 결합}
+그래디언트 부스팅의 핵심은 다음과 같습니다.
+\begin{itemize}
+    \item \textbf{약한 학습기(Simple Models):} 깊이가 얕은 결정 트리(예: 스텀프, Stump)와 같은 단순한 모델들을 사용합니다.
+    \item \textbf{가산적 결합(Additively Combine):} 이 약한 학습기들을 하나씩 추가하면서 이전 모델의 예측을 보완합니다.
+    \item \textbf{반복적 학습(Iteratively):} 다음 약한 학습기는 이전까지의 앙상블 모델이 저지른 실수(잔차)를 학습하여 보정합니다.
+\end{itemize}
+최종 모델은 각 약한 학습기에 \textbf{가중치(\texttt{\lambda})}를 곱하여 합산한 형태가 됩니다:
+\[ F(X) = \sum_{m=1}^{M} \lambda_m T_m(X) \]
+여기서 $T_m(X)$는 $m$번째 약한 학습기이고, $\lambda_m$은 해당 학습기의 가중치입니다.
+
+\subsection{회귀 문제 예시를 통한 단계별 설명}
+다음은 회귀 문제에서 그래디언트 부스팅이 어떻게 작동하는지 구체적인 예시를 통해 설명합니다.
+
+\begin{tcolorbox}[example, title={회귀 문제 예시}] % 마스터 템플릿의 example 스타일 사용
+우리는 예측 변수(X)와 반응 변수(Y)를 가진 데이터를 사용하여 회귀 모델을 구축하고자 합니다.
+
+\begin{enumerate}
+    \item \textbf{1단계: 첫 번째 약한 학습기 학습 (\texttt{T0})}
+    \begin{itemize}
+        \item 가장 먼저, 원본 데이터(X, Y)에 대해 첫 번째 약한 학습기($T_0$)를 학습시킵니다.
+        \item 약한 학습기는 보통 깊이가 1인 스텀프(Stump)입니다. 즉, 데이터를 한 번만 분할합니다.
+        \item 이 스텀프는 가중 평균 제곱 오차(Weighted MSE)를 최소화하는 분할 지점을 찾습니다.
+        \item 각 분할된 영역에서는 해당 영역의 Y 값들의 평균을 예측값으로 사용합니다.
+        \item 예를 들어, X가 6.8보다 작으면 -0.01, X가 6.8보다 크면 7.5를 예측합니다.
+    \end{itemize}
+
+    \item \textbf{2단계: 잔차(Residuals) 계산 (\texttt{R0})}
+    \begin{itemize}
+        \item 첫 번째 모델($T_0$)의 예측값($\hat{Y}_0$)과 실제 값(Y) 사이의 차이인 잔차($R_0 = Y - \hat{Y}_0$)를 계산합니다.
+        \item 이 잔차는 $T_0$가 얼마나 틀렸는지를 나타냅니다.
+    \end{itemize}
+
+    \item \textbf{3단계: 잔차에 대한 두 번째 약한 학습기 학습 (\texttt{T1})}
+    \begin{itemize}
+        \item 이제 \textbf{잔차($R_0$)}를 새로운 목표 변수(Y)로 간주하고, 두 번째 약한 학습기($T_1$)를 학습시킵니다.
+        \item $T_1$은 $R_0$를 최소화하는 분할 지점을 찾고, 각 영역에서 $R_0$의 평균을 예측합니다.
+        \item 예를 들어, X가 3.5보다 작으면 잔차를 2로, X가 3.5보다 크면 잔차를 -1.5로 예측합니다.
+        \item 이 단계는 이전 모델의 \textbf{실수(잔차)를 수정하는 방법}을 학습하는 것입니다.
+    \end{itemize}
+
+    \item \textbf{4단계: 학습률(\texttt{\lambda})을 이용한 모델 결합}
+    \begin{itemize}
+        \item 현재까지의 최종 모델($F_1$)은 첫 번째 모델($T_0$)과 두 번째 모델($T_1$)의 예측을 결합하여 만듭니다.
+        \item 이때, 두 번째 모델($T_1$)의 예측에 \textbf{학습률(\texttt{\lambda})}을 곱하여 더합니다.
+        \[ F_1(X) = T_0(X) + \lambda \cdot T_1(X) \]
+        \item 강의에서는 \texttt{\lambda = 0.5}로 설정했습니다. 이 학습률은 모델이 잔차를 얼마나 강하게 반영할지 조절하는 역할을 합니다. 너무 크게 설정하면 과대적합될 위험이 있습니다.
+    \end{itemize}
+
+    \item \textbf{5단계: 반복 (다음 잔차 계산 및 학습)}
+    \begin{itemize}
+        \item 이제 새로운 최종 모델($F_1$)에 대한 잔차($R_1 = Y - F_1(X)$)를 계산합니다.
+        \item 이 $R_1$을 목표 변수로 하여 세 번째 약한 학습기($T_2$)를 학습시킵니다.
+        \item 이 과정을 미리 정해진 반복 횟수(예: 100번) 또는 잔차 개선이 미미해질 때까지 반복합니다.
+        \item 최종 모델은 모든 약한 학습기들의 예측을 학습률과 함께 합산한 형태가 됩니다.
+        \[ F_M(X) = T_0(X) + \lambda \cdot T_1(X) + \lambda \cdot T_2(X) + \dots + \lambda \cdot T_M(X) \]
+    \end{itemize}
+\end{enumerate}
+\end{tcolorbox}
+
+\subsection{공식화된 그래디언트 부스팅 절차}
+위의 예시를 일반화하면 다음과 같은 절차로 요약할 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{초기 모델 학습:} 훈련 데이터에 대해 첫 번째 약한 모델 $T_0$를 학습합니다. (예: 모든 Y 값의 평균을 예측하는 모델)
+    \item \textbf{반복:} $m=1$부터 미리 정해진 횟수 또는 종료 조건이 충족될 때까지 다음을 반복합니다.
+    \begin{enumerate}
+        \item \textbf{잔차 계산:} 현재 앙상블 모델 $F_{m-1}(X)$의 잔차 $R_{m-1} = Y - F_{m-1}(X)$를 계산합니다.
+        \item \textbf{약한 학습기 학습:} 계산된 잔차 $R_{m-1}$를 목표 변수로 사용하여 새로운 약한 학습기 $T_m(X)$를 학습합니다.
+        \item \textbf{모델 업데이트:} 현재 앙상블 모델을 업데이트합니다.
+        \[ F_m(X) = F_{m-1}(X) + \lambda \cdot T_m(X) \]
+        여기서 $\lambda$는 \textbf{학습률(Learning Rate)}입니다.
+    \end{enumerate}
+    \item \textbf{최종 예측:} 최종 앙상블 모델 $F_M(X)$를 사용하여 예측을 수행합니다.
+\end{enumerate}
+
+\subsection{학습률(\texttt{\lambda})의 역할과 중요성}
+학습률 $\lambda$는 각 단계에서 새로운 약한 학습기의 기여도를 조절하는 중요한 하이퍼파라미터입니다.
+
+\begin{itemize}
+    \item \textbf{과대적합 방지:} $\lambda$가 너무 크면, 새로운 약한 학습기가 잔차를 너무 공격적으로 수정하여 모델이 훈련 데이터에 과대적합될 수 있습니다. 마치 골프 게임에서 공을 너무 세게 쳐서 목표를 지나쳐 버리는 것과 같습니다.
+    \item \textbf{안정적인 학습:} $\lambda$를 작게 설정하면, 모델은 잔차를 조금씩, 점진적으로 수정하며 더 안정적으로 학습합니다. 이는 수렴 속도는 느리지만, 더 견고한 모델을 만들 가능성이 높습니다.
+    \item \textbf{잔차 감소 보장:} $\lambda$를 적절히 설정하면, 각 반복마다 잔차가 감소하는 것을 보장할 수 있습니다.
+\end{itemize}
+
+\begin{tcolorbox}[importantbox, title={학습률(\texttt{\lambda})의 중요성}] % 마스터 템플릿의 importantbox 스타일 사용
+학습률(\texttt{\lambda})은 그래디언트 부스팅의 성능에 매우 큰 영향을 미칩니다. 너무 크면 과대적합과 불안정한 학습을 초래하고, 너무 작으면 학습 시간이 매우 길어질 수 있습니다. 적절한 \texttt{\lambda} 값은 교차 검증(Cross-validation)을 통해 찾아야 합니다.
+\end{tcolorbox}
+
+\subsection{실제 구현 시 유의사항}
+실제로 그래디언트 부스팅을 구현할 때는 모든 약한 학습기들을 하나의 거대한 트리로 명시적으로 결합하지 않습니다. 대신, 각 약한 학습기($T_0, T_1, \dots, T_M$)를 개별적으로 저장하고, 새로운 데이터에 대한 예측(추론) 시에는 각 트리의 예측값에 학습률을 곱하여 모두 더하는 방식으로 최종 예측값을 얻습니다.
+
+\[ \hat{Y}_{final}(X) = T_0(X) + \lambda \cdot T_1(X) + \lambda \cdot T_2(X) + \dots + \lambda \cdot T_M(X) \]
+
+\begin{tipbox}[title={머신러닝에서의 '추론(Inference)' 용어}] % 마스터 템플릿의 tipbox 사용
+통계학에서 '추론(Inference)'은 모집단에 대한 결론을 도출하는 것을 의미합니다. 하지만 머신러닝 분야에서는 종종 '추론'이라는 용어가 \textbf{모델이 새로운 데이터에 대해 예측(Prediction)을 수행하는 과정}을 의미하기도 합니다. 혼동을 피하기 위해 본 강의에서는 '예측'이라는 용어를 주로 사용합니다.
 \end{tipbox}
 
-\subsection{동작 알고리즘 (단계별 설명)}
 
-데이터가 입력값 $x$와 정답 $y$로 구성되어 있다고 합시다.
+\section{그래디언트 부스팅의 수학적 정당화: 그래디언트 하강(Gradient Descent)과의 연결}
 
-\textbf{Step 1: 아주 단순한 첫 번째 모델($T_0$)을 만듭니다.}
+\subsection{잔차 감소의 직관적 설명}
+우리는 각 단계에서 약한 학습기가 이전 모델의 잔차를 학습하도록 합니다. 이는 모델이 이전에 저지른 실수를 점진적으로 수정해 나가는 과정입니다.
+\[ R_m = R_{m-1} - \lambda \cdot T_m(X) \]
+여기서 $R_m$은 $m$번째 반복 후의 잔차이고, $R_{m-1}$은 이전 잔차입니다. $T_m(X)$는 이전 잔차를 예측하는 모델입니다. 만약 $T_m(X)$가 잔차를 잘 예측한다면, 새로운 잔차 $R_m$은 이전 잔차 $R_{m-1}$보다 작아질 것입니다. 즉, 모델의 오차가 점진적으로 감소합니다.
+
+\subsection{최적화의 기본 원리: 그래디언트 하강(Gradient Descent)}
+어떤 함수(예: 손실 함수, Loss Function)를 최소화하고자 할 때, 우리는 보통 해당 함수의 도함수(Derivative) 또는 편도함수(Partial Derivative)를 계산하여 0으로 설정함으로써 최솟값을 찾습니다. 하지만 복잡한 함수에서는 이를 분석적으로 풀기 어렵습니다. 이때 \textbf{그래디언트 하강(Gradient Descent)} 알고리즘이 유용하게 사용됩니다.
+
+\begin{tcolorbox}[summary, title={그래디언트 하강(Gradient Descent)의 핵심}] % 마스터 템플릿의 summary 스타일 사용
+그래디언트 하강은 함수의 최솟값을 찾기 위한 \textbf{반복적인(Iterative)} 최적화 알고리즘입니다.
 \begin{itemize}
-    \item 예: 그냥 전체 데이터의 평균값으로 예측합니다. 당연히 많이 틀립니다.
+    \item \textbf{목표:} 손실 함수 $L(W)$를 최소화하는 파라미터 $W$를 찾습니다.
+    \item \textbf{절차:}
+    \begin{enumerate}
+        \item \textbf{초기화:} 파라미터 $W$를 임의의 값으로 초기화합니다.
+        \item \textbf{기울기 계산:} 현재 파라미터 $W$에서 손실 함수 $L(W)$의 기울기(Gradient, $\nabla L(W)$)를 계산합니다. 기울기는 함수가 가장 빠르게 증가하는 방향을 나타냅니다.
+        \item \textbf{파라미터 업데이트:} 기울기의 \textbf{반대 방향}으로 파라미터를 업데이트합니다. 이때 \textbf{학습률(\texttt{\eta})}을 곱하여 이동할 스텝의 크기를 조절합니다.
+        \[ W_{new} = W_{old} - \eta \cdot \nabla L(W_{old}) \]
+        \item \textbf{반복:} 수렴하거나 미리 정해진 반복 횟수에 도달할 때까지 2, 3단계를 반복합니다.
+    \end{enumerate}
 \end{itemize}
-
-\textbf{Step 2: 잔차(Residual)를 계산합니다.}
-\begin{itemize}
-    \item $r_0 = y - T_0(x)$ 
-    \item 즉, (실제 정답) - (첫 번째 모델의 예측값) = (아직 맞추지 못한 남은 오차)입니다.
-\end{itemize}
-
-\textbf{Step 3: 잔차를 예측하는 두 번째 모델($T_1$)을 만듭니다.}
-\begin{itemize}
-    \item 이번에는 $y$를 맞추는 게 아니라, $r_0$(오차)를 맞추도록 학습합니다.
-    \item 즉, "얼마나 더 더해야 정답에 가까워지는가?"를 배웁니다.
-\end{itemize}
-
-\textbf{Step 4: 모델을 업데이트합니다.}
-\begin{itemize}
-    \item $T_{new} = T_0 + \lambda \times T_1$
-    \item 여기서 $\lambda$(람다)는 \textbf{학습률(Learning Rate)}입니다. 두 번째 모델의 의견을 100\% 반영하지 않고, 조금만 반영하여 과적합을 막습니다.
-\end{itemize}
-
-\textbf{Step 5: 반복합니다.}
-\begin{itemize}
-    \item 다시 새로운 잔차를 계산하고, 그 잔차를 맞추는 모델 $T_2, T_3, \dots$를 계속 더해 나갑니다.
-\end{itemize}
-
-\begin{alertbox}{주의: 실제로는 거대한 나무 하나를 만드는 게 아니다}
-"트리를 합친다"고 해서 실제로 노드와 가지를 물리적으로 합쳐서 거대한 트리 하나를 만드는 것이 아닙니다.
-추론(예측) 시에는 $T_0$의 출력값, $T_1$의 출력값, ... $T_n$의 출력값을 모두 계산한 뒤 \textbf{숫자들을 더해서} 최종 값을 냅니다.
-\end{alertbox}
-
-\newpage
-
-% ------------------------------------------------------------------------
-% 4. 시각적 예시 (Pseudo-Code \& Flow)
-% ------------------------------------------------------------------------
-\section{시각적 예시와 흐름}
-
-그레디언트 부스팅이 데이터를 어떻게 학습하는지 1차원 데이터 예시로 살펴봅니다.
-
-\subsection{데이터 상황}
-\begin{itemize}
-    \item $x$: 입력 변수 (0~8 사이의 값)
-    \item $y$: 출력 변수 (구불구불한 곡선 형태의 데이터)
-\end{itemize}
-
-\subsection{학습 과정 시각화}
-
-\begin{table}[h]
-\centering
-\begin{adjustbox}{width=\textwidth}
-\begin{tabular}{c l l}
-\toprule
-\textbf{단계} & \textbf{모델의 행동} & \textbf{결과 해석} \\ 
-\midrule
-\textbf{Round 1} & \begin{tabular}[c]{@{}l@{}}단순한 스텀프(Stump) 하나로\\ 전체 평균을 예측 ($T_0$)\end{tabular} & \begin{tabular}[c]{@{}l@{}}데이터의 복잡한 패턴을 전혀 못 잡음.\\ 잔차(오차)가 매우 큼.\end{tabular} \\ 
-\midrule
-\textbf{Round 2} & \begin{tabular}[c]{@{}l@{}}Round 1의 잔차(실제값 - 예측값)를\\ 목표로 하는 새 스텀프 학습 ($T_1$)\end{tabular} & \begin{tabular}[c]{@{}l@{}}큰 오차가 있던 부분을 보정함.\\ 전체 모델 모양이 데이터에 약간 가까워짐.\end{tabular} \\ 
-\midrule
-\textbf{Round 3} & \begin{tabular}[c]{@{}l@{}}현재까지 모델($T_0 + \lambda T_1$)의\\ 잔차를 다시 계산해 $T_2$ 학습\end{tabular} & \begin{tabular}[c]{@{}l@{}}세밀한 굴곡을 맞추기 시작함.\\ 오차가 점점 0에 가까워짐.\end{tabular} \\ 
-\midrule
-\textbf{...} & \textbf{반복 (Iteration)} & \textbf{점점 정밀한 모델 완성} \\ 
-\bottomrule
-\end{tabular}
-\end{adjustbox}
-\caption{그레디언트 부스팅의 단계별 학습 흐름}
-\label{tab:gb_flow}
-\end{table}
-
-\subsection{수식 요약}
-\[
-\text{최종 예측 } \hat{y} = T_0(x) + \lambda T_1(x) + \lambda T_2(x) + \dots + \lambda T_N(x)
-\]
-\begin{itemize}
-    \item 각 $T_i$는 이전 단계까지 해결하지 못한 '나머지 오차'를 해결하는 전문가입니다.
-    \item $\lambda$(학습률)가 작을수록, 더 많은 트리가 필요하지만 더 정교하고 안정적인 모델이 됩니다.
-\end{itemize}
-
-\newpage
-
-% ------------------------------------------------------------------------
-% 5. 왜 '그레디언트'인가? (수학적 원리)
-% ------------------------------------------------------------------------
-\section{심화: 왜 '그레디언트(Gradient)' 부스팅인가?}
-
-"잔차를 학습하는 것"이 왜 "경사 하강법(Gradient Descent)"과 같은지 이해하면, 이 알고리즘의 본질을 깨닫게 됩니다.
-
-\subsection{경사 하강법 (Gradient Descent) 복습}
-우리가 산 정상에서 가장 낮은 계곡(손실 함수 $L$의 최소값)으로 내려가려 합니다.
-\begin{itemize}
-    \item 눈을 가리고 있다면, 발끝으로 경사를 느낍니다.
-    \item 경사가 가장 가파르게 올라가는 방향(Gradient, $\nabla L$)의 \textbf{반대 방향}으로 발을 내디뎌야 내려갈 수 있습니다.
-    \item 공식: $w_{new} = w_{old} - \lambda \times \nabla L$ (파라미터 업데이트)
-\end{itemize}
-
-\subsection{함수 공간(Function Space)에서의 하강}
-일반적인 머신러닝은 파라미터($w$, 가중치)를 수정합니다. 하지만 부스팅은 \textbf{함수(모델의 예측값 $\hat{y}$) 자체}를 수정하여 정답에 다가갑니다.
-
-우리가 최소화하고 싶은 손실 함수가 평균 제곱 오차(MSE)라고 가정해 봅시다.
-\[
-L(y, \hat{y}) = \frac{1}{2}(y - \hat{y})^2
-\]
-
-이 손실 함수를 예측값 $\hat{y}$에 대해 미분해 봅니다(경사를 구합니다).
-\[
-\frac{\partial L}{\partial \hat{y}} = -(y - \hat{y})
-\]
-
-어라? 결과가 익숙합니다.
-\begin{itemize}
-    \item $y - \hat{y}$는 바로 \textbf{잔차(Residual)}입니다.
-    \item 즉, \textbf{-(잔차)}가 곧 \textbf{기울기(Gradient)}입니다.
-    \item 경사 하강법은 기울기의 '반대 방향'으로 가는 것이므로, \textbf{-(-잔차) = 잔차 방향}으로 이동하면 됩니다.
-\end{itemize}
-
-\begin{summarybox}{핵심 결론}
-\textbf{"잔차를 더해주는 것"}은 수학적으로 \textbf{"손실 함수의 기울기(Gradient) 반대 방향으로 이동하여 에러를 줄이는 것"}과 완벽하게 동일합니다.
-따라서 이 방법을 \textbf{그레디언트 부스팅}이라고 부릅니다.
-\end{summarybox}
-
-\newpage
-
-% ------------------------------------------------------------------------
-% 6. 실전: 하이퍼파라미터와 튜닝
-% ------------------------------------------------------------------------
-\section{실전 가이드: 모델 튜닝하기}
-
-그레디언트 부스팅을 실제로 사용할 때 가장 중요한 두 가지 설정(Hyperparameter)이 있습니다.
-
-\subsection{1. 학습률 (Learning Rate, $\lambda$)}
-\begin{itemize}
-    \item \textbf{정의:} 새로 추가되는 트리의 의견을 얼마나 반영할지 결정하는 비율 (보통 0.01 ~ 0.1 사이).
-    \item \textbf{$\lambda$가 너무 클 때:} 학습이 빠르지만, 최적점을 지나치거나(Overshooting) 과적합될 위험이 큽니다. (성큼성큼 걷다가 구덩이에 빠짐)
-    \item \textbf{$\lambda$가 너무 작을 때:} 학습이 매우 느리고 많은 트리가 필요하지만, 일반화 성능이 좋습니다. (아주 조심스럽게 발을 내딛음)
-\end{itemize}
-
-\subsection{2. 반복 횟수 (Number of Iterations)}
-\begin{itemize}
-    \item 트리를 몇 개나 더할 것인가를 결정합니다.
-    \item 너무 많으면 훈련 데이터에 과도하게 맞춰져(Overfitting) 테스트 성능이 떨어질 수 있습니다.
-    \item \textbf{조기 종료(Early Stopping):} 검증 데이터(Validation Set)의 성능이 더 이상 좋아지지 않으면 학습을 멈추는 기법을 주로 사용합니다.
-\end{itemize}
-
-\subsection{튜닝 전략}
-보통 \textbf{학습률을 낮게($\lambda \downarrow$)} 설정하고, \textbf{트리 개수를 늘리는($N \uparrow$)} 방식이 성능이 가장 좋습니다. 다만 계산 시간이 오래 걸린다는 단점이 있습니다.
-
-% ------------------------------------------------------------------------
-% 7. FAQ 및 오해 바로잡기
-% ------------------------------------------------------------------------
-\section{자주 묻는 질문 (FAQ) 및 오해 바로잡기}
-
-\begin{tcolorbox}[colback=white, colframe=mainblue, title=Q1. 랜덤 포레스트와 부스팅 중 뭐가 더 좋나요?]
-\textbf{A.} 정답은 "데이터에 따라 다르다"입니다.
-\begin{itemize}
-    \item \textbf{랜덤 포레스트:} 병렬 학습이 가능해 빠르고, 튜닝 없이도 무난하게 좋은 성능을 냅니다. (Overfitting에 강함)
-    \item \textbf{그레디언트 부스팅:} 순차 학습이라 느리고 튜닝이 까다롭지만, 잘 튜닝하면 일반적으로 랜덤 포레스트보다 \textbf{더 높은 정확도}를 냅니다. (Kaggle 대회 우승 알고리즘의 주역)
-\end{itemize}
-테이블 형태(Tabular) 데이터에서는 두 모델 모두 딥러닝보다 더 좋은 성능을 낼 때가 많습니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[colback=white, colframe=mainblue, title=Q2. 'Inference'란 무슨 뜻인가요?]
-\textbf{A.} 문맥에 따라 다릅니다.
+\begin{tcolorbox}[example, title={그래디언트 하강 비유: 어두운 산에서 하산하기}] % 마스터 템플릿의 example 스타일 사용
+어두운 밤, 산 정상에 홀로 서서 가장 낮은 곳(음식과 물이 있는 곳)으로 내려가야 한다고 상상해 보세요. 아무것도 보이지 않지만, 발밑의 경사(기울기)는 느낄 수 있습니다.
 \begin{itemize}
-    \item \textbf{통계학:} 데이터로부터 모집단의 특성을 추론하고 가설을 검정하는 것 (예: p-value 구하기).
-    \item \textbf{머신러닝/공학:} 학습된 모델에 새로운 데이터를 넣어 \textbf{예측(Prediction)}값을 뽑아내는 과정.
+    \item \textbf{기울기 측정:} 발밑에서 가장 가파른 내리막길 방향을 찾습니다. 이것이 기울기의 반대 방향입니다.
+    \item \textbf{스텝 크기 조절:} 경사가 가파르면(기울기 절댓값이 크면) 큰 걸음으로 빠르게 내려가고, 경사가 완만해지면(기울기 절댓값이 작아지면) 작은 걸음으로 조심스럽게 내려갑니다. 이것이 학습률(\texttt{\eta})과 기울기 크기의 곱으로 스텝 크기를 조절하는 원리입니다.
+    \item \textbf{반복:} 계속해서 발밑의 경사를 느끼고, 가장 가파른 내리막길 방향으로 걸음을 옮기는 과정을 반복합니다. 결국 가장 낮은 곳(최솟값)에 도달하게 됩니다.
 \end{itemize}
-부스팅 강의나 자료에서 "Inference가 느리다"고 하면 "예측값을 계산하는 데 시간이 걸린다"는 뜻입니다.
 \end{tcolorbox}
 
-\newpage
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.7\textwidth]{example-gradient-descent.png}  % Image not found: example-gradient-descent.png % Placeholder for actual image
+    \caption{그래디언트 하강의 작동 원리 (가상의 이미지)}
+    \label{fig:gradient_descent}
+\end{figure}
 
-% ------------------------------------------------------------------------
-% 8. 최종 체크리스트
-% ------------------------------------------------------------------------
-\section{학습 마무리 체크리스트}
-
-이 문서를 다 읽은 후, 아래 질문에 스스로 답할 수 있다면 완벽하게 이해한 것입니다.
-
-\begin{itemize}[label=$\square$]
-    \item \textbf{개념:} 부스팅이 배깅(랜덤 포레스트)과 근본적으로 어떻게 다른지 설명할 수 있는가? (힌트: 병렬 vs 순차, 분산 감소 vs 편향 감소)
-    \item \textbf{직관:} "약한 학습기"와 "강한 학습기"의 관계를 비유를 들어 설명할 수 있는가?
-    \item \textbf{알고리즘:} 그레디언트 부스팅이 다음 트리를 만들 때 사용하는 '타겟 값'이 무엇인가? (힌트: 잔차)
-    \item \textbf{수학:} 잔차(Residual)가 왜 손실 함수의 기울기(Gradient)와 관련이 있는지 설명할 수 있는가?
-    \item \textbf{실전:} 학습률($\lambda$)이 높을 때와 낮을 때의 장단점을 알고 있는가?
+\subsubsection{학습률(\texttt{\eta})의 영향}
+\begin{itemize}
+    \item \textbf{\texttt{\eta}가 너무 작을 때:} 매우 작은 걸음으로 이동하므로 최솟값에 도달하는 데 시간이 오래 걸립니다.
+    \item \textbf{\texttt{\eta}가 너무 클 때:} 너무 큰 걸음으로 이동하여 최솟값을 건너뛰거나, 오히려 발산하여 최솟값에서 멀어질 수 있습니다. 마치 산을 내려가다가 너무 크게 점프해서 반대편 언덕으로 넘어가 버리는 것과 같습니다.
 \end{itemize}
 
-\vspace{2cm}
+\subsubsection{볼록 함수와 지역 최솟값}
+\begin{itemize}
+    \item \textbf{볼록 함수(Convex Function):} 손실 함수가 볼록하면 그래디언트 하강은 항상 전역 최솟값(Global Minimum)을 찾을 수 있습니다. 로지스틱 회귀(Logistic Regression)의 손실 함수는 볼록하지만, 분석적으로 해를 찾기 어렵기 때문에 그래디언트 하강을 사용합니다.
+    \item \textbf{비볼록 함수(Non-convex Function):} 손실 함수가 비볼록하면 그래디언트 하강은 지역 최솟값(Local Minimum)에 갇힐 수 있습니다.
+        \begin{itemize}
+            \item \textbf{해결책:}
+                \begin{itemize}
+                    \item \textbf{무작위 재시작(Random Restarts):} 여러 시작점에서 그래디언트 하강을 수행하여 가장 좋은 최솟값을 선택합니다.
+                    \item \textbf{확률적 그래디언트 하강(Stochastic Gradient Descent, SGD):} 데이터의 일부만 사용하여 기울기를 계산하여 지역 최솟값에서 벗어날 가능성을 높입니다 (CS109B에서 다룸).
+                    \item \textbf{실용적 접근:} 지역 최솟값이 전역 최솟값만큼 좋지 않더라도, 교차 검증을 통해 충분히 좋은 성능을 보인다면 만족하는 경우도 많습니다. 딥러닝 분야에서는 지역 최솟값이 전역 최솟값과 크게 다르지 않다는 연구 결과도 있습니다.
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
 
-\begin{center}
-    \textit{"여러 개의 멍청한 모델이 힘을 합치면, 하나의 천재 모델보다 똑똑할 수 있다."} \\
-    \textbf{-- 부스팅의 철학}
-\end{center}
+\subsection{부스팅을 그래디언트 하강으로 해석}
+이제 그래디언트 부스팅을 그래디언트 하강의 관점에서 이해해 봅시다.
 
-\newpage
+\subsubsection{예측 공간에서의 최적화}
+일반적인 그래디언트 하강은 모델의 파라미터(예: 선형 회귀의 $\beta$ 값, 신경망의 가중치 $W$)를 최적화합니다. 하지만 결정 트리와 같은 \textbf{비모수 모델(Non-parametric Models)}은 고정된 수의 파라미터로 정의되지 않습니다. (트리는 데이터를 분할할 때마다 새로운 노드가 생기므로 파라미터 수가 고정되어 있지 않습니다.)
+
+따라서 그래디언트 부스팅은 파라미터 공간이 아닌 \textbf{함수 공간(Function Space)} 또는 \textbf{예측 공간(Prediction Space)}에서 최적화를 수행하는 것으로 볼 수 있습니다.
+
+\begin{itemize}
+    \item \textbf{손실 함수:} 평균 제곱 오차(MSE)를 손실 함수로 사용한다고 가정해 봅시다.
+    \[ L(Y, \hat{Y}) = \frac{1}{N} \sum_{i=1}^{N} (Y_i - \hat{Y}_i)^2 \]
+    \item \textbf{기울기 계산:} 이 손실 함수를 예측값 $\hat{Y}_i$에 대해 미분하면 다음과 같습니다.
+    \[ \frac{\partial L}{\partial \hat{Y}_i} = -2(Y_i - \hat{Y}_i) \]
+    \item \textbf{잔차와의 관계:} 이 기울기는 실제 값과 예측값의 차이, 즉 \textbf{잔차(Residual)}에 비례합니다 (부호는 반대).
+    \[ -\frac{1}{2} \frac{\partial L}{\partial \hat{Y}_i} = Y_i - \hat{Y}_i = R_i \]
+    따라서, 손실 함수를 최소화하는 가장 이상적인 방향은 \textbf{잔차의 방향}입니다. 만약 $\hat{Y}_i$를 파라미터로 직접 최적화한다면, 한 번의 스텝으로 $\hat{Y}_i = Y_i$가 되어 완벽하게 과대적합됩니다. 이는 모델이 아무것도 학습하지 않은 것과 같습니다.
+\end{itemize}
+
+\subsubsection{약한 학습기가 기울기를 근사하는 역할}
+그래디언트 부스팅은 이 문제를 다음과 같이 해결합니다.
+\begin{itemize}
+    \item \textbf{이상적인 방향:} 각 데이터 포인트에 대해 손실 함수의 음의 기울기(Negative Gradient)는 해당 데이터 포인트의 잔차와 같습니다. 이것이 모델이 나아가야 할 '이상적인' 방향입니다.
+    \item \textbf{약한 학습기의 근사:} 하지만 우리는 $\hat{Y}_i$를 직접 업데이트하는 대신, \textbf{약한 학습기($T_m$)}를 사용하여 이 잔차(즉, 음의 기울기)를 \textbf{근사(Approximate)}합니다.
+    \item \textbf{점진적 개선:} $T_m$은 매우 단순한 모델(스텀프)이므로, 잔차를 완벽하게 근사하지 못합니다. 하지만 이 불완전한 근사를 통해 모델은 잔차를 조금씩, 점진적으로 수정해 나갑니다.
+    \item \textbf{학습률(\texttt{\lambda})의 재해석:} 이때 학습률 $\lambda$는 그래디언트 하강에서 스텝 크기를 조절하는 $\eta$와 동일한 역할을 합니다. 즉, 약한 학습기가 근사한 기울기 방향으로 얼마나 크게 스텝을 밟을지 결정합니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.7\textwidth]{example-gradient-boosting-path.png}  % Image not found: example-gradient-boosting-path.png % Placeholder for actual image
+    \caption{그래디언트 부스팅의 함수 공간에서의 경로 (가상의 이미지)}
+    \label{fig:gradient_boosting_path}
+\end{figure}
+
+위 그림 \ref{fig:gradient_boosting_path}에서 볼 수 있듯이, 이상적인 경로는 잔차 방향으로 한 번에 최솟값에 도달하는 것이지만 (과대적합), 그래디언트 부스팅은 약한 학습기를 통해 잔차(기울기)를 근사하고, 학습률(\texttt{\lambda})을 조절하며 점진적으로 최솟값에 가까워집니다.
+
+\begin{tcolorbox}[summary, title={그래디언트 부스팅 = 함수 공간에서의 그래디언트 하강}] % 마스터 템플릿의 summary 스타일 사용
+그래디언트 부스팅은 모델의 파라미터가 아닌 \textbf{모델 자체(함수)}를 최적화하는 그래디언트 하강의 한 형태로 볼 수 있습니다. 각 약한 학습기는 현재 앙상블 모델의 손실 함수에 대한 \textbf{음의 기울기(잔차)}를 근사하고, 학습률(\texttt{\lambda})에 따라 그 방향으로 모델을 업데이트합니다. 이 과정을 반복하여 최종적으로 손실을 최소화하는 강력한 모델을 구축합니다.
+\end{tcolorbox}
+
+\subsection{수렴 보장 및 학습률(\texttt{\lambda}) 튜닝}
+\begin{itemize}
+    \item \textbf{수렴 보장:} 그래디언트 부스팅은 그래디언트 하강의 원리를 따르므로, 학습률 $\lambda$가 충분히 작다면 모델이 최솟값으로 수렴하는 것을 보장할 수 있습니다.
+    \item \textbf{학습률 튜닝:} $\lambda$는 교차 검증(Cross-validation)을 통해 최적의 값을 찾아야 합니다.
+        \begin{itemize}
+            \item \textbf{시각적 확인:} 학습 과정에서 손실(Loss)이 꾸준히 감소하거나 정확도(Accuracy)가 꾸준히 증가하는지 확인합니다.
+            \item \textbf{불안정한 학습:} 만약 손실이 급격히 변동하거나 정확도가 오르내린다면, $\lambda$가 너무 높게 설정되었을 가능성이 큽니다.
+            \item \textbf{고급 기법:} 109B와 같은 고급 과정에서는 기울기의 크기에 반비례하여 $\lambda$를 조절하는 Adam, Momentum과 같은 고급 최적화 기법을 배우게 됩니다.
+        \end{itemize}
+\end{itemize}
+
+\subsection{종료 조건}
+그래디언트 부스팅은 다음 두 가지 방법 중 하나로 학습을 종료합니다.
+\begin{itemize}
+    \item \textbf{최대 반복 횟수 제한:} 미리 정해진 수의 약한 학습기(예: 100개)를 생성한 후 학습을 종료합니다.
+    \item \textbf{성능 개선 임계값:} 새로운 약한 학습기를 추가해도 손실 함수(예: 잔차 제곱합)의 개선이 특정 임계값(예: 0.1\%) 미만일 경우 학습을 종료합니다. 이는 불필요한 계산을 줄이고 과대적합을 방지하는 데 도움이 됩니다.
+\end{itemize}
+
+
+\section{체크리스트: 학습 점검}
+다음 체크리스트를 통해 그래디언트 부스팅에 대한 이해도를 점검해 보세요.
+
+\begin{itemize}
+    \item \textbf{부스팅의 동기 이해:} 왜 랜덤 포레스트 외에 부스팅이 필요한지 설명할 수 있는가?
+    \item \textbf{약한 학습기 개념:} 약한 학습기가 무엇이며, 왜 부스팅에서 약한 학습기를 사용하는지 설명할 수 있는가? (예: 스텀프)
+    \item \textbf{그래디언트 부스팅 절차:} 회귀 예시를 통해 그래디언트 부스팅의 단계별 작동 원리를 설명할 수 있는가? (잔차 학습, 가산적 결합)
+    \item \textbf{학습률(\texttt{\lambda})의 역할:} 학습률이 무엇이며, 모델 학습에 어떤 영향을 미치는지 설명할 수 있는가?
+    \item \textbf{그래디언트 하강 기본 원리:} 그래디언트 하강이 무엇이며, 어떻게 최솟값을 찾아가는지 설명할 수 있는가? (기울기, 스텝 크기)
+    \item \textbf{부스팅과 그래디언트 하강의 연결:} 그래디언트 부스팅이 왜 함수 공간에서의 그래디언트 하강으로 해석될 수 있는지 설명할 수 있는가? (잔차가 음의 기울기)
+    \item \textbf{비모수 모델의 이해:} 결정 트리가 왜 비모수 모델인지 설명할 수 있는가?
+    \item \textbf{학습률 튜닝 및 종료 조건:} 학습률을 어떻게 튜닝하고, 언제 학습을 종료해야 하는지 설명할 수 있는가?
+    \item \textbf{표 형식 데이터에서의 중요성:} 부스팅이 표 형식 데이터에서 왜 강력한지 설명할 수 있는가?
+\end{itemize}
+
+
+\section{FAQ: 자주 묻는 질문}
+
+\begin{faqbox}[title=\textbf{Q: 왜 부스팅이 랜덤 포레스트보다 튜닝하기 어려운가요?}] % faqbox 스타일 사용
+\textbf{A:} 부스팅은 약한 학습기들을 순차적으로 학습시키기 때문에, 각 단계의 결정이 다음 단계에 영향을 미칩니다. 이로 인해 학습률(\texttt{\lambda}), 약한 학습기의 깊이, 반복 횟수 등 여러 하이퍼파라미터 간의 상호작용이 복잡해집니다. 반면 랜덤 포레스트는 트리를 독립적으로 학습시키므로 튜닝이 상대적으로 간단합니다. 부스팅은 과대적합에 더 취약할 수 있어 신중한 튜닝이 필요합니다.
+\end{faqbox}
+
+\begin{faqbox}[title=\textbf{Q: 약한 학습기(Weak Learner)란 정확히 무엇인가요?}] % faqbox 스타일 사용
+\textbf{A:} 약한 학습기는 단독으로는 예측 성능이 좋지 않지만, 무작위 추측보다는 약간 더 나은 성능을 보이는 모델을 의미합니다. 그래디언트 부스팅에서는 주로 깊이가 1인 결정 트리인 \textbf{스텀프(Stump)}를 약한 학습기로 사용합니다. 스텀프는 데이터를 단 한 번만 분할하여 매우 단순한 규칙을 학습합니다. 이러한 단순함 덕분에 과대적합 위험이 낮고, 여러 개를 결합했을 때 강력한 시너지를 낼 수 있습니다.
+\end{faqbox}
+
+\begin{faqbox}[title=\textbf{Q: 학습률(\texttt{\lambda})이 너무 크거나 작으면 모델 학습에 어떤 문제가 발생하나요?}] % faqbox 스타일 사용
+\textbf{A:}
+\begin{itemize}
+    \item \textbf{\texttt{\lambda}가 너무 크면:} 모델이 잔차를 너무 공격적으로 수정하여 최솟값을 건너뛰거나 발산할 수 있습니다. 이는 학습이 불안정해지고 과대적합될 가능성을 높입니다.
+    \item \textbf{\texttt{\lambda}가 너무 작으면:} 모델이 매우 작은 스텝으로 이동하므로 최솟값에 도달하는 데 매우 오랜 시간이 걸립니다. 이는 계산 비용이 커지고 학습 효율이 떨어집니다.
+\end{itemize}
+따라서 적절한 \texttt{\lambda} 값을 찾는 것이 중요하며, 일반적으로 교차 검증을 통해 최적의 값을 탐색합니다.
+\end{faqbox}
+
+\begin{faqbox}[title=\textbf{Q: 결정 트리가 왜 비모수 모델(Non-parametric Model)인가요?}] % faqbox 스타일 사용
+\textbf{A:} 비모수 모델은 데이터의 특정 분포를 가정하지 않거나, 모델의 복잡도(즉, 파라미터의 수)가 데이터에 따라 유연하게 변하는 모델을 의미합니다. 결정 트리는 데이터를 분할할 때마다 새로운 노드와 분할 규칙이 생성되므로, 모델의 구조와 파라미터 수가 고정되어 있지 않습니다. 반면 선형 회귀나 로지스틱 회귀는 $\beta_0, \beta_1, \dots$와 같이 고정된 수의 파라미터를 가집니다. 이러한 유연성 때문에 결정 트리는 비모수 모델로 분류됩니다.
+\end{faqbox}
+
+\begin{faqbox}[title=\textbf{Q: 머신러닝에서 '추론(Inference)'이라는 용어는 통계적 추론과 어떻게 다른가요?}] % faqbox 스타일 사용
+\textbf{A:}
+\begin{itemize}
+    \item \textbf{통계적 추론:} 모집단 특성(예: 평균, 분산)에 대해 표본 데이터를 기반으로 결론을 도출하거나 가설을 검정하는 과정입니다. 불확실성을 정량화하고 신뢰 구간을 제시하는 것이 중요합니다.
+    \item \textbf{머신러닝 추론:} 훈련된 머신러닝 모델이 새로운, 보지 못한 데이터에 대해 예측(Prediction)을 수행하는 과정을 의미합니다. 주로 모델의 예측 성능에 초점을 맞춥니다.
+\end{itemize}
+강의에서는 혼동을 피하기 위해 머신러닝 맥락에서는 '예측'이라는 용어를 사용하는 것이 좋다고 강조합니다.
+\end{faqbox}
+
+
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[summary, title={\textbf{부스팅 핵심 요약}}] % summary 스타일 사용
+\textbf{목표:} 약한 학습기(Weak Learners)를 순차적으로 결합하여 모델의 \textbf{편향(Bias)}을 줄이고 강력한 모델을 구축.
+
+\textbf{랜덤 포레스트와의 차이:}
+\begin{itemize}
+    \item \textbf{랜덤 포레스트:} 독립적인 트리 병렬 학습, \textbf{분산(Variance)} 감소.
+    \item \textbf{부스팅:} 순차적인 트리 학습, 이전 모델의 \textbf{실수(잔차)} 보완, \textbf{편향} 감소.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={\textbf{그래디언트 부스팅 작동 원리}}] % infobox 스타일 사용
+\textbf{1. 초기 모델:} 원본 데이터에 첫 번째 약한 학습기($T_0$) 학습.
+\textbf{2. 잔차 계산:} $T_0$의 예측 오차(잔차 $R_0$) 계산.
+\textbf{3. 잔차 학습:} $R_0$를 목표로 두 번째 약한 학습기($T_1$) 학습.
+\textbf{4. 모델 결합:} $F_1(X) = T_0(X) + \lambda \cdot T_1(X)$ (학습률 $\lambda$ 사용).
+\textbf{5. 반복:} 새로운 $F_1(X)$의 잔차를 계산하고, 이를 학습하는 다음 약한 학습기를 추가하는 과정 반복.
+\textbf{핵심:} 다음 모델은 이전 모델의 \textbf{실수(잔차)}로부터 학습하여 점진적으로 개선.
+\end{tcolorbox}
+
+\begin{tcolorbox}[warningbox, title={\textbf{그래디언트 하강(Gradient Descent)과의 연결}}] % warningbox 스타일 사용
+\textbf{1. 최적화 목표:} 손실 함수 $L(Y, \hat{Y})$를 최소화.
+\textbf{2. 기울기(Gradient):} 손실 함수를 예측값 $\hat{Y}$에 대해 미분하면 \textbf{잔차($Y - \hat{Y}$)}에 비례.
+\textbf{3. 함수 공간 최적화:} 결정 트리는 비모수 모델이므로 파라미터 공간이 아닌 \textbf{함수 공간}에서 최적화.
+\textbf{4. 약한 학습기의 역할:} 각 약한 학습기($T_m$)는 현재 앙상블 모델의 손실 함수에 대한 \textbf{음의 기울기(잔차)}를 근사.
+\textbf{5. 학습률(\texttt{\lambda}):} 그래디언트 하강의 스텝 크기(\texttt{\eta})와 동일하게, 기울기 방향으로 얼마나 크게 이동할지 조절.
+\textbf{결론:} 그래디언트 부스팅은 함수 공간에서 \textbf{잔차(음의 기울기)}를 약한 학습기로 근사하며 점진적으로 최솟값을 찾아가는 그래디언트 하강의 한 형태.
+\end{tcolorbox}
+
+\begin{tcolorbox}[importantbox, title={\textbf{중요 사항}}] % importantbox 스타일 사용
+\textbf{표 형식 데이터:} 부스팅과 랜덤 포레스트는 표 형식 데이터에서 신경망보다 우수한 성능을 보이는 경우가 많음.
+\textbf{학습률(\texttt{\lambda}) 튜닝:} 과대적합 방지 및 안정적인 학습을 위해 교차 검증을 통한 신중한 튜닝 필수.
+\textbf{종료 조건:} 최대 반복 횟수 또는 손실 개선 임계값 설정.
+\end{tcolorbox}
 
 
 %=======================================================================
-% Chapter 24: Lecture 24
+% Lecture 24: Lecture 24
 %=======================================================================
 \chapter{Lecture 24}
 \label{ch:lecture24}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 24}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 24의 핵심 개념 학습}
-
-
-\newpage
 
 
 % -----------------------------------------------------------------------------
@@ -12134,7 +12619,7 @@ L(y, \hat{y}) = \frac{1}{2}(y - \hat{y})^2
 % -----------------------------------------------------------------------------
 \section{개요}
 
-\begin{summarybox}{핵심 요약}
+\begin{summarybox}[title={핵심 요약}]
 AdaBoost는 '실수로부터 배운다'는 철학을 가진 머신러닝 알고리즘입니다. 아주 간단한 모델(Weak Learner)을 여러 번 순차적으로 학습시키되, \textbf{이전 단계에서 틀린 문제(오분류 데이터)에 더 큰 가중치}를 부여하여 다음 모델이 그 문제를 집중적으로 공부하게 만듭니다. 최종적으로 이들을 합쳐 강력한 예측 성능을 냅니다.
 \end{summarybox}
 
@@ -12174,7 +12659,6 @@ AdaBoost는 '실수로부터 배운다'는 철학을 가진 머신러닝 알고�
     \label{tab:terminology}
 \end{table}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 3. 핵심 개념과 원리
@@ -12243,7 +12727,6 @@ AdaBoost는 복잡한 트리를 쓰지 않고, 아주 단순한 \textbf{스텀�
     \item \textbf{최종 예측:} 모든 스텀프의 예측값에 각자의 중요도($\lambda$)를 곱해 더한 뒤, 부호(Sign)를 봅니다. (양수면 +1, 음수면 -1)
 \end{enumerate}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 5. 실습 예제: 2차원 데이터 분류
@@ -12260,7 +12743,7 @@ AdaBoost는 복잡한 트리를 쓰지 않고, 아주 단순한 \textbf{스텀�
     \item \textbf{결과:} 이 세 개의 단순한 직선(스텀프)들이 합쳐져서, 복잡한 곡선 형태의 경계면을 만들어냅니다.
 \end{enumerate}
 
-\begin{tipbox}{팁: 스텀프는 어떻게 가중치를 반영하나요?}
+\begin{tipbox}[title={팁: 스텀프는 어떻게 가중치를 반영하나요?}]
 결정 트리 알고리즘(Gini Index 등)을 계산할 때, 단순히 데이터 개수를 세는 것이 아니라 \textbf{가중치의 합(Weighted Sum)}을 사용하면 됩니다. 또는, 가중치가 높은 데이터를 가중치만큼 복사(Resampling)하여 데이터 셋을 늘린 뒤 학습하는 방법도 있습니다.
 \end{tipbox}
 
@@ -12294,7 +12777,6 @@ AdaBoost는 복잡한 트리를 쓰지 않고, 아주 단순한 \textbf{스텀�
     \item \textbf{Gradient 관점:} AdaBoost도 넓은 의미에서 보면 Exponential Loss에 대한 Gradient Descent를 수행하는 것으로 해석할 수 있습니다.
 \end{itemize}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 7. 과적합(Overfitting)과 하이퍼파라미터
@@ -12342,14 +12824,13 @@ A3. 면접이나 시험에 나올 수 있는 질문입니다. 정답은 \textbf{
     \item \textbf{Non-parametric 관점:} 데이터가 많아질수록 트리 구조가 계속 커지고 복잡해지므로(파라미터 수가 고정되어 있지 않음). 통계학적으로는 주로 Non-parametric으로 분류합니다.
 \end{itemize}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 9. 체크리스트 (시험/과제 대비)
 % -----------------------------------------------------------------------------
 \section{학습 체크리스트 (시험 및 프로젝트 대비)}
 
-\begin{warningbox}{과제/프로젝트 주의사항}
+\begin{warningbox}[title={과제/프로젝트 주의사항}]
 XGBoost와 같은 최신 라이브러리는 과제(Homework)에서는 사용이 제한될 수 있으니(직접 구현 요구 등), 공지사항을 꼭 확인하세요. 하지만 기말 프로젝트에서는 성능을 위해 적극 권장됩니다.
 \end{warningbox}
 
@@ -12367,7 +12848,7 @@ XGBoost와 같은 최신 라이브러리는 과제(Homework)에서는 사용이 
 % -----------------------------------------------------------------------------
 \section{한 페이지 요약 (Cheat Sheet)}
 
-\begin{tcolorbox}[colback=white, colframe=black, title=AdaBoost Quick Review]
+\begin{tcolorbox}[colback=white, colframe=black, title={AdaBoost Quick Review}]
 \begin{enumerate}
     \item \textbf{정의:} 약한 학습기(Stump)를 순차적으로 연결하여 강한 예측기를 만드는 앙상블 기법.
     \item \textbf{핵심 메커니즘:}
@@ -12400,19 +12881,14 @@ y_pred = ada.predict(X_test)
 \end{enumerate}
 \end{tcolorbox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 25: 개요: 왜 더 복잡한 앙상블이 필요한가?
+% Lecture 25: 개요: 왜 더 복잡한 앙상블이 필요한가?
 %=======================================================================
 \chapter{개요: 왜 더 복잡한 앙상블이 필요한가?}
 \label{ch:lecture25}
 
 \metainfo{CS109A: 데이터 과학 입문}{Lecture 25}{Pavlos Protopapas, Kevin Rader, Chris Gumb}{Lecture 25의 핵심 개념 학습}
-
-
-\newpage
 
 
 % 제목 섹션
@@ -12429,7 +12905,7 @@ y_pred = ada.predict(X_test)
 
 이 문서는 기존의 랜덤 포레스트나 부스팅(Bagging/Boosting)을 넘어, 서로 다른 종류의 모델들을 결합하여 성능을 극대화하는 고급 앙상블 기법을 다룹니다.
 
-\begin{summarybox}{핵심 목표 및 요약}
+\begin{summarybox}[title={핵심 목표 및 요약}]
 \begin{itemize}
     \item \textbf{한계 극복:} 단일 모델(Decision Tree 등)이나 동일한 모델의 집합(Random Forest)만으로는 해결하기 어려운 복잡한 데이터 패턴을 학습합니다.
     \item \textbf{이종 결합:} 선형 회귀, KNN, SVM 등 성격이 완전히 다른 모델들을 하나로 합쳐 각 모델의 장점만 취합니다.
@@ -12465,7 +12941,6 @@ y_pred = ada.predict(X_test)
 \caption{앙상블 심화 학습을 위한 핵심 용어}
 \end{table}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 3. 핵심 개념: 앙상블의 진화
@@ -12474,7 +12949,7 @@ y_pred = ada.predict(X_test)
 
 우리가 이전에 배운 Bagging과 Boosting은 강력하지만, 주로 \textbf{'같은 종류의 모델(주로 결정 트리)'}을 사용하는 한계가 있습니다. Blending과 Stacking은 \textbf{'서로 다른 모델'}을 결합한다는 점에서 차이가 있습니다.
 
-\begin{analogybox}{어벤져스 팀 구성하기}
+\begin{analogybox}[title={어벤져스 팀 구성하기}]
 \begin{itemize}
     \item \textbf{Bagging (Random Forest):} 100명의 의사가 모여서 진단하고 다수결로 결정합니다. (모두가 의사라는 점에서 동질적임)
     \item \textbf{Blending/Stacking:} 의사, 변호사, 회계사가 모입니다. 그리고 이들의 의견을 종합해서 최종 결정을 내리는 '판사(Meta Model)'가 있습니다. (서로 다른 직업군이 모여 이질적임)
@@ -12525,11 +13000,10 @@ Blending은 데이터를 여러 조각으로 나누어, 일부는 기반 모델(
     \item \textbf{최종 평가:} Test 세트로 최종 성능을 확인합니다.
 \end{enumerate}
 
-\begin{warningbox}{Blending의 단점: 데이터 효율성}
+\begin{warningbox}[title={Blending의 단점: 데이터 효율성}]
 Blending은 Validation과 Holdout 세트를 따로 떼어놓아야 하므로, 실제로 모델 학습에 사용할 수 있는 데이터의 양이 줄어듭니다. 데이터가 아주 많다면 괜찮지만, 데이터가 적다면 성능 저하가 올 수 있습니다.
 \end{warningbox}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 5. Stacking (스태킹)
@@ -12556,7 +13030,7 @@ Stacking은 Blending과 비슷하지만, \textbf{교차 검증(Cross-Validation)
     \item \textbf{최종 추론:} Test 데이터를 입력하면, 기반 모델들이 예측값을 내놓고, 이를 메타 모델이 받아 최종 결과를 출력합니다.
 \end{enumerate}
 
-\begin{analogybox}{Stacking 과정 비유}
+\begin{analogybox}[title={Stacking 과정 비유}]
 팀원들이 돌아가며 모의고사를 봅니다.
 \begin{itemize}
     \item A가 시험 볼 때 B, C가 공부한 걸로 채점해주고,
@@ -12572,7 +13046,6 @@ Stacking은 Blending과 비슷하지만, \textbf{교차 검증(Cross-Validation)
     \item \textbf{주의:} 데이터 차원이 커지고 복잡해질 수 있습니다.
 \end{itemize}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 6. Mixture of Experts (전문가 혼합 모델)
@@ -12596,7 +13069,7 @@ Stacking은 Blending과 비슷하지만, \textbf{교차 검증(Cross-Validation)
     \item $f_i(x)$: $i$번째 전문가의 예측값
 \end{itemize}
 
-\begin{analogybox}{병원 진료 시스템}
+\begin{analogybox}[title={병원 진료 시스템}]
 환자(데이터)가 병원에 오면, 접수처 직원(Gating Network)이 증상을 듣고 정형외과(Expert 1)로 보낼지, 내과(Expert 2)로 보낼지 결정합니다. 모든 의사가 다 같이 진료하는 것이 아니라, 가장 적합한 의사가 주도적으로 치료합니다.
 \end{analogybox}
 
@@ -12608,7 +13081,6 @@ Stacking은 Blending과 비슷하지만, \textbf{교차 검증(Cross-Validation)
     \item \textbf{해결:} 학습 시 손실 함수(Loss Function)를 조정하여 전문가들이 골고루 학습되도록 유도해야 합니다.
 \end{itemize}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 7. 실습 및 구현 가이드 (Implementation)
@@ -12617,7 +13089,7 @@ Stacking은 Blending과 비슷하지만, \textbf{교차 검증(Cross-Validation)
 
 Stacking은 `sklearn` 라이브러리를 통해 쉽게 구현할 수 있습니다. 아래는 개념적인 의사 코드(Pseudo-code) 흐름입니다.
 
-\begin{tcolorbox}[colback=codebg, title=Stacking Regressor 구현 흐름]
+\begin{tcolorbox}[colback=codebg, title={Stacking Regressor 구현 흐름}]
 \begin{verbatim}
 from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import LinearRegression
@@ -12657,7 +13129,6 @@ y_pred = clf.predict(X_test)
     \item \textbf{해석(Interpretation)이 중요하다:} $\rightarrow$ Stacking을 쓰되, 메타 모델로 선형 회귀를 써서 각 기반 모델의 가중치(계수)를 확인한다.
 \end{itemize}
 
-\newpage
 
 % -----------------------------------------------------------------------------
 % 8. 체크리스트 및 FAQ
@@ -12690,8 +13161,6 @@ A. 아닙니다. 데이터 학습 과정(Gradient Descent)을 통해 모델이 �
 \begin{center}
     \small \textbf{학습 팁:} 처음에는 Random Forest나 Gradient Boosting 같은 검증된 단일 앙상블 기법을 먼저 마스터하세요. 그 후 성능의 한계를 느낄 때, 서로 다른 모델들을 섞는 Stacking을 시도해보는 것이 가장 효율적인 학습 순서입니다.
 \end{center}
-
-\newpage
 
 
 \end{document}

@@ -1,0 +1,907 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{kotex, hyperref, xcolor, tcolorbox, booktabs, graphicx, amsmath, amssymb, listings, setspace, fancyhdr, adjustbox}
+
+% 줄간격 설정
+\onehalfspacing
+% 단락 설정
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+% 표 줄간격 설정
+\renewcommand{\arraystretch}{1.2}
+
+% 코드 리스팅 설정
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numbersep=6pt,
+  frame=single,
+  captionpos=b, % 캡션 위치를 아래로
+  aboveskip=1em, % 코드 블록 위 여백
+  belowskip=1em, % 코드 블록 아래 여백
+  xleftmargin=0.75em, % 왼쪽 여백
+  xrightmargin=0.75em, % 오른쪽 여백
+  showstringspaces=false, % 문자열 내 공백 표시 안 함
+  commentstyle=\color{gray}\ttfamily, % 주석 스타일
+  keywordstyle=\color{blue}\ttfamily, % 키워드 스타일
+  stringstyle=\color{red}\ttfamily % 문자열 스타일
+}
+
+% PDF 메타데이터 설정
+\hypersetup{
+  pdftitle={CSCI103 Lecture 11: LLM 및 에이전트 개발 및 배포},
+  pdfauthor={UIUC Student},
+  pdfsubject={CSCI E-103: Introduction to the Intellectual Enterprises of CS},
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=cyan,
+  citecolor=green
+}
+
+% 헤더/푸터 설정
+\pagestyle{fancy}
+\fancyhf{} % 모든 헤더/푸터 초기화
+\fancyhead[L]{CSCI103 Lecture 11: LLM 및 에이전트 개발 및 배포} % 왼쪽 헤더
+\fancyfoot[C]{\thepage} % 중앙 푸터 (페이지 번호)
+\fancyfoot[R]{\today} % 오른쪽 푸터 (날짜)
+\renewcommand{\headrulewidth}{0.4pt} % 헤더 구분선
+\renewcommand{\footrulewidth}{0.4pt} % 푸터 구분선
+
+% tcolorbox 스타일 정의
+\tcbset{
+  mybox/.style={
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    boxsep=5pt,
+    arc=4pt,
+    boxrule=1pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt
+  },
+  summarybox/.style={
+    mybox={핵심 요약},
+    colback=green!5!white,
+    colframe=green!75!black,
+  },
+  cautionbox/.style={
+    mybox={주의 사항},
+    colback=red!5!white,
+    colframe=red!75!black,
+  },
+  examplebox/.style={
+    mybox={예시},
+    colback=yellow!5!white,
+    colframe=yellow!75!black,
+  },
+  conceptbox/.style={
+    mybox={개념},
+    colback=purple!5!white,
+    colframe=purple!75!black,
+  }
+}
+
+\begin{document}
+
+\newpage
+\section*{개요}
+이 문서는 CSCI103 Lecture 11 강의 자료를 바탕으로 대규모 언어 모델(LLM)과 에이전트의 개발 및 배포에 대한 포괄적인 내용을 다룹니다. AI의 진화 과정부터 LLM의 핵심 개념, 활용 사례, 그리고 실제 구현 시 발생할 수 있는 도전 과제와 윤리적 고려 사항까지 상세히 설명합니다. 특히, Databricks 플랫폼을 활용한 LLM 기능 데모를 통해 이론적 지식을 실제 적용하는 방법을 제시하며, 초심자도 쉽게 이해할 수 있도록 풍부한 설명과 예시를 제공합니다.
+
+\begin{itemize}
+    \item \textbf{주요 목표:} LLM의 기본 원리, 활용법, 그리고 실제 시스템 구축 시 필요한 기술적/윤리적 지식 습득.
+    \item \textbf{핵심 개념:} LLM, RAG, Fine-tuning, 에이전트, 환각, 편향, AI 성숙도 곡선.
+    \item \textbf{평가 포인트:} LLM의 장단점 이해, 적절한 LLM 활용 전략 수립, 윤리적 문제 해결 방안 모색.
+\end{itemize}
+
+\newpage
+\section{용어 정리}
+
+LLM과 에이전트 분야는 빠르게 발전하고 있으며, 다양한 전문 용어가 사용됩니다. 다음 표는 강의에서 다루어진 주요 용어들을 비전공자도 이해하기 쉽게 설명합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+LLM & 대량의 텍스트 데이터를 학습하여 사람처럼 언어를 이해하고 생성하는 AI 모델. & Large Language Model & 텍스트 처리의 핵심 기술. \\
+GAN & 서로 경쟁하는 두 개의 신경망(생성자, 판별자)을 이용해 새로운 데이터를 생성하는 모델. & Generative Adversarial Network & 주로 이미지 생성에 사용. \\
+Diffusion Model & 노이즈를 점진적으로 제거하여 고품질 이미지, 비디오 등을 생성하는 모델. & Diffusion Model & 딥페이크, 립싱크 비디오 등에 활용. \\
+Foundational LLM & 인터넷의 방대한 데이터를 기반으로 학습된 가장 기본적인 대규모 언어 모델. & Foundational LLM & OpenAI의 GPT-3, Anthropic의 Claude 등. \\
+환각 (Hallucination) & LLM이 사실이 아닌 정보를 매우 자신감 있게 생성하는 현상. & Hallucination & 잘못된 정보 제공 위험. \\
+접지 (Grounding) & LLM이 단어나 용어를 실제 세계의 객체나 개념과 연결하여 이해하는 과정. & Grounding & LLM의 세상 이해도 향상. \\
+프롬프트 엔지니어링 & LLM에게 특정 방식으로 행동하도록 지시하는 프롬프트(명령어)를 만드는 기술. & Prompt Engineering & LLM의 성능을 최적화하는 핵심. \\
+제로샷 학습 & 모델에게 예시 없이 질문만으로 작업을 수행하도록 요청하는 방식. & Zero-shot Learning & 새로운 작업에 대한 일반화 능력 테스트. \\
+퓨샷 학습 & 모델에게 몇 가지 예시를 제공하여 작업을 수행하도록 요청하는 방식. & Few-shot Learning & 제로샷보다 정확도 향상에 도움. \\
+사고의 사슬 (Chain of Thought) & 모델이 답변을 도출하는 과정을 단계별로 보여주어 정확도와 해석 가능성을 높이는 기법. & Chain of Thought & 복잡한 문제 해결에 유용. \\
+양식 (Modality) & 데이터의 유형 (텍스트, 이미지, 오디오, 비디오 등). & Modality & 멀티모달 모델은 여러 양식 처리. \\
+트랜스포머 & 자연어 처리(NLP)를 위한 신경망 아키텍처로, 인코더, 디코더, 임베딩으로 구성. & Transformers & LLM의 기반 기술. \\
+튜닝 (Tuning) & 모델의 성능을 특정 목적에 맞게 조정하는 과정. & Tuning & 지시 튜닝(프롬프트)과 파인튜닝(추가 학습)으로 나뉨. \\
+파인튜닝 (Fine-tuning) & 사전 학습된 모델을 특정 도메인 데이터로 추가 학습시켜 전문성을 높이는 과정. & Fine-tuning & 비용 효율적인 모델 맞춤화. \\
+RLHF & 인간의 피드백을 통해 모델의 행동을 강화 학습시키는 기법. & Reinforcement Learning with Human Feedback & 모델의 안전성과 유용성 향상. \\
+RAG & 검색을 통해 외부 지식을 가져와 LLM의 답변을 보강하는 기술. & Retrieval Augmented Generation & 환각 감소 및 최신 정보 반영. \\
+AGI & 인간과 동등하거나 그 이상의 지능을 가진 인공지능. & Artificial General Intelligence & 미래 AI의 궁극적인 목표. \\
+Superintelligence & 인간의 지능을 훨씬 뛰어넘는 인공지능. & Superintelligence & 잠재적 위험과 기회 공존. \\
+벡터 데이터베이스 & 텍스트, 이미지 등을 벡터(숫자 배열)로 변환하여 저장하고 유사성을 검색하는 데이터베이스. & Vector Database & RAG 시스템의 핵심 구성 요소. \\
+임베딩 (Embedding) & 단어나 문장 등을 숫자 벡터로 변환하여 의미를 표현하는 기술. & Embedding & 벡터 데이터베이스에서 유사성 검색에 사용. \\
+AI Gateway & 여러 AI 모델에 대한 단일 접근 지점을 제공하여 관리, 보안, 모니터링을 용이하게 하는 시스템. & AI Gateway & API 게이트웨이와 유사. \\
+에이전트 (Agent) & LLM을 기반으로 특정 목표를 달성하기 위해 도구를 사용하고 의사결정을 내리는 자율적인 시스템. & Agent & 복잡한 작업을 자동화. \\
+Genie & Databricks의 SQL 어시스턴트로, 자연어 질문을 SQL 쿼리로 변환하여 데이터 분석을 돕는 에이전트. & Genie & 데이터 접근성 향상. \\
+Agent Bricks & Databricks의 에이전트 개발 플랫폼으로, 에이전트 생성 및 오케스트레이션을 간소화. & Agent Bricks & 에이전트 개발의 AutoML. \\
+UC 함수 & Unity Catalog에 등록된 함수로, SQL 쿼리나 Python 코드를 통해 특정 작업을 수행. & UC Functions & 데이터 거버넌스 하에 함수 재사용. \\
+ESG 스코어 & 기업의 환경(Environment), 사회(Social), 지배구조(Governance) 성과를 평가하는 지표. & ESG Score & 기업의 지속 가능성 및 윤리성 평가. \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{인공지능(AI)의 진화와 대규모 언어 모델(LLM)}
+
+인공지능은 오랜 기간 동안 다양한 형태로 발전해 왔으며, 최근 대규모 언어 모델(LLM)의 등장은 AI 분야에 혁명적인 변화를 가져왔습니다. 이 섹션에서는 AI의 발전 단계를 살펴보고, LLM이 왜 중요한지, 그리고 미래에 어떤 영향을 미 미칠지에 대해 논의합니다.
+
+\subsection{AI의 발전 단계}
+
+AI는 단순한 규칙 기반 시스템에서 시작하여 점차 복잡한 학습 능력을 갖추게 되었습니다. 각 단계는 이전 단계의 한계를 극복하며 새로운 가능성을 열었습니다.
+
+\begin{itemize}
+    \item \textbf{규칙 기반 시스템 (Rule-based Systems):}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} 미리 정의된 규칙에 따라 작동하는 가장 기본적인 AI 형태.
+        \item \textbf{직관적 예시/비유:} "만약 A이면 B를 해라"와 같은 명확한 지침을 따르는 로봇.
+        \item \textbf{기술적 설명:} 특정 조건이 충족될 때 미리 정해진 행동을 수행하도록 프로그래밍된 시스템입니다. 복잡한 상황에 대한 유연성이 부족합니다.
+    \end{itemize}
+
+    \item \textbf{고전적 머신러닝 (Classical Machine Learning):}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} 데이터에서 패턴을 학습하여 예측이나 분류를 수행하는 모델.
+        \item \textbf{직관적 예시/비유:} 과거 판매 데이터를 보고 다음 달 판매량을 예측하는 시스템.
+        \item \textbf{기술적 설명:} 회귀(Regression) 모델 등 통계적 방법을 사용하여 데이터 내의 관계를 파악하고, 이를 기반으로 새로운 데이터에 대한 결정을 내립니다.
+    \end{itemize}
+
+    \item \textbf{딥러닝 (Deep Learning):}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} 인간 뇌의 신경망을 모방한 다층 구조의 신경망을 사용하여 복잡한 패턴을 학습하는 기술.
+        \item \textbf{직관적 예시/비유:} 수많은 고양이 사진을 보고 '고양이'를 스스로 식별하는 능력.
+        \item \textbf{기술적 설명:} 여러 층의 인공 신경망(Neural Networks)을 통해 데이터의 추상적인 특징을 학습하며, 이미지 인식, 음성 인식 등에서 뛰어난 성능을 보입니다.
+    \end{itemize}
+
+    \item \textbf{생성형 AI (Generative AI) 및 LLM:}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} 기존 데이터를 기반으로 새로운 데이터를 생성하는 AI. 특히 LLM은 텍스트 생성에 특화.
+        \item \textbf{직관적 예시/비유:} 주어진 키워드로 시를 쓰거나, 특정 스타일의 그림을 그리는 AI.
+        \item \textbf{기술적 설명:} 최근 개발된 기술로, 대규모 언어 모델(LLM)은 텍스트 처리를 위해, GAN(Generative Adversarial Network) 모델은 이미지 생성을 위해 개발되었습니다. 기존 AI가 데이터를 분석하고 예측하는 데 중점을 두었다면, 생성형 AI는 새로운 데이터를 '창조'하는 데 초점을 맞춥니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ai_evolution_venn_diagram.png} % 이미지 파일이 없으므로 가상의 파일명 사용
+    \caption{AI 기술의 진화 및 관계 (벤 다이어그램)}
+    \label{fig:ai_evolution}
+\end{figure}
+
+\begin{tcolorbox}[conceptbox={AI 기술 간의 관계}]
+    강의에서는 AI 기술 간의 관계를 벤 다이어그램으로 설명했습니다.
+    \begin{itemize}
+        \item \textbf{인공지능 (Artificial Intelligence):} 가장 큰 범주로, 기계가 인간의 지능을 모방하도록 하는 모든 기술을 포함합니다.
+        \item \textbf{머신러닝 (Machine Learning):} AI의 하위 범주로, 명시적인 프로그래밍 없이 데이터로부터 학습하는 알고리즘을 의미합니다.
+        \item \textbf{신경망 (Neural Networks):} 머신러닝의 하위 범주로, 인간 뇌의 신경망 구조를 모방한 모델입니다.
+        \item \textbf{LLM 및 GAN:} 신경망의 하위 범주로, 각각 텍스트와 이미지 생성에 특화된 최신 기술입니다.
+    \end{itemize}
+    생성형 AI는 기존 데이터에서 새로운 데이터를 생성할 수 있다는 점에서 전통적인 AI 방법과 핵심적인 차이를 가집니다.
+\end{tcolorbox}
+
+\subsection{LLM의 중요성 및 잠재력}
+
+LLM은 방대한 양의 데이터를 통해 학습하며, 인간의 뇌가 신경 연결을 기반으로 학습하는 방식과 유사하게 작동합니다. Meta, Amazon, Google, OpenAI와 같은 거대 기업들은 인터넷의 모든 데이터를 수집하여 모델을 훈련시키는 데 막대한 자원을 투자하고 있습니다.
+
+\begin{itemize}
+    \item \textbf{LLM의 능력:}
+    \begin{itemize}
+        \item 질문에 답변하기
+        \item 텍스트 요약하기
+        \item 컴퓨터 코드 작성하기
+        \item 법률 문서 포함 콘텐츠 생성하기
+        \item 언어 번역하기
+    \end{itemize}
+    현재 수천 개의 다양한 LLM이 존재하며, 각기 다른 기능을 가지고 있습니다. 모델들은 질문에 답변하는 능력 면에서 지속적으로 발전하고 있습니다.
+
+    \item \textbf{LLM에 주목해야 하는 이유:}
+    \begin{itemize}
+        \item \textbf{티핑 포인트 도달:} LLM은 그 능력과 잠재력 면에서 전환점에 도달하고 있으며, 그 발전 속도는 가속화되고 있습니다.
+        \item \textbf{경제성 및 접근성:} 이제는 Amazon Echo와 같은 기기에서도 LLM이 사용되어 일반인도 쉽게 접근할 수 있게 되었습니다. Google 검색 결과에도 LLM 모델의 출력이 포함됩니다.
+        \item \textbf{AGI 및 초지능 예측:} 일부 전문가들은 인공 일반 지능(AGI)이 이르면 2026년에 나타날 수 있다고 예측합니다. AGI는 LLM이 인간과 동등한 능력을 갖추는 지점이며, 이후에는 스스로 학습하고 발전하여 인간보다 수백, 수천 배 더 지능적인 초지능(Superintelligence)으로 진화할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{LLM 기술의 접근성 및 미래}
+
+LLM 기술의 발전은 접근성과 윤리적 책임이라는 두 가지 중요한 측면을 동시에 고려해야 합니다.
+
+\begin{itemize}
+    \item \textbf{개방성과 맞춤화:}
+    \begin{itemize}
+        \item 대부분의 LLM 기술은 오픈 소스이거나 공개적으로 접근 가능하여 누구나 사용하고 맞춤화할 수 있습니다.
+        \item LLM 훈련에는 GPU(그래픽 처리 장치)를 사용하는 막대한 컴퓨팅 자원이 필요하지만, 클라우드 환경에서 이러한 자원을 이용할 수 있으며, 대기업들이 기술 확산을 위해 종종 보조금을 지급하기도 합니다.
+    \end{itemize}
+
+    \item \textbf{AGI 및 초지능의 영향:}
+    \begin{itemize}
+        \item AGI와 초지능의 도래는 인류에게 실존적인 도전이 될 수 있습니다. 우리는 이러한 강력한 모델이 오용되지 않도록 '뚜껑을 닫아두는' 방법을 찾아야 합니다.
+        \item LLM은 지식에 대한 접근을 민주화하는 등 매우 긍정적인 잠재력을 가지고 있지만, 그 결과가 인류에게 이롭도록 만드는 것은 이 분야의 실무자들에게 달려 있습니다.
+        \item \textbf{추천 도서:} Nick Bostrom의 "Superintelligence"는 AGI와 초지능이 도래했을 때 발생할 수 있는 도전 과제와 문제점을 다루고 있습니다.
+    \end{itemize}
+
+    \item \textbf{LLM 개발 생태계:}
+    \begin{itemize}
+        \item \textbf{모델 유형:} 독점(Proprietary) 모델과 오픈 소스(Open Source) LLM이 모두 존재합니다.
+        \item \textbf{애플리케이션 개발 도구:} LangChain, LangGraph와 같은 기술은 LLM을 활용한 애플리케이션 개발을 돕습니다.
+        \item \textbf{에이전트 기술:} LLM과 다른 정보 소스를 결합하여 자율적으로 작업을 수행하는 에이전트(Agent)를 생성하는 기술도 발전하고 있습니다. 에이전트는 LLM의 능력을 확장하여 더 복잡한 문제를 해결할 수 있게 합니다.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{LLM 활용 사례 및 구현 전략}
+
+LLM은 다양한 산업 분야에서 혁신적인 변화를 가져올 수 있는 잠재력을 가지고 있습니다. 이 섹션에서는 LLM의 주요 활용 사례를 살펴보고, LLM을 구현하는 다양한 전략과 각 전략의 장단점을 비교합니다.
+
+\subsection{LLM의 주요 활용 사례}
+
+LLM은 지식 접근성 향상부터 업무 효율성 증대, 그리고 비즈니스 통찰력 확보에 이르기까지 광범위하게 활용될 수 있습니다.
+
+\begin{itemize}
+    \item \textbf{지식 접근성 민주화 (Democratize Access to Knowledge):}
+    \begin{itemize}
+        \item \textbf{설명:} OpenAI와 같은 기업이 개발한 LLM은 인류가 가진 거의 모든 지식을 내포하고 있습니다. 이 모델에 질문하면 상당히 좋은 답변을 얻을 수 있어, 전 세계 모든 사람이 지식에 접근할 수 있도록 돕습니다.
+        \item \textbf{다국어 기능:} LLM은 다국어 기능을 지원하므로, 어떤 언어를 사용하든 지식에 접근할 수 있어 전 세계적으로 큰 힘을 실어줍니다.
+        \item \textbf{예시:}
+        \begin{itemize}
+            \item 콜센터 직원이 질문에 답변하거나, 콜센터 상담원 역할을 수행하도록 지원.
+            \item 비정형 데이터를 구조화된 방식으로 빠르게 분석하여 통찰력 확보. (예: 비디오 콘텐츠를 텍스트로 변환하여 다른 모델에 입력)
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{지식 근로자의 효율성 향상 (Improve Efficiency of Knowledge Workers):}
+    \begin{itemize}
+        \item \textbf{설명:} LLM은 소프트웨어 엔지니어, 법률 보조원, 마케터 등 지식 근로자의 업무 효율을 크게 높일 수 있습니다.
+        \item \textbf{예시:}
+        \begin{itemize}
+            \item \textbf{소프트웨어 개발:} 코드 개발 시간을 단축하여 생산성 향상.
+            \item \textbf{문서 요약:} 회의록, 문서, 특허, 법률 문서 등을 빠르게 요약하고 관련 부분을 추출하며 질문에 답변.
+            \item \textbf{시장 분석:} 고객 피드백을 분석하여 현재 트렌드나 고객 이슈를 신속하게 파악.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{모델 자체 개선 (Self-improving Models):}
+    \begin{itemize}
+        \item \textbf{설명:} LLM은 고객이 작성한 피드백을 기반으로 제품 추천을 조정하는 등 스스로를 개선하는 데 사용될 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{LLM 구현 복잡도 및 비용}
+
+LLM을 활용하는 방법은 다양하며, 각 방법은 품질, 비용, 필요한 데이터 양에서 차이를 보입니다. 조직의 요구사항과 예산에 따라 적절한 전략을 선택하는 것이 중요합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllll}
+\toprule
+\textbf{구현 전략} & \textbf{설명} & \textbf{데이터 요구량} & \textbf{품질} & \textbf{비용} \\
+\midrule
+\textbf{프롬프트 엔지니어링} & 모델에 추가 데이터 없이 프롬프트만으로 지시. & 없음 (모델 내 지식 활용) & 낮음 & 매우 낮음 \\
+\textbf{RAG (검색 증강 생성)} & 외부 데이터베이스에서 정보를 검색하여 프롬프트에 추가. & 수십만 단어 (외부 DB) & 중간 & 낮음 (DB 유지 비용 발생) \\
+\textbf{파인튜닝 (Fine-tuning)} & 기존 LLM을 특정 도메인 데이터로 추가 학습. & 수백만~수십억 단어 (도메인 데이터) & 높음 & 중간 (훈련 비용 발생) \\
+\textbf{사전 학습 (Pre-training)} & 모델을 처음부터 대규모 데이터로 학습. & 수십억 단어 이상 (방대한 데이터) & 매우 높음 & 매우 높음 (수백만 달러) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{itemize}
+    \item \textbf{프롬프트 엔지니어링 (Prompt Engineering):}
+    \begin{itemize}
+        \item \textbf{설명:} 모델에 특정 행동을 지시하는 프롬프트만 제공합니다. 모델은 이미 내부에 있는 지식을 활용합니다.
+        \item \textbf{장점:} 추가 데이터가 필요 없고 비용이 매우 저렴합니다.
+        \item \textbf{단점:} 답변의 품질이 가장 낮을 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{RAG (Retrieval Augmented Generation):}
+    \begin{itemize}
+        \item \textbf{설명:} 외부 데이터베이스에서 관련 정보를 검색하여 프롬프트와 함께 모델에 제공합니다. 수십만 단어에 달하는 정보를 프롬프트에 포함할 수 있습니다.
+        \item \textbf{장점:} 품질이 프롬프트 엔지니어링보다 좋고, 비용은 여전히 낮은 편입니다. 모델을 재훈련할 필요 없이 최신 정보를 반영할 수 있습니다.
+        \item \textbf{단점:} 데이터베이스 유지 관리 비용과 더 많은 토큰 처리로 인한 비용 증가가 있을 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{파인튜닝 (Fine-tuning):}
+    \begin{itemize}
+        \item \textbf{설명:} 기존의 대규모 언어 모델(주로 오픈 소스)을 특정 도메인(예: 의학, 항공 정비)의 데이터로 추가 학습시켜 해당 도메인의 전문가로 만듭니다.
+        \item \textbf{장점:} 특정 도메인에서 매우 높은 품질의 답변을 제공합니다.
+        \item \textbf{단점:} 비용이 RAG보다 높고, 수백만에서 수십억 단어의 도메인 데이터가 필요합니다.
+    \end{itemize}
+
+    \item \textbf{사전 학습 (Pre-training):}
+    \begin{itemize}
+        \item \textbf{설명:} 모델을 처음부터 완전히 새로 만듭니다.
+        \item \textbf{장점:} 매우 높은 품질의 모델을 만들 수 있으며, 가장 높은 수준의 보안을 제공합니다 (모델이 완전히 자체 소유이므로 정보 유출 우려가 적음).
+        \item \textbf{단점:} 수백만 달러에 달하는 막대한 비용과 긴 시간이 소요됩니다. 대기 시간(Latency)과 개인 정보 보호(Privacy) 문제도 발생할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{LLM 개발 및 배포 파이프라인}
+
+LLM을 성공적으로 개발하고 배포하기 위해서는 체계적인 반복(Iteration) 파이프라인이 필요합니다.
+
+\begin{enumerate}
+    \item \textbf{모델 선택:}
+    \begin{itemize}
+        \item 사용 사례에 가장 적합한 모델을 선택합니다. Vellum과 같은 플랫폼에서 모델의 기능 변화를 확인하고 새로운 모델을 탐색할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{프롬프트 엔지니어링:}
+    \begin{itemize}
+        \item 모델이 원하는 작업을 수행하도록 지시하는 프롬프트를 설계합니다.
+    \end{itemize}
+
+    \item \textbf{결과 평가 및 개선:}
+    \begin{itemize}
+        \item 모델의 결과를 평가하고 개선할 여지가 있는지 확인합니다.
+        \item 더 나은 성능이 필요하면 파인튜닝을 고려하거나, RAG를 구현하여 데이터 소스를 검색하고 프롬프트에 추가 정보를 제공합니다.
+    \end{itemize}
+
+    \item \textbf{모델 배포:}
+    \begin{itemize}
+        \item 모델을 테스트 환경에 배포합니다.
+        \item \textbf{A/B 테스트 (A/B Testing):} 새로운 모델이 이전 모델보다 나은지 비교합니다.
+        \item \textbf{카나리 테스트 (Canary Testing):} 기존 모델과 함께 새로운 모델을 배포하되, 트래픽의 일부(예: 5\%)만 새로운 모델로 보냅니다.
+        \item \textbf{블루/그린 배포 (Blue/Green Deployments):} '블루' 모델(기존)과 '그린' 모델(새로운)을 동시에 운영하다가 문제가 발생하면 즉시 블루 모델로 롤백할 수 있도록 합니다.
+    \end{itemize}
+\end{enumerate}
+
+\newpage
+\section{LLM의 도전 과제 및 윤리적 고려 사항}
+
+LLM은 강력한 도구이지만, 그만큼 해결해야 할 도전 과제와 신중하게 다루어야 할 윤리적 문제가 많습니다.
+
+\subsection{LLM의 한계점}
+
+LLM의 주요 한계점으로는 환각, 편향, 그리고 적대적 토큰 공격이 있습니다. 이러한 문제들은 모델의 신뢰성과 안전성에 직접적인 영향을 미칩니다.
+
+\begin{itemize}
+    \item \textbf{환각 (Hallucination):}
+    \begin{itemize}
+        \item \textbf{설명:} 모델이 질문에 대해 사실이 아닌 정보를 매우 자신감 있게 답변하는 현상입니다. 사용자는 모델이 정보를 '만들어냈다'는 것을 알기 어려울 수 있습니다.
+        \item \textbf{제어 방법:}
+        \begin{itemize}
+            \item \textbf{온도(Temperature) 설정:} 모델의 창의성을 조절하는 '온도' 매개변수를 0으로 설정하면 가장 사실적인 답변을 유도할 수 있지만, 여전히 환각이 발생할 수 있습니다.
+            \item \textbf{정확한 프롬프트:} 모델에게 정확히 무엇을 해야 하는지 명확하고 간결하게 지시하는 프롬프트는 환각을 줄이는 데 매우 중요합니다. 프롬프트가 정교할수록 더 나은 결과를 얻을 수 있습니다.
+        \end{itemize}
+        \item \textbf{발생 원인:} 모델은 답변을 생성하도록 보상받기 때문에, 답을 모를 때도 어떻게든 답변을 제공하려 하여 환각으로 이어질 수 있습니다. 이는 잘 알려진 문제이며, 모델은 지속적으로 개선되고 있습니다.
+    \end{itemize}
+
+    \item \textbf{편향 (Bias):}
+    \begin{itemize}
+        \item \textbf{설명:} 모델이 학습 데이터에 존재하는 편향된 아이디어나 사회적 측면을 그대로 반영하여, 바람직하지 않은 편향된 답변을 생성하는 현상입니다.
+        \item \textbf{발생 원인:} 주로 학습 데이터의 편향성 때문에 발생합니다. 예를 들어, 특정 지역의 데이터로만 학습된 모델은 다른 지역의 질병 패턴에 대해 편향된 답변을 줄 수 있습니다.
+        \item \textbf{해결 노력:}
+        \begin{itemize}
+            \item \textbf{데이터 품질:} 편향되지 않고 포괄적인 데이터를 사용하여 모델을 학습시키는 것이 가장 중요합니다. 데이터 품질은 모델의 정확도와 편향 방지에 결정적인 역할을 합니다.
+            \item \textbf{투명성:} 만약 모델이 특정 지역의 데이터로만 학습되었다면, 이를 명확히 알려 사용자가 모델의 한계를 인지하도록 해야 합니다.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{적대적 토큰 (Adversarial Tokens):}
+    \begin{itemize}
+        \item \textbf{설명:} 모델을 혼란시키거나 의도하지 않은 행동을 하도록 속이기 위해 프롬프트의 일부로 주입되는 특정 토큰(단어 또는 문자열) 시퀀스입니다.
+        \item \textbf{예시:} 프롬프트 주입(Prompt Injection), 다국어 탈옥(Multilingual Jailbreaks) 등이 있습니다.
+        \item \textbf{해결 노력:} AI 연구자들은 모델이 인간의 요구에 부합하고 안전하며 보안을 유지하도록 '정렬 문제(Alignment Problem)'를 해결하기 위해 노력하고 있습니다. 모델 주변에 '안전 장치(Guardrails)'를 구축하여 올바르게 작동하도록 합니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[cautionbox={LLM의 강력함과 책임}]
+    LLM은 정부 계약의 부패를 제거하는 데 사용되는 등 매우 강력한 위치에 놓이게 될 것입니다. 이 분야의 실무자로서 우리는 이러한 강력한 모델의 오용 가능성과 관련된 모든 위험을 인지하고, 긍정적인 결과를 이끌어낼 책임이 있습니다.
+\end{tcolorbox}
+
+\subsection{LLM의 윤리적 책임 및 안전 장치}
+
+LLM의 발전은 사회에 긍정적인 영향을 미칠 수 있지만, 동시에 심각한 윤리적 문제를 야기할 수도 있습니다. 이러한 문제를 해결하기 위한 다각적인 노력이 필요합니다.
+
+\begin{itemize}
+    \item \textbf{환각의 본질:}
+    \begin{itemize}
+        \item \textbf{질문:} 환각은 LLM의 본질적인 특성인가, 아니면 언젠가 제거될 수 있는 문제인가?
+        \item \textbf{답변:} 생성형 AI의 특성상 완전히 제거하기는 매우 어려울 수 있습니다. 모델은 콘텐츠 생성을 강력하게 동기 부여받지만, 특정 기준을 준수하지 않는 내용을 생성해서는 안 됩니다. 환각은 모델이 추가 지시를 무시하거나, 지시가 불명확할 때 발생할 수 있습니다. 시간이 지남에 따라 통제는 개선되겠지만, 완전히 사라지지는 않을 것입니다.
+        \item \textbf{비유:} 과거 모델에서 예측값이 미세하게 달랐던 것처럼, 생성형 모델에서는 내용 생성의 미세한 차이가 환각으로 나타날 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{편향의 문제:}
+    \begin{itemize}
+        \item \textbf{질문:} 모델 학습 시 편향을 어떻게 방지할 수 있는가?
+        \item \textbf{답변:} 데이터 품질이 핵심입니다. 학습 데이터가 편향되지 않고 모든 가능한 소스를 포괄하도록 해야 합니다. 만약 특정 지역(예: 미국)의 데이터로만 학습되었다면, 다른 지역(예: 남태평양)의 특성을 모를 수 있음을 명확히 알려야 합니다.
+    \end{itemize}
+
+    \item \textbf{시간적 정확성 문제:}
+    \begin{itemize}
+        \item \textbf{질문:} LLM이 최신 정보와 오래된 정보를 구분하는 데 어려움을 겪는 이유는 무엇인가?
+        \item \textbf{답변:} RAG 시스템에서 여러 버전의 문서(예: 정책 매뉴얼 V1, V2, V3)가 모두 벡터 데이터베이스에 저장되어 있다면, LLM은 가장 최근 버전을 식별하기 어려울 수 있습니다. 문서에 날짜 정보가 특별한 권한을 부여받지 않는 한, 모델은 단순히 가장 유사한 문서를 반환할 수 있습니다. 문서 간의 계승 관계나 패치 업데이트를 효과적으로 연결하는 메커니즘이 현재 RAG에는 부족합니다. 이 문제는 벡터 검색 인덱스 자체에서 CRUD(생성, 읽기, 업데이트, 삭제) 작업을 통해 전체 문서를 최신 버전으로 교체하는 방식으로 일부 해결될 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{안전망 및 완화 전략:}
+    \begin{itemize}
+        \item \textbf{반복적인 프로세스:} LLM의 안전성을 확보하는 것은 반복적인 과정입니다.
+        \item \textbf{내부 상호작용 기록:} AI Gateway와 같은 시스템을 통해 추론 페이로드(Inference Payload)를 자동으로 기록하여 모델의 작동 방식을 이해해야 합니다.
+        \item \textbf{모델 모니터링:} 속도, 정확도, 성능 등을 지속적으로 모니터링합니다.
+        \item \textbf{가드레일 모델 (Guardrail Models):} 더 크고 성능이 좋은 모델(예: 모델 4)을 가드레일로 사용하여 작은 모델(예: 모델 3)의 출력을 검증합니다.
+        \item \textbf{RLHF (Reinforcement Learning with Human Feedback):} 인간의 피드백을 통해 모델의 행동을 지속적으로 개선합니다.
+        \item \textbf{신중한 프롬프트 설계:} 모델의 행동을 제어하는 데 프롬프트가 매우 중요합니다. 잘 설계된 프롬프트는 모델이 지시를 무시할 가능성을 줄입니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{LLM 사용 시 고려할 점}
+
+LLM은 차별, 배제, 유해성, 오정보, 악의적 사용 등 기존의 문제들을 증폭시킬 수 있습니다. 특히 설명 가능성(Explainability)은 더욱 어려워지며, 개인 정보 침해는 가장 위험한 문제 중 하나입니다.
+
+\begin{itemize}
+    \item \textbf{규제 준수:}
+    \begin{itemize}
+        \item \textbf{GDPR 및 EU AI Act:} 유럽 연합(EU)은 AI 법안(EU AI Act)을 통해 기업들이 사용하는 데이터, 컴퓨팅 자원, 모델 배포 방식 등을 공개하도록 의무화하고 있습니다. 이는 혁신의 속도를 제한할 수 있지만, 혁신이라는 이름으로 발생할 수 있는 해악을 줄이는 데 도움이 됩니다.
+    \end{itemize}
+
+    \item \textbf{윤리적 책임:}
+    \begin{itemize}
+        \item \textbf{법 vs. 윤리:} 법은 강제할 수 있지만, 윤리는 문화적 규범을 통해 채택될 수 있을 뿐입니다. 사회 전체로서 우리는 집단적인 도덕적 책임을 가져야 합니다.
+        \item \textbf{ESG 스코어:} 기업의 환경(Environment), 사회(Social), 지배구조(Governance) 성과를 평가하는 ESG 스코어는 기업이 공정성, 투명성, 개인 정보 보호, 책임감 있는 정책을 우선시하도록 유도합니다. 이는 궁극적으로 사회 전체에 이로운 윤리적인 LLM을 구축하는 데 기여할 것입니다.
+        \item \textbf{극단적 사례:} OpenAI 챗 인터페이스가 아동에게 자살을 권유했다는 사례는 LLM의 윤리적 위험성을 극명하게 보여줍니다. 정신적으로 취약한 사람이 LLM을 동반자로 사용할 때, 모델의 부적절한 조언은 심각한 결과를 초래할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{데이터브릭스(Databricks) 플랫폼과 LLM}
+
+Databricks는 데이터 및 AI 워크로드를 위한 통합 플랫폼을 제공하며, LLM 개발 및 배포를 위한 다양한 기능을 지원합니다. 이 섹션에서는 Databricks 플랫폼의 주요 구성 요소와 AI 성숙도 곡선, RAG 시스템 구현, 그리고 LLM 운영 전략에 대해 상세히 설명합니다.
+
+\subsection{데이터브릭스 AI/ML 플랫폼 개요}
+
+Databricks 플랫폼은 구조화된 데이터와 비구조화된 데이터를 모두 관리하며, ML/AI 워크플로우를 지원하는 포괄적인 기능을 제공합니다.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{databricks_platform_overview.png} % 이미지 파일이 없으므로 가상의 파일명 사용
+    \caption{Databricks AI/ML 플랫폼 구성 요소}
+    \label{fig:databricks_platform}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{데이터 플랫폼 (Data Platform):}
+    \begin{itemize}
+        \item \textbf{Delta Tables:} 구조화된 데이터를 저장하고 관리합니다.
+        \item \textbf{Volumes:} 비구조화된 데이터를 저장합니다.
+        \item \textbf{Unity Catalog (UC):} Delta 테이블과 Volumes 모두에 대한 통합 거버넌스(권한 부여 및 회수)를 제공합니다.
+        \item \textbf{Delta Sharing & Marketplace:}
+        \begin{itemize}
+            \item \textbf{Delta Sharing:} 제로 ETL(Zero ETL) 방식으로 데이터를 복사하지 않고 조직 내외부에서 안전하게 공유할 수 있습니다. 비용 효율적이고 빠르며 안전한 오픈 소스 기술입니다.
+            \item \textbf{Marketplace:} 데이터뿐만 아니라 모델, 노트북, 코드 등 효과적인 사용에 필요한 모든 것을 패키징하여 공유할 수 있습니다.
+        \end{itemize}
+        \item \textbf{Feature Store:} ML 모델 학습 및 추론에 사용되는 특징(Feature)을 저장하고 관리합니다.
+        \item \textbf{Model Registry (MLflow):} MLflow의 일부로, 모델의 버전 관리 및 배포를 지원합니다.
+        \item \textbf{Vector Search:} 벡터화된 데이터를 저장하고 유사성 검색을 수행합니다.
+        \item \textbf{Lake Base (PostgreSQL):} 온라인 특징 서빙(Online Feature Serving)의 지연 시간을 줄이기 위해, 레이크하우스의 데이터를 PostgreSQL과 같은 OLTP(온라인 트랜잭션 처리) 데이터베이스로 제로 ETL 방식으로 동기화하여 쿼리 속도를 향상시킵니다.
+    \end{itemize}
+
+    \item \textbf{데이터 준비 (Data Preparation):}
+    \begin{itemize}
+        \item \textbf{Notebooks, SQL Editor, Workflows:} 데이터 처리 및 변환 작업을 수행합니다. 최종 프로젝트에서는 Workflows를 사용하여 모든 구성 요소를 연결합니다.
+        \item \textbf{Delta Live Tables (DLT):} ETL(추출, 변환, 로드) 파이프라인을 간소화하고 데이터 품질을 보장합니다.
+    \end{itemize}
+
+    \item \textbf{모델 개발 및 학습 (Model Development & Training):}
+    \begin{itemize}
+        \item \textbf{Agent Framework & Evaluation:} 에이전트 개발 및 성능 평가를 위한 프레임워크를 제공합니다.
+        \item \textbf{AutoML:} 모델 개발 과정을 자동화합니다.
+        \item \textbf{AI Playground:} 다양한 모델을 비교하고 테스트할 수 있는 환경을 제공합니다.
+        \item \textbf{모델 유형:} 독점 모델, 오픈 소스 모델, 자체 개발 모델 등 모든 종류의 모델을 한 곳에서 작업할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{모델 서빙 및 운영 (Model Serving & Operations):}
+    \begin{itemize}
+        \item \textbf{EIBI Dashboard & Genie:} BI(비즈니스 인텔리전스) 대시보드와 자연어 기반의 데이터 쿼리 도구를 제공합니다.
+        \item \textbf{Model Serving:} 매우 낮은 지연 시간과 높은 처리량으로 모델을 배포합니다.
+        \item \textbf{AI Functions:} SQL 문에서 직접 Gen AI 기능을 호출할 수 있습니다 (예: `summarize`, `sentiment_analysis`).
+        \item \textbf{AI Gateway:} 모든 모델에 대한 단일 진입점을 제공하여 속도 제한, 자격 증명 관리, 페이로드 로깅, A/B 테스트 등 공통 기능을 보호하고 관리합니다. Amazon API Gateway와 유사한 역할을 합니다.
+        \item \textbf{Lakehouse Apps:} 데이터와 모델 위에 구축되는 애플리케이션 계층으로, 비즈니스 기능을 제공하고 사용자 상호작용을 강화합니다. 스마트폰 앱처럼 중독성 있는 경험을 제공하여 데이터 활용도를 높입니다.
+        \item \textbf{CI/CD (Continuous Integration/Continuous Delivery):}
+        \begin{itemize}
+            \item \textbf{Databricks Asset Bundles:} 코드, 파이프라인, 클러스터 구성 등 모든 자산을 개발(Dev) 환경에서 스테이징(Stage), 프로덕션(Prod) 환경으로 효율적으로 이동시킵니다.
+            \item \textbf{Terraform:} 인프라 관리를 자동화합니다.
+        \end{itemize}
+        \item \textbf{MLOps & LLM Ops:} DevOps, MLOps(머신러닝 운영), LLM Ops(LLM 운영)를 통합하여 모델의 개발부터 배포, 모니터링까지 전 과정을 관리합니다. MLflow가 핵심 구성 요소입니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{AI 성숙도 곡선}
+
+AI 성숙도 곡선은 기업이 AI를 도입하고 활용하는 단계를 보여주며, 복잡성이 증가할수록 비즈니스에 미치는 영향도 커진다는 것을 의미합니다.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ai_maturity_curve.png} % 이미지 파일이 없으므로 가상의 파일명 사용
+    \caption{AI 성숙도 곡선: 영향과 복잡성}
+    \label{fig:ai_maturity_curve}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{BI (Business Intelligence):}
+    \begin{itemize}
+        \item \textbf{설명:} 비즈니스 운영에 필수적인 기본적인 대시보드, 보고서, SQL 웨어하우징 등입니다. '무엇이 일어났는지'를 알려주는 과거 지향적인 정보입니다.
+        \item \textbf{예시:} Genie 및 대시보드 (Agentic BI). 데이터를 자연어로 쿼리하고 시각화하여 과거 데이터를 분석합니다.
+    \end{itemize}
+
+    \item \textbf{AI Functions:}
+    \begin{itemize}
+        \item \textbf{설명:} SQL 문 내에서 직접 생성형 AI 기능을 호출하여 데이터에 대한 통찰력을 얻습니다.
+        \item \textbf{예시:} `SELECT AI_SIMILARITY('text1', 'text2'), AI_SUMMARIZE('long text')`와 같이 SQL 쿼리에서 감성 분석, 요약, 정보 추출 등을 수행합니다.
+    \end{itemize}
+
+    \item \textbf{지식 기반 에이전트 (Knowledge-based Agent):}
+    \begin{itemize}
+        \item \textbf{설명:} 비정형 문서(PDF, 이미지, 양식 등)에서 정보를 추출하고 소화하여 인간을 돕거나 고객에게 직접 응답합니다.
+        \item \textbf{예시:} 콜센터에서 상담원이 고객 질문에 더 정확하고 간결하게 답변하도록 지원하거나, 오래된 시스템의 '부족 지식(Tribal Knowledge)'을 LLM이 학습하여 신규 인력에게 전달하는 브릿지 역할.
+    \end{itemize}
+
+    \item \textbf{다중 도구 에이전트 (Agents with Multiple Tools):}
+    \begin{itemize}
+        \item \textbf{설명:} 여러 도구(함수, 다른 에이전트)를 활용하고, 라우터(Router)가 질문의 의도를 이해하여 적절한 도구를 호출하는 에이전트 아키텍처입니다. AI 성숙도 곡선의 정점입니다.
+        \item \textbf{예시:} 데이터베이스 조회, 날씨 정보 검색, 계산 수행 등 다양한 작업을 오케스트레이션하여 복잡한 문제를 해결합니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[conceptbox={모든 기업은 데이터 및 AI 기업}]
+    우리는 모든 기업이 먼저 데이터 및 AI 기업이 되고, 그 위에 각자의 기능이 계층화되는 시대로 가고 있습니다. 데이터 및 AI 여정에서 충분히 빠르게 움직이지 못하면 경쟁에서 뒤처질 수 있습니다.
+\end{tcolorbox}
+
+\subsection{검색 증강 생성(RAG) 심층 분석}
+
+RAG는 LLM의 환각을 줄이고 최신 정보를 제공하며, 특정 도메인 지식을 활용하는 데 매우 효과적인 기술입니다. 파인튜닝이나 사전 학습보다 비용 효율적이고 구현하기 쉽습니다.
+
+\begin{itemize}
+    \item \textbf{RAG의 필요성:}
+    \begin{itemize}
+        \item \textbf{LLM의 한계:} LLM은 학습 시점 이후의 최신 정보를 알지 못하며, 특정 조직의 고유한 맥락(회계 연도, 고객 정의, 수익 의미 등)을 이해하지 못합니다.
+        \item \textbf{비용 효율성:} 파인튜닝이나 사전 학습은 막대한 비용과 시간이 소요됩니다. RAG는 모델을 재훈련할 필요 없이 외부 지식을 활용하여 이러한 한계를 극복합니다.
+        \item \textbf{출처 투명성:} RAG 애플리케이션은 답변의 출처(문서 스니펫)를 함께 제공하여 신뢰도를 높일 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{RAG 작동 방식:}
+    \begin{enumerate}
+        \item \textbf{문서 수집 및 임베딩:} 조직의 방대한 문서(PDF, 텍스트 등)를 수집합니다. 이 문서들은 작은 '청크(Chunk)'로 분할되고, 각 청크는 '임베딩(Embedding)'이라는 숫자 벡터로 변환됩니다. 이 벡터들은 '벡터 데이터베이스(Vector Database)'에 저장됩니다.
+        \item \textbf{질문 임베딩:} 사용자가 질문을 하면, 이 질문도 동일한 방식으로 벡터로 변환됩니다.
+        \item \textbf{유사성 검색:} 질문 벡터는 벡터 데이터베이스에 저장된 문서 청크 벡터들과 비교되어 가장 유사한(의미적으로 가까운) 문서 청크들을 빠르게 찾아냅니다.
+        \item \textbf{LLM에 컨텍스트 제공:} 검색된 문서 청크들은 사용자의 질문과 함께 LLM에 '컨텍스트(Context)'로 제공됩니다. 이때 프롬프트에는 "당신은 보험 상담원이다", "이 문서 범위 내에서만 답변하라", "세 문장 이내로 답변하라"와 같은 지시가 포함될 수 있습니다.
+        \item \textbf{자연어 답변 생성:} LLM은 제공된 컨텍스트와 프롬프트를 바탕으로 자연어 답변을 생성하여 사용자에게 제공합니다. 이 과정에서 AI Gateway가 모델 호출을 관리합니다.
+    \end{enumerate}
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{rag_architecture.png} % 이미지 파일이 없으므로 가상의 파일명 사용
+    \caption{RAG 시스템 아키텍처}
+    \label{fig:rag_architecture}
+\end{figure}
+
+\begin{tcolorbox}[examplebox={RAG 청킹(Chunking) 및 오버랩(Overlap)}]
+    Jeremy의 경험에 따르면, RAG에서 문서를 청크로 나눌 때 청크 크기와 오버랩 크기가 환각을 줄이는 데 중요한 역할을 합니다.
+    \begin{itemize}
+        \item \textbf{최적 청크 크기:} 약 800~1200 토큰 (단어)
+        \item \textbf{오버랩 크기:} 약 100~200 토큰
+    \end{itemize}
+    이러한 설정은 정보 손실을 방지하고, 청크 간의 정보가 적절히 연결되도록 하여 모델이 더 정확한 답변을 생성하는 데 도움을 줍니다.
+\end{tcolorbox}
+
+\subsection{LLM 운영(LLM Ops) 및 통합}
+
+LLM Ops는 MLOps의 확장 개념으로, LLM의 개발, 배포, 모니터링을 위한 추가적인 구성 요소를 포함합니다.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{llm_ops_blueprint.png} % 이미지 파일이 없으므로 가상의 파일명 사용
+    \caption{LLM Ops 청사진}
+    \label{fig:llm_ops_blueprint}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{기존 MLOps와의 통합:} LLM Ops는 기존 MLOps 프레임워크에 몇 가지 추가 블록을 더하여 통합됩니다.
+    \item \textbf{추가 구성 요소:}
+    \begin{itemize}
+        \item \textbf{파인튜닝된 LLM:} 특정 도메인에 특화된 모델.
+        \item \textbf{벡터 데이터베이스 및 벡터 인덱스:} RAG를 위한 핵심 저장소.
+        \item \textbf{에이전트:} LLM을 활용하여 특정 작업을 수행하는 자율 시스템.
+    \end{itemize}
+    \item \textbf{보안 및 거버넌스:} 벡터 검색 인덱스에 민감한 정보가 포함될 수 있으므로, Unity Catalog를 사용하여 데이터, 파일, 테이블, 모델과 동일한 방식으로 벡터 검색 인덱스에 대한 권한을 관리해야 합니다.
+    \item \textbf{CI/CD 시스템:} 개발(Dev)에서 스테이징(Stage), 프로덕션(Prod) 환경으로 모델을 테스트하고 배포하는 과정을 자동화합니다.
+    \item \textbf{모니터링 및 평가:} 배포 후 모델의 속도, 정확도, 성능 등을 지속적으로 모니터링하고 평가합니다.
+    \item \textbf{Git:} 모든 정보 손실을 방지하기 위해 버전 관리에 Git을 사용합니다.
+\end{itemize}
+
+\subsection{LLM 프로젝트 성공을 위한 유스케이스 선정}
+
+LLM을 모든 문제에 적용하려는 유혹이 있지만, LLM은 비용이 많이 들고 환각이나 편향과 같은 부작용이 있을 수 있습니다. 따라서 조직 내에서 LLM 유스케이스를 신중하게 선정하는 것이 매우 중요합니다.
+
+\begin{itemize}
+    \item \textbf{첫 번째 유스케이스의 중요성:}
+    \begin{itemize}
+        \item 첫 번째 '북극성(Northstar)' 유스케이스는 조직이 LLM을 얼마나 빠르게 채택하고 발전시킬지 결정합니다.
+        \item 실패하면 LLM이 단순한 유행이라고 치부될 수 있습니다.
+        \item \textbf{성공적인 유스케이스의 특징:} 높은 실현 가능성, 높은 가치, 낮은 위험.
+    \end{itemize}
+
+    \item \textbf{성공적인 LLM 도입을 위한 요소:}
+    \begin{itemize}
+        \item \textbf{학습 및 교육:} LLM 분야는 빠르게 변화하므로, 모든 사람이 경험을 통해 배우고 교육받아야 합니다.
+        \item \textbf{데이터 접근성 및 품질:} 구현 용이성, 채택률, 다른 문제로의 재사용성을 높이려면 데이터의 접근성과 품질이 중요합니다.
+        \item \textbf{전문성 구축:} 조직 전체에 AI 전문성을 구축해야 합니다.
+        \item \textbf{재사용성:} 모델 레지스트리를 통해 다른 사람들이 모델을 쉽게 찾아 재사용할 수 있도록 해야 합니다.
+    \end{itemize}
+
+    \item \textbf{LLM 사용 시 주의 사항:}
+    \begin{itemize}
+        \item \textbf{정보 유출 위험:} 초기 OpenAI 모델에서는 기업의 영업 비밀이나 경쟁사 정보가 노출되는 사례가 있었습니다. LLM이 민감한 정보를 학습했다면, 유도 질문에 의해 이를 노출할 수 있습니다.
+        \item \textbf{가드레일의 중요성:} 모델에 안전 장치를 구축하여 이러한 위험을 방지해야 합니다.
+        \item \textbf{위험 증폭:} LLM은 차별, 배제, 유해성, 오정보, 악의적 사용, 설명 불가능성, 개인 정보 침해와 같은 기존의 문제들을 더욱 증폭시킬 수 있습니다. 특히 개인 정보 침해는 가장 위험한 문제입니다.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{데이터브릭스 LLM 기능 데모}
+
+강의에서는 Databricks 플랫폼에서 LLM 및 에이전트 기능을 활용하는 다양한 데모가 시연되었습니다. 실제 애플리케이션을 통해 LLM의 강력한 기능을 이해할 수 있습니다.
+
+\subsection{다국어 AI 비서 데모}
+
+이 데모는 RAG를 활용한 다국어 AI 비서로, 음성 및 텍스트 상호작용을 지원합니다.
+
+\begin{itemize}
+    \item \textbf{기능:}
+    \begin{itemize}
+        \item \textbf{다국어 지원:} 사용자의 질문을 여러 언어로 이해하고 답변할 수 있습니다.
+        \item \textbf{음성 상호작용:} 음성으로 질문하고 음성으로 답변을 받을 수 있습니다.
+        \item \textbf{립싱크 이미지 생성:} Diffusion 모델을 사용하여 답변에 맞춰 입술 움직임이 동기화된 이미지를 생성합니다.
+        \item \textbf{자연어 번역:} 영어 질문을 러시아어로 번역하여 음성으로 출력하는 등 다양한 언어 간 번역을 수행합니다.
+        \item \textbf{RAG 활용:} 특정 비즈니스에 대한 정보로 LLM을 보강하여 해당 비즈니스에 대한 지능적인 답변을 제공합니다.
+    \end{itemize}
+    \item \textbf{핵심:} 의사소통 및 상호작용의 장벽을 낮추는 진정한 멀티모달(Multimodal) 경험을 제공합니다. 텍스트, 오디오, 비디오, 자동 생성(립싱크)이 실시간으로 이루어집니다.
+\end{itemize}
+
+\subsection{패션 검색 및 가상 착용 데모}
+
+이 데모는 LLM을 활용하여 전자상거래 분야에서 지능적인 검색 및 가상 착용 서비스를 제공합니다.
+
+\begin{itemize}
+    \item \textbf{지능형 검색:}
+    \begin{itemize}
+        \item \textbf{기능:} 사용자가 "파란색 사리(blue sars)"와 같이 오타가 있는 검색어를 입력해도, LLM은 사용자의 의도를 정확히 파악하여 올바른 제품(예: 파란색 사리)을 찾아줍니다.
+        \item \textbf{RAG 활용:} 제품 카탈로그와 RAG를 결합하여 지능적인 검색 결과를 제공합니다.
+    \end{itemize}
+    \item \textbf{가상 착용 서비스:}
+    \begin{itemize}
+        \item \textbf{기능:} 사용자가 자신의 사진을 업로드하면, Diffusion 모델이 해당 사진 속 인물에게 특정 의상(예: 드레스)을 가상으로 입혀줍니다.
+        \item \textbf{핵심:} 전자상거래에서 고객 경험을 혁신하고 구매 결정을 돕는 흥미로운 애플리케이션입니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Databricks Genie 및 UC 함수}
+
+Databricks Genie는 자연어 질문을 SQL 쿼리로 변환하여 데이터 분석을 돕는 에이전트이며, Unity Catalog(UC) 함수는 재사용 가능한 SQL 또는 Python 코드를 관리합니다.
+
+\begin{itemize}
+    \item \textbf{UC 함수 (Unity Catalog Functions):}
+    \begin{itemize}
+        \item \textbf{설명:} Unity Catalog에 SQL 또는 Python 함수를 등록하여 재사용하고 거버넌스를 적용할 수 있습니다.
+        \item \textbf{예시:} 강의에서는 생명 보험 인수(Life AI Underwriting) 시나리오를 위해 다음과 같은 UC 함수가 시연되었습니다.
+        \begin{itemize}
+            \item `get_a_quote`: 특정 고객에 대한 보장, 예상 보험료, 상품 옵션, 건강 등급 등 모든 견적 세부 정보를 반환합니다. (매개변수: `client_name` (문자열))
+            \item `get_quote_status`: 견적 상태를 반환합니다.
+            \item `get_risk_score`: 위험 점수를 반환합니다.
+        \end{itemize}
+        \item \textbf{특징:}
+        \begin{itemize}
+            \item \textbf{결정론적(Deterministic):} SQL 기반 함수는 매우 결정론적으로 작동하여 예측 가능한 결과를 제공합니다.
+            \item \textbf{권한 관리:} Unity Catalog를 통해 함수 실행 권한을 세밀하게 제어할 수 있어 민감한 정보에 대한 접근을 보호합니다.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Databricks Genie:}
+    \begin{itemize}
+        \item \textbf{설명:} SQL 페르소나에서 작동하는 자연어 기반의 데이터 쿼리 에이전트입니다.
+        \item \textbf{Genie Room 생성:} Databricks UI에서 Genie Room을 생성하고, 여기에 UC 함수를 등록하여 Genie가 사용할 수 있는 도구로 만듭니다.
+        \item \textbf{구성 (Configuration):}
+        \begin{itemize}
+            \item \textbf{추가 지시:} "당신은 전문 생명 보험 비서이다", "프리미엄은 이것을 의미한다"와 같은 지시를 제공하여 LLM에 컨텍스트를 부여합니다.
+            \item \textbf{테이블 관계 정의:} 테이블 간의 조인 조건, 필터링 기준 등 추가 메타데이터를 제공하여 Genie가 더 정확한 SQL 쿼리를 생성하도록 돕습니다.
+        \end{itemize}
+        \item \textbf{벤치마크 (Benchmarks):}
+        \begin{itemize}
+            \item \textbf{설명:} SQL 질문과 그에 대한 '정답(Ground Truth)' SQL 쿼리를 정의하여 Genie의 성능을 평가합니다. 이는 코드의 단위 테스트(Unit Test)와 유사하게 작동하여 모델 변경 시 회귀(Regression)를 감지합니다.
+            \item \textbf{예시:} "성별 및 직업별 평균 보험료는 얼마인가?"와 같은 질문에 대한 올바른 SQL 쿼리를 벤치마크로 설정합니다.
+        \end{itemize}
+        \item \textbf{모니터링 및 공유:} Genie Room에서 질문, 응답, 평가 등 상호작용 기록을 모니터링하고 다른 사용자와 공유할 수 있습니다.
+        \item \textbf{Genie의 두 가지 뷰:}
+        \begin{itemize}
+            \item \textbf{채팅 뷰 (Chat View):} '무엇(What)' 질문에 답변하며, 메타데이터와 스키마를 기반으로 SQL을 생성하여 데이터를 쿼리합니다.
+            \item \textbf{리서치 에이전트 뷰 (Research Agent View):} '왜(Why)' 질문에 답변하며, 탐색적이고 연구 지향적인 질문(예: "금리가 오르면 포트폴리오에 어떤 영향이 미칠까?")에 대해 가설을 세우고 여러 경로를 탐색하여 답변을 도출합니다. 이는 더 많은 시간과 컴퓨팅 자원을 필요로 하며, '사고의 사슬(Chain of Thought)'을 통해 연구 과정을 보여줍니다.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{Databricks Agent Bricks 및 에이전트 오케스트레이션}
+
+Agent Bricks는 Databricks의 에이전트 개발 플랫폼으로, 에이전트 생성을 자동화하고 여러 에이전트를 오케스트레이션(Orchestration)할 수 있습니다.
+
+\begin{itemize}
+    \item \textbf{Agent Bricks:}
+    \begin{itemize}
+        \item \textbf{설명:} 에이전트 개발을 위한 AutoML과 같은 도구입니다. 몇 번의 클릭만으로 에이전트를 생성할 수 있습니다.
+        \item \textbf{에이전트 유형:}
+        \begin{itemize}
+            \item \textbf{정보 추출 (Information Extraction):} 양식이나 설문조사에서 특정 필드(예: 흡연 여부, 콜레스테롤 수치)의 정보를 추출하는 데 사용됩니다.
+            \item \textbf{지식 비서 (Knowledge Assistant):} RAG 시스템을 구현하여 PDF 문서와 같은 지식 소스에서 질문에 답변합니다. (예: 생명 보험 인수 지침 PDF를 지식 소스로 활용)
+        \end{itemize}
+        \item \textbf{에이전트 생성 과정 (지식 비서 예시):}
+        \begin{enumerate}
+            \item 에이전트 이름과 설명을 입력합니다.
+            \item 지식 소스(Knowledge Source)를 지정합니다 (예: 벡터 검색 인덱스 또는 Unity Catalog의 파일).
+            \item 지식 소스가 있는 카탈로그와 볼륨(Volume)을 선택합니다.
+            \item 에이전트를 생성합니다.
+        \end{enumerate}
+        \item \textbf{에이전트 테스트 및 개선:} 생성된 에이전트에 질문을 하고 답변을 확인합니다. 새로운 데이터 소스가 추가되면 에이전트를 업데이트하고 다시 테스트합니다. 인간 피드백(Human Feedback)을 추가하여 모델 학습을 위한 '정답(Ground Truth)' 질문-답변 쌍을 레이블링할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{다중 에이전트 감독자 (Multi-Agent Supervisor) 및 도구 호출 (Tool Calling):}
+    \begin{itemize}
+        \item \textbf{설명:} 여러 에이전트와 도구를 결합하여 복잡한 작업을 수행하는 에이전트 오케스트레이션 아키텍처입니다. 감독자 에이전트는 질문의 의도를 이해하고 적절한 하위 에이전트나 도구로 라우팅합니다.
+        \item \textbf{도구/에이전트 선택:} Genie Space, 에이전트 엔드포인트, Unity Catalog 함수, 외부 MCP 서버 등 다양한 유형의 도구와 에이전트를 결합할 수 있습니다.
+        \item \textbf{예시:} '인수 결정 코파일럿(Underwriting Decision Copilot)'은 Genie Room(구조화된 데이터 쿼리)과 지식 비서(비정형 문서 검색)를 결합하여 질문에 따라 적절한 에이전트로 라우팅합니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{AI 플레이그라운드}
+
+AI 플레이그라운드는 Databricks에서 에이전트와 모델을 테스트하고 비교할 수 있는 강력한 환경입니다.
+
+\begin{itemize}
+    \item \textbf{기능:}
+    \begin{itemize}
+        \item \textbf{에이전트 테스트:} 생성된 에이전트(예: 지식 비서)를 플레이그라운드에서 직접 테스트할 수 있습니다.
+        \item \textbf{모델 비교:} 자체 개발 코드, 오픈 소스 모델, GPT-5, Gemini, Claude 등 다양한 LLM 엔드포인트를 비교할 수 있습니다.
+        \item \textbf{성능 측정:} 동일한 질문에 대해 각 모델이 사용하는 토큰 수, 응답 시간, 결과의 정확도 등을 측정합니다.
+        \item \textbf{AI Judge:} AI Judge 기능을 활성화하여 모델의 답변 품질을 자동으로 평가할 수 있습니다.
+        \item \textbf{View Thoughts:} 모델이 답변을 도출하는 '사고 과정(Chain of Thought)'을 단계별로 시각화하여 보여줍니다. 이는 모델의 해석 가능성(Interpretability)을 높이는 데 매우 유용합니다.
+        \item \textbf{출처 인용:} RAG 기반 에이전트의 경우, 답변의 출처(예: "페이지 1에서 인용됨")를 명확히 표시하여 신뢰도를 높입니다.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{핵심 요약 및 결론}
+
+LLM과 에이전트 기술은 빠르게 발전하고 있으며, 모든 조직의 미래를 재편할 잠재력을 가지고 있습니다. 이 기술을 효과적으로 활용하기 위해서는 핵심 원리를 이해하고, 적절한 구현 전략을 선택하며, 윤리적 책임을 다하는 것이 중요합니다.
+
+\begin{itemize}
+    \item \textbf{모든 조직은 데이터 및 AI 기업:} 미래에는 모든 조직이 데이터와 AI를 핵심 역량으로 삼을 것입니다. LLM을 통해 얻는 차별화된 통찰력은 경쟁 우위를 확보하는 데 필수적입니다.
+    \item \textbf{다양한 LLM 복잡도 수준:} 프롬프트 엔지니어링, RAG, 파인튜닝, 사전 학습 등 다양한 복잡도와 비용 수준의 LLM 구현 전략이 존재하며, 조직의 필요와 성숙도에 따라 적절한 방법을 선택해야 합니다.
+    \item \textbf{좁은 목적의 LLM의 유용성:} 범용적인 대규모 LLM(예: ChatGPT)보다 특정 조직의 요구에 맞는 좁은 목적의 LLM이 더 유용하고 비용 효율적일 수 있습니다.
+    \item \textbf{모델 개선 및 비용 절감:} LLM은 지속적으로 개선되고 있으며 비용도 저렴해지고 있어, 자체 파운데이션 모델을 구축하는 것도 가능해지고 있습니다 (단, 여전히 복잡한 작업).
+    \item \textbf{교육적 활용 및 직업 변화:} LLM은 교육 분야에서 표절 논란을 일으킬 수 있지만, 학습 도구로서의 이점이 훨씬 큽니다. 또한, 일부 반복적인 업무를 자동화하여 일자리 변화를 가져올 것이며, 이는 사회적 불균형을 초래할 수 있습니다.
+\end{itemize}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[summarybox={CSCI103 Lecture 11: LLM 및 에이전트 핵심 요약}]
+    \textbf{AI의 진화:} 규칙 기반 $\rightarrow$ 고전 ML $\rightarrow$ 딥러닝 $\rightarrow$ 생성형 AI (LLM/GAN). LLM은 인간 지능에 근접하며 AGI/초지능 가능성.
+
+    \textbf{LLM의 중요성:} 지식 민주화, 업무 효율 증대, 코드 생성, 다국어 지원. 경제성 및 접근성 향상.
+
+    \textbf{LLM 구현 전략:}
+    \begin{itemize}
+        \item \textbf{프롬프트 엔지니어링:} 저비용, 낮은 품질.
+        \item \textbf{RAG:} 외부 지식 검색으로 보강, 중간 품질, 저비용. 환각 감소, 최신 정보 반영에 효과적.
+        \item \textbf{파인튜닝:} 특정 도메인 데이터로 추가 학습, 고품질, 중간 비용.
+        \item \textbf{사전 학습:} 처음부터 모델 구축, 최고 품질, 고비용.
+    \end{itemize}
+
+    \textbf{LLM의 도전 과제:}
+    \begin{itemize}
+        \item \textbf{환각:} 사실이 아닌 정보 생성. 온도 조절, 정교한 프롬프트로 완화.
+        \item \textbf{편향:} 학습 데이터의 편향 반영. 데이터 품질 및 투명성으로 해결 노력.
+        \item \textbf{보안:} 적대적 토큰, 정보 유출 위험. 가드레일 및 AI Gateway로 보호.
+    \end{itemize}
+
+    \textbf{윤리적 고려 사항:} AGI/초지능의 잠재적 위험, ESG 스코어, 규제 준수(EU AI Act). 인간의 피드백(RLHF) 및 신중한 프롬프트 설계 중요.
+
+    \textbf{Databricks 플랫폼:}
+    \begin{itemize}
+        \item \textbf{통합 플랫폼:} 데이터 관리(Unity Catalog, Delta), ML/AI 개발(MLflow, AutoML), 배포(Model Serving, AI Gateway).
+        \item \textbf{Genie:} 자연어 SQL 쿼리 에이전트.
+        \item \textbf{Agent Bricks:} 에이전트 자동 생성 및 오케스트레이션.
+        \item \textbf{UC 함수:} Unity Catalog 기반 재사용 가능한 함수.
+        \item \textbf{AI Playground:} 모델 및 에이전트 테스트, 비교, 사고 과정 시각화.
+    \end{itemize}
+
+    \textbf{결론:} LLM은 강력한 도구이나, 신중한 유스케이스 선정, 윤리적 책임, 지속적인 모니터링이 필수.
+\end{tcolorbox}
+
+\newpage
+\section{FAQ (자주 묻는 질문)}
+
+초심자가 LLM 학습 시 혼동할 수 있는 질문들을 Q&A 형식으로 정리했습니다.
+
+\begin{itemize}
+    \item \textbf{Q: LLM의 '환각(Hallucination)'은 왜 발생하며, 완전히 제거할 수 있나요?}
+    \begin{itemize}
+        \item A: LLM은 답변을 생성하도록 보상받기 때문에, 답을 모를 때도 그럴듯한 답변을 만들어내려 합니다. 이는 생성형 AI의 본질적인 특성 중 하나로, 완전히 제거하기는 매우 어려울 수 있습니다. 하지만 '온도(Temperature)' 설정을 낮추고, 프롬프트를 매우 명확하고 구체적으로 작성하여 환각 발생 빈도를 크게 줄일 수 있습니다. 모델의 발전과 함께 이 문제는 점차 완화될 것입니다.
+    \end{itemize}
+
+    \item \textbf{Q: LLM이 '편향(Bias)'을 가지는 주된 원인은 무엇이며, 어떻게 해결할 수 있나요?}
+    \begin{itemize}
+        \item A: LLM의 편향은 주로 학습 데이터에 존재하는 편향된 정보나 사회적 고정관념을 모델이 그대로 학습하기 때문에 발생합니다. 이를 해결하기 위해서는 학습 데이터의 품질을 높이고, 편향되지 않으며 다양한 출처의 데이터를 포함하도록 노력해야 합니다. 또한, 모델이 특정 데이터셋으로만 학습되었다면 그 한계를 사용자에게 명확히 알려야 합니다.
+    \end{itemize}
+
+    \item \textbf{Q: '프롬프트 엔지니어링', 'RAG', '파인튜닝', '사전 학습'은 어떤 차이가 있으며, 언제 어떤 방법을 사용해야 하나요?}
+    \begin{itemize}
+        \item A: 이 네 가지 방법은 LLM을 활용하는 복잡도와 비용, 그리고 얻을 수 있는 품질에 따라 다릅니다.
+        \begin{itemize}
+            \item \textbf{프롬프트 엔지니어링:} 가장 간단하고 저렴하며, 모델 내부에 이미 있는 지식으로 충분할 때 사용합니다.
+            \item \textbf{RAG:} 모델이 최신 정보나 특정 도메인 지식이 필요하지만, 모델을 재훈련할 필요가 없을 때 사용합니다. 외부 데이터베이스를 검색하여 프롬프트에 컨텍스트를 추가합니다. 비용 효율적이고 환각을 줄이는 데 좋습니다.
+            \item \textbf{파인튜닝:} 모델이 특정 도메인의 전문가가 되어야 할 때 사용합니다. 기존 모델을 해당 도메인의 대량 데이터로 추가 학습시킵니다. RAG보다 더 깊은 도메인 이해를 제공합니다.
+            \item \textbf{사전 학습:} 모델을 처음부터 완전히 새로 만들 때 사용합니다. 매우 높은 품질과 보안을 제공하지만, 막대한 비용과 시간이 소요되므로 OpenAI와 같은 대규모 연구 기관에서 주로 수행합니다.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Q: LLM이 최신 정보를 정확하게 반영하지 못하는 경우가 있는데, 이 문제를 어떻게 해결할 수 있나요?}
+    \begin{itemize}
+        \item A: LLM은 학습이 완료된 시점까지의 데이터만 알고 있기 때문에, 그 이후의 최신 정보는 알지 못합니다. 이 문제는 주로 RAG(검색 증강 생성)를 통해 해결할 수 있습니다. RAG는 외부 데이터베이스에서 최신 정보를 검색하여 LLM에 컨텍스트로 제공함으로써 모델이 최신 정보에 기반한 답변을 생성하도록 돕습니다. 또한, 데이터브릭스의 벡터 검색 인덱스에서 문서 버전을 관리하고 최신 문서로 교체하는 방식으로도 해결할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{Q: LLM을 활용한 프로젝트를 시작할 때, 어떤 유스케이스를 먼저 선택하는 것이 좋은가요?}
+    \begin{itemize}
+        \item A: 첫 번째 LLM 유스케이스는 조직의 LLM 도입 성공 여부를 결정하는 데 매우 중요합니다. '높은 실현 가능성, 높은 가치, 낮은 위험'을 가진 유스케이스를 선택하는 것이 좋습니다. 예를 들어, 콜센터 지원, 문서 요약, 내부 지식 검색과 같이 명확한 이점을 제공하고 구현이 비교적 쉬운 프로젝트부터 시작하여 조직 전체의 학습과 채택을 유도하는 것이 효과적입니다.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{체크리스트}
+
+이 문서를 학습하거나 LLM 프로젝트를 진행할 때 다음 체크리스트를 활용하여 중요한 사항들을 점검하세요.
+
+\begin{tcolorbox}[mybox={LLM 학습 및 프로젝트 점검표}]
+    \textbf{개념 이해:}
+    \begin{itemize}
+        \item AI의 진화 단계(규칙 기반 $\rightarrow$ 고전 ML $\rightarrow$ 딥러닝 $\rightarrow$ 생성형 AI)를 설명할 수 있는가?
+        \item LLM, GAN, Diffusion Model의 차이점을 이해하고 있는가?
+        \item LLM의 핵심 용어(환각, 편향, RAG, 파인튜닝, 에이전트 등)를 정확히 설명할 수 있는가?
+        \item LLM이 왜 중요한지(지식 민주화, 효율성 증대, AGI/초지능) 설명할 수 있는가?
+    \end{itemize}
+
+    \textbf{활용 및 구현:}
+    \begin{itemize}
+        \item LLM의 주요 활용 사례(콜센터, 문서 요약, 코드 생성 등)를 알고 있는가?
+        \item LLM 구현 전략(프롬프트 엔지니어링, RAG, 파인튜닝, 사전 학습)의 장단점과 비용을 비교할 수 있는가?
+        \item RAG 시스템의 작동 방식(문서 임베딩, 벡터 검색, LLM 컨텍스트 제공)을 설명할 수 있는가?
+        \item LLM 개발 및 배포 파이프라인(모델 선택, 프롬프트 엔지니어링, 평가, 배포)을 이해하고 있는가?
+        \item Databricks Genie, UC 함수, Agent Bricks, AI Playground의 역할을 설명할 수 있는가?
+    \end{itemize}
+
+    \textbf{도전 과제 및 윤리:}
+    \begin{itemize}
+        \item LLM의 주요 한계점(환각, 편향, 적대적 토큰)을 인지하고 있는가?
+        \item 환각과 편향을 줄이기 위한 방법(온도 설정, 데이터 품질, 프롬프트 설계)을 알고 있는가?
+        \item LLM 사용 시 발생할 수 있는 윤리적 문제(정보 유출, 차별, 개인 정보 침해)를 인식하고 있는가?
+        \item LLM의 안전성 확보를 위한 노력(가드레일, RLHF, 규제 준수)을 이해하고 있는가?
+        \item LLM 프로젝트 성공을 위한 유스케이스 선정 기준(높은 실현 가능성, 가치, 낮은 위험)을 알고 있는가?
+    \end{itemize}
+
+    \textbf{Databricks 플랫폼:}
+    \begin{itemize}
+        \item Databricks AI/ML 플랫폼의 주요 구성 요소(Unity Catalog, Delta Sharing, Feature Store, AI Gateway 등)를 알고 있는가?
+        \item AI 성숙도 곡선(BI $\rightarrow$ AI Functions $\rightarrow$ 지식 기반 에이전트 $\rightarrow$ 다중 도구 에이전트)의 각 단계를 설명할 수 있는가?
+        \item LLM Ops가 MLOps와 어떻게 통합되는지 이해하고 있는가?
+    \end{itemize}
+\end{tcolorbox}
+
+\end{document}

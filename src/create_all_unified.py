@@ -13,15 +13,63 @@ from pathlib import Path
 def extract_document_body(tex_content: str) -> str:
     """
     tex 파일에서 \\begin{document}와 \\end{document} 사이의 내용 추출
+    Gemini가 body에 삽입한 preamble 명령도 제거
     """
     match = re.search(r'\\begin\{document\}(.*?)\\end\{document\}', tex_content, re.DOTALL)
     if match:
         body = match.group(1).strip()
+
+        # body에 두 번째 \documentclass...\begin{document} 가 있으면 제거
+        body = re.sub(
+            r'\\documentclass.*?\\begin\{document\}',
+            '', body, flags=re.DOTALL
+        )
+
         # \maketitle, \tableofcontents 등 제거
         body = re.sub(r'\\maketitle', '', body)
         body = re.sub(r'\\tableofcontents', '', body)
         body = re.sub(r'\\thispagestyle\{[^}]*\}', '', body)
-        body = re.sub(r'\\newpage\s*(?=\n|$)', '', body)  # 문서 시작 부분의 newpage만 제거
+        body = re.sub(r'\\newpage\s*(?=\n|$)', '', body)
+
+        # preamble 명령 제거 (Gemini가 body에 삽입한 경우)
+        body = re.sub(r'\\usepackage(?:\[[^\]]*\])?\{[^}]+\}[^\n]*\n?', '', body)
+        body = re.sub(r'\\documentclass(?:\[[^\]]*\])?\{[^}]+\}[^\n]*\n?', '', body)
+        body = re.sub(r'\\pretitle\{[^}]*\}', '', body)
+        body = re.sub(r'\\posttitle\{[^}]*\}', '', body)
+        body = re.sub(r'\\preauthor\{[^}]*\}', '', body)
+        body = re.sub(r'\\postauthor\{[^}]*\}', '', body)
+        body = re.sub(r'\\predate\{[^}]*\}', '', body)
+        body = re.sub(r'\\postdate\{[^}]*\}', '', body)
+        body = re.sub(r'\\titlespacing\*?\{[^}]+\}\{[^}]+\}\{[^}]+\}\{[^}]+\}', '', body)
+        # \newcommand{\metainfo} 블록 제거 (unified는 자체 정의 사용)
+        body = re.sub(
+            r'\\newcommand\{\\metainfo\}\[4\]\{.*?(?:\\end\{tcolorbox\}\s*\})',
+            '', body, flags=re.DOTALL
+        )
+        body = re.sub(r'\\renewcommand\{\\arraystretch\}\{[^}]+\}', '', body)
+        body = re.sub(r'\\setlength\{\\[^}]+\}\{[^}]+\}', '', body)
+        body = re.sub(r'\\onehalfspacing\s*', '', body)
+        body = re.sub(r'\\pagestyle\{[^}]+\}', '', body)
+        body = re.sub(r'\\fancyhf\{[^}]*\}', '', body)
+        body = re.sub(r'\\fancyhead(?:\[[^\]]*\])?\{[^}]*\}', '', body)
+        body = re.sub(r'\\fancyfoot(?:\[[^\]]*\])?\{[^}]*\}', '', body)
+        body = re.sub(r'\\definecolor\{[^}]+\}\{[^}]+\}\{[^}]+\}', '', body)
+        body = re.sub(r'\\newtcolorbox\{[^}]+\}(?:\[[^\]]*\])*\{[^}]*(?:\{[^}]*\}[^}]*)*\}', '', body)
+        body = re.sub(r'\\tcbuselibrary\{[^}]+\}', '', body)
+        body = re.sub(r'\\lstset\{.*?\}', '', body, flags=re.DOTALL)
+        body = re.sub(r'\\lstdefinestyle\{[^}]+\}\{.*?\}', '', body, flags=re.DOTALL)
+        body = re.sub(r'\\newcommand\{\\newsection\}.*\n?', '', body)
+        # \let\cautionbox, \let\endcautionbox 등
+        body = re.sub(r'\\let\\[a-zA-Z]+\\[a-zA-Z]+\s*\n?', '', body)
+        # %=== 구분자 주석 블록 (빈 내용 사이)
+        body = re.sub(r'\n%=+\n%[^\n]*\n%=+\n(?=\s*\n)', '\n', body)
+        # \title{}, \author{}, \date{} 명령
+        body = re.sub(r'\\title\{[^}]*(?:\{[^}]*\}[^}]*)*\}', '', body)
+        body = re.sub(r'\\author\{[^}]*\}', '', body)
+        body = re.sub(r'\\date\{[^}]*\}', '', body)
+        # 잔여 \end{document} 제거
+        body = body.replace('\\end{document}', '')
+
         # 빈 줄 정리
         body = re.sub(r'\n{4,}', '\n\n\n', body)
         return body.strip()
@@ -84,6 +132,7 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
 \\usepackage{{array}}
 \\usepackage{{longtable}}
 \\usepackage{{adjustbox}}
+\\usepackage{{colortbl}}
 \\renewcommand{{\\arraystretch}}{{1.1}}
 
 %========================================================================================
@@ -120,7 +169,14 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
 \\definecolor{{darkorange}}{{RGB}}{{200, 100, 30}}
 \\definecolor{{darkpurple}}{{RGB}}{{100, 60, 150}}
 
+% MIT/Harvard 추가 색상
+\\definecolor{{mainblue}}{{RGB}}{{50, 80, 150}}
+\\definecolor{{subgray}}{{RGB}}{{180, 180, 180}}
+\\definecolor{{codebg}}{{RGB}}{{245, 245, 245}}
+\\definecolor{{boxbgcolor}}{{RGB}}{{245, 245, 250}}
+
 % Stanford CS230 스타일 색상
+\\definecolor{{myblue}}{{RGB}}{{50, 100, 180}}
 \\definecolor{{sblue}}{{RGB}}{{70, 130, 180}}
 \\definecolor{{wgray}}{{RGB}}{{245, 245, 245}}
 \\definecolor{{codegreen}}{{rgb}}{{0,0.6,0}}
@@ -152,10 +208,11 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=lightblue,
     colframe=darkblue,
     fonttitle=\\bfseries,
-    title=#1,
+    title=핵심 요약,
     arc=2mm,
     boxrule=0.7pt,
-    breakable
+    breakable,
+    #1
 }}
 
 \\newtcolorbox{{infobox}}[1][]{{
@@ -175,10 +232,11 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=lightyellow,
     colframe=darkorange,
     fonttitle=\\bfseries,
-    title=#1,
+    title=주의,
     arc=2mm,
     boxrule=0.7pt,
-    breakable
+    breakable,
+    #1
 }}
 
 \\newtcolorbox{{examplebox}}[1][]{{
@@ -186,10 +244,11 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=lightgray,
     colframe=black!60,
     fonttitle=\\bfseries,
-    title=#1,
+    title=예제,
     arc=2mm,
     boxrule=0.7pt,
-    breakable
+    breakable,
+    #1
 }}
 
 \\newtcolorbox{{definitionbox}}[1][]{{
@@ -197,10 +256,11 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=lightpink,
     colframe=purple!70!black,
     fonttitle=\\bfseries,
-    title=#1,
+    title=정의,
     arc=2mm,
     boxrule=0.7pt,
-    breakable
+    breakable,
+    #1
 }}
 
 \\newtcolorbox{{importantbox}}[1][]{{
@@ -208,10 +268,11 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=boxred,
     colframe=red!70!black,
     fonttitle=\\bfseries,
-    title=#1,
+    title=매우 중요,
     arc=2mm,
     boxrule=0.7pt,
-    breakable
+    breakable,
+    #1
 }}
 
 \\newtcolorbox{{conceptbox}}[1][]{{
@@ -219,10 +280,11 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=lightgreen,
     colframe=darkgreen,
     fonttitle=\\bfseries,
-    title=#1,
+    title=개념,
     arc=2mm,
     boxrule=0.7pt,
-    breakable
+    breakable,
+    #1
 }}
 
 \\newtcolorbox{{analogybox}}[1][]{{
@@ -230,14 +292,34 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=green!5!white,
     colframe=green!60!black,
     fonttitle=\\bfseries,
-    title=#1,
+    title=비유,
     arc=2mm,
     boxrule=0.7pt,
-    breakable
+    breakable,
+    #1
 }}
 
 \\let\\cautionbox\\warningbox
 \\let\\endcautionbox\\endwarningbox
+
+% tcbset 스타일 정의 (\\begin{{tcolorbox}}[summarybox] 형식 사용 시 호환)
+\\tcbset{{
+    summarybox/.style={{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable}},
+    warningbox/.style={{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable}},
+    examplebox/.style={{enhanced, colback=lightgray, colframe=black!60, fonttitle=\\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable}},
+    definitionbox/.style={{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable}},
+    importantbox/.style={{enhanced, colback=boxred, colframe=red!70!black, fonttitle=\\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable}},
+    infobox/.style={{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable}},
+    conceptbox/.style={{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable}},
+    analogybox/.style={{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable}},
+    overviewbox/.style={{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\\bfseries\\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable}},
+    cautionbox/.style={{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable}},
+    mybox/.style={{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\\bfseries, title={{#1}}, arc=2mm, boxrule=0.7pt, breakable}},
+    definition/.style={{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\\bfseries, title={{#1}}, arc=2mm, boxrule=0.7pt, breakable}},
+    example/.style={{enhanced, colback=lightgray, colframe=black!60, fonttitle=\\bfseries, title={{#1}}, arc=2mm, boxrule=0.7pt, breakable}},
+    summary/.style={{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\\bfseries, title={{#1}}, arc=2mm, boxrule=0.7pt, breakable}},
+    warning/.style={{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\\bfseries, title={{#1}}, arc=2mm, boxrule=0.7pt, breakable}},
+}}
 
 % mybox 환경 (UIUC용)
 \\newtcolorbox{{mybox}}[1]{{
@@ -245,11 +327,44 @@ def get_unified_preamble(course_code: str, course_name: str) -> str:
     colback=lightblue,
     colframe=darkblue,
     fonttitle=\\bfseries,
-    title=#1,
+    title={{#1}},
     arc=2mm,
     boxrule=0.7pt,
     breakable
 }}
+
+% 추가 환경 (Gemini 생성 콘텐츠에서 사용)
+\\newtcolorbox{{tipbox}}[1][]{{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\\bfseries, title=팁, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{solutionbox}}[1][]{{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\\bfseries, title=풀이, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{downloadbox}}[1][]{{enhanced, colback=boxgray, colframe=black!40, fonttitle=\\bfseries, title=다운로드, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{practicebox}}[1][]{{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\\bfseries, title=연습, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{keypointbox}}[1][]{{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\\bfseries, title=핵심 포인트, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{storybox}}[1][]{{enhanced, colback=lightyellow, colframe=darkorange!80!black, fonttitle=\\bfseries, title=이야기, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{mathstep}}[1][]{{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\\bfseries, title=수학 단계, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{systembox}}[1][]{{enhanced, colback=lightgray, colframe=black!60, fonttitle=\\bfseries, title=시스템, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{toolbox}}[1][]{{enhanced, colback=boxgray, colframe=black!40, fonttitle=\\bfseries, title=도구, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{bayesbox}}[1][]{{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\\bfseries, title=베이즈, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{formulabox}}[1][]{{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\\bfseries, title=공식, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{mathbox}}[1][]{{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\\bfseries, title=수학, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{strategybox}}[1][]{{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\\bfseries, title=전략, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{diagnosisbox}}[1][]{{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\\bfseries, title=진단, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{featurebox}}[1][]{{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\\bfseries, title=특징, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{faqbox}}[1][]{{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\\bfseries, title=FAQ, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{notebox}}[1][]{{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\\bfseries, title=노트, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{codeexamplebox}}[1][]{{enhanced, colback=lightgray, colframe=black!60, fonttitle=\\bfseries, title=코드 예제, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{keyconceptbox}}[1][]{{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\\bfseries, title=핵심 개념, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\newtcolorbox{{termbox}}[1][]{{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\\bfseries, title=용어, arc=2mm, boxrule=0.7pt, breakable, #1}}
+\\let\\cautionbox\\warningbox
+\\let\\endcautionbox\\endwarningbox
+
+% 커스텀 명령어 (Gemini 생성 콘텐츠에서 사용)
+\\newcommand{{\\excel}}[1]{{\\texttt{{#1}}}}
+\\newcommand{{\\code}}[1]{{\\texttt{{#1}}}}
+\\newcommand{{\\concept}}[1]{{\\textbf{{#1}}}}
+\\newcommand{{\\formula}}[1]{{\\textit{{#1}}}}
+\\providecommand{{\\captionof}}[2]{{\\textbf{{#2}}}}
+\\newcommand{{\\chaptertitle}}[2]{{\\section*{{#1: #2}}}}
+\\providecommand{{\\newsection}}{{\\section}}
 
 %========================================================================================
 % 코드 블록
@@ -469,10 +584,11 @@ def create_unified_stanford():
     return unified_path
 
 
-def create_unified_harvard(course_dir_name: str, course_code: str, course_name: str, num_lectures: int):
+def create_unified_harvard(course_dir_name: str, course_code: str, course_name: str, num_lectures: int, file_prefix: str = None):
     """Harvard 통합본 생성"""
     base_dir = Path("c:/Dev/academicnotes/school/harvard")
     course_dir = base_dir / course_dir_name
+    short_code = file_prefix or course_code.lower().replace("-", "")
 
     print(f"\n{'='*60}")
     print(f"Creating: {course_code} - {course_name}")
@@ -481,7 +597,11 @@ def create_unified_harvard(course_dir_name: str, course_code: str, course_name: 
     unified_content = get_unified_preamble(course_code, course_name)
 
     for i in range(1, num_lectures + 1):
-        tex_file = course_dir / f"lecture_{i:02d}" / f"{i}.tex"
+        lecture_dir = course_dir / f"lecture_{i:02d}"
+        # 새 파일명 우선 (예: cs109_17.tex, csci103_01.tex)
+        new_file = lecture_dir / f"{short_code}_{i:02d}.tex"
+        old_file = lecture_dir / f"{i}.tex"
+        tex_file = new_file if new_file.exists() else old_file
         if tex_file.exists():
             print(f"  Processing: {tex_file.name}")
             with open(tex_file, 'r', encoding='utf-8') as f:
@@ -522,22 +642,22 @@ def create_unified_csci89():
     course_dir = base_dir / "csci89"
 
     print(f"\n{'='*60}")
-    print(f"Creating: CSCI89 - Introduction to NLP")
+    print(f"Creating: CSCI89 - Introduction to AI")
     print(f"{'='*60}")
 
-    unified_content = get_unified_preamble("CSCI89", "Introduction to NLP")
+    unified_content = get_unified_preamble("CSCI89", "Introduction to Artificial Intelligence")
 
-    # 파일 매핑 (lecture 1-8: csci89_XX.tex, 9-13: X.tex)
+    # 모든 강의에 대해 새 파일명 우선 (csci89_XX.tex), 없으면 구 파일명 (X.tex)
     file_mappings = []
-    for i in range(1, 9):
-        file_mappings.append((i, f"lecture_{i:02d}", f"csci89_{i:02d}.tex"))
-    for i in range(9, 14):
-        file_mappings.append((i, f"lecture_{i:02d}", f"{i}.tex"))
+    for i in range(1, 13):
+        file_mappings.append((i, f"lecture_{i:02d}"))
 
-    for lecture_num, dir_name, filename in file_mappings:
-        tex_file = course_dir / dir_name / filename
+    for lecture_num, dir_name in file_mappings:
+        new_file = course_dir / dir_name / f"csci89_{lecture_num:02d}.tex"
+        old_file = course_dir / dir_name / f"{lecture_num}.tex"
+        tex_file = new_file if new_file.exists() else old_file
         if tex_file.exists():
-            print(f"  Processing: {filename}")
+            print(f"  Processing: {tex_file.name}")
             with open(tex_file, 'r', encoding='utf-8') as f:
                 content = f.read()
 
@@ -617,6 +737,100 @@ def create_unified_uiuc():
     return unified_path
 
 
+def create_unified_uiuc_fin571():
+    """UIUC FIN-571 통합본 생성"""
+    base_dir = Path("c:/Dev/academicnotes/school/uiuc")
+    course_dir = base_dir / "fin-571"
+
+    print(f"\n{'='*60}")
+    print(f"Creating: FIN571 - Financial Institutions & Monetary Policy")
+    print(f"{'='*60}")
+
+    unified_content = get_unified_preamble("FIN571", "Financial Institutions \\& Monetary Policy")
+
+    for i in range(1, 9):  # 8개 모듈
+        tex_file = course_dir / f"lecture_{i:02d}" / f"fin571_{i:02d}.tex"
+        if tex_file.exists():
+            print(f"  Processing: fin571_{i:02d}.tex")
+            with open(tex_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            title = extract_lecture_title(content, i)
+            body = extract_document_body(content)
+
+            if body:
+                unified_content += f'''
+%=======================================================================
+% Module {i}: {title}
+%=======================================================================
+\\chapter{{{title}}}
+\\label{{ch:module{i}}}
+
+{body}
+
+'''
+        else:
+            print(f"  File not found: {tex_file}")
+
+    unified_content += '''
+\\end{document}
+'''
+
+    unified_path = course_dir / "FIN571_unified.tex"
+    with open(unified_path, 'w', encoding='utf-8') as f:
+        f.write(unified_content)
+
+    print(f"Created: {unified_path}")
+    return unified_path
+
+
+def create_unified_uiuc_badm572():
+    """UIUC BADM-572 통합본 생성"""
+    base_dir = Path("c:/Dev/academicnotes/school/uiuc")
+    course_dir = base_dir / "badm-572"
+
+    print(f"\n{'='*60}")
+    print(f"Creating: BADM572 - Data-Driven Decision Making")
+    print(f"{'='*60}")
+
+    unified_content = get_unified_preamble("BADM572", "Data-Driven Decision Making")
+
+    for i in range(1, 9):  # 8개 모듈
+        tex_file = course_dir / f"lecture_{i:02d}" / f"badm572_{i:02d}.tex"
+        if tex_file.exists():
+            print(f"  Processing: badm572_{i:02d}.tex")
+            with open(tex_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            title = extract_lecture_title(content, i)
+            body = extract_document_body(content)
+
+            if body:
+                unified_content += f'''
+%=======================================================================
+% Module {i}: {title}
+%=======================================================================
+\\chapter{{{title}}}
+\\label{{ch:module{i}}}
+
+{body}
+
+'''
+        else:
+            print(f"  File not found: {tex_file}")
+
+    unified_content += '''
+\\end{document}
+'''
+
+    unified_path = course_dir / "BADM572_unified.tex"
+    with open(unified_path, 'w', encoding='utf-8') as f:
+        f.write(unified_content)
+
+    print(f"Created: {unified_path}")
+    return unified_path
+
+
 def main():
     print("=" * 70)
     print("Creating All Unified LaTeX Files")
@@ -636,12 +850,14 @@ def main():
     create_unified_stanford()
 
     # Harvard
-    create_unified_harvard("cs109", "CS109A", "Introduction to Data Science", 25)
+    create_unified_harvard("cs109", "CS109A", "Introduction to Data Science", 25, file_prefix="cs109")
     create_unified_harvard("csci103", "CSCI103", "Data Engineering", 14)
     create_unified_csci89()
 
     # UIUC
     create_unified_uiuc()
+    create_unified_uiuc_fin571()
+    create_unified_uiuc_badm572()
 
     print("\n" + "=" * 70)
     print("All unified files created successfully!")

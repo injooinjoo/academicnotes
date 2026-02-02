@@ -1,0 +1,3158 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{BADM-572: Data-Driven Decision Making}}
+\fancyhead[R]{\small\textit{Module 02}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={BADM-572: Data-Driven Decision Making - Module 02},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\thispagestyle{firstpage}
+
+\metainfo{데이터 기반 의사결정}{Module 2 (Part 1)}{Prof. Fataneh Taghaboni-Dutta}{데이터 탐색 및 분석을 위한 중심 경향성 및 산포도 이해}
+
+\tableofcontents
+
+\newpage
+\begin{overviewbox}
+이 문서는 'Exploring and Producing Data Module 2'의 첫 번째 파트 내용을 담고 있습니다.
+데이터를 효과적으로 요약하고 분석하기 위한 핵심 통계 개념인 중심 경향성(평균, 중앙값)과 산포도(범위, 분산, 표준 편차)에 대해 다룹니다.
+각 개념의 정의, 계산 방법, 그리고 실제 비즈니스 의사결정에서 어떻게 활용되는지 상세히 설명합니다.
+특히, Excel을 사용하여 이러한 통계량을 계산하는 실용적인 방법도 함께 제시하여, 비전공자나 초심자도 쉽게 이해하고 적용할 수 있도록 구성되었습니다.
+\end{overviewbox}
+
+\newpage
+\section{용어 정리}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+중심 경향성 & 데이터가 어디에 집중되어 있는지 나타내는 값 & Central Tendency & 평균, 중앙값 등이 있음 \\
+평균 & 모든 값을 더한 후 개수로 나눈 값 & Mean (Average) & 데이터의 '기대값'을 나타냄 \\
+중앙값 & 데이터를 크기 순으로 정렬했을 때 가운데 위치하는 값 & Median & 극단값(아웃라이어)에 덜 민감함 \\
+모집단 & 연구 대상이 되는 전체 집단 & Population & 모든 가능한 관측값의 집합 \\
+표본 & 모집단에서 추출한 일부 데이터 & Sample & 모집단의 특성을 추정하는 데 사용 \\
+모수 & 모집단의 특성을 나타내는 수치 & Parameter & 모집단 평균($\mu$), 모집단 표준 편차($\sigma$) 등 \\
+통계량 & 표본의 특성을 나타내는 수치 & Statistics & 표본 평균($\bar{x}$), 표본 표준 편차($s$) 등 \\
+산포도 & 데이터가 얼마나 퍼져 있는지 나타내는 정도 & Dispersion (Variation) & 데이터의 '변동성'을 나타냄 \\
+범위 & 데이터의 최댓값에서 최솟값을 뺀 값 & Range & 데이터의 퍼진 정도를 가장 간단하게 나타냄 \\
+분산 & 각 데이터가 평균으로부터 얼마나 떨어져 있는지 제곱하여 평균한 값 & Variance & 표준 편차의 제곱 \\
+표준 편차 & 분산의 양의 제곱근 & Standard Deviation & 데이터가 평균으로부터 평균적으로 얼마나 떨어져 있는지 나타냄 \\
+아웃라이어 & 다른 데이터와 동떨어진 극단적인 값 & Outlier & 평균에 큰 영향을 미칠 수 있음 \\
+왜도 & 데이터 분포의 비대칭 정도 & Skewness & 평균과 중앙값의 위치 관계에 영향을 줌 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{Module 2: 비즈니스 의사결정을 위한 데이터 탐색 및 생성}
+
+\subsection{Lesson 2-1: 중심 경향성 측정}
+
+\subsubsection*{Lesson 2-1.1: 중심 경향성 측정}
+
+\begin{infobox}[title=데이터 요약의 필요성]
+데이터를 요약하는 것은 방대한 데이터를 효과적으로 이해하고 소통하는 데 필수적입니다.
+단순히 데이터를 훑어보는 것만으로는 의미 있는 통찰을 얻기 어렵기 때문입니다.
+
+\begin{itemize}
+    \item \textbf{목표:} 데이터의 주요 특성을 빠르게 파악하고 전달하기 위함.
+    \item \textbf{방법:}
+    \begin{enumerate}
+        \item \textbf{그래픽 방법 (Graphical methods):} 시각적인 형태로 데이터를 요약합니다. (예: 히스토그램, 상자 그림)
+        \item \textbf{수치적 방법 (Numerical methods):} 숫자를 사용하여 데이터를 요약합니다. (예: 평균, 중앙값)
+    \end{enumerate}
+    이 강의에서는 주로 수치적 요약 방법에 초점을 맞춥니다.
+\end{infobox}
+
+\begin{definitionbox}[title=중심 경향성 (Central Tendency)]
+중심 경향성 측정은 데이터의 '중앙' 또는 '중심'이 어디에 위치하는지를 나타내는 값입니다.
+이는 데이터의 대표적인 값을 찾는 데 사용됩니다.
+
+\begin{itemize}
+    \item \textbf{정의:} 데이터의 중심 또는 중간을 나타내는 측정값입니다.
+    \item \textbf{특징:} 항상 데이터의 '전형적인' 값이라고 할 수는 없습니다.
+    \item \textbf{주요 측정값:} 평균(Mean)과 중앙값(Median)에 대해 자세히 알아봅니다.
+\end{itemize}
+\end{definitionbox}
+
+\begin{definitionbox}[title=평균 (Mean)]
+평균은 데이터의 '산술 평균' 또는 '기대값'을 나타내는 가장 일반적인 중심 경향성 측정값입니다.
+
+\begin{itemize}
+    \item \textbf{정의:} 모든 관측값을 더한 후 관측값의 총 개수로 나눈 값입니다.
+    \item \textbf{표기법:} 통계학에서는 모집단(Population)과 표본(Sample)에 따라 다른 기호를 사용합니다.
+    \begin{itemize}
+        \item \textbf{모집단 평균 ($\mu$ - Mu):} 모집단의 모든 요소를 사용하여 계산된 평균입니다. 이는 '모수(Parameter)'라고 불리며, 그리스 문자로 표기됩니다.
+        \item \textbf{표본 평균 ($\bar{x}$ - x-bar):} 모집단에서 추출한 표본의 요소를 사용하여 계산된 평균입니다. 이는 '통계량(Statistics)'이라고 불리며, 영어 소문자로 표기됩니다. 표본 평균은 모집단 평균을 추정하는 데 사용됩니다.
+    \end{itemize}
+\end{itemize}
+
+\textbf{평균 계산 방법}
+수동으로 계산할 필요는 없지만, 소프트웨어가 어떻게 값을 생성하는지 이해하는 것이 중요합니다.
+
+\begin{itemize}
+    \item \textbf{모집단 평균 ($\mu$):}
+    \begin{equation*}
+        \mu = \frac{\sum_{i=1}^{N} X_i}{N}
+    \end{equation*}
+    여기서,
+    \begin{itemize}
+        \item $X_i$: 모집단의 각 요소의 변수 값
+        \item $N$: 모집단의 크기 (총 요소 수)
+        \item $\sum$: 합계 기호
+    \end{itemize}
+    \item \textbf{표본 평균 ($\bar{x}$):}
+    \begin{equation*}
+        \bar{x} = \frac{\sum_{i=1}^{n} x_i}{n}
+    \end{equation*}
+    여기서,
+    \begin{itemize}
+        \item $x_i$: 표본의 각 요소의 변수 값
+        \item $n$: 표본의 크기 (총 요소 수)
+    \end{itemize}
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=예시: 고객 평균 지출액]
+웹사이트 방문 고객 7명으로부터 수집된 지출 데이터를 사용하여 평균 지출액을 계산해 봅시다.
+
+\begin{adjustbox}{width=0.5\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{고객} & \textbf{지출액 (x)} \\
+\midrule
+1 & \$85.68 \\
+2 & \$67.21 \\
+3 & \$98.08 \\
+4 & \$34.78 \\
+5 & \$56.98 \\
+6 & \$27.93 \\
+7 & \$40.72 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{고객별 지출액 데이터}
+\label{tab:customer_spending}
+
+\textbf{계산:}
+표본 평균($\bar{x}$)은 모든 고객의 지출액을 더한 후 고객 수(7명)로 나눕니다.
+\begin{align*}
+    \bar{x} &= \frac{x_1+x_2+x_3+x_4+x_5+x_6+x_7}{7} \\
+    &= \frac{85.68 + 67.21 + 98.08 + 34.78 + 56.93 + 27.93 + 40.72}{7} \\
+    &= \frac{411.38}{7} \\
+    &= \$58.77
+\end{align*}
+이 표본의 평균 지출액은 \$58.77입니다.
+\end{examplebox}
+
+\begin{definitionbox}[title=중앙값 (Median)]
+중앙값($M_d$)은 데이터를 크기 순으로 정렬했을 때 정확히 가운데에 위치하는 값입니다.
+데이터의 50\%는 중앙값보다 크거나 같고, 50\%는 중앙값보다 작거나 같습니다.
+
+\begin{itemize}
+    \item \textbf{정의:} 데이터를 오름차순 또는 내림차순으로 정렬했을 때 중간에 위치하는 값입니다.
+    \item \textbf{표기법:} 모집단과 표본 간에 별도의 기호 차이는 없습니다.
+    \item \textbf{계산 방법:}
+    \begin{itemize}
+        \item \textbf{측정값의 개수가 홀수인 경우:} 중앙값은 정렬된 데이터에서 정확히 가운데에 있는 값입니다.
+        \item \textbf{측정값의 개수가 짝수인 경우:} 중앙값은 정렬된 데이터에서 가운데에 있는 두 값의 평균입니다.
+    \end{itemize}
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=예시: 고객 지출액의 중앙값]
+위에서 사용한 고객 지출액 데이터를 사용하여 중앙값을 계산해 봅시다.
+
+\begin{adjustbox}{width=0.5\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{고객} & \textbf{지출액 (x)} \\
+\midrule
+1 & \$85.68 \\
+2 & \$67.21 \\
+3 & \$98.08 \\
+4 & \$34.78 \\
+5 & \$56.98 \\
+6 & \$27.93 \\
+7 & \$40.72 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{고객별 지출액 데이터}
+\label{tab:customer_spending_median}
+
+\textbf{계산:}
+\begin{enumerate}
+    \item 데이터를 오름차순으로 정렬합니다.
+    \begin{adjustbox}{width=0.3\textwidth,center}
+    \begin{tabular}{lc}
+    \toprule
+    \textbf{정렬된 목록} & \textbf{지출액} \\
+    \midrule
+    1 & \$27.93 \\
+    2 & \$34.78 \\
+    3 & \$40.72 \\
+    4 & \textbf{\$56.98} \\ % 중앙값
+    5 & \$67.21 \\
+    6 & \$85.68 \\
+    7 & \$98.08 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \captionof{table}{정렬된 고객 지출액 데이터}
+    \label{tab:customer_spending_ordered}
+    \item 데이터 포인트의 개수가 7개(홀수)이므로, 가운데 위치한 4번째 값이 중앙값입니다.
+\end{enumerate}
+따라서 중앙값은 \$56.98입니다. 이는 고객의 50\%가 \$56.98보다 많이 지출했고, 50\%가 그보다 적게 지출했음을 의미합니다.
+\end{examplebox}
+
+\begin{infobox}[title=어떤 중심 경향성 측도를 사용할 것인가? (평균 vs. 중앙값)]
+평균과 중앙값은 모두 데이터의 중심을 나타내지만, 데이터의 특성, 특히 '아웃라이어(Outlier)'의 존재 여부에 따라 어떤 측도가 더 적절한지 달라집니다.
+
+\textbf{예시 1: 일반적인 연봉 데이터}
+친구 9명과 당신(총 10명)이 비슷한 연봉을 받는 상황을 가정해 봅시다.
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{l}
+\toprule
+\textbf{연봉} \\
+\midrule
+\$57,000 \\
+\$58,000 \\
+\$59,000 \\
+\$62,000 \\
+\$64,000 \\
+\$65,000 \\
+\$66,000 \\
+\$68,000 \\
+\$71,000 \\
+\$80,000 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{친구 10명의 연봉 데이터}
+\label{tab:salary_example1}
+
+\begin{itemize}
+    \item \textbf{평균:} \$65,000
+    \item \textbf{중앙값:} 데이터가 짝수(10개)이므로, 가운데 두 값(\$64,000, \$65,000)의 평균인 \$64,500
+\end{itemize}
+이 경우 평균과 중앙값이 매우 유사하며, 둘 다 그룹의 '전형적인' 연봉을 잘 나타냅니다.
+
+\textbf{예시 2: 아웃라이어가 있는 연봉 데이터}
+이제 프로 농구 선수로 성공한 옛 동창 한 명이 그룹에 합류하여 총 11명이 되었다고 가정해 봅시다. 이 동창의 연봉은 \$8,000,000입니다.
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{l}
+\toprule
+\textbf{연봉} \\
+\midrule
+\$57,000 \\
+\$58,000 \\
+\$59,000 \\
+\$62,000 \\
+\$64,000 \\
+\$65,000 \\
+\$66,000 \\
+\$68,000 \\
+\$71,000 \\
+\$80,000 \\
+\$8,000,000 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{아웃라이어가 포함된 연봉 데이터}
+\label{tab:salary_example2}
+
+\begin{itemize}
+    \item \textbf{평균:} \$786,363.64
+    \item \textbf{중앙값:} 데이터가 홀수(11개)이므로, 가운데(6번째) 값인 \$65,000
+\end{itemize}
+
+\textbf{결론:}
+\begin{itemize}
+    \item 아웃라이어(극단적인 값)가 존재할 때, \textbf{평균은 아웃라이어에 매우 민감하게 반응하여 크게 변동}합니다. 이 경우 \$786,363.64는 그룹의 '전형적인' 연봉이라고 보기 어렵습니다.
+    \item 반면, \textbf{중앙값은 아웃라이어에 덜 민감하며, 데이터의 실제 중심을 더 잘 대표}합니다. \$65,000는 여전히 대부분의 그룹 구성원에게 더 전형적인 값입니다.
+    \item \textbf{실제 적용:} 주택 가격을 보고할 때 종종 '중앙값'이 사용됩니다. 이는 몇몇 값비싼 저택이나 낡은 주택 때문에 평균이 왜곡되는 것을 방지하여, 구매자들이 시장의 실제 가격대를 더 정확하게 파악할 수 있도록 돕습니다.
+\end{itemize}
+\end{infobox}
+
+\begin{infobox}[title=평균과 중앙값의 관계: 분포의 왜도 (Skewness)]
+데이터 분포의 형태에 따라 평균과 중앙값의 상대적인 위치가 달라집니다. 이는 데이터의 '왜도'를 나타냅니다.
+
+\begin{itemize}
+    \item \textbf{대칭 분포 (Symmetrical Curve):}
+    \begin{itemize}
+        \item \textbf{특징:} 데이터가 평균을 중심으로 좌우 대칭을 이룹니다. 종 모양의 정규 분포가 대표적입니다.
+        \item \textbf{평균과 중앙값:} 평균과 중앙값이 거의 일치합니다.
+        \item \textbf{예시:} 주식 가격 변동 분포 (일일 상승 종목 수)
+        \begin{adjustbox}{width=0.6\textwidth,center}
+        \begin{tabular}{lc}
+        \toprule
+        \textbf{상승 종목 수} & \textbf{빈도} \\
+        \midrule
+        30 & 1500 \\
+        31 & 2000 \\
+        35 & 6000 \\
+        40 & 8200 \\
+        45 & 4000 \\
+        50 & 1000 \\
+        \bottomrule
+        \end{tabular}
+        \end{adjustbox}
+        \captionof{table}{대칭 분포 예시 (주식 상승 종목 수)}
+        \label{tab:symmetrical_curve}
+        이러한 분포에서는 평균과 중앙값이 모두 40 근처에 위치하며, 데이터의 중심을 잘 나타냅니다.
+    \end{itemize}
+
+    \item \textbf{비대칭 분포 (Skewed Curve):} 아웃라이어가 존재하면 분포가 한쪽으로 치우치게 됩니다.
+    \begin{itemize}
+        \item \textbf{우측 왜도 (Right Skewness / Positive Skewness):}
+        \begin{itemize}
+            \item \textbf{특징:} 분포의 꼬리가 오른쪽으로 길게 늘어져 있습니다. 소수의 큰 값(아웃라이어)이 분포를 오른쪽으로 당깁니다.
+            \item \textbf{평균과 중앙값:} 평균이 중앙값보다 큽니다 (평균 > 중앙값).
+            \item \textbf{예시:} 소득 분포 (소수의 고소득자가 평균을 높임).
+            \item \textbf{시각적 설명:} 히스토그램에서 대부분의 데이터는 왼쪽에 몰려 있고, 오른쪽으로 갈수록 빈도가 낮아지며 꼬리가 길어집니다. 평균(빨간색 막대)은 중앙값(녹색 막대)보다 오른쪽에 위치합니다.
+        \end{itemize}
+        \item \textbf{좌측 왜도 (Left Skewness / Negative Skewness):}
+        \begin{itemize}
+            \item \textbf{특징:} 분포의 꼬리가 왼쪽으로 길게 늘어져 있습니다. 소수의 작은 값(아웃라이어)이 분포를 왼쪽으로 당깁니다.
+            \item \textbf{평균과 중앙값:} 평균이 중앙값보다 작습니다 (평균 < 중앙값).
+            \item \textbf{예시:} 시험 점수 분포 (대부분의 학생이 높은 점수를 받고 소수의 학생이 낮은 점수를 받음).
+            \item \textbf{시각적 설명:} 히스토그램에서 대부분의 데이터는 오른쪽에 몰려 있고, 왼쪽으로 갈수록 빈도가 낮아지며 꼬리가 길어집니다. 평균(빨간색 막대)은 중앙값(녹색 막대)보다 왼쪽에 위치합니다.
+        \end{itemize}
+    \end{itemize}
+    \textbf{핵심:} 중앙값은 아웃라이어에 덜 민감하기 때문에, 왜곡된 분포에서는 평균보다 중앙값이 데이터의 '전형적인' 값을 더 잘 대표할 수 있습니다.
+\end{infobox}
+
+\begin{examplebox}[title=연습 문제: 신규 사업장 연간 임대료]
+신규 사업장 후보지 5곳의 연간 임대료 데이터가 주어졌습니다. 이 데이터 세트의 평균과 중앙값을 계산해 봅시다.
+
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{위치} & \textbf{연간 임대료} \\
+\midrule
+A & \$84,000 \\
+B & \$78,000 \\
+C & \$114,000 \\
+D & \$103,200 \\
+E & \$93,600 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{신규 사업장 연간 임대료 데이터}
+\label{tab:rental_data}
+
+\textbf{풀이:}
+\begin{enumerate}
+    \item \textbf{평균 계산:} 모든 임대료를 더한 후 5로 나눕니다.
+    \begin{align*}
+        \bar{x} &= \frac{84000 + 78000 + 114000 + 103200 + 93600}{5} \\
+        &= \frac{472800}{5} \\
+        &= \$94,560
+    \end{align*}
+    평균 임대료는 \$94,560입니다.
+
+    \item \textbf{중앙값 계산:} 데이터를 오름차순으로 정렬합니다.
+    \begin{adjustbox}{width=0.4\textwidth,center}
+    \begin{tabular}{lc}
+    \toprule
+    \textbf{위치} & \textbf{연간 임대료} \\
+    \midrule
+    B & \$78,000 \\
+    A & \$84,000 \\
+    E & \textbf{\$93,600} \\ % 중앙값
+    D & \$103,200 \\
+    C & \$114,000 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \captionof{table}{정렬된 연간 임대료 데이터}
+    \label{tab:rental_data_sorted}
+    데이터 포인트가 5개(홀수)이므로, 가운데(3번째) 값인 \$93,600이 중앙값입니다.
+\end{enumerate}
+\end{examplebox}
+
+\newpage
+\subsubsection*{Lesson 2-1.2: Excel에서 평균 및 중앙값 계산}
+
+\begin{examplebox}[title={Excel에서 평균 계산하기 (\texttt{AVERAGE} 함수)}]
+뉴욕시의 일일 기온 데이터(26,000개 이상의 기록)를 사용하여 평균을 계산해 봅시다.
+
+\textbf{단계:}
+\begin{enumerate}
+    \item Excel 시트에서 평균을 계산할 셀을 선택합니다. (예: 데이터 옆의 빈 셀)
+    \item 해당 셀에 \texttt{=AVERAGE(}를 입력합니다. Excel은 입력하는 동안 관련 함수 목록을 자동으로 표시합니다.
+    \item 평균을 계산할 데이터 범위를 선택합니다.
+    \begin{itemize}
+        \item 첫 번째 데이터 셀을 클릭합니다 (예: \texttt{C7}).
+        \item \texttt{Ctrl + Shift + 아래쪽 화살표} 키를 동시에 눌러 해당 열의 모든 데이터를 자동으로 선택합니다. (예: \texttt{C7:C26776})
+    \end{itemize}
+    \item 괄호를 닫고 \texttt{)} \texttt{Enter} 키를 누릅니다.
+    \item 결과가 선택한 셀에 표시됩니다. (예: 뉴욕시 평균 기온 55.2도)
+\end{enumerate}
+\begin{lstlisting}[caption={Excel AVERAGE 함수 사용 예시}, label={lst:excel_average}]
+=AVERAGE(C7:C26776)
+\end{lstlisting}
+\end{examplebox}
+
+\begin{examplebox}[title={Excel에서 중앙값 계산하기 (\texttt{MEDIAN} 함수)}]
+동일한 뉴욕시 일일 기온 데이터를 사용하여 중앙값을 계산해 봅시다.
+
+\textbf{단계:}
+\begin{enumerate}
+    \item Excel 시트에서 중앙값을 계산할 셀을 선택합니다. (예: 평균 셀 아래의 빈 셀)
+    \item 해당 셀에 \texttt{=MEDIAN(}를 입력합니다.
+    \item 중앙값을 계산할 데이터 범위를 선택합니다.
+    \begin{itemize}
+        \item 첫 번째 데이터 셀을 클릭합니다 (예: \texttt{C7}).
+        \item \texttt{Ctrl + Shift + 아래쪽 화살표} 키를 동시에 눌러 해당 열의 모든 데이터를 자동으로 선택합니다. (예: \texttt{C7:C26776})
+    \end{itemize}
+    \item 괄호를 닫고 \texttt{)} \texttt{Enter} 키를 누릅니다.
+    \item 결과가 선택한 셀에 표시됩니다. (예: 뉴욕시 중앙값 기온 55.9도)
+\end{enumerate}
+\begin{lstlisting}[caption={Excel MEDIAN 함수 사용 예시}, label={lst:excel_median}]
+=MEDIAN(C7:C26776)
+\end{lstlisting}
+
+\textbf{평균과 중앙값 비교:}
+뉴욕시 기온 데이터의 평균은 55.2도, 중앙값은 55.9도입니다. 이 두 값이 매우 가깝다는 것은 뉴욕시의 일일 기온 분포가 비교적 대칭적이라는 것을 시사합니다.
+\end{examplebox}
+
+\newpage
+\subsection{Lesson 2-2: 산포도 측정}
+
+\subsubsection*{Lesson 2-2.1: 산포도 측정}
+
+\begin{infobox}[title=산포도 (Variation / Dispersion) 측정의 필요성]
+중심 경향성(평균 또는 중앙값)은 데이터의 '중심'을 알려주지만, 이 중심값이 얼마나 '대표적인지'는 알려주지 않습니다.
+데이터가 얼마나 퍼져 있는지, 즉 '변동성'을 이해하는 것이 중요합니다.
+
+\begin{itemize}
+    \item \textbf{목표:} 데이터가 얼마나 넓게 퍼져 있거나 밀집되어 있는지를 파악합니다.
+    \item \textbf{비유:} 자동차 오일 교환 시간이 평균 30분이라고 할 때, 20분 만에 끝날지 40분 걸릴지 예측하려면 변동성 정보가 필요합니다.
+    \item \textbf{주요 측정값:}
+    \begin{enumerate}
+        \item \textbf{범위 (Range)}
+        \item \textbf{분산 (Variance)}
+        \item \textbf{표준 편차 (Standard Deviation)}
+    \end{enumerate}
+\end{itemize}
+\end{infobox}
+
+\begin{definitionbox}[title=범위 (Range)]
+범위는 데이터의 퍼진 정도를 가장 간단하게 나타내는 측정값입니다.
+
+\begin{itemize}
+    \item \textbf{정의:} 데이터 세트의 가장 큰 관측값에서 가장 작은 관측값을 뺀 값입니다.
+    \item \textbf{장점:} 계산이 매우 간단하여 데이터의 대략적인 확산 정도를 빠르게 파악할 수 있습니다.
+    \item \textbf{단점:} 극단값(아웃라이어)에 매우 민감하며, 데이터 세트가 커질수록 정확도가 떨어집니다. 전체 데이터의 변동성을 충분히 반영하지 못할 수 있습니다.
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}[title=예시: 응급실 (ER) 대기 시간 비교]
+두 응급실(ER A, ER B)의 환자 처리 시간 효율성을 비교해 봅시다. 두 ER 모두 평균 대기 시간은 5분으로 동일합니다.
+하지만 어떤 ER이 환자들이 평균에 더 가까운 대기 시간을 경험할까요?
+
+\textbf{ER A의 대기 시간 분포:}
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{대기 시간 (분)} & \textbf{빈도} \\
+\midrule
+4 & 8 \\
+5 & 14 \\
+6 & 6 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{ER A 대기 시간 데이터}
+\label{tab:er_a_waiting_time}
+\begin{itemize}
+    \item \textbf{최소 대기 시간:} 4분
+    \item \textbf{최대 대기 시간:} 6분
+    \item \textbf{범위:} 6분 - 4분 = 2분
+\end{itemize}
+
+\textbf{ER B의 대기 시간 분포:}
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{대기 시간 (분)} & \textbf{빈도} \\
+\midrule
+2 & 2 \\
+3 & 3 \\
+4 & 5 \\
+5 & 11 \\
+6 & 5 \\
+7 & 3 \\
+8 & 2 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{ER B 대기 시간 데이터}
+\label{tab:er_b_waiting_time}
+\begin{itemize}
+    \item \textbf{최소 대기 시간:} 2분
+    \item \textbf{최대 대기 시간:} 8분
+    \item \textbf{범위:} 8분 - 2분 = 6분
+\end{itemize}
+
+\textbf{결론:}
+\begin{itemize}
+    \item 두 ER 모두 평균 대기 시간은 5분으로 같지만, ER A의 범위는 2분이고 ER B의 범위는 6분입니다.
+    \item 이는 ER B의 환자들이 ER A보다 훨씬 더 다양한(변동성이 큰) 대기 시간을 경험한다는 것을 의미합니다.
+    \item 따라서 ER A의 평균 대기 시간은 환자 경험을 더 잘 대표하는 반면, ER B의 평균은 덜 전형적입니다.
+\end{itemize}
+범위는 간단하지만, 데이터 세트가 커질수록 정확도가 떨어지므로, 더 일반적으로 사용되고 의미 있는 산포도 측정값은 표준 편차와 분산입니다.
+\end{examplebox}
+
+\begin{definitionbox}[title=표준 편차 (Standard Deviation) 및 분산 (Variance)]
+표준 편차와 분산은 데이터가 평균으로부터 얼마나 퍼져 있는지를 정량적으로 나타내는 가장 중요한 산포도 측정값입니다.
+
+\begin{itemize}
+    \item \textbf{표준 편차 (Standard Deviation):}
+    \begin{itemize}
+        \item \textbf{정의:} 데이터의 산포도를 측정하는 값입니다. 표준 편차 값이 작으면 데이터 포인트들이 평균에 가깝게 밀집되어 있음을 의미합니다.
+        \item \textbf{계산:} 분산의 양의 제곱근을 취하여 계산됩니다.
+        \item \textbf{활용:} 데이터의 변동성을 표현할 뿐만 아니라, 통계학의 고급 주제(예: 가설 검정, 신뢰 구간)에서도 광범위하게 사용됩니다.
+    \end{itemize}
+    \item \textbf{분산 (Variance):}
+    \begin{itemize}
+        \item \textbf{정의:} 각 관측값이 평균으로부터 얼마나 떨어져 있는지(편차)를 제곱하여 평균한 값입니다. 편차를 제곱하는 이유는 양수와 음수의 편차가 서로 상쇄되는 것을 방지하기 위함입니다.
+        \item \textbf{계산:} 모집단 데이터와 표본 데이터에 따라 계산 방식이 다릅니다.
+    \end{itemize}
+\end{itemize}
+
+\textbf{분산 계산 방법}
+\begin{itemize}
+    \item \textbf{모집단 분산 ($\sigma^2$ - Sigma squared):}
+    \begin{equation*}
+        \sigma^2 = \frac{\sum_{i=1}^{N} (X_i - \mu)^2}{N}
+    \end{equation*}
+    여기서,
+    \begin{itemize}
+        \item $X_i$: 모집단의 각 요소의 변수 값
+        \item $\mu$: 모집단 평균
+        \item $N$: 모집단의 크기
+    \end{itemize}
+    각 관측값에서 모집단 평균을 뺀 후 제곱하고, 이 값들을 모두 더한 다음 모집단 크기 $N$으로 나눕니다.
+
+    \item \textbf{표본 분산 ($s^2$ - s squared):}
+    \begin{equation*}
+        s^2 = \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n-1}
+    \end{equation*}
+    여기서,
+    \begin{itemize}
+        \item $x_i$: 표본의 각 요소의 변수 값
+        \item $\bar{x}$: 표본 평균
+        \item $n$: 표본의 크기
+    \end{itemize}
+    각 관측값에서 표본 평균을 뺀 후 제곱하고, 이 값들을 모두 더한 다음 \textbf{표본 크기 $n$이 아닌 $n-1$로 나눕니다.} $n-1$로 나누는 이유는 표본 분산이 모집단 분산을 더 정확하게 추정하도록 하기 위함입니다 (자유도 보정).
+\end{itemize}
+
+\textbf{표준 편차 계산 방법}
+분산이 어떻게 계산되었든, 표준 편차는 항상 분산의 양의 제곱근입니다.
+
+\begin{itemize}
+    \item \textbf{모집단 표준 편차 ($\sigma$):}
+    \begin{equation*}
+        \sigma = \sqrt{\sigma^2}
+    \end{equation*}
+    \item \textbf{표본 표준 편차 ($s$):}
+    \begin{equation*}
+        s = \sqrt{s^2}
+    \end{equation*}
+\end{itemize}
+\textbf{표기법 주의:} 모집단 모수는 그리스 문자(대문자)로, 표본 통계량은 영어 소문자로 표기됩니다.
+\end{definitionbox}
+
+\begin{examplebox}[title=예시: 연봉 데이터로 분산 및 표준 편차 계산]
+이전의 연봉 데이터를 사용하여 분산과 표준 편차를 계산해 봅시다. 이 그룹의 친구들을 대학 졸업생 모집단의 '표본'으로 간주합니다.
+
+\textbf{첫 번째 그룹 (10명):}
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{l}
+\toprule
+\textbf{연봉} \\
+\midrule
+\$57,000 \\
+\$58,000 \\
+\$59,000 \\
+\$62,000 \\
+\$64,000 \\
+\$65,000 \\
+\$66,000 \\
+\$68,000 \\
+\$71,000 \\
+\$80,000 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{친구 10명의 연봉 데이터}
+\label{tab:salary_example1_sd}
+\begin{itemize}
+    \item 표본 크기 ($n$) = 10
+    \item 표본 평균 ($\bar{x}$) = \$65,000
+\end{itemize}
+\textbf{계산:}
+\begin{align*}
+    s^2 &= \frac{\sum_{i=1}^{10} (x_i - 65000)^2}{10-1} \\
+    &= \frac{(57000-65000)^2 + (58000-65000)^2 + \dots + (80000-65000)^2}{9} \\
+    &= \frac{430,000,000}{9} \\
+    &\approx 47,777,778
+\end{align*}
+표본 분산 ($s^2$) $\approx$ 47,777,778
+
+표본 표준 편차 ($s$) = $\sqrt{47,777,778} \approx \$6,912.147$
+
+\textbf{두 번째 그룹 (아웃라이어 포함, 11명):}
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{l}
+\toprule
+\textbf{연봉} \\
+\midrule
+\$57,000 \\
+\$58,000 \\
+\$59,000 \\
+\$62,000 \\
+\$64,000 \\
+\$65,000 \\
+\$66,000 \\
+\$68,000 \\
+\$71,000 \\
+\$80,000 \\
+\$8,000,000 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{아웃라이어가 포함된 연봉 데이터}
+\label{tab:salary_example2_sd}
+\begin{itemize}
+    \item 표본 크기 ($n$) = 11
+    \item 표본 평균 ($\bar{x}$) = \$786,363.64
+\end{itemize}
+\textbf{계산:}
+\begin{align*}
+    s^2 &= \frac{\sum_{i=1}^{11} (x_i - 786363.64)^2}{11-1} \\
+    &= \frac{(57000-786363.64)^2 + \dots + (8000000-786363.64)^2}{10} \\
+    &\approx 5,724,063,454,545.46
+\end{align*}
+표본 분산 ($s^2$) $\approx$ 5,724,063,454,545.46
+
+표본 표준 편차 ($s$) = $\sqrt{5,724,063,454,545.46} \approx \$2,392,501.51$
+
+\textbf{결론:}
+아웃라이어(8백만 달러 연봉)가 추가되자 표준 편차가 \$6,912에서 \$2,392,501로 크게 증가했습니다.
+이는 평균 연봉(\$786,363)이 이 그룹의 '전형적인' 값을 전혀 대표하지 못한다는 것을 명확히 보여줍니다.
+데이터를 요약할 때는 항상 중심 경향성(평균 또는 중앙값)과 함께 산포도(표준 편차)를 함께 고려해야 합니다.
+\end{examplebox}
+
+\begin{examplebox}[title=연습 문제: 히스토그램을 통한 평균의 대표성 판단]
+두 히스토그램 A와 B가 주어졌습니다. 어떤 표본의 평균이 무작위로 선택된 관측값을 더 잘 대표할까요? 그 이유는 무엇일까요?
+
+\textbf{히스토그램 A 데이터:}
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{값} & \textbf{빈도} \\
+\midrule
+0 & 1 \\
+1 & 3 \\
+2 & 5 \\
+3 & 7 \\
+4 & 9 \\
+5 & 11 \\
+6 & 10 \\
+7 & 8 \\
+8 & 6 \\
+9 & 4 \\
+10 & 2 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{히스토그램 A 데이터}
+\label{tab:histogram_a}
+
+\textbf{히스토그램 B 데이터:}
+\begin{adjustbox}{width=0.4\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{값} & \textbf{빈도} \\
+\midrule
+0 & 2 \\
+1 & 3 \\
+2 & 4 \\
+3 & 5 \\
+4 & 6 \\
+5 & 7 \\
+6 & 6 \\
+7 & 5 \\
+8 & 4 \\
+9 & 3 \\
+10 & 2 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{히스토그램 B 데이터}
+\label{tab:histogram_b}
+
+\textbf{풀이:}
+\begin{itemize}
+    \item \textbf{정답:} A
+    \item \textbf{이유:}
+    \begin{itemize}
+        \item 두 히스토그램 모두 중심 경향성은 5 근처에 있으며, 값의 범위는 0에서 10 사이입니다.
+        \item 하지만 히스토그램 A는 데이터가 중심(5) 주변에 더 밀집되어 있습니다. 즉, A는 B보다 '슬림한' 형태를 가집니다.
+        \item 이는 표본 A의 데이터 분포가 표본 B보다 \textbf{표준 편차가 더 작다}는 것을 의미합니다.
+        \item 표준 편차가 작다는 것은 데이터가 평균에 더 가깝게 모여 있다는 뜻이므로, 평균이 데이터 세트를 더 잘 대표합니다.
+    \end{itemize}
+\end{itemize}
+\textbf{핵심:} 데이터 세트에 대한 정보를 전달할 때 평균과 같은 단일 요약 지점만으로는 불완전합니다. 평균이 데이터의 좋은 대표값이 되려면, 데이터 내의 변동성(표준 편차로 표현됨)도 함께 고려해야 합니다.
+\end{examplebox}
+
+\newpage
+\subsubsection*{Lesson 2-2.2: Excel에서 표준 편차 계산}
+
+\begin{examplebox}[title={Excel에서 표준 편차 계산하기 (\texttt{STDEV.S} 함수)}]
+뉴욕시의 일일 기온 데이터(26,000개 이상의 기록)를 사용하여 표준 편차를 계산해 봅시다.
+이전 계산에서 평균은 55.2도, 중앙값은 55.9도였습니다.
+
+\textbf{단계:}
+\begin{enumerate}
+    \item Excel 시트에서 표준 편차를 계산할 셀을 선택합니다. (예: 평균 및 중앙값 셀 아래의 빈 셀)
+    \item 해당 셀에 \texttt{=ST}를 입력합니다. Excel은 관련 함수 목록을 표시합니다.
+    \item \textbf{중요:} 모집단 표준 편차(\texttt{STDEV.P})와 표본 표준 편차(\texttt{STDEV.S})를 구분해야 합니다.
+    \begin{itemize}
+        \item \texttt{STDEV.P}: 전체 모집단을 기반으로 표준 편차를 계산합니다. (분모 $N$)
+        \item \texttt{STDEV.S}: 표본 데이터를 기반으로 모집단 표준 편차를 추정합니다. (분모 $n-1$)
+    \end{itemize}
+    우리는 뉴욕시의 모든 기온 데이터를 가지고 있지만, 이는 '모집단'이 아닌 '표본'으로 간주되므로 \texttt{STDEV.S}를 선택합니다.
+    \item \texttt{STDEV.S}를 선택하고 \texttt{Tab} 키를 누릅니다.
+    \item 표준 편차를 계산할 데이터 범위를 선택합니다.
+    \begin{itemize}
+        \item 첫 번째 데이터 셀을 클릭합니다 (예: \texttt{C7}).
+        \item \texttt{Ctrl + Shift + 아래쪽 화살표} 키를 동시에 눌러 해당 열의 모든 데이터를 자동으로 선택합니다. (예: \texttt{C7:C26776})
+    \end{itemize}
+    \item 괄호를 닫고 \texttt{)} \texttt{Enter} 키를 누릅니다.
+    \item 결과가 선택한 셀에 표시됩니다. (예: 뉴욕시 기온의 표준 편차 17.37도)
+\end{enumerate}
+\begin{lstlisting}[caption={Excel STDEV.S 함수 사용 예시}, label={lst:excel_stdev_s}]
+=STDEV.S(C7:C26776)
+\end{lstlisting}
+
+\textbf{결과 해석:}
+뉴욕시 기온의 표준 편차는 약 17.37도입니다.
+\begin{itemize}
+    \item 만약 뉴욕시 기온이 정규 분포를 따른다고 가정하면,
+    \begin{itemize}
+        \item 약 68\%의 시간 동안 기온은 평균($\approx$ 55도) $\pm$ 1 표준 편차($\approx$ 17도) 범위 내에 있을 것입니다. (즉, 38도에서 72도 사이)
+        \item 약 95\%의 시간 동안 기온은 평균($\approx$ 55도) $\pm$ 2 표준 편차($\approx$ 34도) 범위 내에 있을 것입니다. (즉, 21도에서 89도 사이)
+    \end{itemize}
+\end{itemize}
+이처럼 표준 편차는 데이터의 변동성을 이해하고, 특정 값이 평균으로부터 얼마나 떨어져 있는지, 그리고 데이터가 얼마나 퍼져 있는지를 파악하는 데 중요한 역할을 합니다.
+\end{examplebox}
+
+\newpage
+
+\newpage
+\section{개요: 데이터 탐색 및 생산 모듈 2 (파트 2/5)}
+
+\begin{overviewbox}
+이 문서는 BADM-572: 데이터 기반 의사결정 과목의 '데이터 탐색 및 생산 모듈 2' 중 두 번째 파트에 해당하는 핵심 내용을 다룹니다. 우리는 데이터 내에서 특정 값의 상대적 위치를 이해하는 데 필수적인 \textbf{백분위수(Percentiles)}와 \textbf{Z-점수(Z-score)} 개념을 학습합니다. 또한, 데이터의 분포 특성을 파악하는 \textbf{경험적 규칙(Empirical Rule)}을 살펴보고, 이들을 \textbf{Excel}에서 어떻게 계산하고 활용하는지 실습합니다. 마지막으로, \textbf{이산(Discrete) 및 연속(Continuous) 확률 변수}의 정의와 그 확률 분포, 그리고 \textbf{기댓값(Expected Value)}과 \textbf{표준편차(Standard Deviation)} 계산 방법을 다룹니다. 이 문서는 시험 대비를 위해 모든 개념을 비전공자도 이해할 수 있도록 상세하고 친절하게 설명하며, 실제 비즈니스 상황에서의 적용 사례를 풍부하게 제시합니다.
+\end{overviewbox}
+
+\newpage
+\section{용어 정리}
+
+다음 표는 이 문서에서 다루는 주요 통계 용어들을 쉽게 설명하고 원어를 병기하여 이해를 돕습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+백분위수 & 데이터에서 특정 값보다 작은 값들이 차지하는 비율 & Percentile & 상대적 위치 파악 \\
+Z-점수 & 특정 데이터가 평균으로부터 표준편차의 몇 배만큼 떨어져 있는지 나타내는 값 & Z-score & 표준화된 거리 \\
+경험적 규칙 & 종 모양 분포에서 평균으로부터 표준편차 거리에 따른 데이터 비율 & Empirical Rule & 정규 분포의 특성 \\
+이산 확률 변수 & 셀 수 있는 유한한 값을 가지는 변수 & Discrete Random Variable & 정수형 값 \\
+연속 확률 변수 & 특정 구간 내에서 무한히 많은 값을 가질 수 있는 변수 & Continuous Random Variable & 실수형 값 \\
+확률 분포 & 확률 변수가 가질 수 있는 각 값과 그 확률을 나열한 것 & Probability Distribution & 데이터의 패턴 \\
+누적 분포 함수 & 확률 변수가 특정 값보다 작거나 같을 확률 & Cumulative Distribution Function (CDF) & 확률의 합 \\
+기댓값 & 확률 변수의 평균적인 값 (장기적으로 기대되는 값) & Expected Value & 평균과 동일한 의미 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{핵심 개념 및 원리}
+
+\subsection{백분위수 (Percentiles)}
+
+\begin{summarybox}[title=백분위수 핵심 요약]
+백분위수는 데이터 세트 내에서 특정 값보다 작은 값들이 차지하는 '대략적인 비율'을 나타냅니다. 이는 데이터의 상대적인 위치를 파악하는 데 매우 유용합니다.
+\end{summarybox}
+
+우리는 종종 어떤 값이 다른 값들과 비교했을 때 상대적으로 어느 위치에 있는지 궁금해합니다. 예를 들어, 새로운 직업 제안으로 10만 달러의 연봉을 받았다면, 이 제안이 좋은 것인지 어떻게 알 수 있을까요? 이때 백분위수가 유용하게 사용됩니다.
+
+\begin{examplebox}[title=백분위수 예시: 연봉 제안]
+만약 당신의 10만 달러 연봉이 '95번째 백분위수'에 해당한다면, 이는 유사 직종의 다른 사람들의 95\%보다 더 많은 급여를 받는다는 의미입니다. 반대로 '25번째 백분위수'라면, 75\%의 사람들이 당신보다 더 많은 급여를 받는다는 뜻이므로, 그리 만족스럽지 않을 수 있습니다. 이처럼 백분위수는 당신이 연구하는 값의 위치를 빠르게 알려줍니다.
+\end{examplebox}
+
+\subsubsection*{백분위수 계산 방법}
+
+백분위수를 계산하는 방법은 여러 가지가 있지만, 모든 방법은 유사한 결과를 제공합니다. 핵심은 데이터를 순서대로 정렬하는 것입니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 정렬:} 모든 데이터 포인트를 오름차순(가장 작은 값부터 가장 큰 값까지)으로 정렬합니다.
+    \item \textbf{위치 파악:} 특정 백분위수(Pth percentile)를 찾으려면, 전체 관측치의 P\%가 그 값보다 작거나 같고, (100-P)\%가 그 값보다 크거나 같게 되는 지점을 찾습니다.
+\end{enumerate}
+
+\begin{infobox}[title=중앙값 (Median)과 백분위수]
+우리는 이미 '중앙값(Median)'에 대해 배웠습니다. 중앙값은 데이터의 50\%가 그 값보다 높고, 50\%가 그 값보다 낮은 값입니다. 따라서 중앙값은 '50번째 백분위수'와 같습니다. 중앙값을 찾을 때 데이터를 정렬하고 중간 지점을 찾는 것과 마찬가지로, 다른 백분위수도 같은 방식으로 찾습니다.
+\end{infobox}
+
+\begin{examplebox}[title=백분위수 계산 예시: 연봉 데이터]
+다음은 유사 직종 10명의 연봉 데이터가 내림차순으로 정렬된 표입니다.
+
+\begin{adjustbox}{width=0.5\textwidth,center}
+\begin{tabular}{lr}
+\toprule
+\textbf{순서} & \textbf{연봉} \\
+\midrule
+1 & \$115,472 \\
+2 & \$105,845 \\
+3 & \$105,582 \\
+4 & \$102,551 \\
+5 & \$98,188 \\
+6 & \$94,220 \\
+7 & \$91,380 \\
+8 & \$89,828 \\
+9 & \$89,697 \\
+10 & \$89,519 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+이 데이터를 오름차순으로 다시 생각해보면:
+\begin{itemize}
+    \item \textbf{10번째 백분위수:} 가장 낮은 값인 \$89,519와 그 다음 값인 \$89,697 사이에 위치합니다. 이는 10\%의 값이 이보다 작고, 90\%의 값이 이보다 크다는 의미입니다.
+    \item \textbf{50번째 백분위수 (중앙값):} \$94,220와 \$98,188 사이에 위치합니다.
+    \item \textbf{60번째 백분위수:} \$98,188와 \$102,551 사이에 위치합니다.
+\end{itemize}
+만약 당신의 연봉이 \$100,000라면, 이 데이터에서는 대략 60번째 백분위수에 가깝게 위치할 것입니다.
+\end{examplebox}
+
+\newpage
+\subsection{Z-점수 (Z-score)}
+
+\begin{summarybox}[title=Z-점수 핵심 요약]
+Z-점수는 특정 관측치가 평균으로부터 '표준편차의 몇 배'만큼 떨어져 있는지를 나타내는 값입니다. 이는 대규모 데이터 세트에서 특정 값의 상대적 위치를 파악하는 또 다른 강력한 방법입니다.
+\end{summarybox}
+
+Z-점수를 사용하면 특정 값보다 작은 데이터 포인트의 비율을 찾을 수 있습니다. 이는 백분위수와 유사하게 상대적 위치를 알려주지만, 표준화된 방식으로 더 정밀한 정보를 제공합니다.
+
+\subsubsection*{Z-점수 공식}
+Z-점수는 다음 공식을 사용하여 계산됩니다:
+\[ Z = \frac{x - \mu}{\sigma} \]
+여기서:
+\begin{itemize}
+    \item \(x\): 관심 변수 (우리가 알고 싶은 특정 값)
+    \item \(\mu\): 모집단의 평균 (데이터 세트의 평균)
+    \item \(\sigma\): 모집단의 표준편차 (데이터 세트의 변동성)
+\end{itemize}
+
+\begin{examplebox}[title=Z-점수 예시: 연봉 비교]
+대학을 졸업하고 비즈니스 학위로 취업 제안을 받았다고 가정해 봅시다. 당신의 제안이 다른 모든 대학 졸업생들의 유사 직종 제안과 비교하여 어느 정도인지 알고 싶습니다. 만약 중앙값만 안다면 상위 50\%인지 하위 50\%인지만 알 수 있습니다. 하지만 51\%인지 95\%인지는 알 수 없습니다. 이때 Z-점수를 계산하여 당신의 제안 위치를 파악할 수 있습니다.
+
+Salary.com 데이터에 따르면, 비즈니스 데이터 분석가의 평균 연봉(중앙값)은 \$54,030이고 표준편차는 약 \$8,900 (또는 예시에서 \$8,600)입니다. 당신이 \$65,000의 제안을 받았다면, 이는 평균보다 높지만 다른 사람들과 비교했을 때 어느 정도일까요?
+
+Z-점수를 계산해 봅시다:
+\begin{align*} Z &= \frac{x - \mu}{\sigma} \\ &= \frac{65,000 - 54,030}{8,600} \\ &= \frac{10,970}{8,600} \\ &\approx 1.27 \end{align*}
+이 Z-점수 1.27은 당신이 받은 연봉 \$65,000가 평균(\$54,030)보다 '1.27 표준편차만큼 더 높다'는 것을 의미합니다.
+\end{examplebox}
+
+\newpage
+\subsection{경험적 규칙 (Empirical Rule)}
+
+\begin{summarybox}[title=경험적 규칙 핵심 요약]
+경험적 규칙은 종 모양(bell-shaped)의 대규모 데이터 분포(정규 분포)에서 데이터가 평균으로부터 표준편차의 몇 배만큼 떨어져 있는지에 따라 데이터의 특정 비율이 포함된다는 규칙입니다. 이는 Z-점수를 통해 대략적인 백분위수를 추정하는 데 유용합니다.
+\end{summarybox}
+
+대규모 데이터 세트에서는 많은 값들이 평균(또는 중앙값) 주변에 밀집되어 있는 경향이 있습니다. 이러한 데이터를 히스토그램으로 그리면 대칭적인 종 모양 곡선(정규 분포)을 형성하는 경우가 많습니다. 이럴 때 '경험적 규칙'이 적용됩니다.
+
+\begin{infobox}[title=경험적 규칙의 내용]
+종 모양 분포에서:
+\begin{itemize}
+    \item 전체 관측치의 \textbf{68\%}는 평균으로부터 \textbf{1 표준편차} 이내에 분포합니다.
+    \item 전체 관측치의 \textbf{95\%}는 평균으로부터 \textbf{2 표준편차} 이내에 분포합니다.
+    \item 전체 관측치의 \textbf{99.7\%}는 평균으로부터 \textbf{3 표준편차} 이내에 분포합니다.
+\end{itemize}
+\end{infobox}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-bell-curve.png}  % Image not found: example-bell-curve.png % 이미지 파일이 없으므로 주석 처리하고 텍스트로 대체합니다.
+    \caption{종 모양 곡선과 경험적 규칙 (가상의 이미지)}
+    \label{fig:empirical_rule}
+\end{figure}
+\begin{infobox}[title=가상의 이미지 설명: 종 모양 곡선과 경험적 규칙]
+슬라이드 46의 이미지는 평균이 2000인 대칭적인 종 모양 곡선을 보여줍니다.
+\begin{itemize}
+    \item \textbf{1 표준편차 이내 (빨간색):} 평균으로부터 1 표준편차 범위 내에 68\%의 데이터가 포함됩니다.
+    \item \textbf{2 표준편차 이내 (녹색):} 평균으로부터 2 표준편차 범위 내에 95\%의 데이터가 포함됩니다.
+    \item \textbf{3 표준편차 이내 (파란색):} 평균으로부터 3 표준편차 범위 내에 99.7\%의 데이터가 포함됩니다.
+\end{itemize}
+이 규칙을 알면 특정 관측치가 평균과 비교하여 어느 위치에 있는지 빠르게 파악할 수 있습니다.
+\end{infobox}
+
+\begin{examplebox}[title=경험적 규칙 적용: Z-점수 1.27]
+앞서 계산한 연봉 제안의 Z-점수가 1.27이었습니다.
+\begin{itemize}
+    \item Z-점수 1은 평균으로부터 1 표준편차 위에 있다는 뜻이며, 이는 대략 68\%의 데이터가 평균 \(\pm\) 1 표준편차 안에 있으므로, 1 표준편차 위는 대략 50\% + (68\%/2) = 84\% 백분위수에 해당합니다.
+    \item Z-점수 2는 평균으로부터 2 표준편차 위에 있다는 뜻이며, 이는 대략 95\%의 데이터가 평균 \(\pm\) 2 표준편차 안에 있으므로, 2 표준편차 위는 대략 50\% + (95\%/2) = 97.5\% 백분위수에 해당합니다.
+\end{itemize}
+당신의 Z-점수 1.27은 1과 2 표준편차 사이에 있으므로, 당신의 연봉은 대략 84\%와 97.5\% 백분위수 사이, 즉 70번째에서 95번째 백분위수 어딘가에 있을 것이라고 추정할 수 있습니다. 이는 꽤 좋은 제안임을 시사합니다.
+
+정확한 값은 나중에 배우겠지만, 경험적 규칙은 컴퓨터나 계산기 없이도 빠르고 직관적인 추정치를 제공하여 의사결정에 도움을 줍니다.
+\end{examplebox}
+
+\subsubsection*{실제 비즈니스에서의 Z-점수 및 백분위수 활용}
+
+\begin{examplebox}[title=자동차 가격 비교 (TrueCar)]
+TrueCar와 같은 서비스는 소비자가 자동차 구매 시 공정한 가격을 지불하는지 판단하는 데 도움을 줍니다. 이들은 특정 지역에서 동일한 자동차 모델에 대해 사람들이 지불한 가격 범위를 시각적으로 보여줍니다.
+\begin{itemize}
+    \item \textbf{평균:} '적정 시장 가격(Good price)'에 해당합니다.
+    \item \textbf{곡선의 왼쪽 꼬리:} '좋은 가격(Great price)' 또는 '매우 좋은 가격(Exceptional price)'을 나타냅니다.
+    \textbf{곡선의 오른쪽 꼬리:} '시장 가격 이상(Above market)'을 나타냅니다.
+\end{itemize}
+당신이 구매한 가격이 평균보다 낮고 곡선의 왼쪽에 위치할수록 더 좋은 거래를 했다고 생각할 것입니다.
+
+예를 들어, Camry XLE V6 모델의 가격 데이터를 보면, 평균 지불 가격은 약 \$29,000입니다. 만약 당신이 평균보다 2 표준편차 낮은 가격에 구매했다면, 이는 '매우 좋은 가격(Exceptional bargain)'에 해당합니다. 이처럼 절대적인 가격 자체보다 다른 사람들이 지불한 가격과 비교한 상대적 위치가 훨씬 더 중요합니다.
+\end{examplebox}
+
+\begin{examplebox}[title=자동차 연비 비교]
+새 차를 구매할 때 연비 라벨을 보게 됩니다. 이 라벨은 차량의 MPG(갤런당 마일) 추정치를 보여주어 소비자가 차량을 비교하고 선택하는 데 도움을 줍니다.
+\begin{itemize}
+    \item 소형 SUV 카테고리의 연비 범위는 16 MPG에서 32 MPG입니다.
+    \item 이 카테고리에서 가장 좋은 연비인 32 MPG는 99번째 백분위수에 해당하고, 가장 나쁜 연비인 16 MPG는 1번째 백분위수에 해당한다고 가정할 수 있습니다.
+    \item 당신이 고려하는 차의 연비가 26 MPG라면, 이 차는 동급 차량들과 비교했을 때 어느 정도일까요?
+\end{itemize}
+
+\textbf{문제 해결:}
+\begin{enumerate}
+    \item \textbf{평균 추정:} 범위의 중간 지점을 평균으로 추정할 수 있습니다.
+    \[ \text{평균} (\mu) = \frac{16 + 32}{2} = 24 \text{ MPG} \]
+    \item \textbf{표준편차 추정:} 경험적 규칙에 따르면, 99.7\%의 관측치는 평균으로부터 \(\pm\) 3 표준편차 이내에 있습니다. 즉, 전체 범위는 약 6 표준편차에 해당합니다.
+    \[ \text{표준편차} (\sigma) = \frac{\text{최대값} - \text{최소값}}{6} = \frac{32 - 16}{6} = \frac{16}{6} \approx 2.67 \text{ MPG} \]
+    \item \textbf{Z-점수 계산:} 당신이 고려하는 차의 연비(x)는 26 MPG입니다.
+    \[ Z = \frac{x - \mu}{\sigma} = \frac{26 - 24}{2.67} = \frac{2}{2.67} \approx 0.75 \]
+\end{enumerate}
+이 차는 평균보다 0.75 표준편차만큼 높은 연비를 가집니다. 경험적 규칙을 다시 적용하면, 68\%의 관측치가 \(\pm\) 1 표준편차 이내에 있으므로, 평균보다 1 표준편차 높은 지점은 대략 84번째 백분위수(50\% + 68\%/2)에 해당합니다. 0.75 표준편차는 1 표준편차보다 약간 낮으므로, 이 차는 대략 80번째 백분위수에 가까울 것으로 추정할 수 있습니다. 즉, 동급 차량의 80\%보다 연비가 좋다는 의미입니다.
+
+이처럼 Z-점수를 알면 특정 관측치가 전체 모집단 내에서 어느 위치에 있는지 파악하는 데 큰 도움이 됩니다. 실제 값(예: 26 MPG) 자체보다 그 상대적 위치(예: 80번째 백분위수)가 의사결정에 더 의미 있는 정보를 제공하는 경우가 많습니다.
+\end{examplebox}
+
+\newpage
+\section{절차/방법: Z-점수 및 백분위수 Excel 계산}
+
+Excel은 Z-점수와 백분위수를 정확하게 계산하는 데 유용한 함수들을 제공합니다. 특히 정규 분포를 따르는 데이터에 대해 특정 값의 백분위수를 찾거나, 특정 백분위수에 해당하는 값을 찾는 데 사용됩니다.
+
+\subsection{Z-점수 예시: 연봉 제안 (Excel 활용)}
+
+앞서 다룬 연봉 제안 예시를 다시 살펴봅시다.
+\begin{itemize}
+    \item 당신의 연봉 제안: \$65,000 (\(x\))
+    \item 평균 연봉: \$54,030 (\(\mu\))
+    \item 표준편차: \$8,600 (\(\sigma\))
+\end{itemize}
+Z-점수는 1.27로 계산되었습니다. 이제 Excel을 사용하여 이 Z-점수에 해당하는 정확한 백분위수를 찾아봅시다.
+
+\subsubsection*{1단계: NORM.DIST 함수로 백분위수 계산}
+
+\texttt{NORM.DIST} 함수는 지정된 평균과 표준편차를 가진 정규 분포에서 특정 값(x)보다 작거나 같은 확률(누적 분포 함수)을 반환합니다. 이 확률이 바로 백분위수입니다.
+
+\begin{lstlisting}[caption={NORM.DIST 함수 사용법}, label={lst:norm_dist}]
+=NORM.DIST(x, mean, standard_dev, cumulative)
+\end{lstlisting}
+여기서 \texttt{cumulative} 인수는 \texttt{TRUE} (또는 1)로 설정하여 누적 분포 함수를 사용해야 합니다. \texttt{FALSE} (또는 0)는 확률 질량 함수(Probability Mass Function)를 반환하며, 이 수업에서는 사용하지 않습니다.
+
+\begin{examplebox}[title=NORM.DIST 함수 적용]
+Excel에서 다음을 입력합니다:
+\begin{lstlisting}[language=Excel, caption={NORM.DIST 함수를 이용한 백분위수 계산}, label={lst:norm_dist_example}]
+=NORM.DIST(65000, 54030, 8600, TRUE)
+% 또는
+=NORM.DIST(65000, 54030, 8600, 1)
+\end{lstlisting}
+\textbf{결과:} 약 \texttt{0.898948}
+
+이 결과는 당신의 연봉 \$65,000가 약 89.9번째 백분위수에 해당한다는 것을 의미합니다. 즉, 유사 직종의 다른 사람들의 약 89.9\%가 당신보다 적은 연봉을 받는다는 뜻입니다. 이는 경험적 규칙을 통해 추정한 70\%-95\% 범위 내에 있으며, 훨씬 더 정확한 값입니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-norm-dist-output.png}  % Image not found: example-norm-dist-output.png % 이미지 파일이 없으므로 주석 처리하고 텍스트로 대체합니다.
+    \caption{NORM.DIST 함수 결과 및 정규 분포 시각화 (가상의 이미지)}
+    \label{fig:norm_dist_output}
+\end{figure}
+\begin{infobox}[title=가상의 이미지 설명: NORM.DIST 함수 결과]
+슬라이드 62의 이미지는 NORM.DIST 함수의 결과인 0.898948을 보여줍니다. 또한, 평균이 \$54,030인 종 모양 곡선에서 약 90\%에 해당하는 영역이 음영 처리되어 있습니다. 이는 계산된 백분위수가 시각적으로 어떤 의미를 가지는지 보여줍니다.
+\end{infobox}
+\end{examplebox}
+
+\subsubsection*{2단계: NORM.S.INV 함수로 Z-점수 확인}
+
+\texttt{NORM.S.INV} 함수는 표준 정규 분포(평균이 0이고 표준편차가 1인 분포)에서 주어진 누적 확률에 해당하는 Z-점수를 반환합니다. 이는 우리가 계산한 백분위수(확률)를 다시 Z-점수로 변환하여 확인할 때 유용합니다.
+
+\begin{lstlisting}[caption={NORM.S.INV 함수 사용법}, label={lst:norm_s_inv}]
+=NORM.S.INV(probability)
+\end{lstlisting}
+
+\begin{examplebox}[title=NORM.S.INV 함수 적용]
+앞서 \texttt{NORM.DIST} 함수로 얻은 백분위수(0.898948)를 사용하여 Z-점수를 확인해 봅시다.
+Excel에서 다음을 입력합니다:
+\begin{lstlisting}[language=Excel, caption={NORM.S.INV 함수를 이용한 Z-점수 확인}, label={lst:norm_s_inv_example}]
+=NORM.S.INV(0.898948)
+\end{lstlisting}
+\textbf{결과:} 약 \texttt{1.275581}
+
+이 결과는 우리가 수동으로 계산했던 Z-점수 1.27과 거의 일치합니다. 이처럼 Excel 함수를 사용하면 Z-점수와 백분위수 사이를 쉽게 오가며 정확한 값을 얻을 수 있습니다.
+
+\begin{infobox}[title=NORM.S.DIST와 NORM.S.INV의 'S' 의미]
+함수 이름에 '.S'가 붙은 \texttt{NORM.S.DIST}나 \texttt{NORM.S.INV}는 'Standard Normal Distribution'을 의미합니다. 즉, 평균이 0이고 표준편차가 1인 표준 정규 분포를 사용한다는 뜻입니다. 일반 \texttt{NORM.DIST}나 \texttt{NORM.INV}는 사용자가 지정한 평균과 표준편차를 사용합니다.
+\end{infobox}
+\end{examplebox}
+
+\newpage
+
+\thispagestyle{firstpage}
+
+\metainfo{BADM-572}{Lecture 2-3/5 \& 2-4/5}{Prof. Fataneh Taghaboni-Dutta}{이산 및 연속 확률 변수, 정규 분포 및 Excel 활용}
+
+\tableofcontents
+
+\newpage
+
+\section{이산 및 연속 확률 변수 (Discrete and Continuous Random Variables)}
+
+\subsection{확률 변수 (Random Variables)}
+
+\begin{summarybox}{확률 변수 핵심 요약}
+확률 변수(\(X\))는 무작위 과정의 수치적 결과를 나타내는 변수입니다. 이는 우리가 던지는 질문에 대한 답이 무작위성을 띠는 경우에 사용됩니다.
+\end{summarybox}
+
+통계학에서 '확률 변수'라는 용어를 자주 듣게 됩니다. 이는 기본적으로 우리가 묻는 질문에 대한 답을 나타냅니다. 예를 들어, "내 주식 가치가 1년 안에 얼마나 변할까?"라는 질문에 대한 답이 바로 확률 변수입니다. 왜 '무작위(Random)'일까요? 주식 가격이 오르거나 내리는 정확한 이유를 완전히 이해하기 어렵기 때문에, 그 결과는 무작위적이라고 간주됩니다. 통계에서는 확률 변수를 대문자 \(X\)로 표기합니다.
+
+\subsection{확률 변수의 종류}
+
+확률 변수는 크게 두 가지 유형으로 나뉩니다: 이산 확률 변수와 연속 확률 변수.
+
+\subsubsection*{1. 이산 확률 변수 (Discrete Random Variable)}
+
+\begin{summarybox}{이산 확률 변수 핵심 요약}
+이산 확률 변수는 '유한한 수의 구별되는 값'만을 가질 수 있는 변수입니다. 즉, 셀 수 있는 값들로 이루어져 있습니다.
+\end{summarybox}
+
+이산 확률 변수는 특정 값을 '점프'하여 가질 수 있으며, 그 사이의 모든 값을 가질 수는 없습니다. 주로 정수 형태의 값을 가집니다.
+
+\begin{examplebox}{이산 확률 변수 예시}
+\begin{itemize}
+    \item 가족 내 자녀 수 (0명, 1명, 2명 등)
+    \item 이 강의를 수강하는 학생 수
+    \item 서비스에 만족한다고 평가한 고객 수
+    \item 주사위를 던졌을 때 나오는 눈의 수 (1, 2, 3, 4, 5, 6)
+\end{itemize}
+이들은 모두 셀 수 있는 명확한 값들로 표현됩니다.
+\end{examplebox}
+
+\subsubsection*{2. 연속 확률 변수 (Continuous Random Variable)}
+
+\begin{summarybox}{연속 확률 변수 핵심 요약}
+연속 확률 변수는 '정의된 구간 내에서 무한히 많은 가능한 값'을 가질 수 있는 변수입니다. 특정 값으로 정의되기보다는 '구간'으로 정의됩니다.
+\end{summarybox}
+
+연속 확률 변수는 셀 수 없을 정도로 무한히 많은 값을 가질 수 있으며, 매우 높은 정밀도로 측정될 수 있습니다.
+
+\begin{examplebox}{연속 확률 변수 예시}
+\begin{itemize}
+    \item 탄산음료 캔의 무게 (예: 11.5온스에서 12.5온스 사이의 모든 실수 값)
+    \item 전구의 수명 (예: 100시간에서 1,000시간 사이의 모든 실수 값)
+    \item 주식의 일일 수익률
+    \item 고객 서비스 상담원과 통화하기 위해 기다린 시간
+\end{itemize}
+실제로 각 탄산음료 캔의 무게를 정확히 측정하면 항상 미세하게 다른 숫자가 나올 것입니다. 이는 특정 값으로 딱 떨어지지 않고, 어떤 구간 내에서 무한한 가능성을 가지기 때문입니다.
+\end{examplebox}
+
+\begin{infobox}{이산 vs. 연속 확률 변수 비교}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lll}
+\toprule
+\textbf{특징} & \textbf{이산 확률 변수} & \textbf{연속 확률 변수} \\
+\midrule
+값의 종류 & 셀 수 있는 유한한 값 & 특정 구간 내 무한한 값 \\
+측정 방식 & 주로 세는 방식 (정수) & 주로 측정하는 방식 (실수) \\
+예시 & 자녀 수, 고객 수, 주사위 눈 & 무게, 시간, 온도, 수익률 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{infobox}
+
+\begin{examplebox}{연습 문제: 이산 또는 연속 확률 변수 식별}
+다음 확률 변수들을 이산 또는 연속으로 식별해 보세요.
+\begin{itemize}
+    \item 주식의 일일 수익률: \textbf{연속} (수익률은 소수점 이하 무한한 값을 가질 수 있습니다.)
+    \item 줄 서서 기다리는 고객 수: \textbf{이산} (고객 수는 0, 1, 2...와 같이 셀 수 있는 정수입니다.)
+    \item 고객 서비스 상담원과 통화하기 위해 기다린 시간: \textbf{연속} (시간은 초, 밀리초 등 무한히 세분화될 수 있습니다.)
+    \item 초콜릿 바의 칼로리 수: \textbf{연속} (칼로리도 이론적으로는 무한히 세분화될 수 있는 연속적인 값입니다. 하지만 실제로는 편의상 정수나 소수점 한 자리로 '기록'될 수 있어 이산처럼 보일 수 있습니다.)
+\end{itemize}
+\end{examplebox}
+
+\newpage
+\subsection{확률 분포 (Probability Distributions)}
+
+\begin{summarybox}{확률 분포 핵심 요약}
+확률 분포는 이산 확률 변수가 가질 수 있는 각 값과 그 값이 발생할 확률을 나열한 것입니다. 이는 데이터의 패턴을 이해하는 데 사용됩니다.
+\end{summarybox}
+
+이산 확률 변수의 경우, 확률 분포는 가능한 각 값과 그에 해당하는 확률을 목록으로 보여줍니다. 이는 우리가 히스토그램과 상대 빈도를 배울 때 이미 다루었던 개념과 유사합니다.
+
+\begin{examplebox}{확률 분포 예시: 형제자매 수}
+20명에게 형제자매가 몇 명인지 물어본 설문조사 결과를 가정해 봅시다. 여기서 확률 변수 \(X\)는 '형제자매 수'입니다.
+
+\begin{adjustbox}{width=0.5\textwidth,center}
+\begin{tabular}{cc}
+\toprule
+\textbf{형제자매 수 (X)} & \textbf{응답자 수} \\
+\midrule
+0 & 3 \\
+1 & 6 \\
+2 & 5 \\
+3 & 4 \\
+4 & 2 \\
+\midrule
+\textbf{총계} & \textbf{20} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+각 형제자매 수에 대한 상대 빈도(확률)를 계산하여 확률 분포를 만들 수 있습니다.
+
+\begin{adjustbox}{width=0.5\textwidth,center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{형제자매 수 (X)} & \textbf{응답자 수} & \textbf{확률 P(X=x)} \\
+\midrule
+0 & 3 & \(3 \div 20 = 0.15\) \\
+1 & 6 & \(6 \div 20 = 0.30\) \\
+2 & 5 & \(5 \div 20 = 0.25\) \\
+3 & 4 & \(4 \div 20 = 0.20\) \\
+4 & 2 & \(2 \div 20 = 0.10\) \\
+\midrule
+\textbf{총계} & \textbf{20} & \textbf{1.00} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+이 표는 이산 확률 변수의 확률 분포를 보여줍니다. 예를 들어, 무작위로 한 명을 선택했을 때 형제자매가 0명일 확률은 15\%이고, 3명일 확률은 20\%입니다.
+\end{examplebox}
+
+\subsubsection*{확률 분포의 속성}
+이산 확률 분포는 다음 두 가지 중요한 속성을 가집니다:
+\begin{enumerate}
+    \item \textbf{각 확률은 0보다 크거나 같아야 합니다:} \(P(X=x) \ge 0\)
+    \item \textbf{모든 가능한 결과의 확률 합은 1이어야 합니다:} \( \sum_{\text{all } x} P(X=x) = 1 \)
+\end{enumerate}
+
+\subsection{누적 분포 함수 (Cumulative Distribution Function, CDF)}
+
+\begin{summarybox}{누적 분포 함수 핵심 요약}
+누적 분포 함수(CDF)는 확률 변수 \(X\)가 특정 값 \(x\)보다 '작거나 같을' 확률을 나타냅니다. 즉, \(P(X \le x)\)를 계산합니다.
+\end{summarybox}
+
+모든 확률 변수(이산 및 연속)는 누적 분포 함수를 가집니다. 이산 확률 변수의 경우, CDF는 해당 값까지의 모든 개별 확률을 합산하여 계산됩니다.
+
+\begin{examplebox}{누적 분포 함수 예시: 형제자매 수}
+형제자매 수 예시에서 \(P(X \le 2)\)를 계산해 봅시다. 이는 형제자매가 2명 이하일 확률을 의미합니다.
+\[ P(X \le 2) = P(X=0) + P(X=1) + P(X=2) \]
+\[ P(X \le 2) = 0.15 + 0.30 + 0.25 = 0.70 \]
+즉, 무작위로 한 명을 선택했을 때 형제자매가 2명 이하일 확률은 70\%입니다.
+
+다음 표는 각 형제자매 수에 대한 누적 확률을 보여줍니다.
+
+\begin{adjustbox}{width=0.5\textwidth,center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{형제자매 수 (X)} & \textbf{확률 P(X=x)} & \textbf{누적 확률 P(X \(\le\) x)} \\
+\midrule
+0 & 0.15 & 0.15 \\
+1 & 0.30 & \(0.15 + 0.30 = 0.45\) \\
+2 & 0.25 & \(0.45 + 0.25 = 0.70\) \\
+3 & 0.20 & \(0.70 + 0.20 = 0.90\) \\
+4 & 0.10 & \(0.90 + 0.10 = 1.00\) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-cdf-plot.png}  % Image not found: example-cdf-plot.png % 이미지 파일이 없으므로 주석 처리하고 텍스트로 대체합니다.
+    \caption{누적 확률 분포 그래프 (계단형, 가상의 이미지)}
+    \label{fig:cdf_plot}
+\end{figure}
+\begin{infobox}{가상의 이미지 설명: 누적 확률 분포 그래프}
+슬라이드 75의 이미지는 계단형으로 증가하는 누적 확률 분포 그래프를 보여줍니다. 형제자매 수가 증가함에 따라 누적 확률도 증가하며, 4명 이하일 확률은 100\%에 도달합니다.
+\end{infobox}
+\end{examplebox}
+
+\newpage
+\subsection{기댓값 (Expected Value) 및 표준편차 (Standard Deviation)}
+
+\subsubsection*{기댓값 (Expected Value) 또는 평균 (\(\mu\))}
+
+\begin{summarybox}{기댓값 핵심 요약}
+이산 확률 변수 \(X\)의 기댓값(\(E(X)\)) 또는 평균(\(\mu\))은 각 가능한 값에 해당 확률을 곱한 후 모두 더한 값입니다. 이는 장기적으로 기대되는 평균적인 결과입니다.
+\end{summarybox}
+
+기댓값은 데이터 분포의 '중심 경향'을 나타냅니다.
+
+\subsubsection*{기댓값 공식}
+\[ E(X) = \mu = \sum_{\text{all } x} x \cdot P(X=x) \]
+
+\begin{examplebox}{기댓값 계산 예시: 형제자매 수}
+형제자매 수 예시에서 기댓값을 계산해 봅시다.
+\begin{align*} E(X) &= (0 \times 0.15) + (1 \times 0.30) + (2 \times 0.25) + (3 \times 0.20) + (4 \times 0.10) \\ &= 0 + 0.30 + 0.50 + 0.60 + 0.40 \\ &= 1.8 \end{align*}
+따라서 이 모집단에서 평균적으로 1.8명의 형제자매를 가질 것으로 기대됩니다. 이는 이 데이터의 중심 경향을 잘 나타냅니다.
+\end{examplebox}
+
+\subsubsection*{표준편차 (Standard Deviation, \(\sigma\))}
+
+\begin{summarybox}{표준편차 핵심 요약}
+이산 확률 변수의 표준편차(\(\sigma\))는 기댓값(평균)으로부터 데이터가 얼마나 퍼져 있는지를 나타내는 척도입니다. 각 값과 평균의 차이를 제곱하고 확률을 곱한 후 모두 더한 값의 제곱근입니다.
+\end{summarybox}
+
+기댓값이 분포의 중심을 알려준다면, 표준편차는 그 중심으로부터 데이터가 얼마나 '변동'하는지를 알려줍니다.
+
+\subsubsection*{표준편차 공식}
+\[ \sigma = \sqrt{\sum_{\text{all } x} (x - \mu)^2 \cdot P(X=x)} \]
+
+\begin{examplebox}{표준편차 계산 예시: 형제자매 수}
+형제자매 수 예시에서 평균 \(\mu = 1.8\)을 사용하여 표준편차를 계산해 봅시다.
+\begin{align*} \sigma^2 &= (0 - 1.8)^2 \times 0.15 \\ &+ (1 - 1.8)^2 \times 0.30 \\ &+ (2 - 1.8)^2 \times 0.25 \\ &+ (3 - 1.8)^2 \times 0.20 \\ &+ (4 - 1.8)^2 \times 0.10 \\ \\ &= (-1.8)^2 \times 0.15 + (-0.8)^2 \times 0.30 + (0.2)^2 \times 0.25 + (1.2)^2 \times 0.20 + (2.2)^2 \times 0.10 \\ &= (3.24 \times 0.15) + (0.64 \times 0.30) + (0.04 \times 0.25) + (1.44 \times 0.20) + (4.84 \times 0.10) \\ &= 0.486 + 0.192 + 0.01 + 0.288 + 0.484 \\ &= 1.46 \end{align*}
+따라서 분산은 1.46이고, 표준편차는:
+\[ \sigma = \sqrt{1.46} \approx 1.21 \]
+이 모집단에서 형제자매 수의 표준편차는 약 1.21명입니다. 이는 평균 1.8명으로부터 데이터가 평균적으로 1.21명 정도 퍼져 있음을 의미합니다.
+\end{examplebox}
+
+\begin{examplebox}{연습 문제: 은행 대기 고객 수}
+은행 지점장이 고객 대기열에 몇 명이 기다리는지 파악하기 위해 연구를 수행하여 다음 패턴을 발견했습니다.
+
+\begin{adjustbox}{width=0.5\textwidth,center}
+\begin{tabular}{cc}
+\toprule
+\textbf{대기 고객 수 (X)} & \textbf{관측 횟수} \\
+\midrule
+0 & 3 \\
+1 & 10 \\
+2 & 8 \\
+3 & 5 \\
+4 & 3 \\
+5 & 2 \\
+6 & 1 \\
+\midrule
+\textbf{총 관측 횟수} & \textbf{32} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{질문:}
+\begin{enumerate}
+    \item 기대되는 대기 고객 수는 몇 명입니까? (기댓값 \(E(X)\))
+    \item 4명 이상의 고객이 줄 서 있는 것을 발견할 확률은 얼마입니까? (\(P(X \ge 4)\))
+\end{enumerate}
+
+\textbf{문제 해결:}
+먼저 각 대기 고객 수에 대한 확률을 계산해야 합니다. 총 관측 횟수는 32회입니다.
+
+\begin{adjustbox}{width=0.6\textwidth,center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{대기 고객 수 (X)} & \textbf{관측 횟수} & \textbf{확률 P(X=x)} \\
+\midrule
+0 & 3 & \(3 \div 32 \approx 0.094\) \\
+1 & 10 & \(10 \div 32 \approx 0.313\) \\
+2 & 8 & \(8 \div 32 = 0.250\) \\
+3 & 5 & \(5 \div 32 \approx 0.156\) \\
+4 & 3 & \(3 \div 32 \approx 0.094\) \\
+5 & 2 & \(2 \div 32 \approx 0.063\) \\
+6 & 1 & \(1 \div 32 \approx 0.031\) \\
+\midrule
+\textbf{총계} & \textbf{32} & \textbf{1.001} (반올림 오차) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{enumerate}
+    \item \textbf{기대되는 대기 고객 수 (기댓값 \(E(X)\)) 계산:}
+    \begin{align*} E(X) &= (0 \times 0.094) + (1 \times 0.313) + (2 \times 0.250) + (3 \times 0.156) + (4 \times 0.094) + (5 \times 0.063) + (6 \times 0.031) \\ &= 0 + 0.313 + 0.500 + 0.468 + 0.376 + 0.315 + 0.186 \\ &\approx 2.158 \end{align*}
+    따라서 기대되는 대기 고객 수는 평균적으로 약 2.16명입니다.
+
+    \item \textbf{4명 이상의 고객이 줄 서 있는 것을 발견할 확률 \(P(X \ge 4)\) 계산:}
+    이는 \(P(X=4) + P(X=5) + P(X=6)\)의 합과 같습니다.
+    \begin{align*} P(X \ge 4) &= P(X=4) + P(X=5) + P(X=6) \\ &= 0.094 + 0.063 + 0.031 \\ &= 0.188 \end{align*}
+    따라서 4명 이상의 고객이 줄 서 있는 것을 발견할 확률은 약 18.8\%입니다.
+\end{enumerate}
+\end{examplebox}
+
+\subsection{확률 분포의 목적}
+
+확률 분포는 이산 확률 변수의 각 결과와 그 발생 확률을 연결하는 표입니다. 가능한 결과가 매우 많은 경우에는 이 표를 일일이 만드는 것이 비효율적일 수 있습니다. 다행히도, 많은 잘 알려진 확률 분포들이 존재하며, 우리의 특정 연구나 실험이 이러한 분포 중 하나에 속한다는 것을 알게 되면, 적절한 공식을 사용하여 특정 결과의 확률을 계산할 수 있습니다.
+
+이 과정에서는 이러한 특정 분포들을 깊이 다루지는 않지만, 대규모 데이터 세트와 표본 추출에 중점을 두기 때문에, 확률 계산을 위한 '정규 분포(Normal Distribution)'에 대해 학습할 것입니다. 정규 분포는 이산 변수와 연속 변수 모두에 사용될 수 있습니다.
+
+\newpage
+\section{빠르게 훑어보기 (핵심 요약)}
+
+\begin{infobox}{모듈 2 파트 2/5 핵심 요약}
+\begin{itemize}
+    \item \textbf{백분위수 (Percentiles):} 데이터 내 값의 상대적 위치를 나타냅니다. 특정 값보다 작은 데이터의 비율을 의미하며, 중앙값은 50번째 백분위수입니다.
+    \item \textbf{Z-점수 (Z-score):} 데이터가 평균으로부터 표준편차의 몇 배만큼 떨어져 있는지를 나타내는 표준화된 값입니다.
+    \[ Z = \frac{x - \mu}{\sigma} \]
+    \item \textbf{경험적 규칙 (Empirical Rule):} 종 모양 분포에서 1, 2, 3 표준편차 이내에 각각 68\%, 95\%, 99.7\%의 데이터가 분포한다는 규칙입니다. Z-점수를 통해 대략적인 백분위수를 추정하는 데 사용됩니다.
+    \item \textbf{Excel 활용:}
+    \begin{itemize}
+        \item \texttt{NORM.DIST(x, mean, standard\_dev, TRUE)}: 특정 값(x)의 백분위수(누적 확률)를 계산합니다.
+        \item \texttt{NORM.S.INV(probability)}: 표준 정규 분포에서 주어진 확률에 해당하는 Z-점수를 반환합니다.
+    \end{itemize}
+    \item \textbf{확률 변수 (Random Variables):} 무작위 과정의 수치적 결과입니다.
+    \begin{itemize}
+        \item \textbf{이산 확률 변수 (Discrete RV):} 셀 수 있는 유한한 값을 가집니다 (예: 고객 수).
+        \item \textbf{연속 확률 변수 (Continuous RV):} 특정 구간 내에서 무한히 많은 값을 가집니다 (예: 시간, 무게).
+    \end{itemize}
+    \item \textbf{확률 분포 (Probability Distribution):} 이산 확률 변수의 각 값과 그 확률을 나열한 것입니다.
+    \item \textbf{누적 분포 함수 (CDF):} 확률 변수가 특정 값보다 작거나 같을 확률 \(P(X \le x)\)입니다.
+    \item \textbf{기댓값 (Expected Value, \(E(X)\) 또는 \(\mu\)):} 이산 확률 변수의 평균적인 값입니다.
+    \[ E(X) = \sum_{\text{all } x} x \cdot P(X=x) \]
+    \item \textbf{표준편차 (Standard Deviation, \(\sigma\)):} 이산 확률 변수의 변동성을 나타냅니다.
+    \[ \sigma = \sqrt{\sum_{\text{all } x} (x - \mu)^2 \cdot P(X=x)} \]
+\end{itemize}
+\end{infobox}
+
+\newpage
+\section{FAQ: 초심자를 위한 질문과 답변}
+
+\begin{enumerate}
+    \item \textbf{Q: 백분위수와 Z-점수는 모두 상대적 위치를 나타내는데, 어떤 차이가 있나요?}
+    \textbf{A:} 백분위수는 특정 값보다 작은 데이터의 '비율'을 직접적으로 보여줍니다 (예: 95\%보다 높다). 반면 Z-점수는 평균으로부터 '표준편차 단위로 얼마나 떨어져 있는지'를 나타냅니다. Z-점수는 정규 분포의 특성을 활용하여 더 정밀한 확률 계산이나 다른 분포와의 비교에 유용합니다.
+
+    \item \textbf{Q: 경험적 규칙은 언제 사용할 수 있나요? 항상 정확한가요?}
+    \textbf{A:} 경험적 규칙은 데이터 분포가 '종 모양'이고 '대칭적'일 때 (즉, 정규 분포를 따를 때) 가장 잘 적용됩니다. 이는 대략적인 추정치를 빠르게 얻는 데 유용하지만, 정확한 백분위수를 얻기 위해서는 Excel의 \texttt{NORM.DIST} 함수와 같은 도구를 사용하는 것이 좋습니다.
+
+    \item \textbf{Q: 이산 확률 변수와 연속 확률 변수를 구분하는 것이 왜 중요한가요?}
+    \textbf{A:} 두 변수의 유형에 따라 확률을 계산하는 방법과 사용하는 통계 모델이 달라지기 때문입니다. 이산 변수는 각 점에서의 확률을, 연속 변수는 특정 구간에서의 확률을 다룹니다. 올바른 유형을 식별해야 적절한 분석 기법을 적용할 수 있습니다.
+
+    \item \textbf{Q: 초콜릿 바의 칼로리 수는 연속 변수라고 했는데, 왜 이산처럼 기록될 수 있다고 하나요?}
+    \textbf{A:} 칼로리는 이론적으로 소수점 이하 무한한 값을 가질 수 있는 연속적인 양입니다. 하지만 실제 제품 라벨에서는 편의상 200kcal, 205kcal 등과 같이 정수나 특정 소수점 자리로 반올림하여 '표시'합니다. 이처럼 연속적인 데이터를 이산적으로 '기록'하는 경우가 있을 수 있습니다.
+
+    \item \textbf{Q: 기댓값은 항상 데이터 세트 내에 실제로 존재하는 값인가요?}
+    \textbf{A:} 아닙니다. 기댓값은 '장기적으로 평균적으로 기대되는 값'을 의미하며, 실제 데이터 세트에 존재하지 않을 수도 있습니다. 예를 들어, 형제자매 수의 기댓값이 1.8명이었지만, 실제로는 1명이나 2명은 있어도 1.8명의 형제자매를 가진 사람은 없습니다.
+\end{enumerate}
+
+\newpage
+\section{개요}
+이 문서는 BADM-572 과목의 'Exploring and Producing Data Module 2' 중 파트 3/5에 해당하는 내용을 다룹니다.
+주요 내용은 이산 확률 변수의 기댓값과 표준 편차를 Excel로 계산하는 방법, 그리고 연속 확률 분포의 핵심인 정규 분포의 개념과 특성, 마지막으로 Excel을 활용하여 정규 분포 확률을 계산하는 실습입니다.
+데이터 기반 의사 결정을 위한 통계적 도구의 실제 적용 방법을 이해하고, 특히 Excel 함수 사용법을 익히는 데 중점을 둡니다.
+
+\newpage
+\section{용어 정리}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+기댓값 & 확률 변수가 가질 수 있는 값들의 평균 & Expected Value (Mean, $\mu$) & 장기적으로 기대되는 평균 \\
+표준 편차 & 데이터가 평균으로부터 얼마나 퍼져있는지 나타내는 척도 & Standard Deviation ($\sigma$) & 변동성 측정 \\
+이산 확률 변수 & 셀 수 있는 유한하거나 가산 무한한 값을 가지는 변수 & Discrete Random Variable & 주사위 눈금, 수요량 등 \\
+연속 확률 변수 & 특정 구간 내의 모든 실숫값을 가질 수 있는 변수 & Continuous Random Variable & 온도, 시간, 키 등 \\
+정규 분포 & 종 모양의 대칭적인 확률 분포 & Normal Distribution & 자연 현상에서 흔히 관찰됨 \\
+표준 정규 분포 & 평균이 0이고 표준 편차가 1인 정규 분포 & Standard Normal Distribution & Z-분포라고도 함 \\
+Z-점수 & 특정 값이 평균으로부터 몇 표준 편차 떨어져 있는지 나타내는 값 & Z-score & 데이터를 표준화하는 방법 \\
+누적 분포 함수 & 특정 값 이하의 확률을 나타내는 함수 & Cumulative Distribution Function (CDF) & Excel의 \texttt{NORM.DIST} 함수에서 \texttt{cumulative=TRUE} \\
+\texttt{SUM} 함수 & 지정된 범위의 숫자들을 모두 더하는 Excel 함수 & \texttt{SUM} & 합계 계산 \\
+\texttt{SUMPRODUCT} 함수 & 여러 배열의 해당 요소들을 곱한 후 그 합계를 반환하는 Excel 함수 & \texttt{SUMPRODUCT} & 기댓값, 분산 계산에 유용 \\
+\texttt{SQRT} 함수 & 숫자의 양의 제곱근을 반환하는 Excel 함수 & \texttt{SQRT} & 표준 편차 계산 시 사용 \\
+\texttt{NORM.DIST} 함수 & 정규 분포의 확률을 계산하는 Excel 함수 & \texttt{NORM.DIST} & 누적 확률 계산 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{핵심 개념 및 원리}
+
+\subsection{이산 확률 변수의 기댓값과 표준 편차}
+이산 확률 변수는 주사위 눈금이나 특정 제품의 일일 수요량처럼 셀 수 있는 값을 가지는 변수입니다. 이러한 변수의 기댓값(평균)과 표준 편차는 데이터의 중심 경향과 변동성을 이해하는 데 필수적입니다.
+
+\begin{summarybox}[기댓값 (Expected Value, $\mu$)]
+기댓값은 이산 확률 변수가 가질 수 있는 각 값에 해당 확률을 곱한 후 모두 더한 값입니다.
+이는 장기적으로 해당 변수가 취할 것으로 예상되는 평균적인 값입니다.
+\begin{equation*}
+E(X) = \mu = \sum_{i=1}^{k} x_i p(x_i) = x_1 p(x_1) + x_2 p(x_2) + \dots + x_k p(x_k)
+\end{equation*}
+여기서 $x_i$는 확률 변수가 가질 수 있는 각 값이고, $p(x_i)$는 해당 값을 가질 확률입니다.
+\end{summarybox}
+
+\begin{summarybox}[표준 편차 (Standard Deviation, $\sigma$)]
+표준 편차는 데이터가 기댓값(평균)으로부터 얼마나 퍼져 있는지를 나타내는 척도입니다.
+표준 편차가 클수록 데이터의 변동성이 크고, 작을수록 데이터가 평균에 밀집되어 있습니다.
+분산($\sigma^2$)은 각 값에서 평균을 뺀 후 제곱하고 해당 확률을 곱한 값들을 모두 더한 것입니다. 표준 편차는 분산의 양의 제곱근입니다.
+\begin{equation*}
+\sigma = \sqrt{\sum_{i=1}^{k} (x_i - \mu)^2 p(x_i)} = \sqrt{(x_1 - \mu)^2 p(x_1) + (x_2 - \mu)^2 p(x_2) + \dots + (x_k - \mu)^2 p(x_k)}
+\end{equation*}
+\end{summarybox}
+
+\newpage
+\subsection{연속 확률 분포와 정규 분포}
+연속 확률 변수는 온도, 키, 시간과 같이 특정 구간 내의 모든 실숫값을 가질 수 있는 변수입니다. 이 변수들은 특정 값에서 정의되지 않고, 값의 구간에 걸쳐 정의되며, 곡선 아래의 면적으로 확률을 나타냅니다.
+
+\begin{infobox}[연속 확률 변수의 특징]
+\begin{itemize}
+    \item 특정 값에서 정의되지 않고, 값의 \textbf{구간}에 걸쳐 정의됩니다.
+    \item 확률은 곡선 아래의 \textbf{면적}으로 표현됩니다 (고급 수학에서는 적분으로 계산).
+    \item 특정 \textbf{단일 값}을 관측할 확률은 0입니다. 왜냐하면 변수가 취할 수 있는 값의 수가 무한하기 때문입니다.
+\end{itemize}
+\end{infobox}
+
+\begin{summarybox}[연속 확률 분포의 속성]
+확률 함수 $p(x)$는 다음을 만족해야 합니다:
+\begin{itemize}
+    \item 모든 $x$에 대해 $P(x) \ge 0$: 어떤 값도 음의 확률을 가질 수 없습니다.
+    \item 곡선 아래의 총 면적은 1: 모든 가능한 확률을 합하면 1(100\%)이 됩니다.
+\end{itemize}
+\end{summarybox}
+
+\subsubsection{정규 분포 (Normal Distribution)}
+정규 분포는 연속 확률 변수에 사용되는 가장 잘 알려진 분포 중 하나이며, 종 모양(bell-shaped)의 곡선 형태를 가집니다. 특정 조건 하에서는 이산 변수의 분포를 근사하는 데도 사용될 수 있어 매우 중요합니다.
+
+\begin{infobox}[정규 분포의 정의]
+정규 분포는 다음 두 가지 매개변수에 의해 정의됩니다:
+\begin{enumerate}
+    \item \textbf{평균 ($\mu$)}: 분포의 중심을 나타내며, 곡선은 평균을 중심으로 대칭입니다.
+    \item \textbf{표준 편차 ($\sigma$)}: 분포의 모양(퍼짐 정도)을 결정합니다. 표준 편차가 클수록 곡선은 더 넓고 낮아지며, 작을수록 더 좁고 높아집니다.
+\end{enumerate}
+\end{infobox}
+
+\begin{figure}[h!]
+    \centering
+    % 원본 슬라이드 98, 99, 100의 내용을 통합하여 설명합니다.
+    % 슬라이드 98: x축 0-20, 평균 10의 종 모양 곡선
+    % 슬라이드 99: 평균 500, SD 15 / 평균 300, SD 15 (동일 SD, 다른 평균)
+    % 슬라이드 100: 평균 500, SD 15 / 평균 500, SD 5 (동일 평균, 다른 SD)
+    % 실제 이미지 파일이 없으므로 텍스트로 대체합니다.
+    \begin{tcolorbox}[colback=white, colframe=black, title=\textbf{정규 분포 곡선 예시 (시각적 설명)}]
+    \textbf{평균과 표준 편차에 따른 정규 분포의 모양 변화:}
+    \begin{itemize}
+        \item \textbf{평균의 영향 (슬라이드 99):}
+        \begin{itemize}
+            \item 평균 500, 표준 편차 15인 곡선은 500에서 가장 높습니다.
+            \item 평균 300, 표준 편차 15인 곡선은 300에서 가장 높습니다.
+            \item 표준 편차가 같으면 곡선의 \textbf{모양(폭과 높이)}은 같고, 평균에 따라 \textbf{중심 위치}만 달라집니다.
+        \end{itemize}
+        \item \textbf{표준 편차의 영향 (슬라이드 100):}
+        \begin{itemize}
+            \item 평균 500, 표준 편차 15인 곡선은 넓게 퍼져 있습니다.
+            \item 평균 500, 표준 편차 5인 곡선은 평균 500에서 더 높고 날씬합니다.
+            \item 표준 편차가 \textbf{클수록} 값들이 더 넓게 퍼져 있고, \textbf{작을수록} 값들이 평균에 더 밀집되어 있습니다. 즉, 평균이 더 나은 대표성을 가집니다.
+        \end{itemize}
+    \end{itemize}
+    \end{tcolorbox}
+    \caption{평균과 표준 편차에 따른 정규 분포의 모양 변화 예시}
+    \label{fig:normal_dist_shape}
+\end{figure}
+\textit{그림 \ref{fig:normal_dist_shape} 설명: 정규 분포는 평균에 따라 중심이 이동하고, 표준 편차에 따라 퍼짐 정도(폭)가 달라지는 종 모양의 곡선입니다. 표준 편차가 클수록 곡선은 낮고 넓게 퍼지며, 작을수록 높고 좁게 집중됩니다.}
+
+\begin{summarybox}[정규 분포의 주요 속성]
+\begin{itemize}
+    \item \textbf{대칭성}: 곡선은 평균($\mu$)을 중심으로 완벽하게 대칭입니다. 평균은 동시에 중앙값(median)이기도 합니다.
+    \item \textbf{꼬리의 무한 확장}: 분포의 양쪽 꼬리는 수평축에 점점 가까워지지만, 결코 닿지 않고 무한히 뻗어 나갑니다. 왼쪽은 음의 무한대, 오른쪽은 양의 무한대로 향합니다.
+    \item \textbf{총 면적}: 곡선 아래의 총 면적은 항상 1(100\%)입니다.
+    \item \textbf{면적의 분할}: 평균의 오른쪽 면적은 0.5이고, 왼쪽 면적도 0.5입니다. 이 둘을 합하면 1(100\%)이 됩니다.
+\end{itemize}
+\end{summarybox}
+
+\subsubsection{표준 정규 곡선 (Standard Normal Curve) 및 Z-점수}
+서로 다른 평균과 표준 편차를 가진 여러 정규 분포를 비교하거나 특정 확률을 계산할 때, 각 분포에 대해 개별적으로 계산하는 것은 비효율적입니다. 이를 위해 모든 정규 분포를 하나의 표준화된 형태로 변환하는 방법이 있는데, 이것이 바로 표준 정규 분포(Standard Normal Distribution)입니다.
+
+\begin{infobox}[표준 정규 분포의 특징]
+\begin{itemize}
+    \item \textbf{평균 ($\mu$)}: 0
+    \item \textbf{표준 편차 ($\sigma$)}: 1
+    \item 표준 정규 분포의 확률 변수를 \textbf{표준 점수(standard score)} 또는 \textbf{Z-점수(z-score)}라고 부릅니다.
+\end{itemize}
+\end{infobox}
+
+\begin{summarybox}[Z-점수 (Z-score)]
+Z-점수는 특정 데이터 값($X$)이 평균($\mu$)으로부터 몇 표준 편차($\sigma$) 떨어져 있는지를 나타냅니다.
+\begin{equation*}
+z = \frac{\text{관심 값} - \text{모든 값의 평균}}{\text{모든 값의 표준 편차}} = \frac{X - \mu}{\sigma}
+\end{equation*}
+Z-점수를 사용하면 어떤 정규 분포든 표준 정규 분포로 변환하여, 표준화된 표나 소프트웨어(예: Excel의 \texttt{NORM.DIST} 함수)를 통해 쉽게 확률을 계산할 수 있습니다.
+\end{summarybox}
+
+\begin{figure}[h!]
+    \centering
+    % 슬라이드 105의 내용을 텍스트로 대체합니다.
+    \begin{tcolorbox}[colback=white, colframe=black, title=\textbf{정규 분포를 표준 정규 분포로 표준화하는 과정}]
+    \textbf{문제:} 평균($\mu$) 1000, 표준 편차($\sigma$) 10인 정규 분포에서 $P(995 \le X \le 1005)$는 얼마인가?
+    \begin{itemize}
+        \item \textbf{원래 분포 (슬라이드 103):} 평균 1000, 표준 편차 10인 종 모양 곡선에서 995와 1005 사이의 면적을 구합니다.
+        \item \textbf{Z-점수 변환 (표준화):}
+        \begin{itemize}
+            \item $X = 995$일 때, $z = (995 - 1000) \div 10 = -0.5$
+            \item $X = 1005$일 때, $z = (1005 - 1000) \div 10 = 0.5$
+        \end{itemize}
+        \item \textbf{표준 정규 분포 (슬라이드 104):} 평균 0, 표준 편차 1인 종 모양 곡선에서 -0.5와 0.5 사이의 면적을 구합니다.
+    \end{itemize}
+    \textbf{결론:} $P(995 \le X \le 1005)$는 $P(-0.5 \le Z \le 0.5)$와 동일하며, 이 값은 0.3829입니다.
+    \end{tcolorbox}
+    \caption{정규 분포를 표준 정규 분포로 표준화하는 과정}
+    \label{fig:standardization}
+\end{figure}
+\textit{그림 \ref{fig:standardization} 설명: Z-점수를 통해 어떤 정규 분포든 평균 0, 표준 편차 1인 표준 정규 분포로 변환할 수 있습니다. 이렇게 변환된 Z-점수를 사용하면 표준화된 표나 Excel 함수를 통해 확률을 쉽게 계산할 수 있습니다.}
+
+\subsubsection{표준 편차와 경험적 규칙 (Empirical Rule)}
+표준 편차는 데이터의 변동성을 측정하는 가장 일반적인 척도입니다. 정규 분포에서는 평균으로부터의 표준 편차 거리에 따라 데이터가 분포하는 비율이 예측 가능합니다.
+
+\begin{infobox}[경험적 규칙 (Empirical Rule)]
+정규 분포를 따르는 대부분의 데이터 세트에서:
+\begin{itemize}
+    \item 약 \textbf{68\%}의 관측치가 평균으로부터 \textbf{1 표준 편차} 이내에 있습니다 ($\mu \pm 1\sigma$).
+    \item 약 \textbf{95.45\%}의 관측치가 평균으로부터 \textbf{2 표준 편차} 이내에 있습니다 ($\mu \pm 2\sigma$).
+    \item 약 \textbf{99.73\%}의 관측치가 평균으로부터 \textbf{3 표준 편차} 이내에 있습니다 ($\mu \pm 3\sigma$).
+\end{itemize}
+3 표준 편차를 벗어나는 관측치는 드물게 발생하며, 이를 \textbf{이상치(outliers)}로 간주할 수 있습니다.
+\end{infobox}
+
+\begin{figure}[h!]
+    \centering
+    % 슬라이드 107의 내용을 텍스트로 대체합니다.
+    \begin{tcolorbox}[colback=white, colframe=black, title=\textbf{표준 편차에 따른 정규 분포의 데이터 포함 비율}]
+    \textbf{경험적 규칙 시각화:}
+    \begin{itemize}
+        \item \textbf{1 표준 편차 이내 ($\mu \pm 1\sigma$):} 표준 정규 분포에서 Z=-1부터 Z=1까지의 면적은 약 68\%입니다.
+        \item \textbf{2 표준 편차 이내 ($\mu \pm 2\sigma$):} 표준 정규 분포에서 Z=-2부터 Z=2까지의 면적은 약 95.45\%입니다.
+        \item \textbf{3 표준 편차 이내 ($\mu \pm 3\sigma$):} 표준 정규 분포에서 Z=-3부터 Z=3까지의 면적은 약 99.73\%입니다.
+    \end{itemize}
+    이 규칙은 데이터의 변동성을 이해하고 이상치를 식별하는 데 유용합니다.
+    \end{tcolorbox}
+    \caption{표준 편차에 따른 정규 분포의 데이터 포함 비율 (경험적 규칙)}
+    \label{fig:empirical_rule}
+\end{figure}
+\textit{그림 \ref{fig:empirical_rule} 설명: 정규 분포에서 평균을 중심으로 1, 2, 3 표준 편차 이내에 포함되는 데이터의 비율을 보여주는 경험적 규칙은 데이터의 분포 특성을 직관적으로 이해하는 데 도움을 줍니다.}
+
+\newpage
+\section{절차 및 방법: Excel을 활용한 통계 계산}
+
+\subsection{이산 확률 변수의 기댓값 및 표준 편차 계산 (Excel)}
+편의점 관리자의 제품 수요 데이터를 예시로 들어, Excel에서 기댓값과 표준 편차를 계산하는 과정을 단계별로 설명합니다.
+
+\begin{examplebox}[문제 상황]
+편의점 관리자는 판매하는 제품 중 하나의 수요를 이해하여 매일 재고량을 더 잘 결정하고자 합니다. 그녀는 몇 주 동안 다음 데이터를 수집했습니다. 이 데이터를 기반으로 예상 수요(기댓값)와 그 표준 편차는 얼마입니까?
+\end{examplebox}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{ll}
+\toprule
+\textbf{일일 수요 (Daily Demand)} & \textbf{발생 횟수 (Occurrence of Demand)} \\
+\midrule
+1 & 3 \\
+2 & 10 \\
+... & ... \\
+20 & 12 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{예상 수요 데이터 세트 (일부)}
+\label{tab:demand_data}
+
+\subsubsection*{단계 1: 총 발생 횟수 계산}
+각 일일 수요가 발생한 총 횟수를 알아야 각 수요의 확률을 계산할 수 있습니다.
+\begin{enumerate}
+    \item Excel 시트에서 '발생 횟수' 열 옆에 '합계 (Sum)' 셀을 만듭니다.
+    \item '합계' 셀 옆에 \texttt{=SUM(}을 입력합니다.
+    \item '발생 횟수' 열의 모든 값을 선택합니다 (첫 번째 셀을 선택한 후 \texttt{Ctrl + Shift + 아래쪽 화살표}를 누르면 편리합니다).
+    \item 괄호를 닫고 \texttt{Enter}를 누릅니다.
+\end{enumerate}
+\begin{infobox}[결과]
+총 발생 횟수는 140입니다.
+\end{infobox}
+
+\subsubsection*{단계 2: 각 수요의 확률 계산}
+각 일일 수요가 발생할 확률은 해당 수요의 발생 횟수를 총 발생 횟수로 나눈 값입니다.
+\begin{enumerate}
+    \item '발생 횟수' 열 옆에 '확률 (Probability)'이라는 새 열을 만듭니다.
+    \item 첫 번째 확률 값을 계산합니다: 첫 번째 '발생 횟수' 셀을 선택하고 총 발생 횟수 셀로 나눕니다. 예를 들어, \texttt{=B2/I1} (여기서 B2는 첫 번째 발생 횟수 값, I1은 총 합계 값).
+    \item \textbf{중요}: 총 발생 횟수 셀(예: \texttt{I1})을 절대 참조로 만듭니다. 셀을 선택한 상태에서 \texttt{F4} 키를 누르면 \texttt{\$I\$1}과 같이 달러 기호가 붙습니다. 이렇게 하면 수식을 아래로 복사할 때 이 셀이 고정됩니다.
+    \item 수식을 입력한 후 \texttt{Enter}를 누릅니다.
+    \item 첫 번째 확률 셀을 선택하고, 셀의 오른쪽 아래 모서리에 있는 채우기 핸들('+' 모양)을 두 번 클릭하거나 아래로 드래그하여 나머지 확률 값을 자동으로 채웁니다.
+\end{enumerate}
+\begin{infobox}[확률 합계 확인]
+모든 확률 값의 합계는 1이 되어야 합니다. '확률' 열의 끝에 \texttt{=SUM()} 함수를 사용하여 합계를 확인합니다. 합계가 1이 아니면 계산에 오류가 있을 수 있습니다.
+\end{infobox}
+
+\subsubsection*{단계 3: 기댓값 (평균 수요) 계산}
+기댓값은 각 일일 수요 값에 해당 확률을 곱한 값들을 모두 더한 것입니다. Excel의 \texttt{SUMPRODUCT} 함수를 사용하면 이 과정을 한 번에 처리할 수 있습니다.
+\begin{enumerate}
+    \item '확률' 열의 오른쪽에 '기댓값 (Expected value (mean))'이라는 셀을 만듭니다.
+    \item 이 셀에 \texttt{=SUMPRODUCT(}을 입력합니다.
+    \item 첫 번째 배열로 '일일 수요' 열 전체를 선택합니다 (예: \texttt{A2:A21}).
+    \item 쉼표(,)를 입력합니다.
+    \item 두 번째 배열로 '확률' 열 전체를 선택합니다 (예: \texttt{C2:C21}).
+    \item 괄호를 닫고 \texttt{Enter}를 누릅니다.
+\end{enumerate}
+\begin{infobox}[결과]
+계산된 기댓값(평균 수요)은 11.49입니다.
+\end{infobox}
+
+\subsubsection*{단계 4: 표준 편차 계산을 위한 중간 값 계산 ($ (x-\mu)^2 $)}
+표준 편차를 계산하기 위해 각 일일 수요 값에서 평균(기댓값)을 뺀 후 제곱한 값을 계산하는 중간 열을 만듭니다.
+\begin{enumerate}
+    \item '확률' 열 옆에 '\texttt{(x-mu)\textasciicircum 2}'라는 새 열을 만듭니다.
+    \item 첫 번째 셀에 \texttt{=(A2-\$I\$4)\textasciicircum 2}와 같이 수식을 입력합니다. (여기서 A2는 첫 번째 일일 수요 값, \$I\$4는 기댓값 셀이며, \texttt{F4}를 눌러 절대 참조로 만듭니다).
+    \item \texttt{Enter}를 누른 후, 채우기 핸들을 사용하여 나머지 셀을 자동으로 채웁니다.
+\end{enumerate}
+
+\subsubsection*{단계 5: 표준 편차 계산}
+이제 표준 편차를 계산할 준비가 되었습니다. 분산($\sigma^2$)은 $ (x-\mu)^2 $ 값에 해당 확률을 곱한 값들을 모두 더한 것이고, 표준 편차는 이 분산의 제곱근입니다.
+\begin{enumerate}
+    \item '기댓값' 셀 아래에 '표준 편차 (Standard deviation)' 셀을 만듭니다.
+    \item 이 셀에 \texttt{=SQRT(SUMPRODUCT(}을 입력합니다.
+    \item 첫 번째 배열로 '\texttt{(x-mu)\textasciicircum 2}' 열 전체를 선택합니다 (예: \texttt{D2:D21}).
+    \item 쉼표(,)를 입력합니다.
+    \item 두 번째 배열로 '확률' 열 전체를 선택합니다 (예: \texttt{C2:C21}).
+    \item 괄호를 닫고 \texttt{Enter}를 누릅니다.
+\end{enumerate}
+\begin{infobox}[결과]
+계산된 표준 편차는 6.205입니다.
+이는 수요의 변동성이 약 6.205 정도임을 의미합니다.
+평균 수요 11.49를 기준으로 1 표준 편차 범위는 약 5.28 (11.49 - 6.205)에서 17.69 (11.49 + 6.205) 사이입니다.
+\end{infobox}
+
+\newpage
+\subsection{정규 분포 확률 계산 (Excel)}
+Excel의 \texttt{NORM.DIST} 함수를 사용하여 정규 분포의 확률을 계산하는 방법을 알아봅니다. 이 함수는 특정 값 이하의 누적 확률을 반환합니다.
+
+\begin{examplebox}[문제 상황]
+평균이 1000이고 표준 편차가 10인 정규 분포가 있습니다. 확률 변수 X가 995와 1005 사이에 있을 확률, 즉 $P(995 \le X \le 1005)$는 얼마입니까?
+\end{examplebox}
+
+\subsubsection*{단계 1: 문제 시각화}
+정규 분포 곡선을 그리고, 995와 1005 사이의 면적을 색칠하여 구하고자 하는 확률을 시각적으로 이해합니다.
+Excel의 \texttt{NORM.DIST} 함수는 항상 특정 값 \textit{이하}의 누적 확률을 반환합니다.
+따라서 $P(995 \le X \le 1005)$를 구하려면, $P(X \le 1005)$에서 $P(X \le 995)$를 빼야 합니다.
+
+\begin{figure}[h!]
+    \centering
+    % 슬라이드 113, 114, 118의 내용을 통합하여 텍스트로 대체합니다.
+    \begin{tcolorbox}[colback=white, colframe=black, title=\textbf{정규 분포에서 특정 구간 확률 계산 시각화}]
+    \textbf{시각적 이해:}
+    \begin{itemize}
+        \item 평균 1000인 종 모양의 정규 분포 곡선을 그립니다.
+        \item 우리가 찾고자 하는 $P(995 \le X \le 1005)$는 995와 1005 사이의 면적입니다.
+        \item Excel의 \texttt{NORM.DIST} 함수는 항상 왼쪽 꼬리부터 특정 값까지의 누적 확률을 계산합니다.
+        \item 따라서 $P(X \le 1005)$는 1005 왼쪽의 모든 면적을 나타냅니다 (큰 영역).
+        \item $P(X \le 995)$는 995 왼쪽의 모든 면적을 나타냅니다 (작은 영역).
+        \item 우리가 원하는 $P(995 \le X \le 1005)$는 $P(X \le 1005) - P(X \le 995)$로 계산할 수 있습니다.
+    \end{itemize}
+    \end{tcolorbox}
+    \caption{정규 분포에서 특정 구간 확률 계산 시각화}
+    \label{fig:normdist_visual}
+\end{figure}
+\textit{그림 \ref{fig:normdist_visual} 설명: 전체 노란색 영역은 $P(X \le 1005)$를 나타내고, 녹색 영역은 $P(X \le 995)$를 나타냅니다. 우리가 구하고자 하는 파란색 영역($P(995 \le X \le 1005)$)은 노란색 영역에서 녹색 영역을 뺀 값과 같습니다.}
+
+\subsubsection*{단계 2: $P(X \le 1005)$ 계산}
+\begin{enumerate}
+    \item Excel 시트에서 평균(1000)과 표준 편차(10)를 입력할 셀을 준비합니다.
+    \item 'p(x $\le$ 1005)'와 같은 레이블을 가진 셀을 만듭니다.
+    \item 해당 셀에 \texttt{=NORM.DIST(}를 입력합니다.
+    \item 함수 인수를 채웁니다:
+    \begin{itemize}
+        \item \texttt{x}: 1005 (관심 있는 값)
+        \item \texttt{mean}: 1000 (평균)
+        \item \texttt{standard\_dev}: 10 (표준 편차)
+        \item \texttt{cumulative}: \texttt{TRUE} 또는 \texttt{1} (누적 분포 함수를 사용하겠다는 의미)
+    \end{itemize}
+    \item 완성된 수식은 \texttt{=NORM.DIST(1005, 1000, 10, TRUE)} 또는 \texttt{=NORM.DIST(1005, 1000, 10, 1)}입니다.
+    \item \texttt{Enter}를 누릅니다.
+\end{enumerate}
+\begin{infobox}[결과]
+$P(X \le 1005)$는 약 0.6915입니다.
+\end{infobox}
+
+\subsubsection*{단계 3: $P(X \le 995)$ 계산}
+\begin{enumerate}
+    \item 'p(x $\le$ 995)'와 같은 레이블을 가진 셀을 만듭니다.
+    \item 해당 셀에 \texttt{=NORM.DIST(}를 입력합니다.
+    \item 함수 인수를 채웁니다:
+    \begin{itemize}
+        \item \texttt{x}: 995
+        \item \texttt{mean}: 1000
+        \item \texttt{standard\_dev}: 10
+        \item \texttt{cumulative}: \texttt{TRUE} 또는 \texttt{1}
+    \end{itemize}
+    \item 완성된 수식은 \texttt{=NORM.DIST(995, 1000, 10, TRUE)} 또는 \texttt{=NORM.DIST(995, 1000, 10, 1)}입니다.
+    \item \texttt{Enter}를 누릅니다.
+\end{enumerate}
+\begin{infobox}[결과]
+$P(X \le 995)$는 약 0.3085입니다.
+\end{infobox}
+
+\subsubsection*{단계 4: $P(995 \le X \le 1005)$ 계산}
+단계 2에서 얻은 값에서 단계 3에서 얻은 값을 뺍니다.
+\begin{enumerate}
+    \item 'p(995 $\le$ x $\le$ 1005)'와 같은 레이블을 가진 셀을 만듭니다.
+    \item 이 셀에 이전 단계에서 계산된 두 셀을 참조하는 수식을 입력합니다. 예를 들어, $P(X \le 1005)$가 B7 셀에 있고 $P(X \le 995)$가 B8 셀에 있다면, \texttt{=B7 - B8}을 입력합니다.
+    \item \texttt{Enter}를 누릅니다.
+\end{enumerate}
+\begin{infobox}[최종 결과]
+$P(995 \le X \le 1005)$는 약 0.38292입니다.
+이는 평균이 1000이고 표준 편차가 10인 정규 분포에서 값이 995에서 1005 사이에 있을 확률이 38.29\%임을 의미합니다.
+\end{infobox}
+
+\newpage
+\section{실습: 표준 편차 근사치 추정}
+
+\begin{examplebox}[문제]
+평균 50을 중심으로 하는 두 개의 정규 분포 곡선 A와 B가 있습니다. 각 곡선의 표준 편차를 근사해 보세요.
+\end{examplebox}
+
+\begin{figure}[h!]
+    \centering
+    % 슬라이드 108의 내용을 텍스트로 대체합니다.
+    \begin{tcolorbox}[colback=white, colframe=black, title=\textbf{두 정규 분포 곡선의 표준 편차 추정 연습}]
+    \textbf{곡선 A:} 평균 50, x축 범위 약 10에서 90. 최고점 y축 0.025.
+    \textbf{곡선 B:} 평균 50, x축 범위 약 25에서 75. 최고점 y축 0.05 (더 높고 날씬함).
+    \end{tcolorbox}
+    \caption{두 정규 분포 곡선의 표준 편차 추정 연습}
+    \label{fig:practice_sd}
+\end{figure}
+\textit{그림 \ref{fig:practice_sd} 설명: 두 곡선 모두 평균이 50입니다. 곡선 A는 10에서 90까지 넓게 퍼져 있고, 곡선 B는 25에서 75까지 좁고 높게 퍼져 있습니다.}
+
+\subsubsection*{해답}
+경험적 규칙에 따르면, 대부분의 데이터(약 99.7\%)는 평균으로부터 3 표준 편차 이내에 분포합니다. 이 점을 활용하여 표준 편차를 근사할 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{곡선 A}:
+    \begin{itemize}
+        \item 곡선 A는 평균 50에서 약 95까지 꼬리가 매우 얇아지는 것으로 보입니다.
+        \item 이는 95가 대략 평균으로부터 3 표준 편차 떨어진 값이라고 가정할 수 있습니다.
+        \item 평균에서 95까지의 거리는 $95 - 50 = 45$입니다.
+        \item 이 거리가 3 표준 편차에 해당하므로, 표준 편차는 $45 \div 3 = 15$로 근사할 수 있습니다.
+    \end{itemize}
+    \item \textbf{곡선 B}:
+    \begin{itemize}
+        \item 곡선 B는 평균 50에서 약 75까지 꼬리가 얇아지는 것으로 보입니다.
+        \item 이는 75가 대략 평균으로부터 3 표준 편차 떨어진 값이라고 가정할 수 있습니다.
+        \item 평균에서 75까지의 거리는 $75 - 50 = 25$입니다.
+        \item 이 거리가 3 표준 편차에 해당하므로, 표준 편차는 $25 \div 3 \approx 8.33$으로 근사할 수 있습니다 (강의에서는 약 8로 언급).
+    \end{itemize}
+\end{enumerate}
+\begin{infobox}[결론]
+곡선 A의 표준 편차는 약 15이고, 곡선 B의 표준 편차는 약 8입니다.
+표준 편차가 작을수록 곡선이 더 높고 날씬하며, 값이 평균에 더 밀집되어 있음을 시각적으로 확인할 수 있습니다.
+\end{infobox}
+
+\newpage
+\section{정규 분포의 모델로서의 활용}
+완벽하게 대칭적인 곡선은 현실 세계에서 드물지만, 많은 실제 현상들이 거의 정규 분포를 따릅니다. 이러한 특성 덕분에 정규 분포는 다양한 분야에서 중요한 통계 모델로 활용됩니다.
+
+\begin{infobox}[정규 분포의 활용]
+\begin{itemize}
+    \item \textbf{확률 평가}: 특정 결과에 대한 확률을 평가하는 모델로 사용됩니다.
+    \item \textbf{표본 정보 활용}: 표본 정보를 사용하여 모집단에 대한 이해를 얻는 데 도움을 줍니다.
+    \item \textbf{이산 확률 변수 근사}: 특정 조건 하에서 이산 확률 변수 및 분포를 근사하는 데 유용하게 사용될 수 있습니다.
+\end{itemize}
+이러한 이유로 정규 분포는 통계학 분야에서 가장 중요한 확률 분포 중 하나로 간주됩니다.
+\end{infobox}
+
+\newpage
+\section{개요}
+이 문서는 \textbf{BADM-572: Data-Driven Decision Making} 과목의 \textbf{Exploring and Producing Data Module 2} 중 파트 4/5에 해당하는 내용을 다룹니다.
+주요 목표는 Excel을 활용하여 정규 분포(Normal Distribution)와 표준 정규 분포(Standard Normal Distribution)와 관련된 다양한 확률을 계산하는 방법을 학습하는 것입니다.
+특히, \texttt{NORM.DIST}, \texttt{NORM.S.DIST}, \texttt{NORM.INV}, \texttt{NORM.S.INV}와 같은 핵심 Excel 함수들의 사용법과 그 차이점을 상세히 설명합니다.
+이 문서를 통해 비전공자나 처음 배우는 사람도 정규 분포의 개념을 이해하고, 실제 데이터 분석에 Excel 함수를 효과적으로 적용할 수 있도록 돕습니다.
+
+\newpage
+\section{용어 정리}
+
+\begin{table}[h!]
+\centering
+\caption{주요 용어 설명}
+\label{tab:glossary}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+정규 분포 & 종 모양의 대칭적인 확률 분포로, 자연 현상에서 흔히 관찰됩니다. & Normal Distribution & 평균과 표준 편차로 정의됩니다. \\
+표준 정규 분포 & 평균이 0이고 표준 편차가 1인 특별한 정규 분포입니다. & Standard Normal Distribution & 모든 정규 분포는 표준 정규 분포로 변환될 수 있습니다. \\
+Z-점수 & 특정 데이터 포인트가 평균에서 표준 편차의 몇 배만큼 떨어져 있는지를 나타내는 값입니다. & Z-score & 데이터를 표준화하여 비교할 때 사용됩니다. \\
+누적 분포 함수 & 특정 값보다 작거나 같은 확률을 나타내는 함수입니다. & Cumulative Distribution Function (CDF) & Excel 함수에서 'cumulative=TRUE'로 설정할 때 계산됩니다. \\
+확률 질량 함수 & 이산 확률 변수에서 특정 값이 나타날 확률을 나타내는 함수입니다. & Probability Mass Function (PMF) & 연속 분포에서는 특정 점의 확률이 0이므로 거의 사용되지 않습니다. \\
+백분위수 & 전체 데이터 중 특정 값보다 작거나 같은 데이터의 비율을 나타냅니다. & Percentile & 예를 들어, 95백분위수는 95\%의 데이터가 그 값보다 작거나 같음을 의미합니다. \\
+평균 & 데이터 세트의 중심 경향을 나타내는 값입니다. & Mean ($\mu$) & 모든 값을 더한 후 개수로 나눈 값입니다. \\
+표준 편차 & 데이터가 평균으로부터 얼마나 퍼져 있는지를 나타내는 척도입니다. & Standard Deviation ($\sigma$) & 값이 클수록 데이터의 산포도가 큽니다. \\
+\texttt{NORM.DIST} & 일반 정규 분포의 확률을 계산하는 Excel 함수입니다. & NORM.DIST & X, 평균, 표준 편차, 누적 여부를 인수로 받습니다. \\
+\texttt{NORM.S.DIST} & 표준 정규 분포의 확률을 계산하는 Excel 함수입니다. & NORM.S.DIST & Z-점수와 누적 여부만을 인수로 받습니다. \\
+\texttt{NORM.INV} & 일반 정규 분포에서 주어진 확률에 해당하는 X 값을 찾는 Excel 함수입니다. & NORM.INV & 확률, 평균, 표준 편차를 인수로 받습니다. \\
+\texttt{NORM.S.INV} & 표준 정규 분포에서 주어진 확률에 해당하는 Z-점수를 찾는 Excel 함수입니다. & NORM.S.INV & 확률만을 인수로 받습니다. \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+\section{핵심 개념 및 원리}
+
+정규 분포는 통계학에서 가장 중요하고 널리 사용되는 확률 분포 중 하나입니다.
+많은 자연 현상, 사회 현상, 측정 오차 등이 정규 분포를 따르는 경향이 있습니다.
+정규 분포는 종 모양(bell-shaped)의 대칭적인 곡선으로 나타나며, 평균($\mu$)과 표준 편차($\sigma$)라는 두 가지 매개변수에 의해 완전히 정의됩니다.
+
+\begin{itemize}
+    \item \textbf{평균 ($\mu$):} 분포의 중심을 나타냅니다. 곡선의 가장 높은 지점입니다.
+    \item \textbf{표준 편차 ($\sigma$):} 데이터가 평균으로부터 얼마나 퍼져 있는지를 나타냅니다. 표준 편차가 작으면 데이터가 평균 주변에 밀집되어 있고, 크면 넓게 퍼져 있습니다.
+\end{itemize}
+
+\subsection{표준화 (Z-점수)}
+서로 다른 평균과 표준 편차를 가진 여러 정규 분포를 비교하거나 분석할 때, 이들을 하나의 공통된 형태로 변환하는 것이 유용합니다.
+이것이 바로 \textbf{표준화(Standardization)} 과정이며, 그 결과로 얻어지는 값이 \textbf{Z-점수(Z-score)}입니다.
+
+\begin{itemize}
+    \item \textbf{Z-점수란?}
+    \begin{enumerate}
+        \item \textbf{한 줄 핵심 요약:} 특정 데이터 포인트가 평균으로부터 표준 편차의 몇 배만큼 떨어져 있는지를 나타내는 값입니다.
+        \item \textbf{직관적 예시/비유:} 당신이 시험에서 80점을 받았는데, 평균이 70점이고 표준 편차가 10점이라면, 당신은 평균보다 10점 높게 받은 것이고, 이는 표준 편차 1개만큼 높은 것입니다. 이때 Z-점수는 +1이 됩니다. 만약 60점을 받았다면, 평균보다 10점 낮으므로 Z-점수는 -1이 됩니다.
+        \item \textbf{기술적 정확한 설명:} 원시 데이터 값($X$)을 평균($\mu$)을 빼고 표준 편차($\sigma$)로 나누어 계산합니다.
+    \end{enumerate}
+\end{itemize}
+
+\begin{equation*}
+    Z = \frac{X - \mu}{\sigma}
+\end{equation*}
+
+Z-점수를 통해 모든 정규 분포는 \textbf{표준 정규 분포(Standard Normal Distribution)}로 변환될 수 있습니다.
+표준 정규 분포는 항상 평균이 0이고 표준 편차가 1인 특성을 가집니다.
+이러한 표준화를 통해 우리는 어떤 정규 분포에서든 특정 값의 상대적인 위치와 확률을 쉽게 비교하고 계산할 수 있습니다.
+
+\subsection{누적 확률 (Cumulative Probability)}
+정규 분포에서 특정 값에 대한 확률을 계산할 때, 우리는 주로 \textbf{누적 확률(Cumulative Probability)}을 사용합니다.
+누적 확률은 특정 값($x$)보다 작거나 같은 모든 값의 확률을 의미하며, 이는 정규 분포 곡선 아래의 왼쪽 면적에 해당합니다.
+
+\begin{itemize}
+    \item \textbf{누적 확률이란?}
+    \begin{enumerate}
+        \item \textbf{한 줄 핵심 요약:} 특정 지점까지의 모든 확률을 합산한 값으로, 곡선 아래의 왼쪽 면적을 나타냅니다.
+        \item \textbf{직관적 예시/비유:} 당신이 시험에서 80점을 받았고, 이 점수가 상위 10\%에 해당한다고 가정해 봅시다. 이는 90\%의 학생들이 80점보다 낮거나 같은 점수를 받았다는 의미입니다. 이때 80점까지의 누적 확률은 0.90 (90\%)이 됩니다.
+        \item \textbf{기술적 정확한 설명:} 확률 변수 $X$가 특정 값 $x$보다 작거나 같을 확률 $P(X \le x)$를 의미합니다. Excel의 정규 분포 함수들은 기본적으로 이 누적 확률을 계산합니다.
+    \end{enumerate}
+\end{itemize}
+
+\begin{cautionbox}
+    \textbf{확률 질량 함수(Probability Mass Function, PMF)와 누적 분포 함수(Cumulative Distribution Function, CDF)의 차이:}
+    연속 확률 분포(정규 분포와 같이)에서는 특정 한 점의 확률은 0입니다. 예를 들어, 키가 정확히 170.000...cm일 확률은 0입니다. 따라서 연속 분포에서는 PMF 대신 CDF를 사용하여 특정 구간의 확률이나 특정 값보다 작거나 같은 확률을 계산합니다. Excel 함수에서 \texttt{cumulative} 인수를 \texttt{TRUE} (또는 1)로 설정하면 CDF를 계산하고, \texttt{FALSE} (또는 0)로 설정하면 확률 밀도 함수(Probability Density Function, PDF)의 값을 반환합니다. PDF 값은 확률이 아니며, 곡선의 높이를 나타냅니다. 일반적으로 확률 계산에는 CDF를 사용합니다.
+\end{cautionbox}
+
+\newpage
+\section{Lesson 2-5.3: Excel을 이용한 표준 정규 분포}
+
+이 섹션에서는 Excel의 \texttt{NORM.S.DIST} 함수를 사용하여 표준 정규 분포의 확률을 계산하는 방법을 배웁니다.
+\texttt{NORM.S.DIST}는 표준 정규 분포(평균 0, 표준 편차 1)에 특화된 함수입니다.
+
+\subsection{문제 정의 및 Z-점수 계산}
+우리는 평균이 1,000이고 표준 편차가 10인 정규 분포에서, 무작위로 관찰된 값이 995와 1,005 사이에 있을 확률을 알고 싶습니다.
+즉, $P(995 \le X \le 1005)$를 계산하는 것이 목표입니다.
+
+이 문제를 해결하기 위해 먼저 원시 값($X$)을 Z-점수로 표준화합니다.
+Z-점수 공식은 $Z = (X - \mu) \div \sigma$ 입니다.
+
+\begin{itemize}
+    \item $X = 995$일 때: $z = (995 - 1000) \div 10 = -0.5$
+    \item $X = 1005$일 때: $z = (1005 - 1000) \div 10 = 0.5$
+\end{itemize}
+따라서 우리는 $P(-0.5 \le Z \le 0.5)$를 계산해야 합니다.
+
+\begin{figure}[h!]
+    \centering
+    % % \includegraphics[width=0.8\textwidth]{standard_normal_curve_1.png}  % Image not found: standard_normal_curve_1.png % 이미지 파일이 없으므로 주석 처리합니다.
+    \caption{표준 정규 곡선 (Z-점수 -0.5에서 0.5 사이 면적)}
+    \label{fig:standard_normal_curve_1}
+    \vspace{0.5em}
+    \textit{슬라이드에는 평균이 0이고 x축이 -3에서 3까지, y축이 0.0에서 0.4까지 퍼져 있는 종 모양의 대칭적인 표준 정규 분포 곡선이 표시됩니다. 곡선 아래 -0.5에서 0.5까지의 면적이 파란색으로 채워져 있습니다. 이는 $P(-0.5 \le Z \le 0.5)$를 시각적으로 나타냅니다. 슬라이드 하단에는 \texttt{NORM.S.DIST} 함수가 강조되어 있습니다.}
+\end{figure}
+
+\subsection{Excel의 \texttt{NORM.S.DIST} 함수 사용}
+\texttt{NORM.S.DIST} 함수는 표준 정규 분포의 누적 확률을 계산합니다.
+이 함수는 Z-점수와 누적 여부만을 인수로 받습니다. 평균과 표준 편차는 표준 정규 분포의 정의에 따라 0과 1로 고정되어 있기 때문에 별도로 입력할 필요가 없습니다.
+
+\begin{itemize}
+    \item \textbf{함수 구문:} \texttt{=NORM.S.DIST(z, cumulative)}
+    \item \textbf{인수 설명:}
+    \begin{itemize}
+        \item \texttt{z}: 확률을 계산하려는 Z-점수입니다.
+        \item \texttt{cumulative}: 누적 분포 함수를 계산할지 여부를 지정합니다.
+        \begin{itemize}
+            \item \texttt{TRUE} (또는 1): 누적 분포 함수를 반환합니다 ($P(Z \le z)$).
+            \item \texttt{FALSE} (또는 0): 확률 밀도 함수 값을 반환합니다. (일반적으로 확률 계산에는 \texttt{TRUE}를 사용합니다.)
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}
+    \textbf{단계별 계산:}
+    우리는 $P(-0.5 \le Z \le 0.5)$를 찾고 있습니다. 이는 $P(Z \le 0.5) - P(Z \le -0.5)$로 계산할 수 있습니다.
+
+    \begin{enumerate}
+        \item \textbf{$P(Z \le 0.5)$ 계산:}
+        Excel에서 \texttt{=NORM.S.DIST(0.5, TRUE)}를 입력합니다.
+        결과는 약 \texttt{0.6914}입니다.
+        이는 Z-점수가 0.5보다 작거나 같을 확률이 69.14\%임을 의미합니다.
+
+        \item \textbf{$P(Z \le -0.5)$ 계산:}
+        Excel에서 \texttt{=NORM.S.DIST(-0.5, TRUE)}를 입력합니다.
+        결과는 약 \texttt{0.3085}입니다.
+        이는 Z-점수가 -0.5보다 작거나 같을 확률이 30.85\%임을 의미합니다.
+
+        \item \textbf{두 값 사이의 확률 계산:}
+        두 결과를 빼면 됩니다: \texttt{0.6914 - 0.3085 = 0.3829}.
+        따라서 $P(-0.5 \le Z \le 0.5)$는 \texttt{0.3829}입니다.
+        이는 원시 값으로 $P(995 \le X \le 1005)$가 38.29\%임을 의미합니다.
+    \end{enumerate}
+\end{examplebox}
+
+\subsection{\texttt{NORM.S.DIST}와 \texttt{NORM.DIST}의 비교}
+Excel에는 일반 정규 분포의 확률을 계산하는 \texttt{NORM.DIST} 함수도 있습니다.
+두 함수의 주요 차이점은 다음과 같습니다.
+
+\begin{table}[h!]
+\centering
+\caption{\texttt{NORM.S.DIST}와 \texttt{NORM.DIST} 함수 비교}
+\label{tab:norm_dist_comparison}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lll}
+\toprule
+\textbf{특징} & \textbf{\texttt{NORM.S.DIST}} & \textbf{\texttt{NORM.DIST}} \\
+\midrule
+\textbf{대상 분포} & 표준 정규 분포 (평균=0, 표준 편차=1) & 일반 정규 분포 (사용자가 지정한 평균, 표준 편차) \\
+\textbf{필요 인수} & Z-점수, 누적 여부 & X 값, 평균, 표준 편차, 누적 여부 \\
+\textbf{사용 시점} & 데이터를 Z-점수로 표준화한 후 확률을 계산할 때 & 원시 데이터(X)와 분포의 매개변수를 직접 사용하여 확률을 계산할 때 \\
+\textbf{효율성} & Z-점수를 수동으로 계산해야 하므로 한 단계 더 필요할 수 있음 & 평균과 표준 편차를 직접 입력하여 한 번에 계산 가능 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{examplebox}
+    \textbf{\texttt{NORM.DIST}를 사용한 동일한 계산:}
+    $P(995 \le X \le 1005)$를 \texttt{NORM.DIST}로 직접 계산할 수도 있습니다.
+    \texttt{=NORM.DIST(1005, 1000, 10, TRUE) - NORM.DIST(995, 1000, 10, TRUE)}
+    이 결과 역시 \texttt{0.3829}가 나옵니다.
+    \texttt{NORM.DIST}는 내부적으로 X 값을 Z-점수로 변환하여 계산하므로, 사용자가 직접 Z-점수를 계산할 필요가 없어 더 효율적일 수 있습니다.
+\end{examplebox}
+
+\begin{tipbox}
+    \textbf{언제 어떤 함수를 사용할까?}
+    \texttt{NORM.DIST}는 대부분의 경우에 더 편리합니다. 그러나 Z-점수 자체의 의미를 분석하거나, 표준 정규 분포표를 사용하는 경우처럼 Z-점수를 명시적으로 다루어야 할 때는 \texttt{NORM.S.DIST}가 유용합니다. 두 함수의 차이점을 이해하는 것이 중요합니다.
+\end{tipbox}
+
+\newpage
+\section{Lesson 2-5.4: Excel에서 '미만' 확률 계산}
+
+이 섹션에서는 Excel의 \texttt{NORM.DIST} 함수를 사용하여 특정 값보다 작거나 같은 확률($P(X \le x)$)을 계산하는 방법을 배웁니다.
+이는 어떤 점수가 전체 모집단에서 몇 백분위수에 해당하는지 알아볼 때 유용합니다.
+
+\subsection{문제 정의}
+SAT 시험 점수를 예로 들어 보겠습니다. SAT 점수는 평균이 500점이고 표준 편차가 100점인 정규 분포를 따른다고 가정합니다.
+어떤 학생이 458점을 받았을 때, 이 학생보다 낮은 점수를 받은 사람들의 비율(즉, 458점의 백분위수)은 얼마일까요?
+우리는 $P(X \le 458)$를 계산해야 합니다.
+
+\begin{figure}[h!]
+    \centering
+    % % \includegraphics[width=0.8\textwidth]{sat_less_than.png}  % Image not found: sat_less_than.png % 이미지 파일이 없으므로 주석 처리합니다.
+    \caption{SAT 점수 458점 미만 확률 곡선}
+    \label{fig:sat_less_than}
+    \vspace{0.5em}
+    \textit{슬라이드에는 평균이 500인 종 모양의 정규 분포 곡선이 표시됩니다. 458점 지점부터 곡선의 왼쪽 끝까지의 면적이 음영 처리되어 있습니다. 이는 $P(X \le 458)$를 시각적으로 나타냅니다. Excel 시트에는 X, Mean, Standard deviation 값이 각각 458, 500, 100으로 입력되어 있습니다. \texttt{p(x <= 458)} 셀 옆에서 \texttt{NORM.DIST} 함수가 선택되는 모습이 보입니다.}
+\end{figure}
+
+\subsection{Excel의 \texttt{NORM.DIST} 함수 사용}
+\texttt{NORM.DIST} 함수는 일반 정규 분포의 누적 확률을 계산합니다.
+
+\begin{itemize}
+    \item \textbf{함수 구문:} \texttt{=NORM.DIST(x, mean, standard\_dev, cumulative)}
+    \item \textbf{인수 설명:}
+    \begin{itemize}
+        \item \texttt{x}: 확률을 계산하려는 특정 값입니다.
+        \item \texttt{mean}: 분포의 평균입니다.
+        \item \texttt{standard\_dev}: 분포의 표준 편차입니다.
+        \item \texttt{cumulative}: 누적 분포 함수를 계산할지 여부를 지정합니다. (확률 계산에는 \texttt{TRUE} 또는 1을 사용합니다.)
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}
+    \textbf{SAT 점수 458점 미만 확률 계산:}
+    Excel에서 \texttt{=NORM.DIST(458, 500, 100, 1)}를 입력합니다.
+    \begin{lstlisting}[caption={Excel에서 '미만' 확률 계산 예시}, label={lst:norm_dist_less_than}]
+=NORM.DIST(458, 500, 100, 1)
+    \end{lstlisting}
+    결과는 약 \texttt{0.337243}입니다.
+
+    \textbf{결과 해석:}
+    이는 SAT 점수가 458점보다 작거나 같을 확률이 33.72\%임을 의미합니다.
+    즉, 이 학생은 약 33.72 백분위수에 해당하며, 전체 응시자의 약 33.72\%가 이 학생보다 낮은 점수를 받았습니다.
+    평균(500점)보다 낮은 점수이므로 50 백분위수보다 낮을 것이라는 직관과 일치합니다.
+\end{examplebox}
+
+\newsection{Lesson 2-5.5: Excel에서 '초과' 확률 계산}
+
+이 섹션에서는 Excel을 사용하여 특정 값보다 크거나 같은 확률($P(X \ge x)$)을 계산하는 방법을 배웁니다.
+Excel의 \texttt{NORM.DIST} 함수는 기본적으로 '미만' 확률(누적 확률)을 제공하므로, '초과' 확률을 계산하려면 약간의 변형이 필요합니다.
+
+\subsection{문제 정의}
+SAT 시험 점수 예시를 계속 사용하겠습니다. 평균 500점, 표준 편차 100점인 정규 분포를 따릅니다.
+어떤 학생이 635점보다 높은 점수를 받을 확률은 얼마일까요?
+즉, $P(X \ge 635)$를 계산해야 합니다.
+
+\begin{figure}[h!]
+    \centering
+    % % \includegraphics[width=0.8\textwidth]{sat_greater_than.png}  % Image not found: sat_greater_than.png % 이미지 파일이 없으므로 주석 처리합니다.
+    \caption{SAT 점수 635점 초과 확률 곡선}
+    \label{fig:sat_greater_than}
+    \vspace{0.5em}
+    \textit{슬라이드에는 평균이 500인 종 모양의 정규 분포 곡선이 표시됩니다. 635점 지점부터 곡선의 오른쪽 끝까지의 면적이 음영 처리되어 있습니다. 이는 $P(X \ge 635)$를 시각적으로 나타냅니다. Excel 시트에는 Mean과 Standard deviation 값이 각각 500, 100으로 입력되어 있으며, \texttt{p(x >= 635)} 셀이 보입니다.}
+\end{figure}
+
+\subsection{계산 원리: 전체 확률에서 '미만' 확률 빼기}
+정규 분포 곡선 아래의 전체 면적(총 확률)은 항상 1입니다.
+따라서 특정 값($x$)보다 크거나 같은 확률은 전체 확률(1)에서 그 값보다 작거나 같은 확률($P(X \le x)$)을 뺀 것과 같습니다.
+
+\begin{equation*}
+    P(X \ge x) = 1 - P(X \le x)
+\end{equation*}
+
+\begin{examplebox}
+    \textbf{SAT 점수 635점 초과 확률 계산:}
+    \begin{enumerate}
+        \item \textbf{$P(X \le 635)$ 계산:}
+        먼저 635점보다 작거나 같은 확률을 \texttt{NORM.DIST} 함수로 계산합니다.
+        Excel에서 \texttt{=NORM.DIST(635, 500, 100, 1)}를 입력합니다.
+        결과는 약 \texttt{0.91149}입니다.
+        이는 635점보다 작거나 같을 확률이 91.15\%임을 의미합니다.
+
+        \item \textbf{$P(X \ge 635)$ 계산:}
+        이제 전체 확률 1에서 위에서 구한 값을 뺍니다.
+        Excel에서 \texttt{=1 - NORM.DIST(635, 500, 100, 1)}를 입력합니다.
+        \begin{lstlisting}[language=Excel, caption={Excel에서 '초과' 확률 계산 예시}, label={lst:norm_dist_greater_than}]
+=1 - NORM.DIST(635, 500, 100, 1)
+        \end{lstlisting}
+        결과는 약 \texttt{0.088508}입니다.
+    \end{enumerate}
+
+    \textbf{결과 해석:}
+    SAT 점수가 635점보다 높을 확률은 약 8.85\%입니다.
+    이는 635점 이상을 받는 학생이 전체의 약 8.85\%라는 의미입니다.
+\end{examplebox}
+
+\newsection{Lesson 2-5.6: Excel에서 '두 값 사이' 확률 계산}
+
+이 섹션에서는 Excel을 사용하여 두 특정 값 사이에 있을 확률($P(\text{lower} \le X \le \text{upper})$)을 계산하는 방법을 배웁니다.
+이 역시 \texttt{NORM.DIST} 함수를 활용하며, '미만' 확률의 개념을 응용합니다.
+
+\subsection{문제 정의}
+SAT 시험 점수 예시를 다시 사용합니다. 평균 500점, 표준 편차 100점인 정규 분포를 따릅니다.
+무작위로 선택된 학생의 SAT 점수가 490점과 550점 사이에 있을 확률은 얼마일까요?
+즉, $P(490 \le X \le 550)$를 계산해야 합니다.
+
+\begin{figure}[h!]
+    \centering
+    % % \includegraphics[width=0.8\textwidth]{sat_between_values.png}  % Image not found: sat_between_values.png % 이미지 파일이 없으므로 주석 처리합니다.
+    \caption{SAT 점수 490점과 550점 사이 확률 곡선}
+    \label{fig:sat_between_values}
+    \vspace{0.5em}
+    \textit{슬라이드에는 평균이 500인 종 모양의 정규 분포 곡선이 표시됩니다. 490점과 550점 사이의 면적이 음영 처리되어 있습니다. 이는 $P(490 \le X \le 550)$를 시각적으로 나타냅니다. Excel 시트에는 Mean과 Standard deviation 값이 각각 500, 100으로 입력되어 있으며, \texttt{p(490 <= x <= 550)} 셀이 보입니다.}
+\end{figure}
+
+\subsection{계산 원리: 상한 누적 확률에서 하한 누적 확률 빼기}
+두 값($\text{lower}$와 $\text{upper}$) 사이에 있을 확률은, $\text{upper}$ 값보다 작거나 같은 확률($P(X \le \text{upper})$)에서 $\text{lower}$ 값보다 작거나 같은 확률($P(X \le \text{lower})$)을 뺀 것과 같습니다.
+
+\begin{equation*}
+    P(\text{lower} \le X \le \text{upper}) = P(X \le \text{upper}) - P(X \le \text{lower})
+\end{equation*}
+
+\begin{examplebox}
+    \textbf{SAT 점수 490점과 550점 사이 확률 계산:}
+    \begin{enumerate}
+        \item \textbf{$P(X \le 550)$ 계산:}
+        먼저 상한 값인 550점보다 작거나 같은 확률을 \texttt{NORM.DIST} 함수로 계산합니다.
+        Excel에서 \texttt{=NORM.DIST(550, 500, 100, 1)}를 입력합니다.
+        결과는 약 \texttt{0.69146}입니다.
+
+        \item \textbf{$P(X \le 490)$ 계산:}
+        다음으로 하한 값인 490점보다 작거나 같은 확률을 \texttt{NORM.DIST} 함수로 계산합니다.
+        Excel에서 \texttt{=NORM.DIST(490, 500, 100, 1)}를 입력합니다.
+        결과는 약 \texttt{0.46017}입니다.
+
+        \item \textbf{두 값 사이의 확률 계산:}
+        두 결과를 빼면 됩니다. Excel에서 다음과 같이 입력합니다.
+        \begin{lstlisting}[language=Excel, caption={Excel에서 '두 값 사이' 확률 계산 예시}, label={lst:norm_dist_between_values}]
+=NORM.DIST(550, 500, 100, 1) - NORM.DIST(490, 500, 100, 1)
+        \end{lstlisting}
+        결과는 약 \texttt{0.23129}입니다.
+    \end{enumerate}
+
+    \textbf{결과 해석:}
+    SAT 점수가 490점과 550점 사이에 있을 확률은 약 23.13\%입니다.
+    이는 무작위로 선택된 학생 중 약 23.13\%가 이 범위 내의 점수를 받는다는 의미입니다.
+\end{examplebox}
+
+\newsection{Lesson 2-5.7: Excel에서 주어진 확률에 대한 Z-값 찾기 (INV 함수)}
+
+이 섹션에서는 정규 분포에서 특정 확률(백분위수)에 해당하는 원시 값($X$) 또는 Z-점수를 찾는 방법을 배웁니다.
+이는 앞서 배운 확률 계산의 역방향 과정이며, Excel의 \texttt{NORM.INV} 및 \texttt{NORM.S.INV} 함수를 사용합니다.
+
+\subsection{문제 정의}
+SAT 시험 점수 예시를 다시 사용합니다. 평균 500점, 표준 편차 100점인 정규 분포를 따릅니다.
+만약 어떤 학교가 상위 95\%의 학생들만 입학시킨다고 할 때, 이 95백분위수에 해당하는 SAT 점수는 몇 점일까요?
+즉, $P(X \le X_{target}) = 0.95$를 만족하는 $X_{target}$ 값을 찾아야 합니다.
+
+\begin{figure}[h!]
+    \centering
+    % % \includegraphics[width=0.8\textwidth]{sat_inv_function.png}  % Image not found: sat_inv_function.png % 이미지 파일이 없으므로 주석 처리합니다.
+    \caption{95백분위수에 해당하는 SAT 점수 찾기}
+    \label{fig:sat_inv_function}
+    \vspace{0.5em}
+    \textit{슬라이드에는 평균이 500인 종 모양의 정규 분포 곡선이 표시됩니다. 곡선의 오른쪽 상단에 'score'라는 값과 함께 0.95의 비율이 음영 처리되어 있습니다. 이는 95백분위수에 해당하는 점수를 찾는 상황을 시각적으로 나타냅니다. Excel 시트에는 'Score at 95\%' 셀 옆에서 \texttt{NORM.INV} 함수가 사용되는 모습이 보입니다.}
+\end{figure}
+
+\subsection{Excel의 \texttt{NORM.INV} 함수 사용}
+\texttt{NORM.INV} 함수는 주어진 누적 확률에 해당하는 원시 값($X$)을 직접 반환합니다.
+
+\begin{itemize}
+    \item \textbf{함수 구문:} \texttt{=NORM.INV(probability, mean, standard\_dev)}
+    \item \textbf{인수 설명:}
+    \begin{itemize}
+        \item \texttt{probability}: 찾고자 하는 누적 확률입니다 (0과 1 사이의 값).
+        \item \texttt{mean}: 분포의 평균입니다.
+        \item \texttt{standard\_dev}: 분포의 표준 편차입니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}
+    \textbf{95백분위수에 해당하는 SAT 점수 계산 (NORM.INV):}
+    Excel에서 \texttt{=NORM.INV(0.95, 500, 100)}를 입력합니다.
+    \begin{lstlisting}[language=Excel, caption={Excel에서 NORM.INV 함수 사용 예시}, label={lst:norm_inv_example}]
+=NORM.INV(0.95, 500, 100)
+    \end{lstlisting}
+    결과는 약 \texttt{664.4854}입니다.
+
+    \textbf{결과 해석:}
+    SAT 점수가 664.4854점 이상이면 상위 5\%에 해당합니다.
+    SAT 점수는 보통 정수이므로, 665점 이상을 받아야 95백분위수 이상에 해당한다고 볼 수 있습니다.
+\end{examplebox}
+
+\subsection{Excel의 \texttt{NORM.S.INV} 함수 사용}
+\texttt{NORM.S.INV} 함수는 주어진 누적 확률에 해당하는 Z-점수를 반환합니다.
+이 함수는 표준 정규 분포(평균 0, 표준 편차 1)를 가정하므로, 평균과 표준 편차를 인수로 받지 않습니다.
+
+\begin{itemize}
+    \item \textbf{함수 구문:} \texttt{=NORM.S.INV(probability)}
+    \item \textbf{인수 설명:}
+    \begin{itemize}
+        \item \texttt{probability}: 찾고자 하는 누적 확률입니다 (0과 1 사이의 값).
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}
+    \textbf{95백분위수에 해당하는 Z-점수 계산 (NORM.S.INV):}
+    Excel에서 \texttt{=NORM.S.INV(0.95)}를 입력합니다.
+    \begin{lstlisting}[language=Excel, caption={Excel에서 NORM.S.INV 함수 사용 예시}, label={lst:norm_s_inv_example}]
+=NORM.S.INV(0.95)
+    \end{lstlisting}
+    결과는 약 \texttt{1.644854}입니다.
+
+    \textbf{Z-점수를 원시 점수로 변환:}
+    이 Z-점수를 사용하여 원래 분포의 점수($X$)를 계산할 수 있습니다.
+    $X = \mu + Z \times \sigma$
+    $X = 500 + 1.644854 \times 100 = 500 + 164.4854 = 664.4854$
+    \begin{lstlisting}[language=Excel, caption={Z-점수를 원시 점수로 변환하는 Excel 수식}, label={lst:z_to_x_formula}]
+=500 + (H6 * 100) % H6 셀에 NORM.S.INV 결과가 있다고 가정
+    \end{lstlisting}
+    결과는 \texttt{NORM.INV}를 사용했을 때와 동일한 \texttt{664.4854}입니다.
+\end{examplebox}
+
+\subsection{두 INV 함수의 비교}
+\texttt{NORM.INV}와 \texttt{NORM.S.INV}는 동일한 최종 결과를 얻을 수 있지만, 과정에서 차이가 있습니다.
+
+\begin{table}[h!]
+\centering
+\caption{\texttt{NORM.INV}와 \texttt{NORM.S.INV} 함수 비교}
+\label{tab:inv_functions_comparison}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lll}
+\toprule
+\textbf{특징} & \textbf{\texttt{NORM.INV}} & \textbf{\texttt{NORM.S.INV}} \\
+\midrule
+\textbf{반환 값} & 원시 값 (X) & Z-점수 \\
+\textbf{필요 인수} & 확률, 평균, 표준 편차 & 확률 \\
+\textbf{사용 시점} & 특정 백분위수에 해당하는 원시 값을 바로 알고 싶을 때 & Z-점수 자체를 분석하거나, Z-점수를 통해 원시 값을 수동으로 계산할 때 \\
+\textbf{효율성} & 한 번의 함수 호출로 최종 결과 획득 & Z-점수를 얻은 후 원시 값으로 변환하는 추가 계산 필요 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{infobox}
+    \textbf{어떤 함수를 선택할까?}
+    대부분의 경우, 특정 백분위수에 해당하는 원시 값을 직접 알고 싶다면 \texttt{NORM.INV}가 더 효율적입니다.
+    그러나 Z-점수의 의미를 이해하고 그 값을 활용해야 하는 상황이라면 \texttt{NORM.S.INV}를 사용하는 것이 좋습니다.
+    두 함수 모두 유용하며, 상황에 따라 적절한 함수를 선택하는 것이 중요합니다.
+\end{infobox}
+
+\newsection{Lesson 2-6: 표준 정규 분포표}
+
+\begin{summarybox}
+    \textbf{참고:}
+    제공된 자료에는 이 섹션에 대한 구체적인 내용이 없으며, Lesson 2-6.1의 내용이 Lesson 2-5.7과 동일하게 "Finding Z for a Given Probability (INV) in Excel"로 명시되어 있습니다.
+    따라서 표준 정규 분포표를 직접 읽는 방법에 대한 설명은 포함되지 않으며, Excel의 INV 함수를 사용하는 방법은 Lesson 2-5.7에서 상세히 다루었습니다.
+    전통적으로 표준 정규 분포표는 Z-점수에 해당하는 누적 확률을 찾거나, 누적 확률에 해당하는 Z-점수를 찾는 데 사용되었습니다.
+    Excel과 같은 도구를 사용하면 이러한 표를 수동으로 찾아볼 필요 없이 함수를 통해 빠르고 정확하게 값을 얻을 수 있습니다.
+\end{summarybox}
+
+\newsection{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=lightblue, colframe=darkblue, title=\textbf{Excel을 활용한 정규 분포 분석 핵심 요약}]
+    \textbf{정규 분포의 이해:}
+    \begin{itemize}
+        \item 종 모양의 대칭 곡선으로, 평균($\mu$)과 표준 편차($\sigma$)로 정의됩니다.
+        \item Z-점수($Z = (X - \mu) / \sigma$)를 통해 모든 정규 분포를 표준 정규 분포(평균 0, 표준 편차 1)로 변환할 수 있습니다.
+        \item Excel 함수는 기본적으로 누적 확률($P(X \le x)$)을 계산합니다.
+    \end{itemize}
+
+    \textbf{확률 계산 (NORM.DIST / NORM.S.DIST):}
+    \begin{itemize}
+        \item \textbf{특정 값 미만 ($P(X \le x)$):}
+        \texttt{=NORM.DIST(x, mean, standard\_dev, TRUE)}
+        \item \textbf{특정 값 초과 ($P(X \ge x)$):}
+        \texttt{=1 - NORM.DIST(x, mean, standard\_dev, TRUE)}
+        \item \textbf{두 값 사이 ($P(\text{lower} \le X \le \text{upper})$):}
+        \texttt{=NORM.DIST(upper, mean, standard\_dev, TRUE) - NORM.DIST(lower, mean, standard\_dev, TRUE)}
+        \item \textbf{표준 정규 분포의 확률 ($P(Z \le z)$):}
+        \texttt{=NORM.S.DIST(z, TRUE)}
+    \end{itemize}
+
+    \textbf{역방향 계산 (NORM.INV / NORM.S.INV):}
+    \begin{itemize}
+        \item \textbf{주어진 확률에 해당하는 X 값 찾기:}
+        \texttt{=NORM.INV(probability, mean, standard\_dev)}
+        \item \textbf{주어진 확률에 해당하는 Z-점수 찾기:}
+        \texttt{=NORM.S.INV(probability)}
+        \item \textbf{Z-점수를 X 값으로 변환:}
+        $X = \mu + Z \times \sigma$
+    \end{itemize}
+
+    \textbf{핵심 비교:}
+    \begin{itemize}
+        \item \texttt{NORM.DIST} vs \texttt{NORM.S.DIST}: 전자는 일반 분포, 후자는 표준 분포.
+        \item \texttt{NORM.INV} vs \texttt{NORM.S.INV}: 전자는 X 값 반환, 후자는 Z-점수 반환.
+    \end{itemize}
+\end{tcolorbox}
+
+\newsection{FAQ}
+
+\begin{itemize}
+    \item \textbf{Q: \texttt{NORM.DIST}와 \texttt{NORM.S.DIST}의 주요 차이점은 무엇인가요?}
+    \textbf{A:} \texttt{NORM.DIST}는 일반 정규 분포(사용자가 평균과 표준 편차를 지정)의 확률을 계산하는 반면, \texttt{NORM.S.DIST}는 표준 정규 분포(평균 0, 표준 편차 1로 고정)의 확률을 계산합니다. 따라서 \texttt{NORM.S.DIST}는 Z-점수만을 인수로 받습니다.
+
+    \item \textbf{Q: \texttt{NORM.INV}와 \texttt{NORM.S.INV}의 차이점은 무엇인가요?}
+    \textbf{A:} 두 함수 모두 주어진 누적 확률에 해당하는 값을 찾지만, \texttt{NORM.INV}는 원래 분포의 X 값(원시 점수)을 직접 반환하고, \texttt{NORM.S.INV}는 표준 정규 분포의 Z-점수를 반환합니다. \texttt{NORM.S.INV}를 사용한 후에는 Z-점수를 X 값으로 변환하는 추가 계산이 필요합니다.
+
+    \item \textbf{Q: Excel에서 '보다 큼' 확률($P(X \ge x)$)을 어떻게 계산하나요?}
+    \textbf{A:} Excel의 정규 분포 함수는 기본적으로 '보다 작거나 같음' 확률(누적 확률)을 반환합니다. 따라서 '보다 큼' 확률을 계산하려면 전체 확률(1)에서 '보다 작거나 같음' 확률을 빼야 합니다. 예: \texttt{=1 - NORM.DIST(x, mean, standard\_dev, TRUE)}.
+
+    \item \textbf{Q: Excel 정규 분포 함수에서 '누적(cumulative)' 인수는 항상 1로 설정해야 하나요?}
+    \textbf{A:} 대부분의 경우, 특정 값보다 작거나 같은 확률(누적 확률)을 계산할 때는 'TRUE' 또는 1로 설정해야 합니다. 'FALSE' 또는 0으로 설정하면 확률 밀도 함수(PDF)의 값을 반환하는데, 이는 특정 한 점의 확률이 아니라 곡선의 높이를 나타내므로 일반적으로 확률 계산에는 사용되지 않습니다.
+\end{itemize}
+
+\newsection*{개요}
+이 문서는 'Exploring and Producing Data Module 2'의 핵심 내용 중 하나인 표준정규분포와 Z-테이블 활용법을 다룹니다. 표준정규분포의 기본 개념부터 Z-점수를 이용한 확률 계산, 그리고 주어진 확률로부터 Z-점수와 원본 값을 역으로 찾아내는 방법까지 상세히 설명합니다. 비전공자도 쉽게 이해할 수 있도록 풍부한 예시와 직관적인 설명을 제공하며, 시험 대비를 위한 필수적인 지식을 완벽하게 정리합니다.
+
+\newsection*{용어 정리}
+데이터 분석에서 표준정규분포와 Z-점수는 매우 중요한 개념입니다. 다음 표는 이 문서에서 사용되는 주요 용어들을 쉽게 설명합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+\textbf{표준정규분포} & 평균이 0이고 표준편차가 1인 특별한 정규분포. & Standard Normal Distribution & 모든 정규분포를 비교하기 위한 기준 \\
+\textbf{Z-점수} & 어떤 데이터 값이 평균으로부터 몇 표준편차 떨어져 있는지를 나타내는 값. & Z-Score & 데이터의 상대적 위치를 파악 \\
+\textbf{확률 밀도 함수} & 연속형 확률 변수가 특정 값을 가질 확률의 상대적 밀도를 나타내는 함수. & Probability Density Function (PDF) & 종 모양 곡선의 높이를 결정 \\
+\textbf{누적 확률} & 특정 값보다 작거나 같은 확률. & Cumulative Probability & Z-테이블에서 제공하는 기본 값 \\
+\textbf{백분위수} & 전체 데이터 중 특정 값보다 작거나 같은 데이터의 비율을 100분율로 나타낸 것. & Percentile & 데이터의 상대적 순위 \\
+\textbf{표준정규분포표} & Z-점수에 해당하는 누적 확률 값을 정리해 놓은 표. & Z-Table & 확률 계산을 위한 필수 도구 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newsection*{핵심 개념 및 원리}
+
+\subsection{표준정규분포의 이해}
+표준정규분포(Standard Normal Distribution)는 통계학에서 매우 중요한 개념입니다. 이는 모든 정규분포를 비교하고 분석하기 위한 표준화된 형태를 제공합니다.
+
+\begin{definitionbox}
+\textbf{표준정규분포의 정의}
+표준정규분포는 평균($\mu$)이 \textbf{0}이고 표준편차($\sigma$)가 \textbf{1}인 특별한 정규분포입니다.
+\end{definitionbox}
+
+\subsubsection*{표준정규분포의 특징}
+\begin{itemize}
+    \item \textbf{종 모양(Bell-shaped Curve)}: 데이터가 평균 주변에 집중되어 있고, 평균에서 멀어질수록 빈도가 줄어드는 대칭적인 종 모양을 가집니다.
+    \item \textbf{대칭성(Symmetry)}: 평균(0)을 중심으로 좌우가 완벽하게 대칭입니다. 이는 음수 Z-점수의 확률을 양수 Z-점수를 통해 유추할 수 있게 합니다.
+    \item \textbf{전체 면적 1}: 곡선 아래의 총 면적은 항상 1입니다. 이는 모든 가능한 확률의 합이 100\%임을 의미합니다.
+    \item \textbf{확률 밀도 함수}: 표준정규분포의 확률 밀도 함수 $p(x)$는 다음과 같습니다.
+    \[ p(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}} \]
+    표준정규분포의 경우 $\mu=0$, $\sigma=1$이므로, 이 식은 다음과 같이 간소화됩니다.
+    \[ p(x) = \frac{1}{\sqrt{2\pi}} e^{-\frac{x^2}{2}} \]
+    여기서 $e \approx 2.71828$ (자연로그의 밑), $\pi \approx 3.14159$ (원주율)입니다. 이 함수는 곡선의 높이, 즉 특정 지점에서의 확률 밀도를 나타냅니다.
+\end{itemize}
+
+\begin{tcolorbox}[title=\textbf{왜 표준정규분포가 필요한가?}, colback=lightgray, colframe=black!75]
+세상에는 다양한 평균과 표준편차를 가진 수많은 정규분포가 존재합니다. 예를 들어, 어떤 시험의 평균은 500점이고 표준편차는 100점일 수 있고, 다른 시험의 평균은 70점이고 표준편차는 10점일 수 있습니다. 이처럼 서로 다른 분포를 직접 비교하기는 어렵습니다.
+
+표준정규분포는 이러한 다양한 정규분포들을 하나의 공통된 척도(평균 0, 표준편차 1)로 변환하여 비교할 수 있게 해줍니다. 이를 통해 어떤 데이터가 해당 분포 내에서 상대적으로 어느 위치에 있는지 쉽게 파악하고, 복잡한 적분 계산 없이도 Z-테이블을 통해 확률을 구할 수 있습니다.
+\end{tcolorbox}
+
+\subsection{Z-점수 계산 및 의미}
+Z-점수(Z-Score)는 개별 데이터 포인트가 평균으로부터 얼마나 떨어져 있는지를 표준편차 단위로 나타내는 값입니다.
+
+\begin{definitionbox}
+\textbf{Z-점수 공식}
+Z-점수는 다음 공식으로 계산됩니다.
+\[ z = \frac{\text{관심 값} - \text{모든 값의 평균}}{\text{모든 값의 표준편차}} \]
+수학적 기호로는 다음과 같습니다.
+\[ z = \frac{x - \mu}{\sigma} \]
+여기서:
+\begin{itemize}
+    \item $x$: 우리가 알고 싶은 특정 데이터 값 (관심 값)
+    \item $\mu$: 모집단의 평균 (average of all values)
+    \item $\sigma$: 모집단의 표준편차 (standard deviation of all values)
+\end{itemize}
+\end{definitionbox}
+
+\subsubsection*{Z-점수의 의미}
+\begin{itemize}
+    \item \textbf{상대적 위치}: Z-점수는 특정 데이터가 평균보다 높은지 낮은지, 그리고 얼마나 높은지 낮은지를 표준편차 단위로 알려줍니다.
+        \begin{itemize}
+            \item Z-점수가 양수이면 평균보다 높은 값입니다.
+            \item Z-점수가 음수이면 평균보다 낮은 값입니다.
+            \item Z-점수가 0이면 평균과 같은 값입니다.
+        \end{itemize}
+    \item \textbf{비교 가능성}: 서로 다른 단위나 분포를 가진 데이터라도 Z-점수로 변환하면 동일한 표준 척도 위에서 비교할 수 있습니다. 예를 들어, 수학 시험 점수와 영어 시험 점수를 Z-점수로 변환하여 어떤 과목에서 더 잘했는지 객관적으로 판단할 수 있습니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{Z-점수 계산 예시: SAT 점수}
+이전 SAT 시험은 각 섹션(예: 수학)의 평균이 500점이고 표준편차가 100점으로 설계되었습니다. 어떤 학생이 635점을 받았다면, 이 학생은 얼마나 잘한 것일까요?
+
+\begin{itemize}
+    \item 관심 값 ($x$) = 635
+    \item 평균 ($\mu$) = 500
+    \item 표준편차 ($\sigma$) = 100
+\end{itemize}
+Z-점수를 계산해 봅시다:
+\[ z = \frac{635 - 500}{100} = \frac{135}{100} = 1.35 \]
+이 학생의 Z-점수는 1.35입니다. 이는 학생의 점수가 평균보다 1.35 표준편차만큼 높다는 것을 의미합니다. 이제 이 Z-점수를 사용하여 학생의 백분위수를 찾아볼 수 있습니다.
+\end{examplebox}
+
+\newsection*{표준정규분포표 (Z-Table) 활용법}
+표준정규분포표, 또는 Z-테이블은 Z-점수에 해당하는 누적 확률을 제공하는 도구입니다. 이 테이블을 통해 복잡한 적분 계산 없이도 특정 Z-점수 이하의 확률을 쉽게 찾을 수 있습니다.
+
+\subsection{Z-테이블의 구성}
+제공된 Z-테이블은 Z-점수와 그에 해당하는 누적 확률(cumulative probability)을 보여줍니다.
+\begin{itemize}
+    \item \textbf{Z-값}: 테이블의 가장 왼쪽 열은 Z-점수의 소수점 첫째 자리까지를 나타냅니다 (예: 0.0, 0.1, 0.2, ...).
+    \item \textbf{소수점 둘째 자리}: 테이블의 가장 위쪽 행은 Z-점수의 소수점 둘째 자리를 나타냅니다 (예: 0.00, 0.01, 0.02, ...).
+    \item \textbf{확률 값}: 테이블 내부의 값들은 해당 Z-점수보다 작거나 같을 확률 $P(Z \le z)$을 나타냅니다. 즉, Z-점수 왼쪽 영역의 면적을 의미합니다.
+\end{itemize}
+
+\begin{warningbox}[title=\textbf{Z-테이블 사용 시 주의사항}]
+Z-테이블은 여러 종류가 있을 수 있습니다. 어떤 테이블은 $P(Z \le z)$를, 어떤 테이블은 $P(Z \ge z)$를, 또 어떤 테이블은 평균(0)과 Z-점수 사이의 면적을 제공하기도 합니다. \textbf{이 문서에서 사용하는 테이블은 $P(Z \le z)$, 즉 Z-점수 왼쪽 영역의 누적 확률을 제공합니다.} 테이블을 사용하기 전에 반드시 해당 테이블의 범례(legend)를 확인하여 어떤 확률을 나타내는지 이해해야 합니다.
+\end{warningbox}
+
+\subsection{표준정규분포표 (Z-Table)}
+다음은 표준정규분포표의 일부입니다. 이 표를 사용하여 다양한 확률을 계산할 수 있습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{ccccccccccc}
+\toprule
+\textbf{z} & \textbf{0.00} & \textbf{0.01} & \textbf{0.02} & \textbf{0.03} & \textbf{0.04} & \textbf{0.05} & \textbf{0.06} & \textbf{0.07} & \textbf{0.08} & \textbf{0.09} \\
+\midrule
+0.0 & 0.50000 & 0.50399 & 0.50798 & 0.51197 & 0.51595 & 0.51994 & 0.52392 & 0.52790 & 0.53188 & 0.53586 \\
+0.1 & 0.53983 & 0.54380 & 0.54776 & 0.55172 & 0.55567 & 0.55966 & 0.56360 & 0.56749 & 0.57142 & 0.57535 \\
+0.2 & 0.57926 & 0.58317 & 0.58706 & 0.59095 & 0.59483 & 0.59871 & 0.60257 & 0.60642 & 0.61026 & 0.61409 \\
+0.3 & 0.61791 & 0.62172 & 0.62552 & 0.62930 & 0.63307 & 0.63683 & 0.64058 & 0.64431 & 0.64803 & 0.65173 \\
+0.4 & 0.65542 & 0.65910 & 0.66276 & 0.66640 & 0.67003 & 0.67364 & 0.67724 & 0.68082 & 0.68439 & 0.68793 \\
+0.5 & 0.69146 & 0.69497 & 0.69847 & 0.70194 & 0.70540 & 0.70884 & 0.71226 & 0.71566 & 0.71904 & 0.72240 \\
+0.6 & 0.72575 & 0.72907 & 0.73237 & 0.73565 & 0.73891 & 0.74215 & 0.74537 & 0.74857 & 0.75175 & 0.75490 \\
+0.7 & 0.75804 & 0.76115 & 0.76424 & 0.76730 & 0.77035 & 0.77337 & 0.77637 & 0.77935 & 0.78230 & 0.78524 \\
+0.8 & 0.78814 & 0.79103 & 0.79389 & 0.79673 & 0.79955 & 0.80234 & 0.80511 & 0.80785 & 0.81057 & 0.81327 \\
+0.9 & 0.81594 & 0.81859 & 0.82121 & 0.82381 & 0.82639 & 0.82894 & 0.83147 & 0.83398 & 0.83646 & 0.83891 \\
+1.0 & 0.84134 & 0.84375 & 0.84614 & 0.84849 & 0.85083 & 0.85314 & 0.85543 & 0.85769 & 0.85993 & 0.86214 \\
+1.1 & 0.86433 & 0.86650 & 0.86864 & 0.87076 & 0.87286 & 0.87493 & 0.87698 & 0.87900 & 0.88100 & 0.88298 \\
+1.2 & 0.88493 & 0.88686 & 0.88877 & 0.89065 & 0.89251 & 0.89435 & 0.89617 & 0.89796 & 0.89973 & 0.90147 \\
+1.3 & 0.90320 & 0.90490 & 0.90658 & 0.90824 & 0.90988 & 0.91149 & 0.91308 & 0.91466 & 0.91621 & 0.91774 \\
+1.4 & 0.91924 & 0.92073 & 0.92220 & 0.92364 & 0.92507 & 0.92647 & 0.92785 & 0.92922 & 0.93056 & 0.93189 \\
+1.5 & 0.93319 & 0.93448 & 0.93574 & 0.93699 & 0.93822 & 0.93943 & 0.94062 & 0.94179 & 0.94295 & 0.94408 \\
+1.6 & 0.94520 & 0.94630 & 0.94738 & 0.94845 & 0.94950 & 0.95053 & 0.95154 & 0.95254 & 0.95352 & 0.95449 \\
+1.7 & 0.95543 & 0.95637 & 0.95728 & 0.95818 & 0.95907 & 0.95994 & 0.96080 & 0.96164 & 0.96246 & 0.96327 \\
+1.8 & 0.96407 & 0.96485 & 0.96562 & 0.96638 & 0.96712 & 0.96784 & 0.96856 & 0.96926 & 0.96995 & 0.97062 \\
+1.9 & 0.97128 & 0.97193 & 0.97257 & 0.97320 & 0.97381 & 0.97441 & 0.97500 & 0.97558 & 0.97615 & 0.97670 \\
+2.0 & 0.97725 & 0.97778 & 0.97831 & 0.97882 & 0.97932 & 0.97982 & 0.98030 & 0.98077 & 0.98124 & 0.98169 \\
+2.1 & 0.98214 & 0.98257 & 0.98300 & 0.98341 & 0.98382 & 0.98422 & 0.98461 & 0.98500 & 0.98537 & 0.98574 \\
+2.2 & 0.98610 & 0.98645 & 0.98679 & 0.98713 & 0.98745 & 0.98778 & 0.98809 & 0.98840 & 0.98870 & 0.98899 \\
+2.3 & 0.98928 & 0.98956 & 0.98983 & 0.99010 & 0.99036 & 0.99061 & 0.99086 & 0.99111 & 0.99134 & 0.99158 \\
+2.4 & 0.99180 & 0.99202 & 0.99224 & 0.99245 & 0.99266 & 0.99286 & 0.99305 & 0.99324 & 0.99343 & 0.99361 \\
+2.5 & 0.99379 & 0.99396 & 0.99413 & 0.99430 & 0.99446 & 0.99461 & 0.99477 & 0.99492 & 0.99506 & 0.99520 \\
+2.6 & 0.99534 & 0.99547 & 0.99560 & 0.99573 & 0.99585 & 0.99598 & 0.99609 & 0.99621 & 0.99632 & 0.99643 \\
+2.7 & 0.99653 & 0.99664 & 0.99674 & 0.99683 & 0.99693 & 0.99702 & 0.99711 & 0.99720 & 0.99728 & 0.99736 \\
+2.8 & 0.99744 & 0.99752 & 0.99760 & 0.99767 & 0.99774 & 0.99781 & 0.99788 & 0.99795 & 0.99801 & 0.99807 \\
+2.9 & 0.99813 & 0.99819 & 0.99825 & 0.99831 & 0.99836 & 0.99841 & 0.99846 & 0.99851 & 0.99856 & 0.99861 \\
+3.0 & 0.99865 & 0.99869 & 0.99874 & 0.99878 & 0.99882 & 0.99886 & 0.99889 & 0.99893 & 0.99896 & 0.99900 \\
+\bottomrule
+\end{tabular}
+\caption{표준정규분포표 (Z-Table): Z-점수보다 작거나 같을 누적 확률 $P(Z \le z)$}
+\label{tab:z_table}
+\end{adjustbox}
+
+\newsection*{확률 계산 절차}
+Z-테이블을 사용하여 다양한 유형의 확률을 계산하는 방법을 단계별로 살펴보겠습니다. 모든 예시는 SAT 시험 점수(평균 $\mu=500$, 표준편차 $\sigma=100$)를 기반으로 합니다.
+
+\subsection{1. 특정 값보다 작을 확률 ($P(X \le x)$)}
+가장 기본적인 형태로, Z-테이블이 직접 제공하는 확률입니다.
+
+\begin{examplebox}
+\textbf{예시: SAT 점수 635점 이하일 확률 ($P(X \le 635)$)}
+어떤 학생이 SAT에서 635점을 받았습니다. 이 학생보다 점수가 낮거나 같은 사람들의 비율(백분위수)은 얼마일까요?
+
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{Z-점수 계산}: 먼저 635점에 해당하는 Z-점수를 계산합니다.
+    \[ z = \frac{635 - 500}{100} = 1.35 \]
+    \item \textbf{Z-테이블에서 값 찾기}: Z-테이블에서 Z-점수 1.35에 해당하는 확률을 찾습니다.
+    \begin{itemize}
+        \item 왼쪽 열에서 '1.3'을 찾습니다.
+        \item 위쪽 행에서 '0.05'를 찾습니다.
+        \item '1.3' 행과 '0.05' 열이 교차하는 지점의 값을 확인합니다.
+    \end{itemize}
+    \begin{center}
+    \begin{adjustbox}{width=0.5\textwidth,center}
+    \begin{tabular}{cccccc}
+    \toprule
+    \textbf{z} & \dots & \textbf{0.05} & \dots \\
+    \midrule
+    \vdots & \ddots & \vdots & \\
+    \textbf{1.3} & \dots & \textbf{0.91149} & \dots \\
+    \vdots & & \vdots & \ddots \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \end{center}
+    테이블에서 찾은 값은 \textbf{0.91149}입니다.
+\end{enumerate}
+\textbf{결론:} $P(Z \le 1.35) = 0.9115$ (반올림). 이는 SAT 시험 응시자 중 약 91.15\%가 635점보다 낮거나 같은 점수를 받았다는 의미입니다. 이 학생은 약 91백분위수에 해당합니다.
+
+\begin{tcolorbox}[title=\textbf{시각적 이해}, colback=lightblue!50!white, colframe=darkblue]
+표준정규분포 곡선에서 Z=1.35 지점의 왼쪽에 해당하는 모든 면적을 파란색으로 칠한 그림을 상상해 보세요. 이 파란색 면적이 바로 0.9115의 확률을 나타냅니다. 곡선은 X축 -3에서 3까지 퍼져 있고, Y축 0에서 0.4까지 밀도를 나타내며, X=0, Y=0.4에서 정점을 이룹니다.
+\end{tcolorbox}
+\end{examplebox}
+
+\subsection{2. 특정 값보다 클 확률 ($P(X \ge x)$)}
+Z-테이블은 $P(Z \le z)$를 제공하므로, $P(Z \ge z)$는 전체 확률(1)에서 $P(Z \le z)$를 빼서 구합니다.
+
+\begin{examplebox}
+\textbf{예시: SAT 점수 635점 이상일 확률 ($P(X \ge 635)$)}
+SAT에서 635점을 받은 학생보다 점수가 높거나 같은 사람들의 비율은 얼마일까요?
+
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{Z-점수 계산}: 635점에 해당하는 Z-점수는 이전 예시와 동일하게 1.35입니다.
+    \item \textbf{$P(Z \le z)$ 찾기}: Z-테이블에서 $P(Z \le 1.35)$는 0.9115입니다.
+    \item \textbf{1에서 빼기}: 전체 확률은 1이므로, $P(Z \ge 1.35)$는 다음과 같습니다.
+    \[ P(Z \ge 1.35) = 1 - P(Z \le 1.35) = 1 - 0.9115 = 0.0885 \]
+\end{enumerate}
+\textbf{결론:} $P(Z \ge 1.35) = 0.0885$. 이는 SAT 시험 응시자 중 약 8.85\%가 635점보다 높거나 같은 점수를 받았다는 의미입니다.
+
+\begin{tcolorbox}[title=\textbf{시각적 이해}, colback=lightblue!50!white, colframe=darkblue]
+표준정규분포 곡선에서 Z=1.35 지점의 왼쪽에 해당하는 면적(파란색, $P(Z \le 1.35)$)과 오른쪽에 해당하는 면적(흰색, $P(Z \ge 1.35)$)을 상상해 보세요. 이 두 면적의 합은 1입니다. 따라서 오른쪽 면적은 1에서 왼쪽 면적을 뺀 값입니다.
+\end{tcolorbox}
+\end{examplebox}
+
+\subsection{3. 음수 Z-점수 처리}
+Z-테이블은 보통 양수 Z-점수만 제공하지만, 표준정규분포의 대칭성을 이용하여 음수 Z-점수의 확률도 계산할 수 있습니다.
+
+\begin{examplebox}
+\textbf{예시: SAT 점수 458점 이하일 확률 ($P(X \le 458)$)}
+어떤 학생이 SAT에서 458점을 받았습니다. 이 학생보다 점수가 낮거나 같은 사람들의 비율은 얼마일까요?
+
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{Z-점수 계산}: 458점에 해당하는 Z-점수를 계산합니다.
+    \[ z = \frac{458 - 500}{100} = \frac{-42}{100} = -0.42 \]
+    Z-점수가 음수이므로, 이 학생은 평균보다 낮은 점수를 받았습니다.
+    \item \textbf{대칭성 활용}: 표준정규분포는 평균(0)을 중심으로 대칭입니다. 따라서 $P(Z \le -0.42)$는 $P(Z \ge 0.42)$와 같습니다. 즉, Z=-0.42의 왼쪽 면적은 Z=0.42의 오른쪽 면적과 동일합니다.
+    \begin{tcolorbox}[title=\textbf{시각적 이해: 대칭성}, colback=lightblue!50!white, colframe=darkblue]
+    두 개의 표준정규분포 곡선을 상상해 보세요.
+    \begin{itemize}
+        \item 왼쪽 곡선: Z=-0.42 지점의 왼쪽 영역이 파란색으로 칠해져 있습니다 ($P(Z \le -0.42)$).
+        \item 오른쪽 곡선: Z=0.42 지점의 오른쪽 영역이 파란색으로 칠해져 있습니다 ($P(Z \ge 0.42)$).
+    \end{itemize}
+    이 두 파란색 영역의 면적은 정확히 같습니다.
+    \end{tcolorbox}
+    \item \textbf{$P(Z \le \text{양수 Z})$ 찾기}: $P(Z \ge 0.42)$를 구하기 위해 먼저 Z-테이블에서 $P(Z \le 0.42)$를 찾습니다.
+    \begin{itemize}
+        \item 왼쪽 열에서 '0.4'를 찾습니다.
+        \item 위쪽 행에서 '0.02'를 찾습니다.
+        \item '0.4' 행과 '0.02' 열이 교차하는 지점의 값을 확인합니다.
+    \end{itemize}
+    테이블에서 찾은 값은 \textbf{0.66276}입니다. (반올림하여 0.6628)
+    이는 $P(Z \le 0.42) = 0.6628$을 의미합니다. 이 값은 Z=0.42의 왼쪽 면적(흰색 영역)입니다.
+    \item \textbf{1에서 빼기}: 우리가 찾는 $P(Z \ge 0.42)$는 $1 - P(Z \le 0.42)$입니다.
+    \[ P(Z \ge 0.42) = 1 - 0.6628 = 0.3372 \]
+\end{enumerate}
+\textbf{결론:} $P(Z \le -0.42) = 0.3372$. 이는 SAT 시험 응시자 중 약 33.72\%가 458점보다 낮거나 같은 점수를 받았다는 의미입니다. 이 학생은 약 33.72백분위수에 해당합니다.
+\end{examplebox}
+
+\subsection{4. 두 값 사이의 확률 ($P(x_1 \le X \le x_2)$)}
+두 Z-점수 사이의 확률은 더 큰 Z-점수까지의 누적 확률에서 더 작은 Z-점수까지의 누적 확률을 빼서 구합니다.
+
+\begin{examplebox}
+\textbf{예시: SAT 점수 490점과 550점 사이일 확률 ($P(490 \le X \le 550)$)}
+SAT 시험에서 490점과 550점 사이의 점수를 받을 확률은 얼마일까요?
+
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{두 Z-점수 계산}:
+    \begin{itemize}
+        \item $x_1 = 490$: $z_1 = \frac{490 - 500}{100} = \frac{-10}{100} = -0.1$
+        \item $x_2 = 550$: $z_2 = \frac{550 - 500}{100} = \frac{50}{100} = 0.5$
+    \end{itemize}
+    이제 $P(-0.1 \le Z \le 0.5)$를 찾아야 합니다.
+    \item \textbf{원리 적용}: $P(z_1 \le Z \le z_2) = P(Z \le z_2) - P(Z \le z_1)$
+    \item \textbf{$P(Z \le 0.5)$ 찾기}: Z-테이블에서 $P(Z \le 0.5)$를 찾습니다.
+    \begin{itemize}
+        \item 왼쪽 열 '0.5', 위쪽 행 '0.00'
+        \item 값: \textbf{0.69146} (반올림하여 0.6915)
+    \end{itemize}
+    \item \textbf{$P(Z \le -0.1)$ 찾기}: 음수 Z-점수이므로 대칭성을 이용합니다.
+    \begin{itemize}
+        \item $P(Z \le -0.1)$는 $P(Z \ge 0.1)$와 같습니다.
+        \item 먼저 $P(Z \le 0.1)$를 Z-테이블에서 찾습니다.
+            \begin{itemize}
+                \item 왼쪽 열 '0.1', 위쪽 행 '0.00'
+                \item 값: \textbf{0.53983} (반올림하여 0.5398)
+            \end{itemize}
+        \item $P(Z \ge 0.1) = 1 - P(Z \le 0.1) = 1 - 0.5398 = 0.4602$
+        \item 따라서 $P(Z \le -0.1) = 0.4602$
+    \end{itemize}
+    \item \textbf{최종 계산}:
+    \[ P(-0.1 \le Z \le 0.5) = P(Z \le 0.5) - P(Z \le -0.1) = 0.6915 - 0.4602 = 0.2313 \]
+\end{enumerate}
+\textbf{결론:} $P(490 \le X \le 550) = 0.2313$. 이는 SAT 시험 응시자 중 약 23.13\%가 490점과 550점 사이의 점수를 받을 확률을 의미합니다.
+
+\begin{tcolorbox}[title=\textbf{시각적 이해}, colback=lightblue!50!white, colframe=darkblue]
+세 개의 표준정규분포 곡선을 상상해 보세요.
+\begin{itemize}
+    \item 첫 번째 곡선: Z=0.5 왼쪽 전체 면적 ($P(Z \le 0.5)$)
+    \item 두 번째 곡선: Z=-0.1 왼쪽 전체 면적 ($P(Z \le -0.1)$)
+    \item 세 번째 곡선: Z=-0.1과 Z=0.5 사이의 면적 ($P(-0.1 \le Z \le 0.5)$)
+\end{itemize}
+첫 번째 곡선의 면적에서 두 번째 곡선의 면적을 빼면 세 번째 곡선의 면적이 됩니다.
+\end{tcolorbox}
+\end{examplebox}
+
+\newsection*{주어진 확률로 Z-값 찾기 (역방향 문제: INV)}
+때로는 특정 확률(예: 백분위수)에 해당하는 Z-점수를 찾고, 그 Z-점수를 이용하여 원본 데이터 값을 역으로 계산해야 할 때가 있습니다. 이는 Z-테이블을 거꾸로 읽는 과정입니다.
+
+\subsection{1. 백분위수(확률)로 Z-값 찾기}
+주어진 확률에 해당하는 Z-점수를 찾으려면, Z-테이블 내부의 확률 값들 중에서 가장 가까운 값을 찾습니다.
+
+\begin{examplebox}
+\textbf{예시: 상위 95백분위수에 해당하는 Z-값 찾기}
+SAT 시험에서 상위 95백분위수에 들려면 Z-점수가 얼마여야 할까요? 즉, $P(Z \le z) = 0.95$를 만족하는 Z-값을 찾습니다.
+
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{Z-테이블에서 0.95에 가장 가까운 값 찾기}: Z-테이블 내부에서 0.95에 가장 가까운 확률 값을 찾습니다.
+    \begin{itemize}
+        \item 0.94950 (Z=1.64)
+        \item 0.95053 (Z=1.65)
+    \end{itemize}
+    우리가 찾는 0.95는 0.94950과 0.95053의 정확히 중간에 있습니다.
+    \item \textbf{Z-값 보간 (Interpolation)}: 0.95가 두 값의 중간이므로, 해당 Z-점수도 두 Z-점수(1.64와 1.65)의 중간값을 사용합니다.
+    \[ Z = \frac{1.64 + 1.65}{2} = 1.645 \]
+\end{enumerate}
+\textbf{결론:} 상위 95백분위수에 해당하는 Z-점수는 약 \textbf{1.645}입니다.
+\end{examplebox}
+
+\subsection{2. Z-값으로 원본 데이터 값 (X) 찾기}
+Z-점수를 알면, Z-점수 공식을 역으로 사용하여 원본 데이터 값($x$)을 계산할 수 있습니다.
+
+\begin{definitionbox}
+\textbf{원본 데이터 값 (X) 계산 공식}
+\[ x = \mu + z \times \sigma \]
+여기서:
+\begin{itemize}
+    \item $x$: 우리가 찾고자 하는 원본 데이터 값
+    \item $\mu$: 모집단의 평균
+    \item $z$: 해당 확률에 대한 Z-점수
+    \item $\sigma$: 모집단의 표준편차
+\end{itemize}
+\end{definitionbox}
+
+\begin{examplebox}
+\textbf{예시: 상위 95백분위수에 해당하는 SAT 점수 찾기}
+SAT 시험에서 상위 95백분위수에 들려면 몇 점을 받아야 할까요? (평균 $\mu=500$, 표준편차 $\sigma=100$)
+
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{Z-값 확인}: 이전 예시에서 상위 95백분위수에 해당하는 Z-점수는 1.645임을 확인했습니다.
+    \item \textbf{원본 값 계산}: Z-점수 공식을 역으로 사용하여 $x$를 계산합니다.
+    \[ x = 500 + (1.645 \times 100) = 500 + 164.5 = 664.5 \]
+\end{enumerate}
+\textbf{결론:} SAT 시험에서 664.5점 이상을 받으면 상위 95백분위수에 해당합니다.
+
+\begin{tcolorbox}[title=\textbf{시각적 이해}, colback=lightblue!50!white, colframe=darkblue]
+표준정규분포 곡선에서 Z=1.645 지점의 왼쪽 면적이 0.95가 되도록 파란색으로 칠한 그림을 상상해 보세요. 이 Z-점수 1.645는 평균으로부터 1.645 표준편차만큼 떨어져 있다는 것을 의미하며, 이를 실제 점수로 환산한 것이 664.5점입니다.
+\end{tcolorbox}
+\end{examplebox}
+
+\newsection*{실습 문제 및 풀이}
+이제 배운 내용을 바탕으로 실습 문제를 풀어봅시다.
+
+\begin{examplebox}
+\textbf{실습 문제: SAT 점수 600점과 650점 사이일 확률}
+SAT 시험(평균 $\mu=500$, 표준편차 $\sigma=100$)에서 무작위로 선택된 응시자가 600점과 650점 사이의 점수를 받을 확률은 얼마일까요? ($P(600 \le X \le 650)$)
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{실습 문제 풀이}
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{두 Z-점수 계산}:
+    \begin{itemize}
+        \item $x_1 = 600$: $z_1 = \frac{600 - 500}{100} = \frac{100}{100} = 1.0$
+        \item $x_2 = 650$: $z_2 = \frac{650 - 500}{100} = \frac{150}{100} = 1.5$
+    \end{itemize}
+    이제 $P(1.0 \le Z \le 1.5)$를 찾아야 합니다.
+    \item \textbf{원리 적용}: $P(z_1 \le Z \le z_2) = P(Z \le z_2) - P(Z \le z_1)$
+    \item \textbf{$P(Z \le 1.5)$ 찾기}: Z-테이블에서 $P(Z \le 1.5)$를 찾습니다.
+    \begin{itemize}
+        \item 왼쪽 열 '1.5', 위쪽 행 '0.00'
+        \item 값: \textbf{0.93319} (반올림하여 0.9332)
+    \end{itemize}
+    \item \textbf{$P(Z \le 1.0)$ 찾기}: Z-테이블에서 $P(Z \le 1.0)$를 찾습니다.
+    \begin{itemize}
+        \item 왼쪽 열 '1.0', 위쪽 행 '0.00'
+        \item 값: \textbf{0.84134} (반올림하여 0.8413)
+    \end{itemize}
+    \item \textbf{최종 계산}:
+    \[ P(1.0 \le Z \le 1.5) = P(Z \le 1.5) - P(Z \le 1.0) = 0.9332 - 0.8413 = 0.0919 \]
+\end{enumerate}
+\textbf{결론:} $P(600 \le X \le 650) = 0.0919$. 이는 SAT 시험 응시자 중 약 9.19\%가 600점과 650점 사이의 점수를 받을 확률을 의미합니다.
+\end{examplebox}
+
+\newsection*{빠르게 훑어보기 (1페이지 요약)}
+다음은 표준정규분포와 Z-테이블 활용의 핵심 내용을 한눈에 볼 수 있도록 요약한 것입니다.
+
+\begin{summarybox}
+\textbf{핵심 요약: 표준정규분포와 Z-테이블}
+\begin{itemize}
+    \item \textbf{표준정규분포}: 평균 $\mu=0$, 표준편차 $\sigma=1$인 정규분포. 모든 정규분포를 표준화하여 비교 가능하게 합니다.
+    \item \textbf{Z-점수}: $z = \frac{x - \mu}{\sigma}$ \\
+    데이터가 평균으로부터 몇 표준편차 떨어져 있는지 나타냅니다.
+    \item \textbf{Z-테이블}: Z-점수 왼쪽의 누적 확률 $P(Z \le z)$를 제공합니다.
+\end{itemize}
+
+\textbf{확률 계산 유형:}
+\begin{itemize}
+    \item \textbf{$P(X \le x)$ (특정 값 이하)}:
+        \begin{enumerate}
+            \item $x$를 $z$로 변환: $z = (x - \mu) / \sigma$
+            \item Z-테이블에서 $P(Z \le z)$ 직접 찾기
+        \end{enumerate}
+    \item \textbf{$P(X \ge x)$ (특정 값 이상)}:
+        \begin{enumerate}
+            \item $x$를 $z$로 변환
+            \item Z-테이블에서 $P(Z \le z)$ 찾기
+            \item $1 - P(Z \le z)$ 계산
+        \end{enumerate}
+    \item \textbf{$P(X \le x)$ (음수 Z-점수)}:
+        \begin{enumerate}
+            \item $x$를 음수 $z$로 변환
+            \item 대칭성 이용: $P(Z \le -z) = P(Z \ge +z)$
+            \item $P(Z \ge +z) = 1 - P(Z \le +z)$ 계산
+        \end{enumerate}
+    \item \textbf{$P(x_1 \le X \le x_2)$ (두 값 사이)}:
+        \begin{enumerate}
+            \item $x_1, x_2$를 각각 $z_1, z_2$로 변환
+            \item $P(Z \le z_2)$와 $P(Z \le z_1)$ 찾기 (음수 Z-점수 주의)
+            \item $P(Z \le z_2) - P(Z \le z_1)$ 계산
+        \end{enumerate}
+\end{itemize}
+
+\textbf{역방향 문제 (주어진 확률로 Z-값 찾기):}
+\begin{itemize}
+    \item \textbf{확률 $\rightarrow$ Z-값}:
+        \begin{enumerate}
+            \item Z-테이블 내부에서 주어진 확률에 가장 가까운 값 찾기
+            \item 해당 Z-점수 확인 (필요시 보간)
+        \end{enumerate}
+    \item \textbf{Z-값 $\rightarrow$ 원본 값 ($X$)}:
+        \begin{enumerate}
+            \item $X = \mu + z \times \sigma$ 공식 사용
+        \end{enumerate}
+\end{itemize}
+\end{summarybox}
+
+\newsection*{FAQ (자주 묻는 질문)}
+
+\begin{itemize}
+    \item \textbf{Q: Z-테이블이 $P(Z \le z)$만 제공하는 이유는 무엇인가요?}
+    \textbf{A:} Z-테이블이 누적 확률($P(Z \le z)$)을 제공하는 것은 통계 계산의 효율성 때문입니다. 이 하나의 값만 알면 대칭성과 전체 면적 1의 성질을 이용하여 $P(Z \ge z)$, $P(Z \le -z)$, $P(z_1 \le Z \le z_2)$ 등 모든 유형의 확률을 쉽게 유도할 수 있기 때문입니다. 가장 기본적인 정보를 제공하여 다른 모든 정보를 파생시킬 수 있도록 설계된 것입니다.
+
+    \item \textbf{Q: 음수 Z-값을 직접 찾을 수 있는 Z-테이블도 있나요?}
+    \textbf{A:} 네, 있습니다. 일부 Z-테이블은 음수 Z-점수에 대한 확률 값도 직접 제공합니다. 하지만 표준정규분포의 대칭성 덕분에 양수 Z-점수 테이블만으로도 모든 계산이 가능하므로, 많은 교재나 자료에서는 양수 Z-점수 테이블만 제공하는 경우가 많습니다. 두 가지 유형의 테이블 모두 같은 결과를 도출합니다.
+
+    \item \textbf{Q: Z-테이블 대신 Excel이나 다른 통계 소프트웨어를 사용하면 좋은 점은 무엇인가요?}
+    \textbf{A:} Excel이나 R, Python 같은 통계 소프트웨어는 Z-테이블을 수동으로 찾아보는 것보다 훨씬 빠르고 정확하게 확률을 계산해 줍니다. 특히 소수점 이하 자리가 많거나 Z-테이블에 없는 정밀한 Z-값을 다룰 때 유용합니다. 또한, 주어진 확률에 대한 Z-값을 역으로 찾아주는 함수(예: Excel의 \texttt{NORM.S.INV})도 제공하여 계산 시간을 크게 단축시켜 줍니다. 이 수업에서도 Excel 사용법을 익히는 것이 중요하다고 강조하고 있습니다.
+\end{itemize}
+
+\newsection*{체크리스트}
+이 문서를 통해 학습한 내용을 점검하고, 시험 및 과제 준비에 활용하세요.
+
+\begin{itemize}
+    \item \textbf{개념 이해}
+    \begin{itemize}
+        \item 표준정규분포의 정의와 특징을 정확히 이해하고 있는가? ($\mu=0, \sigma=1$, 종 모양, 대칭성)
+        \item Z-점수의 의미와 계산 공식을 정확히 알고 있는가? ($z = (x - \mu) / \sigma$)
+        \item Z-테이블이 어떤 확률을 나타내는지 (누적 확률 $P(Z \le z)$) 이해하고 있는가?
+    \end{itemize}
+    \item \textbf{확률 계산 능력}
+    \begin{itemize}
+        \item 특정 값보다 작을 확률 ($P(X \le x)$)을 Z-테이블로 계산할 수 있는가?
+        \item 특정 값보다 클 확률 ($P(X \ge x)$)을 Z-테이블로 계산할 수 있는가?
+        \item 음수 Z-점수가 포함된 확률을 대칭성을 이용하여 계산할 수 있는가?
+        \item 두 값 사이의 확률 ($P(x_1 \le X \le x_2)$)을 Z-테이블로 계산할 수 있는가?
+    \end{itemize}
+    \item \textbf{역방향 문제 해결 능력}
+    \begin{itemize}
+        \item 주어진 확률(백분위수)에 해당하는 Z-점수를 Z-테이블에서 찾을 수 있는가? (보간 포함)
+        \item 찾은 Z-점수를 이용하여 원본 데이터 값 ($X = \mu + z \times \sigma$)을 계산할 수 있는가?
+    \end{itemize}
+    \item \textbf{실습 및 응용}
+    \begin{itemize}
+        \item 제공된 예시들을 스스로 다시 풀어보고 정답을 맞출 수 있는가?
+        \item 새로운 문제에 Z-테이블 활용법을 적용하여 해결할 수 있는가?
+        \item Excel과 같은 도구를 사용하여 Z-점수 및 확률을 계산하는 방법을 알고 있는가? (이 문서에서는 개념 설명에 집중했으나, 실제 활용 시 중요)
+    \end{itemize}
+\end{itemize}
+
+
+% Auto-added missing environment closes:
+\end{itemize}  % Auto-closed
+\end{itemize}  % Auto-closed
+
+\end{document}

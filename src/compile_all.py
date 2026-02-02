@@ -27,7 +27,9 @@ COURSE_SHORT_NAMES = {
     "cs109": "CS109A",
     "csci103": "CSCI103",
     "csci89": "CSCI89",
-    "fin-574": "FIN574"
+    "fin-574": "FIN574",
+    "fin-571": "FIN571",
+    "badm-572": "BADM572",
 }
 
 
@@ -44,7 +46,7 @@ def detect_course_and_lecture(filepath: Path) -> Tuple[Optional[str], Optional[s
     lecture_num = None
 
     for part in path_parts:
-        if part in ['cs109', 'csci103', 'csci89', 'fin-574']:
+        if part in ['cs109', 'csci103', 'csci89', 'fin-574', 'fin-571', 'badm-572']:
             course = part
         if part.startswith('lecture_'):
             lecture_num = part.replace('lecture_', '').zfill(2)  # 01, 02, ... 형식

@@ -35,8 +35,8 @@
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\textit{CSCI E-89B: 자연어 처리 입문}}
-\fancyhead[R]{\small\textit{Lecture 08}}
+\fancyhead[L]{\small\textit{CSCI E-89: Introduction to Artificial Intelligence}}
+\fancyhead[R]{\small\textit{Module 08}}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.3pt}
@@ -64,6 +64,7 @@
 \definecolor{boxgray}{gray}{0.95}
 \definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
 \definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myblue}{RGB}{50, 100, 180}
 
 % 진한 색상 (테두리/제목용)
 \definecolor{darkblue}{RGB}{50, 80, 150}
@@ -152,7 +153,7 @@
     colback=lightgray,
     colframe=black!60,
     fonttitle=\bfseries,
-    title=📖 예제: #1,
+    title=📖 예제,
     arc=2mm,
     boxrule=0.7pt,
     left=6pt,
@@ -160,6 +161,7 @@
     top=6pt,
     bottom=6pt,
     breakable,
+    #1
 }
 
 % 6. 정의 박스
@@ -168,7 +170,7 @@
     colback=lightpink,
     colframe=purple!70!black,
     fonttitle=\bfseries,
-    title=📌 정의: #1,
+    title=📌 정의,
     arc=2mm,
     boxrule=0.7pt,
     left=6pt,
@@ -176,6 +178,7 @@
     top=6pt,
     bottom=6pt,
     breakable,
+    #1
 }
 
 % 7. 중요 박스 (importantbox - warningbox와 유사)
@@ -184,7 +187,7 @@
     colback=boxred,
     colframe=red!70!black,
     fonttitle=\bfseries,
-    title=⚠️ 매우 중요: #1,
+    title=⚠️ 매우 중요,
     arc=2mm,
     boxrule=0.7pt,
     left=6pt,
@@ -192,11 +195,31 @@
     top=6pt,
     bottom=6pt,
     breakable,
+    #1
 }
 
 % 8. cautionbox (warningbox와 동일)
 \let\cautionbox\warningbox
 \let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
 
 %========================================================================================
 % 코드 블록 설정 (밝은 배경)
@@ -303,7 +326,7 @@
 
 % PDF 메타데이터는 각 문서에서 설정
 \hypersetup{
-    pdftitle={CSCI E-89B: 자연어 처리 입문 - Lecture 08},
+    pdftitle={CSCI E-89: Introduction to Artificial Intelligence - Module 08},
     pdfauthor={강의 노트},
     pdfsubject={Academic Notes}
 }
@@ -388,608 +411,716 @@
 
 \begin{document}
 
-}
-\maketitle
 \thispagestyle{firstpage}
 
-\metainfo{CSCI E-89B: 자연어 처리 입문}{Lecture 08}{Dmitry Kurochkin}{Lecture 08의 핵심 개념 학습}
-
-
-\begin{abstract}
-\noindent
-본 문서는 자연어 처리(NLP) 8강의 핵심 내용을 정리합니다. 
-주요 주제는 기존 LDA의 한계를 극복하는 \textbf{구조적 토픽 모델링(Structural Topic Modeling, STM)}입니다. 
-STM이 어떻게 문서의 \textbf{메타데이터(metadata)}를 모델에 통합하여 더 풍부하고 정확한 분석을 가능하게 하는지 수학적 원리와 R 실습을 통해 배웁니다. 
-또한, 과제 수행 시 발생하는 텍스트 오토인코더의 어려움과 올바른 제출 가이드라인을 다루며, LDA와 NMF에 대한 퀴즈 복습을 포함합니다.
-\end{abstract}
+\metainfo{CSCI89}{Lecture 8}{UIUC Student}{본 문서는 CSCI89 Lecture 8 강의 자료를 통합하여 텍스트 데이터 분석의 핵심 기법인 토픽 모델링에 대해 다룹니다. 특히, 잠재 디리클레 할당(LDA)의 기본 원리와 한계를 이해하고, 이를 확장한 구조적 토픽 모델(STM)이 메타데이터를 어떻게 활용하여 토픽 추출의 정확도를 높이는지 상세히 설명합니다. 텍스트 오토인코더의 어려움과 그 해결 방안도 함께 다루며, R 언어를 활용한 STM 모델 구축 및 해석 실습 과정을 포함합니다. 이 문서는 비전공자나 해당 주제를 처음 접하는 학습자도 완벽하게 이해할 수 있도록 쉬운 설명, 풍부한 예시, 그리고 단계별 가이드를 제공합니다.}
 
 \tableofcontents
 
 \newpage
 
-\section{주요 공지 및 과제 가이드라인}
-
-본격적인 강의 내용에 앞서, 과제 제출과 관련된 주요 가이드라인을 명확히 합니다.
-
-\subsection{제출물 요구사항}
-
-과제 제출 시 다음 두 가지 구성 요소를 모두 제출해야 합니다.
-
-\begin{enumerate}
-    \item \textbf{보고서 (Report): 단일 PDF 파일}
-    \begin{itemize}
-        \item 최종 보고서는 \textbf{하나의(single) PDF 파일}이어야 합니다.
-        \item 각 문제 풀이를 별도의 Jupyter Notebook에서 수행했더라도, 각 노트북에서 생성된 PDF 파일들을 \textbf{하나로 병합하여} 제출해야 합니다.
-        \item Jupyter Notebook에서 직접 PDF를 생성하거나, 다른 워드 프로세서(예: MS Word)를 사용해 수동으로 보고서를 작성한 후 PDF로 변환할 수 있습니다.
-    \end{itemize}
-
-    \item \textbf{원본 코드 (Source Code)}
-    \begin{itemize}
-        \item 보고서를 생성하는 데 사용된 모든 원본 코드를 제출해야 합니다.
-        \item (예: \texttt{.ipynb} Jupyter Notebook 파일, \texttt{.py} Python 스크립트 파일 등)
-        \item 여러 개의 코드 파일이 있는 경우, \textbf{하나의 \texttt{.zip} 파일}로 압축하여 제출하는 것을 강력히 권장합니다. (필수는 아니지만 관리에 용이함)
-    \end{itemize}
-\end{enumerate}
-
-\begin{summarybox}
-    \textbf{제출 요약:}
-    \begin{itemize}
-        \item \textbf{파일 1 (필수):} 모든 결과가 포함된 \textbf{하나의 PDF 보고서}.
-        \item \textbf{파일 2 (필수):} 모든 소스 코드를 담은 \textbf{하나의 \texttt{.zip} 파일} (또는 개별 코드 파일들).
-    \end{itemize}
-    Jupyter Notebook을 반드시 사용해야 하는 것은 아니지만, 코드와 리포트를 효율적으로 관리하는 데 유용할 수 있습니다.
-\end{summarybox}
-
-\section{과제 Q\&A: 텍스트 오토인코더(Autoencoder)}
-
-많은 학생이 텍스트(예: 200단어 시퀀스)를 처리하는 오토인코더 과제에서 어려움을 겪고 있습니다.
-
-\subsection{Q: 텍스트 오토인코더로 원본 문장을 완벽하게 복원하기 매우 어렵습니다.}
-
-\textbf{A: 네, 그것은 매우 예상된(expected) 결과입니다.}
-
-완벽하게 복원되지 않는다고 해서 모델이 잘못된 것은 아닙니다. 이 과제의 목적은 텍스트 오토인코더가 이미지 오토인코더보다 훨씬 더 어려운 과제임을 직접 경험하는 것입니다.
-
-\subsubsection{왜 텍스트 복원이 더 어려운가?}
-
-\begin{enumerate}
-    \item \textbf{극심한 병목 현상 (Severe Bottleneck)}
-    \begin{itemize}
-        \item 표준적인 시퀀스-투-시퀀스(Seq2Seq) 오토인코더는 인코더(Encoder)가 전체 텍스트 시퀀스(예: 200단어)를 \textbf{하나의 단일 벡터(single vector)} (예: 인코더 RNN의 마지막 은닉 상태)로 압축합니다.
-        \item 이 단일 벡터가 전체 문장의 문맥, 순서, 의미를 모두 담아야 합니다.
-        \item 디코더(Decoder)는 오직 이 단일 벡터 정보에만 의존하여 원본 시퀀스를 복원해야 하므로, 정보 손실이 막대하게 발생합니다.
-    \end{itemize}
-    
-    \item \textbf{이미지 vs. 텍스트}
-    \begin{itemize}
-        \item \textbf{이미지 (쉬움):} 컨볼루셔널 오토인코더(Convolutional Autoencoder)는 이미지를 압축할 때 공간적 구조(spatial structure)를 유지하며 점진적으로 특징을 추출합니다. 복원 시에도 이 구조를 역으로 따라가면 되므로 상대적으로 복원력이 뛰어납니다.
-        \item \textbf{텍스트 (어려움):} 텍스트는 순서와 문맥이 매우 중요한 데이터입니다. 이를 단일 벡터로 '뭉개버리면' 원본의 복잡한 순차 정보를 복원하기가 극도로 어려워집니다.
-    \end{itemize}
-\end{enumerate}
-
-\begin{summarybox}
-과제의 핵심은 "완벽한 복원"이 아니라, "텍스트 시퀀스를 단일 벡터로 압축하고 복원하는 것이 왜 어려운지, 그 한계가 무엇인지"를 이해하는 것입니다.
-\end{summarybox}
-
-\subsection{개선 시도 및 접근법}
-
-\begin{itemize}
-    \item \textbf{학생의 접근 (Smart Approach):}
-    디코더의 \texttt{softmax} 출력에서 확률이 가장 높은 단어(top-1)만 선택하는 대신, \textbf{온도 함수(temperature function)}를 사용하여 확률 분포를 조절하고, 확률이 높은 *주변*의 단어들을 샘플링(sampling)하는 방식입니다.
-    \textit{→ 교수의 평가: 매우 똑똑한 접근입니다. 원본과 정확히 같지는 않더라도 문법적으로나 의미적으로 일관된 영어 문장을 생성해낼 수 있습니다.}
-
-    \item \textbf{데이터 증강 (Data Augmentation):}
-    모델의 성능이 낮은 이유 중 하나는 훈련 데이터가 부족하기 때문일 수 있습니다. 이 경우 데이터 증강 기법을 사용할 수 있습니다.
-    \begin{itemize}
-        \item \textbf{유의어(Synonym) 대체:} 문장 내 일부 단어를 유의어로 교체합니다.
-        \item \textbf{단어 삽입/삭제:} 문장의 일부 단어를 무작위로 삭제(drop)하거나 다른 단어를 삽입합니다.
-        \item \textbf{문장 순서 변경:} 문맥에 큰 영향이 없는 선에서 문장 순서를 바꿉니다.
-    \end{itemize}
-\end{itemize}
-
-\begin{examplebox}[title=역사적 관점: 기계 번역]
-놀랍게도, 이 '시퀀스를 단일 벡터로 압축하는' 오토인코더 구조는 초기 신경망 기계 번역(NMT)에서 실제로 시도되었던 방식입니다. (예: 영어 문장을 단일 벡터로 압축 $\rightarrow$ 프랑스어 문장으로 복원)
-
-하지만 이 역시 동일한 병목 현상(bottleneck) 문제로 인해 긴 문장에서 성능이 급격히 저하되었고, 이후 '어텐션(Attention) 메커니즘'이 등장하면서 이 접근법은 사장되었습니다. 여러분이 겪은 어려움은 과거 연구자들도 동일하게 겪었던 문제입니다.
-\end{examplebox}
-
-\newpage
-
-\section{퀴즈 7 복습: LDA 및 NMF}
-
-퀴즈 7의 주요 개념인 LDA(잠재 디리클레 할당)와 NMF(음수 미포함 행렬 분해)를 복습합니다.
-
-\subsection{퀴즈 문항 및 정답}
-
-\begin{itemize}
-    \item \textbf{Q1 (LDA의 역할):} LDA가 무엇을 하는가?
-    \textit{A:} (C) 각 문서를 여러 토픽의 \textbf{혼합(mixture)}으로 간주합니다. (예: 이 문서는 정치 60%, 경제 40%)
-
-    \item \textbf{Q2 (LDA의 과제):} LDA 사용 시 흔히 겪는 어려움은?
-    \textit{A:} (B) 최적의 \textbf{토픽 수(K)}를 결정하는 것. (K는 하이퍼파라미터임)
-
-    \item \textbf{Q3 (디리클레 분포의 역할):} LDA에서 디리클레(Dirichlet) 분포의 역할은?
-    \textit{A:} (A) 각 문서 내의 \textbf{토픽 비율(proportions)}($\theta$)을 생성하기 위한 사전 확률 분포(prior distribution)입니다.
-
-    \item \textbf{Q4 (NMF의 역할):} NMF(음수 미포함 행렬 분해)에 대한 가장 좋은 설명은?
-    \textit{A:} (B) (음수가 아닌 항목을 가진) 행렬을 더 작은 행렬들로 분해합니다. (예: 문서-단어 행렬 $V \approx W \times H$)
-
-    \item \textbf{Q5 (LDA vs. NMF 차이):} 두 접근법의 차이는?
-    \textit{A:} (A) LDA는 가능도(likelihood)를 최대화하는 \textbf{확률적 모델}인 반면, NMF는 행렬을 분해하는 \textbf{행렬 대수(matrix algebra)} 기법입니다.
-\end{itemize}
-
-\subsection{LDA와 NMF 심층 비교}
-
-퀴즈 5번 항목에서 혼동이 있을 수 있습니다. LDA와 NMF는 모두 토픽 모델링에 사용될 수 있지만, 그 철학이 다릅니다.
-
-아래 표는 LDA와 NMF의 핵심적인 차이를 요약합니다.
-
-\begin{adjustbox}{width=\textwidth,center}
-\begin{tabular}{>{\raggedright}p{0.2\linewidth} >{\raggedright}p{0.4\linewidth} >{\raggedright\arraybackslash}p{0.4\linewidth}}
-\toprule
-\textbf{특징} & \textbf{LDA (Latent Dirichlet Allocation)} & \textbf{NMF (Non-negative Matrix Factorization)} \\
-\midrule
-\textbf{기본 원리} & \textbf{확률적 생성 모델} (Probabilistic) & \textbf{행렬 대수 분해} (Linear Algebra) \\
-\textbf{목표} & 문서가 생성되는 확률적 과정을 모델링합니다. (최대 가능도 추정, MLE) & 원본 행렬(V)을 두 개의 작은 음수 미포함 행렬(W, H)의 곱($V \approx WH$)으로 근사합니다. \\
-\textbf{결과물} & 1. 문서별 토픽 분포 ($\theta$): 문서 A는 토픽1(40\%), 토픽2(60\%) \newline 2. 토픽별 단어 분포 ($\beta$): 토픽1은 '고양이'(30\%), '강아지'(20\%)... & 1. 토픽-단어 행렬 (W) \newline 2. 문서-토픽 행렬 (H) \\
-\textbf{가정} & 문서는 토픽의 혼합, 토픽은 단어의 분포라는 명확한 생성 가정이 있습니다. (디리클레 사전 분포) & 모든 행렬의 성분이 0 이상이어야 한다는 제약 조건만 있습니다. \\
-\textbf{해석} & 결과가 '확률' 또는 '비율'로 나와 해석이 매우 직관적입니다. & 분해된 행렬을 '토픽'으로 해석합니다. 이때 관계는 덧셈(additive)이 아닌 곱셈(multiplicative)입니다. \\
-\bottomrule
-\end{tabular}
-\end{adjustbox}
-\captionof{table}{LDA와 NMF의 핵심 원리 비교}
-\label{tab:lda_vs_nmf}
-
-\subsection{LDA의 비결정론적(Stochastic) 특성}
-
-LDA는 선형 회귀처럼 단 하나의 정답이 나오는 결정론적(deterministic) 모델이 아닙니다. LDA는 \textbf{확률적(stochastic) 알고리즘}입니다.
-
-\begin{itemize}
-    \item \textbf{실행 시마다 결과가 다름:}
-    LDA를 실행할 때마다 (특히 초기값이 다를 경우) 결과가 미묘하게 달라질 수 있습니다.
-    \begin{itemize}
-        \item 토픽 1과 토픽 2의 순서가 바뀔 수 있습니다.
-        \item 토픽을 구성하는 단어의 클러스터가 약간 달라질 수 있습니다.
-    \end{itemize}
-    
-    \item \textbf{이유: 유일한 해가 없음 (No Unique Solution)}
-    LDA는 최대 가능도 추정(MLE)을 사용하는데, 이 가능도(likelihood)를 최대화하는 해가 유일하지 않을 수 있습니다.
-\end{itemize}
-
-\begin{examplebox}[title=비유: "젖은 고양이"와 최대 가능도 추정 (MLE)]
-최대 가능도 추정(MLE)은 "관측된 데이터를 가장 잘 설명하는 원인(모델 파라미터)은 무엇인가?"를 찾는 과정입니다.
-
-\begin{itemize}
-    \item \textbf{관측 (Data):} 고양이가 밖에서 \textbf{젖은 채로} 집에 돌아왔습니다.
-    \item \textbf{가설 (Model):}
-        \begin{enumerate}
-            \item 가설 A: 밖에 \textbf{비가 왔다.}
-            \item 가설 B: 누군가 고양이에게 \textbf{물을 뿌렸다.}
-        \end{enumerate}
-    \item \textbf{MLE 추론:}
-    "비가 왔을 때 고양이가 젖을 확률"과 "누군가 물을 뿌렸을 때 고양이가 젖을 확률"을 계산하여, 현재의 관측(젖은 고양이)을 가장 그럴듯하게 만드는 가설(예: 비가 왔다)을 선택합니다.
-\end{itemize}
-LDA도 마찬가지로, 우리가 관측한 '문서들(단어들의 집합)'을 가장 그럴듯하게 생성했을 토픽 분포($\theta$)와 단어 분포($\beta$)를 역으로 추정하는 것입니다.
-\end{examplebox}
-
-\begin{warningbox}[title=LDA 실행 시 실전 팁]
-LDA는 확률적이며 안정적이지 않기 때문에, 실제 분석에서는 다음과 같은 방법을 사용합니다.
-
-\begin{enumerate}
-    \item \textbf{여러 번 실행 (Multiple Runs):} 동일한 K(토픽 수)에 대해 모델을 여러 번 실행합니다.
-    \item \textbf{최적 모델 선택:} 실행된 모델들 중에서 가장 "좋은" 모델을 선택합니다.
-    \item \textbf{평가 지표:} "좋은" 모델을 판단하는 기준은 다음과 같습니다.
-    \begin{itemize}
-        \item \textbf{의미론적 일관성 (Semantic Coherence):} 토픽 내의 상위 단어들이 의미적으로 얼마나 관련성이 높은가? (예: '고양이', '강아지', '애완동물' ... $\rightarrow$ 높음)
-        \item \textbf{배타성 (Exclusivity):} 토픽들이 서로 얼마나 겹치지 않고 고유한 단어들을 갖는가?
-    \end{itemize}
-\end{enumerate}
-\end{warningbox}
-
-\newpage
-
-\section{구조적 토픽 모델링 (STM) 소개}
-
-\subsection{LDA의 근본적인 한계: 메타데이터의 부재}
-
-지금까지 배운 LDA는 문서를 '단어의 가방(Bag-of-Words)'으로만 취급합니다. 즉, 문서에 포함된 단어 외의 \textbf{모든 맥락 정보를 무시}합니다.
-
-하지만 실제 세계의 문서는 풍부한 \textbf{메타데이터(Metadata)}와 함께 제공됩니다.
-
-\begin{itemize}
-    \item \textbf{뉴스 기사:} 저자, 출판 날짜, 언론사 (예: New York Times vs. Financial Times)
-    \item \textbf{학술 논문:} 저자, 출판 연도, 학회지(Journal)
-    \item \textbf{고객 리뷰:} 작성자, 평점(Rating), 작성 날짜
-    \item \textbf{학생 강의평가:} 교수 성별, 개설 학과, 수강 시기 (예: 가을 vs. 봄 학기)
-\end{itemize}
-
-LDA는 이 중요한 메타데이터를 활용할 방법이 없습니다.
-
-\subsection{STM (Structural Topic Modeling)의 정의}
-
-\textbf{구조적 토픽 모델링 (Structural Topic Modeling, STM)}은 LDA를 확장하여, 이러한 문서 수준의 \textbf{메타데이터}를 모델에 직접 통합하는 프레임워크입니다.
-
-메타데이터는 통계학 용어로 \textbf{공변량(Covariates)}이라고도 부릅니다.
-
-\begin{summarybox}
-\textbf{STM의 핵심 아이디어:}
-\begin{itemize}
-    \item \textbf{LDA:} 문서의 토픽 비율($\theta$)은 \textit{모든 문서에 동일한} 디리클레 분포($\text{Dir}(\alpha)$)에서 나온다.
-    \item \textbf{STM:} 문서의 토픽 비율($\theta_d$)은 \textit{해당 문서의 메타데이터}($X_d$)에 따라 \textbf{달라진다.}
-\end{itemize}
-(예: '교수 성별'이라는 메타데이터가 '돌봄(caring)' 토픽의 비율에 영향을 줄 수 있다.)
-\end{summarybox}
-
-\section{STM의 수학적 원리}
-
-STM이 LDA와 어떻게 다른지 수학적 공식을 통해 비교합니다. 가장 큰 차이는 문서별 토픽 비율($\theta$)을 생성하는 부분입니다.
-
-\subsubsection{1. LDA의 토픽 유병률 (Topic Prevalence)}
-문서 $m$의 토픽 비율 $\theta_m$은 디리클레 분포에서 직접 샘플링됩니다.
-$$ \theta_m \sim \text{Dirichlet}(\alpha) $$
-여기서 $\alpha$는 모든 문서에 동일하게 적용되는 하이퍼파라미터입니다.
-
-\subsubsection{2. STM의 토픽 유병률 (Topic Prevalence)}
-문서 $d$의 토픽 비율 $\theta_d$는 해당 문서의 메타데이터 $X_d$에 의존하는 \textbf{로지스틱 정규 분포(Logistic-Normal Distribution)}를 따릅니다.
-
-$$ \theta_d | X_d\gamma, \Sigma \sim \text{LogisticNormal}(\mu = X_d\gamma, \Sigma) $$
-
-이 공식이 생소해 보일 수 있지만, 두 단계로 나누어 생각하면 쉽습니다.
-
-\begin{description}
-    \item[1단계 (회귀 분석):]
-    먼저, 문서 $d$의 메타데이터($X_d$)를 사용하여 토픽의 평균적인 방향($\mu$)을 계산합니다.
-    $$ \mu = X_d\gamma $$
-    \begin{itemize}
-        \item $X_d$: 문서 $d$의 메타데이터 벡터 (예: `[1, date, author_gender, ...]`)
-        \item $\gamma$ (감마): 메타데이터가 각 토픽에 미치는 영향을 나타내는 \textbf{회귀 계수} (모델이 학습해야 할 파라미터)
-        \item 이는 선형 회귀($y=X\beta$)와 매우 유사한 형태입니다.
-    \end{itemize}
-    
-    \item[2단계 (Softmax):]
-    1단계에서 계산된 $\mu$를 평균으로, $\Sigma$를 공분산으로 하는 \textbf{다변량 정규 분포(Multivariate Normal)}에서 벡터를 하나 샘플링합니다. 이 벡터를 \textbf{소프트맥스(Softmax) 함수}에 통과시켜 합이 1이 되는 확률 벡터(즉, 토픽 비율 $\theta_d$)를 생성합니다. (이 과정을 합쳐 '로지스틱 정규 분포'라고 부릅니다.)
-\end{description}
-
-\subsubsection{STM의 주요 파라미터}
-
-\begin{itemize}
-    \item $\gamma$ \textbf{(감마):}
-    메타데이터(공변량)가 토픽 유병률에 얼마나 영향을 미치는지 나타내는 \textbf{회귀 계수}입니다. 이 값을 분석하는 것이 STM의 핵심입니다.
-    
-    \item $\Sigma$ \textbf{(시그마):}
-    토픽 간의 \textbf{공분산 행렬}입니다. LDA와 달리, STM은 토픽들이 서로 \textbf{상관관계}를 가질 수 있다고 가정합니다. (예: '정치' 토픽과 '경제' 토픽은 자주 함께 등장 $\rightarrow$ 상관관계가 높음). 이 $\Sigma$ 역시 모델이 데이터로부터 학습합니다.
-\end{itemize}
-
-\section{STM의 장점 및 활용}
-
-\begin{itemize}
-    \item \textbf{메타데이터 통합:}
-    문맥 정보를 활용하여 더 정확하고 의미 있는 토픽을 추출합니다.
-    
-    \item \textbf{가설 검증 (Hypothesis Testing):}
-    STM의 진정한 강점입니다. 모델이 추정한 $\gamma$ 계수를 분석하여 사회과학적, 경영학적 가설을 검증할 수 있습니다.
-    \begin{itemize}
-        \item 예1: "시간이 지남에 따라(date) '기후 변화' 토픽의 언급이 증가했는가?"
-        \item 예2: "여성 교수(gender)가 남성 교수보다 '학생 지원' 관련 토픽을 더 많이 언급받는가?"
-        \item 예3: "보수 언론(source)이 진보 언론보다 '세금 감면' 토픽을 더 많이 다루는가?"
-    \end{itemize}
-    
-    \item \textbf{활용 분야:}
-    미디어 프레이밍 분석, 여론 조사, 소셜 미디어 트렌드 추적, 고객 피드백 분석, 학술 연구 동향 파악 등 메타데이터가 존재하는 모든 텍스트 분석에 활용됩니다.
-\end{itemize}
-
-\newpage
-
-\section{R 실습: \texttt{stm} 패키지}
-
-STM은 Python보다 R의 \texttt{stm} 패키지가 가장 표준적이고 강력한 구현체로 인정받고 있습니다. 본 강의에서는 R을 사용하여 STM을 실습합니다.
-
-\subsection{실습 1: "고양이 vs. 강아지" (저자 분석)}
-
-두 명의 저자가 각각 다른 주제(고양이, 강아지)에 대해서만 글을 쓴 간단한 예제입니다.
-
-\begin{itemize}
-    \item \textbf{데이터:} 저자 1 (고양이 텍스트 8개), 저자 2 (강아지 텍스트 8개)
-    \item \textbf{메타데이터 ($X_d$):} \texttt{author} (범주형 변수: "Author1", "Author2")
-\end{itemize}
-
-\begin{lstlisting}[language=R, caption={R 코드: 간단한 STM 모델 피팅 (저자 분석)}, label=lst:stm_simple, breaklines=true]
-# 1. 라이브러리 로드
-library(stm)
-
-# 2. 데이터 및 메타데이터 준비 (생략)
-# documents <- c("Cats purr gently...", "Dogs bark loudly...", ...)
-# metadata <- data.frame(author = rep(c("Author1", "Author2"), each = 8))
-
-# 3. 텍스트 전처리
-# textProcessor는 문서와 메타데이터를 함께 처리하여
-# 문서가 삭제될 경우 메타데이터도 함께 동기화시킵니다.
-processed <- textProcessor(documents = documents, metadata = metadata)
-out <- prepDocuments(processed$documents, processed$vocab, processed$meta)
-
-# 4. STM 모델 피팅
-# K=2 (토픽 2개), prevalence = ~ author (저자 변수를 공변량으로 사용)
-stm_model <- stm(documents = out$documents, 
-                 vocab = out$vocab, 
-                 K = 2,
-                 prevalence = ~ author,  # 핵심: 메타데이터 지정
-                 data = out$meta,
-                 max.em.its = 100, 
-                 init.type = "Spectral")
-
-# 5. 결과 요약
-summary(stm_model)
-# Topic 1 Top Words: dog, energet, bark, enjoy, chase...
-# Topic 2 Top Words: cat, love, climb, purr, spot...
-
-# 6. 메타데이터 효과 추정
-effects <- estimateEffect(1:2 ~ author, 
-                          stmobj = stm_model,
-                          metadata = out$meta, 
-                          uncertainty = "Global")
-
-# 7. 효과 시각화
-plot(effects, 
-     covariate = "author", 
-     method = "difference",
-     cov.value1 = "Author1", 
-     cov.value2 = "Author2",
-     main = "Effect of Author Across Topics")
-\end{lstlisting}
-
-\begin{itemize}
-    \item \textbf{결과 해석:}
-    \texttt{summary} 결과, 토픽 1은 '강아지' 관련, 토픽 2는 '고양이' 관련 단어로 명확히 분리됩니다.
-    \texttt{plot(effects, ...)} 결과는 "Author1이 Author2에 비해 토픽 2(고양이)를 더 많이 사용하고, 토픽 1(강아지)을 덜 사용한다"는 것을 시각적으로 보여줍니다.
-\end{itemize}
-
-\subsection{실습 2: "Kaggle 뉴스 헤드라인" (시계열 분석)}
-
-100만 개 이상의 호주 뉴스 헤드라인 데이터를 사용하여 시간에 따른 토픽 트렌드를 분석합니다.
-
-\begin{itemize}
-    \item \textbf{데이터:} 뉴스 헤드라인 텍스트
-    \item \textbf{메타데이터 ($X_d$):} \texttt{publish\_date} (날짜, 예: \texttt{20030219})
-\end{itemize}
-
-\subsubsection{데이터 전처리: 날짜(Date) 공변량 다루기}
-
-날짜 데이터를 STM에서 공변량으로 사용하는 방법은 두 가지가 있습니다.
-
-\begin{enumerate}
-    \item \textbf{범주형(Categorical) 변수:}
-    모든 날짜(예: '2003-02-19', '2003-02-20'...)를 별개의 범주로 취급합니다.
-    \textit{(단점: 변수의 수가 너무 많아져(수천~수만 개) 계산 비용이 매우 비싸지고(expensive) 분석이 어려워짐.)}
-
-    \item \textbf{연속형(Continuous) 수치 변수:}
-    날짜를 \textbf{하나의 숫자}로 변환합니다. (예: `2003.0 + (month-1)/12`)
-    \textit{(장점: 변수가 하나이므로 계산이 효율적임.)}
-    \textit{(가정: 이 방식을 사용하면, 토픽의 유병률이 시간에 따라 \textbf{선형적(linear)으로} 증가하거나 감소한다고 \textbf{가정}하는 것입니다.)}
-    
-    본 실습에서는 \textbf{2번 (연속형 수치 변수)} 방식을 사용합니다.
-\end{enumerate}
-
-\subsubsection{전처리 시 중요사항: 빈 문서 자동 제거}
-
-\texttt{textProcessor}와 \texttt{prepDocuments} 함수는 텍스트를 정리(불용어, 숫자, 구두점 제거)합니다.
-
-\begin{warningbox}[title=데이터 정합성(Consistency) 유지]
-\begin{itemize}
-    \item 텍스트 정리 과정에서, 어떤 문서는 내용이 \textbf{완전히 비게(empty)} 될 수 있습니다 (실습 예제에서 50개 문서).
-    \item \texttt{prepDocuments}는 이 빈 문서들을 \textbf{자동으로 제거}합니다.
-    \item \textbf{치명적 오류 방지:} 만약 원본 메타데이터를 그대로 \texttt{stm} 모델에 전달하면, 문서 수(줄어듦)와 메타데이터 행 수(그대로)가 일치하지 않아 오류가 발생합니다.
-    \item \textbf{해결책:} \texttt{prepDocuments}가 반환한 \textbf{\texttt{out\$meta}}를 새로운 메타데이터로 사용해야 합니다. \texttt{out\$meta}는 빈 문서에 해당하는 행이 이미 제거된, 정제된 메타데이터입니다.
-\end{itemize}
-\begin{lstlisting}[language=R, basicstyle=\ttfamily\small\bfseries, numbers=none, frame=none, breaklines=true]
-# 잘못된 사용
-meta <- original_metadata
-out <- prepDocuments(...)
-stm_model <- stm(..., data = meta) # 오류! 행 개수가 안 맞음
-
-# 올바른 사용
-out <- prepDocuments(..., metadata = original_metadata)
-meta_synced <- out$meta # <--- 반드시 out$meta를 사용
-stm_model <- stm(..., data = meta_synced) # 정상 작동
-\end{lstlisting}
-\end{warningbox}
-
-\subsubsection{시계열 효과 추정 및 시각화}
-
-\begin{lstlisting}[language=R, caption={R 코드: STM 시계열 효과 추정}, label=lst:stm_timeseries, breaklines=true]
-# 1. STM 모델 피팅 (K=5, 날짜를 공변량으로)
-# (date_numeric는 2003.083... 같이 변환된 수치형 날짜)
-stm_model_news <- stm(..., 
-                      K = 5,
-                      prevalence = ~ date_numeric, 
-                      data = meta_synced)
-
-# 2. 효과 추정
-# estimateEffect는 모델의 후방 분포(posterior distribution)에서
-# 샘플링하여 date_numeric에 따른 prevalence를 회귀 분석합니다.
-effects_news <- estimateEffect(1:5 ~ date_numeric, 
-                             stmobj = stm_model_news,
-                             metadata = meta_synced, 
-                             uncertainty = "Global")
-
-# 3. 시계열 트렌드 시각화
-plot(effects_news, 
-     covariate = "date_numeric", 
-     method = "continuous", # <--- 연속형 변수 지정
-     topics = 1:5,
-     xlab = "Year",
-     main = "Topic Prevalence Over Time")
-\end{lstlisting}
-
-\begin{itemize}
-    \item \textbf{결과 해석:}
-    생성된 플롯은 시간에 따른 각 토픽의 유병률 \textbf{추세(trend)}와 \textbf{신뢰 구간(confidence interval)}을 보여줍니다.
-    \begin{itemize}
-        \item (예: 토픽 1 (Council, Govt)은 시간이 지남에 따라 유병률이 \textbf{증가}하는 선형 추세를 보임.)
-        \item (예: 토픽 3 (Politics)은 시간이 지남에 따라 유병률이 \textbf{감소}하는 선형 추세를 보임.)
-    \end{itemize}
-\end{itemize}
-
-\newpage
-
-\section{최적의 토픽 수 (K) 찾기}
-
-지금까지 K(토픽 수)를 임의로 (K=2, K=5) 지정했습니다. 하지만 LDA와 마찬가지로 STM에서도 최적의 K를 찾는 것은 매우 중요한 하이퍼파라미터 튜닝 과정입니다.
-
-\subsection{방법: \texttt{searchK()} 함수}
-
-\texttt{stm} 패키지는 \texttt{searchK()} 함수를 제공하여, 여러 K 값에 대한 모델 성능을 한 번에 비교할 수 있게 합니다.
-
-\begin{lstlisting}[language=R, caption={R 코드: 최적의 K 탐색}, label=lst:searchk, breaklines=true]
-# K=2부터 10까지 모델을 모두 실행하고 성능을 비교
-k_search_results <- searchK(documents = out$documents, 
-                            vocab = out$vocab,
-                            K = c(2, 3, 4, 5, 6, 7, 8, 9, 10),
-                            prevalence = ~ date_numeric, 
-                            data = meta_synced)
-
-# 결과 시각화
-plot(k_search_results)
-\end{lstlisting}
-
-\begin{warningbox}
-\texttt{searchK()}는 지정된 모든 K 값에 대해 STM 모델을 (여러 번) 실행하고 평가합니다. 데이터가 크면 \textbf{매우 오랜 시간} (수 시간 ~ 수 일)이 소요될 수 있습니다.
-\end{warningbox}
-
-\subsection{평가 지표: 일관성(Coherence) vs. 배타성(Exclusivity)}
-
-\texttt{searchK()}는 여러 지표를 보여주지만, 토픽의 품질을 평가하는 데 가장 중요한 두 가지 지표는 다음과 같습니다.
-
-\begin{description}
-    \item[의미론적 일관성 (Semantic Coherence)]
-    \begin{itemize}
-        \item \textbf{의미:} 토픽 내의 상위 단어들이 의미적으로 얼마나 관련성이 높은가?
-        \item \textbf{예시:} '고양이', '강아지', '애완동물', '먹이' ... $\rightarrow$ \textbf{일관성 높음}
-        \item (높을수록 좋음)
-    \end{itemize}
-
-    \item[배타성 (Exclusivity)]
-    \begin{itemize}
-        \item \textbf{의미:} 토픽들이 서로 얼마나 겹치지 않고 고유한(unique) 단어들을 갖는가?
-        \item \textbf{예시:} 토픽 A: '고양이', '야옹', '집사' / 토픽 B: '강아지', '멍멍', '산책' $\rightarrow$ \textbf{배타성 높음}
-        \item (높을수록 좋음)
-    \end{itemize}
-\end{description}
-
-\begin{summarybox}[title=최적의 K 선택 전략]
-\begin{enumerate}
-    \item \textbf{트레이드오프(Trade-off):}
-    일반적으로 K가 너무 작으면 일관성은 높지만 배타성이 낮고, K가 너무 크면 배타성은 높지만 일관성이 낮아지는 경향이 있습니다.
-    
-    \item \textbf{시각화 및 선택:}
-    X축을 '배타성', Y축을 '의미론적 일관성'으로 하는 2D 플롯을 그립니다.
-    \textbf{가장 오른쪽 위 (Top-Right)}에 위치하는, 즉 두 지표가 모두 가장 높은 K 값을 선택하는 것이 이상적입니다.
-    
-    \item \textbf{정규화(Rescaling) 팁:}
-    두 지표는 스케일이 매우 다를 수 있습니다 (예: 일관성 9 vs. 배타성 -260).
-    따라서 각 지표를 [0, 1] 범위로 정규화(rescale)한 뒤, \textbf{두 정규화된 값의 평균}을 최대화하는 K를 선택하는 것이 합리적인 방법입니다.
-\end{enumerate}
-\end{summarybox}
-
-\section{토픽 해석하기: "토픽 1"은 무엇인가?}
-
-모델을 훈련하고 최적의 K를 찾아도, "토픽 1", "토픽 2" 등은 그저 숫자에 불과합니다. 이 토픽들이 실제 어떤 의미를 갖는지 해석하는 과정이 필요합니다.
-
-\subsection{방법 1: 상위 단어 확인 (\texttt{summary()} 또는 \texttt{labelTopics()})}
-\begin{itemize}
-    \item \textbf{내용:} 각 토픽에서 등장 확률이 가장 높은 단어들을 봅니다.
-    \item \textbf{예시:} (토픽 1: cat, purr, climb...), (토픽 2: dog, bark, fetch...)
-    \item \textbf{단점:} (실습 2의 경우) 'australia', 'council', 'govt' 등 모든 토픽에 공통적으로 등장하거나 의미 파악에 도움이 안 되는 단어들이 상위를 차지할 수 있습니다.
-\end{itemize}
-
-\subsection{방법 2: 대표 문서 확인 (\texttt{findThoughts()}) - 권장}
-\textbf{가장 권장되는 방법입니다.} \texttt{findThoughts()} 함수는 각 토픽에 대해 \textbf{가장 높은 유병률($\theta$)을 갖는 원본 문서(들)}을 직접 보여줍니다.
-
-\begin{lstlisting}[language=R, caption={R 코드: 대표 문서로 토픽 해석}, label=lst:findthoughts, breaklines=true]
-# 토픽 3에 대해 가장 대표적인 문서(헤드라인) 2개를 보여줌
-findThoughts(stm_model_news, 
-             texts = original_headlines, # 원본 텍스트
-             n = 2, 
-             topics = 3)
-\end{lstlisting}
-
-\begin{itemize}
-    \item \textbf{해석 과정:}
-    \begin{enumerate}
-        \item \texttt{findThoughts()}를 실행하여 토픽 3의 대표 헤드라인을 읽습니다.
-        \item (예: "Police investigate crash on highway", "Man charged over stabbing incident")
-        \item 이 문서들을 읽어본 분석가는 "아, 토픽 3은 \textbf{'사건/사고 및 범죄'}에 관한 토픽이구나"라고 \textbf{수동으로 레이블(label)을 붙일 수 있습니다.}
-    \end{enumerate}
-\end{itemize}
-
-\begin{examplebox}[title=Theta($\theta$) 행렬의 의미]
-\texttt{findThoughts}는 모델의 \texttt{theta} ($\theta$) 행렬을 기반으로 작동합니다.
-\begin{itemize}
-    \item \texttt{theta}는 (문서 수 $\times$ 토픽 수) 크기의 행렬입니다.
-    \item \texttt{theta[d, k]} 값은 $d$번째 문서에서 $k$번째 토픽이 차지하는 비율(유병률)을 의미합니다.
-    \item \texttt{findThoughts(..., topics=3)}는 \texttt{theta} 행렬의 3번째 열(토픽 3)에서 값이 가장 큰 행(문서)을 찾아, 그 문서의 원본 텍스트를 보여주는 것입니다.
-\end{itemize}
-\end{examplebox}
-
-\newpage
-
 \section{용어 정리}
+텍스트 토픽 모델링 및 관련 개념들을 이해하기 위한 주요 용어들을 정리했습니다.
 
 \begin{adjustbox}{width=\textwidth,center}
-\begin{tabular}{>{\raggedright}p{0.2\linewidth} >{\raggedright}p{0.4\linewidth} >{\raggedright\arraybackslash}p{0.4\linewidth}}
+\begin{tabular}{lllc}
 \toprule
-\textbf{용어 (원어)} & \textbf{쉬운 설명} & \textbf{비고 (관련 개념)} \\
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
 \midrule
-\textbf{LDA} \newline (Latent Dirichlet Allocation) & 문서가 여러 토픽의 혼합으로 이루어져 있다고 가정하는 확률적 토픽 모델. & 메타데이터를 사용하지 못함. \\
-\textbf{STM} \newline (Structural Topic Modeling) & LDA를 확장하여, 문서의 \textbf{메타데이터}가 토픽 비율에 영향을 미친다고 보는 고급 토픽 모델. & R \texttt{stm} 패키지. \\
-\textbf{메타데이터} \newline (Metadata) & 텍스트 자체는 아니지만 텍스트에 대한 정보. (예: 저자, 날짜, 출처) & STM에서는 '공변량(Covariate)'이라고도 부름. \\
-\textbf{공변량} \newline (Covariate) & 분석 대상(토픽 비율)에 영향을 줄 수 있는 외부 변수. (예: $X_d$) & 통계학 용어. 메타데이터와 거의 동일한 의미로 사용됨. \\
-\textbf{토픽 유병률} \newline (Topic Prevalence) & 특정 문서 또는 문서 집합에서 특정 토픽이 차지하는 비율 또는 중요도. & $\theta$ (세타) 값. \\
-\textbf{로지스틱 정규 분포} \newline (Logistic-Normal) & 다변량 정규 분포에서 샘플링한 벡터를 Softmax 함수에 통과시켜 합이 1인 확률 벡터를 얻는 분포. & STM에서 $\theta_d$를 생성하는 방식. \\
-\textbf{최대 가능도 추정} \newline (MLE, Max. Likelihood Est.) & 관측된 데이터를 가장 그럴듯하게 설명하는(생성할 확률이 가장 높은) 모델 파라미터를 찾는 통계적 방법. & "젖은 고양이" 비유. \\
-\textbf{확률적/비결정론적} \newline (Stochastic) & 무작위성을 포함하므로 실행할 때마다 결과가 달라질 수 있음. & LDA, STM 모두 해당. \\
-\textbf{의미론적 일관성} \newline (Semantic Coherence) & 토픽 내의 단어들이 의미적으로 얼마나 일관된지를 나타내는 지표. & (높을수록 좋음) \\
-\textbf{배타성} \newline (Exclusivity) & 토픽들이 서로 얼마나 겹치지 않고 고유한 단어들로 구성되었는지를 나타내는 지표. & (높을수록 좋음) \\
-\textbf{NMF} \newline (Non-negative Matrix Fact.) & 음수 미포함 행렬($V$)을 두 개의 작은 행렬($W \times H$)의 곱으로 분해하는 기법. & LDA와 달리 확률 모델이 아님. \\
+토픽 모델링 & 문서 집합에서 숨겨진 주제(토픽)를 찾아내는 통계적 방법 & Topic Modeling & \\
+잠재 디리클레 할당 & 문서가 여러 토픽의 혼합으로 구성된다고 가정하는 토픽 모델 & Latent Dirichlet Allocation (LDA) & 비지도 학습 \\
+음수 행렬 분해 & 텍스트 데이터를 비음수 행렬로 분해하여 잠재 구조를 찾는 방법 & Non-negative Matrix Factorization (NMF) & 행렬 대수 기반 \\
+구조적 토픽 모델 & LDA를 확장하여 문서의 메타데이터를 토픽 모델링에 활용하는 모델 & Structural Topic Model (STM) & 메타데이터 활용 \\
+오토인코더 & 입력 데이터를 압축(인코딩)한 후 다시 복원(디코딩)하는 신경망 & Autoencoder & 차원 축소, 특징 학습 \\
+잠재 변수 & 모델 내에 존재하지만 직접 관측할 수 없는 변수 & Latent Variable & 예: 문서의 실제 토픽 \\
+메타데이터 & 문서 자체에 대한 추가 정보 (예: 저자, 출판일, 성별) & Metadata & 공변량(Covariate)이라고도 함 \\
+공변량 & 모델에서 결과 변수에 영향을 미칠 수 있는 보조 변수 & Covariate & 메타데이터의 일종 \\
+우도 & 특정 모델과 파라미터가 관측된 데이터를 얼마나 잘 설명하는지 나타내는 값 & Likelihood & 모델 적합도 측정 \\
+EM 알고리즘 & 잠재 변수가 있는 모델의 파라미터를 추정하는 반복적인 최적화 방법 & Expectation-Maximization (EM) Algorithm & 기대(E) 단계와 최대화(M) 단계 \\
+의미론적 일관성 & 토픽 내 단어들이 의미적으로 얼마나 관련성이 높은지 측정 & Semantic Coherence & 토픽 품질 지표 \\
+배타성 & 토픽이 다른 토픽과 얼마나 겹치지 않는지 측정 & Exclusivity & 토픽 품질 지표 \\
+Held-out 우도 & 모델 훈련에 사용되지 않은 데이터에 대한 우도 & Held-out Likelihood & 모델 일반화 성능 지표 \\
+Softmax 함수 & 여러 개의 숫자(로그 확률)를 확률 분포로 변환하는 함수 & Softmax Function & 합이 1이 되도록 정규화 \\
+로지스틱 정규 분포 & 정규 분포에서 샘플링한 후 Softmax를 적용하여 확률 벡터를 생성하는 분포 & Logistic Normal Distribution & STM에서 토픽 비율 생성에 사용 \\
+어간 추출 & 단어의 접미사를 제거하여 원형(어간)으로 만드는 과정 & Stemming & 텍스트 정규화 \\
+불용어 & 분석에 큰 의미가 없어 제거되는 일반적인 단어 (예: "은", "는", "이", "가") & Stop Words & 텍스트 전처리 \\
+하이퍼파라미터 & 모델 훈련 전에 사용자가 직접 설정해야 하는 파라미터 & Hyperparameter & 예: 토픽의 수(K) \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\captionof{table}{주요 용어 정리}
-\label{tab:terms}
 
 \newpage
+\section{핵심 개념 및 원리}
 
-\section{FAQ (주요 질문 및 답변)}
+\subsection{텍스트 오토인코더의 어려움}
+오토인코더는 입력 데이터를 압축(인코딩)하여 잠재 공간(latent space)에 표현한 후, 이 잠재 표현을 다시 원본 데이터로 복원(디코딩)하는 신경망 모델입니다. 이미지 처리에서는 매우 효과적이지만, 텍스트 데이터에 적용할 때는 여러 가지 고유한 어려움에 직면합니다.
 
-\begin{tcolorbox}[title={Q: STM을 꼭 R로만 해야 하나요? Python은 없나요?}]
-    \textbf{A:} \texttt{stm} 패키지는 R에서 개발되었고, 가장 많은 기능과 안정성을 제공하며 학계에서도 표준으로 사용됩니다. Python에 일부 구현체가 존재하긴 하지만(GitHub 등), R 패키지만큼 신뢰할 수 있거나 기능이 풍부하지 않은 경우가 많습니다.
-    
-    본 강의에서는 안정적인 분석과 \texttt{estimateEffect} 같은 강력한 효과 추정 기능을 위해 R 사용을 권장합니다.
+\begin{tcolorbox}[definition={오토인코더의 기본 개념}]
+오토인코더는 입력 데이터를 효율적으로 압축하고 복원하는 방법을 학습하는 신경망입니다. 인코더는 입력 데이터를 잠재 표현으로 변환하고, 디코더는 이 잠재 표현을 사용하여 원본 데이터를 재구성합니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[title={Q: \texttt{searchK()}를 실행하는 데 시간이 너무 오래 걸립니다.}]
-    \textbf{A:} 정상입니다. \texttt{searchK()}는 (K의 개수 $\times$ 실행 횟수)만큼 STM 모델을 처음부터 끝까지 훈련시킵니다.
-    
-    실제 분석에서는 (1) 데이터의 일부를 샘플링하여 빠르게 K의 범위를 좁히거나, (2) 밤새도록 또는 며칠간 실행할 것을 예상해야 합니다.
+\subsubsection{이미지 오토인코더와의 비교}
+이미지 데이터는 픽셀 값의 연속적인 배열로 구성되며, 공간적 인접성이 중요합니다. 컨볼루션 신경망(CNN) 기반의 오토인코더는 이러한 공간적 특징을 잘 포착하여 효율적으로 압축하고 복원할 수 있습니다. 예를 들어, 이미지의 특정 영역을 압축해도 전체적인 형태나 색상 정보는 비교적 잘 유지됩니다.
+
+그러나 텍스트 데이터는 이산적인 단어들의 시퀀스로 구성되며, 단어의 순서와 문맥이 의미를 결정하는 데 매우 중요합니다. 텍스트를 하나의 고정된 벡터로 압축하는 과정에서 시퀀스 정보(시간적 요소)가 크게 손실될 수 있습니다.
+
+\begin{tcolorbox}[example={텍스트 오토인코더의 병목 현상}]
+200개의 단어로 이루어진 문장을 하나의 단일 벡터로 압축한다고 상상해 보세요. 이 단일 벡터는 200개 단어의 모든 의미와 순서 정보를 담아야 합니다. 이는 마치 긴 소설의 내용을 한 문장으로 요약하는 것과 같습니다. 요약은 가능하지만, 원본의 모든 세부 정보를 완벽하게 복원하기는 매우 어렵습니다. 이처럼 정보를 압축하는 과정에서 발생하는 제약을 '병목(bottleneck)' 현상이라고 부릅니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[title={Q: 메타데이터로 날짜를 사용할 때, '연속형'과 '범주형' 중 무엇이 더 좋은가요?}]
-    \textbf{A:} 정답은 없습니다.
+\subsubsection{정보 손실과 재현의 어려움}
+텍스트 오토인코더는 전체 단어 시퀀스를 단일 벡터로 압축하는 과정에서 자연스러운 병목 현상을 만듭니다. 이 병목은 모델이 시퀀스의 핵심 정보를 추출하도록 강제하지만, 동시에 많은 세부 정보를 잃게 만듭니다.
+
+\begin{itemize}
+    \item \textbf{시퀀스 정보 손실}: 텍스트는 단어의 순서가 중요하지만, 단일 벡터로 압축하면 이러한 시간적(sequential) 정보가 크게 손실됩니다.
+    \item \textbf{의미론적 복잡성}: 단어 임베딩을 통해 단어를 벡터로 표현하더라도, 문장 전체의 복잡한 의미를 하나의 벡터에 담는 것은 매우 어렵습니다.
+    \item \textbf{관측치 부족}: 충분히 많은 양의 텍스트 데이터(관측치)가 없다면, 모델은 효과적인 잠재 표현을 학습하기 어렵습니다.
+\end{itemize}
+
+\begin{tcolorbox}[caution={완벽한 재현에 대한 기대}]
+텍스트 오토인코더, 특히 순환 신경망(RNN) 기반의 모델로 문장을 완벽하게 재현하는 것은 매우 어렵습니다. 이미지 오토인코더에서 얻을 수 있는 높은 재현율을 텍스트에서 기대해서는 안 됩니다. 이 과제의 목표는 완벽한 모델을 만드는 것이 아니라, 텍스트 시퀀스 모델링의 어려움을 직접 경험하고 이해하는 것입니다.
+\end{tcolorbox}
+
+\subsubsection{해결 시도 및 대안}
+강의에서는 텍스트 오토인코더의 성능을 개선하거나 다른 방식으로 임베딩을 훈련하는 몇 가지 방법을 제시합니다.
+
+\begin{enumerate}
+    \item \textbf{잠재 표현 차원 증가}: 잠재 벡터의 차원을 늘려 더 많은 정보를 담을 수 있도록 합니다. 하지만 이것만으로는 근본적인 문제를 해결하기 어렵습니다.
+    \item \textbf{Softmax 온도 함수 활용}: 디코더의 출력에서 단어를 선택할 때, 가장 높은 확률의 단어만을 선택하는 대신, Softmax 함수에 '온도(temperature)' 파라미터를 적용하여 확률 분포를 부드럽게 만들고, 그 분포에서 샘플링하여 다양한 문장을 생성할 수 있습니다. 이는 원본과 완벽히 같지는 않지만, 문법적으로 그럴듯한 문장을 생성하는 데 도움이 됩니다.
+    \item \textbf{데이터 증강 (Data Augmentation)}: 텍스트 데이터셋이 부족할 경우, 인위적으로 데이터를 늘리는 기법입니다.
     \begin{itemize}
-        \item \textbf{연속형 (예: \texttt{year + (m-1)/12}):}
-        "토픽이 시간에 따라 \textit{선형적으로} 증가/감소한다"는 강한 가정을 합니다. 트렌드를 부드럽게 볼 수 있지만, 계절성이나 특정 이벤트(예: 선거)로 인한 급격한 변화를 놓칠 수 있습니다.
-        
-        \item \textbf{범주형 (예: \texttt{as.factor(year)}):}
-        "연도별로 토픽 비율이 자유롭게 다를 수 있다"고 가정합니다. 더 유연하지만, 해석이 복잡해지고 더 많은 데이터가 필요합니다.
+        \item \textbf{동의어 대체}: 문장 내 단어를 동의어로 바꿉니다.
+        \item \textbf{단어 삽입/삭제/교체}: 문장에서 단어를 추가하거나, 제거하거나, 다른 단어로 교체합니다.
+        \item \textbf{문장 재구성}: 문장의 구조를 약간 변경합니다.
     \end{itemize}
-    분석의 목적에 맞게 선택해야 합니다. "장기적 트렌드"를 보려면 연속형, "특정 연도의 차이"를 보려면 범주형이 적합할 수 있습니다.
+    이미지 데이터 증강(회전, 확대/축소)보다 복잡하지만, 텍스트에서도 효과적일 수 있습니다.
+    \item \textbf{병목 없는 임베딩 훈련 (시퀀스-투-시퀀스 모델)}: 오토인코더의 병목 현상 없이 임베딩 레이어를 훈련하는 방법입니다. 순환 신경망(RNN) 레이어를 여러 개 쌓아 입력 시퀀스를 출력 시퀀스로 직접 변환합니다. 이 경우, 잠재 벡터로 압축하는 과정이 없으므로 정보 손실이 적고, 높은 재현율을 얻을 수 있습니다.
+    \begin{itemize}
+        \item \textbf{목표}: 임베딩 레이어 자체를 효과적으로 훈련하는 것.
+        \item \textbf{방법}: LSTM과 같은 순환 레이어를 사용하여 입력 시퀀스(단어 임베딩)를 출력 시퀀스(원래 문장)로 직접 매핑합니다.
+        \item \textbf{결과}: 거의 100\%에 가까운 재현율을 얻을 수 있지만, 이는 엄밀히 말해 오토인코더의 정의(병목을 통한 압축)에 부합하지 않습니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{tcolorbox}[summary={텍스트 오토인코더의 현실적 목표}]
+텍스트 오토인코더는 이미지 오토인코더만큼 완벽한 재현을 기대하기 어렵습니다. 특히 텍스트 데이터의 특성상 병목 현상으로 인한 정보 손실이 크기 때문입니다. 이 모델의 학습 목표는 완벽한 재현이 아니라, 모델의 한계와 텍스트 시퀀스 압축의 어려움을 이해하는 데 있습니다.
 \end{tcolorbox}
 
-\begin{tcolorbox}[title={Q: 전처리 후 문서가 50개나 사라졌습니다. 괜찮은가요?}]
-    \textbf{A:} 네, 괜찮습니다. 뉴스 헤드라인처럼 매우 짧은 텍스트는 불용어, 숫자, 구두점 등을 제거하고 나면 내용이 완전히 비게 되는 경우가 흔합니다. 
-    
-    \texttt{textProcessor}와 \texttt{prepDocuments}는 이런 빈 문서들을 자동으로 제거해 주므로 편리합니다.
-    
-    \textbf{단, \texttt{out\$meta}를 사용해야 한다는 점을 절대 잊지 마세요.} (데이터 정합성)
+\newpage
+\subsection{잠재 디리클레 할당 (Latent Dirichlet Allocation, LDA)}
+LDA는 문서 집합에서 추상적인 "토픽"을 발견하는 통계적 모델입니다. 각 문서는 여러 토픽의 혼합으로 구성되며, 각 토픽은 특정 단어들의 분포로 정의된다고 가정합니다.
+
+\begin{tcolorbox}[definition={LDA의 핵심 가정}]
+LDA는 모든 문서가 여러 토픽의 혼합으로 이루어져 있으며, 각 토픽은 특정 단어들의 확률 분포로 표현된다고 가정합니다. 예를 들어, "스포츠" 토픽은 "야구", "축구", "경기"와 같은 단어들이 높은 확률로 나타날 것입니다.
+\end{tcolorbox}
+
+\subsubsection{LDA의 동작 원리}
+LDA는 다음과 같은 생성 과정을 가정하여 문서가 생성되었다고 봅니다. 이 가정을 바탕으로 역으로 토픽과 문서-토픽 분포를 추정합니다.
+
+\begin{enumerate}
+    \item \textbf{문서별 토픽 분포 선택}: 각 문서 $d$에 대해, 디리클레 분포(Dirichlet distribution)에서 토픽 분포 $\theta_d$를 샘플링합니다. $\theta_d$는 문서 $d$가 각 토픽에 할당될 확률을 나타내는 벡터입니다 (예: 토픽 1에 60\%, 토픽 2에 40\%).
+    \item \textbf{단어별 토픽 선택}: 문서 $d$의 각 단어 위치에 대해, $\theta_d$에 따라 토픽 $z$를 선택합니다.
+    \item \textbf{단어 생성}: 선택된 토픽 $z$에 해당하는 단어 분포 $\phi_z$에서 실제 단어 $w$를 샘플링합니다.
+\end{enumerate}
+이 과정에서 $\alpha$와 $\beta$는 디리클레 분포의 하이퍼파라미터로, 각각 문서-토픽 분포와 토픽-단어 분포의 희소성(sparsity)을 조절합니다.
+
+\begin{tcolorbox}[example={LDA의 토픽 할당 예시}]
+뉴스 기사를 읽을 때, 하나의 기사가 정치와 경제를 동시에 다룰 수 있습니다. LDA는 이 기사를 "정치 토픽 70\% + 경제 토픽 30\%"와 같이 여러 토픽의 혼합으로 해석합니다. 각 토픽은 다시 "정치" 토픽은 '선거', '국회', '법안' 등의 단어와, "경제" 토픽은 '주식', '환율', '성장률' 등의 단어와 높은 연관성을 가집니다.
+\end{tcolorbox}
+
+\subsubsection{LDA의 특징}
+\begin{itemize}
+    \item \textbf{비지도 학습 (Unsupervised Learning)}: LDA는 문서에 미리 레이블이 지정되어 있지 않아도 토픽을 발견할 수 있습니다. 이는 대규모 텍스트 데이터에서 유용합니다.
+    \item \textbf{문서-토픽 혼합}: 각 문서는 단일 토픽이 아닌 여러 토픽의 혼합으로 표현됩니다.
+    \item \textbf{토픽-단어 분포}: 각 토픽은 특정 단어들의 확률 분포로 정의됩니다.
+    \item \textbf{잠재 변수}: 어떤 토픽이 선택되어 특정 단어가 생성되었는지 직접 관측할 수 없으므로, 토픽 할당 $Z$는 잠재 변수(latent variable)로 간주됩니다.
+\end{itemize}
+
+\subsubsection{LDA의 한계: 최적 토픽 수 결정}
+LDA의 가장 큰 도전 과제 중 하나는 최적의 토픽 수 $K$를 결정하는 것입니다. $K$는 모델 훈련 전에 사용자가 직접 설정해야 하는 하이퍼파라미터입니다.
+
+\begin{itemize}
+    \item \textbf{너무 많은 토픽}: 유사한 아이디어를 가진 여러 토픽이 생성되어 토픽 간 구분이 모호해질 수 있습니다 (예: '고양이 1' 토픽과 '고양이 2' 토픽).
+    \item \textbf{너무 적은 토픽}: 서로 다른 아이디어가 하나의 토픽으로 묶여 토픽의 의미가 불분명해질 수 있습니다 (예: '컴퓨터'와 '고양이'가 하나의 토픽으로 묶이는 경우).
+\end{itemize}
+
+최적의 $K$를 찾기 위해 다음과 같은 지표들을 활용합니다.
+\begin{itemize}
+    \item \textbf{의미론적 일관성 (Semantic Coherence)}: 토픽 내 단어들이 얼마나 의미적으로 관련성이 높은지 측정합니다.
+    \item \textbf{배타성 (Exclusivity)}: 토픽이 다른 토픽과 얼마나 겹치지 않는지 측정합니다.
+    \item \textbf{Held-out 우도 (Held-out Likelihood)}: 훈련에 사용되지 않은 데이터에 대한 모델의 우도를 측정하여 일반화 성능을 평가합니다.
+\end{itemize}
+일반적으로 여러 $K$ 값에 대해 LDA를 실행하고, 이 지표들을 시각화하여 최적의 $K$를 선택합니다. 이는 종종 수동적인 작업이 될 수 있습니다.
+
+\begin{tcolorbox}[caution={LDA의 확률적 특성}]
+LDA는 확률적(stochastic) 알고리즘이므로, 같은 데이터와 파라미터로 여러 번 실행해도 항상 동일한 결과를 얻지 못할 수 있습니다. 토픽의 순서가 바뀌거나, 토픽을 구성하는 단어의 조합이 미묘하게 달라질 수 있습니다. 이는 우도 함수의 최대값이 유일하지 않거나, 여러 지역 최대값(local maxima)을 가질 수 있기 때문입니다. 따라서 실제 적용 시에는 여러 번 실행하여 가장 좋은 결과를 선택하는 것이 일반적입니다.
+\end{tcolorbox}
+
+\newpage
+\subsection{음수 행렬 분해 (Non-negative Matrix Factorization, NMF)}
+NMF는 텍스트 데이터를 나타내는 행렬을 두 개의 작은 비음수(non-negative) 행렬로 분해하는 방법입니다. 이 분해된 행렬들은 텍스트의 잠재적인 "토픽" 구조를 드러내는 데 사용될 수 있습니다.
+
+\begin{tcolorbox}[definition={NMF의 기본 개념}]
+NMF는 모든 원소가 음수가 아닌 행렬 $V$를 두 개의 비음수 행렬 $W$와 $H$의 곱으로 근사하는 방법입니다 ($V \approx WH$). 여기서 $V$는 문서-단어 행렬, $W$는 문서-토픽 행렬, $H$는 토픽-단어 행렬로 해석될 수 있습니다.
+\end{tcolorbox}
+
+\subsubsection{NMF의 동작 원리}
+\begin{itemize}
+    \item \textbf{문서-단어 행렬 ($V$)}: 각 행은 문서를, 각 열은 어휘의 단어를 나타냅니다. 셀 값은 해당 단어가 문서에 나타나는 빈도 등을 나타냅니다.
+    \item \textbf{문서-토픽 행렬 ($W$)}: 각 행은 문서를, 각 열은 "토픽"을 나타냅니다. 각 셀은 문서가 특정 토픽에 얼마나 기여하는지를 나타냅니다.
+    \item \textbf{토픽-단어 행렬 ($H$)}: 각 행은 "토픽"을, 각 열은 어휘의 단어를 나타냅니다. 각 셀은 특정 토픽이 특정 단어에 얼마나 기여하는지를 나타냅니다.
+\end{itemize}
+NMF는 $W$와 $H$의 차원(토픽 수)을 원본 행렬 $V$의 차원보다 작게 설정하여 차원 축소 효과를 얻습니다. 이 과정에서 함께 자주 나타나는 단어들이 하나의 토픽으로 묶이는 경향이 있습니다.
+
+\begin{tcolorbox}[example={NMF 행렬 분해 예시}]
+어휘에 6개의 단어(고양이, 개, 먹이, 짖다, 야옹, 털)가 있고, 3개의 문서가 있다고 가정해 봅시다.
+원본 문서-단어 행렬 $V$ (3x6)는 다음과 같습니다:
+\begin{itemize}
+    \item 문서 1: 고양이, 야옹, 털
+    \item 문서 2: 개, 짖다, 먹이
+    \item 문서 3: 고양이, 개, 털, 먹이
+\end{itemize}
+NMF는 이 $V$를 두 개의 "토픽"을 가진 $W$ (3x2)와 $H$ (2x6)로 분해할 수 있습니다.
+\begin{itemize}
+    \item $W$의 첫 번째 열은 문서가 '고양이 토픽'에 얼마나 기여하는지, 두 번째 열은 '개 토픽'에 얼마나 기여하는지를 나타낼 수 있습니다.
+    \item $H$의 첫 번째 행은 '고양이 토픽'이 어떤 단어들(고양이, 야옹, 털)로 구성되는지, 두 번째 행은 '개 토픽'이 어떤 단어들(개, 짖다, 먹이)로 구성되는지를 나타낼 수 있습니다.
+\end{itemize}
+\end{tcolorbox}
+
+\subsubsection{LDA와 NMF의 비교}
+LDA와 NMF는 모두 텍스트에서 잠재적인 토픽을 추출하는 데 사용되지만, 근본적인 접근 방식에서 차이가 있습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lll}
+\toprule
+\textbf{특징} & \textbf{LDA (잠재 디리클레 할당)} & \textbf{NMF (음수 행렬 분해)} \\
+\midrule
+\textbf{기반 이론} & 확률론적 모델 (베이즈 추론) & 행렬 대수 (선형 대수) \\
+\textbf{목표} & 관측된 데이터의 우도(likelihood) 최대화 & 원본 행렬을 두 비음수 행렬의 곱으로 근사 \\
+\textbf{토픽 정의} & 단어들의 확률 분포 & 단어들의 가중치 벡터 \\
+\textbf{문서 정의} & 토픽들의 확률 분포 & 토픽들의 가중치 벡터 \\
+\textbf{결과 특성} & 확률적, 실행마다 결과가 달라질 수 있음 & 결정론적 (일반적으로), 재현 가능 \\
+\textbf{해석} & 문서-토픽 분포, 토픽-단어 분포 & 문서-토픽 행렬, 토픽-단어 행렬 \\
+\textbf{주요 용도} & 토픽 발견, 문서 분류, 추천 시스템 & 차원 축소, 특징 추출, 이미지 처리 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\subsection{최대 우도 추정 (Maximum Likelihood Estimation, MLE) 및 EM 알고리즘}
+LDA와 같은 확률론적 모델에서 파라미터를 추정하는 핵심 방법은 최대 우도 추정입니다. 특히 모델에 직접 관측할 수 없는 잠재 변수(latent variable)가 포함되어 있을 때, EM(Expectation-Maximization) 알고리즘이 사용됩니다.
+
+\begin{tcolorbox}[definition={최대 우도 추정 (MLE)}]
+MLE는 관측된 데이터가 주어졌을 때, 이 데이터를 생성했을 가능성이 가장 높은(우도가 최대인) 모델 파라미터를 찾는 방법입니다.
+\end{tcolorbox}
+
+\subsubsection{MLE의 직관적 이해}
+\begin{tcolorbox}[example={젖은 고양이 비유}]
+집에 돌아왔는데 고양이가 젖어 있습니다. 이 관측 데이터($D$: 고양이가 젖었다)를 바탕으로 무엇이 일어났을지 추론해야 합니다.
+\begin{itemize}
+    \item \textbf{가설 1}: 밖에 비가 왔다 ($H_1$: 비가 옴).
+    \item \textbf{가설 2}: 누군가 고양이에게 물을 뿌렸다 ($H_2$: 물 뿌림).
+\end{itemize}
+MLE는 각 가설 하에서 고양이가 젖을 확률($P(D|H_1)$ 또는 $P(D|H_2)$)을 계산하고, 이 확률(우도)이 가장 높은 가설을 선택합니다. 만약 비가 왔을 때 고양이가 젖을 확률이 100\%에 가깝고, 누군가 물을 뿌릴 확률이 낮다면, "비가 왔다"는 가설이 더 높은 우도를 가집니다.
+\end{tcolorbox}
+이처럼 MLE는 관측된 데이터가 특정 모델 파라미터 하에서 발생할 확률을 최대화하는 파라미터를 찾습니다.
+
+\subsubsection{EM 알고리즘: 잠재 변수가 있는 경우}
+LDA와 같이 토픽 할당($Z$)과 같은 잠재 변수가 모델에 포함되어 직접 관측할 수 없을 때, 일반적인 MLE는 적용하기 어렵습니다. 이때 EM 알고리즘이 사용됩니다.
+
+\begin{tcolorbox}[definition={EM 알고리즘}]
+EM 알고리즘은 잠재 변수가 포함된 통계 모델의 파라미터를 추정하기 위한 반복적인 방법입니다. 기대(Expectation) 단계와 최대화(Maximization) 단계로 구성됩니다.
+\end{tcolorbox}
+
+\begin{enumerate}
+    \item \textbf{E-단계 (기대 단계, Expectation Step)}: 현재 추정된 모델 파라미터를 사용하여 잠재 변수의 기대값(또는 잠재 변수에 대한 우도의 기대값)을 계산합니다. 즉, 관측할 수 없는 잠재 변수가 어떤 값을 가질지 '기대'합니다.
+    \item \textbf{M-단계 (최대화 단계, Maximization Step)}: E-단계에서 계산된 잠재 변수의 기대값을 마치 관측된 데이터처럼 사용하여, 모델 파라미터의 우도를 최대화합니다. 새로운 파라미터 추정치를 얻습니다.
+\end{enumerate}
+이 두 단계는 파라미터가 수렴할 때까지 반복됩니다. LDA에서는 이 EM 알고리즘을 사용하여 문서-토픽 분포($\theta$)와 토픽-단어 분포($\phi$)를 추정합니다.
+
+\begin{tcolorbox}[caution={LDA의 비고유한 해}]
+LDA는 EM 알고리즘을 사용하며, 우도 함수가 여러 지역 최대값(local maxima)을 가질 수 있습니다. 이로 인해 알고리즘이 시작되는 초기값에 따라 다른 결과(다른 토픽 조합이나 순서)에 수렴할 수 있습니다. 따라서 LDA를 여러 번 실행하고, 의미론적 일관성이나 배타성 같은 지표를 사용하여 가장 좋은 결과를 선택하는 것이 중요합니다.
+\end{tcolorbox}
+
+\newpage
+\section{구조적 토픽 모델링 (Structural Topic Model, STM)}
+
+\subsection{STM의 필요성: 메타데이터 활용}
+LDA의 주요 한계 중 하나는 문서 자체의 내용만을 사용하여 토픽을 추출한다는 점입니다. 하지만 실제 문서에는 저자, 출판일, 출판 매체, 문서 유형 등 다양한 '메타데이터'가 존재하며, 이러한 정보는 토픽의 특성이나 분포에 큰 영향을 미칠 수 있습니다. STM은 이러한 메타데이터를 모델에 통합하여 토픽 모델링의 정확도와 해석 가능성을 높입니다.
+
+\begin{tcolorbox}[definition={메타데이터 (Metadata) 또는 공변량 (Covariate)}]
+메타데이터는 문서의 내용 외에 문서에 대한 추가적인 정보를 의미합니다. 예를 들어, 뉴스 기사의 경우 저자의 성별, 출판 연도, 출판 매체 등이 메타데이터가 될 수 있습니다. STM에서는 이러한 메타데이터를 '공변량(covariate)'이라고 부르며, 토픽 분포에 영향을 미치는 변수로 활용합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[example={메타데이터의 중요성}]
+학생 강의 평가 데이터를 분석한다고 가정해 봅시다.
+\begin{itemize}
+    \item \textbf{문서 내용}: 학생들이 작성한 평가 텍스트.
+    \item \textbf{메타데이터}: 강사의 성별, 학과, 강의 연도, 학생의 학년 등.
+\end{itemize}
+만약 "강사의 열정"에 대한 토픽이 있다면, 이 토픽의 출현 빈도(prevalence)가 강사의 성별이나 학과에 따라 달라질 수 있습니다. LDA는 이러한 관계를 파악할 수 없지만, STM은 메타데이터를 활용하여 "여성 강사에 대한 평가에서 '열정' 토픽이 더 자주 언급된다"와 같은 통찰을 얻을 수 있습니다.
+\end{tcolorbox}
+
+\subsection{STM의 원리 및 공식}
+STM은 LDA의 토픽 생성 과정 중, 문서별 토픽 분포 $\theta_d$를 생성하는 부분에 메타데이터를 통합합니다.
+
+\subsubsection{토픽 비율($\theta_d$) 생성의 변화}
+LDA에서는 $\theta_d$가 디리클레 분포에서 직접 샘플링되었습니다. STM에서는 $\theta_d$가 '로지스틱 정규 분포(Logistic Normal Distribution)'에서 생성됩니다. 이 분포의 중심(평균)은 메타데이터와 선형적으로 연결됩니다.
+
+\begin{equation*}
+\theta_d \sim \text{Logistic Normal}(\mu_d, \Sigma)
+\end{equation*}
+여기서 $\mu_d$는 문서 $d$의 메타데이터 $X_d$와 계수 $\gamma$의 선형 결합으로 정의됩니다.
+\begin{equation*}
+\mu_d = X_d \gamma
+\end{equation*}
+
+\begin{itemize}
+    \item \textbf{$X_d$}: 문서 $d$에 해당하는 메타데이터 벡터 (예: [1, 강사성별, 강의연도]).
+    \item \textbf{$\gamma$}: 메타데이터 변수들이 토픽 분포에 미치는 영향을 나타내는 계수 벡터.
+    \item \textbf{$\Sigma$}: 토픽 간의 공분산을 나타내는 행렬. 이는 토픽들이 서로 독립적이지 않고 상관관계를 가질 수 있음을 의미하며, 모델 훈련 과정에서 추정됩니다.
+\end{itemize}
+
+\begin{tcolorbox}[definition={로지스틱 정규 분포 (Logistic Normal Distribution)}]
+로지스틱 정규 분포는 다변량 정규 분포에서 벡터를 샘플링한 후, 이 벡터에 Softmax 함수를 적용하여 확률 벡터(합이 1이 되는 벡터)를 생성하는 분포입니다. STM에서는 이 방법을 통해 메타데이터에 따라 토픽 비율 $\theta_d$를 생성합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[example={$\mu_d = X_d \gamma$의 의미}]
+만약 메타데이터 $X_d$가 강사의 성별(0: 남성, 1: 여성)과 강의 연도($Y$)로 구성된다면, $\mu_d$는 다음과 같이 표현될 수 있습니다.
+\begin{equation*}
+\mu_d = \gamma_0 + \gamma_1 \cdot \text{성별}_d + \gamma_2 \cdot Y_d
+\end{equation*}
+이것은 마치 선형 회귀 모델처럼, 강사의 성별과 강의 연도가 문서 $d$의 토픽 분포 중심 $\mu_d$에 어떻게 영향을 미치는지를 나타냅니다. 이 $\mu_d$를 중심으로 하는 정규 분포에서 샘플링한 후 Softmax를 적용하여 최종 토픽 비율 $\theta_d$를 얻습니다.
+\end{tcolorbox}
+
+\subsection{STM의 장점 및 활용}
+STM은 메타데이터를 통합함으로써 LDA의 한계를 극복하고 다음과 같은 장점을 제공합니다.
+
+\begin{enumerate}
+    \item \textbf{더 정확한 토픽 할당}: 메타데이터를 고려하여 문서에 토픽을 할당하므로, 토픽 추출의 정확도가 높아집니다.
+    \item \textbf{가설 검정 및 통찰}: 메타데이터 변수가 특정 토픽의 출현 빈도(prevalence)에 유의미한 영향을 미치는지 통계적으로 검정할 수 있습니다.
+    \begin{itemize}
+        \item \textbf{예시 1: 시간 경과에 따른 토픽 변화}: 특정 토픽(예: '경제 위기')의 언급 빈도가 시간이 지남에 따라 어떻게 변하는지 분석할 수 있습니다.
+        \item \textbf{예시 2: 강사 성별에 따른 평가 편향}: "강사의 열정" 토픽이 여성 강사 평가에서 더 자주 언급되는지, 남성 강사 평가에서 "강의의 흥미로움" 토픽이 더 자주 언급되는지 등을 분석하여 잠재적인 편향을 탐지할 수 있습니다.
+    \end{itemize}
+    \item \textbf{시각화}: 메타데이터 변수에 따른 토픽 prevalence의 변화를 그래프로 쉽게 시각화할 수 있습니다.
+\end{enumerate}
+
+\begin{tcolorbox}[summary={STM의 핵심 가치}]
+STM은 단순히 토픽을 추출하는 것을 넘어, 토픽과 문서의 메타데이터 간의 관계를 탐색하고 통계적으로 검정할 수 있게 함으로써 사회과학, 경제학 등 다양한 분야에서 깊이 있는 통찰을 제공합니다.
+\end{tcolorbox}
+
+\newpage
+\section{STM 실습: R 언어 활용}
+이 섹션에서는 R 언어와 \texttt{stm} 패키지를 사용하여 구조적 토픽 모델을 구축하고 분석하는 과정을 단계별로 설명합니다.
+
+\subsection{R 환경 설정 및 데이터 준비}
+\texttt{stm} 패키지는 R에서 가장 널리 사용되는 구조적 토픽 모델링 도구입니다.
+
+\begin{tcolorbox}[definition={R Markdown (RMD)}]
+R Markdown은 코드, 텍스트, 그리고 코드 실행 결과를 하나의 문서에 통합할 수 있는 도구입니다. Jupyter Notebook과 유사하게 코드 블록을 실행하고 그 결과를 문서에 포함시킬 수 있습니다. 코드 블록은 세 개의 백틱(\texttt{ } \texttt{)으로 둘러싸여 구분됩니다.
+\end{tcolorbox}
+
+\subsubsection{}stm\texttt{ 패키지 설치 및 로드}
+R에서 }stm\texttt{ 패키지를 사용하려면 먼저 설치하고 로드해야 합니다.
+
+\begin{lstlisting}[language=R, caption={}stm\texttt{ 패키지 설치 및 로드}, label={lst:install_stm}]
+# stm 패키지 설치 (최초 1회만 실행)
+install.packages("stm")
+
+# stm 패키지 로드 (새로운 R 세션 시작 시마다 실행)
+library(stm)
+# dplyr, ggplot2 등 다른 필요한 패키지도 로드
+library(dplyr)
+library(ggplot2)
+\end{lstlisting}
+
+\subsubsection{데이터셋 준비}
+실습에서는 Kaggle의 "Million News Headlines" 데이터셋을 사용합니다. 이 데이터셋은 뉴스 헤드라인 텍스트와 출판일(publish date)을 포함합니다.
+
+\begin{lstlisting}[language=R, caption={데이터셋 로드 및 구조 확인}, label={lst:load_data}]
+# 데이터셋 로드 (CSV 파일 경로 지정)
+# 데이터는 Canvas의 'data' 폴더 또는 Kaggle에서 다운로드 가능
+news_data <- read.csv("abcnews-date-text.csv", stringsAsFactors = FALSE)
+
+# 데이터 차원 확인 (백만 개 이상의 헤드라인)
+dim(news_data)
+
+# 데이터 구조 확인
+str(news_data)
+\end{lstlisting}
+}dim(news_data)\texttt{ 결과는 }[1000000, 2]\texttt{와 같이 백만 개 이상의 행과 2개의 열을 보여줄 것입니다. }str(news_data)\texttt{ 결과는 }publish_date\texttt{와 }headline_text\texttt{ 필드를 보여줍니다.
+
+\subsubsection{날짜 변수 처리}
+}publish_date\texttt{는 }YYYYMMDD\texttt{ 형식의 숫자로 되어 있습니다. 이를 STM 모델에서 공변량으로 사용하기 위해 연속적인 숫자형 변수로 변환합니다.
+
+\begin{lstlisting}[language=R, caption={날짜 변수 전처리}, label={lst:process_date}]
+# publish_date를 Date 형식으로 변환
+news_data$date_obj <- as.Date(as.character(news_data$publish_date), format="%Y%m%d")
+
+# 연도와 월 추출
+news_data$year <- as.numeric(format(news_data$date_obj, "%Y"))
+news_data$month <- as.numeric(format(news_data$date_obj, "%m"))
+
+# 연속적인 숫자형 날짜 변수 생성 (연도 + (월-1)/12)
+# 예: 2003년 2월은 2003 + (2-1)/12 = 2003.083...
+news_data$numeric_date <- news_data$year + (news_data$month - 1) / 12
+
+# 첫 몇 개 값 확인
+head(news_data$numeric_date)
+\end{lstlisting}
+이렇게 생성된 }numeric_date\texttt{ 변수는 시간의 흐름을 나타내는 연속적인 숫자형 공변량으로 사용됩니다.
+
+\subsubsection{데이터 샘플링}
+백만 개 이상의 데이터를 모두 처리하는 데는 시간이 오래 걸리므로, 개발 단계에서는 데이터의 일부만 샘플링하여 사용합니다.
+
+\begin{lstlisting}[language=R, caption={데이터 샘플링}, label={lst:sample_data}]
+# 전체 데이터의 5%만 샘플링하여 사용
+# 실제 분석 시에는 이 줄을 주석 처리하고 전체 데이터를 사용
+news_sample <- news_data %>% sample_frac(0.05)
+
+# 샘플링된 데이터의 차원 확인
+dim(news_sample)
+\end{lstlisting}
+
+\subsection{텍스트 전처리}
+STM 모델을 훈련하기 전에 텍스트 데이터를 전처리해야 합니다. }stm\texttt{ 패키지는 }textProcessor\texttt{와 }prepareDocuments\texttt{ 함수를 제공하여 이 과정을 자동화합니다.
+
+\begin{lstlisting}[language=R, caption={텍스트 전처리 (}textProcessor\texttt{)}, label={lst:text_processor}]
+# 문서 텍스트와 메타데이터 분리
+docs <- news_sample$headline_text
+meta <- data.frame(date = news_sample$numeric_date) # 메타데이터는 데이터프레임 형식으로
+
+# 텍스트 전처리: 소문자화, 불용어 제거, 숫자 제거, 구두점 제거, 어간 추출
+processed <- textProcessor(
+  documents = docs,
+  metadata = meta,
+  lowercase = TRUE,
+  removestopwords = TRUE,
+  removenumbers = TRUE,
+  removepunctuation = TRUE,
+  stem = TRUE
+)
+
+# 전처리 결과 요약
+summary(processed)
+\end{lstlisting}
+}textProcessor\texttt{의 }summary()\texttt{ 출력은 제거된 단어, 빈 문서 수, 최종 어휘 크기 등을 보여줍니다. 예를 들어, "removing 9000 observations from 21000 due to frequency"는 빈번하지 않은 단어들 때문에 9000개의 단어가 어휘에서 제거되었음을 의미합니다. "50 documents become empty"는 전처리 후 50개의 문서가 비어있게 되어 제거되었음을 의미합니다. 이 경우, 해당 문서에 대응하는 메타데이터도 함께 제거됩니다.
+
+\begin{lstlisting}[language=R, caption={문서 준비 (}prepareDocuments\texttt{)}, label={lst:prepare_docs}]
+# 추가적인 문서 준비 (희귀 단어 제거 등)
+out <- prepareDocuments(
+  documents = processed$documents,
+  vocab = processed$vocab,
+  metadata = processed$meta,
+  lower.thresh = 10 # 최소 10번 이상 등장하는 단어만 유지
+)
+
+# 준비된 문서, 어휘, 메타데이터 추출
+docs_final <- out$documents
+vocab_final <- out$vocab
+vocab_final <- vocab_final[vocab_final %in% names(table(unlist(docs_final)))] %* The original code had a potential issue where }vocab_final\texttt{ might not be perfectly aligned with }docs_final\texttt{ after }prepareDocuments\texttt{ if }lower.thresh\texttt{ removed words. The }stm\texttt{ package handles this internally, but for explicit clarity and robustness, ensuring }vocab_final\texttt{ only contains words present in }docs_final\texttt{ is a good practice. However, }prepareDocuments\texttt{ already returns a consistent }vocab\texttt{. So, this line is not strictly necessary and might even cause issues if not handled carefully. I will revert to the original }vocab_final <- out$vocab\texttt{ and }meta_final <- out$meta\texttt{.
+  meta_final <- out$meta # 전처리 과정에서 변경될 수 있으므로 새로 추출
+\end{lstlisting}
+}prepareDocuments\texttt{는 }lower.thresh\texttt{와 같은 파라미터를 통해 희귀 단어를 추가로 제거할 수 있습니다. 이 과정에서 문서나 어휘가 더 줄어들 수 있으며, }meta_final\texttt{은 }docs_final\texttt{과 일관성을 유지하도록 업데이트됩니다.
+
+\subsection{STM 모델 실행 및 결과 해석}
+이제 전처리된 데이터를 사용하여 STM 모델을 훈련하고 결과를 해석합니다.
+
+\subsubsection{STM 모델 훈련}
+}stm()\texttt{ 함수를 사용하여 모델을 훈련합니다. }K\texttt{는 토픽의 수, }formula\texttt{는 공변량을 지정합니다.
+
+\begin{lstlisting}[language=R, caption={STM 모델 훈련}, label={lst:run_stm}]
+# 재현 가능한 결과를 위해 시드 설정
+set.seed(89)
+
+# STM 모델 훈련 (K=5로 가정)
+# formula = ~ date는 'date' 변수를 공변량으로 사용하겠다는 의미
+stm_model <- stm(
+  documents = docs_final,
+  vocab = vocab_final,
+  K = 5, # 토픽 수 (여기서는 5개로 가정)
+  formula = ~ date, # 공변량 지정
+  data = meta_final, # 메타데이터
+  init.type = "Spectral", # 초기화 방식
+  max.em.iter = 100 # EM 알고리즘 최대 반복 횟수
+)
+\end{lstlisting}
+}stm()\texttt{ 함수는 EM 알고리즘을 사용하여 모델 파라미터를 추정합니다. }E-step\texttt{과 }M-step\texttt{이 반복적으로 수행되며, 수렴할 때까지 또는 }max.em.iter\texttt{에 도달할 때까지 진행됩니다.
+
+\subsubsection{모델 결과 요약}
+훈련된 모델의 }summary()\texttt{를 통해 각 토픽과 가장 연관된 단어들을 확인할 수 있습니다.
+
+\begin{lstlisting}[language=R, caption={STM 모델 요약}, label={lst:summary_stm}]
+summary(stm_model)
+\end{lstlisting}
+}summary()\texttt{ 출력은 각 토픽에 대해 가장 높은 확률을 가진 단어들을 보여줍니다. 하지만 이 단어들만으로는 토픽의 의미를 명확히 파악하기 어려울 수 있습니다 (예: 'Australia'와 같은 단어는 뉴스 헤드라인 데이터셋에서 흔히 나타나므로 특정 토픽을 잘 대표하지 못할 수 있습니다).
+
+\subsubsection{토픽 prevalence 시각화}
+}plot()\texttt{ 함수는 각 토픽의 평균 출현 빈도(prevalence)를 시각화하여, 어떤 토픽이 전체 문서 집합에서 가장 지배적인지 보여줍니다.
+
+\begin{lstlisting}[language=R, caption={토픽 prevalence 시각화}, label={lst:plot_prevalence}]
+plot(stm_model, type = "summary", n = 5) # 5개 토픽 모두 표시
+\end{lstlisting}
+이 그래프는 각 토픽이 전체 문서에서 차지하는 평균 비율을 보여줍니다. 예를 들어, 'Topic 2'가 30\%로 가장 높다면, 이 토픽이 전체 뉴스 헤드라인에서 가장 자주 다루어지는 주제임을 의미합니다.
+
+\subsubsection{워드 클라우드 시각화}
+}cloud()\texttt{ 함수는 각 토픽에 대한 워드 클라우드를 생성합니다.
+
+\begin{lstlisting}[language=R, caption={토픽별 워드 클라우드}, label={lst:cloud_plot}]
+cloud(stm_model, topic = 1, scale = c(2.2, .2)) # Topic 1에 대한 워드 클라우드
+\end{lstlisting}
+워드 클라우드는 토픽과 연관된 단어들을 시각적으로 보여주지만, }summary()\texttt{와 마찬가지로 토픽의 의미를 명확히 해석하는 데 한계가 있을 수 있습니다.
+
+\subsection{토픽 효과 추정 및 시각화}
+STM의 강력한 기능 중 하나는 공변량(메타데이터)이 토픽의 prevalence에 미치는 영향을 추정하고 시각화하는 것입니다.
+
+\subsubsection{}estimateEffect()\texttt{ 함수}
+}estimateEffect()\texttt{ 함수는 훈련된 STM 모델의 파라미터를 사용하여, 공변량의 변화에 따른 토픽 prevalence의 변화를 추정합니다.
+
+\begin{lstlisting}[language=R, caption={토픽 효과 추정}, label={lst:estimate_effect}]
+# 1번부터 5번까지 모든 토픽에 대해 효과 추정
+# formula = ~ date는 'date' 변수가 토픽 prevalence에 미치는 영향을 분석하겠다는 의미
+effect <- estimateEffect(
+  1:5 ~ date, # 모든 토픽 (1:5)에 대해 date 변수의 효과 추정
+  stmobj = stm_model, # 훈련된 STM 모델 객체
+  metadata = meta_final, # 메타데이터
+  uncertainty = "Global" # 불확실성 추정 방식
+)
+
+# 추정된 효과 객체 요약
+summary(effect)
+\end{lstlisting}
+}estimateEffect()\texttt{는 추정된 파라미터(사후 분포)를 기반으로 토픽 prevalence의 기대값을 반복적으로 샘플링하고, 이 샘플링된 값들을 공변량에 대해 회귀 분석하여 효과를 추정합니다.
+
+\subsubsection{토픽 prevalence 변화 시각화}
+}plot()\texttt{ 함수를 }estimateEffect()\texttt{의 결과와 함께 사용하여 공변량에 따른 토픽 prevalence의 변화를 시각화할 수 있습니다.
+
+\begin{lstlisting}[language=R, caption={토픽 prevalence 변화 시각화}, label={lst:plot_effect}]
+plot(
+  effect,
+  covariate = "date", # 공변량 지정
+  topics = 1:5, # 모든 토픽 표시
+  model = stm_model, # STM 모델 객체
+  method = "continuous", # 공변량이 연속형 변수임을 지정
+  xlab = "Year", # x축 레이블
+  main = "Topic Prevalence Over Time", # 그래프 제목
+  linecol = "blue", # 추세선 색상
+  printlegend = TRUE # 범례 표시
+)
+\end{lstlisting}
+이 그래프는 }numeric_date\texttt{ 변수(연도)에 따라 각 토픽의 prevalence가 어떻게 변하는지 보여줍니다. 예를 들어, 특정 토픽의 prevalence가 시간이 지남에 따라 증가하는 선형 추세를 보일 수 있습니다. 이는 해당 주제가 시간이 흐르면서 뉴스 헤드라인에서 더 자주 다루어졌음을 의미합니다.
+
+\begin{tcolorbox}[caution={선형 추세 가정의 한계}]
+}method = "continuous"\texttt{를 사용할 경우, 공변량과 토픽 prevalence 간의 관계를 선형으로 가정합니다. 만약 비선형적인 관계(예: U자형, 주기적 변화)가 예상된다면, }formula\texttt{에 }date^2\texttt{와 같은 변수를 추가하거나, }date\texttt{를 범주형 변수로 처리하여 각 시점별 prevalence를 개별적으로 분석하는 방법을 고려할 수 있습니다.
+\end{tcolorbox}
+
+\subsection{최적 토픽 수($K$) 탐색}
+STM 모델에서 가장 중요한 하이퍼파라미터 중 하나는 토픽의 수 $K$입니다. 최적의 $K$를 찾기 위해 }searchK()\texttt{ 함수를 사용하여 여러 $K$ 값에 대해 모델을 실행하고, 다양한 평가 지표를 비교합니다.
+
+\subsubsection{}searchK()\texttt{ 함수 실행}
+}searchK()\texttt{는 지정된 범위의 $K$ 값에 대해 STM 모델을 훈련하고, 각 $K$에 대한 평가 지표를 계산합니다.
+
+\begin{lstlisting}[language=R, caption={최적 토픽 수 탐색 (}searchK\texttt{)}, label={lst:search_k}]
+# 2개부터 10개까지의 토픽 수에 대해 모델 실행
+k_results <- searchK(
+  documents = docs_final,
+  vocab = vocab_final,
+  K = c(2:10), # 탐색할 토픽 수 범위
+  formula = ~ date,
+  data = meta_final,
+  init.type = "Spectral",
+  max.em.iter = 50 # 탐색이므로 반복 횟수를 줄일 수 있음
+)
+
+# 결과 요약
+plot(k_results)
+\end{lstlisting}
+}plot(k_results)\texttt{는 held-out likelihood, 잔차(residuals) 등을 보여주지만, 토픽 모델링에서는 의미론적 일관성(semantic coherence)과 배타성(exclusivity)이 더 중요한 지표로 간주됩니다.
+
+\subsubsection{평가 지표 시각화 및 최적 $K$ 선택}
+}searchK()\texttt{ 결과에서 의미론적 일관성과 배타성 값을 추출하여 시각화하고, 이 두 지표를 동시에 최대화하는 $K$를 선택합니다.
+
+\begin{lstlisting}[language=R, caption={일관성 및 배타성 시각화}, label={lst:plot_coherence_exclusivity}]
+# 각 K에 대한 의미론적 일관성(coherence)과 배타성(exclusivity) 추출
+coherence_values <- unlist(k_results$results$semcoh)
+exclusivity_values <- unlist(k_results$results$exclus)
+k_values <- k_results$results$K
+
+# 데이터프레임 생성
+metrics_df <- data.frame(
+  K = k_values,
+  Coherence = coherence_values,
+  Exclusivity = exclusivity_values
+)
+
+# ggplot2를 이용한 시각화
+ggplot(metrics_df, aes(x = Exclusivity, y = Coherence, label = K)) +
+  geom_point(size = 3) +
+  geom_text(vjust = -1, hjust = 0.5) +
+  labs(title = "Coherence vs. Exclusivity for Different K",
+       x = "Exclusivity",
+       y = "Coherence") +
+  theme_minimal()
+\end{lstlisting}
+이 그래프에서 우측 상단(높은 일관성과 높은 배타성)에 위치하는 $K$ 값을 선택하는 것이 일반적입니다. 두 지표의 스케일이 다를 수 있으므로, 각 지표를 0-1 사이로 재조정(rescale)한 후 평균을 내어 최적 $K$를 선택하는 방법도 있습니다.
+
+\begin{tcolorbox}[caution={최적 K 선택의 주관성}]
+최적의 $K$를 선택하는 것은 완전히 객관적이지 않을 수 있습니다. 통계적 지표 외에도, 추출된 토픽들이 인간이 이해하기에 얼마나 의미 있고 해석 가능한지(interpretability)도 중요한 고려 사항입니다. }findThoughts()\texttt{ 함수를 사용하여 각 $K$에서 추출된 토픽들의 대표 문서를 확인하며 의미를 평가하는 것이 좋습니다.
+\end{tcolorbox}
+
+\subsubsection{최적 모델 선택 및 재현성}
+}searchK()\texttt{는 각 $K$ 값에 대해 여러 번 실행될 수 있으며, 각 실행마다 결과가 다를 수 있습니다. 따라서 특정 $K$에 대해 가장 좋은 성능을 보인 모델을 명시적으로 선택하는 것이 중요합니다.
+
+\begin{lstlisting}[language=R, caption={최적 K에 대한 모델 선택}, label={lst:select_best_k_model}]
+# 예를 들어, K=5가 최적이라고 판단했을 때, 해당 K에 대한 최적 모델을 선택
+# k_results$runout[[K_index]][[run_index]] 형태로 접근 가능
+# 여기서는 K=5에 해당하는 첫 번째 실행 모델을 선택한다고 가정
+selected_k_model <- k_results$runout[[which(k_results$results$K == 5)]][[1]]
+
+# 선택된 모델 요약
+summary(selected_k_model)
+\end{lstlisting}
+이렇게 선택된 모델을 사용하여 이후의 분석을 진행합니다.
+
+\subsection{토픽 내용 이해}
+토픽의 의미를 명확히 이해하기 위해서는 }findThoughts()\texttt{ 함수를 사용하여 각 토픽과 가장 연관성이 높은 문서들을 살펴보는 것이 가장 효과적입니다.
+
+\begin{lstlisting}[language=R, caption={토픽별 대표 문서 확인 (}findThoughts\texttt{)}, label={lst:find_thoughts}]
+# Topic 1과 가장 연관된 문서 3개 확인
+findThoughts(
+  model = stm_model,
+  texts = docs, # 원본 문서 텍스트 (전처리 전)
+  n = 3, # 표시할 문서 수
+  topics = 1 # 확인할 토픽 번호
+)
+
+# Topic 3과 가장 연관된 문서 3개 확인
+findThoughts(
+  model = stm_model,
+  texts = docs,
+  n = 3,
+  topics = 3
+)
+\end{lstlisting}
+}findThoughts()\texttt{는 특정 토픽에 대한 }theta\texttt{ 값이 가장 높은 문서들을 보여줍니다. 이 문서들을 읽어보면 해당 토픽이 어떤 주제를 다루는지 직관적으로 파악할 수 있습니다. 예를 들어, Topic 1의 대표 문서들이 '정부 정책', '선거'와 같은 단어를 포함한다면, Topic 1을 '정치' 토픽으로 명명할 수 있습니다.
+
+\begin{tcolorbox}[definition={}theta\texttt{ 행렬의 해석}]
+STM 모델의 결과 객체에는 문서-토픽 분포를 나타내는 }theta\texttt{ 행렬이 포함됩니다. 이 행렬은 각 문서가 각 토픽에 얼마나 기여하는지를 확률 값으로 보여줍니다.
+\begin{itemize}
+    \item \textbf{행}: 각 문서
+    \item \textbf{열}: 각 토픽
+    \item \textbf{값}: 문서가 해당 토픽에 기여하는 확률 (모든 토픽에 대한 확률의 합은 1)
+\end{itemize}
+예를 들어, }theta[1, 2] = 0.7\texttt{이라면 첫 번째 문서가 두 번째 토픽에 70\% 기여한다는 의미입니다.
+\end{tcolorbox}
+
+\newpage
+\section{과제 및 제출 가이드라인}
+강의에서 언급된 과제 제출 관련 지침을 정리합니다.
+
+\subsection*{과제 5: 텍스트 오토인코더}
+\begin{itemize}
+    \item \textbf{목표}: 텍스트 오토인코더의 구현 및 한계 이해. 완벽한 재현보다는 모델의 어려움을 경험하는 것이 중요합니다.
+    \item \textbf{제출물}:
+    \begin{itemize}
+        \item \textbf{보고서 (PDF)}: Jupyter Notebook으로 생성하거나 수동으로 작성할 수 있습니다. 최종적으로는 \textbf{하나의 PDF 파일}로 통합하여 제출하는 것이 권장됩니다. 보고서에는 모델 구현, 결과, 그리고 결과가 기대만큼 좋지 않은 이유에 대한 논의가 포함되어야 합니다.
+        \item \textbf{코드 파일}: Jupyter Notebook(.ipynb) 파일 또는 기타 코드 파일. 여러 문제를 해결하기 위해 여러 Jupyter Notebook 파일을 제출하는 것이 허용됩니다.
+        \item \textbf{압축 파일 (ZIP)}: 여러 코드 파일을 제출할 경우, 모든 파일을 하나의 ZIP 파일로 압축하여 제출하는 것이 좋습니다. 2~3개의 파일은 개별 제출도 허용되지만, 20개와 같이 파일 수가 많으면 ZIP 파일로 압축해야 합니다.
+    \end{itemize}
+    \item \textbf{핵심}: 보고서와 원본 코드를 모두 제출하여, 보고서 내용을 검증할 수 있도록 해야 합니다.
+\end{itemize}
+
+\subsection*{과제 6: 구조적 토픽 모델링 (STM)}
+\begin{itemize}
+    \item \textbf{목표}: R 언어를 사용하여 STM 모델을 구축하고, 메타데이터의 영향을 분석하며, 최적의 토픽 수를 탐색하는 실습.
+    \item \textbf{데이터}: 선택한 뉴스 기사 데이터셋 (강의에서 사용된 Kaggle 데이터셋 포함).
+    \item \textbf{제출물}: 과제 5와 동일한 제출 가이드라인을 따릅니다. R 코드와 보고서를 포함해야 합니다.
+\end{itemize}
+
+\begin{tcolorbox}[caution={제출물 누락 방지}]
+가장 중요한 것은 보고서와 원본 코드를 모두 제출하는 것입니다. 파일 압축 여부는 부차적인 문제이지만, 여러 파일일 경우 ZIP으로 묶는 것이 채점자에게 편리합니다. 보고서가 없거나 코드가 없으면 채점 자체가 불가능합니다.
+\end{tcolorbox}
+
+\newpage
+\section{체크리스트}
+학습 내용 복습, 과제 작성 및 제출 시 활용할 수 있는 체크리스트입니다.
+
+\subsection*{학습 내용 점검}
+\begin{itemize}
+    \item 텍스트 오토인코더의 어려움과 이미지 오토인코더와의 차이점을 이해했는가?
+    \item LDA의 기본 가정(문서-토픽 혼합)과 동작 원리를 이해했는가?
+    \item LDA가 비지도 학습이며, 레이블 데이터가 필요 없음을 이해했는가?
+    \item LDA에서 최적 토픽 수 $K$를 결정하는 어려움과 평가 지표(일관성, 배타성)를 이해했는가?
+    \item LDA가 확률적 모델이며, 실행마다 결과가 달라질 수 있음을 이해했는가?
+    \item NMF가 행렬 분해 기반의 토픽 모델임을 이해했는가?
+    \item LDA와 NMF의 주요 차이점을 설명할 수 있는가?
+    \item 최대 우도 추정(MLE)의 개념과 잠재 변수가 있을 때 EM 알고리즘이 사용되는 이유를 이해했는가?
+    \item STM이 LDA의 한계를 어떻게 극복하고 메타데이터를 활용하는지 이해했는가?
+    \item STM에서 토픽 비율($\theta_d$)이 로지스틱 정규 분포에서 생성되는 과정을 이해했는가?
+    \item R 언어에서 }stm\texttt{ 패키지를 설치하고 로드하는 방법을 아는가?
+    \item }textProcessor\texttt{와 }prepareDocuments\texttt{ 함수를 사용하여 텍스트를 전처리하는 방법을 아는가?
+    \item }stm()\texttt{ 함수로 모델을 훈련하고 }summary()\texttt{, }plot()\texttt{으로 결과를 해석하는 방법을 아는가?
+    \item }estimateEffect()\texttt{ 함수로 공변량의 영향을 추정하고 시각화하는 방법을 아는가?
+    \item }searchK()\texttt{ 함수로 최적 토픽 수 $K$를 탐색하고 평가 지표를 해석하는 방법을 아는가?
+    \item }findThoughts()\texttt{ 함수로 토픽의 의미를 파악하는 방법을 아는가?
+\end{itemize}
+
+\subsection*{과제 제출 점검}
+\begin{itemize}
+    \item 과제 보고서(PDF)를 작성했는가?
+    \item 보고서에 모든 문제에 대한 해결 과정, 결과, 분석 및 논의가 포함되어 있는가?
+    \item 보고서가 단일 PDF 파일로 통합되어 있는가?
+    \item 모든 원본 코드 파일(Jupyter Notebook 등)을 포함했는가?
+    \item 여러 코드 파일이 있다면 하나의 ZIP 파일로 압축했는가?
+    \item 제출 파일에 출처, 파일명, 페이지 언급 등 금지된 내용이 없는가?
+    \item 모든 파일이 Canvas에 올바르게 업로드되었는가?
+\end{itemize}
+
+\newpage
+\section{FAQ (자주 묻는 질문)}
+
+\begin{tcolorbox}[title=Q: 텍스트 오토인코더가 이미지 오토인코더보다 어려운 이유는 무엇인가요?]
+\textbf{A:} 텍스트는 이산적인 단어들의 시퀀스로 구성되며, 단어의 순서와 문맥이 의미를 결정하는 데 매우 중요합니다. 이미지는 연속적인 픽셀 값으로 공간적 인접성이 중요하죠. 텍스트를 단일 벡터로 압축하는 과정에서 이러한 시퀀스 정보(시간적 요소)가 크게 손실되는 '병목 현상'이 발생하여, 원본 문장을 완벽하게 복원하기가 매우 어렵습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Q: LDA는 왜 실행할 때마다 결과가 달라질 수 있나요?]
+\textbf{A:} LDA는 확률론적 모델이며, EM 알고리즘과 같은 반복적인 최적화 방법을 사용합니다. 이 과정에서 우도 함수가 여러 지역 최대값(local maxima)을 가질 수 있어, 알고리즘의 초기값이나 내부적인 확률적 샘플링에 따라 다른 결과에 수렴할 수 있습니다. 따라서 여러 번 실행하여 가장 좋은 결과를 선택하는 것이 일반적입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Q: STM에서 메타데이터는 어떻게 토픽 모델링에 활용되나요?]
+\textbf{A:} STM은 LDA의 토픽 생성 과정 중, 문서별 토픽 분포($\theta_d$)를 생성하는 부분에 메타데이터를 통합합니다. 구체적으로, $\theta_d$가 로지스틱 정규 분포에서 생성되는데, 이 분포의 중심(평균)이 메타데이터($X_d$)와 계수($\gamma$)의 선형 결합($X_d \gamma$)으로 정의됩니다. 이를 통해 메타데이터 변수가 토픽의 출현 빈도(prevalence)에 미치는 영향을 모델링할 수 있습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Q: R Markdown(RMD)은 Jupyter Notebook과 어떻게 다른가요?]
+\textbf{A:} 둘 다 코드, 텍스트, 실행 결과를 통합하는 도구이지만, RMD는 주로 R 언어에 최적화되어 있으며, LaTeX, HTML, Word 등 다양한 형식의 보고서 생성이 용이합니다. 코드 블록은 백틱(} \texttt{ })으로 구분하며, RMD 파일 자체는 텍스트 기반이어서 버전 관리에 유리합니다. Jupyter Notebook은 Python을 포함한 다양한 언어를 지원하며, 웹 기반 인터페이스가 특징입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=Q: \texttt{searchK()}로 최적 토픽 수 $K$를 찾을 때 어떤 지표를 봐야 하나요?]
+\textbf{A:} 주로 의미론적 일관성(Semantic Coherence)과 배타성(Exclusivity)을 함께 고려합니다. 일관성은 토픽 내 단어들의 의미적 관련성을, 배타성은 토픽들이 서로 겹치지 않는 정도를 나타냅니다. 이 두 지표를 동시에 최대화하는 $K$를 선택하는 것이 이상적입니다. 시각화된 그래프에서 우측 상단에 위치하는 $K$를 선택하는 경향이 있습니다.
+\end{tcolorbox}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[summary={CSCI89 Lecture 8 핵심 요약}]
+\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+    \item \textbf{텍스트 오토인코더의 어려움}: 이미지와 달리 텍스트는 시퀀스 정보 손실이 커 완벽한 재현이 어렵습니다. 병목 현상, 관측치 부족이 주원인입니다. 데이터 증강이나 Softmax 온도 함수 활용, 또는 병목 없는 시퀀스-투-시퀀스 모델로 임베딩을 훈련하는 방법을 고려할 수 있습니다.
+    \item \textbf{LDA (잠재 디리클레 할당)}: 문서가 여러 토픽의 혼합으로 구성된다는 비지도 학습 모델입니다. 최적 토픽 수 $K$ 결정이 어렵고, 확률적 특성으로 인해 실행마다 결과가 달라질 수 있습니다.
+    \item \textbf{NMF (음수 행렬 분해)}: 텍스트 행렬을 두 개의 비음수 행렬로 분해하여 잠재 토픽 구조를 찾는 행렬 대수 기반 모델입니다. LDA와 달리 결정론적이며, 차원 축소에 활용됩니다.
+    \item \textbf{EM 알고리즘}: 잠재 변수(예: LDA의 토픽 할당)가 있는 모델의 파라미터를 추정하는 반복적인 최적화 방법입니다. 기대(E) 단계와 최대화(M) 단계로 구성됩니다.
+    \item \textbf{STM (구조적 토픽 모델)}: LDA를 확장하여 문서의 메타데이터(예: 저자, 출판일, 성별)를 토픽 모델링에 통합합니다. 메타데이터가 토픽 분포에 미치는 영향을 분석하고 가설을 검정할 수 있어 더 정확하고 해석 가능한 토픽을 제공합니다.
+    \item \textbf{R 실습 (\texttt{stm} 패키지)}:
+    \begin{itemize}
+        \item \textbf{데이터 준비}: 뉴스 헤드라인 데이터셋을 로드하고, \texttt{publish_date}를 연속적인 숫자형 공변량으로 전처리합니다.
+        \item \textbf{텍스트 전처리}: \texttt{textProcessor}와 \texttt{prepareDocuments}를 사용하여 불용어 제거, 어간 추출, 빈 문서 및 희귀 단어 제거 등을 수행합니다.
+        \item \textbf{모델 훈련 및 해석}: \texttt{stm()} 함수로 모델을 훈련하고, \texttt{summary()}, \texttt{plot()}으로 토픽별 단어 및 prevalence를 확인합니다.
+        \item \textbf{효과 분석}: \texttt{estimateEffect()}로 공변량(예: 시간)이 토픽 prevalence에 미치는 영향을 추정하고 시각화합니다.
+        \item \textbf{최적 K 탐색}: \texttt{searchK()}로 다양한 토픽 수 $K$에 대해 모델을 실행하고, 의미론적 일관성 및 배타성 지표를 비교하여 최적 $K$를 선택합니다.
+        \item \textbf{토픽 이해}: \texttt{findThoughts()}로 각 토픽과 가장 연관된 문서를 확인하여 토픽의 의미를 파악합니다.
+    \end{itemize}
+    \item \textbf{과제 제출}: 보고서(PDF)와 모든 코드 파일(ZIP 압축 권장)을 함께 제출해야 합니다.
+\end{itemize}
 \end{tcolorbox}
 
 \end{document}

@@ -1,0 +1,980 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{kotex} % For Korean language support
+\usepackage[margin=25mm]{geometry} % Page margins
+\usepackage{hyperref} % For clickable links and PDF metadata
+\usepackage{xcolor} % For custom colors
+\usepackage[most]{tcolorbox} % For colored boxes
+\usepackage{booktabs} % For professional-looking tables
+\usepackage{graphicx} % For including images (though none provided, good practice)
+\usepackage{amsmath, amssymb} % For mathematical symbols
+\usepackage{listings} % For code listings (not directly used here, but good practice)
+\usepackage{setspace} % For line spacing
+\usepackage{fancyhdr} % For custom headers and footers
+\usepackage{adjustbox} % For adjusting box sizes, useful for tables
+
+% Document settings
+\onehalfspacing % Line spacing
+\setlength{\parskip}{0.6em} % Space between paragraphs
+\setlength{\parindent}{0pt} % No paragraph indentation
+\renewcommand{\arraystretch}{1.2} % Increase row height in tables
+
+% Custom colors for tcolorbox
+\definecolor{myblue}{HTML}{E0F2F7} % Light blue
+\definecolor{mygreen}{HTML}{E8F5E9} % Light green
+\definecolor{myyellow}{HTML}{FFFDE7} % Light yellow
+\definecolor{myred}{HTML}{FFEBEE} % Light red
+
+% tcolorbox styles
+\tcbset{
+  mybox/.style={
+    colback=myblue,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    boxsep=5pt,
+    arc=4pt,
+    boxrule=0.8pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable
+  },
+  summarybox/.style={
+    colback=mygreen,
+    colframe=green!75!black,
+    fonttitle=\bfseries,
+    boxsep=5pt,
+    arc=4pt,
+    boxrule=0.8pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable
+  },
+  warningbox/.style={
+    colback=myred,
+    colframe=red!75!black,
+    fonttitle=\bfseries,
+    boxsep=5pt,
+    arc=4pt,
+    boxrule=0.8pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable
+  },
+  examplebox/.style={
+    colback=myyellow,
+    colframe=orange!75!black,
+    fonttitle=\bfseries,
+    boxsep=5pt,
+    arc=4pt,
+    boxrule=0.8pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    breakable
+  }
+}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+\fancyhead[L]{FIN-571: 금융 기관 및 통화 정책} % Left header
+\fancyhead[R]{Module 4: 규제} % Right header
+\fancyfoot[C]{\thepage} % Center footer for page number
+\renewcommand{\headrulewidth}{0.4pt} % Line under header
+\renewcommand{\footrulewidth}{0.4pt} % Line above footer
+
+% PDF metadata
+\hypersetup{
+  pdftitle={Banking and Financial Institutions Module 4: Regulation},
+  pdfauthor={Professor Rustom Manouchehri Irani / UIUC Student},
+  pdfsubject={FIN-571: Financial Institutions & Monetary Policy},
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=green,
+  urlcolor=cyan
+}
+
+% Listings settings (not used in this specific document, but included as per request)
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numbersep=6pt,
+  frame=single
+}
+
+\begin{document}
+
+\newpage
+\section*{개요}
+
+\begin{summarybox}[title=모듈 4: 규제 개요]
+이 문서는 '금융 기관 및 통화 정책' 모듈 4의 강의 내용을 통합하여, 은행 규제의 필요성, 실제 작동 방식, 그리고 21세기 규제 당국이 직면한 주요 과제를 심층적으로 다룹니다.
+
+정부가 은행을 규제하는 이유와 그 목표를 시작으로, 은행 시스템의 취약성과 정부 안전망의 역할을 설명합니다.
+
+실제 규제 및 감독 과정, 특히 자본 요건, 감독 절차, 스트레스 테스트를 상세히 살펴봅니다.
+
+마지막으로, '대마불사' 문제와 그림자 금융이라는 현대적 도전에 대해 논의하며, 규제가 어떻게 진화하고 있는지 이해를 돕습니다.
+
+이 문서를 통해 현대 은행이 왜 규제되는지, 규제 과정이 어떻게 진행되는지, 그리고 새로운 도전에 어떻게 대응하는지 완벽하게 이해할 수 있습니다.
+\end{summarybox}
+
+\newpage
+\section*{용어 정리}
+
+다음 표는 본 문서에서 다루는 주요 용어들을 비전공자도 쉽게 이해할 수 있도록 설명합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+규제 & 정부가 시장 참여자에게 특정 규칙이나 제약을 부과하는 행위 & Regulation & 시장 실패를 교정 \\
+시장 실패 & 시장이 자원을 효율적으로 배분하지 못하는 상황 & Market Failure & 규제의 주된 이유 \\
+부정적 외부 효과 & 어떤 경제 활동이 관련 없는 제3자에게 해를 끼치는 것 & Negative Externality & 은행 실패의 파급 효과 \\
+미시 건전성 규제 & 개별 은행의 위험을 줄여 파산을 막는 규제 & Micro-prudential Regulation & 개별 은행의 안정성 목표 \\
+거시 건전성 규제 & 금융 시스템 전체의 위험을 줄여 시스템 위기를 막는 규제 & Macro-prudential Regulation & 시스템 전체의 안정성 목표 \\
+정부 안전망 & 은행 시스템의 안정성을 위해 정부가 제공하는 보호 장치 & Government Safety Net & 예금 보험, 최종 대부자 \\
+유동성 불일치 & 은행 자산은 장기적이고 비유동적인 반면, 부채는 단기적이고 유동적인 상태 & Liquidity Mismatch & 은행 취약성의 근본 원인 \\
+뱅크런 & 예금자들이 은행의 건전성을 의심하여 한꺼번에 예금을 인출하는 현상 & Bank Run & 은행 파산으로 이어질 수 있음 \\
+전염 효과 & 한 은행의 문제가 다른 은행으로 확산되는 현상 & Contagion & 금융 위기 심화 요인 \\
+예금 보험 & 은행이 파산해도 예금자의 예금을 일정 한도까지 보호해주는 제도 & Deposit Insurance & FDIC (미국) \\
+최종 대부자 & 금융 위기 시 일시적인 자금 부족을 겪는 은행에 대출해주는 기관 & Lender of Last Resort & 중앙은행 (미국 연준) \\
+도덕적 해이 & 정부의 보호를 믿고 은행이 과도한 위험을 감수하는 경향 & Moral Hazard & 규제의 부작용 \\
+바젤 협약 & 국제 은행들이 지켜야 할 최소 자기자본 비율에 대한 국제적 합의 & Basel Accord & 은행의 손실 흡수 능력 강화 \\
+자본 요건 & 은행이 보유해야 하는 최소한의 자기자본 비율 & Capital Requirements & 위험 가중 자산 대비 \\
+감독 & 규제 준수 여부를 지속적으로 감시하고 위반 시 제재하는 과정 & Supervision & 현장 검사, 스트레스 테스트 \\
+CAMELS 평가 & 은행의 건전성을 6가지 기준으로 평가하는 시스템 & CAMELS Rating & 자본, 자산, 경영, 수익, 유동성, 시장 위험 민감도 \\
+스트레스 테스트 & 극심한 경제 위기 상황을 가정하여 은행의 손실 흡수 능력을 평가 & Stress Testing & 미래 위험 대비 \\
+대마불사 & 너무 커서 망하게 내버려 둘 수 없는 금융 기관 & Too Big to Fail (TBTF) & 정부의 구제금융 가능성 \\
+시스템 리스크 & 한 금융 기관의 실패가 전체 금융 시스템에 파급되는 위험 & Systemic Risk & 금융 위기의 핵심 \\
+FSOC & 금융 시스템의 안정성을 감독하고 시스템 리스크를 관리하는 미국 기관 & Financial Stability Oversight Council & 시스템적으로 중요한 기관 지정 \\
+SIFI / GSIB & 시스템적으로 중요한 금융 기관 / 글로벌 시스템적으로 중요한 은행 & Systemically Important Financial Institution / Global Systemically Important Bank & 강화된 규제 대상 \\
+그림자 금융 & 은행과 유사한 금융 서비스를 제공하지만 규제는 덜 받는 기관 & Shadow Banking & 규제 차익거래 가능성 \\
+머니마켓펀드 & 단기 금융 상품에 투자하는 펀드로, 은행 예금과 유사한 기능 & Money Market Mutual Fund (MMMF) & 대표적인 그림자 금융 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section*{핵심 개념·원리}
+
+\subsection{금융 규제의 목표 이해}
+
+정부가 민간 시장에 개입하여 금융 기관을 규제하는 것은 단순히 통제하려는 것이 아니라, 시장이 스스로 해결하지 못하는 문제들을 바로잡아 사회 전체에 더 나은 결과를 가져오기 위함입니다. 특히 은행은 그 특성상 규제가 더욱 중요합니다.
+
+\subsubsection{규제의 필요성: 시장 실패와 부정적 외부 효과}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 시장이 자원을 효율적으로 배분하지 못하고, 특정 활동이 의도치 않게 다른 사람들에게 피해를 줄 때 정부 규제가 필요합니다.
+    \item \textbf{직관적 예시/비유:} 공장이 오염 물질을 배출하여 강물과 주변 환경을 해치는 경우를 생각해 보세요. 공장 주인은 생산 비용만 고려할 뿐, 오염으로 인한 어업 피해나 주민 건강 악화 같은 '외부 비용'은 신경 쓰지 않습니다. 이처럼 개인에게는 최적의 생산량이라도 사회 전체적으로는 과도한 오염(생산)이 될 수 있습니다. 정부는 환경 규제를 통해 공장이 이러한 외부 비용을 고려하도록 유도합니다.
+    \item \textbf{기술적 정확한 설명:} 규제(Regulation)는 정부가 자유 시장에 개입하여 시장 참여자에게 제약을 가하는 행위입니다. 이는 시장 균형에 영향을 미쳐 사회적으로 더 나은 결과를 도출하는 것을 목표로 합니다. 주로 시장 실패(Market Failure)를 교정하기 위해 이루어지며, 특히 부정적 외부 효과(Negative Externality)나 파급 효과(Spillover)가 발생할 때 중요합니다. 시장 참여자들은 자신에게 직접적인 영향을 미치지 않는 외부 효과를 무시하는 경향이 있으므로, 정부는 이들이 의사 결정 시 외부 효과를 고려하도록 유인합니다.
+\end{itemize}
+
+\subsubsection{은행의 독특한 외부 효과}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 개별 은행의 실패는 해당 은행을 넘어 다른 금융 기관과 전체 경제에 심각한 피해를 줄 수 있는 '전염성'을 가지고 있습니다.
+    \item \textbf{직관적 예시/비유:} 한 은행이 파산하면, 그 은행에 돈을 맡긴 사람들은 저축을 잃거나 돈을 찾지 못하게 됩니다. 또 그 은행에서 대출을 받던 기업들은 자금줄이 끊겨 사업을 접을 수도 있습니다. 더 나아가, 이 은행과 거래하던 다른 은행들도 손실을 입고 불안해져 연쇄적으로 문제가 생길 수 있습니다. 마치 한 건물의 불이 옆 건물로 번져 도시 전체를 위협하는 것과 같습니다.
+    \item \textbf{기술적 정확한 설명:} 은행은 사회에 금융 서비스를 제공하며 가치를 창출하지만, 개별 은행 또는 여러 은행의 실패(Bank Failure)는 지역 사회, 기업, 가계, 그리고 납세자에게 큰 손실을 초래할 수 있습니다. 특히 은행들은 서로 고도로 연결되어 있어, 한 은행의 실패가 다른 은행으로 파급되는 연쇄 효과(Knock-on Effects)를 일으킬 수 있습니다. 이러한 파급 효과는 개별 은행이 투자 및 자금 조달 결정을 내릴 때 고려하지 않는 부정적 외부 효과입니다. 이는 사회적 관점에서 볼 때 은행의 위험 감수(Risk-taking)가 과도해질 수 있음을 의미합니다.
+\end{itemize}
+
+\begin{examplebox}[title=사례: 리먼 브라더스 (Lehman Brothers)]
+2008년 리먼 브라더스의 파산은 한 은행의 과도한 위험 감수가 다른 금융 기관과 광범위한 경제에 어떻게 파급될 수 있는지를 보여주는 명확한 사례입니다. 리먼 브라더스는 파산으로 인한 시스템적 실패(Systemic Failures)의 비용을 스스로 부담하지 않았으며, 이는 정부 개입의 필요성을 부각시켰습니다.
+\end{examplebox}
+
+\subsubsection{금융 규제의 두 가지 주요 유형}
+
+\begin{itemize}
+    \item \textbf{미시 건전성 규제 (Micro-prudential Regulation):}
+    \begin{itemize}
+        \item \textbf{목표:} 개별 은행의 파산 위험을 줄이는 데 중점을 둡니다.
+        \item \textbf{예시:} 은행의 위험 감수 한도를 설정하여 특정 투자에 대한 노출을 제한하는 것 등이 있습니다. 개별 은행이 건전하면 시스템 전체도 안전하다는 전제에 기반합니다.
+    \end{itemize}
+    \item \textbf{거시 건전성 규제 (Macro-prudential Regulation):}
+    \begin{itemize}
+        \item \textbf{목표:} 시스템적 실패(Systemic Failures), 즉 한 은행의 실패가 전체 금융 시스템으로 확산되는 것을 줄이는 데 중점을 둡니다.
+        \item \textbf{예시:} 대형 은행에 더 엄격한 규제를 부과하여, 이들 은행의 실패가 사회에 미치는 막대한 비용을 줄이려는 시도입니다. 이는 '오염'이 다른 기관으로 확산되는 것을 막는 것에 비유할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{규제의 다른 목표: 고객 보호 및 공정성}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 규제는 금융 시스템의 안정성뿐만 아니라, 일반 고객들이 불공정한 대우를 받거나 손실을 입지 않도록 보호하는 역할도 합니다.
+    \item \textbf{직관적 예시/비유:} 어린이나 노약자가 사기를 당하지 않도록 법이 보호하는 것과 같습니다. 금융 서비스는 복잡하고 전문적이어서 일반 고객이 은행보다 정보가 부족할 수 있습니다. 따라서 정부는 고객이 부당한 수수료를 내거나, 차별적인 대출을 받지 않도록 보호합니다.
+    \item \textbf{기술적 정확한 설명:} 규제 당국은 금융 안정성 외에도 고객 보호(Customer Protection)를 중요한 목표로 삼습니다. 이는 소액 투자자와 차입자를 보호하는 것을 의미합니다. 정보가 부족한 소액 예금자들이 은행 파산 시 평생 저축을 잃지 않도록 보호하고, 은행보다 전문성이 떨어지는 차입자들이 금융 서비스를 이용할 때 부당하게 착취당하지 않도록 합니다.
+\end{itemize}
+
+\begin{examplebox}[title=사례: 레드라이닝 (Redlining)]
+레드라이닝은 미국 은행 대출에서 소득, 성별, 인종을 기반으로 심각한 차별이 존재했던 악명 높은 사례입니다. 특정 지역 전체를 위험하다고 분류하여 해당 지역 주민들에게 대출을 거부하거나 불리한 조건으로 대출을 제공했습니다. 이는 명백히 불공정한 행위였으며, 이러한 차별을 막기 위해 수많은 정부 규제가 도입되어 은행이 모든 지역 사회 구성원에게 서비스를 제공하도록 보장하고 있습니다.
+\end{examplebox}
+
+\subsubsection{규제의 상충 관계: 비용과 부작용}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 규제는 사회에 이점을 제공하지만, 은행의 효율성을 떨어뜨리거나 예상치 못한 부작용, 그리고 도덕적 해이를 유발할 수 있습니다.
+    \item \textbf{직관적 예시/비유:} 자동차 제조업체는 파산해도 정부가 구제하지 않습니다. 하지만 은행은 다릅니다. 규제는 은행이 안전하게 운영되도록 돕지만, 동시에 은행이 돈을 버는 데 제약을 가합니다. 예를 들어, 특정 위험한 투자를 금지하면 은행의 수익이 줄어들 수 있습니다. 또한, 정부가 은행을 구제해 줄 것이라는 믿음은 은행이 더 위험한 행동을 하도록 부추길 수 있습니다.
+    \item \textbf{기술적 정확한 설명:} 규제는 은행에 제약을 가하여 비효율성(Inefficiency)을 초래할 수 있습니다. 특정 거래를 금지하면 은행의 수익성이 저하될 수 있습니다. 또한, 규제는 거의 항상 의도치 않은 결과(Unintended Consequences)를 낳습니다. 예를 들어, 소외된 지역 사회에 대출을 장려하는 규제가 해당 지역의 임대료를 상승시켜 일부 가구가 감당하기 어렵게 만들 수도 있습니다. 가장 큰 문제는 도덕적 해이(Moral Hazard)입니다. 정부가 과도한 위험 감수를 실패로 처벌하지 않고 구제금융(Bailout)을 제공하면, 은행은 '성공하면 내가 이득, 실패하면 정부가 손실'이라는 생각으로 더 큰 위험을 감수하게 됩니다.
+\end{itemize}
+
+\begin{examplebox}[title=사례: 부실자산구제프로그램 (TARP)]
+2008년 금융 위기 당시, 미국 정부는 부실자산구제프로그램(Troubled Asset Relief Program, TARP)을 통해 대형 은행들의 부실 자산을 매입하여 이들이 파산하는 것을 막았습니다. 많은 경제학자들은 이러한 구제금융이 은행들이 미래에 더 큰 위험을 감수하도록 부추기는 도덕적 해이를 유발한다고 지적했습니다.
+\end{examplebox}
+
+\begin{tcolorbox}[mybox,title=결론: 규제의 균형점]
+부정적 외부 효과는 정부 개입의 역할을 만듭니다. 은행 실패로 인한 파급 효과는 은행 규제의 필요성을 야기합니다. 이러한 규제는 사회에 이익을 줄 수 있지만, 공짜가 아닙니다. 정부 개입은 은행을 덜 효율적으로 만들거나 나쁜 유인을 초래할 수 있습니다. 규제가 합리적인지는 궁극적으로 공공 정책 문제입니다. 정책 입안자들은 이점과 비용을 비교하여 결정을 내려야 합니다.
+\end{tcolorbox}
+
+\newpage
+\subsection{정부 안전망}
+
+은행 시스템의 불안정성은 금융 시스템과 경제 전반에 매우 파괴적인 영향을 미칠 수 있습니다. 이러한 불안정성, 특히 뱅크런과 금융 공황으로부터 시스템을 보호하기 위해 전 세계 정부는 두 가지 핵심 제도를 마련했습니다: 예금 보험(Deposit Insurance)과 최종 대부자(Lender of Last Resort). 이 두 제도를 통틀어 '정부 안전망(Government Safety Net)'이라고 부릅니다.
+
+\subsubsection{은행의 취약성: 뱅크런의 원인}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 은행은 단기 예금을 받아 장기 대출에 투자하는 '유동성 불일치' 구조 때문에 본질적으로 취약하며, 이는 뱅크런으로 이어질 수 있습니다.
+    \item \textbf{직관적 예시/비유:} 은행은 마치 단기 대여금으로 장기 프로젝트에 투자하는 회사와 같습니다. 고객들은 언제든지 돈을 돌려받을 수 있지만(단기 부채), 은행이 투자한 대출은 당장 현금으로 바꾸기 어렵습니다(장기 비유동 자산). 만약 고객들이 갑자기 모두 돈을 돌려달라고 하면, 은행은 현금이 부족해져 문을 닫을 수밖에 없습니다.
+    \item \textbf{기술적 정확한 설명:} 은행은 '단기 차입(borrow short)하여 장기 대출(lend long)'하는 구조를 가지고 있습니다. 대부분의 은행 자산은 정보 민감성이 높고 판매하기 어려운 대출과 같은 비유동 자산(Illiquid Assets)입니다. 반면, 은행은 예금자에게 유동성(Liquidity)을 제공하여 예금자가 요구하면 언제든지 자금을 인출할 수 있도록 합니다. 이러한 자산과 부채 간의 유동성 불일치(Liquidity Mismatch)가 은행을 취약하게 만듭니다. 갑작스러운 현금 부족은 은행을 지급 불능 상태로 몰아넣을 수 있으며, 뱅크런(Bank Run)이 발생하면 예금과 부채가 빠르게 인출됩니다. 은행은 대출 포트폴리오를 청산하려 할 수 있지만, 비유동 자산은 손실을 보고 '헐값 매각(fire sale prices)'될 수 있으며, 이마저도 시간이 걸립니다. 이러한 상황을 예상한 은행은 보통 영업을 중단하게 됩니다.
+\end{itemize}
+
+\subsubsection{뱅크런의 사회적 비용과 전염 효과}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 개별 은행의 실패는 예금자, 차입자에게 직접적인 피해를 줄 뿐만 아니라, 금융 시스템 전체로 확산되어 경제 활동을 마비시키는 '금융 공황'을 초래할 수 있습니다.
+    \item \textbf{직관적 예시/비유:} 한 은행이 망하면 그 은행 고객만 피해를 보는 것이 아닙니다. 다른 은행 고객들도 '혹시 내 은행도?'라는 불안감에 돈을 인출하기 시작합니다. 이는 마치 독감 환자 한 명이 주변 사람들에게 바이러스를 퍼뜨려 도시 전체가 독감에 걸리는 것과 같습니다. 결국 기업들은 대출을 받지 못해 투자를 줄이고, 가계는 소비를 줄여 경제 전체가 침체됩니다.
+    \item \textbf{기술적 정확한 설명:} 은행 실패는 예금자에게 예금 손실이나 지급 시스템 접근 불가라는 피해를 주고, 차입자에게는 금융 서비스 접근 불가라는 피해를 줍니다. 정부의 주된 우려는 이러한 초기 충격이 금융 시스템 전체로 확산되는 전염 효과(Contagion)입니다. 예금자와 채권자들이 금융 시스템 전체의 건전성에 대해 우려하게 되면, 전반적인 인출이 발생하는데 이를 금융 공황(Panic)이라고 합니다.
+\end{itemize}
+
+\begin{tcolorbox}[mybox,title=전염 효과의 두 가지 주요 원천]
+\begin{enumerate}
+    \item \textbf{정보 비대칭 (Information Asymmetry):} 예금자와 은행 경영진 간의 정보 불균형에서 발생합니다. 한 은행에 대한 나쁜 소문(진실 여부와 무관하게)이 퍼지면, 예금자들은 자신의 돈을 인출하기 위해 달려갑니다. 이 과정에서 다른 은행의 예금자들도 불안감을 느끼고 예금을 인출할 수 있습니다. 예금자들이 정보가 부족한 한, 소문은 건전한 은행까지 무너뜨릴 수 있습니다.
+    \item \textbf{상호 연결성 (Interconnectedness):} 21세기 은행들은 고도로 상호 연결되어 있습니다. 한 대형 은행이 실패하면, 다른 은행들은 도매 자금 조달(Wholesale Funding)에 접근하지 못할 수 있습니다. 또한, 보험이나 파생상품 계약의 상대방 위험(Counter-party Risk)으로 인해 연쇄적인 손실이 발생할 수 있습니다.
+\end{enumerate}
+\end{tcolorbox}
+
+금융 공황은 사회에 막대한 비용을 초래합니다. 건전한 은행들까지 파산할 수 있으며, 차입자들이 신용에 접근하지 못하면 기업 투자, 가계 지출, 전반적인 경제 활동이 악화됩니다. 경제가 나빠지면 더 많은 대출이 부실화되어 상황은 더욱 악화됩니다. 금융과 경제 활동 간의 이러한 부정적인 피드백 루프는 깊고 장기적인 경기 침체로 이어질 수 있습니다. 우리는 부실 은행이 실패하는 것을 원하지만, 금융 공황은 원하지 않습니다. 바로 이 지점에서 정부가 개입하여 안전망을 구축합니다.
+
+\subsubsection{정부 안전망의 두 축: 예금 보험과 최종 대부자}
+
+정부 안전망은 예금 보험(Deposit Insurance)과 최종 대부자(Lender of Last Resort)라는 두 가지 제도로 구성되어 뱅크런에 대한 양면 공격을 펼칩니다.
+
+\begin{enumerate}
+    \item \textbf{예금 보험 (Deposit Insurance):}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} 은행이 파산해도 예금자의 돈을 일정 한도까지 보장하여, 예금자들이 뱅크런을 할 유인을 없앱니다.
+        \item \textbf{직관적 예시/비유:} 자동차 보험과 같습니다. 사고가 나도 보험사가 수리비를 내주기 때문에 운전자는 작은 사고에 대해 크게 걱정하지 않습니다. 예금 보험도 은행이 망해도 정부가 예금을 돌려주기 때문에 예금자들은 소문에 흔들리지 않고 돈을 인출할 필요가 없습니다.
+        \item \textbf{기술적 정확한 설명:} 대부분의 국가에는 예금 보험 프로그램이 있습니다. 미국의 경우 1933년부터 연방예금보험공사(Federal Deposit Insurance Corporation, FDIC)가 운영되고 있습니다. 은행들은 예금 보험료를 지불하며, 은행이 파산하면 소매 예금자(일반 고객)는 돈을 잃지 않습니다. 2020년 기준 보험 한도는 25만 달러로, 일반 고객에게는 충분한 보장입니다. FDIC는 파산한 은행을 정리(Resolve)합니다. 은행은 파산 법원이 아닌 FDIC가 처리하며, 보통 파산 은행을 지역의 건전한 다른 은행에 경매로 넘겨 예금 계좌가 해당 은행으로 이전됩니다. 이는 빠르고 쉬운 과정입니다.
+        \item \textbf{작동 원리:} 예금 보험은 뱅크런을 예방합니다. 예금자는 은행에 대한 나쁜 소문을 들어도, 최악의 경우 FDIC로부터 돈을 돌려받을 수 있기 때문에 굳이 은행으로 달려가 돈을 인출할 유인이 없습니다. 이는 '사전 예방(before-the-fact)' 장치입니다.
+    \end{itemize}
+    \item \textbf{최종 대부자 (Lender of Last Resort):}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} 건전하지만 일시적인 현금 부족을 겪는 은행에 중앙은행이 긴급 대출을 제공하여, 진행 중인 뱅크런을 중단시킵니다.
+        \item \textbf{직관적 예시/비유:} 갑자기 집에 불이 났는데 소방차가 출동하여 불을 끄는 것과 같습니다. 은행이 갑자기 현금이 부족해져 뱅크런이 시작되면, 중앙은행이 긴급 자금을 공급하여 뱅크런을 진정시킵니다.
+        \item \textbf{기술적 정확한 설명:} 미국에는 100년 이상 된 연방준비제도(Federal Reserve System, Fed)라는 중앙은행이 있습니다. 연준의 주요 기능 중 하나는 최종 대부자 역할을 하는 것입니다. 이는 연준이 지급 능력이 있는(Solvent) 은행, 즉 건전하지만 일시적으로 뱅크런을 겪는 은행에 현금 대출을 제공하는 것을 의미합니다. 은행은 대출을 공개 시장에서 헐값에 매각하는 대신, 연준에 고품질 대출을 담보로 단기 현금 대출을 받을 수 있습니다. 은행은 이 현금을 사용하여 예금자들의 인출 요구를 충족시킬 수 있습니다. 예금자들이 돈을 돌려받을 수 있다는 것을 알게 되면, 뱅크런을 할 유인이 사라집니다. 상황이 진정되면 은행은 연준에 대출금을 상환합니다.
+        \item \textbf{작동 원리:} 최종 대부자는 건전한 은행에 현금 대출을 제공하여 진행 중인 뱅크런을 중단시킵니다. 이는 '사후 대응(after-the-fact)' 장치입니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{사례 연구: 2007-2009년 금융 위기 개입}
+
+2007-2009년 금융 위기 동안 정부 안전망이 어떻게 작동했는지 살펴보는 것은 매우 중요합니다.
+
+\begin{itemize}
+    \item \textbf{위기 전 상황:} 2006년 여름 미국 주택 가격이 정점에 달한 후 급락하기 시작하면서 금융 시스템의 취약점이 드러났습니다.
+    \item \textbf{금융 스트레스 지표:} TED 스프레드(TED spread)는 금융 부문 스트레스의 일반적인 척도입니다. 이는 은행 간 대출 금리(interbank rate)와 미국 국채 금리(Treasury bill rate)의 차이입니다. 정상 시기에는 차이가 거의 없지만, 위기 시기에는 스프레드가 확대되어 투자자들이 금융 시스템을 더 위험하게 본다는 것을 나타냅니다.
+    \item \textbf{위기 전개:}
+    \begin{itemize}
+        \item \textbf{2007년 8월:} 프랑스 대형 은행 BNP 파리바(BNP Paribas)가 미국 모기지에 대규모 투자했던 투자 펀드 자회사 세 곳의 인출을 중단했습니다. 이후 투자자들은 어떤 금융 기관이 미국 모기지에 노출되어 있는지 우려하기 시작했고, 금융 스트레스가 증가했습니다.
+        \item \textbf{2008년 3월:} 미국 대형 투자 은행 베어 스턴스(Bear Stearns)가 도매 자금 조달(Wholesale Funding)에서 뱅크런을 겪었고, 연준은 JP모건 체이스(JPMorgan Chase)를 통한 긴급 구제를 주선해야 했습니다. 스트레스는 더욱 고조되었습니다.
+        \item \textbf{2008년 9월:} 리먼 브라더스(Lehman Brothers)의 파산은 광범위한 공황을 촉발했습니다. 금융 스트레스 지표는 전례 없는 수준으로 치솟았고, 신용 시장은 얼어붙었으며, 주식 시장은 폭락했습니다. 경제 전반으로의 파급 효과가 명백해졌습니다.
+    \end{itemize}
+    \item \textbf{정부 개입:} 정부는 금융 공황을 막고 경제적 파급 효과를 제한하기 위해 개입했습니다. 주요 개입은 다음과 같습니다.
+    \begin{itemize}
+        \item \textbf{예금 보험 확대:} 2008년 10월 8일, 리먼 파산 한 달도 채 되지 않아 예금 보험 한도가 10만 달러에서 25만 달러로 인상되었습니다. 이 개입의 목표는 미래의 뱅크런을 예방하는 것이었습니다.
+        \item \textbf{최종 대부자 역할:} 연방준비제도는 유동성 지원 시설(Liquidity Facilities)을 통해 임시 현금 대출을 제공했습니다. 2008년 초부터 운영되었지만, 공황 기간 동안 크게 확대되었습니다. 이 시설들은 모두 진행 중인 뱅크런을 중단시키는 동일한 목적을 가졌습니다. 상황이 진정된 후 연준은 대출금을 상환받았습니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[warningbox,title=정부 안전망의 함정: 도덕적 해이]
+정부 안전망은 은행 경영진에게 실패에 대한 완충 역할을 제공하여 도덕적 해이를 유발할 수 있습니다. 마치 보험에 가입한 운전자가 작은 사고에 대해 덜 걱정하는 것처럼, 은행 경영진은 더 큰 위험을 감수하려 할 수 있습니다. 앞으로 은행 규제와 감독이 이 문제를 어떻게 다루는지 살펴보겠습니다.
+\end{tcolorbox}
+
+\newpage
+\section{규제 및 감독의 실제}
+
+금융 시스템의 심각한 혼란은 사회에 막대한 비용을 초래할 수 있으므로, 은행은 가장 엄격하게 규제받는 기업 중 하나입니다. 이 섹션에서는 정부의 은행 규제가 어떻게 작동하는지, 규제 당국이 은행에 어떤 제약을 가하는지, 그리고 은행이 규칙을 위반했을 때 어떤 일이 발생하는지 설명합니다.
+
+\subsection{은행 규제}
+
+\subsubsection{규제와 감독의 구분}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 규제는 은행이 따라야 할 '규칙'을 만드는 것이고, 감독은 그 규칙이 잘 지켜지는지 '감시하고 집행'하는 것입니다.
+    \item \textbf{직관적 예시/비유:} 규제는 도로교통법을 만드는 것과 같습니다. "시속 60km 이상으로 달리지 마시오"와 같은 규칙을 정하는 것이죠. 반면 감독은 경찰이 도로에서 과속하는 차량을 단속하고 벌금을 부과하는 것과 같습니다.
+    \item \textbf{기술적 정확한 설명:}
+    \begin{itemize}
+        \item \textbf{은행 규제 (Bank Regulation):} 정부가 은행이 따라야 할 구체적인 규칙(Specific Rules)을 제정하는 것입니다. 이 규칙들은 보통 정부가 통과시킨 법률(예: 글래스-스티걸 법)의 권한 아래 작성됩니다. 예를 들어, 상업 은행과 투자 은행의 분리를 요구하는 규칙을 만드는 것입니다.
+        \item \textbf{은행 감독 (Bank Supervision):} 은행 시스템에 대한 지속적인 감시(Continuous Oversight)를 포함합니다. 은행이 규칙을 위반하면 처벌(Enforcement Actions)이 따릅니다. 감독은 개별 은행의 안전성과 건전성(Safety and Soundness)에 더 좁게 초점을 맞춥니다. 정부는 은행의 재무 보고서를 검사하고, 현장 검사(On-site Examinations)를 수행하며, 연간 스트레스 테스트(Stress Testing)를 실시합니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{무엇이 규제되는가?}
+
+은행 규제는 크게 경쟁, 활동 및 투자, 자금 조달, 그리고 공시 요건의 네 가지 영역에 걸쳐 이루어집니다.
+
+\begin{enumerate}
+    \item \textbf{경쟁 (Competition):}
+    \begin{itemize}
+        \item \textbf{내용:} 은행을 개설하려면 연방 또는 주 규제 당국의 승인을 받아야 합니다. 은행 합병(Mergers)도 정부 승인이 필요합니다. 최근까지 은행이 지점을 개설할 수 있는 지리적 범위도 제한되었습니다. 산업 퇴출(Industry Exit)의 경우, 은행에는 파산 절차가 없으며 FDIC가 부실 은행을 정리합니다.
+        \item \textbf{목표:} 과도한 경쟁은 은행이 생존을 위해 도박을 하게 만들 수 있고, 너무 적은 경쟁은 고객 착취로 이어질 수 있으므로, 이 사이에서 균형을 맞추기 위함입니다.
+    \end{itemize}
+    \item \textbf{활동 및 투자 (Activities and Investments):}
+    \begin{itemize}
+        \item \textbf{내용:} 과거에는 예금 수취 상업 은행이 증권 인수(Securities Underwriting)를 할 수 없었습니다. 현재는 자기 계정 거래(Proprietary Trading)에 제한이 있습니다. 은행은 위험성이 높은 주식(Stocks)을 보유할 수 없으며, 정크 본드(Junk Bond) 보유에도 제한이 있습니다.
+        \item \textbf{목표:} 이러한 규제는 은행의 위험 감수(Risk-taking)를 직접적으로 통제하여 은행의 건전성을 확보하려는 것입니다.
+    \end{itemize}
+    \item \textbf{자금 조달 (Funding):}
+    \begin{itemize}
+        \item \textbf{내용:} 은행은 레버리지(Leverage)에 대한 상한선을 가지고 있습니다. 이는 자기자본 조달(Equity Funding)에 대한 최소 요건으로 표현됩니다. 도매 자금 조달(Wholesale Funding)의 사용도 면밀히 감시됩니다.
+        \item \textbf{목표:} 손실에 대한 완충 역할을 할 수 있는 안정적인 자금 조달은 은행의 실패 위험을 줄이는 데 도움이 됩니다.
+    \end{itemize}
+    \item \textbf{공시 요건 (Disclosure Requirements):}
+    \begin{itemize}
+        \item \textbf{내용:} 은행은 고객에게 신용 카드 비용을 명확히 알려야 합니다. 또한, 표준화된 형식으로 정기적으로 재무 정보를 공개해야 합니다.
+        \textbf{목표:} 이는 규제 당국과 금융 시장 모두가 과도한 위험을 감수하는 은행을 규율할 수 있도록 합니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{누가 규제하는가? (미국 중심)}
+
+미국에서는 여러 기관이 은행을 규제하고 감독합니다.
+
+\begin{itemize}
+    \item \textbf{연방예금보험공사 (FDIC):} 모든 은행이 예금 보험에 가입되어 있으므로 FDIC가 최우선 규제 기관입니다.
+    \item \textbf{연방준비제도 (Federal Reserve System):} 중앙은행으로서 중요한 규제 역할을 합니다.
+    \item \textbf{통화감독청 (Office of the Comptroller of the Currency, OCC):} 미국 재무부 산하 기관입니다.
+    \item \textbf{주 정부 당국:} 많은 소규모 은행들은 주(State) 차원에서 규제됩니다.
+\end{itemize}
+미국은 여러 규제 기관이 존재하는 점에서 다소 독특합니다. 다른 국가들은 보통 중앙은행 내에 단일 은행 규제 기관을 두는 경우가 많습니다.
+
+\subsubsection{사례 연구: 바젤 협약과 자본 요건}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 바젤 협약은 전 세계 은행들이 최소한의 자기자본을 보유하도록 요구하여, 은행의 손실 흡수 능력을 강화하고 국제적인 경쟁의 공정성을 유지하려는 국제적 합의입니다.
+    \item \textbf{직관적 예시/비유:} 전 세계 자동차 경주에서 모든 참가 차량이 최소한의 안전 장치(에어백, 안전벨트 등)를 갖추도록 의무화하는 것과 같습니다. 어떤 나라의 차량은 안전 장치가 적어 더 가볍고 빠르다면 불공평하겠죠. 바젤 협약은 은행의 '안전 장치'인 자기자본을 국제적으로 표준화하는 것입니다.
+    \item \textbf{기술적 정확한 설명:} 바젤 협약(Basel Accord)은 은행 위험 감수에 대한 '글로벌 최소세'로 볼 수 있습니다. 1980년대 은행업이 점점 더 글로벌화되면서, 규제가 느슨한 국가의 은행이 규제가 엄격한 국가의 은행보다 경쟁 우위를 가질 수 있다는 문제가 발생했습니다. 이는 규제 당국 간의 '규제 완화 경쟁(race to the bottom)'을 유발할 수 있었습니다.
+    \item \textbf{바젤 협약의 해결책:} 1988년 스위스 바젤에서 전 세계 은행 규제 당국자들이 모여 모든 국가의 은행에 대해 공정한 경쟁 환경(Level Playing Field)을 조성하기 위한 새로운 규칙을 개발했습니다. 바젤 협약은 은행의 손실 흡수 능력(Loss-bearing Capacity)에 초점을 맞췄습니다. 은행이 투자를 자기자본(Equity Capital)으로 조달하도록 장려함으로써, 더 많은 자본은 잠재적 손실에 대한 더 큰 완충 역할을 하여 더 안전한 글로벌 은행 시스템을 구축하는 것을 목표로 했습니다.
+    \item \textbf{최소 자본 요건 (Minimum Capital Requirements):}
+    \begin{itemize}
+        \item 대략적으로 은행은 자산 1달러당 최소 0.08달러의 자기자본으로 자금을 조달해야 합니다.
+        \item 이 규칙은 은행 투자의 위험도를 고려합니다. 예를 들어, 매우 안전한 AAA 등급 국채에만 투자하는 은행은 더 적은 자기자본 완충이 필요합니다. 즉, 자본 요건은 위험 기반(Risk-based)입니다.
+        \item 시간이 지남에 따라 바젤 1(1988년)에서 바젤 3(2010년)으로 진화했지만, 기본적인 아이디어는 동일합니다: 위험 투자 1달러당 최소 X센트의 자기자본을 보유해야 합니다. 2017년에는 최소 6센트였습니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}[title=미국 대형 은행의 자본 비율 (2017년 데이터)]
+JP모건, 뱅크 오브 아메리카 등 미국 대형 은행들은 2017년 기준 최소 자본 요건을 충분히 충족했습니다. 이는 2020년 코로나19 팬데믹이 닥쳤을 때 이들 은행이 잘 대응할 수 있었던 이유 중 하나로 평가됩니다. 여기서 사용되는 자본 비율은 단순히 '자기자본/자산'이 아니라 '자기자본/위험 가중 자산(Risk-weighted Assets)'으로, 위험도를 반영한 복잡한 계산을 거칩니다.
+\end{examplebox}
+
+\begin{tcolorbox}[mybox,title=은행 규제 요약]
+은행 규제는 은행에 제약을 가하고, 특정 위험 활동을 금지하며, 은행이 간과할 수 있는 행동을 장려합니다. 바젤 협약은 최소 자본 요건을 설정하여 글로벌 표준을 제공하고 공정한 경쟁 환경을 보장하는 중요한 사례입니다.
+\end{tcolorbox}
+
+\newpage
+\subsection{감독 과정}
+
+은행 규제가 정부가 규칙을 제정하는 것이라면, 감독(Supervision)은 그 규칙이 실제로 잘 지켜지고 있는지 확인하는 과정입니다. 규칙을 위반하면 반드시 그에 따른 결과가 있어야 합니다. 감독은 은행의 건전성을 모니터링하기 위해 검사(Exams)와 스트레스 테스트(Stress Tests)를 활용합니다.
+
+\subsubsection{누가 감독하는가?}
+
+규칙을 제정하는 기관과 동일한 기관들이 은행을 감독합니다. 즉, FDIC, 연준(Fed), OCC, 그리고 주(State) 당국이 은행 감독을 담당합니다. 이 기관들은 규칙을 실행에 옮깁니다.
+
+\subsubsection{규칙 위반 시 제재: 집행 조치}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 은행이 규정을 위반하면 규제 당국은 시정 조치를 요구하고, 불이행 시 벌금, 활동 제한, 또는 개인 제재와 같은 처벌을 가합니다.
+    \item \textbf{직관적 예시/비유:} 학교에서 교칙을 어긴 학생에게 벌점을 주거나, 반성문을 쓰게 하고, 심하면 정학 처분을 내리는 것과 같습니다. 은행도 규칙을 어기면 '벌점'을 받고, '반성문'에 해당하는 시정 계획을 제출해야 하며, 심하면 '영업 정지'와 같은 제재를 받습니다.
+    \item \textbf{기술적 정확한 설명:} 은행이 규칙을 위반할 경우, 규제 당국은 특정 조치(Certain Actions)를 요구하고 불이행 시 제재(Penalize Noncompliance)할 권한을 가집니다. 일반적으로 규제 당국은 은행에 절차상의 결함을 시정하거나 자기자본 확충과 같은 조치를 요구합니다. 은행이 이를 준수하지 않으면, 특정 개인의 은행업 종사 금지, 특정 M\&A 활동 금지, 배당금 지급 금지, 심지어 벌금(Fines)과 같은 처벌이 따를 수 있습니다.
+\end{itemize}
+
+\begin{examplebox}[title=사례: 런던 고래 (London Whale) 사건]
+2013년 연준은 JP모건 체이스의 '런던 고래' 사건과 관련하여 집행 조치를 발표했습니다. 이 사건에서 한 트레이더가 은행의 부실한 감시 하에 막대한 손실을 입혔습니다. 연준은 은행의 위험 관리(Risk Management) 결함을 지적하고, 이를 시정하기 위한 신속한 조치를 요구했으며, 2억 달러의 벌금을 부과했습니다. 이는 영국 규제 당국의 벌금과 합쳐 약 10억 달러에 달하는 막대한 금액이었습니다. 이러한 처벌은 JP모건이 60억 달러의 손실을 입고 은행을 위험에 빠뜨린 사건에 대한 것이었으며, 적절한 절차가 있었다면 피할 수 있었을 것입니다.
+\end{examplebox}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{위반 유형} & \textbf{주요 벌금 사례 (2008-2015)} \\
+        \midrule
+        미판매 미국 모기지 및 관련 증권 & 가장 큰 비중을 차지 \\
+        런던 고래 사건 & JP모건 체이스에 2억 달러 벌금 \\
+        기타 & 다양한 규제 위반에 대한 벌금 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{은행별 및 위반 유형별 벌금 (2008-2015년 개념적 요약)}
+    \label{tab:bank_fines}
+\end{figure}
+\vspace{0.5em}
+위 표는 2008년부터 2015년까지 은행별 및 위반 유형별 벌금 현황을 개념적으로 보여줍니다. 미판매 미국 모기지 및 관련 증권과 관련된 벌금이 가장 큰 비중을 차지했으며, 런던 고래 사건과 같은 개별 사례도 상당한 벌금을 초래했습니다. 이러한 벌금은 은행이 규칙을 위반할 경우 반드시 결과가 따른다는 것을 보여주며, 은행이 규칙을 준수하고 적절한 위험 관리 관행을 채택하도록 장려하는 역할을 합니다.
+
+\subsubsection{감독 과정의 핵심: 공식 은행 검사}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 감독관은 은행의 재무 보고서를 분석하고 직접 방문하여 은행의 건강 상태를 종합적으로 평가합니다.
+    \item \textbf{직관적 예시/비유:} 의사가 환자의 건강 상태를 진단하는 것과 같습니다. 혈액 검사(재무 보고서 분석)를 통해 전반적인 상태를 파악하고, 직접 진찰(현장 검사)을 통해 더 깊이 있는 문제를 찾아냅니다.
+    \item \textbf{기술적 정확한 설명:} 공식 은행 검사(Formal Bank Examinations)는 감독 과정의 핵심 부분입니다. 모든 은행은 검사를 받아야 합니다.
+    \begin{itemize}
+        \item \textbf{비현장 검사 (Offsite Component):} 은행은 규제 당국에 분기별 재무 보고서를 제출해야 합니다. 감독관은 이 보고서를 분석하여 잠재적인 약점을 가진 은행을 찾아냅니다.
+        \item \textbf{현장 검사 (Onsite Component):} 검사관이 최소 연 1회 은행을 방문합니다. 때로는 예고 없이 방문하기도 하며, 대형 은행의 경우 검사관이 연중 상주하기도 합니다. 모든 경우에 검사관은 은행의 사업을 심층적으로 조사하여 은행의 상태와 성과를 파악합니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{CAMELS 평가 시스템}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 은행 검사의 결과는 'CAMELS'라는 6가지 핵심 기준에 따라 은행의 건전성을 평가하는 점수로 나타납니다.
+    \item \textbf{직관적 예시/비유:} 학생의 성적표와 같습니다. 국어, 영어, 수학 등 여러 과목(CAMELS 기준)에서 점수를 받고, 이를 종합하여 총점(전반적인 점수)이 나옵니다. 만약 낙제하면 '문제 학생 명단'에 오르겠죠.
+    \item \textbf{기술적 정확한 설명:} 검사 과정의 결과는 CAMELS 점수(CAMELS Score)로 나타납니다. 이 점수는 은행이 검사를 통과하는지 여부를 결정합니다. 은행은 다음 6가지 핵심 기준에 따라 평가됩니다.
+    \begin{itemize}
+        \item \textbf{C}apital adequacy (자본 적정성): 은행의 손실 흡수 능력.
+        \item \textbf{A}sset quality (자산 건전성): 자산이 부실화되고 있는지, 아니면 양호한 상태인지.
+        \item \textbf{M}anagement (경영): 은행이 법규 및 규정을 잘 준수하며 운영되고 있는지.
+        \item \textbf{E}arnings (수익): 은행의 투자가 수익을 창출하고 있는지.
+        \item \textbf{L}iquidity (유동성): 은행의 유동성 위험 원천은 무엇이며, 충분한 현금을 보유하고 있는지.
+        \item \textbf{S}ensitivity to market risk (시장 위험 민감도): 시장 위험에 대한 은행의 민감도.
+    \end{itemize}
+    각 기준에 대한 점수가 부여되고, 전반적인 점수가 주어집니다. 은행이 검사에 실패하면 '문제 은행 목록(Problem Bank List)'에 오르게 됩니다. 문제 은행은 공개적으로 명단이 발표되지는 않지만, 규제 당국은 은행에 검사 실패 사실을 비공개로 통보합니다. 이들 은행은 규제 당국의 특정 우려 사항을 해결할 때까지 제한을 받게 됩니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{ccc}
+        \toprule
+        \textbf{연도} & \textbf{문제 은행 수} & \textbf{총 관리 자산 (개념적)} \\
+        \midrule
+        2008 & (높음) & (높음) \\
+        ... & ... & ... \\
+        2021 & (낮음) & (낮음) \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{문제 은행 목록 (2008-2021년 개념적 추이)}
+    \label{tab:problem_banks}
+\end{figure}
+\vspace{0.5em}
+위 표는 2008년부터 2021년까지 문제 은행의 수와 총 관리 자산의 추이를 개념적으로 보여줍니다. 이 수치는 경기 순환적(Cyclical) 특성을 가집니다. 경기 침체기에는 은행의 결함이 드러나면서 문제 은행의 수가 증가하는 경향이 있습니다.
+
+\newpage
+\subsection{스트레스 테스트}
+
+스트레스 테스트(Stress Testing)는 감독 과정에 비교적 최근에 추가된 요소로, 2007-2009년 위기 이후 인기를 얻었습니다.
+
+\subsubsection{스트레스 테스트의 목표와 작동 방식}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 스트레스 테스트는 은행이 극심한 경제 위기 상황에서도 충분한 자본을 보유하여 생존할 수 있는지 미리 평가하는 제도입니다.
+    \item \textbf{직관적 예시/비유:} 건물을 지을 때 지진이나 태풍 같은 최악의 상황을 가정하여 건물이 무너지지 않도록 설계하는 것과 같습니다. 은행도 최악의 경제 상황을 가정하여 얼마나 튼튼한지 미리 시험하는 것입니다.
+    \item \textbf{기술적 정확한 설명:} 스트레스 테스트의 목표는 은행이 대규모 잠재적 손실에 대해 생각하도록 강제하는 것입니다. 이는 은행이 심각한 경제 및 금융 스트레스 기간에도 생존할 수 있는 충분한 자본을 보유하고 있는지 확인하는 것입니다. 미래 지향적인 방식으로 은행의 회복 탄력성(Resilience)을 테스트합니다.
+\end{itemize}
+
+\begin{tcolorbox}[mybox,title=스트레스 테스트 절차]
+\begin{enumerate}
+    \item \textbf{경제 시나리오 제공:} 은행은 향후 몇 년간의 경제 시나리오를 받습니다.
+    \begin{itemize}
+        \item \textbf{기준 시나리오 (Baseline Scenario):} GDP, 실업률, 주택 가격 등이 현재 추세대로 지속되는 상황.
+        \item \textbf{불리한 시나리오 (Adverse Scenario):} 경제가 붕괴하는 최악의 시나리오.
+        \item \textbf{심각하게 불리한 시나리오 (Severely Adverse Scenario):} 경제가 더욱 심각하게 붕괴하는 최악 중의 최악 시나리오.
+    \end{itemize}
+    \item \textbf{손실 예측 및 자본 계획 제출:} 은행은 각 시나리오 하에서 예상 손실을 예측하고, 이에 기반하여 자본 계획(Capital Plan)을 제출합니다. 이 계획에는 이익을 은행 내에 유보할지, 배당금으로 지급할지, 폭풍을 견디기 위해 얼마나 추가 주식을 발행할지 등이 포함됩니다.
+    \item \textbf{규제 당국의 검토:} 이 계획은 규제 당국(주로 연준)에 제출되어 검토됩니다. 연준은 은행이 제안한 계획을 바탕으로 은행의 성과에 대한 자체 예측을 수행합니다.
+    \item \textbf{결과 공개:} 스트레스 테스트 결과는 대중에게 공개됩니다. 은행들은 금융 시장에 놀라움을 주지 않기 위해, 그리고 '공개적인 망신'을 피하기 위해 이 결과를 통과하기를 원합니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\subsubsection{사례 연구: SCAP와 CCAR}
+
+\begin{enumerate}
+    \item \textbf{감독 자본 평가 프로그램 (Supervisory Capital Assessment Program, SCAP):}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} 2009년 금융 위기 중 실시된 최초의 스트레스 테스트로, 은행 시스템의 부족한 자본을 평가하고 확충을 유도했습니다.
+        \item \textbf{기술적 정확한 설명:} SCAP는 2009년 초 금융 위기 중에 은행 시스템의 부족한 자본을 평가하기 위해 실시된 최초의 스트레스 테스트였습니다. 이는 '각 은행이 생존하기 위해 얼마나 더 많은 손실 흡수 능력이 필요한가?'라는 질문에 답했습니다.
+        \item \textbf{과정:} 19개 대형 은행을 대상으로 2009년과 2010년의 신용 손실을 기준 시나리오와 불리한 시나리오 하에서 추정하도록 요구했습니다. 불리한 시나리오는 장기적인 경기 침체, 실업률 10\% 이상, 주택 가격 25\% 추가 하락 등을 가정했습니다.
+        \item \textbf{결과:} 2009년 5월에 발표된 결과에 따르면, 19개 은행 중 10개 은행이 자본 부족(Capital Deficient) 상태로 판명되었습니다. 미국 정부는 이들 은행에 2009년 11월까지 부족한 자본을 민간에서 조달하거나, 그렇지 않으면 미국 재무부가 필요한 자기자본을 제공하고 향후 배당금을 소각할 것이라는 최후통첩을 보냈습니다. 한 달 이내에 거의 모든 은행이 부족한 자기자본을 조달할 수 있었습니다.
+    \end{itemize}
+    \item \textbf{종합 자본 적정성 검토 (Comprehensive Capital Adequacy Review, CCAR):}
+    \begin{itemize}
+        \item \textbf{한 줄 핵심 요약:} SCAP의 성공에 힘입어 대형 은행을 대상으로 매년 실시되는 정기적인 스트레스 테스트입니다.
+        \item \textbf{기술적 정확한 설명:} SCAP의 성공을 바탕으로 규제 당국은 대형 은행에 대해 스트레스 테스트를 지속적으로 실시하도록 했습니다. CCAR은 SCAP와 동일하게 '최악의 시나리오에서 얼마나 많은 자본이 부족한가?'라는 문제를 다룹니다.
+        \item \textbf{과정:} 매년 실시되며, 세 가지 시나리오(기준, 불리, 심각하게 불리)를 사용하고, 은행은 2년 후의 손실을 예측해야 합니다. 은행은 연준의 검토와 대중 공개를 위해 자본 계획을 계속 제공합니다. 금융 시장이 테스트에 실패한 은행을 규율할 것이라는 믿음이 있습니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{examplebox}[title=CCAR 심각하게 불리한 시나리오 (2012년)]
+2012년 CCAR의 심각하게 불리한 시나리오는 은행에 제공된 28개의 거시경제 변수를 포함했습니다. GDP 성장률, 실업률, 주식 시장, 주택 가격 등 모든 지표가 이 시나리오에서는 악화되는 것으로 가정되었습니다. 은행들은 이 시나리오에 따라 계획을 제출하고, 연준은 이를 검토한 후 결과를 발표합니다. 2012년 주기에서는 Ally Bank를 제외한 모든 은행이 연준이 설정한 5\% 최소 자본 비율을 통과했습니다.
+\end{examplebox}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{cc}
+        \toprule
+        \textbf{은행} & \textbf{최악 시나리오 하 자기자본 비율 (2012년 개념적)} \\
+        \midrule
+        JP모건 & (통과) \\
+        뱅크 오브 아메리카 & (통과) \\
+        ... & ... \\
+        Ally Bank & 5\% 미만 (실패) \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{CCAR 최악 시나리오 하 자기자본 비율 (2012년 개념적)}
+    \label{tab:ccar_results}
+\end{figure}
+\vspace{0.5em}
+위 표는 2012년 CCAR에서 최악의 시나리오 하에서 각 은행의 자기자본 비율을 개념적으로 보여줍니다. Ally Bank를 제외한 모든 대형 은행이 연준이 설정한 5\%의 최소 자본 비율을 통과했습니다.
+
+\begin{tcolorbox}[mybox,title=감독 과정 요약]
+감독은 은행 규칙과 규제가 실제로 적용되는 곳입니다. 은행은 정기적으로 현장 및 비현장 검사를 받으며, 최근 몇 년간 대형 은행들은 스트레스 테스트를 받았습니다. 은행에 어떤 결함이 발견되면 집행 조치가 뒤따를 수 있습니다. 목표는 허용 가능한 위험 한도 내에서 운영되는 경쟁력 있고 성과가 좋은 은행 시스템을 갖는 것입니다.
+\end{tcolorbox}
+
+\newpage
+\section{21세기 규제 당국의 과제}
+
+정부가 은행 부문을 어떻게 규제하고 감독하는지 살펴보았습니다. 우리는 효율적이면서도 안전한 은행 시스템을 원합니다. 이 섹션에서는 은행 규모의 역할과 규제 당국이 직면한 주요 과제에 대해 논의합니다.
+
+\subsection{대마불사 (Too Big to Fail)}
+
+\subsubsection{미국 은행 시스템의 집중화}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 미국 은행 시스템은 소수의 거대 은행들이 전체 대출 및 예금 활동의 대부분을 차지하며 집중되어 있습니다.
+    \item \textbf{직관적 예시/비유:} 한 마을에 수많은 작은 가게들이 있지만, 실제로는 몇 개의 대형 마트가 모든 물건을 팔고 있는 것과 같습니다. 은행도 수천 개가 있지만, 소수의 '메가 은행'이 금융 시장을 지배합니다.
+    \textbf{기술적 정확한 설명:} 미국 은행 시스템은 집중화(Concentrated)되어 있습니다. 이는 소수의 은행이 대출 및 예금 활동의 대부분을 통제한다는 의미입니다. JP모건, 뱅크 오브 아메리카, 씨티그룹, 웰스 파고 등 약 10개의 미국 메가 은행이 존재합니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{은행 유형} & \textbf{전체 은행 자산 점유율 (2018년 개념적)} \\
+        \midrule
+        메가 은행 (각 2,500억 달러 이상) & 약 50\% \\
+        커뮤니티 은행 (각 10억 달러 미만) & 약 15\% \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{미국 은행 시스템 자산 집중도 (2018년 FDIC 데이터 기반 개념적)}
+    \label{tab:bank_concentration}
+\end{figure}
+\vspace{0.5em}
+위 표는 2018년 FDIC 데이터를 기반으로 미국 은행 시스템의 자산 집중도를 개념적으로 보여줍니다. 수천 개의 커뮤니티 은행이 존재하지만, 소수의 메가 은행이 전체 은행 자산의 약 50\%를 차지하고 있습니다.
+
+\subsubsection{왜 대형 은행이 존재하는가?}
+
+대형 은행이 존재하는 이유에 대한 두 가지 상호 보완적인 관점이 있습니다.
+
+\begin{enumerate}
+    \item \textbf{효율성 관점:}
+    \begin{itemize}
+        \item \textbf{내용:} 은행이 대규모로 성장하는 것이 효율적이라는 주장입니다. 규모의 경제(Economies of Scale)를 활용하기 위해 은행은 규모를 키워야 합니다. 또한, 여러 제품을 판매하여 고정 비용을 공유함으로써 범위의 경제(Economies of Scope)를 활용하기 위해 더 복잡해져야 합니다.
+    \end{itemize}
+    \item \textbf{정부 보조금 관점 (대마불사):}
+    \begin{itemize}
+        \item \textbf{내용:} 은행들은 정부가 가장 큰 금융 기관의 실패를 용납하지 않을 것이라는 점을 이해하고 있다는 다소 어두운 관점입니다. 만약 메가 은행이 어려움에 처하면 정부가 구제금융을 제공할 것이라는 기대가 있습니다. 이는 최종 대부자로부터 대출을 받거나, 정부가 신속하게 합병을 주선하거나, 심지어 정부가 자기자본을 대가로 현금을 제공하는 형태일 수 있습니다.
+        \item \textbf{결과:} 이러한 '대마불사(Too Big to Fail, TBTF)' 정책은 은행이 이러한 보조금을 포착하기 위해 더 커지도록 장려합니다. 구제금융은 대마불사 정책이 실제로 작동하는 사례입니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{examplebox}[title=대마불사 정책의 실제 사례]
+\begin{itemize}
+    \item \textbf{콘티넨탈 일리노이 은행 (Continental Illinois Bank):} 이 은행이 파산 위기에 처했을 때의 이례적인 처리는 '대마불사'라는 용어를 탄생시켰습니다.
+    \item \textbf{2008년 영국 은행:} 로열 뱅크 오브 스코틀랜드(Royal Bank of Scotland)를 포함한 영국 은행들은 파산 대신 부분적으로 국유화되었습니다.
+    \item \textbf{미국 은행 구제금융:} 부실자산구제프로그램(TARP)을 통해 수많은 미국 은행들이 자기자본을 대가로 현금을 받았습니다. 골드만삭스(Goldman Sachs)와 모건 스탠리(Morgan Stanley)는 투자 은행에서 상업 은행 지주 회사로 전환하여 이러한 정부 지원에 접근할 수 있었습니다.
+    \item \textbf{정부 후원 기업 (GSEs):} 패니 매(Fannie Mae)와 프레디 맥(Freddie Mac)도 정부로부터 막대한 지원을 받았습니다.
+    \item \textbf{보험 회사:} 2008년에는 일부 대형 보험 회사들도 정부 지원을 받았습니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection{시스템 리스크와 규제}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 시스템 리스크는 한 금융 기관의 실패가 전체 금융 시스템과 경제에 연쇄적으로 파급되는 위험을 의미하며, 이는 '오염'과 유사하게 규제되어야 합니다.
+    \item \textbf{직관적 예시/비유:} 한 공장의 오염 물질이 강물 전체를 오염시키고 생태계를 파괴하는 것과 같습니다. 개별 공장은 자신의 오염이 전체 환경에 미치는 영향을 고려하지 않지만, 사회는 이를 막기 위해 '오염세'를 부과합니다. 시스템 리스크도 마찬가지로, 개별 은행은 자신의 실패가 전체 시스템에 미치는 영향을 고려하지 않으므로 규제가 필요합니다.
+    \item \textbf{기술적 정확한 설명:} 금융 기관이 실패할 때 금융 시스템과 광범위한 경제에 파급 효과가 발생할 수 있는데, 시스템 리스크(Systemic Risk)는 이러한 잠재적 파급 효과를 포착하는 개념입니다. 최악의 시나리오에서는 금융 시스템을 통한 지급 및 신용 흐름이 갑자기 멈추고 경제가 마비될 수 있습니다.
+    \item \textbf{시스템 리스크를 유발하는 기업:} 규모가 큰 기업은 실패 시 더 큰 파급 효과를 가질 가능성이 높습니다. 또한, 규모는 작지만 더 복잡하고 상호 연결된 금융 기업도 중요할 수 있습니다. 이는 대형 및 상호 연결된 금융 기업이 전통적인 대출 및 차입 활동뿐만 아니라 파생상품과 같은 금융 계약을 통해 기업 및 다른 금융 기업과 더 많은 연결 고리를 가질 가능성이 높기 때문입니다.
+    \item \textbf{시스템 리스크 규제:} 과거에는 규제 당국이 개별 은행의 실패 위험을 최소화하려고 노력했습니다. 최근에는 거시 건전성 접근 방식(Macroprudential Approaches)이 대신 금융 기업 간의 파급 효과를 목표로 합니다. 이는 오염에 대한 세금과 유사합니다.
+\end{itemize}
+
+\subsubsection{금융 안정성 감독 위원회 (FSOC)}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} FSOC는 2010년에 설립된 미국 기관으로, 금융 위기를 예방하기 위해 시스템 리스크를 관리하는 것을 목표로 합니다.
+    \item \textbf{기술적 정확한 설명:} 금융 안정성 감독 위원회(Financial Stability Oversight Council, FSOC)는 2010년에 금융 위기를 예방하기 위한 시스템 리스크 관리라는 야심찬 목표를 달성하기 위해 설립되었습니다.
+    \item \textbf{구성 및 역할:} FSOC는 재무부, 연방준비제도, SEC, FDIC, 상품선물거래위원회(CFTC) 등 광범위한 금융 규제 당국의 리더들을 한자리에 모읍니다. 이들은 개별 시장 감독에만 집중하는 대신, 금융 시스템 전체에 대한 총체적인 관점(Holistic View)을 가지고 금융 시스템의 안전성에 대해 심도 있게 논의합니다.
+    \item \textbf{SIFI 지정 권한:} FSOC는 모든 민간 기업을 시스템적으로 중요한 금융 기관(Systemically Important Financial Institution, SIFI)으로 지정할 권한을 가집니다. SIFI로 지정된 기업은 강화된 감독(Enhanced Oversights)을 받게 됩니다.
+\end{itemize}
+
+\subsubsection{글로벌 시스템적으로 중요한 은행 (GSIB)}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} GSIB는 국제 은행 규제 당국에 의해 지정된, 전 세계에서 가장 크고 상호 연결된 은행들로, 시스템 리스크에 따라 계층화되어 관리됩니다.
+    \item \textbf{기술적 정확한 설명:} SIFI 은행들은 국제 은행 규제 당국에 의해 GSIB(Globally Systemically Important Banks)라고도 불립니다. 이 은행들은 전 세계에서 가장 크고 가장 상호 연결된 은행들입니다. GSIB 은행들은 다양한 시스템 리스크 범주로 계층화됩니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{GSIB 계층} & \textbf{대표 은행 (개념적)} \\
+        \midrule
+        가장 시스템적으로 중요 & JP모건, HSBC (가장 글로벌) \\
+        두 번째 계층 & ICBC (자산 기준 세계 최대, 주로 국내), 기타 메가 은행 \\
+        G-SIB 제로 버킷 & 글로벌 시스템적으로 중요한 은행 전체 목록 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{GSIB 계층 분류 (개념적)}
+    \label{tab:gsib_tiers}
+\end{figure}
+\vspace{0.5em}
+위 표는 GSIB 은행들이 시스템 리스크에 따라 어떻게 계층화되는지 개념적으로 보여줍니다. JP모건은 가장 시스템적으로 중요하다고 간주되며, HSBC는 가장 글로벌한 은행으로 평가됩니다. ICBC(중국공상은행)는 자산 기준으로 세계 최대 은행이지만, 주로 국내 범위에 집중되어 있어 다른 계층에 분류될 수 있습니다.
+
+\subsubsection{시스템 리스크 규제 접근 방식}
+
+FSOC가 시스템적으로 중요한 기관을 지정한 후, 미국 정부는 시스템 리스크를 목표로 하는 두 가지 접근 방식을 사용합니다.
+
+\begin{enumerate}
+    \item \textbf{스트레스 테스트 (Stress Testing):}
+    \begin{itemize}
+        \item \textbf{내용:} SIFI 기업들은 연방준비제도의 스트레스 테스트를 받습니다. 이는 이들 기업이 금융 위기 시 잠재적 손실에 대해 미리 생각하고, 이러한 손실을 흡수하고 생존할 수 있는 충분한 자본을 보유하도록 장려합니다.
+        \item \textbf{목표:} 시스템적으로 중요한 기업의 경우, 이 연습은 더욱 중요합니다.
+    \end{itemize}
+    \item \textbf{시스템 리스크 추가 자본금 (Systemic Risk Surcharges):}
+    \begin{itemize}
+        \item \textbf{내용:} 이러한 기관에 '세금'을 부과하는 것입니다. 오염세가 오염을 유발하는 기업이 깨끗해지도록 유인하는 것처럼, 시스템 리스크 추가 자본금은 금융 기업이 '대마불사'가 되는 것을 억제합니다.
+        \item \textbf{예시:} 씨티그룹, HSBC, JP모건과 같은 GSIB 은행들은 지구상에서 가장 시스템적으로 위험한 은행으로 간주되며, 그에 따라 세금이 부과됩니다. 동등한 비시스템적 은행과 비교하여, 이들은 투자 1달러당 추가로 2\%포인트의 자기자본을 보유해야 합니다. 사회적 관점에서 우리는 이러한 시스템적 은행들이 잠재적 손실에 대해 훨씬 더 회복 탄력적(Resilient)이기를 원합니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{GSIB 은행} & \textbf{시스템 리스크 자본 추가금 (개념적)} \\
+        \midrule
+        JP모건 & 2\% \\
+        HSBC & 2\% \\
+        씨티그룹 & 2\% \\
+        ... & ... \\
+        \bottomrule
+    \end{tabular}
+    \endimbox}
+    \caption{GSIB 은행 시스템 리스크 자본 추가금 (개념적)}
+    \label{tab:gsib_surcharges}
+\end{figure}
+\vspace{0.5em}
+위 표는 GSIB 은행에 부과되는 시스템 리스크 자본 추가금을 개념적으로 보여줍니다. 가장 시스템적으로 위험한 은행들은 투자 1달러당 추가로 2\%포인트의 자기자본을 보유해야 합니다.
+
+\begin{tcolorbox}[mybox,title=대마불사 요약]
+시스템 리스크는 한 은행의 실패가 시스템의 나머지 부분으로 파급될 수 있는 잠재력을 포착합니다. 더 크고 상호 연결된 은행은 가장 큰 시스템 리스크를 초래하며, 모두가 이들이 '대마불사'라고 믿습니다. 대마불사는 은행 규제 당국에게 큰 도전 과제입니다. 시스템 리스크 규제의 기본 아이디어는 이러한 크고 복잡한 금융 기업을 식별하고 세금을 부과하는 것입니다. 미국에서는 FSOC의 책임입니다. 가장 큰 은행들을 강화된 감독에 노출시킴으로써 시스템이 더 안전해지기를 바랍니다.
+\end{tcolorbox}
+
+\newpage
+\subsection{그림자 금융 정의}
+
+은행 시스템 내의 혼란은 사회에 막대한 비용을 초래할 수 있으므로, 정부는 안전망을 제공하고 은행을 규제합니다. 이러한 규제는 부담스럽지만, 은행 시스템이 원활하고 효율적으로 운영되도록 돕는다는 믿음이 있습니다. 이 섹션에서는 그림자 금융(Shadow Banking)에 대해 살펴봅니다.
+
+\subsubsection{그림자 금융이란 무엇인가?}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 그림자 금융은 은행과 유사한 금융 서비스를 제공하지만, 은행만큼 엄격한 규제를 받지 않는 기관들을 말합니다.
+    \item \textbf{직관적 예시/비유:} 정식 식당은 위생 검사를 받고 허가를 받아야 하지만, 길거리에서 음식을 파는 노점상은 상대적으로 규제가 덜한 것과 같습니다. 노점상도 음식을 팔지만, 정식 식당만큼의 규제를 받지 않죠. 그림자 금융도 은행과 비슷한 역할을 하지만, 규제 '그림자'에 숨어있다고 해서 붙여진 이름입니다.
+    \textbf{기술적 정확한 설명:} 그림자 은행(Shadow Banks)은 은행과 유사한 금융 서비스를 제공하지만, 규제는 덜 받는(Less Regulation) 기관들입니다. 이는 은행 규제 당국에게 엄청난 도전 과제를 제시하며, 특히 규제 당국이 개입할 권한이 제한적일 때 더욱 그렇습니다.
+\end{itemize}
+
+\begin{tcolorbox}[mybox,title=상업 은행의 정의 (1956년 은행 지주 회사법)]
+상업 은행(Commercial Bank)은 '요구불 예금(Demand Deposits)을 수취하고 상업 대출(Commercial Loans)을 제공하는 기관'으로 정의됩니다. 즉, 이 두 가지 활동을 같은 지붕 아래에서 모두 수행하는 기관입니다.
+\end{tcolorbox}
+
+\subsubsection{그림자 은행의 특징과 예시}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 그림자 은행은 은행처럼 비유동 자산에 투자하고 예금과 유사한 단기 부채를 발행하지만, 법적으로는 은행으로 분류되지 않아 규제를 피합니다.
+    \item \textbf{직관적 예시/비유:} 은행은 고객의 돈을 받아(예금) 기업에 빌려줍니다(대출). 그림자 은행도 고객의 돈을 받아(예금과 유사한 상품) 기업이나 부동산에 투자합니다(대출과 유사한 투자). 하지만 법적으로는 '은행'이 아니라고 주장하며 은행 규제를 받지 않습니다.
+    \item \textbf{기술적 정확한 설명:} 수년에 걸쳐 상업 은행 서비스를 제공하지만 기술적으로는 은행으로 간주되지 않는 많은 기관들이 등장했습니다.
+    \begin{itemize}
+        \item \textbf{비유동 자산에 투자:} 일부 기관은 모기지 담보 증권(MBS)이나 기업 대출 뮤추얼 펀드와 같은 비유동 자산에 자금을 투자합니다.
+        \item \textbf{예금과 유사한 부채 발행:} 다른 기관들은 요구불 예금과 유사한 부채를 발행하여 운영 자금을 조달합니다. 예를 들어, 환매 조건부 채권(Repurchase Agreement)은 현금이 풍부한 연기금과 같은 기업이 단기간 현금을 보관하고 단기간 내에 회수할 수 있도록 하여 은행 예금과 유사한 경제적 기능을 수행합니다.
+        \item \textbf{두 가지 모두 수행:} 일부 기관은 이 두 가지를 모두 수행합니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}[title=대표적인 그림자 은행]
+\begin{itemize}
+    \item \textbf{머니마켓펀드 (Money Market Mutual Fund, MMMF):} 고정 가치 주식(Fixed Value Shares)을 판매하여 자금을 조달하는 뮤추얼 펀드입니다. 고객은 1달러를 머니마켓 계좌에 넣고 단기간 내에 1달러(이자 포함)를 인출할 수 있습니다. 이 주식은 고객 관점에서 저축 계좌로 판매되며, 은행 예금과 동일한 기능을 합니다. 자산 측면에서는 다양한 채무 상품에 투자합니다. 이는 기본적으로 은행이 하는 일과 같습니다(예금을 발행하고 비유동 자산에 투자). 이러한 이유로 머니마켓펀드는 종종 그림자 은행이라고 불립니다.
+    \item \textbf{헤지펀드 (Hedge Funds):} 단기 부채 조달에 의존하는 일부 헤지펀드도 그림자 은행으로 간주됩니다.
+    \item \textbf{그림자 은행이 아닌 경우:} 보험 회사와 같은 비은행 기관은 장기 비유동 자산에 투자하지만, 유동성 부채로 자금을 조달하지 않으므로 그림자 은행으로 간주되지 않습니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection{그림자 은행의 존재 이유: 효율성 vs. 규제 차익거래}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 그림자 은행은 은행보다 효율적일 수 있지만, 주로 은행 규제를 회피하여 '규제 차익거래'를 하려는 목적으로 존재한다는 비판을 받습니다.
+    \item \textbf{기술적 정확한 설명:} 그림자 은행이 존재하는 이유에 대해 두 가지 관점이 있습니다.
+    \begin{itemize}
+        \item \textbf{효율성 관점:} 그림자 은행은 은행보다 더 효율적인 전문 금융 기업일 수 있습니다.
+        \item \textbf{규제 차익거래 관점 (더 일반적):} 이들 기관은 은행과 동일한 서비스를 제공하지만, 규제를 회피합니다. 그래서 '그림자'라는 이름이 붙었습니다. 이들 기관은 규제의 그림자 속에 숨어 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{그림자 은행의 문제점: 유동성 위험과 안전망 부재}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 그림자 은행은 은행과 유사한 유동성 불일치 구조를 가지지만, 정부 안전망의 보호를 받지 못해 뱅크런에 매우 취약합니다.
+    \item \textbf{직관적 예시/비유:} 안전벨트나 에어백 없이 고속도로를 달리는 자동차와 같습니다. 사고가 나면 훨씬 더 위험하겠죠. 그림자 은행은 은행처럼 위험한 '유동성 불일치'라는 엔진을 가지고 있지만, '예금 보험'이나 '최종 대부자'라는 안전벨트와 에어백이 없습니다.
+    \item \textbf{기술적 정확한 설명:} 그림자 은행은 유동성 위험(Liquidity Risk)에 노출되어 있습니다. 그림자 은행이 예금을 발행하도록 허용한다면, 예금자들의 뱅크런에 취약해질 수밖에 없습니다. 이는 상업 은행의 경우 정부 안전망 도입으로 1세기 전에 해결된 문제였습니다.
+    \item \textbf{정부 안전망 부재:} 그림자 은행은 정부 안전망에 접근할 수 없기 때문에 취약합니다. 그림자 예금은 FDIC에 의해 보험에 가입되지 않습니다. 이는 그림자 예금자들이 우려할 경우 그림자 은행에 대해 뱅크런을 할 유인을 가집니다. 또한, 그림자 은행은 금융 위기 시 최종 대부자로부터 차입할 수 없습니다. 이는 뱅크런이 발생할 경우 건전한 그림자 은행이라도 현금이 고갈되어 파산할 수 있음을 의미합니다.
+    \item \textbf{규제와 구제금융의 역설:} 이들 기관은 정부 규제가 제한적이므로 위기 시 구제금융을 받아서는 안 됩니다. 그러나 2008년 머니마켓펀드 사례에서 보듯이, 실제로는 구제금융을 받았습니다.
+\end{itemize}
+
+\newpage
+\subsection{사례 연구: 머니마켓펀드}
+
+머니마켓펀드(Money Market Mutual Funds, MMMF)는 그림자 금융의 중요한 사례입니다.
+
+\subsubsection{2008년 이전 상황}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 2008년 이전 머니마켓펀드는 예금 보험이나 자본 요건 없이 FDIC 보험 예금과 유사한 저축 계좌를 제공했습니다.
+    \item \textbf{기술적 정확한 설명:} 2008년 이전 머니마켓펀드는 FDIC 보험 예금과 유사한 저축 계좌를 제공했습니다. 머니마켓펀드는 기본적으로 예금 보험이나 자본 요건 없이 은행 예금을 제공했습니다.
+\end{itemize}
+
+\subsubsection{2008년 공황과 정부 구제금융}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 2008년 리먼 브라더스 파산 후 머니마켓펀드 산업은 대규모 인출 공황을 겪었고, 정부는 '대마불사'로 간주하여 구제금융을 제공했습니다.
+    \item \textbf{기술적 정확한 설명:} 규제가 덜한 머니마켓펀드 산업은 2008년 9월 대규모 인출(Massive Withdrawals)을 겪었습니다. 일부 머니마켓펀드는 리먼 브라더스 및 기타 안전하다고 여겨지던 자산에 손실을 입는 투자를 했었습니다. 이러한 손실이 현실화되자 산업 전반에 걸쳐 공황이 촉발되었습니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{날짜} & \textbf{관리 자산 (2008년 9월 10일 기준 100\%)} \\
+        \midrule
+        2008년 9월 10일 & 100\% \\
+        2008년 9월 말 & 약 70\% (30\% 감소) \\
+        이후 & 안정화 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{머니마켓펀드 뱅크런 (2008년 9월 개념적)}
+    \label{tab:mmmf_run_2008}
+\end{figure}
+\vspace{0.5em}
+위 표는 2008년 9월 머니마켓펀드 뱅크런 상황을 개념적으로 보여줍니다. 리먼 브라더스 파산 약 일주일 전인 9월 10일을 기준으로 관리 자산을 100\%로 정규화했을 때, 자산이 약 30\% 급감한 후 안정화되었습니다. 이는 명백한 공황 상황이었습니다.
+
+\begin{itemize}
+    \item \textbf{공황 진정 이유:} 공황은 정부 구제금융(Government Bailout) 덕분에 진정되었습니다. 머니마켓펀드는 그림자 은행이며, 정부 보험 예금을 발행하지 않고 위기 시 연준으로부터 차입할 수 없어야 합니다. 그러나 2008년 실제 상황에서는 이들이 그렇게 할 수 있도록 허용되었습니다. 전체 산업이 '대마불사'로 간주된 것입니다.
+    \item \textbf{구체적인 구제금융 조치:}
+    \begin{itemize}
+        \item \textbf{2008년 9월 19일:} 미국 정부는 머니마켓펀드의 모든 부채를 보증했습니다. 투자자들은 단 한 푼도 잃을 위험이 없게 되었습니다.
+        \item \textbf{연준의 긴급 대출:} 연방준비제도는 비상 권한을 사용하여 머니마켓펀드에 현금 대출을 제공했습니다. 이로써 이들 뮤추얼 펀드는 투자자들의 현금 수요를 쉽게 충족시킬 수 있었습니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{기간} & \textbf{연준의 머니마켓펀드 대출 프로그램 (개념적)} \\
+        \midrule
+        2008년 9월 말 & 급격한 대출 증가 \\
+        이후 & 점진적 감소 및 종료 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{연준의 머니마켓펀드 대출 프로그램 (2008년 개념적)}
+    \label{tab:fed_mmmf_lending}
+\end{figure}
+\vspace{0.5em}
+위 표는 2008년 연준의 머니마켓펀드 대출 프로그램의 개념적인 추이를 보여줍니다. 공황 시기에 대출이 급격히 증가했다가 상황이 진정되면서 점진적으로 감소하고 종료되었습니다. 전반적으로 이들 그림자 은행은 보험에 가입되고 규제되는 상업 은행과 거의 동일한 정부 안전망에 접근했습니다.
+
+\subsubsection{미국 정부의 대응과 새로운 규칙}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 2008년 위기 이후 FSOC는 머니마켓펀드에 대한 새로운 규제를 추진했지만, 2020년 팬데믹 시기에도 또 다른 공황과 구제금융이 발생했습니다.
+    \item \textbf{기술적 정확한 설명:} 미국 정부는 이 불행한 사건에 어떻게 대응했을까요? 시스템 리스크 규제 기관인 금융 안정성 감독 위원회(FSOC)가 나섰습니다. FSOC는 재무부, 연준, SEC(뮤추얼 펀드 산업 규제 기관)가 해결책을 찾기 위한 포럼이었습니다.
+    \item \textbf{FSOC의 판단:} 개별 머니마켓펀드는 시스템적으로 중요하지 않지만, 전체 산업은 뱅크런에 취약한 것으로 보였습니다. FSOC는 SEC에 금융 안정성을 보호하도록 압력을 가했습니다.
+    \item \textbf{새로운 규칙 도입:} SEC는 뱅크런에 취약한 대형 펀드에 대해 '변동 순자산 가치(Floating Net Asset Value)' 규칙을 도입했습니다. 이는 머니마켓펀드 주식을 예금보다는 뮤추얼 펀드 주식처럼 만들었습니다. 또한, 이 새로운 규칙은 머니마켓펀드에 뱅크런을 방지할 도구를 제공했습니다. 뱅크런 발생 시 펀드는 인출에 대해 유동성 수수료(Liquidity Fees)를 부과하거나, 최대 10일 동안 환매(Redemptions)를 동결할 수 있게 되었습니다.
+\end{itemize}
+
+\subsubsection{2020년 팬데믹 공황과 규칙의 한계}
+
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 2020년 코로나19 팬데믹 시기에도 머니마켓펀드는 다시 공황을 겪었고, 새로운 규칙은 효과적으로 작동하지 않아 또다시 연준의 구제금융이 필요했습니다.
+    \item \textbf{기술적 정확한 설명:} 이 새로운 규칙들이 2020년 뱅크런을 막는 데 도움이 되었을까요? 불행히도 그렇지 않았습니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \begin{adjustbox}{width=0.9\textwidth,center}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{날짜} & \textbf{관리 자산 (2020년 3월 9일 기준 100\%)} \\
+        \midrule
+        2020년 3월 9일 & 100\% \\
+        2020년 3월 중순 & 급격한 감소 \\
+        이후 & 연준 개입 후 안정화 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{머니마켓펀드 뱅크런 (2020년 3월 개념적)}
+    \label{tab:mmmf_run_2020}
+\end{figure}
+\vspace{0.5em}
+위 표는 2020년 3월 머니마켓펀드 뱅크런 상황을 개념적으로 보여줍니다. 2020년 3월 9일(미국 내 코로나19 충격 시작 시점)을 기준으로 관리 자산을 100\%로 정규화했을 때, 다시 공황이 발생했습니다. 초기 뱅크런 발생 10일 후, 연준은 다시 개입하여 현금 대출로 산업을 구제했습니다.
+
+\begin{itemize}
+    \item \textbf{규칙이 작동하지 않은 이유:} 이는 여전히 논쟁의 대상입니다. 한 가지 문제는 인출에 대한 수수료 부과가 투자자들에게 선제적으로 인출할 유인을 제공할 수 있다는 것입니다. '지금 인출하지 않으면 내일 자금이 묶일 수도 있다'는 생각은 오히려 뱅크런을 부추길 수 있습니다. 이는 머니마켓펀드 관리자에게 인출을 차단할 도구를 주는 것이 역효과를 낼 수 있음을 시사합니다. 분명히 미국 정책 입안자들은 또 다른 공황과 구제금융을 막을 수 없었습니다.
+\end{itemize}
+
+\begin{tcolorbox}[mybox,title=그림자 금융 요약]
+우리는 상업 은행과 그림자 은행의 차이점을 살펴보았습니다. 그림자 은행은 상업 은행과 유사한 금융 서비스를 제공하지만, 동일한 방식으로 규제되지 않습니다. 일반적으로 정부 규제를 덜 받습니다. 그림자 은행은 정부 안전망에 접근할 수 없어야 하지만, 머니마켓펀드 사례에서 보듯이 정부는 이들을 구제할 강력한 유인을 가질 수 있습니다. 그림자 은행을 식별하고 규제하는 것은 금융 규제 당국에게 여전히 엄청난 도전 과제입니다.
+\end{tcolorbox}
+
+\newpage
+\section*{체크리스트: 모듈 4 학습 점검}
+
+이 체크리스트를 활용하여 모듈 4의 핵심 내용을 얼마나 잘 이해하고 있는지 스스로 점검해 보세요.
+
+\begin{itemize}
+    \item \textbf{규제의 기본 이해:}
+    \begin{itemize}
+        \item 시장 실패와 부정적 외부 효과가 무엇이며, 왜 규제가 필요한지 설명할 수 있는가?
+        \item 미시 건전성 규제와 거시 건전성 규제의 차이점을 아는가?
+        \item 고객 보호와 공정성이라는 규제의 다른 목표를 설명할 수 있는가?
+        \item 규제의 주요 상충 관계(비효율성, 의도치 않은 결과, 도덕적 해이)를 이해하는가?
+    \end{itemize}
+    \item \textbf{정부 안전망:}
+    \begin{itemize}
+        \item 은행의 취약성(유동성 불일치)과 뱅크런의 원인을 설명할 수 있는가?
+        \item 전염 효과의 두 가지 주요 원천(정보 비대칭, 상호 연결성)을 아는가?
+        \item 예금 보험(FDIC)과 최종 대부자(연준)의 역할과 작동 방식을 설명할 수 있는가?
+        \item 2007-2009년 금융 위기 시 정부 개입 사례를 설명할 수 있는가?
+    \end{itemize}
+    \item \textbf{규제 및 감독 실제:}
+    \begin{itemize}
+        \item 은행 규제와 은행 감독의 차이점을 명확히 구분할 수 있는가?
+        \item 은행 규제의 주요 영역(경쟁, 활동/투자, 자금 조달, 공시)을 설명할 수 있는가?
+        \item 바젤 협약의 목적(글로벌 표준, 자본 요건)과 진화 과정을 아는가?
+        \item 감독 과정에서 집행 조치(벌금, 제한)가 어떻게 이루어지는지 아는가?
+        \item CAMELS 평가 시스템의 각 요소가 무엇을 의미하는지 설명할 수 있는가?
+        \item 스트레스 테스트의 목표, 절차, 그리고 SCAP/CCAR 사례를 설명할 수 있는가?
+    \end{itemize}
+    \item \textbf{21세기 규제 당국의 과제:}
+    \begin{itemize}
+        \item 미국 은행 시스템의 집중화 현상과 '대마불사' 개념을 이해하는가?
+        \item '대마불사'가 은행의 효율성 관점과 정부 보조금 관점에서 어떻게 설명되는지 아는가?
+        \item 시스템 리스크의 개념과 FSOC의 역할(SIFI 지정)을 설명할 수 있는가?
+        \item GSIB 분류와 시스템 리스크 추가 자본금의 의미를 아는가?
+        \item 그림자 금융의 정의와 상업 은행과의 차이점을 설명할 수 있는가?
+        \item 머니마켓펀드 사례를 통해 그림자 금융의 유동성 위험과 정부 안전망 부재 문제를 설명할 수 있는가?
+        \item 2008년 및 2020년 머니마켓펀드 공황과 정부 개입, 그리고 새로운 규칙의 한계를 아는가?
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section*{FAQ: 자주 묻는 질문}
+
+초심자들이 금융 규제에 대해 가질 수 있는 몇 가지 질문과 답변입니다.
+
+\begin{tcolorbox}[examplebox,title=Q1: 모든 금융 기관이 은행처럼 규제되어야 하나요?]
+\textbf{A1:} 반드시 그렇지는 않습니다. 은행은 예금 수취와 대출이라는 독특한 기능 때문에 시스템적으로 중요하며, 뱅크런에 취약합니다. 따라서 은행에 대한 엄격한 규제는 금융 시스템 안정에 필수적입니다. 하지만 모든 금융 기관이 은행과 동일한 위험 프로필을 가지는 것은 아니므로, 각 기관의 특성과 위험에 맞는 맞춤형 규제가 필요합니다. 그림자 금융의 경우, 은행과 유사한 위험을 가지지만 규제가 덜한 것이 문제입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox,title=Q2: 규제가 은행의 혁신을 저해하지는 않나요?]
+\textbf{A2:} 규제는 은행의 특정 활동에 제약을 가하므로 단기적으로 혁신을 저해할 수 있다는 비판이 있습니다. 그러나 장기적으로 볼 때, 안정적인 금융 시스템은 혁신과 경제 성장의 기반이 됩니다. 과도한 위험 감수로 인한 금융 위기는 훨씬 더 큰 경제적 손실을 초래하므로, 규제는 위험과 혁신 사이의 균형을 찾는 중요한 역할을 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox,title=Q3: '대마불사' 문제는 어떻게 해결할 수 있나요?]
+\textbf{A3:} '대마불사'는 규제 당국의 가장 큰 도전 과제 중 하나입니다. 해결책으로는 대형 은행에 더 높은 자본 요건을 부과하거나(시스템 리스크 추가 자본금), 복잡성을 줄여 실패 시 해체하기 쉽게 만드는 방안, 그리고 구제금융 대신 '정리 계획(Resolution Plan)'을 통해 시장에 미치는 충격을 최소화하면서 파산시키는 방안 등이 논의되고 있습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox,title=Q4: 스트레스 테스트는 항상 정확한가요?]
+\textbf{A4:} 스트레스 테스트는 미래의 불확실한 상황을 예측하는 것이므로 완벽하게 정확할 수는 없습니다. 시나리오 설정의 가정, 은행의 모델링 능력, 그리고 예상치 못한 새로운 유형의 위기 발생 가능성 등 여러 한계가 있습니다. 하지만 과거 위기 경험을 바탕으로 은행의 취약점을 미리 파악하고 대비하는 데 매우 유용한 도구임은 분명합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox,title=Q5: 그림자 금융은 왜 규제하기 어려운가요?]
+\textbf{A5:} 그림자 금융은 빠르게 진화하고 다양한 형태로 존재하며, 법적 정의가 모호한 경우가 많습니다. 또한, 기존 은행 규제 체계의 사각지대에 놓여 있어 규제 당국의 권한이 제한적입니다. 규제가 너무 엄격하면 금융 활동이 다른 규제 회피 경로로 이동할 수 있어, 규제 당국은 그림자 금융의 위험을 관리하면서도 시장의 효율성을 해치지 않는 균형점을 찾아야 합니다.
+\end{tcolorbox}
+
+\newpage
+\section*{빠르게 훑어보기: 모듈 4 핵심 요약 (1페이지)}
+
+\begin{tcolorbox}[summarybox,title=모듈 4: 규제 핵심 요약]
+
+\textbf{1. 규제의 목표: 왜 필요한가?}
+\begin{itemize}
+    \item \textbf{시장 실패 교정:} 은행 실패의 \textbf{부정적 외부 효과} (전염성) 방지.
+    \item \textbf{금융 안정성:} \textbf{미시 건전성} (개별 은행) 및 \textbf{거시 건전성} (시스템 전체) 유지.
+    \item \textbf{고객 보호:} 소액 예금자 및 차입자 보호, \textbf{레드라이닝} 같은 차별 방지.
+    \item \textbf{상충 관계:} \textbf{비효율성}, \textbf{의도치 않은 결과}, \textbf{도덕적 해이} (예: TARP) 발생 가능성.
+\end{itemize}
+
+\textbf{2. 정부 안전망: 뱅크런 방지}
+\begin{itemize}
+    \item \textbf{은행 취약성:} \textbf{유동성 불일치} (단기 차입, 장기 대출)로 인한 \textbf{뱅크런} 발생.
+    \item \textbf{전염 효과:} 정보 비대칭, 상호 연결성으로 공황 확산.
+    \item \textbf{두 가지 축:}
+    \begin{itemize}
+        \item \textbf{예금 보험 (FDIC):} 예금자 보호, 뱅크런 \textbf{사전 예방}.
+        \item \textbf{최종 대부자 (연준):} 건전 은행에 긴급 대출, 뱅크런 \textbf{사후 중단}.
+    \end{itemize}
+    \item \textbf{2007-2009 위기:} 예금 보험 확대, 연준 유동성 지원으로 공황 대응.
+\end{itemize}
+
+\textbf{3. 규제 및 감독 실제: 어떻게 작동하는가?}
+\begin{itemize}
+    \item \textbf{규제 vs. 감독:} \textbf{규제}는 규칙 제정, \textbf{감독}은 규칙 준수 감시 및 집행.
+    \item \textbf{규제 대상:} 경쟁, 활동/투자, 자금 조달, 공시 요건.
+    \item \textbf{바젤 협약:} \textbf{글로벌 최소 자본 요건} (위험 기반) 설정, 공정한 경쟁 환경 조성.
+    \item \textbf{감독 과정:}
+    \begin{itemize}
+        \item \textbf{집행 조치:} 규칙 위반 시 벌금, 활동 제한 (예: 런던 고래).
+        \item \textbf{은행 검사:} 비현장 (보고서 분석) 및 현장 (방문) 검사.
+        \item \textbf{CAMELS 평가:} 자본, 자산, 경영, 수익, 유동성, 시장 위험 민감도 평가.
+    \end{itemize}
+    \item \textbf{스트레스 테스트:}
+    \begin{itemize}
+        \item \textbf{목표:} 극심한 위기 시 은행의 자본 적정성 평가 (미래 지향적).
+        \item \textbf{절차:} 경제 시나리오 $\rightarrow$ 손실 예측/자본 계획 $\rightarrow$ 규제 검토 $\rightarrow$ 결과 공개.
+        \item \textbf{사례:} SCAP (2009년 위기 대응), CCAR (매년 정기 실시).
+    \end{itemize}
+\end{itemize}
+
+\textbf{4. 21세기 규제 당국의 과제: 새로운 도전}
+\begin{itemize}
+    \item \textbf{대마불사 (TBTF):}
+    \begin{itemize}
+        \item \textbf{문제:} 소수 메가 은행의 집중화, 실패 시 \textbf{시스템 리스크} (전체 경제 마비).
+        \item \textbf{원인:} 효율성 (규모/범위의 경제) vs. 정부 보조금 (구제금융 기대).
+        \textbf{대응:} \textbf{FSOC} (시스템 리스크 관리), \textbf{SIFI/GSIB} 지정, \textbf{시스템 리스크 추가 자본금} 부과.
+    \end{itemize}
+    \item \textbf{그림자 금융 (Shadow Banking):}
+    \begin{itemize}
+        \item \textbf{정의:} 은행과 유사 서비스 제공하나 규제 덜 받는 기관 (예: 머니마켓펀드).
+        \item \textbf{문제:} \textbf{유동성 위험}에 취약하나 정부 안전망 부재.
+        \item \textbf{사례 (MMMF):} 2008년 및 2020년 공황 시 정부 구제금융 발생, 규제 한계 노출.
+    \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

@@ -10,23 +10,24 @@
 %========================================================================================
 
 \usepackage{kotex}
-\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
-\usepackage{amsmath, amssymb, amsthm}
-\usepackage{graphicx}
+% --- 표 관련 ---
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{adjustbox}
+\usepackage{colortbl}
 \renewcommand{\arraystretch}{1.1}
 
-\usepackage{enumitem}
-\setlist{nosep, leftmargin=*, itemsep=0.3em}
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -35,7 +36,288 @@
 \fancyhead[LO]{\leftmark}
 \fancyhead[RE]{CS230}
 \renewcommand{\headrulewidth}{0.5pt}
-\setlength{\headheight}{15pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+%========================================================================================
+% 색상 정의
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+% MIT/Harvard 추가 색상
+\definecolor{mainblue}{RGB}{50, 80, 150}
+\definecolor{subgray}{RGB}{180, 180, 180}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{boxbgcolor}{RGB}{245, 245, 250}
+
+% Stanford CS230 스타일 색상
+\definecolor{myblue}{RGB}{50, 100, 180}
+\definecolor{sblue}{RGB}{70, 130, 180}
+\definecolor{wgray}{RGB}{245, 245, 245}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%========================================================================================
+% 박스 환경
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=주의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=개념,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced,
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=비유,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+% mybox 환경 (UIUC용)
+\newtcolorbox{mybox}[1]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title={#1},
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable
+}
+
+% 추가 환경 (Gemini 생성 콘텐츠에서 사용)
+\newtcolorbox{tipbox}[1][]{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=팁, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{solutionbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=풀이, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{downloadbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=다운로드, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{practicebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=연습, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keypointbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=핵심 포인트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{storybox}[1][]{enhanced, colback=lightyellow, colframe=darkorange!80!black, fonttitle=\bfseries, title=이야기, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathstep}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학 단계, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{systembox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=시스템, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{toolbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=도구, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{bayesbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=베이즈, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{formulabox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=공식, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{strategybox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=전략, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{diagnosisbox}[1][]{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=진단, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{featurebox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=특징, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{faqbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=FAQ, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{notebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=노트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{codeexamplebox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=코드 예제, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keyconceptbox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 개념, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{termbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=용어, arc=2mm, boxrule=0.7pt, breakable, #1}
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% 커스텀 명령어 (Gemini 생성 콘텐츠에서 사용)
+\newcommand{\excel}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\concept}[1]{\textbf{#1}}
+\newcommand{\formula}[1]{\textit{#1}}
+\providecommand{\captionof}[2]{\textbf{#2}}
+\newcommand{\chaptertitle}[2]{\section*{#1: #2}}
+\providecommand{\newsection}{\section}
+
+%========================================================================================
+% 코드 블록
+%========================================================================================
+
+\usepackage{listings}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{
+    style=mystyle,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[chapter]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[chapter]
+\newtheorem{example}{예제}[chapter]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
 
 \usepackage[
     colorlinks=true,
@@ -46,635 +328,40 @@
 ]{hyperref}
 
 %========================================================================================
-% 색상 정의
+% 기타
 %========================================================================================
 
-\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
 
-\definecolor{pointblue}{RGB}{0, 102, 204}
-\definecolor{analogygreen}{RGB}{0, 153, 76}
-\definecolor{warningred}{RGB}{204, 0, 0}
-\definecolor{exampleorange}{RGB}{255, 128, 0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
-\definecolor{conceptblue}{RGB}{60, 100, 160}
-\definecolor{analogygreen}{RGB}{80, 160, 100}
-\definecolor{alertred}{RGB}{200, 60, 60}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
-\definecolor{conceptblue}{RGB}{60, 100, 160}
-\definecolor{analogygreen}{RGB}{80, 160, 100}
-\definecolor{alertred}{RGB}{200, 60, 60}
-\definecolor{exampleorange}{RGB}{230, 120, 30}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{backcolour}{rgb}{0.96,0.96,0.96}
-\definecolor{sblue}{RGB}{70, 130, 180}
-\definecolor{wgray}{RGB}{245, 245, 245}
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{url}
+\urlstyle{same}
 
 %========================================================================================
-% 박스 환경 (tcolorbox)
+% 메타 정보 박스 명령어
 %========================================================================================
 
-\usepackage[most]{tcolorbox}
-\tcbuselibrary{skins, breakable}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+\textbf{강의명:} & #1 \\[0.3em]
+\textbf{주차:} & #2 \\[0.3em]
+\textbf{교수명:} & #3 \\[0.3em]
+\textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
 }
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{architecturebox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🏗️ #1 (구조 분석)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{diagnosisbox}[1]{
-    colback=purple!5!white,
-    colframe=purple!80!black,
-    fonttitle=\bfseries,
-    title=🩺 #1 (닥터 딥러닝의 진단표)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{mathbox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (핵심 원리)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{strategybox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧭 #1 (전략 가이드)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{formulabox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (핵심 메커니즘)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (수학적 증명 \& 시나리오)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=blue!5!white,
-    colframe=blue!75!black,
-    fonttitle=\bfseries,
-    title=#1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=green!5!white,
-    colframe=green!60!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white,
-    colframe=red!75!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 금지)
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=orange!5!white,
-    colframe=orange!75!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (실전 계산)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (실전 시나리오 \& 계산)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (실전 시나리오 \& 벤치마크)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{tipbox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (실전 팁)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{diagnosisbox}[1]{
-    colback=purple!5!white,
-    colframe=purple!80!black,
-    fonttitle=\bfseries,
-    title=🩺 #1 (모델 진단)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{formulabox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (수학적 정의)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{featurebox}[1]{
-    colback=purple!5!white,
-    colframe=purple!80!black,
-    fonttitle=\bfseries,
-    title=🔍 #1 (핵심 특징)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{diagnosisbox}[1]{
-    colback=purple!5!white,
-    colframe=purple!80!black,
-    fonttitle=\bfseries,
-    title=🩺 #1 (닥터 딥러닝의 처방전)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{formulabox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (핵심 수식)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{mathbox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (수학적 원리)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=pointblue!5!white,
-    colframe=pointblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=warningred!5!white,
-    colframe=warningred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (실전 시나리오 \& 계산)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{mathbox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (수학적 증명)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{formulabox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (만능 공식)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (오해 방지 가이드)
-}
-
-\newtcolorbox{formulabox}[1]{
-    colback=exampleorange!5!white,
-    colframe=exampleorange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (수학적 원리)
-}
-
-\newtcolorbox{summarybox}[1]{
-    colback=conceptblue!5!white,
-    colframe=conceptblue!80!black,
-    fonttitle=\bfseries,
-    title=📌 #1
-}
-
-\newtcolorbox{analogybox}[1]{
-    colback=analogygreen!5!white,
-    colframe=analogygreen!80!black,
-    fonttitle=\bfseries,
-    title=💡 #1 (직관적 비유)
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=alertred!5!white,
-    colframe=alertred!80!black,
-    fonttitle=\bfseries,
-    title=⚠️ #1 (핵심 주의사항)
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=orange!5!white,
-    colframe=orange!80!black,
-    fonttitle=\bfseries,
-    title=🧮 #1 (실전 계산)
-}
-
-%========================================================================================
-% 사용자 정의 명령어
-%========================================================================================
-
-
 
 %========================================================================================
 % 문서 시작
@@ -688,18 +375,16 @@
 
 \maketitle
 \tableofcontents
-\newpage
 
 
 %=======================================================================
-% Chapter 1: Chapter 1. Deep Learning Introduction (Completed)
+% Lecture 1: Chapter 1. Deep Learning Introduction (Completed)
 %=======================================================================
 \chapter{Chapter 1. Deep Learning Introduction (Completed)}
 \label{ch:lecture1}
 
 % --- 전체 목차 (TOC) ---
 
-\newpage
 
 % --- 1. 이전 단원 (Dummy) ---
 \section*{Chapter 1. Deep Learning Introduction (Completed)}
@@ -718,7 +403,7 @@
 거대한 빌딩도 벽돌 한 장에서 시작하듯, 아무리 복잡한 AI(LLM, AlphaGo 등)도 결국 \textbf{'뉴런(Neuron)'}이라는 작은 단위의 집합입니다. 이번 단원에서는 딥러닝의 가장 기초 단위인 \textbf{로지스틱 회귀(Logistic Regression)}를 하나의 신경망으로 해석하고, 그 내부 동작 원리를 완전히 해부합니다.
 
 % 2.2 개요
-\begin{summarybox}{📌 단원 개요 (Overview)}
+\begin{summarybox}[title={📌 단원 개요 (Overview)}]
 이 단원은 딥러닝 학습의 \textbf{'기초 체력'}을 다지는 구간입니다.
 \begin{itemize}
     \item \textbf{목표}: 이진 분류 문제를 신경망 구조(Input $\to$ Linear $\to$ Activation)로 모델링합니다.
@@ -754,7 +439,7 @@
 \subsubsection{1. 문제 정의: 이진 분류 (Binary Classification)}
 \textbf{한 줄 요약}: 질문에 대해 YES(1) 또는 NO(0)로 답하는 문제입니다.
 
-\begin{analogybox}{고양이 탐지기}
+\begin{analogybox}[title={고양이 탐지기}]
 당신이 사진을 보고 "이것은 고양이입니까?"라는 질문에 답해야 한다고 상상해봅시다.
 \begin{itemize}
     \item \textbf{입력($x$):} 사진 속의 털, 귀 모양, 눈동자 색깔 등의 단서들.
@@ -792,7 +477,7 @@ $$a = \sigma(z) = \frac{1}{1 + e^{-z}}$$
 \subsubsection{3. 비용 함수 (Cost Function): 왜 MSE가 아닐까?}
 우리는 모델이 예측한 값($a$)과 실제 정답($y$)이 다르다면 모델을 '혼내줘야' 합니다. 그 벌점을 매기는 규칙이 비용 함수입니다.
 
-\begin{warningbox}{MSE(평균 제곱 오차)를 쓰면 안 되나요?}
+\begin{warningbox}[title={MSE(평균 제곱 오차)를 쓰면 안 되나요?}]
 선형 회귀에서는 MSE($\frac{1}{2}(\hat{y}-y)^2$)를 쓰지만, 로지스틱 회귀에서 이를 쓰면 비용 함수가 \textbf{울퉁불퉁한(Non-Convex)} 모양이 됩니다.
 즉, 경사 하강법을 할 때, 진짜 최소점(Global Minimum)이 아닌 웅덩이(Local Optima)에 빠져 학습이 멈출 수 있습니다.
 \end{warningbox}
@@ -808,7 +493,7 @@ $$L(a, y) = -(y \log(a) + (1-y) \log(1-a))$$
 
 수식을 이해하는 가장 좋은 방법은 숫자를 넣어보는 것입니다.
 
-\begin{examplebox}{시험 합격 예측 시나리오}
+\begin{examplebox}[title={시험 합격 예측 시나리오}]
 \textbf{상황}: 학생의 '공부 시간($x_1$)'과 '수면 시간($x_2$)'으로 '합격($y=1$)'을 예측합니다.
 \begin{itemize}
     \item \textbf{데이터}: 공부 2시간($x_1=2$), 수면 5시간($x_2=5$). 실제 결과: 합격($y=1$).
@@ -882,7 +567,7 @@ def propagate(w, b, X, Y):
     return dw, db, cost
 \end{lstlisting}
 
-\begin{warningbox}{주의: Rank-1 Array Pitfall}
+\begin{warningbox}[title={주의: Rank-1 Array Pitfall}]
 NumPy에서 `a = np.random.randn(5)`는 `(5,)` 형태를 가집니다. 이는 행 벡터도 열 벡터도 아니어서 전치(`T`)를 해도 모양이 바뀌지 않아 버그를 유발합니다.
 반드시 `a = np.random.randn(5, 1)` 처럼 \textbf{차원을 명시}하십시오.
 \end{warningbox}
@@ -904,7 +589,7 @@ A. 보폭이 너무 커서 최적점을 지나쳐 버리거나(Overshooting), �
 \hrule
 \vspace{0.5cm}
 
-\begin{summarybox}{📝 단원 요약 (Chapter Summary)}
+\begin{summarybox}[title={📝 단원 요약 (Chapter Summary)}]
 \begin{enumerate}
     \item 로지스틱 회귀는 딥러닝의 가장 작은 단위인 \textbf{1-Layer Neural Network}이다.
     \item 구조: $z = w^Tx + b$ (선형) $\rightarrow$ $a = \sigma(z)$ (비선형 활성화).
@@ -916,13 +601,11 @@ A. 보폭이 너무 커서 최적점을 지나쳐 버리거나(Overshooting), �
 \subsection*{🔜 다음 단원 예고}
 축하합니다! 여러분은 이제 신경망의 '뇌세포' 하나를 완벽하게 만들 수 있습니다. 다음 장 \textbf{[Chapter 3. Shallow Neural Networks]}에서는 이 세포들을 옆으로 나란히 연결하고, 뒤로 층층이 쌓아서 더 복잡한 문제를 해결하는 \textbf{은닉층(Hidden Layer)}의 마법을 배워보겠습니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 2: [CS230] Foundations of Neural Networks:  Logistic Regression as a Neural Network
+% Lecture 2: [CS230] Foundations of Neural Networks: \\ Logistic Regression as a Neural Network
 %=======================================================================
-\chapter{[CS230] Foundations of Neural Networks:  Logistic Regression as a Neural Network}
+\chapter{[CS230] Foundations of Neural Networks: \\ Logistic Regression as a Neural Network}
 \label{ch:lecture2}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -950,7 +633,7 @@ A. 보폭이 너무 커서 최적점을 지나쳐 버리거나(Overshooting), �
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 요약}
+\begin{summarybox}[title={핵심 요약}]
 이 단원은 딥러닝 모델의 최소 단위인 \textbf{'단일 뉴런'}의 작동 원리를 다룹니다.
 \begin{itemize}
     \item \textbf{목표:} 이진 분류 문제를 입력 $\to$ 선형 계산 $\to$ 활성화 $\to$ 출력의 신경망 구조로 재해석합니다.
@@ -993,7 +676,7 @@ $$ z = w^T x + b $$
 계산된 점수($z$)는 $-\infty \sim \infty$ 범위를 가집니다. 이를 확률($0 \sim 1$)로 바꾸기 위해 \textbf{시그모이드(Sigmoid)} 함수를 통과시킵니다.
 $$ \hat{y} = a = \sigma(z) = \frac{1}{1 + e^{-z}} $$
 
-\begin{analogybox}{대학 입학 사정관 비유}
+\begin{analogybox}[title={대학 입학 사정관 비유}]
 이 뉴런을 \textbf{'깐깐한 입학 사정관'}이라고 상상해 봅시다.
 \begin{enumerate}
     \item \textbf{입력 ($x$):} 학생의 내신 성적($x_1$), 수능 점수($x_2$), 봉사 시간($x_3$).
@@ -1007,7 +690,7 @@ $$ \hat{y} = a = \sigma(z) = \frac{1}{1 + e^{-z}} $$
 \subsection{2. 비용 함수 (Cost Function): 왜 MSE가 아닌가?}
 우리는 모델이 정답을 맞히면 칭찬하고, 틀리면 벌점(Cost)을 줘야 합니다. 선형 회귀에서 쓰던 MSE(평균 제곱 오차)를 쓰면 안 될까요?
 
-\begin{warningbox}{MSE 사용 금지 경보}
+\begin{warningbox}[title={MSE 사용 금지 경보}]
 로지스틱 회귀(Sigmoid 포함)에 MSE를 적용하면 비용 함수 그래프가 \textbf{울퉁불퉁한 계란판 모양(Non-Convex)}이 됩니다. 경사 하강법을 쓸 때, 가장 깊은 골짜기(Global Minimum)가 아닌 엉뚱한 웅덩이(Local Optima)에 빠져 학습이 멈출 수 있습니다.
 \end{warningbox}
 
@@ -1023,7 +706,7 @@ $$ J(w, b) = -\frac{1}{m} \sum_{i=1}^{m} [y^{(i)} \log(\hat{y}^{(i)}) + (1-y^{(i
 
 수식을 눈으로만 보면 이해되지 않습니다. 숫자를 넣어봅시다.
 
-\begin{examplebox}{야간 자율학습 도망자 잡기 시나리오}
+\begin{examplebox}[title={야간 자율학습 도망자 잡기 시나리오}]
 \textbf{상황:} 선생님(모델)이 학생의 행동을 보고 '도망($y=1$)' 갈지 예측합니다.
 \begin{itemize}
     \item \textbf{입력 $x$:} 가방을 쌈($x_1=1$), 눈치를 봄($x_2=5$, 매우 많이 봄).
@@ -1119,7 +802,7 @@ class LogisticUnit:
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{구조:} 로지스틱 회귀 = $z = w^Tx + b$ (선형) $\to$ $\sigma(z)$ (비선형 활성화).
     \item \textbf{학습:} \textbf{Cross-Entropy} 비용 함수를 최소화하는 방향으로 $w, b$를 업데이트.
@@ -1128,13 +811,11 @@ class LogisticUnit:
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 3: [CS230] Foundations of Neural Networks:  Cost Function \& Gradient Descent
+% Lecture 3: [CS230] Foundations of Neural Networks: \\ Cost Function \& Gradient Descent
 %=======================================================================
-\chapter{[CS230] Foundations of Neural Networks:  Cost Function \& Gradient Descent}
+\chapter{[CS230] Foundations of Neural Networks: \\ Cost Function \& Gradient Descent}
 \label{ch:lecture3}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -1165,7 +846,7 @@ class LogisticUnit:
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 유닛은 머신러닝의 \textbf{'엔진(Engine)'}을 다룹니다. 차체(모델 구조)가 좋아도 엔진(학습 알고리즘)이 없으면 움직이지 않습니다.
 \begin{itemize}
     \item \textbf{구분:} 데이터 하나에 대한 오차(Loss)와 전체 성적표(Cost)를 구분합니다.
@@ -1195,7 +876,7 @@ class LogisticUnit:
 \subsection{1. Loss vs. Cost (오차의 정의)}
 \textbf{한 줄 요약:} Loss는 '쪽지시험 점수', Cost는 '학기말 평균 성적'입니다.
 
-\begin{analogybox}{시험 점수 비유}
+\begin{analogybox}[title={시험 점수 비유}]
 \begin{itemize}
     \item \textbf{Loss Function ($L$):} 1번 학생이 문제를 틀렸습니다. 이 학생 하나의 오차입니다.
     \item \textbf{Cost Function ($J$):} 우리 반 30명 전체의 평균 오차입니다. 선생님(모델)의 목표는 특정 학생만 잘 가르치는 게 아니라, 반 전체의 평균 성적($J$)을 좋게 만드는 것입니다.
@@ -1213,8 +894,7 @@ $$ J(w, b) = \frac{1}{m} \sum_{i=1}^{m} L(\hat{y}^{(i)}, y^{(i)}) $$
 선형 회귀와 달리 Sigmoid 함수가 포함된 로지스틱 회귀에 MSE($\frac{1}{2}(\hat{y}-y)^2$)를 적용하면 비용 함수가 \textbf{비볼록(Non-Convex)} 형태가 됩니다. 이는 수많은 \textbf{국소 최적해(Local Optima)}를 만듭니다.
 
 
-
-\begin{warningbox}{MSE를 쓰면 안 되는 이유}
+\begin{warningbox}[title={MSE를 쓰면 안 되는 이유}]
 위 그림의 오른쪽(Non-Convex)을 보세요. 울퉁불퉁한 지형에서는 구슬을 굴렸을 때 가장 깊은 바닥(Global Minimum)이 아니라, 중간에 있는 작은 웅덩이(Local Minimum)에 갇혀버립니다. 학습이 망했다는 뜻입니다.
 반면, \textbf{로그 손실(Log Loss)}을 사용하면 왼쪽(Convex)처럼 매끄러운 그릇 모양이 되어, 어디서 시작하든 바닥으로 수렴합니다.
 \end{warningbox}
@@ -1232,8 +912,7 @@ $$ L(\hat{y}, y) = -(y \log(\hat{y}) + (1-y) \log(1-\hat{y})) $$
 \textbf{한 줄 요약:} 눈을 가린 채 산에서 가장 낮은 골짜기로 내려가는 방법입니다.
 
 
-
-\begin{analogybox}{안개 낀 산 하산하기}
+\begin{analogybox}[title={안개 낀 산 하산하기}]
 당신은 짙은 안개가 낀 산 정상에 서 있습니다. 앞이 보이지 않습니다.
 가장 낮은 곳(비용 최소화 지점)으로 가려면 어떻게 해야 할까요?
 \begin{enumerate}
@@ -1267,7 +946,7 @@ $$ b := b - \alpha \frac{\partial J}{\partial b} $$
 % --- 8. 공식/절차 + 예시 계산 ---
 \section{Numerical Example: 비용 계산 해보기}
 
-\begin{examplebox}{비용 함수 계산 실습}
+\begin{examplebox}[title={비용 함수 계산 실습}]
 \textbf{상황:} 고양이 사진($y=1$)을 보여줬는데, 모델이 0.8(80\%)로 예측했습니다.
 $$ y = 1, \quad \hat{y} = 0.8 $$
 
@@ -1330,7 +1009,7 @@ def update_parameters(w, b, dw, db, learning_rate):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Cost Function:} 전체 데이터의 오차 평균($J$)을 최소화하는 것이 목표다.
     \item \textbf{Log Loss:} 로지스틱 회귀에는 MSE 대신 Log Loss를 써야 Convex(볼록)해진다.
@@ -1339,13 +1018,11 @@ def update_parameters(w, b, dw, db, learning_rate):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 4: [CS230] Foundations of Neural Networks:  Python \& Vectorization
+% Lecture 4: [CS230] Foundations of Neural Networks: \\ Python \& Vectorization
 %=======================================================================
-\chapter{[CS230] Foundations of Neural Networks:  Python \& Vectorization}
+\chapter{[CS230] Foundations of Neural Networks: \\ Python \& Vectorization}
 \label{ch:lecture4}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -1377,7 +1054,7 @@ def update_parameters(w, b, dw, db, learning_rate):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 딥러닝 코드를 수백 배 빠르게 만드는 \textbf{'최적화 기술'}을 다룹니다.
 \begin{itemize}
     \item \textbf{개념:} `for-loop`를 죄악시하고, 행렬 단위 연산(Vectorization)을 해야 하는 이유를 배웁니다.
@@ -1407,7 +1084,7 @@ def update_parameters(w, b, dw, db, learning_rate):
 \subsection{1. Vectorization (벡터화란 무엇인가?)}
 \textbf{한 줄 요약:} 하나씩 처리하지 말고, 트럭에 실어서 한 번에 옮기십시오.
 
-\begin{analogybox}{이사짐 옮기기 비유}
+\begin{analogybox}[title={이사짐 옮기기 비유}]
 100만 개의 벽돌(데이터)을 옮겨야 합니다.
 \begin{itemize}
     \item \textbf{For-loop (Non-vectorized):} 인부가 벽돌을 \textbf{손에 하나씩 들고} 100만 번 왕복합니다. (파이썬이 데이터를 하나씩 꺼내서 처리함)
@@ -1424,7 +1101,6 @@ $z = w^T x + b$를 계산할 때, $w_1x_1, w_2x_2 \dots$를 순회하지 않고,
 왜 NumPy(`np.dot`)가 `for`문보다 빠를까요? 단순히 C언어로 짜여서가 아닙니다. 컴퓨터 구조적인 이유가 있습니다.
 
 
-
 \begin{itemize}
     \item \textbf{SISD (Single Instruction, Single Data):} 일반적인 `for`문입니다. CPU가 "가져와", "곱해", "저장해"를 데이터 하나마다 반복합니다.
     \item \textbf{SIMD (Single Instruction, Multiple Data):} 최신 CPU는 "이 8개의 데이터를 동시에 곱해!"라는 명령을 내릴 수 있습니다. 벡터화는 이 병렬 처리 기능을 활용합니다.
@@ -1434,7 +1110,6 @@ $z = w^T x + b$를 계산할 때, $w_1x_1, w_2x_2 \dots$를 순회하지 않고,
 
 \subsection{3. Broadcasting (브로드캐스팅)}
 \textbf{한 줄 요약:} 작은 행렬을 큰 행렬 크기에 맞게 자동으로 '늘려서(Stretch)' 연산합니다.
-
 
 
 \begin{itemize}
@@ -1449,7 +1124,7 @@ $z = w^T x + b$를 계산할 때, $w_1x_1, w_2x_2 \dots$를 순회하지 않고,
 
 "백문이 불여일견"입니다. 100만 개의 데이터를 곱하는 시간을 직접 측정해 봅시다.
 
-\begin{examplebox}{For-loop vs Vectorization 속도 대결}
+\begin{examplebox}[title={For-loop vs Vectorization 속도 대결}]
 \begin{lstlisting}[language=Python, breaklines=true]
 import numpy as np
 import time
@@ -1482,7 +1157,7 @@ print(f"Time: {1000 * (toc - tic):.2f} ms") # 약 1~2ms 소요
 % --- 8. 주의사항 및 FAQ ---
 \section{Pitfalls \& FAQ}
 
-\begin{warningbox}{Rank-1 Array의 함정}
+\begin{warningbox}[title={Rank-1 Array의 함정}]
 NumPy에서 `a = np.random.randn(5)`를 하면 모양(Shape)이 `(5,)`가 됩니다.
 이것은 행 벡터도, 열 벡터도 아닌 애매한 상태라 전치(Transpose)가 안 됩니다.
 \begin{itemize}
@@ -1507,7 +1182,7 @@ A. 대부분의 수학 연산은 가능합니다. 하지만 복잡한 조건문(
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Vectorization:} `for`문은 죄악이다. `np.dot` 등을 써서 행렬 단위로 계산하라.
     \item \textbf{SIMD:} 벡터화는 CPU의 병렬 처리 명령어를 사용하여 속도를 수백 배 높인다.
@@ -1516,13 +1191,11 @@ A. 대부분의 수학 연산은 가능합니다. 하지만 복잡한 조건문(
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 5: [CS230] Foundations of Neural Networks:  Broadcasting \& Removing Loops
+% Lecture 5: [CS230] Foundations of Neural Networks: \\ Broadcasting \& Removing Loops
 %=======================================================================
-\chapter{[CS230] Foundations of Neural Networks:  Broadcasting \& Removing Loops}
+\chapter{[CS230] Foundations of Neural Networks: \\ Broadcasting \& Removing Loops}
 \label{ch:lecture5}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -1555,7 +1228,7 @@ A. 대부분의 수학 연산은 가능합니다. 하지만 복잡한 조건문(
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 서로 다른 모양(Shape)의 데이터를 오류 없이 연산하는 방법을 다룹니다.
 \begin{itemize}
     \item \textbf{개념:} NumPy가 작은 배열을 자동으로 확장(Stretch)하여 연산하는 규칙을 배웁니다.
@@ -1584,14 +1257,13 @@ A. 대부분의 수학 연산은 가능합니다. 하지만 복잡한 조건문(
 \subsection{1. Broadcasting의 정의와 비유}
 \textbf{한 줄 요약:} 작은 행렬을 큰 행렬 크기에 맞춰 자동으로 '늘려서(Copy)' 연산합니다.
 
-\begin{analogybox}{식빵과 버터 비유}
+\begin{analogybox}[title={식빵과 버터 비유}]
 식빵 100개(데이터 $m=100$)에 버터($b$)를 발라야 합니다.
 \begin{itemize}
     \item \textbf{For-loop:} 식빵을 하나 꺼내고, 버터를 바르고, 내려놓습니다. (100번 반복)
     \item \textbf{Broadcasting:} 마법을 부려 버터를 식빵 100개 길이만큼 \textbf{순식간에 늘린(Stretch)} 뒤, 한 번에 쾅 찍어버립니다.
 \end{itemize}
 \end{analogybox}
-
 
 
 \subsection{2. General Broadcasting Rules (엄격한 규칙)}
@@ -1628,7 +1300,7 @@ $B: (4, \mathbf{2}) \rightarrow$ 3과 2는 다르고, 둘 다 1이 아님.
 % --- 7. 실전 계산 예시 ---
 \section{Numerical Example: 손으로 푸는 브로드캐스팅}
 
-\begin{examplebox}{칼로리 계산 시나리오}
+\begin{examplebox}[title={칼로리 계산 시나리오}]
 \textbf{상황:} 4가지 음식(행)의 영양소(열: 탄, 단, 지) 데이터가 있습니다. 각 음식의 총 칼로리가 100g당 얼마인지 더하고 싶습니다.
 
 \textbf{데이터 행렬 A (2개 음식 x 3개 영양소):}
@@ -1702,7 +1374,7 @@ if __name__ == "__main__":
 % --- 9. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{주의: (m, 1) + (1, m) = (m, m)}
+\begin{warningbox}[title={주의: (m, 1) + (1, m) = (m, m)}]
 브로드캐스팅의 강력함이 독이 될 때가 있습니다.
 \begin{itemize}
     \item 벡터 A: $(5, 1)$
@@ -1723,7 +1395,7 @@ A. `mu`의 shape이 `(4,)`가 됩니다. 이를 `Rank-1 Array`라고 합니다. 
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Broadcasting:} 작은 배열을 큰 배열에 맞춰 '가상으로 확장'하여 연산한다.
     \item \textbf{Rule:} 차원을 오른쪽 끝부터 비교하여, 같거나 1이어야 한다.
@@ -1732,13 +1404,11 @@ A. `mu`의 shape이 `(4,)`가 됩니다. 이를 `Rank-1 Array`라고 합니다. 
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 6: [CS230] Shallow Neural Networks:  Concept of Hidden Layer
+% Lecture 6: [CS230] Shallow Neural Networks: \\ Concept of Hidden Layer
 %=======================================================================
-\chapter{[CS230] Shallow Neural Networks:  Concept of Hidden Layer}
+\chapter{[CS230] Shallow Neural Networks: \\ Concept of Hidden Layer}
 \label{ch:lecture6}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -1766,7 +1436,7 @@ A. `mu`의 shape이 `(4,)`가 됩니다. 이를 `Rank-1 Array`라고 합니다. 
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 로지스틱 회귀를 확장하여 \textbf{2-Layer 신경망}을 만드는 과정을 다룹니다.
 \begin{itemize}
     \item \textbf{개념:} 입력층과 출력층 사이에 있는 \textbf{'은닉층(Hidden Layer)'}의 역할과 정의를 이해합니다.
@@ -1800,14 +1470,13 @@ $n^{[l]}$ & $l$번째 층의 뉴런 개수 & $n^{[1]} = 4$ (은닉층 뉴런이 
 로지스틱 회귀가 '입력 $\to$ 출력'의 직행버스라면, 얕은 신경망은 중간에 \textbf{환승 센터(은닉층)}가 하나 있는 구조입니다.
 
 
-
 \begin{itemize}
     \item \textbf{입력층 ($Input$):} $x_1, x_2, x_3$ (데이터 특성)
     \item \textbf{은닉층 ($Hidden$):} 입력 정보를 섞고 비틀어서 새로운 정보를 만듭니다.
     \item \textbf{출력층 ($Output$):} 은닉층의 정보를 종합하여 최종 결정을 내립니다.
 \end{itemize}
 
-\begin{analogybox}{자동차 공장 조립 라인}
+\begin{analogybox}[title={자동차 공장 조립 라인}]
 \begin{itemize}
     \item \textbf{Input ($x$):} 철판, 유리, 고무 등 원자재.
     \item \textbf{Hidden Layer ($a^{[1]}$):} 공장 내부의 작업자들. 철판을 구부려 문짝을 만들고, 엔진을 조립합니다. 외부(사용자)에서는 이 과정이 보이지 않으므로 \textbf{'Hidden(은닉)'}이라고 합니다.
@@ -1844,7 +1513,6 @@ $$ Output = W_2(W_1 x + b_1) + b_2 = (W_2 W_1)x + (W_2 b_1 + b_2) = W'x + b' $$
 선형 함수끼리의 결합은 결국 또 다른 하나의 선형 함수가 됩니다. 100층을 쌓아도 수학적으로는 1층짜리 로지스틱 회귀와 똑같아집니다. 복잡한 곡선을 그리려면 비선형 함수가 필수입니다.
 
 
-
 % --- 7. 공식 및 계산 예시 ---
 \section{Mathematical Forward Propagation}
 
@@ -1862,7 +1530,7 @@ $$ A^{[2]} = \sigma(Z^{[2]}) \quad (\hat{y}) $$
 % --- 8. 실전 시나리오 ---
 \section{Practical Scenario: 얼굴 인식}
 
-\begin{examplebox}{얼굴 인식 AI의 사고 과정}
+\begin{examplebox}[title={얼굴 인식 AI의 사고 과정}]
 \begin{itemize}
     \item \textbf{Input ($x$):} 이미지의 각 픽셀 밝기값 (단순한 숫자 나열).
     \item \textbf{Hidden Layer ($a^{[1]}$):} 픽셀들을 조합하여 '선(Line)', '모서리(Edge)', '눈 모양', '코 모양' 같은 \textbf{특징(Feature)}을 찾아냅니다.
@@ -1933,7 +1601,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Hidden Layer:} 입력과 출력 사이에서 비선형적 특징을 추출하는 층.
     \item \textbf{Notation:} $[l]$은 층 번호, $(i)$는 데이터 번호. 혼동 금지!
@@ -1942,13 +1610,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 7: [CS230] Shallow Neural Networks:  Activation Functions
+% Lecture 7: [CS230] Shallow Neural Networks: \\ Activation Functions
 %=======================================================================
-\chapter{[CS230] Shallow Neural Networks:  Activation Functions}
+\chapter{[CS230] Shallow Neural Networks: \\ Activation Functions}
 \label{ch:lecture7}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -1983,7 +1649,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 딥러닝 모델의 성능을 결정짓는 \textbf{'4대 활성화 함수'}를 완벽하게 해부합니다.
 \begin{itemize}
     \item \textbf{비교:} Sigmoid, Tanh, ReLU, Leaky ReLU의 수식과 그래프 특징을 비교합니다.
@@ -2041,7 +1707,7 @@ if __name__ == "__main__":
     \item \textbf{용도:} \textbf{모든 은닉층의 기본값(Default)}입니다. 고민될 땐 무조건 ReLU를 쓰세요.
 \end{itemize}
 
-\begin{analogybox}{전등 스위치 비유}
+\begin{analogybox}[title={전등 스위치 비유}]
 \begin{itemize}
     \item \textbf{Sigmoid:} 조광기(Dimmer). 밝기를 0\%에서 100\%까지 미세하게 조절하지만, 너무 복잡합니다.
     \item \textbf{ReLU:} 똑딱 스위치. 켜지면 확실하게 켜지고(그대로 통과), 꺼지면 확실하게 꺼집니다(0). 단순함이 속도의 비결입니다.
@@ -2057,7 +1723,7 @@ if __name__ == "__main__":
 \subsection{The Vanishing Gradient Problem}
 역전파(Backpropagation)는 출력층의 오차를 입력층까지 전달하기 위해 \textbf{미분값(기울기)을 계속 곱하는(Chain Rule)} 과정입니다.
 
-\begin{examplebox}{수학적 증명: $0.25$ vs $1.0$}
+\begin{examplebox}[title={수학적 증명: $0.25$ vs $1.0$}]
 Sigmoid 함수의 미분 최댓값은 $z=0$일 때 \textbf{0.25}입니다.
 만약 은닉층이 10개라고 가정해봅시다.
 
@@ -2145,7 +1811,7 @@ class Activations:
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{ReLU의 미분 불가능 점 ($z=0$)}
+\begin{warningbox}[title={ReLU의 미분 불가능 점 ($z=0$)}]
 \textbf{Q. 수학적으로 $z=0$에서 ReLU는 미분이 불가능한데(뾰족점), 코딩은 어떻게 하나요?} \\
 \textbf{A.} 맞습니다. 하지만 컴퓨터 공학에서는 실용적으로 접근합니다. $z=0$일 때 기울기를 그냥 \textbf{0}이나 \textbf{1} 중 하나로 정해버립니다. (보통 0으로 둠). $z$가 정확히 0.0000...이 될 확률은 매우 낮으므로 학습에 아무런 지장이 없습니다.
 \end{warningbox}
@@ -2161,7 +1827,7 @@ class Activations:
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Sigmoid:} 출력층(이진 분류)에만 사용. 은닉층 사용 시 기울기 소실 발생.
     \item \textbf{ReLU:} 은닉층의 \textbf{Default}. 양수는 그대로(기울기 1), 음수는 0. 연산 빠름.
@@ -2170,13 +1836,11 @@ class Activations:
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 8: [CS230] Shallow Neural Networks:  Forward \& Backward Propagation
+% Lecture 8: [CS230] Shallow Neural Networks: \\ Forward \& Backward Propagation
 %=======================================================================
-\chapter{[CS230] Shallow Neural Networks:  Forward \& Backward Propagation}
+\chapter{[CS230] Shallow Neural Networks: \\ Forward \& Backward Propagation}
 \label{ch:lecture8}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -2212,7 +1876,7 @@ class Activations:
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 딥러닝 학습 메커니즘인 '순전파'와 '역전파'를 수식과 코드로 구현합니다.
 \begin{itemize}
     \item \textbf{순전파 (Forward):} 입력 $X$가 은닉층을 거쳐 출력 $\hat{y}$가 되는 과정을 행렬로 정의합니다.
@@ -2254,7 +1918,7 @@ $$ Input(X) \xrightarrow{W^{[1]}, b^{[1]}} Hidden(A^{[1]}) \xrightarrow{W^{[2]},
 예측값($A^{[2]}$)과 실제값($Y$)의 차이, 즉 \textbf{비용(Cost)}을 줄이기 위해 미분을 사용합니다.
 문제는 우리가 수정하고 싶은 파라미터($W^{[1]}$)가 출력층에서 멀리 떨어져 있다는 것입니다.
 
-\begin{analogybox}{프로젝트 실패의 책임 소재 따지기 (The Blame Game)}
+\begin{analogybox}[title={프로젝트 실패의 책임 소재 따지기 (The Blame Game)}]
 여러분이 팀장(출력층)이고 프로젝트가 실패(Error)했다고 가정해봅시다.
 \begin{enumerate}
     \item \textbf{Step 1 (Output Layer):} 먼저 최종 결과물($A^{[2]}$)을 보고 "얼마나 부족했는지($dZ^{[2]}$)" 파악합니다.
@@ -2280,7 +1944,7 @@ $$ dZ^{[2]} = A^{[2]} - Y $$
 \textbf{2. 가중치 기울기 ($dW^{[2]}$)}
 오차($dZ^{[2]}$)에 입력값($A^{[1]}$)을 곱합니다.
 $$ dW^{[2]} = \frac{1}{m} dZ^{[2]} A^{[1]T} $$
-\begin{warningbox}{왜 전치($T$)를 하나요?}
+\begin{warningbox}[title={왜 전치($T$)를 하나요?}]
 행렬 곱셈의 차원을 맞추기 위해서입니다.
 $dZ^{[2]}$는 $(1, m)$, $A^{[1]}$은 $(n^{[1]}, m)$입니다. 곱하려면 $A^{[1]}$을 뒤집어야 $(1, m) \times (m, n^{[1]}) = (1, n^{[1]})$이 되어 $W^{[2]}$와 크기가 같아집니다.
 \end{warningbox}
@@ -2358,7 +2022,7 @@ def backward_propagation(parameters, cache, X, Y):
 % --- 8. 예시 시나리오 ---
 \section{Numerical Example: 계산 흐름 추적}
 
-\begin{examplebox}{간단한 오차 역전파 예시}
+\begin{examplebox}[title={간단한 오차 역전파 예시}]
 \textbf{상황:} 정답 $y=1$인데, 모델이 예측 $a^{[2]}=0.8$을 내놓았습니다.
 \begin{enumerate}
     \item \textbf{오차 발생 ($dZ^{[2]}$):} $0.8 - 1.0 = -0.2$. (0.2만큼 부족함)
@@ -2389,7 +2053,7 @@ $dW$는 $W$와 모양이 같아야 합니다. $(n, m)$과 $(1, m)$을 곱해서 
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{역전파:} 출력층의 오차($dZ$)를 구해 입력층 방향으로 전파하며 기울기($dW$)를 구한다.
     \item \textbf{Chain Rule:} 층을 건너갈 때마다 미분값을 곱한다 (미분의 연쇄).
@@ -2398,13 +2062,11 @@ $dW$는 $W$와 모양이 같아야 합니다. $(n, m)$과 $(1, m)$을 곱해서 
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 9: [CS230] Deep Neural Networks:  MLP Architecture
+% Lecture 9: [CS230] Deep Neural Networks: \\ MLP Architecture
 %=======================================================================
-\chapter{[CS230] Deep Neural Networks:  MLP Architecture}
+\chapter{[CS230] Deep Neural Networks: \\ MLP Architecture}
 \label{ch:lecture9}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -2436,7 +2098,7 @@ $dW$는 $W$와 모양이 같아야 합니다. $(n, m)$과 $(1, m)$을 곱해서 
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 $L$개의 층을 가진 일반화된 심층 신경망(Deep MLP)을 설계하고 구현합니다.
 \begin{itemize}
     \item \textbf{표기법:} 층의 개수가 $L$개일 때의 파라미터($W^{[l]}, b^{[l]}$)와 활성화값($A^{[l]}$)을 정의합니다.
@@ -2469,8 +2131,7 @@ $A^{[l]}$ & $l$번째 층의 출력 & $A^{[l]} = g^{[l]}(Z^{[l]})$. 다음 층�
 \textbf{아닙니다.} 딥러닝의 힘은 \textbf{'쪼개서 이해하기'}에서 나옵니다.
 
 
-
-\begin{analogybox}{사람의 얼굴 인식 과정}
+\begin{analogybox}[title={사람의 얼굴 인식 과정}]
 우리의 뇌나 딥러닝 모델은 복잡한 이미지를 한 번에 이해하지 않습니다.
 \begin{enumerate}
     \item \textbf{Layer 1 (Low-level):} 픽셀을 보고 가로선, 세로선 같은 \textbf{경계(Edges)}를 찾습니다.
@@ -2492,7 +2153,7 @@ $l$번째 층의 가중치 $W^{[l]}$와 편향 $b^{[l]}$의 크기는 다음과 
     \item \textbf{$Z^{[l]}, A^{[l]}$ Shape:} $(n^{[l]}, m)$ $\rightarrow$ (현재 층 뉴런 수, 데이터 개수)
 \end{itemize}
 
-\begin{examplebox}{차원 계산 퀴즈}
+\begin{examplebox}[title={차원 계산 퀴즈}]
 \textbf{상황:}
 입력 특성 $n_x = 12288$ (이미지).
 Layer 1 뉴런: 20개.
@@ -2580,7 +2241,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{파라미터 초기화: 0.01 vs He Initialization}
+\begin{warningbox}[title={파라미터 초기화: 0.01 vs He Initialization}]
 얕은 신경망에서는 `* 0.01`로 초기화해도 괜찮았습니다.
 하지만 층이 깊어지면($L > 5$), 값이 계속 곱해지면서 신호가 사라지거나 폭발합니다(Vanishing/Exploding Gradient).
 따라서 ReLU를 쓸 때는 \textbf{He Initialization} (`np.sqrt(2/n)`)을 쓰는 것이 \textbf{딥러닝의 표준(Standard)}입니다.
@@ -2598,7 +2259,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Deep Learning:} 은닉층을 여러 개 쌓아 계층적 특징(Hierarchical Features)을 학습한다.
     \item \textbf{Dimensions:} $W^{[l]}$의 크기는 $(n^{[l]}, n^{[l-1]})$이다. (현재 층, 이전 층)
@@ -2607,13 +2268,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 10: [CS230] Deep Neural Networks:  Dimensions \& Initialization
+% Lecture 10: [CS230] Deep Neural Networks: \\ Dimensions \& Initialization
 %=======================================================================
-\chapter{[CS230] Deep Neural Networks:  Dimensions \& Initialization}
+\chapter{[CS230] Deep Neural Networks: \\ Dimensions \& Initialization}
 \label{ch:lecture10}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -2645,7 +2304,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 디버깅 시간을 획기적으로 줄여주는 \textbf{'차원 분석'}과 학습 성공의 열쇠인 \textbf{'파라미터 초기화'}를 다룹니다.
 \begin{itemize}
     \item \textbf{분석:} $L$층 신경망의 파라미터($W, b$)와 데이터($Z, A$)의 형상(Shape)을 정확히 도출합니다.
@@ -2695,7 +2354,7 @@ if __name__ == "__main__":
 "교수님, 로지스틱 회귀에선 0으로 해도 잘 됐잖아요?"
 네, 하지만 \textbf{신경망(은닉층이 있는 경우)에서는 절대 안 됩니다.}
 
-\begin{analogybox}{복제 인간 군대 비유}
+\begin{analogybox}[title={복제 인간 군대 비유}]
 \begin{itemize}
     \item \textbf{상황:} 모든 가중치 $W$를 0으로 초기화했습니다.
     \item \textbf{Forward:} 모든 은닉 뉴런이 입력값에 상관없이 똑같은 값(0)을 계산합니다.
@@ -2710,7 +2369,6 @@ if __name__ == "__main__":
 \subsection{3. Best Practice: He Initialization}
 그렇다면 랜덤하게(Random) 초기화하면 될까요? 
 너무 크면(x10) 기울기 소실이 오고, 너무 작으면(x0.0001) 신호가 죽어버립니다.
-
 
 
 Kaiming He 박사가 제안한 \textbf{He Initialization}은 ReLU를 사용할 때 분산을 일정하게 유지해주는 마법의 공식입니다.
@@ -2781,7 +2439,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{편향(Bias) $b$는 0으로 해도 되나요?}
+\begin{warningbox}[title={편향(Bias) $b$는 0으로 해도 되나요?}]
 \textbf{네, 됩니다!}
 대칭성 문제는 가중치 $W$에서 발생합니다. $W$가 이미 랜덤하게 섞여 있다면(Symmetry Broken), 편향 $b$가 모두 0이어도 뉴런들은 서로 다른 값을 출력하게 됩니다. 따라서 $b$는 편의상 `np.zeros`로 초기화하는 것이 일반적입니다.
 \end{warningbox}
@@ -2797,7 +2455,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Dimensions:} $W$는 $(n^{[l]}, n^{[l-1]})$이다. 차원 확인이 디버깅의 시작이다.
     \item \textbf{Zero Init:} $W$를 0으로 하면 학습이 안 된다. (대칭성 문제)
@@ -2806,13 +2464,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 11: [CS230] Improving Deep Neural Networks:  Data Setup Strategy
+% Lecture 11: [CS230] Improving Deep Neural Networks: \\ Data Setup Strategy
 %=======================================================================
-\chapter{[CS230] Improving Deep Neural Networks:  Data Setup Strategy}
+\chapter{[CS230] Improving Deep Neural Networks: \\ Data Setup Strategy}
 \label{ch:lecture11}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -2844,7 +2500,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 성공적인 머신러닝 프로젝트의 나침반인 \textbf{'데이터 분할 전략'}을 다룹니다.
 \begin{itemize}
     \item \textbf{정의:} Train(학습), Dev(튜닝), Test(평가) 세트의 명확한 역할 차이를 이해합니다.
@@ -2888,11 +2544,10 @@ if __name__ == "__main__":
 \end{itemize}
 
 
-
 \subsection{2. The Golden Rule: Same Distribution}
 \textbf{"Dev Set과 Test Set은 반드시 같은 과녁을 겨냥해야 한다."}
 
-\begin{warningbox}{나쁜 예시 (Bad Example)}
+\begin{warningbox}[title={나쁜 예시 (Bad Example)}]
 \begin{itemize}
     \item \textbf{Train:} 웹에서 크롤링한 고화질 고양이 사진 (20만 장)
     \item \textbf{Dev/Test:} 사용자가 폰으로 찍은 흐릿한 고양이 사진 (1만 장)
@@ -2907,7 +2562,7 @@ if __name__ == "__main__":
 
 데이터를 나누는 진짜 이유는 모델의 상태를 진단하기 위해서입니다.
 
-\begin{diagnosisbox}{성능 진단표 (Human Error $\approx$ 0\% 가정)}
+\begin{diagnosisbox}[title={성능 진단표 (Human Error $\approx$ 0\% 가정)}]
 \begin{center}
 \begin{tabular}{c|c|l|l}
 \hline
@@ -2924,7 +2579,6 @@ if __name__ == "__main__":
     \item \textbf{Bias(편향) 문제:} Train Set조차 제대로 못 맞춤. (공부를 안 함)
     \item \textbf{Variance(분산) 문제:} Train은 잘 맞추는데 Dev는 못 맞춤. (교과서만 달달 외움, 응용 불가)
 \end{itemize}
-
 
 
 % --- 7. 구현 코드 ---
@@ -2983,7 +2637,7 @@ def prepare_data(X, y):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Split:} 빅데이터 시대에는 \textbf{98/1/1} 비율이 대세다. Train에 집중하라.
     \item \textbf{Distribution:} Dev와 Test는 반드시 \textbf{같은 분포}여야 한다.
@@ -2992,13 +2646,11 @@ def prepare_data(X, y):
   \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 12: [CS230] Improving Deep Neural Networks:  Bias vs Variance Trade-off Analysis
+% Lecture 12: [CS230] Improving Deep Neural Networks: \\ Bias vs Variance Trade-off Analysis
 %=======================================================================
-\chapter{[CS230] Improving Deep Neural Networks:  Bias vs Variance Trade-off Analysis}
+\chapter{[CS230] Improving Deep Neural Networks: \\ Bias vs Variance Trade-off Analysis}
 \label{ch:lecture12}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -3030,7 +2682,7 @@ def prepare_data(X, y):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 모델의 성능 저하 원인을 규명하는 \textbf{'진단(Diagnosis)'} 기술을 다룹니다.
 \begin{itemize}
     \item \textbf{개념:} 편향(Bias)과 분산(Variance)을 각각 과소적합(Underfitting)과 과대적합(Overfitting)으로 이해합니다.
@@ -3057,7 +2709,6 @@ def prepare_data(X, y):
 \section{Core Concepts: 과녁 맞추기 (Bullseye Analogy)}
 
 
-
 \subsection{1. High Bias (Underfitting)}
 \begin{itemize}
     \item \textbf{현상:} 화살들이 정중앙에서 멀리 떨어져 있고, 자기들끼리는 뭉쳐 있습니다.
@@ -3073,7 +2724,7 @@ def prepare_data(X, y):
 \subsection{3. The Diagnostic Recipe (진단 레시피)}
 숫자를 보고 진단하는 법입니다. Bayes Error(인간 수준 오차)가 0\%라고 가정합니다.
 
-\begin{diagnosisbox}{증상별 처방전}
+\begin{diagnosisbox}[title={증상별 처방전}]
 \begin{center}
 \begin{tabular}{c|c|l|l}
 \hline
@@ -3153,7 +2804,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{Train Error가 높다고 무조건 High Bias인가요?}
+\begin{warningbox}[title={Train Error가 높다고 무조건 High Bias인가요?}]
 \textbf{아닙니다!} 비교 대상(Bayes Error)이 중요합니다.
 \begin{itemize}
     \item \textbf{상황:} 흐릿한 옛날 문서 인식. 사람도 15\% 틀림(Human Error = 15\%).
@@ -3174,7 +2825,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{High Bias:} Train Error가 높다. $\rightarrow$ 모델을 키워라(Bigger Network).
     \item \textbf{High Variance:} Dev Error가 Train Error보다 훨씬 높다. $\rightarrow$ 데이터를 모으거나 정규화(Regularization)하라.
@@ -3183,13 +2834,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 13: [CS230] Improving Deep Neural Networks:  Regularization (L2 / Weight Decay)
+% Lecture 13: [CS230] Improving Deep Neural Networks: \\ Regularization (L2 / Weight Decay)
 %=======================================================================
-\chapter{[CS230] Improving Deep Neural Networks:  Regularization (L2 / Weight Decay)}
+\chapter{[CS230] Improving Deep Neural Networks: \\ Regularization (L2 / Weight Decay)}
 \label{ch:lecture13}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -3222,7 +2871,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 모델의 복잡도를 억제하여 일반화 성능을 높이는 \textbf{L2 정규화}를 집중적으로 다룹니다.
 \begin{itemize}
     \item \textbf{개념:} 비용 함수 $J$에 가중치 크기($||W||^2$)에 비례하는 벌점을 추가합니다.
@@ -3272,7 +2921,7 @@ $$ J_{regularized}(W, b) = \underbrace{J_{original}(W, b)}_{\text{오차 (Cross 
 
 이 섹션은 L2 정규화를 왜 \textbf{'가중치 감쇠'}라고 부르는지 수학적으로 증명합니다.
 
-\begin{mathbox}{역전파 수식 유도}
+\begin{mathbox}[title={역전파 수식 유도}]
 비용 함수 $J_{reg}$를 $W$에 대해 미분해 봅시다.
 
 $$ \frac{\partial J_{reg}}{\partial W} = \frac{\partial J_{orig}}{\partial W} + \frac{\partial}{\partial W} \left( \frac{\lambda}{2m} W^2 \right) $$
@@ -3347,7 +2996,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{편향(Bias) $b$는 정규화 안 하나요?}
+\begin{warningbox}[title={편향(Bias) $b$는 정규화 안 하나요?}]
 \textbf{보통 안 합니다.}
 $b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따라서 모델의 복잡도에 큰 영향을 주지 않습니다. $W$만 정규화해도 충분합니다.
 \end{warningbox}
@@ -3364,7 +3013,7 @@ $b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따�
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{L2 Regularization:} 가중치 제곱합($W^2$)을 비용 함수에 추가하여 큰 가중치에 벌점을 준다.
     \item \textbf{Weight Decay:} 역전파 시 $W$가 매번 조금씩 0을 향해 줄어든다.
@@ -3373,13 +3022,11 @@ $b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따�
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 14: [CS230] Improving Deep Neural Networks:  Dropout Regularization
+% Lecture 14: [CS230] Improving Deep Neural Networks: \\ Dropout Regularization
 %=======================================================================
-\chapter{[CS230] Improving Deep Neural Networks:  Dropout Regularization}
+\chapter{[CS230] Improving Deep Neural Networks: \\ Dropout Regularization}
 \label{ch:lecture14}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -3414,7 +3061,7 @@ $b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따�
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 신경망의 강건함(Robustness)을 높이는 \textbf{드롭아웃}의 원리와 구현을 다룹니다.
 \begin{itemize}
     \item \textbf{원리:} 드롭아웃이 어떻게 특정 뉴런에 대한 의존도(Co-adaptation)를 낮추는지 이해합니다.
@@ -3443,7 +3090,7 @@ $b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따�
 \subsection{1. 직관적 해석 (Why does it work?)}
 
 
-\begin{analogybox}{천재에게 의존하는 팀 프로젝트}
+\begin{analogybox}[title={천재에게 의존하는 팀 프로젝트}]
 \begin{itemize}
     \item \textbf{상황 (No Dropout):} 팀에 천재 한 명(특정 뉴런)이 있습니다. 다른 팀원들은 그 천재만 믿고 일을 안 합니다. 만약 천재가 결근하면(새로운 데이터), 프로젝트는 망합니다. (과대적합)
     \item \textbf{상황 (Dropout):} 매일 무작위로 팀원을 출근시키지 않습니다. 천재가 결근할 수도 있습니다.
@@ -3458,7 +3105,7 @@ $b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따�
 
 이 섹션은 면접 단골 질문인 "왜 학습 때 값을 나누나요?"에 대한 답입니다.
 
-\begin{mathbox}{The Scale Problem}
+\begin{mathbox}[title={The Scale Problem}]
 \texttt{keep\_prob = 0.5} (50\% 삭제)라고 가정합시다.
 
 \textbf{1. 학습 단계 (Train):}
@@ -3475,7 +3122,7 @@ $b$는 함수의 모양(곡률)이 아니라 위치만 이동시킵니다. 따�
 % --- 7. 구현 코드 ---
 \section{Implementation: Dropout Layer}
 
-가장 중요한 것은 `is_training` 플래그입니다. 테스트 때는 드롭아웃을 적용하면 안 됩니다.
+가장 중요한 것은 \texttt{is\_training} 플래그입니다. 테스트 때는 드롭아웃을 적용하면 안 됩니다.
 
 \begin{lstlisting}[language=Python, caption=Inverted Dropout Implementation, breaklines=true]
 import numpy as np
@@ -3537,9 +3184,9 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{비용 함수(Cost Function) 진동 문제}
+\begin{warningbox}[title={비용 함수(Cost Function) 진동 문제}]
 드롭아웃을 쓰면 매번 네트워크 구조가 무작위로 바뀝니다. 따라서 비용 함수 $J$가 매끄럽게 내려가지 않고 \textbf{톱니바퀴처럼 진동}할 수 있습니다.
-디버깅할 때는 잠시 `keep_prob = 1.0`(드롭아웃 끄기)으로 설정하여 $J$가 잘 내려가는지 확인한 후, 다시 켜는 것이 좋습니다.
+디버깅할 때는 잠시 \texttt{keep\_prob = 1.0}(드롭아웃 끄기)으로 설정하여 $J$가 잘 내려가는지 확인한 후, 다시 켜는 것이 좋습니다.
 \end{warningbox}
 
 \textbf{Q. 입력층(Input Layer)에도 드롭아웃을 쓰나요?} \\
@@ -3557,7 +3204,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Dropout:} 학습 시 무작위로 뉴런을 끈다. (Ensemble 효과, 과대적합 방지)
     \item \textbf{Inverted Dropout:} 학습 시 출력값을 \texttt{keep\_prob}로 나눠주어 기댓값을 유지한다.
@@ -3566,13 +3213,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 15: [CS230] Improving Deep Neural Networks:  Data Augmentation \& Early Stopping
+% Lecture 15: [CS230] Improving Deep Neural Networks: \\ Data Augmentation \& Early Stopping
 %=======================================================================
-\chapter{[CS230] Improving Deep Neural Networks:  Data Augmentation \& Early Stopping}
+\chapter{[CS230] Improving Deep Neural Networks: \\ Data Augmentation \& Early Stopping}
 \label{ch:lecture15}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -3605,7 +3250,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 모델의 일반화 성능을 높이는 가장 직관적이고 가성비 좋은 두 가지 기법을 다룹니다.
 \begin{itemize}
     \item \textbf{Data Augmentation:} 이미지를 변형하여 데이터셋을 뻥튀기하고, 모델에게 \textbf{불변성(Invariance)}을 가르칩니다.
@@ -3641,8 +3286,7 @@ if __name__ == "__main__":
 \end{itemize}
 
 
-
-\begin{tipbox}{On-the-fly Generation (실시간 생성)}
+\begin{tipbox}[title={On-the-fly Generation (실시간 생성)}]
 "교수님, 변형된 이미지를 하드디스크에 저장해두고 써야 합니까?"
 \textbf{절대 아닙니다.} 1TB짜리 데이터셋을 10배 증강하면 10TB가 됩니다. 감당할 수 없습니다.
 \textbf{CPU가 학습 도중에 실시간으로 변형}해서 GPU에게 넘겨주는 방식을 사용합니다. 디스크 용량은 그대로 유지됩니다.
@@ -3652,7 +3296,6 @@ if __name__ == "__main__":
 
 \subsection{2. Early Stopping (조기 종료)}
 학습 곡선(Learning Curve)을 보다가, Train Error는 줄지만 Dev Error가 다시 올라가려는 순간(과대적합 시작점)에 멈춥니다.
-
 
 
 \begin{itemize}
@@ -3715,8 +3358,8 @@ class EarlyStopping:
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{Deep Copy를 안 쓰면 생기는 일}
-파이썬에서 `best_model = model`이라고 쓰면, `best_model`은 `model`을 가리키는 별명이 될 뿐입니다. 학습이 계속 진행되어 `model`이 망가지면 `best_model`도 같이 망가집니다.
+\begin{warningbox}[title={Deep Copy를 안 쓰면 생기는 일}]
+파이썬에서 \texttt{best\_model = model}이라고 쓰면, \texttt{best\_model}은 `model`을 가리키는 별명이 될 뿐입니다. 학습이 계속 진행되어 `model`이 망가지면 \texttt{best\_model}도 같이 망가집니다.
 반드시 `copy.deepcopy(model)`을 사용하여 \textbf{그 순간의 스냅샷}을 메모리에 따로 저장해야 합니다.
 \end{warningbox}
 
@@ -3732,7 +3375,7 @@ class EarlyStopping:
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Augmentation:} 데이터를 변형해 양을 늘리고 불변성(Invariance)을 학습시킨다.
     \item \textbf{On-the-fly:} 디스크 절약을 위해 학습 도중 실시간으로 변형한다.
@@ -3741,13 +3384,11 @@ class EarlyStopping:
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 16: [CS230] Improving Deep Neural Networks:  Mini-batch Gradient Descent
+% Lecture 16: [CS230] Improving Deep Neural Networks: \\ Mini-batch Gradient Descent
 %=======================================================================
-\chapter{[CS230] Improving Deep Neural Networks:  Mini-batch Gradient Descent}
+\chapter{[CS230] Improving Deep Neural Networks: \\ Mini-batch Gradient Descent}
 \label{ch:lecture16}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -3780,7 +3421,7 @@ class EarlyStopping:
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 대용량 데이터를 효율적으로 학습시키는 \textbf{미니 배치 경사 하강법}을 다룹니다.
 \begin{itemize}
     \item \textbf{비교:} Batch(전체), Stochastic(1개), Mini-batch(덩어리)의 장단점을 비교합니다.
@@ -3829,8 +3470,7 @@ class EarlyStopping:
 \end{itemize}
 
 
-
-\begin{analogybox}{산 내려오기 비유}
+\begin{analogybox}[title={산 내려오기 비유}]
 \begin{itemize}
     \item \textbf{Batch:} 지도를 펼쳐 산 전체를 파악한 뒤, 정확하게 한 발자국 내딛습니다. (너무 신중함)
     \item \textbf{Stochastic:} 눈을 감고 발끝 감각만으로 미친 듯이 뛰어내려 갑니다. (빠르지만 비틀거림)
@@ -3901,7 +3541,7 @@ def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{Shuffle 시 주의사항}
+\begin{warningbox}[title={Shuffle 시 주의사항}]
 시계열 데이터(주식, 날씨, 음성 등)처럼 \textbf{순서(Time)}가 중요한 데이터는 절대 섞으면 안 됩니다! 과거 데이터로 미래를 예측해야 하는데, 섞어버리면 미래를 보고 과거를 맞추는 꼴(Data Leakage)이 됩니다.
 \end{warningbox}
 
@@ -3917,7 +3557,7 @@ def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Mini-batch GD:} 데이터를 작은 묶음으로 나누어 업데이트한다. (속도 + 안정성)
     \item \textbf{Power of 2:} 배치 크기는 $2^n$ (32, 64, 128...)이 하드웨어 효율적이다.
@@ -3926,13 +3566,11 @@ def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 17: [CS230] Optimization Algorithms:  Momentum \& RMSprop
+% Lecture 17: [CS230] Optimization Algorithms: \\ Momentum \& RMSprop
 %=======================================================================
-\chapter{[CS230] Optimization Algorithms:  Momentum \& RMSprop}
+\chapter{[CS230] Optimization Algorithms: \\ Momentum \& RMSprop}
 \label{ch:lecture17}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -3965,7 +3603,7 @@ def random_mini_batches(X, Y, mini_batch_size=64, seed=0):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 단순한 경사 하강법을 넘어선 \textbf{고급 최적화 알고리즘} 두 가지를 다룹니다.
 \begin{itemize}
     \item \textbf{기초:} 시계열 데이터의 트렌드를 추출하는 \textbf{지수 가중 이동 평균(EWMA)}을 이해합니다.
@@ -4001,20 +3639,19 @@ $$ v_t = \beta v_{t-1} + (1 - \beta) \theta_t $$
 \end{itemize}
 
 
-
 \vspace{0.5cm}\hrule\vspace{0.5cm}
 
 \subsection{2. Momentum (관성)}
 \textbf{"공이 언덕을 굴러 내려갈 때 속도가 붙는 물리 법칙"}
 
-\begin{analogybox}{얼음판 위의 쇠구슬}
+\begin{analogybox}[title={얼음판 위의 쇠구슬}]
 \begin{itemize}
     \item \textbf{SGD (일반 경사 하강법):} 마찰력이 무한대인 바닥. 힘(기울기)을 주면 움직이고, 안 주면 딱 멈춥니다. 방향이 바뀌면 즉시 꺾입니다 (지그재그).
     \item \textbf{Momentum:} 마찰력이 없는 얼음판. 힘을 주지 않아도 기존에 내려오던 \textbf{속도(Velocity, $v$)} 때문에 계속 미끄러져 내려갑니다. 이 관성이 진동을 상쇄하고 웅덩이(Local Minima)를 넘게 해줍니다.
 \end{itemize}
 \end{analogybox}
 
-\begin{mathbox}{Update Rule}
+\begin{mathbox}[title={Update Rule}]
 1. 속도 계산: $v = \beta v + (1-\beta) dW$ \\
 2. 파라미터 업데이트: $W = W - \alpha v$ \\
 ($\alpha$: 학습률, $\beta$: 보통 0.9 사용)
@@ -4035,7 +3672,7 @@ $$ v_t = \beta v_{t-1} + (1 - \beta) \theta_t $$
     \end{itemize}
 \end{itemize}
 
-\begin{mathbox}{Update Rule}
+\begin{mathbox}[title={Update Rule}]
 1. 제곱 평균: $S = \beta_2 S + (1-\beta_2) dW^2$ (요소별 제곱) \\
 2. 파라미터 업데이트: $W = W - \alpha \frac{dW}{\sqrt{S} + \epsilon}$ \\
 ($\epsilon$: 0으로 나누기 방지용, $10^{-8}$)
@@ -4088,7 +3725,7 @@ def update_with_rmsprop(parameters, grads, s, beta2, learning_rate, epsilon=1e-8
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{변수 초기화 실수}
+\begin{warningbox}[title={변수 초기화 실수}]
 $v$와 $s$는 학습 루프(Iteration)가 돌 때마다 초기화하면 안 됩니다! 
 그러면 관성이 사라집니다. 반드시 \textbf{학습 시작 전(Epoch 0 이전)에 한 번만 0으로 초기화}하고, 계속 값을 누적해가야 합니다.
 \end{warningbox}
@@ -4108,7 +3745,7 @@ $v$와 $s$는 학습 루프(Iteration)가 돌 때마다 초기화하면 안 됩�
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Momentum:} $v \leftarrow dW$. 과거의 속도를 유지하여 Local Minima 탈출 및 가속.
     \item \textbf{RMSprop:} $S \leftarrow dW^2$. 기울기가 크면 학습률을 낮춰 진동을 방지.
@@ -4117,13 +3754,11 @@ $v$와 $s$는 학습 루프(Iteration)가 돌 때마다 초기화하면 안 됩�
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 18: [CS230] Optimization Algorithms:  Adam Optimizer
+% Lecture 18: [CS230] Optimization Algorithms: \\ Adam Optimizer
 %=======================================================================
-\chapter{[CS230] Optimization Algorithms:  Adam Optimizer}
+\chapter{[CS230] Optimization Algorithms: \\ Adam Optimizer}
 \label{ch:lecture18}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -4158,7 +3793,7 @@ $v$와 $s$는 학습 루프(Iteration)가 돌 때마다 초기화하면 안 됩�
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 현대 딥러닝의 표준인 \textbf{Adam Optimizer}의 내부 구조를 해부합니다.
 \begin{itemize}
     \item \textbf{통합:} Adam이 Momentum의 평균(1차)과 RMSprop의 분산(2차)을 어떻게 결합하는지 수식으로 이해합니다.
@@ -4208,7 +3843,7 @@ Adam은 매 스텝($t$)마다 다음 4단계를 수행합니다.
 "교수님, 왜 굳이 $(1 - \beta^t)$로 나눠주나요?"
 이것은 Adam의 정교함을 보여주는 대목입니다.
 
-\begin{mathbox}{초기값 0의 저주}
+\begin{mathbox}[title={초기값 0의 저주}]
 우리는 $v_0 = 0$으로 시작합니다. 첫 번째 스텝($t=1$)을 봅시다.
 ($\beta_1 = 0.9$ 가정)
 
@@ -4272,7 +3907,7 @@ def update_parameters_with_adam(parameters, grads, v, s, t, learning_rate=0.01,
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{Iteration Count $t$ 주의}
+\begin{warningbox}[title={Iteration Count $t$ 주의}]
 함수를 호출할 때 $t$는 반드시 1부터 시작해야 합니다. 만약 $t=0$이면 $1 - \beta^0 = 1 - 1 = 0$이 되어 \textbf{ZeroDivisionError}가 발생합니다.
 \end{warningbox}
 
@@ -4288,7 +3923,7 @@ def update_parameters_with_adam(parameters, grads, v, s, t, learning_rate=0.01,
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Adam:} Momentum(속도) + RMSprop(가속도 제어) + Bias Correction(초기 보정).
     \item \textbf{Standard Params:} $\alpha$(튜닝), $\beta_1(0.9)$, $\beta_2(0.999)$, $\epsilon(10^{-8})$.
@@ -4297,13 +3932,11 @@ def update_parameters_with_adam(parameters, grads, v, s, t, learning_rate=0.01,
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 19: [CS230] Optimization Algorithms:  Learning Rate Decay
+% Lecture 19: [CS230] Optimization Algorithms: \\ Learning Rate Decay
 %=======================================================================
-\chapter{[CS230] Optimization Algorithms:  Learning Rate Decay}
+\chapter{[CS230] Optimization Algorithms: \\ Learning Rate Decay}
 \label{ch:lecture19}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -4336,7 +3969,7 @@ def update_parameters_with_adam(parameters, grads, v, s, t, learning_rate=0.01,
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 학습 단계별로 학습률($\alpha$)을 조절하여 모델 성능을 극대화하는 기법을 다룹니다.
 \begin{itemize}
     \item \textbf{이유:} 고정된 학습률이 최저점 근처에서 수렴하지 못하는 이유를 기하학적으로 이해합니다.
@@ -4364,7 +3997,7 @@ def update_parameters_with_adam(parameters, grads, v, s, t, learning_rate=0.01,
 \subsection{1. The Parking Problem (왜 줄여야 하는가?)}
 
 
-\begin{analogybox}{고속도로와 주차장 비유}
+\begin{analogybox}[title={고속도로와 주차장 비유}]
 \begin{itemize}
     \item \textbf{Early Stage (고속도로):} 최저점이 멀리 있습니다. 이때는 보폭이 커야(High $\alpha$) 빨리 접근할 수 있습니다.
     \item \textbf{Late Stage (주차장):} 최저점 근처입니다. 이때도 보폭이 크다면 구멍을 지나쳐 버리고(Overshooting), 다시 돌아오려다 또 지나칩니다.
@@ -4451,7 +4084,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{tipbox}{ReduceLROnPlateau (실전 꿀팁)}
+\begin{tipbox}[title={ReduceLROnPlateau (실전 꿀팁)}]
 가장 실용적인 방법은 수식보다는 \textbf{성능}을 보고 줄이는 것입니다.
 \textbf{"지난 10 에폭 동안 Dev Error가 줄어들지 않았네? (Plateau)"} $\rightarrow$ \textbf{"이제 정밀 타격할 때다. 학습률을 1/10로 줄여라."}
 Keras나 PyTorch에서 `ReduceLROnPlateau` 콜백을 사용하면 됩니다.
@@ -4470,7 +4103,7 @@ Keras나 PyTorch에서 `ReduceLROnPlateau` 콜백을 사용하면 됩니다.
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Need for Decay:} 고정 학습률은 최저점 근처에서 진동한다. 정밀한 수렴을 위해 줄여야 한다.
     \item \textbf{Schedules:} Inverse Time(완만), Exponential(급격), Step(계단식) 등이 있다.
@@ -4479,13 +4112,11 @@ Keras나 PyTorch에서 `ReduceLROnPlateau` 콜백을 사용하면 됩니다.
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 20: [CS230] Optimization Algorithms:  Hyperparameter Tuning Strategy
+% Lecture 20: [CS230] Optimization Algorithms: \\ Hyperparameter Tuning Strategy
 %=======================================================================
-\chapter{[CS230] Optimization Algorithms:  Hyperparameter Tuning Strategy}
+\chapter{[CS230] Optimization Algorithms: \\ Hyperparameter Tuning Strategy}
 \label{ch:lecture20}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -4520,7 +4151,7 @@ Keras나 PyTorch에서 `ReduceLROnPlateau` 콜백을 사용하면 됩니다.
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 SOTA(State-of-the-art) 성능을 달성하기 위한 하이퍼파라미터 튜닝의 \textbf{우선순위}와 \textbf{탐색 기법}을 다룹니다.
 \begin{itemize}
     \item \textbf{우선순위:} 학습률($\alpha$)이 가장 중요하다는 계층 구조를 이해합니다.
@@ -4572,7 +4203,7 @@ Keras나 PyTorch에서 `ReduceLROnPlateau` 콜백을 사용하면 됩니다.
 \subsection{2. Grid Search vs Random Search}
 
 
-\begin{analogybox}{보물 찾기}
+\begin{analogybox}[title={보물 찾기}]
 지도상에 보물이 어디 있는지 모릅니다.
 \begin{itemize}
     \item \textbf{Grid Search:} 지도를 바둑판처럼 나누고 교차점만 팝니다. 만약 보물이 교차점 사이에 있다면? 영원히 못 찾습니다.
@@ -4647,7 +4278,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{tipbox}{Coarse to Fine 전략}
+\begin{tipbox}[title={Coarse to Fine 전략}]
 처음부터 100 Epoch씩 돌리며 완벽한 값을 찾으려 하지 마세요.
 1. \textbf{Coarse:} 넓은 범위에서 5~10 Epoch만 짧게 돌려 대략적인 성능을 봅니다.
 2. \textbf{Zoom In:} 성능이 좋은 영역을 발견하면 그 구간을 집중 확대합니다.
@@ -4666,7 +4297,7 @@ $0.9 \to 0.9005$는 별 차이 없지만, $0.999 \to 0.9995$는 평균 기간이
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Priority:} 학습률($\alpha$)이 1순위다.
     \item \textbf{Strategy:} Grid Search보다는 \textbf{Random Search}가 효율적이다.
@@ -4675,13 +4306,11 @@ $0.9 \to 0.9005$는 별 차이 없지만, $0.999 \to 0.9995$는 평균 기간이
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 21: [CS230] Optimization Algorithms:  Batch Normalization
+% Lecture 21: [CS230] Optimization Algorithms: \\ Batch Normalization
 %=======================================================================
-\chapter{[CS230] Optimization Algorithms:  Batch Normalization}
+\chapter{[CS230] Optimization Algorithms: \\ Batch Normalization}
 \label{ch:lecture21}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -4715,7 +4344,7 @@ $0.9 \to 0.9005$는 별 차이 없지만, $0.999 \to 0.9995$는 평균 기간이
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 딥러닝 역사상 가장 위대한 발명 중 하나인 \textbf{배치 정규화}의 원리와 구현을 다룹니다.
 \begin{itemize}
     \item \textbf{원인:} 학습을 방해하는 \textbf{내부 공변량 변화(Internal Covariate Shift)} 현상을 이해합니다.
@@ -4744,7 +4373,7 @@ $0.9 \to 0.9005$는 별 차이 없지만, $0.999 \to 0.9995$는 평균 기간이
 \subsection{1. Internal Covariate Shift (내부 공변량 변화)}
 
 
-\begin{analogybox}{흔들리는 다리 위에서 걷기}
+\begin{analogybox}[title={흔들리는 다리 위에서 걷기}]
 \begin{itemize}
     \item \textbf{Without BN:} 앞사람(Layer 1)이 발을 구를 때마다 다리가 흔들립니다. 뒷사람(Layer 2)은 중심 잡느라 앞으로 나아갈 수가 없습니다. (학습 속도 저하)
     \item \textbf{With BN:} 각 층마다 \textbf{"발판을 수평으로 고정(Normalize)"}해줍니다. 뒷사람은 앞사람의 움직임에 상관없이 안정적으로 달릴 수 있습니다. (학습 속도 비약적 향상)
@@ -4763,7 +4392,7 @@ $0.9 \to 0.9005$는 별 차이 없지만, $0.999 \to 0.9995$는 평균 기간이
     \item \textbf{Scale \& Shift (핵심):} $\tilde{z} = \gamma z_{norm} + \beta$
 \end{enumerate}
 
-\begin{warningbox}{왜 다시 $\gamma, \beta$로 망가뜨리나요?}
+\begin{warningbox}[title={왜 다시 $\gamma, \beta$로 망가뜨리나요?}]
 무조건 평균 0, 분산 1로 고정하면, 데이터가 Sigmoid의 선형 구간(가운데)에만 몰리게 되어 \textbf{비선형성(표현력)을 잃게 됩니다.}
 $\gamma$와 $\beta$를 학습 가능하게 두어, "필요하다면 원래 분포로 되돌릴 수 있는 자유"를 모델에게 주는 것입니다.
 \end{warningbox}
@@ -4775,8 +4404,8 @@ $\gamma$와 $\beta$를 학습 가능하게 두어, "필요하다면 원래 분�
 배치 정규화 구현에서 가장 중요한 포인트입니다.
 
 \begin{itemize}
-    \item \textbf{Training Mode:} 현재 들어온 \textbf{미니 배치의 평균/분산}을 계산해서 씁니다. 동시에 이 값들을 `running_mean`, `running_var`에 누적(업데이트)해둡니다.
-    \item \textbf{Test Mode:} 테스트 때는 데이터가 1개만 들어올 수도 있습니다(분산 계산 불가). 따라서 학습 때 미리 저장해둔 \textbf{`running_mean`, `running_var`}를 가져와서 정규화합니다.
+    \item \textbf{Training Mode:} 현재 들어온 \textbf{미니 배치의 평균/분산}을 계산해서 씁니다. 동시에 이 값들을 \texttt{running\_mean}, \texttt{running\_var}에 누적(업데이트)해둡니다.
+    \item \textbf{Test Mode:} 테스트 때는 데이터가 1개만 들어올 수도 있습니다(분산 계산 불가). 따라서 학습 때 미리 저장해둔 \textbf{\texttt{running\_mean}, \texttt{running\_var}}를 가져와서 정규화합니다.
 \end{itemize}
 
 % --- 7. 구현 코드 ---
@@ -4837,7 +4466,7 @@ class BatchNorm:
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Batch Norm:} 각 층의 입력을 정규화하여 학습을 안정화하고 가속한다.
     \item \textbf{Gamma/Beta:} 정규화로 잃어버린 표현력을 복구하기 위한 학습 파라미터.
@@ -4846,13 +4475,11 @@ class BatchNorm:
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 22: [CS230] Structuring Machine Learning Projects:  Orthogonalization Strategy
+% Lecture 22: [CS230] Structuring Machine Learning Projects: \\ Orthogonalization Strategy
 %=======================================================================
-\chapter{[CS230] Structuring Machine Learning Projects:  Orthogonalization Strategy}
+\chapter{[CS230] Structuring Machine Learning Projects: \\ Orthogonalization Strategy}
 \label{ch:lecture22}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -4886,7 +4513,7 @@ class BatchNorm:
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 머신러닝 프로젝트를 효율적으로 이끄는 \textbf{전략적 사고방식}을 다룹니다.
 \begin{itemize}
     \item \textbf{개념:} 시스템의 변수들을 서로 독립적으로(Orthogonal) 제어하여 원하는 효과를 정밀 타격하는 원리를 배웁니다.
@@ -4916,7 +4543,7 @@ class BatchNorm:
 
 수학적으로 두 벡터가 직교(90도)하면, 한 벡터를 조절해도 다른 벡터에는 영향을 주지 않습니다. 엔지니어링에서도 마찬가지입니다. \textbf{"하나의 다이얼은 하나의 기능만 조절해야 한다"}는 원칙입니다.
 
-\begin{analogybox}{자동차 운전 비유}
+\begin{analogybox}[title={자동차 운전 비유}]
 \begin{itemize}
     \item \textbf{Orthogonal (좋은 설계):}
     \begin{itemize}
@@ -4950,7 +4577,7 @@ class BatchNorm:
 
 각 단계에서 문제가 발생했을 때, 다른 단계에 부작용을 주지 않고 해당 문제만 해결하는 \textbf{직교화된 도구}를 써야 합니다.
 
-\begin{strategybox}{Dr. Ng's Prescription Table}
+\begin{strategybox}[title={Dr. Ng's Prescription Table}]
 \begin{center}
 \begin{tabular}{l|l|l}
 \hline
@@ -4965,7 +4592,7 @@ class BatchNorm:
 \end{center}
 \end{strategybox}
 
-\begin{warningbox}{Early Stopping의 딜레마}
+\begin{warningbox}[title={Early Stopping의 딜레마}]
 Early Stopping은 학습을 중간에 멈춥니다.
 \begin{itemize}
     \item 비용함수 $J$ 최소화 중단 $\rightarrow$ \textbf{Bias 악화}
@@ -5039,7 +4666,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Orthogonalization:} 변수들을 독립적으로 제어하여 튜닝을 명확하게 만드는 전략.
     \item \textbf{Sequence:} Train Fit $\to$ Dev Fit $\to$ Test Fit 순서로 해결한다.
@@ -5048,13 +4675,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 23: [CS230] Structuring Machine Learning Projects:  Single Number Evaluation Metric (F1 Score)
+% Lecture 23: [CS230] Structuring Machine Learning Projects: \\ Single Number Evaluation Metric (F1 Score)
 %=======================================================================
-\chapter{[CS230] Structuring Machine Learning Projects:  Single Number Evaluation Metric (F1 Score)}
+\chapter{[CS230] Structuring Machine Learning Projects: \\ Single Number Evaluation Metric (F1 Score)}
 \label{ch:lecture23}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -5088,7 +4713,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 불균형 데이터에서 모델 성능을 정확히 평가하는 \textbf{F1 Score}를 다룹니다.
 \begin{itemize}
     \item \textbf{정의:} 정밀도(Precision)와 재현율(Recall)의 개념을 오차 행렬을 통해 익힙니다.
@@ -5116,7 +4741,7 @@ if __name__ == "__main__":
 
 \textbf{질문:} "모델이 찾은 것 중에 진짜는 얼마나 되는가?"
 $$ P = \frac{TP}{TP + FP} $$
-\begin{analogybox}{깐깐한 미식가}
+\begin{analogybox}[title={깐깐한 미식가}]
 "나는 맛없는 건 절대 안 먹어." (FP 싫어함)
 맛있는 것(TP)을 좀 놓치더라도, 내 입에 들어오는 건 무조건 맛있어야 합니다.
 \textbf{활용:} 스팸 메일 분류 (정상 메일을 스팸통에 넣으면 치명적임).
@@ -5126,7 +4751,7 @@ $$ P = \frac{TP}{TP + FP} $$
 
 \textbf{질문:} "실제 존재하는 것 중에 모델이 얼마나 찾았는가?"
 $$ R = \frac{TP}{TP + FN} $$
-\begin{analogybox}{그물망 어선}
+\begin{analogybox}[title={그물망 어선}]
 "쓰레기가 좀 섞여도 좋으니, 물고기는 다 잡아라." (FN 싫어함)
 잡동사니(FP)가 걸려도 괜찮지만, 물고기(TP)를 놓치면 안 됩니다.
 \textbf{활용:} 암 진단 (암 환자를 정상이라 하면 생명이 위험함), 도둑 탐지.
@@ -5138,7 +4763,7 @@ $$ R = \frac{TP}{TP + FN} $$
 
 왜 두 지표를 그냥 더해서 2로 나누면(산술 평균) 안 될까요?
 
-\begin{mathbox}{바보 모델의 함정}
+\begin{mathbox}[title={바보 모델의 함정}]
 암 환자가 1\%인 데이터가 있습니다.
 어떤 모델이 \textbf{"무조건 암이다(1)"}라고 예측한다고 합시다. (Recall = 1.0, Precision $\approx$ 0.01)
 
@@ -5215,7 +4840,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Need:} 불균형 데이터에서는 정확도 대신 Precision/Recall을 봐야 한다.
     \item \textbf{Trade-off:} Precision과 Recall은 반비례 관계다. 둘 다 높은 게 최고다.
@@ -5224,13 +4849,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 24: [CS230] Structuring Machine Learning Projects:  Satisficing and Optimizing Metrics
+% Lecture 24: [CS230] Structuring Machine Learning Projects: \\ Satisficing and Optimizing Metrics
 %=======================================================================
-\chapter{[CS230] Structuring Machine Learning Projects:  Satisficing and Optimizing Metrics}
+\chapter{[CS230] Structuring Machine Learning Projects: \\ Satisficing and Optimizing Metrics}
 \label{ch:lecture24}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -5267,7 +4890,7 @@ A는 성능은 좋지만 1.5초나 걸려서 아무도 안 쓸 겁니다. 그렇
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 여러 개의 목표가 충돌할 때, 우선순위를 정하는 \textbf{전략적 프레임워크}를 다룹니다.
 \begin{itemize}
     \item \textbf{구분:} 평가 지표를 \textbf{'최대한 좋게 할 것(Optimizing)'}과 \textbf{'기준만 넘기면 되는 것(Satisficing)'}으로 나눕니다.
@@ -5294,7 +4917,7 @@ A는 성능은 좋지만 1.5초나 걸려서 아무도 안 쓸 겁니다. 그렇
 고려해야 할 지표가 3개(정확도, 속도, 메모리)라면 어떻게 해야 할까요?
 \textbf{"3마리 토끼를 다 잡으려다가는 다 놓칩니다."}
 
-\begin{analogybox}{올림픽 달리기와 도핑 테스트}
+\begin{analogybox}[title={올림픽 달리기와 도핑 테스트}]
 \begin{itemize}
     \item \textbf{Optimizing (달리기 기록):} 0.01초라도 빠르면 무조건 좋습니다. 금메달의 기준입니다.
     \item \textbf{Satisficing (도핑 테스트):} 약물이 "아주 조금 검출됨"이나 "전혀 검출 안 됨"이나 똑같이 \textbf{통과(Pass)}입니다. 기준치만 안 넘으면 됩니다. 더 깨끗하다고 가산점을 주진 않습니다.
@@ -5315,7 +4938,7 @@ $$ \text{and } \textbf{Memory} \le 500MB $$
     \item \textbf{Latency, Memory:} 제약 조건 (Constraints) $\rightarrow$ Satisficing
 \end{itemize}
 
-\begin{warningbox}{가중치 합의 함정}
+\begin{warningbox}[title={가중치 합의 함정}]
 "그냥 $\text{Score} = \text{Accuracy} - 0.5 \times \text{Latency}$ 처럼 합치면 안 되나요?"
 \textbf{비추천합니다.}
 1. 단위가 다릅니다(Accuracy는 \%, Latency는 ms).
@@ -5397,7 +5020,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Optimizing:} 최대한 좋게 만들어야 하는 단 하나의 지표 (예: Accuracy).
     \item \textbf{Satisficing:} 기준선(Threshold)만 넘으면 되는 지표들 (예: Latency, Cost).
@@ -5406,13 +5029,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 25: [CS230] Structuring Machine Learning Projects:  Error Analysis
+% Lecture 25: [CS230] Structuring Machine Learning Projects: \\ Error Analysis
 %=======================================================================
-\chapter{[CS230] Structuring Machine Learning Projects:  Error Analysis}
+\chapter{[CS230] Structuring Machine Learning Projects: \\ Error Analysis}
 \label{ch:lecture25}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -5445,7 +5066,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 틀린 데이터를 직접 분석하여 프로젝트의 우선순위를 정하는 전략을 다룹니다.
 \begin{itemize}
     \item \textbf{철학:} "추측하지 말고 확인하라(Don't guess, look)." 오분류된 데이터를 직접 눈으로 확인합니다.
@@ -5479,8 +5100,7 @@ if __name__ == "__main__":
 Dev Set에서 모델이 틀린 샘플 100개를 무작위로 뽑아 엑셀에 정리합니다.
 
 
-
-\begin{strategybox}{분석 결과 시뮬레이션}
+\begin{strategybox}[title={분석 결과 시뮬레이션}]
 \begin{center}
 \begin{tabular}{l|c|c}
 \hline
@@ -5569,7 +5189,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{Dev Set만 고치면 안 되나요?}
+\begin{warningbox}[title={Dev Set만 고치면 안 되나요?}]
 \textbf{절대 안 됩니다.}
 Dev Set의 라벨만 고치고 Test Set을 그대로 두면, 두 데이터셋의 분포가 달라집니다(Distribution Mismatch). 평가의 신뢰도가 깨집니다. 귀찮더라도 Dev와 Test는 \textbf{한 몸처럼} 다뤄야 합니다.
 \end{warningbox}
@@ -5586,7 +5206,7 @@ Dev Set의 라벨만 고치고 Test Set을 그대로 두면, 두 데이터셋의
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Don't Guess:} 직감이 아닌 데이터를 보고 결정하라.
     \item \textbf{Ceiling Analysis:} 특정 문제를 해결했을 때 얻을 수 있는 최대 이익(ROI)을 계산하라.
@@ -5595,13 +5215,11 @@ Dev Set의 라벨만 고치고 Test Set을 그대로 두면, 두 데이터셋의
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 26: [CS230] Structuring Machine Learning Projects:  Data Mismatch \& Train-Dev Set
+% Lecture 26: [CS230] Structuring Machine Learning Projects: \\ Data Mismatch \& Train-Dev Set
 %=======================================================================
-\chapter{[CS230] Structuring Machine Learning Projects:  Data Mismatch \& Train-Dev Set}
+\chapter{[CS230] Structuring Machine Learning Projects: \\ Data Mismatch \& Train-Dev Set}
 \label{ch:lecture26}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -5634,7 +5252,7 @@ Dev Set의 라벨만 고치고 Test Set을 그대로 두면, 두 데이터셋의
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 학습 데이터와 실전 데이터의 분포가 다를 때 발생하는 문제를 해결합니다.
 \begin{itemize}
     \item \textbf{진단:} 과대적합(Variance)과 데이터 불일치(Mismatch)를 구분하기 위해 \textbf{Train-Dev Set}을 도입합니다.
@@ -5680,7 +5298,7 @@ Dev Set의 라벨만 고치고 Test Set을 그대로 두면, 두 데이터셋의
 
 이 표가 오늘 강의의 핵심입니다. \textbf{에러의 차이(Gap)}가 어디서 벌어지는지 봐야 합니다.
 
-\begin{diagnosisbox}{Mismatch 진단 로직}
+\begin{diagnosisbox}[title={Mismatch 진단 로직}]
 \begin{center}
 \begin{tabular}{l|c|l}
 \hline
@@ -5693,7 +5311,7 @@ Dev Set의 라벨만 고치고 Test Set을 그대로 두면, 두 데이터셋의
 \end{center}
 \end{diagnosisbox}
 
-\begin{analogybox}{시나리오 분석}
+\begin{analogybox}[title={시나리오 분석}]
 \textbf{상황:} Train Error 1\%.
 \begin{itemize}
     \item \textbf{Case A:} Train-Dev 9\%, Dev 10\%.
@@ -5777,7 +5395,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Problem:} 학습 데이터(Web)와 실전 데이터(Mobile)의 분포가 다르면 성능이 떨어진다.
     \item \textbf{Tool:} \textbf{Train-Dev Set} (Train과 분포는 같으나 학습엔 안 씀).
@@ -5786,13 +5404,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 27: [CS230] Structuring Machine Learning Projects:  Transfer Learning \& Multi-task Learning
+% Lecture 27: [CS230] Structuring Machine Learning Projects: \\ Transfer Learning \& Multi-task Learning
 %=======================================================================
-\chapter{[CS230] Structuring Machine Learning Projects:  Transfer Learning \& Multi-task Learning}
+\chapter{[CS230] Structuring Machine Learning Projects: \\ Transfer Learning \& Multi-task Learning}
 \label{ch:lecture27}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -5825,7 +5441,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 '데이터 부족'을 해결하고 학습 효율을 극대화하는 두 가지 패러다임을 다룹니다.
 \begin{itemize}
     \item \textbf{Transfer Learning:} 대규모 데이터(ImageNet)로 학습된 모델을 가져와 내 문제(X-ray)에 적용하는 법을 배웁니다.
@@ -5876,7 +5492,7 @@ if __name__ == "__main__":
 
 "데이터가 얼마나 있느냐"에 따라 전략이 달라집니다.
 
-\begin{strategybox}{데이터 규모별 전략}
+\begin{strategybox}[title={데이터 규모별 전략}]
 \begin{enumerate}
     \item \textbf{Small Data (데이터 매우 적음):}
     \begin{itemize}
@@ -5957,7 +5573,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{처음부터 Fine-tuning을 하면 안 되나요?}
+\begin{warningbox}[title={처음부터 Fine-tuning을 하면 안 되나요?}]
 \textbf{절대 안 됩니다.}
 새로 붙인 Head(분류기)는 랜덤 초기화 상태라 엉뚱한 오차(Gradient)를 뿜어냅니다. Base Model을 고정하지 않으면, 이 큰 오차 때문에 잘 학습되어 있던 Base Model의 가중치가 다 망가져버립니다 (\textbf{Catastrophic Forgetting}).
 반드시 \textbf{Head를 먼저 학습시켜 안정화한 뒤}, Base Model을 풀어야 합니다.
@@ -5974,7 +5590,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Transfer Learning:} 빅데이터 모델(Source)을 소량 데이터 문제(Target)에 재활용한다.
     \item \textbf{Freeze:} 초기 학습 시에는 Backbone을 고정하고 Head만 학습한다.
@@ -5983,13 +5599,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 28: [CS230] Structuring Machine Learning Projects:  End-to-End Deep Learning
+% Lecture 28: [CS230] Structuring Machine Learning Projects: \\ End-to-End Deep Learning
 %=======================================================================
-\chapter{[CS230] Structuring Machine Learning Projects:  End-to-End Deep Learning}
+\chapter{[CS230] Structuring Machine Learning Projects: \\ End-to-End Deep Learning}
 \label{ch:lecture28}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -6022,7 +5636,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 중간 단계를 생략하고 데이터만으로 학습하는 E2E 딥러닝의 장단점을 분석합니다.
 \begin{itemize}
     \item \textbf{정의:} 전통적인 \textbf{파이프라인(Pipeline)} 방식과 \textbf{E2E} 방식의 구조적 차이를 구분합니다.
@@ -6070,7 +5684,7 @@ if __name__ == "__main__":
 
 무조건 E2E가 좋은 것은 아닙니다. 명확한 트레이드오프가 존재합니다.
 
-\begin{strategybox}{End-to-End 장단점 분석}
+\begin{strategybox}[title={End-to-End 장단점 분석}]
 \textbf{장점 (Pros):}
 \begin{itemize}
     \item \textbf{Data-driven:} 인간의 선입견에 갇히지 않고 데이터 패턴 자체를 학습하므로, 데이터가 많을수록 성능 상한선이 높습니다.
@@ -6127,7 +5741,7 @@ model.fit(x_data, y_data)
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{E2E:} 중간 단계 없이 입력에서 출력으로 바로 매핑하는 딥러닝 방식.
     \item \textbf{Pros:} 데이터가 충분하면 인간보다 더 효율적인 특징을 찾아낸다.
@@ -6136,13 +5750,11 @@ model.fit(x_data, y_data)
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 29: [CS230] Convolutional Neural Networks:  CNN Foundations
+% Lecture 29: [CS230] Convolutional Neural Networks: \\ CNN Foundations
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  CNN Foundations}
+\chapter{[CS230] Convolutional Neural Networks: \\ CNN Foundations}
 \label{ch:lecture29}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -6175,7 +5787,7 @@ model.fit(x_data, y_data)
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 CNN을 구성하는 가장 기초적인 '레고 블록' 세 가지를 마스터합니다.
 \begin{itemize}
     \item \textbf{Convolution:} 필터를 슬라이딩하며 특징을 추출하는 기본 연산.
@@ -6203,7 +5815,6 @@ model.fit(x_data, y_data)
 
 \subsection{1. The Convolution Operation ($*$)}
 FC Layer가 이미지 전체를 한 번에 본다면, 합성곱은 작은 \textbf{'손전등'}으로 이미지를 훑는 것과 같습니다.
-
 
 
 \begin{itemize}
@@ -6235,7 +5846,7 @@ FC Layer가 이미지 전체를 한 번에 본다면, 합성곱은 작은 \textb
 
 이 공식은 CNN 아키텍처를 설계하거나 논문을 읽을 때 필수입니다. 무조건 암기하십시오.
 
-\begin{formulabox}{출력 크기 계산 공식}
+\begin{formulabox}[title={출력 크기 계산 공식}]
 입력 크기가 $n \times n$ 일 때, 출력 크기는 다음과 같습니다.
 $$ n_{out} = \left\lfloor \frac{n + 2p - f}{s} + 1 \right\rfloor $$
 \begin{itemize}
@@ -6247,7 +5858,7 @@ $$ n_{out} = \left\lfloor \frac{n + 2p - f}{s} + 1 \right\rfloor $$
 \end{itemize}
 \end{formulabox}
 
-\begin{examplebox}{계산 예제}
+\begin{examplebox}[title={계산 예제}]
 \textbf{상황:}
 입력 $7 \times 7$ ($n=7$), 필터 $3 \times 3$ ($f=3$), 패딩 없음 ($p=0$), 스트라이드 2 ($s=2$).
 
@@ -6267,7 +5878,7 @@ $$ n_{out} = \left\lfloor \frac{7 + 2(0) - 3}{2} + 1 \right\rfloor = \left\lfloo
     \item \textbf{다중 필터:} 만약 이런 필터를 10개 쓴다면? 출력은 $4 \times 4 \times \mathbf{10}$ 이 됩니다.
 \end{itemize}
 
-\begin{warningbox}{필터 개수 = 출력 채널 수}
+\begin{warningbox}[title={필터 개수 = 출력 채널 수}]
 CNN 층을 지난 뒤 데이터의 깊이(Depth)는 입력의 깊이가 아니라 \textbf{필터의 개수}에 의해 결정됩니다. 이것이 채널 수를 조절하는 핵심 메커니즘입니다.
 \end{warningbox}
 
@@ -6280,7 +5891,7 @@ CNN 층을 지난 뒤 데이터의 깊이(Depth)는 입력의 깊이가 아니�
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Convolution:} 필터를 슬라이딩하며 지역적 특징을 추출한다.
     \item \textbf{Padding:} 가장자리 손실을 막고 크기를 유지한다 (Same Padding).
@@ -6289,13 +5900,11 @@ CNN 층을 지난 뒤 데이터의 깊이(Depth)는 입력의 깊이가 아니�
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 30: [CS230] Convolutional Neural Networks:  Pooling Layers
+% Lecture 30: [CS230] Convolutional Neural Networks: \\ Pooling Layers
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  Pooling Layers}
+\chapter{[CS230] Convolutional Neural Networks: \\ Pooling Layers}
 \label{ch:lecture30}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -6327,7 +5936,7 @@ CNN 층을 지난 뒤 데이터의 깊이(Depth)는 입력의 깊이가 아니�
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 CNN의 핵심 구성 요소인 풀링 층의 원리와 종류를 다룹니다.
 \begin{itemize}
     \item \textbf{다운샘플링:} 이미지 크기($n_H, n_W$)를 줄여 계산량을 낮추는 원리를 이해합니다.
@@ -6389,7 +5998,7 @@ CNN 층을 지난 뒤 데이터의 깊이(Depth)는 입력의 깊이가 아니�
 \end{itemize}
 \end{featurebox}
 
-\begin{warningbox}{파라미터 개수는 몇 개?}
+\begin{warningbox}[title={파라미터 개수는 몇 개?}]
 풀링 층에는 학습해야 할 가중치($W$)나 편향($b$)이 있을까요?
 \textbf{정답: 0개입니다.}
 풀링은 우리가 정해준 규칙($f, s$, Max/Avg)대로만 계산하는 고정된 함수입니다. 역전파 때 업데이트될 대상이 없습니다.
@@ -6475,7 +6084,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Max Pooling:} 영역 내 최댓값만 남겨 특징을 강조한다. (가장 많이 씀)
     \item \textbf{Dimension:} 가로/세로는 줄어들지만, \textbf{채널 수($n_C$)는 유지된다.}
@@ -6484,13 +6093,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 31: [CS230] Convolutional Neural Networks:  Classic Networks (LeNet, AlexNet, VGG)
+% Lecture 31: [CS230] Convolutional Neural Networks: \\ Classic Networks (LeNet, AlexNet, VGG)
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  Classic Networks (LeNet, AlexNet, VGG)}
+\chapter{[CS230] Convolutional Neural Networks: \\ Classic Networks (LeNet, AlexNet, VGG)}
 \label{ch:lecture31}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -6522,7 +6129,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 현대 컴퓨터 비전 모델의 조상이 되는 세 가지 고전 모델을 다룹니다.
 \begin{itemize}
     \item \textbf{LeNet-5 (1998):} CNN의 기본 구조(Conv-Pool 반복)를 정립한 선구자.
@@ -6570,7 +6177,7 @@ if __name__ == "__main__":
 
 옥스퍼드 대학 VGG 팀이 개발했습니다. \textbf{"화려한 기교(11x11 필터 등)는 필요 없다. 깊이(Depth)만이 정답이다"}를 증명했습니다.
 
-\begin{mathbox}{Why $3 \times 3$ filters?}
+\begin{mathbox}[title={Why $3 \times 3$ filters?}]
 VGG는 모든 층에서 $3 \times 3$ 필터만 씁니다. 왜 큰 필터 한 번 대신 작은 필터를 여러 번 쓸까요?
 
 \textbf{1. 파라미터 효율 (Parameter Efficiency)}
@@ -6626,7 +6233,7 @@ VGG는 훌륭했지만, 층이 20개를 넘어가면 성능이 오히려 떨어�
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{LeNet-5:} CNN의 조상. Conv-Pool 패턴의 시초.
     \item \textbf{AlexNet:} ReLU와 Dropout으로 딥러닝 성능을 입증함.
@@ -6635,13 +6242,11 @@ VGG는 훌륭했지만, 층이 20개를 넘어가면 성능이 오히려 떨어�
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 32: [CS230] Convolutional Neural Networks:  ResNet (Residual Networks)
+% Lecture 32: [CS230] Convolutional Neural Networks: \\ ResNet (Residual Networks)
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  ResNet (Residual Networks)}
+\chapter{[CS230] Convolutional Neural Networks: \\ ResNet (Residual Networks)}
 \label{ch:lecture32}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -6675,7 +6280,7 @@ VGG는 훌륭했지만, 층이 20개를 넘어가면 성능이 오히려 떨어�
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 152층 이상의 초심층 신경망 학습을 가능하게 한 ResNet의 핵심 원리를 다룹니다.
 \begin{itemize}
     \item \textbf{문제:} 망이 깊어질수록 학습이 안 되는 이유(기울기 소실 등)를 이해합니다.
@@ -6714,7 +6319,7 @@ ResNet의 아이디어는 간단합니다. \textbf{"정보가 흐르는 고속�
     \item \textbf{Output:} $H(x) = F(x) + x$
 \end{itemize}
 
-\begin{analogybox}{교과서 암기 비유}
+\begin{analogybox}[title={교과서 암기 비유}]
 \begin{itemize}
     \item \textbf{Plain:} "백지상태에서 교과서 전체($H(x)$)를 다 외워라." (어렵다)
     \item \textbf{ResNet:} "너는 이미 $x$만큼 알고 있으니, 교과서 내용과 네 지식의 \textbf{차이($F(x)$)}만 추가로 공부해라." (쉽다)
@@ -6725,7 +6330,7 @@ ResNet의 아이디어는 간단합니다. \textbf{"정보가 흐르는 고속�
 
 \section{Deep Dive: Why does it work?}
 
-\begin{mathbox}{Gradient Superhighway}
+\begin{mathbox}[title={Gradient Superhighway}]
 역전파 시 미분값이 전달되는 과정을 봅시다.
 $$ H(x) = F(x) + x $$
 $$ \frac{\partial H}{\partial x} = \frac{\partial F(x)}{\partial x} + \mathbf{1} $$
@@ -6784,7 +6389,7 @@ def identity_block(X, f, filters):
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{ReLU 위치 주의}
+\begin{warningbox}[title={ReLU 위치 주의}]
 Skip Connection을 더하는 `Add()` 연산은 마지막 ReLU \textbf{이전}에 수행되어야 합니다.
 (X + Shortcut) $\rightarrow$ ReLU. 순서가 바뀌면 성능이 떨어집니다.
 \end{warningbox}
@@ -6802,7 +6407,7 @@ ResNet을 통해 우리는 깊이에 대한 두려움을 극복했습니다.
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Problem:} 너무 깊으면 학습이 안 된다 (Degradation).
     \item \textbf{Solution:} Skip Connection ($H(x) = F(x) + x$).
@@ -6811,13 +6416,11 @@ ResNet을 통해 우리는 깊이에 대한 두려움을 극복했습니다.
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 33: [CS230] Convolutional Neural Networks:  Inception Network \& 1x1 Convolutions
+% Lecture 33: [CS230] Convolutional Neural Networks: \\ Inception Network \& 1x1 Convolutions
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  Inception Network \& 1x1 Convolutions}
+\chapter{[CS230] Convolutional Neural Networks: \\ Inception Network \& 1x1 Convolutions}
 \label{ch:lecture33}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -6851,7 +6454,7 @@ ResNet을 통해 우리는 깊이에 대한 두려움을 극복했습니다.
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 CNN의 효율성 혁명을 이끈 Inception 구조와 핵심 기술을 다룹니다.
 \begin{itemize}
     \item \textbf{1x1 Conv:} 채널 수를 조절하여 연산량을 줄이는 \textbf{Network in Network} 개념을 이해합니다.
@@ -6882,7 +6485,6 @@ ResNet을 통해 우리는 깊이에 대한 두려움을 극복했습니다.
 2D 이미지에서는 그렇습니다. 하지만 입체적인 볼륨($H \times W \times C$)에서는 다릅니다.
 
 
-
 \begin{itemize}
     \item \textbf{연산:} $1 \times 1 \times \mathbf{192}$ (입력 채널 수) 크기의 필터가 입력을 훑습니다.
     \item \textbf{효과:} 채널 방향으로 FC Layer를 적용하는 것과 같습니다. 필터 개수를 32개로 설정하면, 출력 채널은 32개가 됩니다. \textbf{(192 $\to$ 32 압축)}
@@ -6891,7 +6493,7 @@ ResNet을 통해 우리는 깊이에 대한 두려움을 극복했습니다.
 \subsection{2. Bottleneck Layer (비용 절감의 핵심)}
 이 섹션이 오늘 강의의 하이라이트입니다. 숫자로 증명합니다.
 
-\begin{mathbox}{Computational Cost Analysis}
+\begin{mathbox}[title={Computational Cost Analysis}]
 \textbf{상황:} 입력 $28 \times 28 \times 192$ $\to$ 출력 $28 \times 28 \times 32$ (using $5 \times 5$ conv).
 
 \textbf{1. Naive Approach (그냥 $5 \times 5$ 사용):}
@@ -6913,7 +6515,6 @@ $$ (28 \times 28 \times 32) \times (5 \times 5 \times 16) \approx 10,000,000 $$
 
 구글은 고민했습니다. "$3 \times 3$을 쓸까, $5 \times 5$를 쓸까?"
 결론은 \textbf{"그냥 다 하자(Do them all)"}였습니다.
-
 
 
 \begin{itemize}
@@ -6975,7 +6576,7 @@ def inception_module(x, filters):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{$1 \times 1$ Conv:} 채널 수를 줄여 연산량을 아끼는 핵심 도구.
     \item \textbf{Inception:} 여러 필터를 병렬로 사용하여 다양한 특징을 동시에 잡는다.
@@ -6984,13 +6585,11 @@ def inception_module(x, filters):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 34: [CS230] Convolutional Neural Networks:  Object Detection \& Sliding Windows
+% Lecture 34: [CS230] Convolutional Neural Networks: \\ Object Detection \& Sliding Windows
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  Object Detection \& Sliding Windows}
+\chapter{[CS230] Convolutional Neural Networks: \\ Object Detection \& Sliding Windows}
 \label{ch:lecture34}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -7022,7 +6621,7 @@ def inception_module(x, filters):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 객체 탐지의 기본 개념과 속도 문제를 해결하는 핵심 기술을 다룹니다.
 \begin{itemize}
     \item \textbf{개념:} 분류(Classification)와 탐지(Detection)의 차이를 이해합니다.
@@ -7055,7 +6654,7 @@ def inception_module(x, filters):
 3. 옆으로 한 칸 이동(Stride)해서 반복합니다.
 4. 다 끝나면 윈도우 크기를 키워서 다시 처음부터 합니다.
 
-\begin{warningbox}{치명적 단점: 속도}
+\begin{warningbox}[title={치명적 단점: 속도}]
 이 방식은 계산 비용이 폭발합니다.
 작은 스트라이드 $\rightarrow$ 수만 번 ConvNet 실행 $\rightarrow$ \textbf{너무 느림.}
 큰 스트라이드 $\rightarrow$ 듬성듬성 봄 $\rightarrow$ \textbf{정확도 하락.}
@@ -7080,7 +6679,7 @@ def inception_module(x, filters):
 \subsection{2. Running on the Whole Image}
 이제 이미지를 자르지 않고 통째로 넣습니다.
 
-\begin{mathbox}{연산 공유의 마법}
+\begin{mathbox}[title={연산 공유의 마법}]
 학습 모델 입력이 $14 \times 14$라고 가정합시다.
 테스트 때 $16 \times 16$ 이미지를 통째로 넣으면 어떻게 될까요?
 
@@ -7151,7 +6750,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Detection:} 무엇이(What) 어디에(Where) 있는지 찾는 문제.
     \item \textbf{Sliding Window:} 윈도우를 이동하며 찾음. 너무 느림.
@@ -7160,13 +6759,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 35: [CS230] Convolutional Neural Networks:  YOLO Algorithm (Object Detection)
+% Lecture 35: [CS230] Convolutional Neural Networks: \\ YOLO Algorithm (Object Detection)
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  YOLO Algorithm (Object Detection)}
+\chapter{[CS230] Convolutional Neural Networks: \\ YOLO Algorithm (Object Detection)}
 \label{ch:lecture35}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -7199,7 +6796,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 실시간 객체 탐지의 표준인 YOLO 알고리즘의 원리를 완벽히 이해합니다.
 \begin{itemize}
     \item \textbf{그리드:} 이미지를 격자로 나누고, 객체 중심점이 속한 셀이 책임을 지는 구조를 배웁니다.
@@ -7242,7 +6839,7 @@ $$ y = [p_c, b_x, b_y, b_h, b_w, c_1, c_2, \dots]^T $$
 
 
 모델이 예측한 박스가 정답과 얼마나 비슷한지 평가하는 척도입니다.
-\begin{formulabox}{IoU 수식}
+\begin{formulabox}[title={IoU 수식}]
 $$ \text{IoU} = \frac{\text{교집합 영역 (Intersection)}}{\text{합집합 영역 (Union)}} $$
 \begin{itemize}
     \item 보통 $\text{IoU} \ge 0.5$ 이면 "올바른 탐지"로 간주합니다.
@@ -7315,7 +6912,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{좌표계 주의}
+\begin{warningbox}[title={좌표계 주의}]
 YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치(0~1)}입니다. 실제 이미지 위에 박스를 그리려면, 셀의 위치(인덱스)를 더하고 이미지 크기를 곱해주는 변환 과정이 필요합니다.
 \end{warningbox}
 
@@ -7331,7 +6928,7 @@ YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{YOLO:} 그리드 셀마다 바운딩 박스를 회귀(Regression)로 직접 예측한다.
     \item \textbf{IoU:} 교집합/합집합. 박스 위치 정확도의 척도이자 NMS의 기준.
@@ -7340,13 +6937,11 @@ YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 36: [CS230] Special Applications:  Face Recognition \& One-shot Learning
+% Lecture 36: [CS230] Special Applications: \\ Face Recognition \& One-shot Learning
 %=======================================================================
-\chapter{[CS230] Special Applications:  Face Recognition \& One-shot Learning}
+\chapter{[CS230] Special Applications: \\ Face Recognition \& One-shot Learning}
 \label{ch:lecture36}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -7378,7 +6973,7 @@ YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 데이터가 극도로 적은 상황에서 작동하는 얼굴 인식 시스템의 원리를 다룹니다.
 \begin{itemize}
     \item \textbf{One-shot Learning:} 단 한 장의 데이터로 학습하는 문제를 '분류'가 아닌 '유사도 측정'으로 풉니다.
@@ -7438,7 +7033,7 @@ YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치
     \item \textbf{Negative (N):} 나와 다른 사람(영희)의 사진.
 \end{itemize}
 
-\begin{mathbox}{Loss Function Derivation}
+\begin{mathbox}[title={Loss Function Derivation}]
 우리의 목표는 다음과 같습니다.
 $$ ||f(A) - f(P)||^2 \le ||f(A) - f(N)||^2 $$
 (A와 P 사이의 거리가 A와 N 사이의 거리보다 작아야 한다.)
@@ -7488,7 +7083,7 @@ def triplet_loss(y_true, y_pred, alpha=0.2):
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{Hard Triplet Mining (학습 데이터 선정)}
+\begin{warningbox}[title={Hard Triplet Mining (학습 데이터 선정)}]
 랜덤하게 A, P, N을 고르면 학습이 잘 안 됩니다. 왜냐하면 대부분의 경우 랜덤한 두 사람(A, N)은 이미 충분히 다르게 생겼기 때문입니다. ($Loss=0$)
 학습 효율을 위해 \textbf{"A와 N이 꽤 닮은 경우(Hard Triplet)"}를 골라내어 학습시켜야 합니다.
 \end{warningbox}
@@ -7505,7 +7100,7 @@ def triplet_loss(y_true, y_pred, alpha=0.2):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Similarity:} 분류가 아닌 거리 측정 문제로 접근한다.
     \item \textbf{Siamese Network:} 가중치를 공유하는 쌍둥이 네트워크.
@@ -7514,13 +7109,11 @@ def triplet_loss(y_true, y_pred, alpha=0.2):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 37: [CS230] Convolutional Neural Networks:  YOLO Algorithm (Object Detection)
+% Lecture 37: [CS230] Convolutional Neural Networks: \\ YOLO Algorithm (Object Detection)
 %=======================================================================
-\chapter{[CS230] Convolutional Neural Networks:  YOLO Algorithm (Object Detection)}
+\chapter{[CS230] Convolutional Neural Networks: \\ YOLO Algorithm (Object Detection)}
 \label{ch:lecture37}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -7553,7 +7146,7 @@ def triplet_loss(y_true, y_pred, alpha=0.2):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 실시간 객체 탐지의 표준인 YOLO 알고리즘의 원리를 완벽히 이해합니다.
 \begin{itemize}
     \item \textbf{그리드:} 이미지를 격자로 나누고, 객체 중심점이 속한 셀이 책임을 지는 구조를 배웁니다.
@@ -7596,7 +7189,7 @@ $$ y = [p_c, b_x, b_y, b_h, b_w, c_1, c_2, \dots]^T $$
 
 
 모델이 예측한 박스가 정답과 얼마나 비슷한지 평가하는 척도입니다.
-\begin{formulabox}{IoU 수식}
+\begin{formulabox}[title={IoU 수식}]
 $$ \text{IoU} = \frac{\text{교집합 영역 (Intersection)}}{\text{합집합 영역 (Union)}} $$
 \begin{itemize}
     \item 보통 $\text{IoU} \ge 0.5$ 이면 "올바른 탐지"로 간주합니다.
@@ -7669,7 +7262,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{좌표계 주의}
+\begin{warningbox}[title={좌표계 주의}]
 YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치(0~1)}입니다. 실제 이미지 위에 박스를 그리려면, 셀의 위치(인덱스)를 더하고 이미지 크기를 곱해주는 변환 과정이 필요합니다.
 \end{warningbox}
 
@@ -7685,7 +7278,7 @@ YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{YOLO:} 그리드 셀마다 바운딩 박스를 회귀(Regression)로 직접 예측한다.
     \item \textbf{IoU:} 교집합/합집합. 박스 위치 정확도의 척도이자 NMS의 기준.
@@ -7694,13 +7287,11 @@ YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 38: [CS230] Special Applications:  Neural Style Transfer (NST)
+% Lecture 38: [CS230] Special Applications: \\ Neural Style Transfer (NST)
 %=======================================================================
-\chapter{[CS230] Special Applications:  Neural Style Transfer (NST)}
+\chapter{[CS230] Special Applications: \\ Neural Style Transfer (NST)}
 \label{ch:lecture38}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -7733,7 +7324,7 @@ YOLO의 출력 $b_x, b_y$는 \textbf{그리드 셀 내부에서의 상대 위치
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 CNN의 특성을 활용하여 두 이미지를 합성하는 NST 알고리즘을 다룹니다.
 \begin{itemize}
     \item \textbf{전환:} 가중치($W$)가 아닌 \textbf{입력 이미지($G$)의 픽셀}을 학습한다는 차이점을 이해합니다.
@@ -7779,7 +7370,7 @@ NST의 가장 큰 특징은 학습의 대상이 다르다는 것입니다.
 "이미지 $G$가 이미지 $S$의 화풍(질감)을 담고 있는가?"
 스타일은 "어디에 있는가"가 아니라 \textbf{"무엇이 함께 나타나는가(Correlation)"}입니다.
 
-\begin{analogybox}{그람 행렬의 직관}
+\begin{analogybox}[title={그람 행렬의 직관}]
 어떤 층에 두 개의 필터(채널)가 있다고 가정합시다.
 \begin{itemize}
     \item \textbf{필터 A:} 수직선을 찾음.
@@ -7788,7 +7379,7 @@ NST의 가장 큰 특징은 학습의 대상이 다르다는 것입니다.
 이 두 필터가 이미지의 같은 위치에서 동시에 활성화된다면(상관관계 높음), "이 화풍은 수직선과 주황색이 함께 다니는 스타일이다"라고 정의할 수 있습니다. 이것을 수치화한 것이 \textbf{그람 행렬(Gram Matrix)}입니다.
 \end{analogybox}
 
-\begin{formulabox}{Gram Matrix ($G^{[l]}$)}
+\begin{formulabox}[title={Gram Matrix ($G^{[l]}$)}]
 $$ G_{kk'}^{[l]} = \sum_{i} \sum_{j} a_{i,j,k}^{[l]} \cdot a_{i,j,k'}^{[l]} $$
 (채널 $k$와 채널 $k'$의 활성화 맵 내적)
 \end{formulabox}
@@ -7841,7 +7432,7 @@ def train_step(image):
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{왜 그람 행렬인가요?}
+\begin{warningbox}[title={왜 그람 행렬인가요?}]
 그람 행렬은 공간 정보(Spatial Information)를 합쳐버립니다($\sum_{i,j}$). 즉, "어디에" 있는지는 무시하고 "어떤 특징들이 통계적으로 공존하는가"만 남기기 때문에 \textbf{스타일(질감, 패턴)}을 표현하기에 적합합니다.
 \end{warningbox}
 
@@ -7857,7 +7448,7 @@ def train_step(image):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{NST:} 사전 학습된 CNN을 이용해 콘텐츠와 스타일을 합성한다.
     \item \textbf{Learning:} 가중치는 고정하고, \textbf{입력 이미지의 픽셀}을 학습(업데이트)한다.
@@ -7866,13 +7457,11 @@ def train_step(image):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 39: [CS230] Sequence Models:  Recurrent Neural Networks (RNN)
+% Lecture 39: [CS230] Sequence Models: \\ Recurrent Neural Networks (RNN)
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Recurrent Neural Networks (RNN)}
+\chapter{[CS230] Sequence Models: \\ Recurrent Neural Networks (RNN)}
 \label{ch:lecture39}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -7905,7 +7494,7 @@ def train_step(image):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 시계열 데이터를 처리하는 RNN의 기본 원리와 학습 알고리즘을 다룹니다.
 \begin{itemize}
     \item \textbf{구조:} 은닉 상태(Hidden State)를 통해 과거 정보를 현재로 전달하는 루프 구조를 이해합니다.
@@ -7936,7 +7525,6 @@ $W_{ax}$ & Weight (Input) & 현재 입력을 받아들이는 가중치. \\ \hlin
 RNN은 자신을 가리키는 화살표(Loop)를 가집니다. 이를 시간축으로 펼치면 다음과 같습니다.
 
 
-
 \begin{itemize}
     \item \textbf{입력:} 매 시점 $t$마다 $x^{\langle t \rangle}$가 들어옵니다.
     \item \textbf{전달:} 이전 시점의 기억 $a^{\langle t-1 \rangle}$이 현재 시점 $t$로 전달됩니다.
@@ -7946,7 +7534,7 @@ RNN은 자신을 가리키는 화살표(Loop)를 가집니다. 이를 시간축�
 \subsection{2. Forward Propagation Formulas}
 RNN의 핵심은 \textbf{"현재 입력과 과거 기억을 섞어서 새로운 기억을 만든다"}는 것입니다.
 
-\begin{formulabox}{은닉 상태 업데이트 (기억 갱신)}
+\begin{formulabox}[title={은닉 상태 업데이트 (기억 갱신)}]
 $$ a^{\langle t \rangle} = \tanh(W_{aa}a^{\langle t-1 \rangle} + W_{ax}x^{\langle t \rangle} + b_a) $$
 \begin{itemize}
     \item $W_{aa}a^{\langle t-1 \rangle}$: 과거의 기억 반영.
@@ -7955,7 +7543,7 @@ $$ a^{\langle t \rangle} = \tanh(W_{aa}a^{\langle t-1 \rangle} + W_{ax}x^{\langl
 \end{itemize}
 \end{formulabox}
 
-\begin{formulabox}{출력 계산}
+\begin{formulabox}[title={출력 계산}]
 $$ \hat{y}^{\langle t \rangle} = \text{softmax}(W_{ya}a^{\langle t \rangle} + b_y) $$
 \begin{itemize}
     \item 현재의 기억($a^{\langle t \rangle}$)을 바탕으로 예측을 수행합니다.
@@ -8052,7 +7640,7 @@ def softmax(x):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Structure:} 입력($x$) + 이전 기억($a$) $\rightarrow$ 새 기억 $\rightarrow$ 출력($y$).
     \item \textbf{Sharing:} 모든 시점에서 동일한 파라미터($W_{ax}, W_{aa}$)를 쓴다.
@@ -8061,13 +7649,11 @@ def softmax(x):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 40: [CS230] Sequence Models:  Various RNN Architectures
+% Lecture 40: [CS230] Sequence Models: \\ Various RNN Architectures
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Various RNN Architectures}
+\chapter{[CS230] Sequence Models: \\ Various RNN Architectures}
 \label{ch:lecture40}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -8100,7 +7686,7 @@ RNN의 강력함은 바로 이 \textbf{입출력 구조의 유연성(Flexibility
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 입력($T_x$)과 출력($T_y$)의 조합에 따른 5가지 RNN 아키텍처를 분류하고 이해합니다.
 \begin{itemize}
     \item \textbf{One-to-Many:} 하나의 입력으로 시퀀스를 생성 (음악, 캡셔닝).
@@ -8228,7 +7814,7 @@ RNN은 이렇게 다양한 구조로 변신할 수 있습니다. 하지만 어�
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Flexibility:} $T_x$와 $T_y$가 달라도 처리할 수 있다.
     \item \textbf{Many-to-One:} 감성 분석 (정보 요약).
@@ -8237,13 +7823,11 @@ RNN은 이렇게 다양한 구조로 변신할 수 있습니다. 하지만 어�
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 41: [CS230] Sequence Models:  Vanishing Gradients \& GRU
+% Lecture 41: [CS230] Sequence Models: \\ Vanishing Gradients \& GRU
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Vanishing Gradients \& GRU}
+\chapter{[CS230] Sequence Models: \\ Vanishing Gradients \& GRU}
 \label{ch:lecture41}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -8279,7 +7863,7 @@ RNN은 중간 수식어가 길어지면 주어 'cat(단수)'을 잊어버리고 
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 RNN의 장기 의존성 문제를 해결하는 게이트(Gate) 메커니즘을 다룹니다.
 \begin{itemize}
     \item \textbf{원인:} 역전파 시 기울기가 지수적으로 작아져서 초기 기억이 사라지는 수학적 원리를 이해합니다.
@@ -8307,7 +7891,7 @@ RNN은 중간 수식어가 길어지면 주어 'cat(단수)'을 잊어버리고 
 \subsection{1. The Problem: Vanishing Gradients}
 RNN에서 $t=100$ 시점의 오차를 $t=1$ 시점까지 전파하려면 가중치 행렬 $W$를 100번 곱해야 합니다.
 
-\begin{analogybox}{복사본의 복사본}
+\begin{analogybox}[title={복사본의 복사본}]
 문서를 복사하고, 그 복사본을 또 복사하는 과정을 100번 반복한다고 상상해 보세요.
 조금이라도 흐릿해지면($W < 1$), 100번째 복사본은 백지가 되어버립니다.
 반대로 진해지면($W > 1$), 검은색 잉크 덩어리가 됩니다(Exploding).
@@ -8316,7 +7900,7 @@ RNN에서 $t=100$ 시점의 오차를 $t=1$ 시점까지 전파하려면 가중�
 \subsection{2. The Solution: Gated Recurrent Unit (GRU)}
 핵심 아이디어는 \textbf{"기억을 위한 전용 금고(Memory Cell)를 만들고 문지기를 세우자"}는 것입니다.
 
-\begin{formulabox}{GRU의 핵심 수식}
+\begin{formulabox}[title={GRU의 핵심 수식}]
 $$ c^{\langle t \rangle} = \Gamma_u \cdot \tilde{c}^{\langle t \rangle} + (1 - \Gamma_u) \cdot c^{\langle t-1 \rangle} $$
 \begin{itemize}
     \item $\Gamma_u$ (Update Gate): 0이면 문을 닫습니다.
@@ -8385,7 +7969,7 @@ def gru_cell_forward(xt, a_prev, parameters):
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{Gradient Clipping (기울기 자르기)}
+\begin{warningbox}[title={Gradient Clipping (기울기 자르기)}]
 기울기 소실의 반대는 \textbf{기울기 폭발(Exploding Gradient)}입니다. 숫자가 너무 커져서 `NaN`이 뜹니다.
 해결책은 간단합니다. 기울기 벡터의 크기(Norm)가 특정 값(예: 5)을 넘으면 강제로 줄여버리는 \textbf{Gradient Clipping}을 사용합니다.
 \end{warningbox}
@@ -8401,7 +7985,7 @@ GRU는 훌륭하고 단순합니다. 하지만 때로는 더 섬세한 제어가
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Vanishing Gradient:} 시퀀스가 길어지면 초기 정보가 사라지는 문제.
     \item \textbf{Gate:} 시그모이드를 사용해 정보의 통과 여부(0~1)를 결정하는 밸브.
@@ -8410,13 +7994,11 @@ GRU는 훌륭하고 단순합니다. 하지만 때로는 더 섬세한 제어가
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 42: [CS230] Sequence Models:  LSTM (Long Short-Term Memory)
+% Lecture 42: [CS230] Sequence Models: \\ LSTM (Long Short-Term Memory)
 %=======================================================================
-\chapter{[CS230] Sequence Models:  LSTM (Long Short-Term Memory)}
+\chapter{[CS230] Sequence Models: \\ LSTM (Long Short-Term Memory)}
 \label{ch:lecture42}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -8450,7 +8032,7 @@ GRU는 훌륭하고 단순합니다. 하지만 때로는 더 섬세한 제어가
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 시퀀스 모델의 업계 표준인 LSTM의 구조와 동작 원리를 파헤칩니다.
 \begin{itemize}
     \item \textbf{구조:} \textbf{Cell State($c$)}와 \textbf{Hidden State($a$)}가 분리된 이중 트랙 구조를 이해합니다.
@@ -8481,7 +8063,6 @@ GRU는 훌륭하고 단순합니다. 하지만 때로는 더 섬세한 제어가
 GRU는 기억($c$)과 출력($a$)이 통합되어 있었습니다. 반면 LSTM은 이를 엄격히 분리합니다.
 
 
-
 \begin{itemize}
     \item \textbf{Cell State ($c^{\langle t \rangle}$):} 기억의 핵심입니다. 기울기가 소실되지 않도록 보호받는 경로입니다.
     \item \textbf{Hidden State ($a^{\langle t \rangle}$):} Cell State에 $\tanh$를 씌우고 Output Gate를 통과시켜 만든, "지금 당장 필요한 정보"입니다.
@@ -8490,7 +8071,7 @@ GRU는 기억($c$)과 출력($a$)이 통합되어 있었습니다. 반면 LSTM�
 \subsection{2. The Three Gates (3개의 문지기)}
 LSTM은 기억을 관리하기 위해 3단계 검문을 수행합니다.
 
-\begin{analogybox}{LSTM의 기억 관리 시스템}
+\begin{analogybox}[title={LSTM의 기억 관리 시스템}]
 \begin{itemize}
     \item \textbf{Forget Gate ($\Gamma_f$): [쓰레기통]} "이전 기억 중 쓸모없는 건 버려라." (예: 문단이 바뀌었으니 이전 주제 삭제)
     \item \textbf{Update Gate ($\Gamma_u$): [기록장]} "새로운 정보 중 중요한 것만 적어라." (예: 새로운 주어 등록)
@@ -8512,7 +8093,7 @@ $$ \Gamma_u = \sigma(W_u[a^{\langle t-1 \rangle}, x^{\langle t \rangle}] + b_u) 
 $$ \Gamma_o = \sigma(W_o[a^{\langle t-1 \rangle}, x^{\langle t \rangle}] + b_o) $$
 
 \subsection{2. Memory Update (핵심)}
-\begin{formulabox}{Cell State Update}
+\begin{formulabox}[title={Cell State Update}]
 $$ c^{\langle t \rangle} = \underbrace{\Gamma_f \cdot c^{\langle t-1 \rangle}}_{\text{과거 기억 삭제}} + \underbrace{\Gamma_u \cdot \tilde{c}^{\langle t \rangle}}_{\text{새 기억 추가}} $$
 \begin{itemize}
     \item \textbf{GRU와의 차이:} GRU는 $\Gamma_u$ 하나로 과거와 현재의 비율을 시소처럼 조절했습니다 ($1-\Gamma_u$).
@@ -8592,7 +8173,7 @@ def lstm_cell_forward(xt, a_prev, c_prev, parameters):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{LSTM:} 3개의 게이트로 기억을 관리하는 시퀀스 모델의 표준.
     \item \textbf{Structure:} 장기 기억($c$)과 단기 상태($a$)를 분리하여 운영한다.
@@ -8601,13 +8182,11 @@ def lstm_cell_forward(xt, a_prev, c_prev, parameters):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 43: [CS230] Sequence Models:  Word Representation (Embedding)
+% Lecture 43: [CS230] Sequence Models: \\ Word Representation (Embedding)
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Word Representation (Embedding)}
+\chapter{[CS230] Sequence Models: \\ Word Representation (Embedding)}
 \label{ch:lecture43}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -8640,7 +8219,7 @@ def lstm_cell_forward(xt, a_prev, c_prev, parameters):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 컴퓨터가 인간의 언어를 이해하는 척하게 만든 핵심 기술을 다룹니다.
 \begin{itemize}
     \item \textbf{One-hot:} 전통적인 방식의 희소성(Sparsity)과 의미 부재 문제를 이해합니다.
@@ -8676,7 +8255,7 @@ def lstm_cell_forward(xt, a_prev, c_prev, parameters):
 \subsection{2. The New Way: Word Embedding}
 단어를 훨씬 작은 차원(예: 300차원)의 \textbf{실수 벡터(Real-valued Vector)}로 표현합니다. 각 차원은 우리가 알 수 없는(혹은 추상적인) '특징(Feature)'을 나타냅니다.
 
-\begin{analogybox}{가상의 특징표 (Featurized Representation)}
+\begin{analogybox}[title={가상의 특징표 (Featurized Representation)}]
 \begin{center}
 \begin{tabular}{l|c|c|c|c}
 \hline
@@ -8760,7 +8339,7 @@ model.summary()
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{One-hot:} 단어 간 유사성을 표현하지 못하는 희소 벡터.
     \item \textbf{Embedding:} 단어 간 유사성을 내적(거리)으로 계산할 수 있는 밀집 벡터.
@@ -8769,13 +8348,11 @@ model.summary()
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 44: [CS230] Sequence Models:  Word2Vec \& GloVe
+% Lecture 44: [CS230] Sequence Models: \\ Word2Vec \& GloVe
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Word2Vec \& GloVe}
+\chapter{[CS230] Sequence Models: \\ Word2Vec \& GloVe}
 \label{ch:lecture44}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -8810,7 +8387,7 @@ model.summary()
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 단어 임베딩을 학습하는 대표적인 두 가지 알고리즘을 다룹니다.
 \begin{itemize}
     \item \textbf{Skip-gram:} 중심 단어로 주변 단어를 예측하며 학습하는 방식을 이해합니다.
@@ -8866,7 +8443,7 @@ $$ P(t | c) = \frac{e^{\theta_t^T e_c}}{\sum_{j=1}^{V} e^{\theta_j^T e_c}} $$
 
 Word2Vec은 윈도우를 슬라이딩하며 국소적(Local) 정보만 봅니다. GloVe는 \textbf{전체 통계(Global Statistics)}를 봅니다.
 
-\begin{formulabox}{Co-occurrence Matrix (동시 등장 행렬)}
+\begin{formulabox}[title={Co-occurrence Matrix (동시 등장 행렬)}]
 $$ X_{ij} = \text{단어 } i \text{ 주변에 단어 } j \text{가 등장한 횟수} $$
 GloVe의 목표는 임베딩 벡터의 내적이 이 횟수의 로그값과 비슷해지는 것입니다.
 $$ w_i^T w_j + b_i + b_j \approx \log(X_{ij}) $$
@@ -8906,7 +8483,7 @@ print(f"Similar to 'deep': {similar}")
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{데이터 양이 중요합니다}
+\begin{warningbox}[title={데이터 양이 중요합니다}]
 위의 예제처럼 문장 4개로는 아무것도 못 배웁니다. Word2Vec이 제대로 작동하려면 위키피디아 전체 같은 \textbf{대용량 텍스트}가 필요합니다. 실무에서는 보통 구글이나 페이스북이 미리 학습해둔 모델(Pre-trained)을 다운받아 씁니다.
 \end{warningbox}
 
@@ -8922,7 +8499,7 @@ print(f"Similar to 'deep': {similar}")
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Skip-gram:} 중심 단어로 주변 단어를 예측한다. (희귀 단어에 강함)
     \item \textbf{Negative Sampling:} 전체 Softmax 대신 O/X 문제로 바꿔 속도를 높인다.
@@ -8931,13 +8508,11 @@ print(f"Similar to 'deep': {similar}")
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 45: [CS230] Sequence Models:  Debiasing Word Embeddings
+% Lecture 45: [CS230] Sequence Models: \\ Debiasing Word Embeddings
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Debiasing Word Embeddings}
+\chapter{[CS230] Sequence Models: \\ Debiasing Word Embeddings}
 \label{ch:lecture45}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -8971,7 +8546,7 @@ print(f"Similar to 'deep': {similar}")
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 학습된 임베딩 벡터에서 사회적 편향을 수학적으로 제거하는 알고리즘을 다룹니다.
 \begin{itemize}
     \item \textbf{식별:} 편향 방향(Gender Axis)을 벡터 공간에서 찾아냅니다.
@@ -9011,7 +8586,7 @@ $$ g \approx \text{Average}(\vec{he}-\vec{she}, \vec{male}-\vec{female}, \dots) 
 "Doctor" 같은 중립 단어는 성별 축 성분을 가져서는 안 됩니다.
 \textbf{Action:} 단어 벡터 $w$를 성별 축 $g$에 투영(Project)하여 편향 성분을 뺍니다.
 
-\begin{formulabox}{중화 공식 (Projection)}
+\begin{formulabox}[title={중화 공식 (Projection)}]
 $$ w_{debiased} = w - \frac{w \cdot g}{\|g\|^2} g $$
 벡터 $w$에서 성별 축 방향의 \textbf{그림자(성분)}를 제거하여, 성별 축과 수직이 되게 만듭니다.
 \end{formulabox}
@@ -9060,7 +8635,7 @@ if __name__ == "__main__":
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{모든 단어를 중화하면 안 됩니다!}
+\begin{warningbox}[title={모든 단어를 중화하면 안 됩니다!}]
 "King", "Queen", "Actor", "Actress" 같은 단어는 성별 정보가 그 단어의 핵심 의미입니다. 이런 단어들을 중화해버리면 "King"과 "Queen"이 똑같은 단어가 되어버립니다.
 따라서 \textbf{성별 정의 단어(Gender Definition Words)}를 분류하는 작업이 선행되어야 합니다.
 \end{warningbox}
@@ -9077,7 +8652,7 @@ if __name__ == "__main__":
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Bias:} 학습 데이터의 사회적 편향이 임베딩 벡터에 반영된다.
     \item \textbf{Neutralize:} 중립 단어(직업 등)를 성별 축에 수직이 되도록 투영한다.
@@ -9086,13 +8661,11 @@ if __name__ == "__main__":
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 46: [CS230] Sequence Models:  Sequence-to-Sequence (Seq2Seq)
+% Lecture 46: [CS230] Sequence Models: \\ Sequence-to-Sequence (Seq2Seq)
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Sequence-to-Sequence (Seq2Seq)}
+\chapter{[CS230] Sequence Models: \\ Sequence-to-Sequence (Seq2Seq)}
 \label{ch:lecture46}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -9127,7 +8700,7 @@ if __name__ == "__main__":
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 입력과 출력의 길이가 다른 시퀀스 변환 모델을 다룹니다.
 \begin{itemize}
     \item \textbf{구조:} 입력 시퀀스를 압축하는 \textbf{인코더}와, 이를 풀어내는 \textbf{디코더} 구조를 이해합니다.
@@ -9156,13 +8729,12 @@ if __name__ == "__main__":
 Seq2Seq는 두 개의 RNN을 이어 붙인 구조입니다.
 
 
-
 \begin{itemize}
     \item \textbf{Encoder:} 문장 $x^{\langle 1 \rangle} \dots x^{\langle T_x \rangle}$를 순서대로 읽습니다. 출력을 내지 않고 은닉 상태($h$)만 업데이트합니다. 마지막 상태 $h^{\langle T_x \rangle}$에 모든 정보를 압축합니다.
     \item \textbf{Decoder:} 인코더가 준 문맥 벡터를 \textbf{자신의 초기 상태($h^{\langle 0 \rangle}_{dec}$)}로 받습니다. 이를 바탕으로 번역문을 생성합니다.
 \end{itemize}
 
-\begin{analogybox}{번역가의 작업 방식}
+\begin{analogybox}[title={번역가의 작업 방식}]
 \begin{itemize}
     \item \textbf{Read (Encoder):} 문장을 끝까지 다 읽습니다. 중간에 번역하지 않습니다. 머릿속에 핵심 의미(Context)를 정리합니다.
     \item \textbf{Write (Decoder):} 머릿속 의미를 바탕으로 프랑스어 문장을 처음부터 써 내려갑니다.
@@ -9217,7 +8789,7 @@ def build_seq2seq(vocab_size, embedding_dim, latent_dim):
 % --- 8. FAQ ---
 \section{FAQ \& Pitfalls}
 
-\begin{warningbox}{The Bottleneck Problem (병목 현상)}
+\begin{warningbox}[title={The Bottleneck Problem (병목 현상)}]
 Seq2Seq의 치명적 단점은 인코더가 문장이 길든 짧든 \textbf{고정된 크기의 벡터 하나}에 모든 정보를 우겨 넣어야 한다는 점입니다.
 문장이 길어지면(50단어 이상) 정보 손실이 발생해 번역 품질이 급격히 떨어집니다. 이를 해결하기 위해 \textbf{Attention Mechanism}이 등장했습니다.
 \end{warningbox}
@@ -9234,22 +8806,20 @@ Seq2Seq의 치명적 단점은 인코더가 문장이 길든 짧든 \textbf{고�
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Structure:} Encoder가 압축하고 Decoder가 푼다.
     \item \textbf{Context:} 인코더의 마지막 상태가 문장의 핵심 의미를 담은 매개체다.
-    \item \textbf{Transfer:} $h_{enc}$를 $h_{dec}$의 `initial_state`로 전달한다.
+    \item \textbf{Transfer:} $h_{enc}$를 $h_{dec}$의 \texttt{initial\_state}로 전달한다.
     \item \textbf{Limit:} 긴 문장을 하나의 벡터로 압축하면 정보 손실이 발생한다.
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 47: [CS230] Sequence Models:  Beam Search (Optimization)
+% Lecture 47: [CS230] Sequence Models: \\ Beam Search (Optimization)
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Beam Search (Optimization)}
+\chapter{[CS230] Sequence Models: \\ Beam Search (Optimization)}
 \label{ch:lecture47}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -9281,7 +8851,7 @@ Seq2Seq의 치명적 단점은 인코더가 문장이 길든 짧든 \textbf{고�
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 텍스트 생성 모델의 성능을 결정짓는 탐색 알고리즘을 다룹니다.
 \begin{itemize}
     \item \textbf{Greedy:} 매 순간 1등만 뽑는 방식의 한계(Local Optima)를 이해합니다.
@@ -9308,7 +8878,7 @@ Seq2Seq의 치명적 단점은 인코더가 문장이 길든 짧든 \textbf{고�
 \subsection{1. The Problem: Greedy Search}
 
 매 스텝에서 확률이 가장 높은 단어 1개만 고르고 다음으로 넘어갑니다.
-\begin{analogybox}{미로 찾기}
+\begin{analogybox}[title={미로 찾기}]
 갈림길에서 무조건 "출구와 가까워 보이는 쪽"으로만 가는 것과 같습니다. 가다 보니 막다른 길일 수 있지만, 되돌아갈 수 없습니다(No Backtracking).
 \end{analogybox}
 
@@ -9333,7 +8903,7 @@ Seq2Seq의 치명적 단점은 인코더가 문장이 길든 짧든 \textbf{고�
 확률(0.1, 0.05...)을 수십 번 곱하면 값이 $0.0000\dots$이 되어 컴퓨터가 0으로 인식해버립니다 (\textbf{Underflow}).
 해결책은 \textbf{로그($\log$)}를 취하는 것입니다. 곱셈이 덧셈으로 변합니다.
 
-\begin{formulabox}{Score Function}
+\begin{formulabox}[title={Score Function}]
 $$ \sum_{t=1}^{T_y} \log P(y^{\langle t \rangle} | y^{\langle 1 \dots t-1 \rangle}, x) $$
 로그 합을 최대화하는 것은 확률 곱을 최대화하는 것과 수학적으로 동일합니다.
 \end{formulabox}
@@ -9342,7 +8912,7 @@ $$ \sum_{t=1}^{T_y} \log P(y^{\langle t \rangle} | y^{\langle 1 \dots t-1 \rangl
 로그 확률(음수)을 계속 더하면, 문장이 길어질수록 점수는 계속 낮아집니다. 모델이 \textbf{"짧은 문장"}을 과도하게 선호하게 됩니다.
 해결책은 점수를 문장 길이($T_y$)로 나누어 \textbf{평균}을 내는 것입니다.
 
-\begin{formulabox}{Normalized Score}
+\begin{formulabox}[title={Normalized Score}]
 $$ \text{Score} = \frac{1}{T_y^\alpha} \sum \log P(\dots) $$
 \begin{itemize}
     \item $\alpha$: 보정 계수 (보통 0.7).
@@ -9369,7 +8939,7 @@ Seq2Seq의 인코더는 아무리 긴 문장이라도 \textbf{하나의 고정�
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Greedy:} 빠르지만 시야가 좁아 최적 문장을 놓친다.
     \item \textbf{Beam Search:} $B$개의 유망주를 끝까지 키운다.
@@ -9378,13 +8948,11 @@ Seq2Seq의 인코더는 아무리 긴 문장이라도 \textbf{하나의 고정�
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 48: [CS230] Sequence Models:  BLEU Score (Evaluation Metric)
+% Lecture 48: [CS230] Sequence Models: \\ BLEU Score (Evaluation Metric)
 %=======================================================================
-\chapter{[CS230] Sequence Models:  BLEU Score (Evaluation Metric)}
+\chapter{[CS230] Sequence Models: \\ BLEU Score (Evaluation Metric)}
 \label{ch:lecture48}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -9418,7 +8986,7 @@ Seq2Seq의 인코더는 아무리 긴 문장이라도 \textbf{하나의 고정�
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 기계 번역 평가의 표준인 BLEU Score의 원리를 다룹니다.
 \begin{itemize}
     \item \textbf{다중 정답:} 여러 개의 참고 문장(Reference)을 기준으로 평가합니다.
@@ -9472,7 +9040,7 @@ Seq2Seq의 인코더는 아무리 긴 문장이라도 \textbf{하나의 고정�
 
 \section{Deep Dive: The Formula}
 
-\begin{formulabox}{BLEU Formula}
+\begin{formulabox}[title={BLEU Formula}]
 $$ \text{BLEU} = BP \times \exp \left( \frac{1}{4} \sum_{n=1}^{4} p_n \right) $$
 \begin{itemize}
     \item $p_n$: n-gram의 보정된 정밀도.
@@ -9525,7 +9093,7 @@ print(f"BLEU Score: {score:.4f}")
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Modified Precision:} 정답에 등장하는 횟수만큼만 인정하여 중복 꼼수를 막는다.
     \item \textbf{N-gram:} 1~4단어 묶음을 비교하여 문맥과 유창성을 평가한다.
@@ -9534,13 +9102,11 @@ print(f"BLEU Score: {score:.4f}")
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 49: [CS230] Sequence Models:  Attention Mechanism
+% Lecture 49: [CS230] Sequence Models: \\ Attention Mechanism
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Attention Mechanism}
+\chapter{[CS230] Sequence Models: \\ Attention Mechanism}
 \label{ch:lecture49}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -9573,7 +9139,7 @@ print(f"BLEU Score: {score:.4f}")
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 긴 시퀀스 정보 손실을 해결하고 성능을 극대화하는 어텐션 메커니즘을 다룹니다.
 \begin{itemize}
     \item \textbf{동적 문맥:} 매 타임 스텝마다 다르게 계산되는 \textbf{문맥 벡터 $c^{\langle t \rangle}$}의 개념을 이해합니다.
@@ -9603,7 +9169,7 @@ print(f"BLEU Score: {score:.4f}")
 
 기존 Seq2Seq는 인코더의 \textbf{마지막 정보} 하나만 디코더에게 던져줍니다. 반면, 어텐션 모델은 디코더가 단어를 생성할 때마다 인코더의 \textbf{모든 은닉 상태}($a^{\langle 1 \rangle}, a^{\langle 2 \rangle}, \dots$)를 다 참고합니다. 단, 중요한 것은 진하게(높은 가중치), 안 중요한 것은 흐리게 봅니다.
 
-\begin{analogybox}{번역가의 힐끔거리기}
+\begin{analogybox}[title={번역가의 힐끔거리기}]
 \begin{itemize}
     \item \textbf{기존:} 문장을 한 번 읽고 책을 덮은 뒤 암기해서 번역함. (병목 발생)
     \item \textbf{어텐션:} 번역문을 쓰면서 원문에서 지금 단어와 관련된 부분(예: 주어, 목적어)을 계속 \textbf{힐끔힐끔} 다시 보며 번역함.
@@ -9613,7 +9179,7 @@ print(f"BLEU Score: {score:.4f}")
 \subsection{2. The Architecture: Context Vector $c^{\langle t \rangle}$}
 문맥 벡터 $c^{\langle t \rangle}$는 인코더의 모든 은닉 상태 $a^{\langle t' \rangle}$의 \textbf{가중 평균}입니다.
 
-\begin{formulabox}{Context Vector 공식}
+\begin{formulabox}[title={Context Vector 공식}]
 $$ c^{\langle t \rangle} = \sum_{t'} \alpha^{\langle t, t' \rangle} a^{\langle t' \rangle} $$
 \begin{itemize}
     \item $\alpha^{\langle t, t' \rangle}$: 디코더 $t$ 시점에 인코더 $t'$ 시점을 보는 비중.
@@ -9634,7 +9200,6 @@ $$ c^{\langle t \rangle} = \sum_{t'} \alpha^{\langle t, t' \rangle} a^{\langle t
     \item \textbf{Softmax (Weights):} 점수를 확률로 변환합니다.
     $$ \alpha^{\langle t, t' \rangle} = \frac{\exp(e^{\langle t, t' \rangle})}{\sum_{k=1}^{T_x} \exp(e^{\langle t, k \rangle})} $$
 \end{enumerate}
-
 
 
 % --- 7. 구현 코드 ---
@@ -9691,7 +9256,7 @@ class BahdanauAttention(Layer):
 
 \vspace{0.5cm}
 
-\begin{summarybox}{단원 요약 (Cheat Sheet)}
+\begin{summarybox}[title={단원 요약 (Cheat Sheet)}]
 \begin{enumerate}
     \item \textbf{Problem:} Seq2Seq 인코더의 고정 크기 벡터 병목 현상.
     \item \textbf{Solution:} 디코더가 매 순간 인코더의 모든 부분을 연관성에 따라 참고한다.
@@ -9700,13 +9265,11 @@ class BahdanauAttention(Layer):
 \end{enumerate}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 50: [CS230] Sequence Models:  Transformers \& Self-Attention
+% Lecture 50: [CS230] Sequence Models: \\ Transformers \& Self-Attention
 %=======================================================================
-\chapter{[CS230] Sequence Models:  Transformers \& Self-Attention}
+\chapter{[CS230] Sequence Models: \\ Transformers \& Self-Attention}
 \label{ch:lecture50}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -9737,7 +9300,7 @@ class BahdanauAttention(Layer):
 
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 현대 AI 시스템의 중추인 트랜스포머 아키텍처의 핵심 원리를 다룹니다.
 \begin{itemize}
     \item \textbf{Self-Attention:} 문장 내 단어들이 서로 어떤 관계를 맺고 있는지 스스로 학습하는 원리를 배웁니다.
@@ -9766,12 +9329,11 @@ class BahdanauAttention(Layer):
 \subsection{1. Self-Attention: 대명사 해결}
 RNN은 단어를 순서대로 읽었지만, 트랜스포머는 문장 안의 모든 단어 쌍 사이의 관계를 \textbf{한 번에} 계산합니다.
 
-\begin{analogybox}{"it"은 누구인가?}
+\begin{analogybox}[title={"it"은 누구인가?}]
 \textbf{"The animal didn't cross the street because it was too tired."} \\
 Self-Attention은 "it"이라는 단어를 처리할 때 문장의 모든 단어를 훑습니다.
 모델은 "animal"과의 어텐션 점수를 가장 높게 주어, \textbf{"it = animal"}임을 스스로 깨닫게 됩니다.
 \end{analogybox}
-
 
 
 \subsection{2. Multi-Head Attention}
@@ -9790,7 +9352,7 @@ Self-Attention은 "it"이라는 단어를 처리할 때 문장의 모든 단어�
 
 트랜스포머의 심장인 Scaled Dot-Product Attention의 수식입니다.
 
-\begin{formulabox}{Scaled Dot-Product Attention}
+\begin{formulabox}[title={Scaled Dot-Product Attention}]
 $$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$
 \begin{itemize}
     \item $QK^T$: Query와 Key 사이의 유사도 점수.
@@ -9798,7 +9360,6 @@ $$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right
     \item $V$: 최종적으로 가중치를 곱해 정보를 취합할 실제 값.
 \end{itemize}
 \end{formulabox}
-
 
 
 % --- 7. 구현 코드 ---
@@ -9838,10 +9399,9 @@ def scaled_dot_product_attention(q, k, v, mask=None):
 \end{itemize}
 
 
-
 % --- 9. 요약 및 마무리 ---
 \section*{🏁 Course Conclusion}
-\begin{summarybox}{최종 요약}
+\begin{summarybox}[title={최종 요약}]
 \begin{enumerate}
     \item \textbf{Self-Attention:} 단어 간의 유기적 관계를 한 번에 파악하는 혁신적 방식.
     \item \textbf{No More RNN:} 병렬 처리가 가능해져 모델의 거대화가 가능해짐.
@@ -9851,13 +9411,11 @@ def scaled_dot_product_attention(q, k, v, mask=None):
 
 축하합니다! Seq2Seq에서 시작해 어텐션을 거쳐, 세상을 바꾸고 있는 트랜스포머의 원리까지 모두 마스터하셨습니다. 여러분은 이제 현대 딥러닝의 정점에 서 있습니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 51: [CS230] Sequence Models:  The Transformer Architecture
+% Lecture 51: [CS230] Sequence Models: \\ The Transformer Architecture
 %=======================================================================
-\chapter{[CS230] Sequence Models:  The Transformer Architecture}
+\chapter{[CS230] Sequence Models: \\ The Transformer Architecture}
 \label{ch:lecture51}
 
 % --- 1. 전체 목차 (TOC) ---
@@ -9886,10 +9444,9 @@ def scaled_dot_product_attention(q, k, v, mask=None):
 우리는 지난 시간에 Self-Attention이라는 트랜스포머의 핵심 엔진을 배웠습니다. 오늘은 이 엔진들을 조립해서 어떻게 BERT나 GPT 같은 거대 모델의 뼈대가 되는 \textbf{트랜스포머 아키텍처(Transformer Architecture)}가 완성되는지 해부해 보겠습니다. 트랜스포머는 크게 정보를 읽어 들이는 \textbf{인코더(Encoder)}와 정보를 생성하는 \textbf{디코더(Decoder)} 두 부분으로 나뉩니다.
 
 
-
 % --- 4. 개요 ---
 \section{Unit Overview}
-\begin{summarybox}{핵심 목표}
+\begin{summarybox}[title={핵심 목표}]
 이 단원은 현대 AI 시스템의 설계도인 트랜스포머의 구조를 완벽히 이해합니다.
 \begin{itemize}
     \item \textbf{전체 구조:} 인코더와 디코더의 연결 메커니즘을 파악합니다.
@@ -9905,12 +9462,11 @@ def scaled_dot_product_attention(q, k, v, mask=None):
 \subsection{1. Positional Encoding (위치 정보 주입)}
 트랜스포머는 단어를 한꺼번에 병렬로 입력받기 때문에, "I love you"와 "You love me"를 구분하지 못합니다. 
 
-\begin{mathbox}{위치 신호 주입}
+\begin{mathbox}[title={위치 신호 주입}]
 각 단어 벡터에 고유한 위치 값을 더해줍니다. 주기 함수인 Sine과 Cosine을 활용하여 고차원 공간에서 단어의 상대적/절대적 위치를 입힙니다.
 $$ PE_{(pos, 2i)} = \sin(pos/10000^{2i/d_{model}}) $$
 $$ PE_{(pos, 2i+1)} = \cos(pos/10000^{2i/d_{model}}) $$
 \end{mathbox}
-
 
 
 \subsection{2. Encoder Block (인코더: 이해의 영역)}
@@ -9928,7 +9484,6 @@ $$ PE_{(pos, 2i+1)} = \cos(pos/10000^{2i/d_{model}}) $$
     \item \textbf{Encoder-Decoder Attention:} 단어를 뱉을 때마다 인코더가 분석한 원문 정보를 다시 참고합니다.
     \item \textbf{GPT:} 이 디코더를 쌓아 만든 모델로, 다음 단어 예측(Auto-regressive)에 특화되어 있습니다.
 \end{itemize}
-
 
 
 \vspace{0.5cm}\hrule\vspace{0.5cm}
@@ -9974,11 +9529,9 @@ gpt = GPT2Model.from_pretrained('gpt2')
 이제 여러분은 현대 인공지능이 인간의 언어를 어떻게 처리하는지 그 밑바닥 설계도를 보셨습니다. 이 구조는 이제 언어를 넘어 이미지(ViT), 음성(Whisper) 등으로 무한히 확장되고 있습니다.
 
 \vspace{0.5cm}
-\begin{summarybox}{생각해볼 거리}
+\begin{summarybox}[title={생각해볼 거리}]
 마스킹(Masking)이 없다면 디코더는 왜 학습이 불가능할까요? 잔차 연결(Residual Connection)이 깊은 트랜스포머 층에서 왜 필수적일까요? 궁금한 점이 있다면 언제든 질문해 주세요!
 \end{summarybox}
-
-\newpage
 
 
 \end{document}

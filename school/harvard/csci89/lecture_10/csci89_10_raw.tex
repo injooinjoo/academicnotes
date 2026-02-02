@@ -1,0 +1,695 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{kotex, geometry, hyperref, xcolor, tcolorbox, booktabs, graphicx, amsmath, amssymb, listings, setspace, fancyhdr, adjustbox}
+
+% PDF 레이아웃 규격
+\usepackage[margin=25mm]{geometry}
+\onehalfspacing % 줄간격
+\setlength{\parskip}{0.6em} % 단락 사이 간격
+\setlength{\parindent}{0pt} % 단락 들여쓰기 없음
+\renewcommand{\arraystretch}{1.2} % 표 행 높이
+
+% 헤더/푸터 설정
+\fancyhead{} % 기존 헤더 지우기
+\fancyfoot{} % 기존 푸터 지우기
+\fancyhead[L]{\textbf{CSCI E-89: 인공지능 개론}} % 왼쪽 헤더: 문서명
+\fancyhead[R]{\textbf{Lecture 10 노트}} % 오른쪽 헤더: 강의명
+\fancyfoot[C]{\thepage} % 중앙 푸터: 쪽수
+\pagestyle{fancy} % fancy 스타일 적용
+
+% 코드 블록 설정
+\lstset{
+  basicstyle=\ttfamily\small, % 기본 폰트 및 크기
+  breaklines=true, % 줄바꿈 허용
+  numbers=left, % 행 번호 왼쪽 표시
+  numbersep=6pt, % 행 번호와 코드 사이 간격
+  frame=single, % 코드 블록 테두리
+  captionpos=b, % 캡션 위치 (아래)
+  showstringspaces=false, % 문자열 내 공백 표시 안 함
+  commentstyle=\color{gray}\ttfamily, % 주석 스타일
+  keywordstyle=\color{blue}\bfseries, % 키워드 스타일
+  stringstyle=\color{red}\ttfamily, % 문자열 스타일
+  identifierstyle=\color{black}, % 식별자 스타일
+  xleftmargin=1em, % 왼쪽 여백
+  xrightmargin=1em, % 오른쪽 여백
+  aboveskip=1em, % 코드 블록 위 여백
+  belowskip=1em % 코드 블록 아래 여백
+}
+
+% 하이퍼링크 설정
+\hypersetup{
+  colorlinks=true, % 링크에 색상 적용
+  linkcolor=blue, % 내부 링크 색상
+  citecolor=green, % 인용 링크 색상
+  urlcolor=cyan, % URL 링크 색상
+  pdftitle={CSCI89 Lecture 10 - 인공지능 개론},
+  pdfauthor={UIUC Student},
+  pdfsubject={CSCI E-89: Introduction to Artificial Intelligence}
+}
+
+% tcolorbox 설정 (요약, 주의, 예시 박스)
+\definecolor{myblue}{RGB}{220,230,250}
+\definecolor{mygreen}{RGB}{220,250,230}
+\definecolor{myred}{RGB}{250,220,220}
+\definecolor{myyellow}{RGB}{255,255,200}
+
+\newtcolorbox{summarybox}[1][]{
+  colback=myblue,
+  colframe=blue!75!black,
+  fonttitle=\bfseries,
+  title={요약},
+  #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+  colback=myred,
+  colframe=red!75!black,
+  fonttitle=\bfseries,
+  title={주의},
+  #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+  colback=mygreen,
+  colframe=green!75!black,
+  fonttitle=\bfseries,
+  title={예시},
+  #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+  colback=myyellow,
+  colframe=orange!75!black,
+  fonttitle=\bfseries,
+  title={핵심 개념},
+  #1
+}
+
+\begin{document}
+
+\begin{summarybox}
+\section*{개요}
+본 문서는 CSCI E-89 '인공지능 개론' 10강의 핵심 내용을 다룹니다.
+나이브 베이즈, K-최근접 이웃, 로지스틱 회귀, 서포트 벡터 머신, 랜덤 포레스트 등 주요 머신러닝 모델의 기본 원리와 가정, 그리고 실제 적용 시 고려사항을 설명합니다.
+특히, 최대 우도 추정(MLE)의 개념과 명명된 개체 인식(NER)의 중요성, 다양한 기법 및 실습 예제를 상세히 다룹니다.
+또한, 최종 프로젝트와 과제 9에 대한 안내 및 채점 기준, AI 도구 활용 방안과 주의사항을 포함하여 시험 대비 및 실습에 필요한 모든 정보를 제공합니다.
+\end{summarybox}
+
+\newpage
+\section*{용어 정리}
+다음 표는 본 강의에서 다루는 주요 용어들을 비전공자도 이해하기 쉽게 설명합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+나이브 베이즈 & 각 특성이 서로 독립이라고 가정하는 분류 모델 & Naive Bayes & '나이브(Naive)'한 가정 \\
+K-최근접 이웃 & 주변의 K개 데이터의 다수결로 분류/예측하는 모델 & K-Nearest Neighbors (KNN) & 거리 기반 \\
+로지스틱 회귀 & 선형 모델을 사용하여 범주형 결과의 확률을 예측 & Logistic Regression & 분류에 사용되는 회귀 \\
+최대 우도 추정 & 관측된 데이터를 가장 잘 설명하는 모델 파라미터를 찾는 방법 & Maximum Likelihood Estimation (MLE) & 모델 학습의 핵심 원리 \\
+서포트 벡터 머신 & 데이터를 분류하는 최적의 경계(초평면)를 찾는 모델 & Support Vector Machine (SVM) & 마진 최대화 \\
+랜덤 포레스트 & 여러 결정 트리를 만들어 결과를 평균하여 예측하는 앙상블 모델 & Random Forest & 분산 감소 효과 \\
+명명된 개체 인식 & 텍스트에서 사람 이름, 장소, 날짜 등 특정 개체를 식별하는 기술 & Named Entity Recognition (NER) & 자연어 처리의 기본 \\
+토큰화 & 텍스트를 단어, 구두점 등 의미 있는 단위로 분리하는 과정 & Tokenization & 텍스트 전처리 \\
+표제어 추출 & 단어의 다양한 형태를 기본형(표제어)으로 통일하는 과정 & Lemmatization & 텍스트 정규화 \\
+품사 태깅 & 텍스트의 각 단어에 품사(명사, 동사 등)를 부여하는 과정 & Part-of-Speech (POS) Tagging & 문법적 분석 \\
+정규 표현식 & 특정 문자열 패턴을 찾고 조작하는 데 사용되는 규칙 & Regular Expressions (Regex) & 패턴 매칭 \\
+합성곱 신경망 & 이미지 처리에서 주로 사용되나 텍스트에서도 특징 추출에 활용 & Convolutional Neural Network (CNN) & NER 모델의 기반 \\
+순환 신경망 & 순서가 있는 데이터(시퀀스) 처리에 적합한 신경망 & Recurrent Neural Network (RNN) & 텍스트, 시계열 데이터 \\
+은닉 마르코프 모델 & 관측할 수 없는 '숨겨진' 상태를 가정하여 시퀀스 데이터를 모델링 & Hidden Markov Model (HMM) & 시퀀스 모델링 \\
+조건부 랜덤 필드 & 순서가 있는 데이터의 레이블 시퀀스를 예측하는 통계 모델 & Conditional Random Fields (CRF) & HMM의 확장 \\
+TF-IDF & 단어의 중요도를 나타내는 지표 (문서 내 빈도, 전체 문서 내 희소성) & Term Frequency-Inverse Document Frequency & 텍스트 특징 추출 \\
+하이퍼파라미터 & 모델 학습 전에 사용자가 직접 설정하는 값 (학습률, C 값 등) & Hyperparameter & 모델 성능에 영향 \\
+사전 확률 & 데이터가 관측되기 전에 특정 사건이 발생할 확률에 대한 믿음 & Prior Probability & 베이즈 정리의 구성 요소 \\
+우도 함수 & 특정 모델 파라미터에서 관측된 데이터가 나타날 확률 & Likelihood Function & MLE의 핵심 \\
+소프트맥스 & 여러 클래스 중 하나에 속할 확률을 계산하는 함수 & Softmax & 다중 클래스 분류 \\
+파이프라인 & 여러 처리 단계를 순차적으로 연결하여 자동화하는 시스템 & Pipeline & spaCy NER의 구조 \\
+임베딩 & 단어나 문장을 숫자 벡터로 변환하여 컴퓨터가 이해하도록 하는 표현 & Embedding & 텍스트의 수치화 \\
+서포트 벡터 & 결정 경계에 가장 가까이 위치하여 경계에 영향을 주는 데이터 포인트 & Support Vectors & SVM의 핵심 \\
+마진 & 결정 경계와 가장 가까운 서포트 벡터 사이의 거리 & Margin & SVM의 목표 \\
+허용치 (C) & SVM에서 분류 오류를 얼마나 허용할지 조절하는 하이퍼파라미터 & Allowance (C) & 소프트 마진 조절 \\
+과적합 & 모델이 훈련 데이터에 너무 맞춰져 새 데이터에 대한 성능이 떨어지는 현상 & Overfitting & 모델 일반화 저해 \\
+분산 & 모델이 훈련 데이터의 작은 변화에 얼마나 민감하게 반응하는지 & Variance & 앙상블 모델로 감소 \\
+일반화 & 모델이 훈련되지 않은 새로운 데이터에 대해 잘 예측하는 능력 & Generalization & 모델의 목표 \\
+메타데이터 & 데이터에 대한 데이터 (텍스트의 경우, 개체 수, 작성자 등) & Metadata & 데이터 보강 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section*{핵심 개념 및 원리}
+
+\subsection{나이브 베이즈 분류기 (Naive Bayes Classifier)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 각 특성(단어 빈도 등)이 클래스 레이블이 주어졌을 때 서로 독립이라고 가정하여 데이터를 분류하는 모델입니다.
+\end{conceptbox}
+
+\textbf{직관적 예시/비유:}
+스팸 메일을 분류한다고 가정해 봅시다. '할인', '무료', '지금'이라는 단어가 스팸 메일에 자주 나타납니다. 나이브 베이즈는 이 단어들이 서로 독립적으로 스팸 여부에 영향을 미친다고 봅니다. 즉, '할인'이 나왔다고 해서 '무료'가 나올 확률이 달라지지 않는다고 가정하는 것입니다. 실제로는 '할인'과 '무료'는 함께 나올 가능성이 높지만, 나이브 베이즈는 이를 무시하고 단순하게 계산합니다.
+
+\textbf{기술적 정확한 설명:}
+나이브 베이즈 분류기는 베이즈 정리(Bayes' Theorem)에 기반하며, 특히 '나이브(Naive)'한 가정을 사용합니다. 이 가정은 "모든 특성(feature)은 주어진 클래스 레이블(class label)에 대해 다른 모든 특성과 조건부 독립(conditionally independent)이다"라는 것입니다.
+
+\begin{itemize}
+    \item \textbf{가정의 의미:} 예를 들어, 문서 분류에서 '단어 빈도(term frequency)'나 'IDF(Inverse Document Frequency)'를 특성으로 사용한다면, 이 단어 빈도나 IDF 값들은 문서가 속할 클래스(예: 스포츠, 경제)가 주어졌을 때 서로 독립적이라고 가정합니다.
+    \item \textbf{현실과의 괴리:} 실제로는 단어들이 서로 강하게 연관되어 나타나는 경우가 많습니다. 예를 들어, '축구'라는 단어가 나오면 '골', '경기'와 같은 단어도 함께 나올 가능성이 높습니다. 나이브 베이즈는 이러한 단어 간의 상관관계를 무시하기 때문에 '나이브'하다고 불립니다.
+    \item \textbf{성능:} 이러한 단순한 가정에도 불구하고, 나이브 베이즈는 때때로 매우 좋은 성능을 보여주며, 특히 텍스트 분류와 같은 분야에서 효과적입니다.
+\end{itemize}
+
+\begin{warningbox}
+\textbf{잘못된 직관 vs 올바른 이해: 사전 확률의 중요성}
+\textbf{잘못된 직관:} 모든 클래스의 사전 확률(prior probabilities)은 같다고 가정해야 한다. (예: 스팸/햄 메일은 50/50)
+\textbf{올바른 이해:} 사전 확률은 반드시 같을 필요는 없습니다. 만약 특정 클래스에 대한 사전 정보(예: IT 엔지니어와 화학자의 비율)가 있다면 이를 반영할 수 있습니다. 또한, 이전 실험 결과나 도메인 지식을 사전 확률로 활용하거나, 심지어 하이퍼파라미터(hyperparameter)처럼 여러 값을 시도하여 최적의 성능을 내는 사전 확률을 찾을 수도 있습니다. 이는 모델의 정규화(regularization) 기법으로도 활용될 수 있습니다.
+\end{warningbox}
+
+\newpage
+\subsection{K-최근접 이웃 (K-Nearest Neighbors, KNN)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 새로운 데이터가 주어졌을 때, 가장 가까운 K개의 훈련 데이터 포인트를 찾아 그들의 클래스(분류)나 값(회귀)을 따라 예측하는 간단한 모델입니다.
+\end{conceptbox}
+
+\textbf{직관적 예시/비유:}
+새로운 학생이 전학 왔을 때, 그 학생이 어떤 그룹에 속할지 예측한다고 해봅시다. 이 학생과 가장 친한(가까운) 5명의 친구들을 살펴보고, 그 친구들이 주로 어떤 그룹(예: 운동부, 독서부)에 속하는지 보고 다수결로 결정하는 것과 같습니다. 여기서 '가깝다'는 것은 키, 몸무게, 성적 등 여러 특성을 종합한 '거리'를 의미합니다.
+
+\textbf{기술적 정확한 설명:}
+KNN은 비모수(non-parametric) 방식의 게으른 학습(lazy learning) 알고리즘입니다. 훈련 단계에서 특별한 모델을 만들지 않고, 예측 시점에 훈련 데이터를 사용하여 가장 가까운 이웃을 찾습니다.
+
+\begin{itemize}
+    \item \textbf{거리 측정:} 두 데이터 포인트 간의 거리를 측정하는 것이 핵심입니다. 가장 흔히 사용되는 것은 유클리드 거리(Euclidean distance)입니다.
+    \item \textbf{유클리드 거리 공식:} 두 벡터 $\mathbf{x} = (x_1, x_2, \dots, x_n)$와 $\mathbf{x}' = (x'_1, x'_2, \dots, x'_n)$ 사이의 거리는 다음과 같습니다.
+    $$ D(\mathbf{x}, \mathbf{x}') = \sqrt{(x_1 - x'_1)^2 + (x_2 - x'_2)^2 + \dots + (x_n - x'_n)^2} $$
+    \item \textbf{K 값 선택:} K는 사용자가 미리 정하는 하이퍼파라미터입니다. K가 너무 작으면 노이즈에 민감해지고, 너무 크면 결정 경계가 흐려져 과소적합(underfitting)될 수 있습니다.
+\end{itemize}
+
+\begin{warningbox}
+\textbf{주의: 특성 스케일링의 중요성}
+\textbf{문제점:} 키(cm 단위, 160~170)와 몸무게(kg 단위, 60~70)를 특성으로 사용한다고 가정해 봅시다. 키의 차이(예: 10cm)는 몸무게의 차이(예: 5kg)보다 수치적으로 훨씬 크게 나타납니다. 유클리드 거리를 계산할 때, 키의 제곱 항이 몸무게의 제곱 항보다 훨씬 커져서, 사실상 모델이 키 특성에만 의존하게 될 수 있습니다.
+\textbf{해결책:} 모든 특성들이 동일한 스케일을 갖도록 정규화(normalization) 또는 표준화(standardization)하는 것이 매우 중요합니다. 이를 통해 모든 특성이 거리 계산에 공정하게 기여할 수 있습니다.
+\end{warningbox}
+
+\newpage
+\subsection{로지스틱 회귀 (Logistic Regression)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 선형 모델의 출력을 시그모이드 함수(sigmoid function)를 통해 0과 1 사이의 확률로 변환하여 이진 분류(binary classification) 문제를 해결하는 모델입니다.
+\end{conceptbox}
+
+\textbf{직관적 예시/비유:}
+어떤 사람이 대출을 받을 수 있을지 없을지 예측한다고 해봅시다. 소득, 신용 점수, 직업 등 여러 정보를 종합하여 '대출 가능성 점수'를 계산합니다. 이 점수가 높을수록 대출 가능성이 높지만, 점수 자체는 확률이 아닙니다. 로지스틱 회귀는 이 점수를 '대출을 받을 확률'로 변환해주는 시그모이드 함수를 사용하여, 최종적으로 '대출 가능성'을 0~1 사이의 확률로 제시합니다.
+
+\textbf{기술적 정확한 설명:}
+로지스틱 회귀는 이름에 '회귀'가 들어가지만 실제로는 분류(classification) 모델입니다. 선형 회귀와 유사하게 특성들의 선형 조합을 사용하지만, 이 선형 조합의 결과를 시그모이드 함수에 통과시켜 0과 1 사이의 확률 값을 출력합니다.
+
+\begin{itemize}
+    \item \textbf{모델 구조:}
+        \begin{itemize}
+            \item 선형 조합: $z = w_0 + w_1x_1 + w_2x_2 + \dots + w_nx_n$
+            \item 시그모이드 함수: $\sigma(z) = \frac{1}{1 + e^{-z}}$
+            \item 확률 출력: $P(Y=1|\mathbf{x}) = \sigma(z)$
+        \end{itemize}
+    \item \textbf{파라미터 학습:} 로지스틱 회귀의 파라미터($w_0, w_1, \dots, w_n$)는 주로 \textbf{최대 우도 추정(Maximum Likelihood Estimation, MLE)} 방법을 통해 학습됩니다.
+\end{itemize}
+
+\subsubsection*{최대 우도 추정 (Maximum Likelihood Estimation, MLE)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 관측된 데이터가 주어졌을 때, 이 데이터를 발생시킬 확률을 가장 높게 만드는 모델 파라미터(매개변수)를 찾는 통계적 방법입니다.
+\end{conceptbox}
+
+\textbf{직관적 예시/비유:}
+동전 던지기 게임을 했는데, 10번 던져서 앞면이 7번, 뒷면이 3번 나왔습니다. 이 동전이 앞면이 나올 확률(p)이 얼마일까요? MLE는 'p' 값을 0부터 1까지 바꿔가면서, '앞면 7번, 뒷면 3번'이라는 결과가 나올 확률을 계산합니다. 이 확률을 가장 높게 만드는 'p' 값이 바로 MLE 추정치입니다. 직관적으로는 0.7이 가장 합리적일 것입니다.
+
+\textbf{기술적 정확한 설명:}
+MLE는 주어진 데이터($D$)가 특정 모델 파라미터($\theta$)에서 발생할 확률, 즉 $P(D|\theta)$를 최대화하는 $\theta$를 찾는 방법입니다. 이 $P(D|\theta)$를 파라미터 $\theta$의 함수로 보았을 때 \textbf{우도 함수(Likelihood Function)} $L(\theta|D)$라고 부릅니다.
+
+\begin{itemize}
+    \item \textbf{우도 함수의 정의:} $L(\theta|D) = P(D|\theta)$
+        \begin{itemize}
+            \item 여기서 $D$는 관측된 데이터(고정된 값)이고, $\theta$는 우리가 추정하려는 파라미터(변수)입니다.
+            \item \textbf{확률 $P(D|\theta)$와 우도 $L(\theta|D)$의 차이:}
+                \begin{itemize}
+                    \item $P(D|\theta)$: 파라미터 $\theta$가 주어졌을 때 데이터 $D$가 관측될 확률. (확률론적 관점: $\theta$는 고정, $D$는 변수)
+                    \item $L(\theta|D)$: 데이터 $D$가 관측되었을 때, 파라미터 $\theta$가 이 데이터를 얼마나 잘 설명하는지 나타내는 값. (통계적 추정 관점: $D$는 고정, $\theta$는 변수)
+                \end{itemize}
+        \end{itemize}
+    \item \textbf{로그 우도 (Log-Likelihood):} 우도 함수는 보통 여러 확률의 곱으로 표현되므로, 계산의 편의를 위해 로그를 취한 \textbf{로그 우도 함수}를 사용합니다. 로그 함수는 단조 증가 함수이므로, 로그를 취해도 최대값을 갖는 파라미터의 위치는 변하지 않습니다.
+    \item \textbf{최대화 과정:} 로그 우도 함수를 파라미터에 대해 미분하고, 그 값을 0으로 설정하여 파라미터의 최적값을 찾습니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{MLE 예시: 동전 던지기}
+\textbf{상황:} 동전을 10번 던져 앞면(H)이 7번, 뒷면(T)이 3번 나왔습니다. 앞면이 나올 확률 $p$를 추정합니다.
+
+\textbf{1. 우도 함수 구성:}
+앞면이 나올 확률을 $p$라고 하면, 뒷면이 나올 확률은 $1-p$입니다.
+7번의 앞면과 3번의 뒷면이 나올 확률은 $p^7 (1-p)^3$입니다.
+여기에 10번 중 7번 앞면이 나오는 경우의 수 $\binom{10}{7}$를 곱해야 하지만, 최대값을 찾는 데는 영향을 미치지 않으므로 생략합니다.
+$$ L(p|D) = p^7 (1-p)^3 $$
+
+\textbf{2. 로그 우도 함수 구성:}
+$$ \log L(p|D) = 7 \log(p) + 3 \log(1-p) $$
+
+\textbf{3. 미분 및 최대값 찾기:}
+로그 우도 함수를 $p$에 대해 미분하고 0으로 설정합니다.
+$$ \frac{d}{dp} \log L(p|D) = \frac{7}{p} - \frac{3}{1-p} = 0 $$
+$$ \frac{7}{p} = \frac{3}{1-p} $$
+$$ 7(1-p) = 3p $$
+$$ 7 - 7p = 3p $$
+$$ 7 = 10p $$
+$$ p = 0.7 $$
+\textbf{결과:} MLE 추정치 $p_{MLE}$는 0.7입니다. 이는 직관적인 결과와 일치합니다.
+\end{examplebox}
+
+\newpage
+\subsection{서포트 벡터 머신 (Support Vector Machine, SVM)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 데이터를 두 클래스로 분류하는 최적의 '결정 경계(decision boundary)'를 찾는데, 이 경계는 각 클래스의 가장 가까운 데이터 포인트(서포트 벡터)로부터 가장 큰 '마진(margin)'을 가지도록 합니다.
+\end{conceptbox}
+
+\textbf{직관적 예시/비유:}
+두 종류의 과일(사과와 오렌지)이 섞여 있는 접시가 있다고 상상해 봅시다. SVM은 이 두 과일을 가장 잘 나눌 수 있는 선(결정 경계)을 찾습니다. 이때, 단순히 나누는 선이 아니라, 사과 중 가장 가까운 사과와 오렌지 중 가장 가까운 오렌지로부터 최대한 멀리 떨어져 있는 선을 찾습니다. 이 '가장 가까운 과일들'이 바로 서포트 벡터이고, '멀리 떨어져 있는 정도'가 마진입니다.
+
+\textbf{기술적 정확한 설명:}
+SVM은 분류를 위한 강력한 지도 학습 모델입니다. 주로 이진 분류에 사용되지만, 다중 클래스 분류로 확장될 수 있습니다.
+
+\begin{itemize}
+    \item \textbf{결정 경계와 마진:} SVM의 목표는 두 클래스 사이의 마진을 최대화하는 결정 경계(초평면)를 찾는 것입니다. 마진은 결정 경계와 가장 가까운 훈련 데이터 포인트(서포트 벡터) 사이의 거리입니다.
+    \item \textbf{서포트 벡터 (Support Vectors):} 결정 경계의 위치에 직접적인 영향을 미치는 데이터 포인트들입니다. 이 서포트 벡터들만이 결정 경계를 정의하며, 다른 데이터 포인트들은 마진 내에 있지 않으므로 경계에 영향을 미치지 않습니다.
+    \item \textbf{과적합 문제:} 만약 데이터에 이상치(outlier)가 있거나, 데이터가 선형적으로 완벽하게 분리되지 않는 경우, 마진을 최대화하려는 엄격한 규칙은 모델을 이상치에 과도하게 민감하게 만들 수 있습니다. 이는 과적합(overfitting)으로 이어질 수 있습니다.
+\end{itemize}
+
+\subsubsection*{소프트 마진과 허용치 (Soft Margin and Allowance, C)}
+
+\textbf{문제점:} 모든 데이터를 완벽하게 분리하면서 마진을 최대화하는 것이 불가능하거나, 이상치에 너무 민감해지는 경우가 있습니다.
+
+\textbf{해결책: 소프트 마진 (Soft Margin):}
+소프트 마진 SVM은 일부 분류 오류나 마진 침범을 허용하면서도 마진을 최대화하려고 시도합니다. 이를 통해 모델의 일반화 성능을 향상시키고 과적합을 줄일 수 있습니다.
+
+\begin{itemize}
+    \item \textbf{허용치 (C 상수):} 소프트 마진의 핵심은 'C'라는 하이퍼파라미터입니다. C는 분류 오류에 대한 페널티(벌칙)를 조절하는 역할을 합니다.
+        \begin{itemize}
+            \item \textbf{C가 작을 때 (큰 허용치):} 분류 오류를 더 많이 허용하고, 마진은 더 넓어집니다. 모델은 더 유연해지고 과소적합될 가능성이 있습니다.
+            \item \textbf{C가 클 때 (작은 허용치):} 분류 오류를 덜 허용하고, 마진은 더 좁아집니다. 모델은 훈련 데이터에 더 엄격하게 맞춰지고 과적합될 가능성이 있습니다.
+            \item \textbf{C가 무한대일 때 (허용치 없음):} 하드 마진(Hard Margin) SVM과 동일하며, 분류 오류를 전혀 허용하지 않습니다.
+        \end{itemize}
+    \item \textbf{C 값 선택:} C 값은 모델의 성능에 큰 영향을 미치므로, 교차 검증(cross-validation)과 같은 기법을 사용하여 검증 세트(validation set)에서 최적의 C 값을 찾아야 합니다.
+\end{itemize}
+
+\newpage
+\subsection{랜덤 포레스트 (Random Forest)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 여러 개의 독립적인 결정 트리(decision tree)를 만들고, 각 트리의 예측 결과를 모아 다수결(분류) 또는 평균(회귀)을 통해 최종 예측을 수행하여 모델의 안정성과 정확도를 높이는 앙상블 학습 모델입니다.
+\end{conceptbox}
+
+\textbf{직관적 예시/비유:}
+한 가지 문제에 대해 한 명의 전문가(단일 결정 트리)에게만 의존하는 대신, 여러 명의 다양한 전문가(여러 결정 트리)에게 의견을 묻고 그들의 의견을 종합하여 최종 결정을 내리는 것과 같습니다. 각 전문가는 약간 다른 방식으로 문제를 보고(데이터의 일부만 사용), 각자의 결론을 내립니다. 이들의 의견을 모으면 한 명의 전문가보다 훨씬 더 신뢰할 수 있는 결론을 얻을 수 있습니다.
+
+\textbf{기술적 정확한 설명:}
+랜덤 포레스트는 배깅(Bagging, Bootstrap Aggregating)이라는 앙상블(Ensemble) 기법의 일종입니다. 여러 개의 결정 트리를 생성하고 이들의 예측을 결합하여 최종 예측을 수행합니다.
+
+\begin{itemize}
+    \item \textbf{작동 원리:}
+        \begin{enumerate}
+            \item \textbf{부트스트랩 샘플링:} 훈련 데이터에서 무작위로 복원 추출하여 여러 개의 서브셋(부트스트랩 샘플)을 만듭니다. 각 서브셋은 원본 데이터와 크기가 같지만, 일부 데이터는 중복되고 일부는 누락될 수 있습니다.
+            \item \textbf{특성 무작위 선택:} 각 결정 트리를 만들 때, 모든 특성 중에서 무작위로 일부 특성만 선택하여 분할(split)에 사용합니다.
+            \item \textbf{트리 생성:} 각 부트스트랩 샘플과 무작위로 선택된 특성을 사용하여 독립적인 결정 트리를 성장시킵니다.
+            \item \textbf{예측 결합:}
+                \begin{itemize}
+                    \item \textbf{분류:} 각 트리의 예측 중 가장 많은 표를 얻은 클래스를 최종 예측으로 선택합니다 (다수결).
+                    \item \textbf{회귀:} 각 트리의 예측 값들을 평균하여 최종 예측 값을 얻습니다.
+                \end{itemize}
+        \end{enumerate}
+    \item \textbf{주요 장점: 분산 감소 (Variance Reduction):}
+        \begin{itemize}
+            \item 단일 결정 트리는 훈련 데이터의 작은 변화에도 민감하게 반응하여 불안정하고 과적합되기 쉽습니다 (높은 분산).
+            \item 랜덤 포레스트는 여러 트리의 예측을 평균함으로써 이러한 개별 트리의 높은 분산을 상쇄하고, 모델의 안정성과 일반화 성능을 크게 향상시킵니다.
+            \item '편향-분산 트레이드오프(Bias-Variance Trade-off)' 관점에서, 랜덤 포레스트는 편향을 크게 늘리지 않으면서 분산을 효과적으로 줄이는 데 강점이 있습니다.
+        \end{itemize}
+\end{itemize}
+
+\newpage
+\section*{명명된 개체 인식 (Named Entity Recognition, NER)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 텍스트에서 사람 이름, 조직, 장소, 날짜, 시간, 금액 등 미리 정의된 범주의 '명명된 개체(Named Entity)'를 식별하고 분류하는 자연어 처리(NLP) 기술입니다.
+\end{conceptbox}
+
+\textbf{직관적 예시/비유:}
+긴 신문 기사를 읽을 때, 우리는 자연스럽게 '도널드 트럼프'가 사람 이름이고, '테슬라'가 회사 이름이며, '2024년 11월 14일'이 날짜라는 것을 알아챕니다. NER은 컴퓨터가 이처럼 텍스트 속에서 중요한 고유 명사나 숫자 표현을 찾아내고, 그것이 어떤 종류의 정보인지(사람, 조직, 날짜 등) 꼬리표를 붙여주는 기술입니다.
+
+\textbf{왜 NER이 중요한가?}
+NER은 텍스트를 이해하고 처리하는 데 있어 매우 기본적인 단계입니다.
+\begin{itemize}
+    \item \textbf{번역:} '도널드 트럼프'와 같은 인명을 번역할 때는 단순히 음차하여 표기만 바꾸면 됩니다. 컴퓨터가 이것이 이름임을 알면, 일반 단어처럼 의미를 찾아 번역하려 하지 않고 올바르게 처리할 수 있습니다.
+    \item \textbf{정보 추출:} 기사에서 누가, 언제, 어디서, 무엇을 했는지와 같은 핵심 정보를 빠르게 파악할 수 있습니다.
+    \item \textbf{텍스트 분류/감성 분석:} 텍스트에 특정 인물이나 조직, 지리적 개체가 얼마나 언급되는지, 또는 어떤 개체와 관련된 감성이 긍정적인지 부정적인지 파악하는 데 도움이 됩니다.
+\end{itemize}
+
+\subsubsection*{NER의 주요 개체 유형}
+NER이 식별하는 일반적인 개체 유형은 다음과 같습니다.
+\begin{itemize}
+    \item \textbf{인물 (Person):} 사람의 이름 (예: 도널드 트럼프, 일론 머스크)
+    \item \textbf{조직 (Organization):} 회사, 기관, 단체 (예: 테슬라, 연방준비제도, 뱅크 오브 잉글랜드)
+    \item \textbf{지리정치적 개체 (Geopolitical Entity, GPE):} 국가, 도시, 대륙 (예: 미국, 아프리카, 중국)
+    \item \textbf{날짜 및 시간 (Date \& Time):} 특정 날짜, 기간, 시간 (예: 2024년 11월 14일, 한 주, 3월, 9월)
+    \item \textbf{금액 (Money):} 화폐 단위와 금액 (예: 1조 달러)
+    \item \textbf{백분율 (Percent):} 비율 (예: 40\%)
+    \item \textbf{서수 (Ordinal):} 순서를 나타내는 숫자 (예: 첫 번째)
+    \item \textbf{기수 (Cardinal):} 일반 숫자 (예: 50 이상)
+    \item \textbf{제품 (Product):} 상품명, 브랜드 (예: 아이폰, 삼성 갤럭시)
+    \item \textbf{이벤트 (Event):} 특정 사건 (예: 올림픽, 월드컵)
+\item \textbf{기타:} 이메일 주소, 웹사이트 주소 등
+\end{itemize}
+
+\begin{examplebox}
+\textbf{NER 적용 예시: 뉴스 기사 분석}
+다음은 '도널드 트럼프' 관련 뉴스 기사에 NER을 적용한 결과입니다.
+\begin{itemize}
+    \item "Donald Trump" $\rightarrow$ \textbf{PERSON}
+    \item "more than 50" $\rightarrow$ \textbf{CARDINAL} (기수)
+    \item "this year" $\rightarrow$ \textbf{DATE}
+    \item "first" $\rightarrow$ \textbf{ORDINAL} (서수)
+    \item "Tesla" $\rightarrow$ \textbf{ORG} (조직)
+    \item "one trillion of dollars" $\rightarrow$ \textbf{MONEY}
+    \item "2022" $\rightarrow$ \textbf{DATE}
+    \item "over 40\%" $\rightarrow$ \textbf{PERCENT}
+    \item "Bitcoin" $\rightarrow$ \textbf{PERSON} (모델이 비트코인을 인명으로 오인식한 예시)
+    \item "cryptocurrencies" $\rightarrow$ \textbf{ORG} (모델이 암호화폐를 조직으로 오인식한 예시)
+    \item "a week" $\rightarrow$ \textbf{DATE}
+    \item "March", "September" $\rightarrow$ \textbf{DATE}
+    \item "Federal Reserve", "Bank of England" $\rightarrow$ \textbf{ORG}
+\end{itemize}
+이 예시에서 보듯이, NER 모델은 텍스트의 맥락을 통해 개체를 식별하지만, 때로는 'Bitcoin'을 인명으로, 'cryptocurrencies'를 조직으로 잘못 분류하는 경우도 있습니다. 이는 모델의 한계나 훈련 데이터의 특성 때문일 수 있습니다.
+\end{examplebox}
+
+\subsubsection*{NER의 응용 분야}
+NER은 다양한 NLP 응용 분야에서 핵심적인 역할을 합니다.
+\begin{itemize}
+    \item \textbf{텍스트 분류 강화 (Text Classification Enhancement):}
+        \begin{itemize}
+            \item 텍스트를 분류하기 전에 NER을 통해 개체를 추출합니다.
+            \item 추출된 개체 정보(예: 텍스트에 등장하는 인물 수, 조직 수, 특정 도시 이름)를 텍스트의 기존 특성 벡터에 추가(concatenate)하여 모델의 성능을 향상시킬 수 있습니다.
+            \item 예를 들어, "이 텍스트에는 5명의 인물과 2개의 조직이 언급되어 있습니다"와 같은 메타데이터를 추가하는 것입니다.
+        \end{itemize}
+    \item \textbf{차원 축소 (Dimensionality Reduction):}
+        \begin{itemize}
+            \item 텍스트 전체 대신 핵심 개체(예: 도널드 트럼프, 테슬라, 암호화폐)에만 초점을 맞춰 텍스트의 내용을 요약하고, 불필요한 정보를 제거하여 데이터의 차원을 줄일 수 있습니다.
+        \end{itemize}
+    \item \textbf{관계 추출 (Relationship Extraction):}
+        \begin{itemize}
+            \item 텍스트 내에서 개체들(예: Apple과 Tim Cook)이 함께 언급되는 빈도나 방식을 분석하여 개체 간의 관계(예: Tim Cook은 Apple의 CEO)를 파악할 수 있습니다.
+        \end{itemize}
+    \item \textbf{메타데이터 생성 (Metadata Creation):}
+        \begin{itemize}
+            \item 텍스트 자체(비정형 데이터) 외에, 텍스트에 대한 구조화된 정보(예: 이 텍스트는 누구에 대한 것인가, 어떤 회사에 대한 것인가)를 생성하여 데이터셋을 풍부하게 만듭니다. 이는 소셜 토픽 모델링에서 메타데이터를 활용하는 것과 유사합니다.
+        \end{itemize}
+    \item \textbf{콘텐츠 태깅 및 검색 (Content Tagging and Search):}
+        \begin{itemize}
+            \item 텍스트 콘텐츠에 자동으로 태그(예: #인물, #조직, #날짜)를 부여하여 검색 시스템의 정확도를 높이거나, 질문-답변 시스템에서 질문과 답변 간의 개체를 매칭하는 데 활용됩니다.
+        \end{itemize}
+    \item \textbf{의미 분석 (Semantic Analysis):}
+        \begin{itemize}
+            \item 텍스트 전체의 감성뿐만 아니라, 특정 개체(예: CEO)에 대한 부정적인 언급과 다른 개체(예: 회사)에 대한 긍정적인 언급을 분리하여 더 세밀한 의미 분석을 수행할 수 있습니다.
+        \end{itemize}
+\end{itemize}
+
+\subsubsection*{NER 기술의 접근 방식}
+NER은 크게 두 가지 주요 기술 접근 방식으로 나뉩니다.
+
+\begin{table}[h!]
+\caption{NER 기술 접근 방식 비교}
+\label{tab:ner_approaches}
+\centering
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.2\textwidth}p{0.35\textwidth}p{0.35\textwidth}}
+\toprule
+\textbf{특징} & \textbf{규칙 기반 접근 방식 (Rule-Based Approach)} & \textbf{통계적/머신러닝 접근 방식 (Statistical/ML Approach)} \\
+\midrule
+\textbf{원리} & 미리 정의된 규칙, 패턴, 사전(dictionary)을 사용하여 개체를 식별 & 레이블링된 데이터를 학습하여 개체를 식별하는 모델 구축 \\
+\textbf{예시 기법} & 정규 표현식 (Regular Expressions), 문법 규칙 (Grammar Rules), 사전 (Pre-specified Lists of Entities) & 은닉 마르코프 모델 (HMM), 조건부 랜덤 필드 (CRF), 신경망 (CNN, RNN, BERT) \\
+\textbf{장점} & \begin{itemize}
+    \item \textbf{정확성:} 규칙이 명확한 경우 매우 정확함
+    \item \textbf{해석 가능성:} 규칙이 투명하여 이해하기 쉬움
+    \item \textbf{데이터 불필요:} 대규모 레이블링된 훈련 데이터가 필요 없음
+\end{itemize} & \begin{itemize}
+    \item \textbf{데이터 기반:} 수동 규칙 작성 불필요
+    \item \textbf{유연성:} 새로운 도메인이나 언어에 적응하기 쉬움 (훈련 데이터만 변경)
+    \item \textbf{맥락 이해:} 복잡한 맥락을 학습하여 모호성 해결에 유리
+\end{itemize} \\
+\textbf{단점} & \begin{itemize}
+    \item \textbf{유지보수 어려움:} 규칙이 복잡해지고 많아질수록 관리 어려움
+    \item \textbf{유연성 부족:} 새로운 패턴이나 언어에 적응하기 어려움 (규칙을 수동으로 업데이트해야 함)
+    \item \textbf{맥락 무시:} 단순 패턴 매칭으로 맥락에 따른 의미 변화를 놓칠 수 있음
+    \item \textbf{확장성 부족:} 규칙이 많아질수록 성능 저하
+\end{itemize} & \begin{itemize}
+    \item \textbf{대규모 데이터 필요:} 고품질의 대규모 레이블링된 훈련 데이터가 필수적
+    \item \textbf{계산 비용:} 모델 훈련에 많은 컴퓨팅 자원과 시간 소요
+    \item \textbf{해석 어려움:} 모델의 내부 작동 방식이 불투명할 수 있음
+\end{itemize} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+\subsubsection*{NER 모델의 내부 작동 방식 (CNN 기반)}
+spaCy와 같은 라이브러리에서 기본적으로 사용하는 NER 모델은 종종 합성곱 신경망(CNN)을 기반으로 합니다.
+
+\textbf{1. 입력 (Input):}
+\begin{itemize}
+    \item 전체 문서가 입력으로 들어옵니다.
+    \item 문서 내의 각 단어(토큰)는 먼저 \textbf{임베딩(Embedding)}이라는 숫자 벡터로 변환됩니다. 임베딩은 단어의 의미를 다차원 공간에 표현한 것입니다.
+    \item 예시: "The cat sat on Mat" $\rightarrow$ 각 단어가 벡터로 변환됩니다.
+\end{itemize}
+
+\textbf{2. 맥락 추출 (Context Extraction):}
+\begin{itemize}
+    \item \textbf{합성곱 필터 (Convolutional Filter):} CNN은 이미지 처리에서 사용되는 필터와 유사하게, 텍스트 임베딩 위를 슬라이딩하는 필터를 사용합니다.
+    \item 이 필터는 특정 단어뿐만 아니라 그 주변 단어들(이웃 단어들)의 정보를 함께 캡처하여 단어의 맥락적 의미를 파악합니다. 예를 들어, 'Tesla'라는 단어만 보는 것이 아니라 'Tesla sells cars'와 같이 주변 단어들을 함께 보아 'Tesla'가 회사인지 사람 이름인지 판단하는 데 도움을 받습니다.
+\end{itemize}
+
+\textbf{3. 출력 (Output):}
+\begin{itemize}
+    \item 각 토큰에 대해, 모델은 해당 토큰이 특정 개체 유형(예: PERSON, ORG, GPE, DATE)에 속할 확률을 출력합니다.
+    \item \textbf{소프트맥스 (Softmax):} 이 확률은 소프트맥스 함수를 통해 계산되며, 모든 개체 유형에 대한 확률의 합은 1이 됩니다.
+    \item 예시: 'cat'이라는 토큰에 대해 [PERSON: 0.01, ORG: 0.005, GPE: 0.001, O: 0.984]와 같이 출력될 수 있습니다 (여기서 'O'는 'Other' 즉, 명명된 개체가 아님을 의미).
+\end{itemize}
+
+\textbf{4. 훈련 (Training):}
+\begin{itemize}
+    \item 모델을 훈련시키기 위해서는 대규모의 \textbf{레이블링된 데이터(Labeled Data)}가 필요합니다.
+    \item 레이블링된 데이터는 각 토큰에 대해 정확한 개체 유형이 미리 지정되어 있어야 합니다.
+    \item 예시: "Donald Trump" $\rightarrow$ "Donald"는 PERSON, "Trump"는 PERSON으로 레이블링됩니다.
+    \item 훈련 과정에서 모델은 예측된 확률 분포와 실제 레이블 간의 차이를 최소화하도록 파라미터를 조정합니다.
+\end{itemize}
+
+\begin{warningbox}
+\textbf{주의: 다중 단어 개체 및 맥락 의존성}
+\textbf{다중 단어 개체:} "Bank of England"와 같이 여러 단어로 구성된 개체는 토큰화 단계에서 하나의 개체로 처리되거나, 각 단어가 개체의 일부임을 나타내는 특별한 레이블(예: B-ORG, I-ORG)이 부여됩니다.
+\textbf{맥락 의존성:} "Tesla"와 같은 단어는 맥락에 따라 '회사'일 수도 있고 '인명(니콜라 테슬라)'일 수도 있습니다. CNN은 주변 단어들을 함께 고려하여 이러한 모호성을 해결하려고 시도합니다. 예를 들어, "Tesla sells cars"에서는 '회사'로, "Nikola Tesla was a physicist"에서는 '인물'로 인식할 수 있습니다. 이를 위해 훈련 데이터에 다양한 맥락에서의 레이블링이 필수적입니다.
+\end{warningbox}
+
+\newpage
+\section*{과제 및 프로젝트 안내}
+
+\subsection{과제 9 (Assignment 9)}
+과제 9는 NER 기술을 직접 적용하고 활용하는 세 가지 문제로 구성됩니다.
+
+\begin{table}[h!]
+\caption{과제 9 문제 요약}
+\label{tab:assignment9_summary}
+\centering
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.1\textwidth}p{0.2\textwidth}p{0.6\textwidth}}
+\toprule
+\textbf{문제} & \textbf{주제} & \textbf{내용 및 목표} \\
+\midrule
+\textbf{문제 1} & 규칙 기반 NER & 정규 표현식(Regular Expressions)을 사용하여 텍스트에서 사람 이름(Mr., Dr. 등), 시간, 날짜, 조직(Inc., Ltd. 등)과 같은 개체를 식별하는 규칙을 구현합니다. \\
+\textbf{문제 2} & spaCy NER 적용 & spaCy 라이브러리의 사전 훈련된 NER 모델을 사용하여 텍스트에서 명명된 개체를 식별하고 시각화합니다. \\
+\textbf{문제 3} & NER을 활용한 텍스트 분류 모델 개선 & 뉴스 기사 데이터셋(\texttt{news\_data.csv})을 사용하여 텍스트 분류 모델을 구축하고, NER에서 추출한 특성(개체의 존재 여부)을 추가하여 모델의 성능을 개선합니다. \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsubsection*{문제 3 상세 설명: NER을 활용한 텍스트 분류 모델 개선}
+이 문제는 NER의 실제 응용을 다루며, 모델 성능 향상에 초점을 맞춥니다.
+
+\textbf{데이터셋:} \texttt{news\_data.csv}
+\begin{itemize}
+    \item \textbf{구성:} 뉴스 헤드라인, 기사 본문, 기사 유형(7가지 카테고리)
+    \item \textbf{크기:} 총 124개의 뉴스 기사 (매우 작은 데이터셋)
+    \item \textbf{클래스 수:} 7가지 유형 (예: 스포츠, 경제, 기술 등)
+\end{itemize}
+
+\textbf{단계별 절차:}
+\begin{enumerate}
+    \item \textbf{데이터 로드 및 전처리:}
+        \begin{itemize}
+            \item \texttt{news\_data.csv} 파일을 로드합니다.
+            \item 기사 유형(category)을 숫자 값으로 인코딩합니다 (예: 스포츠 $\rightarrow$ 0, 경제 $\rightarrow$ 1).
+            \item '뉴스 헤드라인'과 '기사 본문'을 하나의 텍스트 컬럼으로 결합합니다.
+        \end{itemize}
+    \item \textbf{데이터 분할:}
+        \begin{itemize}
+            \item 전체 데이터의 80\%를 훈련 세트(training set)로, 20\%를 테스트 세트(test set)로 분할합니다. (124개 중 약 100개가 훈련 데이터)
+        \end{itemize}
+    \item \textbf{기준 모델 구축 (TF-IDF + 신경망):}
+        \begin{itemize}
+            \item \textbf{TF-IDF 벡터화:} 훈련 텍스트 데이터를 TF-IDF(Term Frequency-Inverse Document Frequency) 벡터로 변환합니다.
+                \begin{itemize}
+                    \item \textbf{주의:} 데이터셋이 매우 작으므로, 모든 토큰을 사용하는 것은 과적합을 유발할 수 있습니다. 가장 중요한 토큰(예: 상위 20개)만 선택하는 방법을 고려해야 합니다.
+                \end{itemize}
+            \item \textbf{신경망 모델:} TF-IDF 벡터를 입력으로 받아 기사 유형을 분류하는 완전 연결 신경망(Fully Connected Neural Network)을 구축하고 훈련시킵니다. (순환 신경망(RNN)은 작은 데이터셋에 적합하지 않음)
+            \item \textbf{성능 평가:} 모델의 분류 정확도를 측정하여 기준 성능을 확보합니다. (무작위 추측보다는 나은 성능을 목표로 함)
+        \end{itemize}
+    \item \textbf{모델 개선 (NER 특성 추가):}
+        \begin{itemize}
+            \item \textbf{NER 개체 추출:} spaCy 라이브러리를 사용하여 각 뉴스 기사에서 명명된 개체(PERSON, ORG, GPE 등)를 인식합니다.
+            \item \textbf{이진 더미 변수 생성:} 인식된 각 개체 유형(예: Toyota, Audi)에 대해 이진 더미 변수(0 또는 1)를 생성합니다.
+                \begin{itemize}
+                    \item 0: 해당 개체가 문서에 없음
+                    \item 1: 해당 개체가 문서에 한 번 이상 존재함
+                \end{itemize}
+            \item \textbf{특성 행렬 결합:} 기존 TF-IDF 특성 행렬에 NER에서 생성된 이진 더미 변수들을 추가하여 새로운 종합 특성 행렬을 만듭니다.
+            \item \textbf{개선된 모델 훈련:} 이 새로운 특성 행렬을 사용하여 신경망 모델을 다시 훈련시키고 성능을 평가합니다.
+            \item \textbf{성능 비교:} NER 특성을 추가하기 전후의 모델 성능을 비교하여 개선 여부를 확인합니다.
+                \begin{itemize}
+                    \item \textbf{참고:} 데이터셋이 작기 때문에 성능 개선이 항상 보장되지는 않습니다. 때로는 토큰 수를 줄이거나, NER 특성만으로 분류를 시도하는 등 다양한 실험이 필요할 수 있습니다.
+                \end{itemize}
+        \end{itemize}
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{작은 데이터셋에서의 과적합 주의}
+124개의 관측치와 7개의 클래스는 매우 어려운 분류 문제입니다. 특히 TF-IDF 벡터화 시 너무 많은 토큰을 사용하면 특성의 수가 관측치 수를 훨씬 초과하여 과적합될 가능성이 매우 높습니다. 중요한 토큰만 선별하거나, 정규화 기법을 적극적으로 활용해야 합니다.
+\end{warningbox}
+
+\newpage
+\subsection{최종 프로젝트 (Final Project)}
+최종 프로젝트는 학기 동안 배운 내용을 종합하여 실제 문제에 적용하는 기회입니다.
+
+\textbf{주요 일정:}
+\begin{itemize}
+    \item \textbf{11월 9일 (일요일):} 프로젝트 설명 게시 (가능한 프로젝트 목록 제공, 학생 제안 가능)
+    \item \textbf{11월 25일:} 프로젝트 선정 제출 마감 (Canvas 퀴즈 형식의 1페이지 제안서)
+    \item \textbf{12월 16일:} 최종 프로젝트 제출 마감
+\end{itemize}
+
+\textbf{제출물 (Deliverables):}
+\begin{enumerate}
+    \item \textbf{프로젝트 선정 제안서 (Project Selection Proposal):}
+        \begin{itemize}
+            \item Canvas 퀴즈 창에 직접 작성 (약 1페이지 분량).
+            \item \textbf{내용:} 해결하려는 문제 정의, 사용할 데이터(어디서 얻었는지), 모델의 입력과 출력, 사용할 신경망 종류.
+            \item \textbf{목표:} 프로젝트의 실행 가능성을 확인하고, 데이터 수집 및 모델 설계에 대한 초기 계획을 수립합니다.
+        \end{itemize}
+    \item \textbf{비디오 발표 (Video Presentation):}
+        \begin{itemize}
+            \item YouTube 또는 다른 플랫폼에 업로드된 비디오 형식.
+            \item 프로젝트 결과 및 과정을 설명합니다.
+        \end{itemize}
+    \item \textbf{발표 슬라이드 (Presentation Slides):}
+        \begin{itemize}
+            \item 비디오 발표에 사용된 슬라이드 (PowerPoint, PDF 등).
+        \end{itemize}
+    \item \textbf{프로젝트 보고서 (Project Report):}
+        \begin{itemize}
+            \item \textbf{구조:} 초록(Abstract), 내용(Content), 데이터 이해(Data Understanding), 모델 아키텍처(Architecture), 모델링(Modeling), 성능 지표(Performance Metrics), 결과(Results), 토론(Discussion), 결론(Conclusion), 참고문헌(References), 부록(Appendix - 코드 스냅샷 포함).
+            \item \textbf{목표:} 프로젝트의 모든 측면을 상세하고 체계적으로 문서화합니다.
+        \end{itemize}
+    \item \textbf{작동하는 데모 코드 (Working Demo Code):}
+        \begin{itemize}
+            \item 프로젝트를 실행하고 결과를 재현할 수 있는 코드.
+            \item 코드 내에 중요한 스냅샷이나 설명을 포함할 수 있습니다.
+        \end{itemize}
+\end{enumerate}
+
+\textbf{채점 기준 (Grading Rubric):}
+\begin{table}[h!]
+\caption{최종 프로젝트 채점 기준 (총 15점)}
+\label{tab:project_rubric}
+\centering
+\begin{adjustbox}{width=0.8\textwidth,center}
+\begin{tabular}{ll}
+\toprule
+\textbf{항목} & \textbf{배점} \\
+\midrule
+프로젝트 선정 제안서 & 2점 \\
+슬라이드 발표 & 5점 \\
+비디오 발표 & 5점 \\
+보고서 및 코드 & 3점 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\textbf{AI 도구 (ChatGPT, GitHub Copilot 등) 활용 지침:}
+\begin{itemize}
+    \item \textbf{허용:} AI 생성 도구를 사용하여 코드 작성, 디버깅, 개선하는 것은 허용됩니다. 이는 현대 산업 현장에서 널리 사용되는 방식입니다.
+    \item \textbf{필수:} AI 도구를 사용한 경우 \textbf{반드시 출처를 명시(cite)해야 합니다.}
+    \item \textbf{중요:} 단순히 코드를 복사하여 붙여넣는 것을 넘어, \textbf{생성된 코드를 이해하고 학습하는 것이 중요합니다.} 본 수업의 목표는 학습입니다.
+    \item \textbf{위반:} 출처를 명시하지 않거나, 이해 없이 제출하는 것은 표절(plagiarism)로 간주되며, 학칙 위반으로 심각한 결과를 초래할 수 있습니다 (예: 하버드 익스텐션 스쿨의 향후 수강 능력에 영향).
+\end{itemize}
+
+\newpage
+\section*{실습 및 코드 예제}
+
+\subsection{NLTK를 이용한 품사 태깅 (Part-of-Speech Tagging)}
+품사 태깅(POS Tagging)은 텍스트의 각 단어에 품사(명사, 동사, 형용사 등)를 부여하는 과정입니다. NLTK(Natural Language Toolkit)는 이를 위한 강력한 도구입니다.
+
+\begin{lstlisting}[language=Python, caption={NLTK 품사 태깅 예제}, label={lst:nltk_pos}]
+import nltk
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+# NLTK 데이터 다운로드 (최초 1회 실행)
+# nltk.download('punkt')
+# nltk.download('averaged_perceptron_tagger')
+# nltk.download('tagsets')
+
+# NLTK 태그셋 설명 보기
+# print(nltk.help.upenn_tagset())
+
+# 주요 품사 태그 예시
+# CC: 접속사 (conjunction)
+# JJ: 형용사 (adjective) - 예: oiled
+# NN: 명사 (noun) - 예: humor
+# NNS: 복수 명사 (plural noun) - 예: undergraduates
+# IN: 전치사 (preposition) - 예: in
+
+# 예시 텍스트
+text = """
+Elon Musk, the CEO of Tesla and SpaceX, has been a prominent figure in the tech industry.
+From electric cars to solar panels, his ventures span a wide range of innovations.
+Mr. Musk often shares his thoughts on Twitter, engaging with millions of followers.
+"""
+
+# 1. 문장 토큰화 (Sentence Tokenization)
+sentences = sent_tokenize(text)
+print("--- 원본 문장 ---")
+for i, s in enumerate(sentences):
+    print(f"문장 {i+1}: {s}")
+
+# 2. 각 문장을 단어 토큰화 (Word Tokenization)
+tokenized_sentences = [word_tokenize(s) for s in sentences]
+print("\n--- 토큰화된 문장 ---")
+for i, s_tokens in enumerate(tokenized_sentences):
+    print(f"문장 {i+1}: {s_tokens}")
+
+# 3. 품사 태깅 (Part-of-Speech Tagging)
+pos_tagged_sentences = [nltk.pos_tag(s_tokens) for s_tokens in tokenized_sentences]
+print("\n--- 품사 태깅 결과 ---")
+for i, pos_tags in enumerate(pos_tagged_sentences):
+    print(f"문장 {i+1}: {pos_tags}")
+
+# 품사 태깅 결과 해석 예시:
+# ('From', 'IN'): 'From'은 전치사 (preposition)
+# ('electric', 'JJ'): 'electric'은 형용사 (adjective)
+# ('cars', 'NNS'): 'cars'는 복수 명사 (plural noun)
+# ('to', 'TO'): 'to'는 전치사 (to)
+# ('solar', 'JJ'): 'solar'는 형용사 (adjective)
+# ('panels', 'NNS'): 'panels'는 복수 명사 (plural noun)

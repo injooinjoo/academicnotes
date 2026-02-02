@@ -1,0 +1,1719 @@
+\documentclass[11pt,a4paper]{article}
+\begin{document}
+
+\begin{center}
+  \Huge\textbf{Exploring and Producing Data Module 1} \\
+  \Large\textbf{비즈니스 의사결정을 위한 데이터 탐색 및 생성} \\
+  \vspace{1cm}
+  \large BADM-572: Data-Driven Decision Making \\
+  \large UIUC Faculty
+\end{center}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section*{개요}
+이 문서는 'Exploring and Producing Data Module 1'의 핵심 내용을 담고 있습니다.
+데이터 기반 의사결정을 위한 통계학의 기본 개념부터 실제 데이터 요약 기법까지 다룹니다.
+특히, 데이터의 종류를 이해하고, 빈도표를 활용하여 데이터를 효과적으로 시각화하고 해석하는 방법을 학습합니다.
+Excel을 이용한 실습 과정을 포함하여, 비전공자도 통계적 사고와 데이터 활용 능력을 키울 수 있도록 구성되었습니다.
+
+\newpage
+\section*{용어 정리}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+데이터 & 결론을 도출할 수 있는 사실과 수치 & Data & 소득, 나이, 교육 수준 등 \\
+변수 & 요소의 특정 특성 & Variable & 성별, 나이, 직업 등 \\
+데이터 세트 & 특정 연구를 위해 수집된 데이터 모음 & Data Set & 연구 대상에 대한 정보 제공 \\
+양적 변수 & 수량적 의미를 가지는 숫자 값 & Quantitative Variable & 연봉, 나이, 온도 (단위가 있음) \\
+질적 변수 (범주형) & 범주를 나타내는 데이터 & Qualitative (Categorical) Variable & 성별, 민족, 만족도 수준 (단위 없음) \\
+명목 변수 & 순서나 순위가 없는 질적 변수 & Nominative Variable & 성별, 거주 주, 머리색, 우편번호 \\
+순서 변수 & 의미 있는 순서나 순위가 있는 질적 변수 & Ordinal Variable & 만족도 수준 (매우 불만족 < 불만족), 학위 \\
+모집단 & 결론을 도출하고자 하는 모든 요소의 집합 & Population & 일리노이 주 모든 사람의 고용 상태 \\
+표본 & 모집단의 부분 집합 & Sample & 선거 예측을 위한 유권자 일부 \\
+모수 & 모집단 데이터에서 계산된 요약 측정값 & Population Parameter & 모집단 평균 \\
+통계량 & 표본 데이터에서 계산된 요약 측정값 & Sample Statistic & 표본 평균 (모수를 추정하는 데 사용) \\
+빈도표 & 데이터를 범주별로 정리하여 빈도를 보여주는 표 & Frequency Table & 특정 항목의 발생 횟수 \\
+상대 빈도 & 전체 관측치 중 특정 값의 비율 & Relative Frequency & (관측 횟수) $\div$ (총 관측 횟수) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{1. 서문 (Preface)}
+
+Gies eBook을 선택해 주셔서 감사합니다. 이 Gies eBook은 Coursera에서 제공되는 Fataneh Taghaboni-Dutta 교수의 'Exploring and Producing Data for Business Decision Making' 모듈 1의 확장된 비디오 강의 스크립트를 기반으로 합니다. 이 eBook은 MOOC 비디오의 모든 정보를 완전히 접근 가능한 형식으로 제공하여 독서 경험을 향상시킵니다. ePUB 3.0 형식을 지원하는 모든 표준 기반 e-리딩 소프트웨어와 함께 사용할 수 있습니다.
+
+\begin{summarybox}
+\textbf{Gies eBook의 특징:}
+\begin{itemize}
+    \item Coursera 강의 스크립트 기반: 비디오 강의 내용을 텍스트로 제공합니다.
+    \item 완전한 정보 제공: MOOC 비디오의 모든 정보를 담고 있습니다.
+    \item 접근성: 모든 표준 기반 e-리딩 소프트웨어(ePUB 3.0)에서 사용 가능합니다.
+\end{itemize}
+\end{summarybox}
+
+각 Gies eBook은 레슨별로 나뉘어 있으며, e-리더의 목차 기능을 사용하여 탐색할 수 있습니다. 각 레슨 내에서는 다음 순서의 콘텐츠가 항상 나타납니다:
+
+\begin{itemize}
+    \item \textbf{레슨 제목 (Lesson title)}
+    \item \textbf{웹 기반 비디오 링크 (A link to the web-based videos for each lesson)}: 비디오를 시청하려면 온라인 상태여야 합니다.
+\end{itemize}
+
+레슨 내에서 슬라이드가 변경되거나 다음 정보 비디오 장면으로 전환될 때마다 다음 내용이 제공됩니다:
+
+\begin{itemize}
+    \item \textbf{현재 슬라이드 또는 비디오 장면의 썸네일 이미지 (Thumbnail image)}
+    \item \textbf{슬라이드에 있는 텍스트 (Any text present on the slide)}: 검색 가능하고 스크린 리더가 읽을 수 있는 형식으로 썸네일 아래에 재현됩니다.
+    \item \textbf{중요한 시각 자료에 대한 확장된 텍스트 설명 (Extended text description of the important visuals)}: 그래프 및 차트와 같은 시각 자료에 대한 상세 설명입니다.
+    \item \textbf{비디오의 표 형식 데이터 (Any tabular data from the video)}: 스크린 리더 탐색 및 읽기를 위해 재현되고 적절하게 레이블이 지정됩니다.
+    \item \textbf{모든 수학 방정식 (All math equations)}: 화면에 표시될 경우 내용과 표현을 모두 제공하는 MathML로 제공됩니다.
+    \item \textbf{강의록 (Transcript)}: 말하는 사람별로 레이블이 지정된 비디오의 모든 원본 음성을 캡처합니다.
+\end{itemize}
+
+모든 Gies eBook은 접근성과 사용성을 최우선으로 설계되었습니다. 이 디자인은 독자들이 어떤 디지털 독서 도구를 선택하든 유연하게 모든 독자에게 서비스를 제공하기 위함입니다.
+
+이 Gies eBook에 대한 질문이나 개선 제안이 있으시면 Giesbooks@illinois.edu로 문의하십시오.
+
+\textbf{저작권 (Copyright)}
+Copyright © 2019 by Fataneh Taghaboni-Dutta. All rights reserved.
+Published by the Gies College of Business at the University of Illinois at Urbana-Champaign, and the Board of Trustees of the University of Illinois.
+
+\newpage
+\section{2. 모듈 1: 비즈니스 의사결정을 위한 데이터 탐색 및 생성 (Module 1 Exploring and Producing Data for Business Decision Making)}
+
+\subsection{2.1. 모듈 소개 (Welcome to Exploring and Producing Data for Business Decision Making!)}
+
+\subsubsection{2.1.1. 강의 소개 (Course Introduction)}
+
+\begin{examplebox}
+\textbf{왜 통계학을 공부해야 할까요? (Why Study Statistics?)}
+\begin{itemize}
+    \item \textbf{데이터는 우리 주변에 있습니다:} GDP, 인플레이션율, 실업률과 같은 경제 지표부터 스포츠 선수의 성과, 복권 당첨 확률까지, 우리는 매일 수많은 숫자를 접합니다.
+    \item \textbf{더 나은 의사결정을 위해:} 이 숫자들은 우리에게 정보를 제공하여 더 나은 의사결정을 돕기 위함입니다. 하지만 우리는 이 숫자들을 어떻게 활용해야 할까요?
+\end{itemize}
+\end{examplebox}
+
+\begin{tcolorbox}[title={데이터 분석의 중요성}, colback=white, colframe=black!20!white]
+데이터 분석은 모든 분야에서 중요합니다.
+\begin{itemize}
+    \item 농업 비즈니스 (Agro business)
+    \item 헬스케어 (Health care)
+    \item 금융 기관 (Financial institutions)
+    \item 숙박 산업 (Hospitality industries)
+    \item 소매업 (Retail)
+    \item 제조업 (Manufacturing)
+    \item 교육 (Education)
+    \item 기타 등등 (Etc., etc.)
+\end{itemize}
+통계학은 의학, 농업, 날씨, 경제, 스포츠, 사회 행동 등 모든 것을 설명하는 데 사용될 수 있습니다. 통계학은 결과에 영향을 미치는 요인을 식별하고, 이러한 요인이 결과에 어떻게 영향을 미치는지 학습하여 결과를 형성하는 데 도움을 줍니다.
+\end{tcolorbox}
+
+\begin{summarybox}
+\textbf{통계학의 가치:}
+\begin{itemize}
+    \item \textbf{데이터 이해:} 통계학은 데이터를 이해하는 데 도움을 줍니다.
+    \item \textbf{핵심 역량:} 고용주들이 신입 사원에게 가장 중요하게 여기는 기술 중 하나입니다.
+    \item \textbf{미래 직업:} LinkedIn에서 '가장 인기 있는 기술' 1위로 선정되었으며, Google의 수석 경제학자 Hal Varian은 "향후 10년 동안 가장 섹시한 직업은 통계학자"라고 언급했습니다. 모든 조직은 데이터 과학자를 찾고 있습니다.
+\end{itemize}
+\end{summarybox}
+
+\begin{tcolorbox}[title={그렇다면 통계학이란 무엇일까요? (So What is Statistics?)}]
+\textbf{올바른 통계학 (Done the Right Way):}
+통계학은 데이터에 수학적 방법을 사용하는 것을 포함합니다. 하지만 이는 실제로 유용한 데이터를 얻는 방법과 최종적으로 결과를 해석하는 방법을 아는 것을 의미하기도 합니다.
+
+\textbf{무엇이 잘못될 수 있을까요? (What can go wrong?)}
+\begin{itemize}
+    \item 우리가 가진 데이터가 좋지 않다 (Data that we have is not good)
+    \item 사용된 방법이 부적절하다 (Method used is inappropriate)
+    \item 해석이 부정확하다 (The interpretation is incorrect)
+\end{itemize}
+통계학은 의도적으로 비윤리적이거나, 의도치 않게 무지한 사람에 의해 쉽게 오용될 수 있는 분야입니다. 데이터가 올바른 방식으로 수집되고, 분석이 올바른 방식으로 수행되며, 최종적으로 결과가 올바른 방식으로 제시될 때, 통계학은 우리 주변의 세상을 이해하고 더 나은 의사결정을 통해 이점을 얻을 수 있는 훌륭한 도구가 될 수 있습니다. 반대로, 잘못된 데이터로 시작하거나, 잘못된 방법론을 사용하거나, 결과를 잘못 해석하면 실제로 해를 끼칠 수 있습니다.
+\end{tcolorbox}
+
+\begin{summarybox}
+\textbf{무엇을 배우게 될까요? (What Will You Learn? - Macro Objectives)}
+이 과정은 여러분을 데이터 과학자나 통계학자로 만들지는 않습니다. 하지만 통계학의 기본을 이해하고, 데이터를 활용하여 더 나은 비즈니스 의사결정을 내릴 수 있는 능력을 키우는 데 초점을 맞춥니다.
+
+\begin{itemize}
+    \item \textbf{통계적 소양 (Statistically literate)을 갖추게 됩니다.}
+    \item \textbf{데이터를 요약하는 방법 (how to summarize data)을 배웁니다.}
+    \item \textbf{요약된 데이터에서 통찰력을 얻는 방법 (how to gain insight from the summaries)을 배웁니다.}
+    \item \textbf{표본 추출 (sampling)과 표본 통계량 (sample statistics)의 중요성을 이해합니다.}
+    \item \textbf{표본 통계량을 사용하여 모집단 (population)에 대한 추론 (inferences)을 하는 방법을 배웁니다.}
+\end{itemize}
+\end{summarybox}
+
+\begin{tcolorbox}[title={어떻게 배우게 될까요? (How Will You Learn?)}]
+다양한 활동을 통해 주제를 더 잘 이해하게 될 것입니다.
+\begin{itemize}
+    \item \textbf{비디오 강의 (Video lectures):} 이론적 개념을 가르치고, 다양한 문제와 설정에 적용하는 방법을 제공합니다.
+    \item \textbf{Excel 시연 (Excel illustrations):} 대규모 데이터 세트에 방법론을 적용하고 결과를 해석하는 방법을 보여줍니다. 단순히 결과를 생성하는 것이 아니라, 결과가 실제로 무엇을 의미하는지 이해하여 더 나은 의사결정을 내리는 것이 목표입니다.
+    \item \textbf{채점 퀴즈 (Graded quizzes):} 자료를 숙달했는지 확인합니다. 통계 개념은 서로 연결되어 있으므로, 다음 주제로 넘어가기 전에 각 주제를 잘 이해하는 것이 중요합니다. 자가 평가는 다음 단계로 넘어갈 준비가 되었는지, 아니면 개념을 더 자세히 검토해야 하는지 알려줄 것입니다.
+    \item \textbf{동료 평가 과제 (Peer reviewed assignments):} 덜 양적인 질문이나 시나리오에 대해 설명하거나 비평하도록 요청받습니다. 응답을 게시하고 다른 학생들의 응답을 읽고 품질에 대한 의견을 게시해야 합니다. 이 활동은 데이터 분석 기반 보고서에 반응하는 기술을 연마하고, 의사결정자에게 필요한 많은 기술을 통합하는 데 도움이 됩니다.
+\end{itemize}
+이 과정은 쉬운 주제가 아니지만, 배우는 도구를 적용하는 데 집중할 것입니다. 때로는 지루하게 분류될 수 있는 개념들도 결과를 이해하는 데 필요한 만큼만 다룰 것입니다. 이 과정을 통해 통계학의 아름다움과 힘을 발견하게 될 것입니다.
+\end{tcolorbox}
+
+\newpage
+\subsection{2.2. 레슨 1-1: 비즈니스 통계학 개론 (Lesson 1-1 Introduction to Business Statistics)}
+
+\subsubsection{2.2.1. 레슨 1-1.1: 기본 용어 (Lesson 1-1.1 Basic Terminology)}
+
+\begin{tcolorbox}[title={비즈니스 통계학 (Business Statistics)}]
+\textbf{불확실성에 직면한 "좋은" 의사결정을 위한 과학}
+
+우리는 종종 좋은 의사결정을 내리기 위해 많은 정보 조각들을 맞춰야 합니다. 이는 마치 퍼즐을 푸는 것과 같습니다. 통계학은 이 퍼즐을 푸는 데 도움을 줄 수 있습니다.
+
+\begin{center}
+\includegraphics[width=0.6\textwidth]{example-puzzle.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{통계적 의사결정 과정의 퍼즐 비유}
+\label{fig:puzzle}
+\end{center}
+
+이 과정을 위해 우리는 세 가지 주요 단계를 거칩니다:
+\begin{enumerate}
+    \item \textbf{데이터 설명 (Describing Data):} 우리가 알고 싶은 것을 명확하고 간결하며 구체적으로 요약하려고 노력합니다.
+    \item \textbf{데이터 생성 (Producing Data):} 더 구체적인 질문을 공식화하고, 질문에 정확히 맞춰진 정보를 수집하기 시작합니다.
+    \item \textbf{데이터로부터 결론 도출 (Conclusion from Data):} 수집한 데이터와 정보로부터 결론을 도출하고, 그 결론이 얼마나 확실한지 결정합니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{summarybox}
+\textbf{중요 용어 (Important Terminology)}
+통계학을 배우는 것은 외국어를 배우는 것과 같습니다. 먼저 어휘를 배워야 합니다.
+\begin{itemize}
+    \item \textbf{데이터 (Data):} 결론을 도출할 수 있는 사실과 수치입니다.
+    \begin{itemize}
+        \item \textbf{예시:} 여러분의 소득, 나이, 교육 수준 등은 모두 데이터의 예시입니다.
+    \end{itemize}
+    \item \textbf{변수 (Variable):} 요소의 어떤 특성입니다.
+    \begin{itemize}
+        \item \textbf{예시:} 이 강의에 누가 관심이 있는지 알고 싶다면, 성별, 나이, 직업, 교육 수준, 지리적 위치 등이 변수가 될 수 있습니다.
+    \end{itemize}
+    \item \textbf{데이터 세트 (Data set):} 특정 연구를 위해 수집된 데이터입니다.
+    \begin{itemize}
+        \item \textbf{설명:} 각 연구 요소에 대해 관심 있는 변수에 대한 데이터 항목을 수집한 결과입니다. 데이터 세트는 연구 대상(사람, 사건, 객체 등)에 대한 정보를 제공합니다.
+    \end{itemize}
+\end{itemize}
+\end{summarybox}
+
+\begin{tcolorbox}[title={변수의 종류 (Types of Variables)}]
+변수에는 크게 두 가지 종류가 있습니다: 양적 변수와 질적 변수입니다.
+
+\textbf{1. 양적 변수 (Quantitative Variables)}
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 수량(quantity)을 나타내는 숫자 값입니다.
+    \item \textbf{직관적 예시/비유:} 키, 몸무게, 연봉, 나이, 온도 등 측정 가능한 숫자들입니다.
+    \item \textbf{기술적 정확한 설명:} 항상 숫자 값을 가지며, 어떤 종류의 수량을 나타냅니다. 고정되거나 표준화된 측정 단위를 가집니다. 예를 들어, 소득은 달러 단위, 온도는 섭씨 또는 화씨 단위로 측정됩니다.
+\end{itemize}
+
+\textbf{2. 질적 변수 (Qualitative (Categorical) Variables)}
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 범주(category)를 나타내는 데이터입니다.
+    \item \textbf{직관적 예시/비유:} 성별(남/여), 머리색(검정/갈색), 만족도(매우 만족/만족/보통) 등 분류 가능한 항목들입니다.
+    \item \textbf{기술적 정확한 설명:} 범주형 데이터라고도 합니다.
+    \begin{itemize}
+        \item \textbf{비수치형 또는 수치형일 수 있습니다:}
+        \begin{itemize}
+            \item \textbf{비수치형 (Non-numeric):} 예를 들어, 사람의 성별은 단순히 '남성' 또는 '여성'으로 기록될 수 있습니다.
+            \item \textbf{수치형 (Numeric):} 예를 들어, 서비스 만족도를 1부터 5까지의 척도로 평가하도록 요청할 수 있습니다 (1은 '매우 불만족', 5는 '매우 만족'). 이 경우 숫자는 수량이 아니라 만족도 수준이라는 범주를 나타냅니다. 중요한 점은 이 숫자들은 측정 단위가 없다는 것입니다.
+        \end{itemize}
+        \item \textbf{명목 변수 (Nominative) 또는 순서 변수 (Ordinal)일 수 있습니다:}
+        \begin{itemize}
+            \item \textbf{명목 변수 (Nominative):} 범주들 사이에 의미 있는 순서나 순위가 없는 질적 변수입니다.
+            \begin{itemize}
+                \item \textbf{예시:} 사람의 성별, 거주 주, 머리색, 우편번호 등.
+            \end{itemize}
+            \item \textbf{순서 변수 (Ordinal):} 범주들 사이에 의미 있는 순서나 순위가 있는 질적 변수입니다. 데이터가 수치적으로 기록되었든 비수치적으로 기록되었든 상관없습니다.
+            \begin{itemize}
+                \item \textbf{예시:} 고객 만족도 수준을 '탁월', '좋음', '보통', '나쁨', '불만족'으로 평가하는 경우. 여기서 한 범주는 다음 범주보다 높으므로 순서 변수입니다. 만약 이들을 숫자 4, 3, 2, 1, 0으로 대체하더라도 여전히 순서 변수입니다.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+\begin{examplebox}
+\textbf{연습해 봅시다: 변수의 종류 분류하기 (Let's Practice)}
+다음 변수들이 양적 변수인지 질적 변수인지, 그리고 질적 변수라면 명목 변수인지 순서 변수인지 판단해 보세요.
+
+\begin{itemize}
+    \item 우편번호 (Postal zip code)
+    \item 형제자매 수 (Number of siblings)
+    \item 최종 학위 (Highest degree earned)
+    \item 연봉 (Annual salary)
+    \item 머리색 (Hair color)
+\end{itemize}
+
+\textbf{정답 (Follow Up):}
+\begin{itemize}
+    \item \textbf{머리색 (Hair color):} \textbf{범주형 (Categorical)}, \textbf{명목 (Nominative)}. 자연적인 순서가 존재하지 않습니다.
+    \item \textbf{형제자매 수 (Number of siblings):} \textbf{양적 (Quantitative)}. 숫자로 세어지는 수량입니다.
+    \item \textbf{최종 학위 (Highest degree earned):} \textbf{범주형 (Categorical)}, \textbf{순서 (Ordinal)}. 고등학교 학위, 학사, 석사 등 의미 있는 순서가 있습니다.
+    \item \textbf{연봉 (Annual salary):} \textbf{양적 (Quantitative)}. 숫자로 측정되는 수량입니다.
+    \item \textbf{우편번호 (Postal zip code):} \textbf{범주형 (Categorical)}, \textbf{명목 (Nominative)}. 숫자이지만 값을 나타내지 않으며 (예: UIUC의 61820 우편번호는 수량이 아님), 자연적인 순서가 없습니다.
+\end{itemize}
+\end{examplebox}
+
+\begin{tcolorbox}[title={데이터 세트의 구성 요소 (What Is In The Data Set?)}]
+\textbf{모집단 (Population)과 표본 (Sample)}
+
+\begin{center}
+\includegraphics[width=0.7\textwidth]{example-population-sample.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{모집단과 표본의 개념}
+\label{fig:population_sample}
+\end{center}
+
+\begin{itemize}
+    \item \textbf{모집단 (Population):} 우리가 결론을 도출하고자 하는 모든 요소의 집합입니다.
+    \begin{itemize}
+        \item \textbf{예시:} 일리노이 주에 거주하는 모든 사람의 고용 상태를 알고 싶다면, 일리노이 주에 거주하는 모든 사람을 조사해야 합니다. 미국 정부는 10년마다 인구 조사를 실시하여 당시 미국에 거주하는 모든 사람에 대한 데이터를 수집합니다.
+        \item \textbf{주의:} 모집단에 대한 연구는 대부분 너무 비싸고 시간이 많이 소요됩니다.
+    \end{itemize}
+    \item \textbf{표본 (Sample):} 모집단 단위의 부분 집합입니다.
+    \begin{itemize}
+        \item \textbf{설명:} 모집단 전체를 조사하는 대신, 모집단의 일부를 선택하여 데이터를 수집합니다.
+        \item \textbf{예시:} 선거 결과를 예측하는 정치 여론 조사는 유권자 표본으로부터 데이터를 수집하여 수행됩니다.
+    \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+\begin{summarybox}
+\textbf{모수 (Parameters)와 통계량 (Statistics)}
+\begin{itemize}
+    \item \textbf{모집단 모수 (A population parameter):} 모집단 데이터(예: 인구 조사)를 사용하여 계산된, 데이터 세트의 어떤 측면을 설명하는 요약 측정값입니다.
+    \begin{itemize}
+        \item \textbf{예시:} 모집단 평균은 모집단 내 모든 값의 평균입니다.
+    \end{itemize}
+    \item \textbf{표본 통계량 (A sample statistic):} 표본 정보로부터 계산된 값입니다.
+    \begin{itemize}
+        \item \textbf{설명:} 우리는 표본 통계량을 사용하여 모집단에 대한 값을 추정합니다.
+    \end{itemize}
+\end{itemize}
+\end{summarybox}
+우리는 방금 매우 기본적인 그러나 중요한 용어들을 배웠습니다. 이 용어들은 이 과정 내내, 그리고 더 중요하게는 통계학이 사용되는 모든 분야에서 사용될 것입니다. 따라서 이 용어들이 정확히 무엇을 의미하는지 아는 것이 중요합니다. 과정이 진행되고 이 주제에 대한 지식이 증가함에 따라 다른 용어들도 배우게 될 것입니다.
+
+\newpage
+\subsection{2.3. 레슨 1-2: 기술 통계학: 빈도표 (Lesson 1-2 Descriptive Statistics: Frequency Tables)}
+
+\subsubsection{2.3.1. 레슨 1-2.1: 데이터 요약: 빈도표 (Lesson 1-2.1 Summarizing Data: Frequency Tables)}
+
+\begin{tcolorbox}[title={데이터 요약 (Summarizing Data)}]
+우리는 더 나은 의사결정을 내리기 위해 데이터를 수집합니다. 예를 들어, 마케팅 프로모션이 판매에 미치는 영향을 파악하거나, 인력의 생산성에 대한 데이터를 수집할 수 있습니다. 그러나 단순히 쌓여 있는 데이터를 보는 것만으로는 그다지 유용하지 않습니다. 우리는 데이터를 이해해야 하며, 데이터를 더 잘 이해하는 가장 좋은 방법 중 하나는 시각적인 수단을 통해 데이터를 정리하고 요약하는 것입니다.
+
+이 모듈에서는 양적 변수와 범주형 변수 모두에 대한 시각적 요약 기법에 초점을 맞출 것입니다. 구체적으로는 \textbf{빈도표 (Frequency tables)}, \textbf{히스토그램 (Histograms)}, \textbf{원형 차트 (Pie charts)}, 그리고 \textbf{산점도 (Scatter plots)}를 다룹니다.
+\end{tcolorbox}
+
+\begin{examplebox}
+\textbf{미국에서 가장 많이 팔린 픽업트럭 (Best-Selling Pickup Trucks In The US)}
+
+\begin{center}
+\captionof{table}{미국에서 가장 많이 팔린 픽업트럭 (2015년 8월 기준)}
+\label{tab:pickup_trucks}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{순위} & \textbf{베스트셀러 트럭} & \textbf{2015년 8월} & \textbf{2014년 8월} & \textbf{\% 변화 1} & \textbf{2015년 YTD} & \textbf{2014년 YTD} & \textbf{\% 변화 2} \\
+\midrule
+\#1 & Ford F-Series & 71,332 & 68,109 & 4.7\% & 494,800 & 497,174 & -0.5\% \\
+\#2 & Chevrolet Silverado & 54,977 & 49,201 & 11.7\% & 387,179 & 331,977 & 16.6\% \\
+\#3 & Ram P/U & 45,310 & 43,775 & 3.5\% & 294,045 & 283,256 & 3.8\% \\
+\#4 & GMC Sierra & 21,241 & 19,847 & 7.0\% & 141,799 & 130,526 & 8.7\% \\
+\#5 & Toyota Tacoma & 16,230 & 14,338 & 13.2\% & 122,064 & 102,736 & 18.8\% \\
+\#6 & Toyota Tundra & 10,057 & 11,834 & -15.0\% & 81,582 & 80,133 & 1.8\% \\
+\#7 & Chevrolet Colorado & 7,114 & 55,898 & 73.0\% & - & - & - \\ % 원본 데이터 오류 수정
+\#8 & Nissan Frontier & 3,645 & 6,770 & -46.2\% & 42,644 & 48,510 & -12.1\% \\
+\#9 & GMC Canyon & 2,423 & 20,094 & 5.0\% & - & - & - \\ % 원본 데이터 오류 수정
+\#10 & Nissan Titan & 1,268 & 1,231 & 3.0\% & 8,443 & 8,719 & -3.2\% \\
+\#11 & Honda Ridgeline & 4 & 1,347 & -99.7\% & 513 & 10,593 & -95.2\% \\
+\#12 & Chevrolet Avalanche & 0 & 5 & -100.0\% & 8 & 87 & -90.8\% \\
+\#13 & Cadillac Escalade EXT & 0 & 1 & -100.0\% & 2 & 50 & -96.0\% \\
+\midrule
+\textbf{총계} & & \textbf{233,601} & \textbf{216,458} & \textbf{7.9\%} & \textbf{1,649,071} & \textbf{1,493,839} & \textbf{10.4\%} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{center}
+이러한 표는 미디어 또는 비즈니스 회의에서 자주 볼 수 있습니다. 이 표는 2015년 8월까지 미국에서 가장 많이 팔린 픽업트럭 상위 13개를 한눈에 보여줍니다. 이 유형의 표를 \textbf{빈도표 (frequency table)}라고 하며, \textbf{범주형 데이터 (categorical data)}를 요약하는 데 매우 유용합니다 (이 경우 트럭 모델 이름).
+
+이 표를 보면, 2015년 첫 8개월 동안 미국에서 233,601대의 트럭이 판매되었다는 것을 알 수 있습니다. 만약 실제 233,601개의 기록을 본다면, 어떤 트럭이 1위 판매자이고 어떤 트럭이 2위 판매자인지 즉시 알기 어려울 것입니다. 이와 같은 표로 데이터를 요약하면 어떤 모델이 얼마나 팔렸는지, 그리고 모델들이 서로 어떻게 비교되는지 정확히 알 수 있습니다.
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{example-bar-graph-count.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{트럭 판매량 빈도 막대 그래프}
+\label{fig:bar_graph_count}
+\end{center}
+이 정보는 막대 그래프로도 나타낼 수 있습니다. 각 막대의 높이는 각 특정 트럭의 판매 대수를 나타내며, 원시 데이터를 빠르게 개괄적으로 보여주는 또 다른 방법입니다. 이는 데이터에 대해 더 효과적으로 소통하는 데 도움이 됩니다.
+
+각 모델의 판매 대수 대신, 각 범주를 \textbf{상대 빈도 (relative frequency)}로 요약할 수도 있습니다. 예를 들어, Ford F-Series가 가장 많이 팔린 트럭이라는 것은 알지만, 이 트럭의 시장 점유율은 얼마일까요? 이러한 유형의 질문은 상대 빈도를 찾아 답할 수 있습니다.
+\end{examplebox}
+
+\begin{tcolorbox}[title={상대 빈도 분포 (Relative Frequency Distribution)}]
+\textbf{상대 빈도 (Relative Frequency)}는 특정 값이 관측된 횟수를 총 관측 횟수로 나눈 값입니다.
+\[ \text{상대 빈도} = \frac{\text{값이 관측된 횟수}}{\text{총 관측 횟수}} \]
+
+\begin{examplebox}
+\textbf{Ford F-Series의 상대 빈도 계산:}
+Ford F-Series는 71,332대 판매되었고, 총 판매 대수는 233,601대입니다.
+\[ \text{Ford F-Series 상대 빈도} = \frac{71,332}{233,601} \approx 0.3054 \]
+따라서 Ford F-Series가 가장 많이 팔린 트럭일 뿐만 아니라, 시장의 약 30.5\%를 차지한다는 것을 알 수 있습니다. 데이터를 요약하는 것만으로도 데이터에 대한 통찰력을 얻기 시작합니다.
+\end{examplebox}
+
+\begin{center}
+\captionof{table}{미국에서 가장 많이 팔린 픽업트럭 (상대 빈도 포함)}
+\label{tab:pickup_trucks_relative_freq}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{순위} & \textbf{트럭 모델} & \textbf{2015년 8월} & \textbf{상대 빈도} \\
+\midrule
+\#1 & Ford F-Series & 71,332 & 30.54\% \\
+\#2 & Chevrolet Silverado & 54,977 & 23.53\% \\
+\#3 & Ram P/U & 45,310 & 19.40\% \\
+\#4 & GMC Sierra & 21,241 & 9.09\% \\
+\#5 & Toyota Tacoma & 16,230 & 6.95\% \\
+\#6 & Toyota Tundra & 10,057 & 4.31\% \\
+\#7 & Chevrolet Colorado & 7,114 & 3.05\% \\
+\#8 & Nissan Frontier & 3,645 & 1.56\% \\
+\#9 & GMC Canyon & 2,423 & 1.04\% \\
+\#10 & Nissan Titan & 1,268 & 0.54\% \\
+\#11 & Honda Ridgeline & 4 & 0.00\% \\
+\#12 & Chevrolet Avalanche & 0 & 0.00\% \\
+\#13 & Cadillac Escalade EXT & 0 & 0.00\% \\
+\midrule
+\textbf{총계} & & \textbf{233,601} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{center}
+모든 모델에 대한 상대 빈도를 생성할 수 있으며, 이제 상위 3개 베스트셀러가 전체 시장의 약 73\%를 차지한다는 것을 알 수 있습니다.
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{example-bar-graph-relative-freq.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{트럭 판매량 상대 빈도 막대 그래프}
+\label{fig:bar_graph_relative_freq}
+\end{center}
+이것은 Y축에 상대 빈도가 표시된 막대 그래프입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={양적 데이터에 대한 빈도표 (Frequency Table for Quantitative Data)}]
+\textbf{고객 대기 시간에 대해 무엇을 알 수 있을까요? (What do we know about customers’ waiting times?)}
+
+콜센터를 상상해 보세요. 고객 경험의 중요한 부분은 상담원에게 빠르게 연결되는 것입니다. 고객이 무엇을 경험하고 있는지 이해하려면 대기 시간에 대한 정보를 수집할 수 있습니다. 각 고객은 다른 고객과 약간 다른 경험을 할 수 있습니다.
+
+\begin{center}
+\captionof{table}{고객 대기 시간 (초)}
+\label{tab:customer_waiting_time_raw}
+\begin{tabular}{ccccc}
+\toprule
+51 & 95 & 68 & 243 & 167 \\
+288 & 108 & 83 & 48 & 251 \\
+\bottomrule
+\end{tabular}
+\end{center}
+이 표는 10명의 고객에 대한 대기 시간을 초 단위로 보여줍니다. 하지만 500개의 관측치가 있다고 가정해 봅시다. 500개의 항목을 보는 것만으로는 무슨 일이 일어나고 있는지 빠르게 이해할 수 없습니다. 따라서 데이터를 요약하여 더 잘 이해하기 위해 빈도표를 사용할 수 있습니다.
+
+여기에 있는 것과 유사한 양적 데이터에 대한 빈도표를 만들려면, \textbf{범위 (ranges)}를 만들고 각 범위에 해당하는 고객 수를 세어야 합니다. 예를 들어, 고객을 0~0.5분(30초 이하) 범위에 배치할 수 있습니다. 그런 다음 31초에서 60초 사이에 대기한 고객을 두 번째 구간(bin)에 배치하는 식으로 계속할 수 있습니다.
+
+\begin{center}
+\captionof{table}{양적 데이터에 대한 빈도표 (500개 관측치)}
+\label{tab:quantitative_frequency_table}
+\begin{tabular}{ccc}
+\toprule
+\textbf{범위 (Range)} & \textbf{빈도 (Frequency)} & \textbf{상대 빈도 (Relative Frequency)} \\
+\midrule
+30 & 30 & 0.06 \\
+60 & 49 & 0.10 \\
+90 & 40 & 0.08 \\
+120 & 40 & 0.08 \\
+150 & 37 & 0.07 \\
+180 & 45 & 0.09 \\
+\textbf{210} & \textbf{66} & \textbf{0.13} \\ % 강조된 부분
+240 & 62 & 0.12 \\
+270 & 71 & 0.14 \\
+300 & 60 & 0.12 \\
+\bottomrule
+\end{tabular}
+\end{center}
+여기서 500개 관측치의 요약을 볼 수 있습니다. 빈도 열의 값은 다양한 대기 시간을 경험한 고객 수를 나타냅니다. 예를 들어, 66명의 고객은 상담원과 통화하기 전에 181초에서 210초 사이를 기다렸습니다. 상대 빈도 열은 다양한 대기 시간을 경험한 고객의 비율을 보여줍니다. 이 경우, 고객의 13\%가 181초에서 210초 사이(3분에서 3.5분 사이)를 기다렸습니다. 많은 보고서에서 데이터를 요약하는 다양한 방법을 사용하므로, 숫자가 어떻게 요약되었는지 면밀히 살펴봐야 합니다.
+\end{tcolorbox}
+
+\begin{examplebox}
+\textbf{예시: 연령별 치명적인 충돌 사고 운전자 (Drivers Involved in Fatal Crashes by Age, 2011)}
+
+\begin{center}
+\captionof{table}{2011년 연령별 치명적인 충돌 사고 운전자}
+\label{tab:fatal_crashes}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+& \multicolumn{2}{c}{\textbf{총 운전자}} & \multicolumn{3}{c}{\textbf{주의 산만 운전자}} & \multicolumn{3}{c}{\textbf{휴대폰 사용 운전자}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-6} \cmidrule(lr){7-9}
+\textbf{연령대} & \textbf{\#} & \textbf{총 \%} & \textbf{\#} & \textbf{총 운전자 \%} & \textbf{주의 산만 운전자 \%} & \textbf{\#} & \textbf{총 \%} & \textbf{휴대폰 운전자 \%} \\
+\midrule
+15–19 & 3,212 & 7 & 344 & 11 & 11 & 72 & 21 & 20 \\
+20–29 & 10,160 & 23 & 790 & 8 & 26 & 117 & 15 & 32 \\
+30–39 & 7,401 & 17 & 505 & 7 & 16 & 79 & 16 & 21 \\
+40–49 & 7,376 & 17 & 464 & 6 & 15 & 49 & 11 & 13 \\
+50–59 & 6,783 & 16 & 434 & 6 & 14 & 34 & 8 & 9 \\
+60–69 & 4,144 & 9 & 251 & 6 & 8 & 12 & 5 & 3 \\
++70 & 3,815 & 9 & 270 & 9 & 9 & 5 & 2 & 1 \\
+\midrule
+\textbf{총계} & \textbf{43,658} & \textbf{100} & \textbf{3,085} & \textbf{7} & \textbf{100} & \textbf{368} & \textbf{12} & \textbf{100} \\
+\bottomrule
+\multicolumn{9}{l}{\small Source: NCSA, FARS 2011 (ARF); Note: Total includes 60 drivers aged 14 and under, 4 of whom were noted as distracted.} \\
+\end{tabular}
+\end{adjustbox}
+\end{center}
+이 표는 미국 교통부 보고서에서 가져온 것입니다. 이 표를 사용하여 몇 가지 질문에 답해 봅시다.
+
+\textbf{질문 1:} 어떤 연령대가 주의 산만으로 인한 치명적인 충돌 사고 수준이 가장 높았습니까?
+\begin{itemize}
+    \item \textbf{답변:} 15-19세 연령대입니다. 이 연령대의 운전자 3,212명 중 344명이 주의 산만으로 인해 치명적인 충돌 사고를 냈습니다. (표의 '주의 산만 운전자' 열에서 15-19세의 344명, '총 운전자 \%'에서 11\%를 확인)
+\end{itemize}
+
+\textbf{질문 2:} 어떤 연령대가 휴대폰 사용으로 인한 치명적인 충돌 사고 수준이 가장 높았습니까?
+\begin{itemize}
+    \item \textbf{답변:} 다시 15-19세 연령대입니다. (표의 '휴대폰 사용 운전자' 열에서 15-19세의 72명, '총 \%'에서 21\%를 확인)
+    \item \textbf{추가 분석:} 15-19세 연령대의 주의 산만 운전자 344명 중 72명이 휴대폰을 사용했기 때문에 주의가 산만해졌습니다. 이는 이 연령대에서 주의 산만 운전으로 인한 치명적인 충돌 사고의 21\%가 휴대폰 사용 때문에 발생했다는 의미입니다.
+\end{itemize}
+
+\textbf{연습해 봅시다 (Let's Practice):}
+20-29세 운전자 중 치명적인 충돌 사고를 냈을 때 휴대폰을 사용하고 있던 비율은 몇 퍼센트입니까?
+
+\textbf{정답 (Follow Up):}
+\begin{itemize}
+    \item \textbf{답변:} 15\%입니다. 20-29세 연령대의 주의 산만 운전자 790명 중 117명이 휴대폰을 사용했습니다. ($117 \div 790 \approx 0.1481$, 즉 약 15\%)
+\end{itemize}
+빈도표를 사용하면 많은 양의 데이터를 이해하기 쉽고 소통에 매우 유용한 요약으로 만들 수 있습니다. 또한, 무슨 일이 일어나고 있는지에 대한 이해를 높이는 질문을 하는 데 도움이 됩니다 (예: 치명적인 충돌 사고 수를 줄이는 방법).
+
+이 강의에서는 데이터를 요약하는 두 가지 그래픽 방법을 배웠습니다. 데이터를 요약하는 것은 무슨 일이 일어나고 있는지 빠르게 이해하고, 더 정교한 통계적 방법으로 데이터를 탐색하기 시작할 수 있게 해줍니다.
+\end{examplebox}
+
+\newpage
+\subsubsection{2.3.2. 레슨 1-2.2: Excel에서 빈도표 만들기: 양적 데이터 (Lesson 1-2.2 Frequency Tables in Excel: Quantitative Data)}
+
+\begin{tcolorbox}[title={Excel에서 고객 대기 시간 빈도표 만들기}]
+여기 고객들이 전화로 상담원과 통화하기까지 기다린 시간을 초 단위로 기록한 데이터 파일이 있습니다. 이 파일에는 500개의 관측치가 있습니다. 만약 제가 관리자이고 고객이 상담원과 통화하기까지 일반적으로 얼마나 기다리는지 알고 싶다면, 원시 데이터만 봐서는 알 수 없을 것입니다. 따라서 데이터를 요약하기 위해 빈도표를 사용할 것입니다. 하지만 양적 데이터를 다루고 있기 때문에 각 숫자를 개별적으로 나타낼 수는 없습니다.
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{excel_customer_wait_time_raw.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{고객 대기 시간 Excel 원시 데이터}
+\label{fig:excel_raw_data}
+\end{center}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={최소값, 최대값, 개수 찾기 (Finding Min, Max, Count)}]
+범위를 만들기 위해서는 데이터의 최소 관측치, 최대 관측치, 그리고 총 관측치 수를 아는 것이 매우 유용합니다.
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{excel_min_max_count_setup.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{최소, 최대, 개수 계산을 위한 Excel 설정}
+\label{fig:excel_min_max_count_setup}
+\end{center}
+
+\textbf{1. 최소값 (Minimum) 찾기:}
+\begin{itemize}
+    \item `MIN` 함수를 사용합니다. 이 함수는 주어진 범위에서 가장 작은 숫자를 반환합니다.
+    \item \textbf{단계:}
+    \begin{enumerate}
+        \item 최소값을 표시할 셀을 선택합니다.
+        \item `=MIN(`을 입력합니다.
+        \item 데이터 범위(예: A2 셀부터 시작)를 선택합니다. `Ctrl + Shift + 아래쪽 화살표`를 눌러 전체 데이터를 한 번에 선택할 수 있습니다.
+        \item `)`를 입력하고 `Enter`를 누릅니다.
+    \end{enumerate}
+    \item \textbf{결과:} 최소값은 0입니다. 이는 적어도 한 명의 고객이 기다리지 않고 즉시 상담원과 통화할 수 있었다는 의미입니다.
+\end{itemize}
+
+\begin{lstlisting}[caption={Excel MIN 함수 사용 예시}, label={lst:excel_min}]
+=MIN(A2:A501)
+\end{lstlisting}
+
+\textbf{2. 최대값 (Maximum) 찾기:}
+\begin{itemize}
+    \item `MAX` 함수를 사용합니다. `MIN` 함수와 동일한 방식으로 작동합니다.
+    \item \textbf{단계:}
+    \begin{enumerate}
+        \item 최대값을 표시할 셀을 선택합니다.
+        \item `=MAX(`을 입력합니다.
+        \item 데이터 범위(예: A2:A501)를 선택합니다.
+        \item `)`를 입력하고 `Enter`를 누릅니다.
+    \end{enumerate}
+    \item \textbf{결과:} 최대 대기 시간은 300초입니다. 즉, 5분입니다. 적어도 한 명의 고객이 5분까지 기다렸습니다.
+\end{itemize}
+
+\begin{lstlisting}[caption={Excel MAX 함수 사용 예시}, label={lst:excel_max}]
+=MAX(A2:A501)
+\end{lstlisting}
+
+\textbf{3. 개수 (Count) 찾기:}
+\begin{itemize}
+    \item `COUNT` 함수를 사용합니다.
+    \item \textbf{단계:}
+    \begin{enumerate}
+        \item 개수를 표시할 셀을 선택합니다.
+        \item `=COUNT(`을 입력합니다.
+        \item 데이터 범위(예: A2:A501)를 선택합니다.
+        \item `)`를 입력하고 `Enter`를 누릅니다.
+    \end{enumerate}
+    \item \textbf{결과:} 총 500개의 관측치가 있습니다.
+\end{itemize}
+
+\begin{lstlisting}[caption={Excel COUNT 함수 사용 예시}, label={lst:excel_count}]
+=COUNT(A2:A501)
+\end{lstlisting}
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{excel_min_max_count_results.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{최소, 최대, 개수 계산 결과}
+\label{fig:excel_min_max_count_results}
+\end{center}
+이 정보를 통해 최소 대기 시간은 0초, 최대 대기 시간은 300초이며 총 500개의 관측치가 있음을 알 수 있습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={구간 (Bin) 생성}]
+이제 데이터를 30초 간격으로 정리할 구간(bin)을 만들 것입니다.
+
+\begin{itemize}
+    \item \textbf{단계:}
+    \begin{enumerate}
+        \item 'Bin'이라는 새 열을 만듭니다.
+        \item 첫 번째 셀에 30을 입력합니다. 이 구간에는 0초부터 30초까지 기다린 모든 고객이 포함됩니다.
+        \item 다음 셀에 60을 입력합니다. 이 구간에는 30초를 약간 넘는 시간부터 60초까지 기다린 고객이 포함됩니다.
+        \item 90을 입력하는 식으로 300까지 30 간격으로 숫자를 채웁니다. 첫 두 개의 숫자를 입력한 후, 두 셀을 선택하고 오른쪽 아래 모서리를 드래그하여 자동으로 채울 수 있습니다.
+    \end{enumerate}
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=0.8\textwidth]{excel_create_bins.png} % 이미지 파일이 없으므로 예시로 대체
+\captionof{figure}{Excel에서 구간(Bin) 생성}
+\label{fig:excel_create_bins}
+\end{center}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={빈도 계산 (Calculating Frequency)}]
+빈도를 찾기 위해 Excel의 배열 함수인 `FREQUENCY`를 사용할 것입니다. 배열 함수는 단일 숫자가 아닌 배열(여러 값)을 반환하므로, 모든 값을 기록할 공간이 필요합니다.
+
+\begin{itemize}
+    \item \textbf{단계:}
+    \begin{enumerate}
+        \item 빈도 값을 받을 셀 범위를 선택합니다. 구간(bin) 열 옆에 있는 셀들을 선택하고, 혹시 모를 추가 관측치를 위해 마지막 구간 아래에 한 셀을 더 포함하는 것이 좋습니다.
+        \item 선택된 범위의 첫 번째 셀에 `=FREQUENCY(`를 입력합니다.
+        \item \textbf{데이터 배열 (data\_array):} 원본 데이터가 있는 범위(예: A2:A501)를 선택합니다.
+        \item 쉼표(`,`)를 입력합니다.
+        \item \textbf{구간 배열 (bins\_array):} 방금 만든 구간(bin) 범위(예: B2:B11)를 선택합니다.
+        \item `)`를 입력합니다.
+        \item \textbf{매우 중요:} `Ctrl + Shift + Enter`를 동시에 눌러 배열 함수를 완료합니다. 이렇게 해야 모든 빈도 값이 올바르게 채워집니다.
+    \end{enumerate}
+\end{itemize}
+
+\begin{lstlisting}[caption={Excel FREQUENCY 함수 사용 예시}, label={lst:excel_frequency}]
+{=FREQUENCY(A2:A501,B2:B11)} % 중괄호는 Ctrl+Shift+Enter로 자동 생성됨
+\end{lstlisting}
+
+\begin{center}
+\captionof{table}{Excel에서 계산된 빈도표}
+\label{tab:excel_frequency_results}
+\begin{adjustbox}{width=0.6\textwidth,center}
+\begin{tabular}{cc}
+\toprule
+\textbf{구간 (Bin)} & \textbf{빈도 (Frequency)} \\
+\midrule
+30 & 30 \\
+60 & 49 \\
+90 & 40 \\
+120 & 40 \\
+150 & 37 \\
+180 & 45 \\
+210 & 66 \\
+240 & 62 \\
+270 & 71 \\
+300 & 60 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{center}
+이제 각 구간에 해당하는 고객 수를 알 수 있습니다. 예를 들어, 30명의 고객은 0초에서 30초 사이를 기다렸고, 66명의 고객은 180초에서 210초 사이를 기다렸습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title={상대 빈도 계산 (Calculating Relative Frequency)}]
+상대 빈도는 각 범주에 속하는 고객의 비율을 알려줍니다. 예를 들어, 30명의 고객이 0초에서 30초 사이를 기다렸는데, 이는 총 500명의 고객 중 30명입니다. 이 비율을 계산해야 합니다.
+
+\begin{itemize}
+    \item \textbf{단계:}
+    \begin{enumerate}
+        \item 'Relative Frequency'라는 새 열을 만듭니다.
+        \item 첫 번째 상대 빈도 셀에 `=C2/E4` (예시: 빈도 셀이 C2이고 총 개수 셀이 E4인 경우)와 같이 입력합니다.
+        \item \textbf{총 개수 셀 고정:} 총 개수(500)는 모든 계산에서 동일하게 사용되어야 하므로, 해당 셀(예: E4)을 선택한 후 `F4` 키를 눌러 절대 참조($\$E\$4$)로 만듭니다. 이렇게 하면 수식을 아래로 끌어 복사해도 총 개수 셀의 위치가 고정됩니다.
+        \item 수식을 입력한 후 `Enter`를 누릅니다.
+        \item 첫 번째 상대 빈도 셀을 선택하고, 셀의 오른쪽 아래 모서리를 두 번 클릭하거나 아래로 끌어 나머지 셀을 자동으로 채웁니다.
+        \item 필요하다면, 상대 빈도 열의 셀들을 선택하고 Excel의 서식 옵션에서 '백분율 (Percentage)'로 변경하여 비율을 퍼센트로 표시할 수 있습니다.
+    \end{enumerate}
+\end{itemize}
+
+\begin{lstlisting}[caption={Excel 상대 빈도 계산 예시}, label={lst:excel_relative_frequency}]
+=C2/$E$4 % C2는 빈도, E4는 총 개수 셀
+\end{lstlisting}
+
+\begin{center}
+\captionof{table}{Excel에서 계산된 빈도 및 상대 빈도표}
+\label{tab:excel_frequency_relative_frequency_results}
+\begin{adjustbox}{width=0.7\textwidth,center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{구간 (Bin)} & \textbf{빈도 (Frequency)} & \textbf{상대 빈도 (Relative Frequency)} \\
+\midrule
+30 & 30 & 0.06 (6\%) \\
+60 & 49 & 0.098 (9.8\%) \\
+90 & 40 & 0.08 (8\%) \\
+120 & 40 & 0.08 (8\%) \\
+150 & 37 & 0.074 (7.4\%) \\
+180 & 45 & 0.09 (9\%) \\
+210 & 66 & 0.132 (13.2\%) \\
+240 & 62 & 0.124 (12.4\%) \\
+270 & 71 & 0.142 (14.2\%) \\
+300 & 60 & 0.12 (12\%) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{center}
+이제 고객 대기 시간에 대한 상대 빈도를 얻었습니다. 이 표를 보면 많은 고객이 대기 시간의 상위 구간에 집중되어 있음을 알 수 있습니다. 만약 대기 시간이 부정적인 고객 경험 지표라면, 이는 어떤 비즈니스 관리자에게도 좋은 소식이 아닐 것입니다.
+\end{tcolorbox}
+
+\newpage
+
+\newpage
+\section*{개요}
+이 문서는 'Exploring and Producing Data Module 1'의 두 번째 파트(2/3)로, 데이터 요약 및 시각화의 핵심 도구들을 다룹니다.
+특히 질적 데이터(Qualitative Data)와 양적 데이터(Quantitative Data)를 효과적으로 분석하고 표현하는 방법을 학습합니다.
+Excel을 활용하여 빈도표(Frequency Tables)를 생성하고, 이를 막대 그래프(Bar Graphs), 히스토그램(Histograms), 파이 차트(Pie Charts)로 시각화하는 구체적인 절차를 상세히 설명합니다.
+각 시각화 도구의 특징과 적절한 사용 시점을 이해하여, 데이터를 통해 더 나은 의사결정을 내릴 수 있는 기반을 마련하는 것이 목표입니다.
+
+\newpage
+\section*{용어 정리}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어 (Term)} & \textbf{쉬운 설명} & \textbf{원어 (Original Term)} & \textbf{비고} \\
+\midrule
+빈도표 & 특정 범주나 값의 출현 횟수를 정리한 표 & Frequency Table & 질적/양적 데이터 요약 \\
+범주형 데이터 & 분류나 그룹으로 나눌 수 있는 데이터 & Categorical Data (Qualitative Data) & 트럭 모델, 성별 등 \\
+수치형 데이터 & 숫자 형태로 측정되는 데이터 & Quantitative Data & 판매량, 대기 시간 등 \\
+상대 빈도 & 전체 데이터 중 특정 범주나 값이 차지하는 비율 & Relative Frequency & 백분율로 표현 가능 \\
+막대 그래프 & 범주형 데이터의 빈도를 막대 길이로 표현한 그래프 & Bar Graph & 각 범주 간 비교에 용이 \\
+히스토그램 & 수치형 데이터의 분포를 구간별 빈도로 표현한 그래프 & Histogram & 막대 사이 간격 없음 \\
+빈 (계급 구간) & 히스토그램에서 데이터를 나누는 구간 & Bin (Class Interval) & 적절한 크기 선택이 중요 \\
+파이 차트 & 전체에 대한 각 범주의 비율을 부채꼴 크기로 표현한 그래프 & Pie Chart & 전체 대비 비율 비교에 용이 \\
+데이터 분석 도구 & Excel에서 통계 분석 기능을 제공하는 추가 기능 & Data Analysis Toolpak & 히스토그램 생성 시 필요 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section*{핵심 개념 및 원리}
+
+데이터를 효과적으로 이해하고 의사결정에 활용하기 위해서는 원시(Raw) 데이터를 단순히 보는 것만으로는 부족합니다. 데이터를 요약하고 시각화하는 다양한 도구들을 활용해야 합니다. 이 섹션에서는 질적 데이터와 양적 데이터를 요약하고 시각화하는 주요 방법들을 소개합니다.
+
+\subsection*{1. 빈도표 (Frequency Tables)}
+빈도표는 데이터에 포함된 특정 값이나 범주가 얼마나 자주 나타나는지(빈도)를 정리한 표입니다. 이는 대량의 원시 데이터를 한눈에 파악하기 쉽게 요약하는 강력한 도구입니다.
+
+\begin{summarybox}
+\textbf{한 줄 핵심 요약:} 빈도표는 데이터의 각 항목이 얼마나 자주 나타나는지(빈도)를 정리하여 데이터를 요약하는 표입니다.
+\end{summarybox}
+
+\textbf{직관적 예시/비유:}
+만약 당신이 한 해 동안 팔린 모든 트럭 모델의 목록을 가지고 있다면, 이 목록은 수십만 개의 항목으로 이루어져 있을 것입니다. 이 원시 데이터를 보면서 "어떤 트럭이 가장 많이 팔렸지?"라는 질문에 답하기는 매우 어렵습니다. 하지만 빈도표를 만들면, 각 트럭 모델별로 몇 대가 팔렸는지(빈도)를 쉽게 알 수 있어, 시장의 흐름을 빠르게 파악할 수 있습니다.
+
+\textbf{기술적 정확한 설명:}
+빈도표는 주로 범주형 데이터(Qualitative Data)를 요약하는 데 사용되지만, 수치형 데이터(Quantitative Data)도 특정 구간(Bin)으로 묶어 빈도를 계산할 수 있습니다. 빈도표는 다음과 같은 정보를 포함할 수 있습니다:
+\begin{itemize}
+    \item \textbf{범주 (Category)}: 데이터의 각 고유한 값 또는 그룹.
+    \item \textbf{빈도 (Frequency)}: 각 범주가 데이터 세트에서 나타나는 횟수.
+    \item \textbf{상대 빈도 (Relative Frequency)}: 각 범주의 빈도를 전체 데이터 수로 나눈 값으로, 보통 백분율로 표현됩니다. 이는 전체에서 각 범주가 차지하는 비율을 보여줍니다.
+\end{itemize}
+빈도표를 통해 데이터의 분포를 파악하고, 가장 흔한 항목이나 가장 드문 항목을 식별할 수 있습니다.
+
+\subsection*{2. 막대 그래프 (Bar Graphs)}
+막대 그래프는 빈도표의 정보를 시각적으로 표현하는 가장 일반적인 방법 중 하나입니다. 주로 범주형 데이터의 빈도나 상대 빈도를 비교할 때 사용됩니다.
+
+\begin{summarybox}
+\textbf{한 줄 핵심 요약:} 막대 그래프는 범주형 데이터의 빈도나 상대 빈도를 막대의 길이로 시각화하여 각 범주 간의 크기를 비교하는 데 유용합니다.
+\end{summarybox}
+
+\textbf{직관적 예시/비유:}
+트럭 판매량 빈도표를 만들었다면, 이 표를 보고 어떤 트럭이 가장 많이 팔렸는지 숫자로 알 수 있습니다. 하지만 막대 그래프로 그리면, 가장 긴 막대가 가장 많이 팔린 트럭을 나타내므로, 시각적으로 훨씬 빠르게 판매 순위를 파악할 수 있습니다. 마치 키를 비교할 때 숫자로 말하는 것보다 나란히 서 있는 모습을 보는 것이 더 직관적인 것과 같습니다.
+
+\textbf{기술적 정확한 설명:}
+막대 그래프는 다음과 같은 특징을 가집니다:
+\begin{itemize}
+    \item \textbf{축 (Axes)}: 일반적으로 가로축(x-축)은 범주(예: 트럭 모델)를 나타내고, 세로축(y-축)은 빈도 또는 상대 빈도를 나타냅니다.
+    \item \textbf{막대 (Bars)}: 각 범주에 해당하는 막대는 서로 떨어져 있습니다. 이는 각 범주가 독립적임을 시각적으로 보여줍니다. 막대의 길이는 해당 범주의 빈도 또는 상대 빈도에 비례합니다.
+    \item \textbf{비교 용이성}: 막대의 길이를 통해 여러 범주 간의 크기를 쉽게 비교할 수 있습니다.
+\end{itemize}
+막대 그래프는 데이터의 순위나 특정 범주의 중요도를 강조할 때 효과적입니다.
+
+\subsection*{3. 히스토그램 (Histograms)}
+히스토그램은 막대 그래프와 유사해 보이지만, 수치형 데이터의 분포를 시각화하는 데 특화된 도구입니다. 데이터를 특정 구간(빈)으로 나누고, 각 구간에 속하는 데이터의 빈도를 막대로 표현합니다.
+
+\begin{summarybox}
+\textbf{한 줄 핵심 요약:} 히스토그램은 수치형 데이터의 분포를 보여주기 위해 데이터를 구간(빈)으로 나누고, 각 구간의 빈도를 막대로 표현하는 특별한 형태의 막대 그래프입니다.
+\end{summarybox}
+
+\textbf{직관적 예시/비유:}
+고객 대기 시간 데이터를 가지고 있다고 가정해 봅시다. 1초, 5초, 10초, 30초 등 다양한 대기 시간이 있을 것입니다. 이 모든 시간을 개별적으로 막대 그래프로 그리면 너무 많은 막대가 생겨 복잡해집니다. 히스토그램은 "0~30초", "31~60초"와 같이 대기 시간을 구간으로 묶어, 각 구간에 몇 명의 고객이 속하는지를 보여줍니다. 이를 통해 "대부분의 고객이 30초 이내로 기다리는구나" 또는 "1분 이상 기다리는 고객도 꽤 많네"와 같은 전체적인 대기 시간 패턴을 파악할 수 있습니다.
+
+\textbf{기술적 정확한 설명:}
+히스토그램은 다음과 같은 특징을 가집니다:
+\begin{itemize}
+    \item \textbf{연속성}: 막대 그래프와 달리 히스토그램의 막대들은 서로 붙어 있습니다. 이는 데이터가 연속적인 수치형 데이터임을 나타냅니다.
+    \item \textbf{빈 (Bins)}: 가로축은 데이터의 값 범위를 여러 개의 구간(빈 또는 계급 구간)으로 나눕니다. 각 빈은 특정 값 범위를 나타내며, 빈의 크기(간격)는 히스토그램의 모양에 큰 영향을 미칩니다.
+    \item \textbf{빈도 (Frequency)}: 세로축은 각 빈에 속하는 데이터의 빈도(또는 상대 빈도)를 나타냅니다.
+    \item \textbf{분포 파악}: 히스토그램을 통해 데이터의 중심 경향, 퍼짐 정도, 왜도(skewness), 이상치(outliers) 등 전반적인 분포 형태를 파악할 수 있습니다.
+\end{itemize}
+\textbf{빈 크기의 중요성:} 빈의 크기를 너무 크게 설정하면 중요한 세부 정보를 놓칠 수 있고, 너무 작게 설정하면 데이터가 효과적으로 요약되지 않아 패턴을 파악하기 어려워집니다. 적절한 빈 크기를 선택하는 것이 중요합니다.
+
+\subsection*{4. 파이 차트 (Pie Charts)}
+파이 차트는 전체에 대한 각 범주의 비율을 시각적으로 비교하는 데 사용되는 원형 그래프입니다. 주로 범주형 데이터의 상대 빈도를 표현할 때 유용합니다.
+
+\begin{summarybox}
+\textbf{한 줄 핵심 요약:} 파이 차트는 전체 데이터에서 각 범주가 차지하는 비율을 원형의 부채꼴 형태로 시각화하여, 각 부분의 상대적 크기를 쉽게 비교할 수 있게 합니다.
+\end{summarybox}
+
+\textbf{직관적 예시/비유:}
+미국인들이 가장 좋아하는 디저트 종류를 조사했다고 가정해 봅시다. 파이(Pie)가 29\%, 케이크(Cake)가 17\%, 쿠키(Cookies)가 15\% 등 다양한 비율이 나올 것입니다. 이 정보를 파이 차트로 그리면, 전체 원(100\%)에서 파이가 가장 큰 조각을 차지하고 있음을 한눈에 알 수 있습니다. 마치 피자를 여러 조각으로 나눈 것처럼, 각 조각의 크기가 전체에서 차지하는 비율을 직관적으로 보여줍니다.
+
+\textbf{기술적 정확한 설명:}
+파이 차트는 다음과 같은 특징을 가집니다:
+\begin{itemize}
+    \item \textbf{전체 비율}: 파이 차트의 전체 원은 100\%를 나타내며, 각 부채꼴(slice)은 특정 범주가 전체에서 차지하는 비율을 나타냅니다.
+    \item \textbf{범주형 데이터}: 주로 범주형 데이터에 사용되며, 각 범주는 서로 배타적이어야 합니다.
+    \item \textbf{제한된 범주 수}: 너무 많은 범주를 파이 차트에 포함하면 각 부채꼴이 너무 작아져 구분이 어려워지고 가독성이 떨어집니다. 일반적으로 5~7개 이하의 범주에 사용하는 것이 좋습니다.
+    \item \textbf{상대적 비교}: 각 범주의 절대적인 값보다는 전체에 대한 상대적인 비율을 비교하는 데 효과적입니다.
+\end{itemize}
+파이 차트는 전체 대비 각 부분의 중요도를 강조하거나, 여러 범주가 전체를 어떻게 구성하는지 보여줄 때 유용합니다.
+
+\newpage
+\section*{절차/방법: Excel을 활용한 데이터 요약 및 시각화}
+
+이 섹션에서는 Excel을 사용하여 빈도표를 만들고, 이를 바탕으로 막대 그래프, 히스토그램, 파이 차트를 생성하는 구체적인 단계를 설명합니다.
+
+\subsection*{1. Excel에서 질적 데이터 빈도표 생성하기 (Lesson 1-2.3)}
+
+질적 데이터(예: 트럭 모델 이름)의 빈도표를 만드는 과정은 다음과 같습니다. 이 과정은 어떤 항목이 얼마나 많이 팔렸는지, 즉 각 항목의 빈도를 파악하는 데 사용됩니다.
+
+\begin{tcolorbox}[title=\textbf{시나리오: 베스트셀러 트럭 모델 분석},colback=myblue!5!white,colframe=myblue!75!black]
+미국에서 한 해 동안 판매된 23만 3천 대 이상의 트럭 모델 데이터를 가지고 있습니다. 이 원시 데이터만으로는 어떤 트럭이 잘 팔렸는지 파악하기 어렵습니다. 빈도표를 만들어 데이터를 요약하고 시장 동향을 이해하고자 합니다.
+\end{tcolorbox}
+
+\subsubsection*{단계 1: 고유한 트럭 모델 목록 추출하기}
+수십만 개의 데이터에서 중복을 제거하고 고유한 트럭 모델 이름만 추출하는 과정입니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 선택:} 트럭 모델 이름이 있는 열(예: A열)을 선택합니다.
+    \item \textbf{전체 데이터 범위 선택:} A1 셀을 클릭한 후, \texttt{Ctrl + Shift + 아래쪽 화살표} 키를 눌러 A열의 모든 데이터를 한 번에 선택합니다. (233,602개의 행이 선택될 것입니다.)
+    \item \textbf{고급 필터 열기:} Excel 리본 메뉴에서 \textbf{데이터(Data)} 탭으로 이동한 후, \textbf{정렬 및 필터(Sort \& Filter)} 그룹에서 \textbf{고급(Advanced)}을 클릭합니다.
+    \item \textbf{고급 필터 설정:}
+    \begin{itemize}
+        \item 팝업 창에서 \textbf{다른 장소에 복사(Copy to another location)}를 선택합니다.
+        \item \textbf{목록 범위(List range)}는 이미 선택된 A열 데이터 범위로 자동 입력됩니다.
+        \item \textbf{복사 위치(Copy to)} 입력란을 클릭한 후, 고유한 목록을 표시할 새 셀(예: E1)을 선택합니다.
+        \item \textbf{고유한 레코드만(Unique records only)} 확인란을 선택합니다.
+        \item \textbf{확인(OK)}을 클릭합니다.
+    \end{itemize}
+    \item \textbf{결과 확인:} E열에 판매된 고유한 트럭 모델 목록이 자동으로 생성됩니다.
+\end{enumerate}
+
+\subsubsection*{단계 2: 각 트럭 모델의 판매 빈도 계산하기}
+추출된 고유 모델별로 원시 데이터에서 몇 번 나타나는지 세는 과정입니다.
+
+\begin{enumerate}
+    \item \textbf{COUNTIF 함수 사용:} 고유 트럭 모델 목록 옆 셀(예: F2)에 다음 수식을 입력합니다:
+    \begin{lstlisting}[language=Excel, caption=COUNTIF 함수 예시]
+=COUNTIF(range, criteria)
+    \end{lstlisting}
+    \item \textbf{범위(Range) 지정:}
+    \begin{itemize}
+        \item \texttt{COUNTIF(} 다음, 원시 데이터가 있는 A열의 실제 데이터 범위(A2부터 시작)를 선택합니다. A1은 열 이름이므로 제외합니다.
+        \item A2 셀을 클릭한 후, \texttt{Ctrl + Shift + 아래쪽 화살표} 키를 눌러 A열의 모든 트럭 모델 데이터를 선택합니다.
+        \item \textbf{선택된 범위 고정:} \texttt{F4} 키를 눌러 선택된 범위(예: \texttt{\$A\$2:\$A\$233602})를 절대 참조로 고정합니다. 이렇게 하면 수식을 다른 셀로 복사해도 범위가 변하지 않습니다.
+    \end{itemize}
+    \item \textbf{조건(Criteria) 지정:}
+    \begin{itemize}
+        \item 범위 지정 후 쉼표(,)를 입력합니다.
+        \item 고유 트럭 모델 목록의 첫 번째 항목(예: E2, 'Toyota Tacoma')을 클릭합니다.
+        \item 괄호를 닫고 \texttt{Enter} 키를 누릅니다.
+    \end{itemize}
+    \item \textbf{결과 확인:} F2 셀에 'Toyota Tacoma'의 판매 빈도(예: 16,230)가 표시됩니다.
+    \item \textbf{수식 자동 채우기:} F2 셀의 오른쪽 아래 모서리에 마우스를 가져가면 십자(+) 모양이 나타납니다. 이 상태에서 더블 클릭하면 나머지 모든 고유 트럭 모델에 대한 판매 빈도가 자동으로 계산됩니다.
+\end{enumerate}
+
+\subsubsection*{단계 3: 빈도표 정렬하기}
+판매 빈도를 기준으로 트럭 모델을 정렬하여 순위를 쉽게 파악할 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 선택:} 고유 트럭 모델 목록(E열)과 해당 빈도(F열)를 모두 선택합니다.
+    \item \textbf{사용자 지정 정렬:} Excel 리본 메뉴에서 \textbf{홈(Home)} 탭으로 이동한 후, \textbf{편집(Editing)} 그룹에서 \textbf{정렬 및 필터(Sort \& Filter)}를 클릭하고 \textbf{사용자 지정 정렬(Custom Sort)}을 선택합니다.
+    \item \textbf{정렬 기준 설정:}
+    \begin{itemize}
+        \item \textbf{정렬 기준(Sort by)} 드롭다운 메뉴에서 'Count' (빈도 열의 이름)를 선택합니다.
+        \item \textbf{정렬 순서(Order)} 드롭다운 메뉴에서 \textbf{내림차순(Largest to Smallest)}을 선택합니다.
+        \item \textbf{확인(OK)}을 클릭합니다.
+    \end{itemize}
+    \item \textbf{결과 확인:} 트럭 모델이 판매량(빈도)이 가장 많은 순서대로 정렬됩니다.
+\end{enumerate}
+
+\begin{examplebox}
+\textbf{정렬된 트럭 모델 판매 빈도표 예시:}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lr}
+\toprule
+\textbf{트럭 모델 (Truck Model)} & \textbf{판매 대수 (Count)} \\
+\midrule
+Ford F-Series & 71332 \\
+Chevrolet Silverado & 54977 \\
+Ram P/U & 45310 \\
+GMC Sierra & 21241 \\
+Toyota Tacoma & 16230 \\
+Toyota Tundra & 10057 \\
+Chevrolet Colorado & 7114 \\
+Nissan Frontier & 3645 \\
+GMC Canyon & 2423 \\
+Nissan Titan & 1268 \\
+Honda Ridgeline & 4 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{베스트셀러 트럭 모델 판매 빈도 (정렬됨)}
+\end{examplebox}
+
+\subsubsection*{단계 4: 상대 빈도 (Relative Frequency) 계산하기}
+각 트럭 모델이 전체 판매량에서 차지하는 비율을 계산합니다.
+
+\begin{enumerate}
+    \item \textbf{총 판매 대수 계산:} 빈도표 아래 빈 셀(예: F13)에 \texttt{=SUM(F2:F12)}와 같이 빈도 열의 모든 값을 더하는 수식을 입력하여 총 판매 대수를 계산합니다. (결과: 233,601)
+    \item \textbf{상대 빈도 열 추가:} 빈도 열 옆에 '상대 빈도(Relative Frequency)'라는 새 열(예: G열)을 추가합니다.
+    \item \textbf{상대 빈도 수식 입력:} 첫 번째 트럭 모델의 상대 빈도를 계산할 셀(예: G2)에 다음 수식을 입력합니다:
+    \begin{lstlisting}[language=Excel, caption=상대 빈도 계산 수식]
+=F2 / $F$13
+    \end{lstlisting}
+    \begin{itemize}
+        \item \texttt{F2}는 해당 트럭 모델의 빈도입니다.
+        \item \texttt{\$F\$13}는 총 판매 대수 셀을 절대 참조로 고정한 것입니다. \texttt{F4} 키를 눌러 고정할 수 있습니다. 이렇게 해야 수식을 복사할 때 총 판매 대수 셀이 변하지 않습니다.
+    \end{itemize}
+    \item \textbf{결과 확인 및 서식 지정:} G2 셀에 'Ford F-Series'의 상대 빈도(예: 0.305)가 표시됩니다.
+    \begin{itemize}
+        \item 이 값을 백분율로 표시하려면, 셀을 선택하고 \textbf{홈(Home)} 탭의 \textbf{표시 형식(Number)} 그룹에서 \textbf{백분율 스타일(\%)} 버튼을 클릭합니다. (예: 31\%)
+        \item 소수점 자릿수를 조정하려면, 같은 그룹에서 \textbf{소수 자릿수 늘림/줄임} 버튼을 사용합니다.
+    \end{itemize}
+    \item \textbf{수식 자동 채우기:} G2 셀의 오른쪽 아래 모서리를 더블 클릭하여 나머지 모든 트럭 모델의 상대 빈도를 계산합니다.
+\end{enumerate}
+
+\begin{examplebox}
+\textbf{상대 빈도가 포함된 트럭 모델 판매 빈도표 예시:}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lrr}
+\toprule
+\textbf{트럭 모델 (Truck Model)} & \textbf{판매 대수 (Count)} & \textbf{상대 빈도 (Relative Frequency)} \\
+\midrule
+Ford F-Series & 71332 & 0.305 \\
+Chevrolet Silverado & 54977 & 0.235 \\
+Ram P/U & 45310 & 0.194 \\
+GMC Sierra & 21241 & 0.091 \\
+Toyota Tacoma & 16230 & 0.069 \\
+Toyota Tundra & 10057 & 0.043 \\
+Chevrolet Colorado & 7114 & 0.030 \\
+Nissan Frontier & 3645 & 0.016 \\
+GMC Canyon & 2423 & 0.010 \\
+Nissan Titan & 1268 & 0.005 \\
+Honda Ridgeline & 4 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{베스트셀러 트럭 모델 판매 빈도 및 상대 빈도}
+\end{examplebox}
+이 빈도표를 통해 Ford F-Series가 전체 판매량의 30.5\%를 차지하며 가장 많이 팔린 트럭임을 한눈에 알 수 있습니다.
+
+\newpage
+\subsection*{2. Excel에서 빈도표를 막대 그래프로 표현하기 (Lesson 1-2.4)}
+
+빈도표를 시각적으로 표현하는 가장 효과적인 방법 중 하나는 막대 그래프를 사용하는 것입니다. 이는 각 범주 간의 비교를 직관적으로 보여줍니다.
+
+\subsubsection*{단계 1: 판매 대수 막대 그래프 생성하기}
+트럭 모델별 판매 대수(Count)를 막대 그래프로 시각화합니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 선택:} 트럭 모델 이름 열(예: E열)과 판매 대수(Count) 열(예: F열)을 모두 선택합니다.
+    \item \textbf{차트 삽입:} Excel 리본 메뉴에서 \textbf{삽입(Insert)} 탭으로 이동한 후, \textbf{차트(Charts)} 그룹에서 \textbf{막대(Bar)} 차트 아이콘을 클릭하고 \textbf{2차원 세로 막대형(2-D Column)}을 선택합니다.
+    \item \textbf{차트 생성:} 선택한 데이터에 대한 막대 그래프가 자동으로 생성됩니다.
+    \item \textbf{차트 서식 지정 (선택 사항):}
+    \begin{itemize}
+        \item \textbf{차트 스타일 변경:} 차트가 선택된 상태에서 리본 메뉴의 \textbf{차트 디자인(Chart Design)} 탭에서 다양한 차트 스타일을 선택하여 디자인을 변경할 수 있습니다.
+        \item \textbf{눈금선 제거:} 차트의 가로 눈금선(Gridlines)을 클릭하여 선택한 후 \texttt{Delete} 키를 눌러 제거할 수 있습니다.
+        \item \textbf{축 서식 변경:} x-축(트럭 모델 이름)을 더블 클릭하여 \textbf{축 서식(Format Axis)} 창을 엽니다. \textbf{선(Line)} 옵션에서 선 색상을 '검정(Black)'으로, 너비를 조절하여 더 선명하게 만들 수 있습니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{단계 2: 상대 빈도 막대 그래프 생성하기}
+트럭 모델별 상대 빈도(Relative Frequency)를 막대 그래프로 시각화합니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 선택 (비연속 열):}
+    \begin{itemize}
+        \item 먼저 트럭 모델 이름 열(예: E열)을 선택합니다.
+        \item \texttt{Ctrl} 키를 누른 상태에서 상대 빈도(Relative Frequency) 열(예: G열)을 선택합니다. 이렇게 하면 서로 떨어져 있는 두 개의 열을 동시에 선택할 수 있습니다.
+    \end{itemize}
+    \item \textbf{차트 삽입:} Excel 리본 메뉴에서 \textbf{삽입(Insert)} 탭으로 이동한 후, \textbf{차트(Charts)} 그룹에서 \textbf{막대(Bar)} 차트 아이콘을 클릭하고 \textbf{2차원 세로 막대형(2-D Column)}을 선택합니다.
+    \item \textbf{차트 생성:} 상대 빈도를 나타내는 막대 그래프가 생성됩니다. 이 그래프의 y-축은 백분율 또는 소수점 형태로 상대 빈도를 나타냅니다.
+    \item \textbf{결과 확인:} 이 그래프를 통해 각 트럭 모델이 전체 판매량에서 차지하는 비율을 시각적으로 비교할 수 있습니다. 예를 들어, Ford F-Series의 막대는 30\%를 약간 넘는 높이를 가질 것입니다.
+\end{enumerate}
+
+\begin{tipbox}
+\textbf{막대 그래프와 히스토그램의 차이:}
+\begin{itemize}
+    \item \textbf{막대 그래프 (Bar Graph):} 주로 \textbf{범주형 데이터}에 사용되며, 각 막대 사이에 간격이 있습니다. 각 막대는 독립적인 범주를 나타냅니다.
+    \item \textbf{히스토그램 (Histogram):} 주로 \textbf{수치형 데이터}에 사용되며, 막대들이 서로 붙어 있습니다. 각 막대는 연속적인 데이터의 특정 구간(빈)을 나타냅니다.
+\end{itemize}
+이러한 시각적 차이는 데이터의 종류와 특성을 반영합니다.
+\end{tipbox}
+
+\newpage
+\subsection*{3. Excel에서 히스토그램 생성하기 (Lesson 1-3.2)}
+
+히스토그램은 수치형 데이터의 분포를 시각적으로 파악하는 데 매우 유용합니다. Excel의 '데이터 분석(Data Analysis)' 도구를 사용하여 히스토그램을 생성할 수 있습니다.
+
+\begin{warningbox}
+\textbf{사전 준비: 데이터 분석 도구 추가 기능 활성화}
+Excel에서 히스토그램 기능을 사용하려면 '데이터 분석(Data Analysis)' 추가 기능이 활성화되어 있어야 합니다.
+\begin{enumerate}
+    \item \textbf{파일(File)} 탭 $\rightarrow$ \textbf{옵션(Options)} $\rightarrow$ \textbf{추가 기능(Add-ins)}으로 이동합니다.
+    \item \textbf{관리(Manage)} 드롭다운 메뉴에서 \textbf{Excel 추가 기능(Excel Add-ins)}을 선택하고 \textbf{이동(Go...)}을 클릭합니다.
+    \item \textbf{분석 도구(Analysis ToolPak)} 확인란을 선택하고 \textbf{확인(OK)}을 클릭합니다.
+    \item 이제 \textbf{데이터(Data)} 탭에 \textbf{데이터 분석(Data Analysis)} 버튼이 나타날 것입니다.
+\end{enumerate}
+\end{warningbox}
+
+\begin{tcolorbox}[title=\textbf{시나리오: 고객 대기 시간 분석},colback=myblue!5!white,colframe=myblue!75!black]
+고객 서비스 센터의 고객 대기 시간 데이터를 가지고 있습니다. 이 데이터의 분포를 파악하여 고객들이 얼마나 오래 기다리는지, 그리고 대기 시간 패턴이 어떤지 이해하고자 합니다.
+\end{tcolorbox}
+
+\subsubsection*{단계 1: Excel의 자동 빈(Bin) 설정을 사용하여 히스토그램 생성하기}
+Excel이 데이터에 적합하다고 판단하는 빈(구간)을 자동으로 설정하여 히스토그램을 생성합니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 준비:} 고객 대기 시간 데이터가 있는 열(예: A열)을 준비합니다. (A1 셀에 'Customer Waiting Time'과 같은 레이블이 있다고 가정합니다.)
+    \item \textbf{데이터 분석 도구 실행:} Excel 리본 메뉴에서 \textbf{데이터(Data)} 탭으로 이동한 후, \textbf{분석(Analyze)} 그룹에서 \textbf{데이터 분석(Data Analysis)}을 클릭합니다.
+    \item \textbf{히스토그램 선택:} 팝업 창에서 \textbf{히스토그램(Histogram)}을 선택하고 \textbf{확인(OK)}을 클릭합니다.
+    \item \textbf{히스토그램 대화 상자 설정:}
+    \begin{itemize}
+        \item \textbf{입력 범위(Input Range):} 고객 대기 시간 데이터가 있는 열을 선택합니다. A1 셀을 클릭한 후 \texttt{Ctrl + Shift + 아래쪽 화살표} 키를 눌러 전체 데이터를 선택합니다.
+        \item \textbf{빈 범위(Bin Range):} 이 단계에서는 Excel이 자동으로 빈을 설정하도록 비워둡니다.
+        \item \textbf{레이블(Labels):} 입력 범위에 열 이름(예: A1)이 포함되어 있다면 이 확인란을 선택합니다.
+        \item \textbf{출력 옵션(Output Options):}
+        \begin{itemize}
+            \item \textbf{출력 범위(Output Range):} 결과를 표시할 워크시트의 빈 셀(예: C1)을 클릭합니다. (기본값인 '새 워크시트'를 선택할 수도 있습니다.)
+            \item \textbf{차트 출력(Chart Output):} 히스토그램 그래프를 함께 생성하려면 이 확인란을 반드시 선택합니다.
+        \end{itemize}
+        \item \textbf{확인(OK)}을 클릭합니다.
+    \end{itemize}
+    \item \textbf{결과 확인:} 선택한 출력 범위에 빈(Bin)과 빈도(Frequency) 표, 그리고 히스토그램 그래프가 생성됩니다. Excel이 자동으로 설정한 빈은 데이터의 최소값부터 시작하여 일정한 간격(예: 13.63초)으로 증가하는 것을 볼 수 있습니다.
+\end{enumerate}
+
+\subsubsection*{단계 2: 사용자 지정 빈(Bin) 설정을 사용하여 히스토그램 생성하기}
+분석 목적에 따라 특정 빈(구간)을 직접 정의하여 히스토그램을 생성할 수 있습니다. 예를 들어, 고객 대기 시간을 30초 간격으로 보고 싶을 때 유용합니다.
+
+\begin{enumerate}
+    \item \textbf{빈 범위 준비:} 새 열(예: D열)에 원하는 빈의 상한값을 입력합니다. 예를 들어, 30초 간격으로 빈을 만들려면 '30', '60', '90', ... 과 같이 입력합니다. (D1 셀에 'Range'와 같은 레이블이 있다고 가정합니다.)
+    \item \textbf{데이터 분석 도구 실행:} \textbf{데이터(Data)} 탭 $\rightarrow$ \textbf{데이터 분석(Data Analysis)} $\rightarrow$ \textbf{히스토그램(Histogram)} $\rightarrow$ \textbf{확인(OK)}을 클릭합니다.
+    \item \textbf{히스토그램 대화 상자 설정:}
+    \begin{itemize}
+        \item \textbf{입력 범위(Input Range):} 고객 대기 시간 데이터 열(예: A열)을 선택합니다. (레이블 포함)
+        \item \textbf{빈 범위(Bin Range):} 새로 준비한 사용자 지정 빈 범위(예: D1:D10)를 선택합니다. (레이블 포함)
+        \item \textbf{레이블(Labels):} 입력 범위와 빈 범위 모두에 열 이름이 포함되어 있다면 이 확인란을 선택합니다.
+        \item \textbf{출력 옵션(Output Options):}
+        \begin{itemize}
+            \item \textbf{출력 범위(Output Range):} 이전 결과와 겹치지 않도록 빈 셀(예: H7)을 선택합니다.
+            \item \textbf{차트 출력(Chart Output):} 선택합니다.
+        \end{itemize}
+        \item \textbf{확인(OK)}을 클릭합니다.
+    \end{itemize}
+    \item \textbf{결과 확인:} 사용자 지정 빈에 따른 빈도표와 히스토그램이 생성됩니다.
+\end{enumerate}
+
+\begin{tipbox}
+\textbf{적절한 빈 크기 선택의 중요성:}
+\begin{itemize}
+    \item \textbf{Excel 자동 빈:} Excel이 자동으로 선택한 빈(예: 13.63초 간격)은 데이터의 세부적인 변동을 더 많이 보여줄 수 있습니다. 이는 데이터의 미묘한 패턴을 탐색할 때 유용합니다.
+    \item \textbf{사용자 지정 빈:} 사용자 지정 빈(예: 30초 간격)은 데이터를 더 크게 요약하여 전반적인 추세나 문제점을 파악하는 데 집중할 수 있게 합니다. 예를 들어, "많은 고객이 긴 시간 대기하고 있다"는 핵심 메시지를 전달할 때 더 효과적일 수 있습니다.
+\end{itemize}
+어떤 빈 크기를 사용할지는 분석의 목적과 전달하고자 하는 메시지에 따라 달라집니다. Excel의 자동 빈으로 시작하여, 필요에 따라 빈 크기를 조정하며 가장 적절한 시각화를 찾는 것이 좋습니다.
+\end{tipbox}
+
+\newpage
+\subsection*{4. Excel에서 파이 차트 생성하기 (Lesson 1-4.2)}
+
+파이 차트는 범주형 데이터에서 각 부분이 전체에서 차지하는 비율을 시각적으로 보여주는 데 효과적입니다.
+
+\begin{tcolorbox}[title=\textbf{시나리오: 미국인 디저트 선호도 분석},colback=myblue!5!white,colframe=myblue!75!black]
+미국인들이 가장 선호하는 디저트 종류에 대한 설문조사 결과가 있습니다. 파이(29\%), 케이크(17\%), 쿠키(15\%) 등 각 디저트가 전체에서 차지하는 비율을 한눈에 보여주고자 합니다.
+\end{tcolorbox}
+
+\subsubsection*{단계 1: 파이 차트 생성하기}
+
+\begin{enumerate}
+    \item \textbf{데이터 준비:} 디저트 종류(범주)와 해당 비율(상대 빈도)이 있는 표를 준비합니다.
+    \begin{examplebox}
+    \textbf{디저트 선호도 데이터 예시:}
+    \begin{adjustbox}{width=0.5\textwidth,center}
+    \begin{tabular}{lr}
+    \toprule
+    \textbf{디저트 종류} & \textbf{선호도 (\%)} \\
+    \midrule
+    파이 & 29 \\
+    케이크 & 17 \\
+    쿠키 & 15 \\
+    기타 & 39 \\ % (100 - 29 - 17 - 15)
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \captionof{table}{미국인 디저트 선호도}
+    \end{examplebox}
+    \item \textbf{데이터 선택:} 디저트 종류 열과 선호도(비율) 열을 모두 선택합니다.
+    \item \textbf{차트 삽입:} Excel 리본 메뉴에서 \textbf{삽입(Insert)} 탭으로 이동한 후, \textbf{차트(Charts)} 그룹에서 \textbf{파이(Pie)} 차트 아이콘을 클릭하고 \textbf{2차원 원형(2-D Pie)}을 선택합니다.
+    \item \textbf{차트 생성:} 선택한 데이터에 대한 파이 차트가 자동으로 생성됩니다.
+    \item \textbf{차트 서식 지정 (선택 사항):}
+    \begin{itemize}
+        \item \textbf{데이터 레이블 추가:} 차트를 선택한 후, 차트 옆에 나타나는 '+' 버튼을 클릭하고 \textbf{데이터 레이블(Data Labels)}을 선택합니다. 레이블 옵션에서 \textbf{백분율(Percentage)} 및 \textbf{항목 이름(Category Name)}을 표시하도록 설정할 수 있습니다.
+        \item \textbf{차트 제목 변경:} 차트 제목을 클릭하여 원하는 제목으로 변경합니다 (예: "미국인 디저트 선호도").
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection*{파이 차트와 막대 그래프의 비교 (Lesson 1-4.1)}
+
+데이터를 시각화할 때 파이 차트와 막대 그래프 중 어떤 것을 선택할지는 전달하고자 하는 메시지에 따라 달라집니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.45\textwidth}p{0.45\textwidth}}
+\toprule
+\textbf{파이 차트 (Pie Chart)} & \textbf{막대 그래프 (Bar Graph)} \\
+\midrule
+\textbf{장점:} & \textbf{장점:} \\
+\begin{itemize}
+    \item 전체에 대한 각 부분의 \textbf{상대적 비율}을 시각적으로 쉽게 비교할 수 있습니다.
+    \item 각 범주가 전체를 어떻게 구성하는지 \textbf{직관적으로} 보여줍니다.
+    \item 범주 수가 적을 때 \textbf{가독성이 높습니다}.
+\end{itemize}
+&
+\begin{itemize}
+    \item 각 범주의 \textbf{절대적인 값}을 명확하게 보여줍니다.
+    \item 여러 범주 간의 \textbf{정확한 비교}와 \textbf{순위 파악}에 용이합니다.
+    \item 범주 수가 많아도 \textbf{가독성을 유지}하기 쉽습니다.
+\end{itemize}
+\\
+\textbf{단점:} & \textbf{단점:} \\
+\begin{itemize}
+    \item 범주 수가 많으면 각 부채꼴이 너무 작아져 \textbf{비교가 어렵습니다}.
+    \item 각 범주의 \textbf{절대적인 값}을 파악하기 어렵습니다.
+    \item 비슷한 비율의 범주들을 \textbf{구분하기 어렵습니다}.
+\end{itemize}
+&
+\begin{itemize}
+    \item 전체에 대한 각 부분의 \textbf{상대적 비율}을 직관적으로 파악하기 어렵습니다.
+    \item 모든 범주를 포함하여 전체를 구성하는 관계를 보여주기에는 \textbf{덜 효과적}입니다.
+\end{itemize}
+\\
+\textbf{주요 사용 시점:} & \textbf{주요 사용 시점:} \\
+\begin{itemize}
+    \item 전체 대비 각 부분의 \textbf{비율 관계}를 강조할 때.
+    \item 범주 수가 적고, 각 범주가 전체의 \textbf{상당 부분을 차지}할 때.
+\end{itemize}
+&
+\begin{itemize}
+    \item 각 범주의 \textbf{정확한 값}을 보여주고 싶을 때.
+    \item 여러 범주 간의 \textbf{순위나 크기 차이}를 명확히 비교하고 싶을 때.
+    \item 범주 수가 많거나, '기타'와 같은 \textbf{추가 범주}를 포함할 때.
+\end{itemize}
+\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{파이 차트와 막대 그래프의 비교}
+
+\begin{examplebox}
+\textbf{미국-중국 수출 데이터 예시:}
+2015년 미국에서 중국으로의 10대 수출 품목 데이터를 막대 그래프와 파이 차트로 시각화할 수 있습니다.
+\begin{itemize}
+    \item \textbf{막대 그래프:} 항공우주 부문이 약 140억 달러로 1위임을 명확히 보여주며, 각 품목의 정확한 수출액을 비교하기 좋습니다.
+    \item \textbf{파이 차트:} 상위 5개 수출 품목(항공우주, 전기 기계, 핵, 차량, 씨앗 및 씨앗 오일)이 전체 수출액의 4분의 3을 차지한다는 관계를 빠르게 파악할 수 있습니다.
+\end{itemize}
+여기에 '기타 모든 수출 품목'이라는 11번째 범주를 추가하면, 파이 차트가 상위 10개 품목과 기타 품목 간의 전체적인 비율 관계를 더 효과적으로 보여줄 수 있습니다. 반면 막대 그래프는 '기타' 항목이 추가되면 전체적인 순위 비교가 다소 복잡해질 수 있습니다.
+\end{examplebox}
+
+\newpage
+\section*{체크리스트}
+
+이 섹션의 내용을 학습하고 실습하면서 다음 항목들을 확인해 보세요.
+
+\begin{itemize}
+    \item \textbf{빈도표 이해 및 생성:}
+    \begin{itemize}
+        \item 질적 데이터의 빈도표를 만드는 목적을 이해했는가?
+        \item Excel의 '고급 필터'를 사용하여 고유한 레코드를 추출할 수 있는가?
+        \item \texttt{COUNTIF} 함수를 사용하여 각 항목의 빈도를 정확히 계산할 수 있는가?
+        \item \texttt{F4} 키를 사용하여 셀 참조를 절대 참조로 고정하는 방법을 이해하고 활용할 수 있는가?
+        \item 상대 빈도를 계산하고 백분율로 서식 지정할 수 있는가?
+        \item 빈도표를 특정 기준(예: 빈도)으로 정렬할 수 있는가?
+    \end{itemize}
+    \item \textbf{막대 그래프 이해 및 생성:}
+    \begin{itemize}
+        \item 막대 그래프가 범주형 데이터 시각화에 적합한 이유를 설명할 수 있는가?
+        \item Excel에서 판매 대수 및 상대 빈도 막대 그래프를 생성할 수 있는가?
+        \item 비연속적인 열을 선택하여 차트를 만드는 방법을 알고 있는가? (\texttt{Ctrl} 키 활용)
+        \item 차트의 기본 서식(제목, 축, 눈금선 등)을 변경할 수 있는가?
+    \end{itemize}
+    \item \textbf{히스토그램 이해 및 생성:}
+    \begin{itemize}
+        \item 히스토그램이 수치형 데이터 시각화에 적합한 이유를 설명할 수 있는가?
+        \item Excel의 '데이터 분석' 추가 기능을 활성화할 수 있는가?
+        \item Excel의 자동 빈 설정을 사용하여 히스토그램을 생성할 수 있는가?
+        \item 사용자 지정 빈을 정의하여 히스토그램을 생성할 수 있는가?
+        \item 빈 크기 선택이 히스토그램의 해석에 미치는 영향을 이해하고 설명할 수 있는가?
+    \end{itemize}
+    \item \textbf{파이 차트 이해 및 생성:}
+    \begin{itemize}
+        \item 파이 차트가 전체 대비 각 부분의 비율을 시각화하는 데 적합한 이유를 설명할 수 있는가?
+        \item Excel에서 파이 차트를 생성하고 데이터 레이블을 추가할 수 있는가?
+        \item 파이 차트와 막대 그래프의 장단점 및 적절한 사용 시점을 비교 설명할 수 있는가?
+    \end{itemize}
+    \item \textbf{전반적인 데이터 시각화 능력:}
+    \begin{itemize}
+        \item 주어진 데이터의 종류(질적/양적)에 따라 적절한 요약 및 시각화 도구를 선택할 수 있는가?
+        \item 시각화된 데이터를 통해 데이터의 패턴이나 주요 특징을 파악하고 설명할 수 있는가?
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section*{FAQ (자주 묻는 질문)}
+
+\begin{itemize}
+    \item \textbf{Q: 빈도표를 만들 때 왜 '고유한 레코드만'을 선택해야 하나요?}
+    \textbf{A:} 원시 데이터에는 수십만 개의 중복된 항목(예: 같은 트럭 모델 이름)이 있을 수 있습니다. 빈도표를 만들려면 각 고유한 항목이 무엇인지 먼저 알아야 합니다. '고유한 레코드만'을 선택하면 중복 없이 각 항목의 목록을 얻을 수 있어, 이 목록을 기준으로 각 항목의 빈도를 계산할 수 있습니다.
+
+    \item \textbf{Q: \texttt{COUNTIF} 함수에서 범위를 고정하기 위해 \texttt{F4} 키를 누르는 것이 왜 중요한가요?}
+    \textbf{A:} \texttt{F4} 키를 눌러 범위를 절대 참조(예: \texttt{\$A\$2:\$A\$233602})로 고정하지 않으면, 수식을 아래 셀로 복사할 때 범위도 함께 이동(상대 참조)하게 됩니다. 이렇게 되면 잘못된 범위에서 빈도를 계산하게 되어 결과가 틀어지게 됩니다. 범위를 고정하면 모든 계산이 동일한 원시 데이터 범위를 참조하게 됩니다.
+
+    \item \textbf{Q: 막대 그래프와 히스토그램은 둘 다 막대를 사용하는데, 어떤 차이가 있나요?}
+    \textbf{A:} 가장 큰 차이는 데이터의 종류와 막대 사이의 간격입니다. 막대 그래프는 '범주형 데이터'(예: 트럭 모델)에 사용되며, 각 막대 사이에 간격이 있습니다. 반면 히스토그램은 '수치형 데이터'(예: 대기 시간)에 사용되며, 막대들이 서로 붙어 있습니다. 히스토그램의 막대는 연속적인 데이터의 특정 '구간(빈)'을 나타냅니다.
+
+    \item \textbf{Q: 히스토그램에서 빈(Bin) 크기를 어떻게 결정해야 하나요?}
+    \textbf{A:} 빈 크기 결정은 중요하면서도 어려운 부분입니다. 너무 크면 데이터의 중요한 세부 정보를 놓치고, 너무 작으면 데이터가 효과적으로 요약되지 않아 패턴을 파악하기 어렵습니다. Excel의 '데이터 분석' 도구는 자동으로 빈을 설정해 주므로, 먼저 이를 활용해 보고, 그 다음 분석 목적에 따라 30초, 60초 등 의미 있는 간격으로 직접 빈을 설정하여 여러 히스토그램을 비교해 보는 것이 좋습니다.
+
+    \item \textbf{Q: 파이 차트는 언제 사용하고, 막대 그래프는 언제 사용하는 것이 좋은가요?}
+    \textbf{A:} 파이 차트는 각 부분이 '전체에서 차지하는 비율'을 강조하고 싶을 때, 특히 범주 수가 적을 때 좋습니다. 반면 막대 그래프는 각 범주의 '절대적인 값'을 비교하거나, 여러 범주 간의 '순위'를 명확히 보여주고 싶을 때, 또는 범주 수가 많을 때 더 효과적입니다. 전달하고자 하는 메시지에 따라 적절한 차트를 선택해야 합니다.
+\end{itemize}
+
+\newpage
+\section*{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=myblue!5!white,colframe=myblue!75!black,title=\textbf{데이터 요약 및 시각화 핵심 도구}]
+\textbf{1. 빈도표 (Frequency Tables)}
+\begin{itemize}
+    \item \textbf{목적:} 질적/양적 데이터의 출현 횟수(빈도)를 정리하여 요약.
+    \item \textbf{Excel 활용:}
+    \begin{itemize}
+        \item \textbf{고유 목록 추출:} '데이터' $\rightarrow$ '고급 필터' $\rightarrow$ '다른 장소에 복사' $\rightarrow$ '고유한 레코드만'.
+        \item \textbf{빈도 계산:} \texttt{=COUNTIF(원시 데이터 범위, 고유 항목)} (범위는 \texttt{F4}로 절대 참조 고정).
+        \item \textbf{상대 빈도:} \texttt{=빈도 / 총합} (총합은 \texttt{F4}로 절대 참조 고정).
+        \item \textbf{정렬:} '홈' $\rightarrow$ '정렬 및 필터' $\rightarrow$ '사용자 지정 정렬'.
+    \end{itemize}
+\end{itemize}
+
+\textbf{2. 막대 그래프 (Bar Graphs)}
+\begin{itemize}
+    \item \textbf{목적:} 범주형 데이터의 빈도/상대 빈도를 막대 길이로 시각화하여 각 범주 간 크기 비교.
+    \item \textbf{Excel 활용:}
+    \begin{itemize}
+        \item \textbf{데이터 선택:} 범주 열과 빈도/상대 빈도 열 선택 (\texttt{Ctrl}로 비연속 열 선택 가능).
+        \item \textbf{차트 삽입:} '삽입' $\rightarrow$ '막대' $\rightarrow$ '2차원 세로 막대형'.
+        \item \textbf{특징:} 막대 사이에 간격 있음.
+    \end{itemize}
+\end{itemize}
+
+\textbf{3. 히스토그램 (Histograms)}
+\begin{itemize}
+    \item \textbf{목적:} 수치형 데이터의 분포를 구간(빈)별 빈도로 시각화.
+    \item \textbf{Excel 활용:}
+    \begin{itemize}
+        \item \textbf{사전 준비:} '데이터 분석' 추가 기능 활성화.
+        \item \textbf{생성:} '데이터' $\rightarrow$ '데이터 분석' $\rightarrow$ '히스토그램'.
+        \item \textbf{설정:} 입력 범위, (선택적) 빈 범위, 레이블, 출력 범위, 차트 출력.
+        \item \textbf{빈 크기:} Excel 자동 설정 또는 사용자 지정 (분석 목적에 따라 조절).
+        \item \textbf{특징:} 막대들이 서로 붙어 있음.
+    \end{itemize}
+\end{itemize}
+
+\textbf{4. 파이 차트 (Pie Charts)}
+\begin{itemize}
+    \item \textbf{목적:} 전체에 대한 각 범주의 비율을 부채꼴 크기로 시각화.
+    \item \textbf{Excel 활용:}
+    \begin{itemize}
+        \item \textbf{데이터 선택:} 범주 열과 비율 열 선택.
+        \item \textbf{차트 삽입:} '삽입' $\rightarrow$ '파이' $\rightarrow$ '2차원 원형'.
+        \item \textbf{특징:} 범주 수가 적을 때 효과적, 전체 대비 비율 강조.
+    \end{itemize}
+\end{itemize}
+
+\textbf{시각화 도구 선택 가이드:}
+\begin{itemize}
+    \item \textbf{파이 차트:} 전체 대비 각 부분의 비율 관계 강조 (범주 소수).
+    \item \textbf{막대 그래프:} 각 범주의 정확한 값 비교, 순위 파악 (범주 다수 가능).
+    \item \textbf{히스토그램:} 수치형 데이터의 전반적인 분포, 패턴 파악.
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\newpage
+\section*{개요: 데이터 탐색 및 생산 모듈 1 (파트 3/3)}
+
+이 문서는 BADM-572: Data-Driven Decision Making 과목의 'Exploring and Producing Data Module 1' 중 마지막 파트(3/3)를 다룹니다.
+주요 목표는 데이터를 시각적으로 요약하고 관계를 탐색하는 방법을 학습하는 것입니다.
+특히, 파이 차트(Pie Charts)를 활용하여 범주형 데이터의 비율을 시각화하고,
+산점도(Scatter Plots)를 통해 두 변수 간의 관계를 파악하는 기술에 중점을 둡니다.
+엑셀(Excel)을 활용한 실제 데이터 시각화 절차와 함께,
+각 차트 유형의 목적, 장단점, 그리고 효과적인 활용 전략을 상세히 설명합니다.
+이 문서를 통해 데이터 시각화의 기본 원리를 이해하고, 실제 비즈니스 의사결정에 필요한 통찰력을 얻을 수 있습니다.
+
+\newpage
+\section{용어 정리}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어 (Term)} & \textbf{쉬운 설명 (Easy Explanation)} & \textbf{원어 (Original Term)} & \textbf{비고 (Notes)} \\
+\midrule
+파이 차트 & 전체에 대한 각 부분의 비율을 부채꼴 모양으로 나타낸 그래프 & Pie Chart & 범주형 데이터에 유용 \\
+범주형 데이터 & 이름이나 라벨로 구분되는 데이터 (예: 트럭 모델) & Categorical Data & \\
+상대 빈도 & 전체 데이터 중 특정 범주가 차지하는 비율 & Relative Frequency & 백분율로 표현 가능 \\
+파이 오브 파이 & 작은 비율의 범주들을 묶어 별도의 파이 차트로 보여주는 방식 & Pie of Pie & 복잡한 파이 차트 가독성 향상 \\
+산점도 & 두 변수 간의 관계를 점으로 표시하여 시각화한 그래프 & Scatter Plot & 두 변수 간의 상관관계 파악 \\
+독립 변수 & 다른 변수에 영향을 주는 변수 (X축에 배치) & Independent Variable & 원인 또는 예측 변수 \\
+종속 변수 & 독립 변수의 영향을 받는 변수 (Y축에 배치) & Dependent Variable & 결과 또는 반응 변수 \\
+시계열 & X축이 시간의 흐름을 나타내는 산점도 & Time Series & 시간 경과에 따른 변화 추세 분석 \\
+상관관계 & 두 변수가 함께 변화하는 경향성 & Correlation & 관계의 방향과 강도 \\
+데이터 레이블 & 차트의 각 요소에 표시되는 실제 값이나 백분율 & Data Labels & 정보의 정확한 전달 \\
+범례 & 차트의 색상이나 패턴이 무엇을 의미하는지 설명하는 요소 & Legend & 차트 해석에 필수적 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{핵심 개념 및 원리}
+
+\subsection{파이 차트 (Pie Charts)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 파이 차트는 전체에 대한 각 부분의 비율을 시각적으로 보여주는 원형 그래프입니다.
+\textbf{직관적 예시/비유:} 피자 한 판을 여러 조각으로 나누어 각 조각이 전체 피자에서 차지하는 비율을 보여주는 것과 같습니다. 각 조각의 크기는 해당 범주의 비율을 나타냅니다.
+\textbf{기술적 정확한 설명:} 파이 차트는 범주형 데이터(Categorical Data)의 분포를 시각화하는 데 특히 유용합니다. 각 범주(예: 트럭 모델)가 전체 시장(Total Market)에서 차지하는 비례적인 시장 점유율(Proportion of the Market)을 한눈에 파악할 수 있도록 돕습니다. 각 슬라이스(slice)는 전체의 백분율을 나타내며, 모든 슬라이스의 합은 100\%가 됩니다.
+\end{conceptbox}
+
+\subsubsection{파이 차트의 활용 목적}
+파이 차트는 주로 다음과 같은 상황에서 사용됩니다:
+\begin{itemize}
+    \item \textbf{시장 점유율 분석:} 특정 제품이나 서비스가 전체 시장에서 차지하는 비율을 보여줄 때.
+    \item \textbf{예산 분배:} 전체 예산이 각 항목에 어떻게 배분되었는지 시각화할 때.
+    \item \textbf{인구 통계:} 특정 그룹이 전체 인구에서 차지하는 비율을 나타낼 때.
+\end{itemize}
+파이 차트는 범주의 수가 적을 때 가장 효과적이며, 각 범주의 비율 차이가 명확할수록 시각적 효과가 좋습니다.
+
+\subsubsection{파이 차트의 한계와 '파이 오브 파이' (Pie of Pie)}
+\begin{warningbox}
+\textbf{파이 차트의 한계:} 범주의 수가 너무 많거나, 각 범주의 비율이 매우 작아서 슬라이스가 너무 얇아지면 차트가 복잡해지고 가독성이 떨어집니다. 특히, 작은 비율의 범주들이 많을 때 이러한 문제가 두드러집니다.
+\end{warningbox}
+
+\begin{conceptbox}
+\textbf{파이 오브 파이 (Pie of Pie):} 이러한 한계를 극복하기 위해 '파이 오브 파이' 차트가 사용됩니다. 이는 원래 파이 차트에서 작은 비율을 차지하는 여러 범주들을 하나로 묶어 '기타(Other)'와 같은 단일 슬라이스로 만든 다음, 이 '기타' 슬라이스를 다시 별도의 작은 파이 차트로 분할하여 상세하게 보여주는 방식입니다.
+\end{conceptbox}
+
+\textbf{파이 오브 파이의 장점:}
+\begin{itemize}
+    \item \textbf{가독성 향상:} 메인 파이 차트의 복잡성을 줄여 주요 범주에 집중할 수 있게 합니다.
+    \item \textbf{세부 정보 제공:} 작은 비율의 범주들도 놓치지 않고 상세하게 분석할 수 있는 기회를 제공합니다.
+    \item \textbf{효과적인 커뮤니케이션:} 데이터의 핵심 메시지를 명확하게 전달하면서도 필요한 세부 정보를 제공할 수 있습니다.
+\end{itemize}
+이 차트를 효과적으로 사용하려면 데이터가 내림차순으로 정렬되어 있는 것이 좋습니다. 엑셀은 기본적으로 하위 몇 개 항목을 자동으로 분리하여 보조 차트를 생성합니다.
+
+\newpage
+\subsection{산점도 (Scatter Plots)}
+
+\begin{conceptbox}
+\textbf{한 줄 핵심 요약:} 산점도는 두 변수 간의 관계를 시각적으로 탐색하기 위해 사용되는 그래프입니다.
+\textbf{직관적 예시/비유:} 키와 몸무게의 관계를 알아보기 위해 사람들의 키와 몸무게를 각각 X축과 Y축에 점으로 찍어보는 것과 같습니다. 점들이 특정 패턴을 보이면 두 변수 사이에 관계가 있다고 추측할 수 있습니다.
+\textbf{기술적 정확한 설명:} 산점도는 두 개의 양적 변수(Quantitative Variables)가 서로 어떻게 관련되어 있는지를 보여줍니다. 각 데이터 포인트는 두 변수의 특정 값을 나타내는 (X, Y) 좌표로 표시됩니다. 이를 통해 변수 간의 상관관계(Correlation) 유무, 관계의 방향(양의 상관관계, 음의 상관관계), 그리고 관계의 강도(강한 관계, 약한 관계)를 시각적으로 파악할 수 있습니다.
+\end{conceptbox}
+
+\subsubsection{독립 변수와 종속 변수}
+산점도를 그릴 때 가장 중요한 것은 어떤 변수를 X축에, 어떤 변수를 Y축에 놓을지 결정하는 것입니다.
+\begin{itemize}
+    \item \textbf{독립 변수 (Independent Variable):} 다른 변수에 영향을 미친다고 가정하는 변수입니다. 보통 원인(Cause)이 되거나 예측(Predictor)하는 역할을 합니다. 산점도에서는 \textbf{X축}에 배치됩니다.
+    \item \textbf{종속 변수 (Dependent Variable):} 독립 변수의 영향을 받는다고 가정하는 변수입니다. 보통 결과(Effect)가 되거나 반응(Response)하는 역할을 합니다. 산점도에서는 \textbf{Y축}에 배치됩니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{예시: 광고비 지출과 판매량}
+\begin{itemize}
+    \item \textbf{질문:} 광고비 지출이 판매량에 영향을 미치는가?
+    \item \textbf{독립 변수 (X축):} 광고 예산 (Advertising Budget) -- 우리가 통제하거나 결정할 수 있는 변수입니다.
+    \item \textbf{종속 변수 (Y축):} 판매량 (Sales) -- 광고 예산에 의해 영향을 받는다고 생각하는 변수입니다.
+\end{itemize}
+이처럼 변수 간의 인과 관계(Causal Relationship)를 가정할 때, 원인 변수를 X축에, 결과 변수를 Y축에 놓는 것이 일반적입니다.
+\end{examplebox}
+
+\subsubsection{시계열 (Time Series)}
+\begin{conceptbox}
+\textbf{시계열 (Time Series):} 특별한 형태의 산점도로, X축이 시간의 흐름(예: 연도, 월, 일)을 나타낼 때 사용됩니다. 시계열 그래프는 시간 경과에 따른 데이터의 변화 추세, 계절성, 주기성 등을 파악하는 데 유용합니다.
+\end{conceptbox}
+\begin{examplebox}
+\textbf{예시: 미국-중국 수출액 시계열}
+1992년부터 2014년까지 미국에서 중국으로의 총 수출액을 연도별로 산점도로 나타내면 시계열 그래프가 됩니다. 이 그래프를 통해 수출액이 시간이 지남에 따라 어떻게 변화했는지, 특정 시점에 급격한 변화가 있었는지 등을 파악할 수 있습니다. 예를 들어, 1992년에서 1999년까지는 완만한 성장세를 보이다가 2000년부터는 상당히 꾸준하고 선형적인 성장을 보였다는 것을 시각적으로 확인할 수 있습니다.
+\end{examplebox}
+
+\subsubsection{산점도 해석의 중요성}
+산점도를 통해 두 변수 간의 관계를 시각적으로 파악하는 것은 데이터 분석의 첫 단계입니다.
+\begin{itemize}
+    \item 점들이 오른쪽 위로 향하는 경향을 보이면 \textbf{양의 상관관계} (Positive Correlation)가 있다고 할 수 있습니다 (예: 광고비 증가 → 판매량 증가).
+    \item 점들이 오른쪽 아래로 향하는 경향을 보이면 \textbf{음의 상관관계} (Negative Correlation)가 있다고 할 수 있습니다.
+    \item 점들이 특별한 패턴 없이 흩어져 있으면 \textbf{상관관계가 없거나 약하다}고 볼 수 있습니다.
+\end{itemize}
+이러한 시각적 분석은 나중에 회귀 분석(Regression Analysis)과 같은 통계적 분석을 수행하기 위한 중요한 기반이 됩니다.
+
+\newpage
+\section{절차/방법: 엑셀을 이용한 데이터 시각화}
+
+\subsection{파이 차트 생성 및 서식 지정 (Excel)}
+
+이 섹션에서는 엑셀을 사용하여 파이 차트를 만들고, 가독성을 높이기 위해 다양한 서식 옵션을 적용하는 방법을 단계별로 설명합니다.
+
+\begin{downloadbox}
+\textbf{자료 다운로드:}
+파이 차트 실습을 위한 엑셀 파일: \texttt{Best-selling Trucks Pie chart excel file}
+(첫 번째 워크시트: \texttt{Best\_Selling\_Trucks\_Table} 참조)
+\end{downloadbox}
+
+\subsubsection{1단계: 데이터 준비 및 선택}
+\begin{itemize}
+    \item \textbf{데이터 확인:} 트럭 모델 판매 데이터(Truck Model Sold Data)를 사용합니다. 이 데이터는 이전에 빈도표(Frequency Table)와 막대 차트(Bar Chart)를 만드는 데 사용되었습니다.
+    \item \textbf{데이터 선택:} 파이 차트를 그릴 데이터를 선택합니다. 일반적으로 '트럭 모델 판매(Truck Model Sold)', '판매 대수(Counts)', '상대 빈도(Relative Frequency)' 열을 선택합니다.
+    \item \textbf{핵심:} 엑셀은 '트럭 모델 판매'를 범주로, '판매 대수'를 각 슬라이스의 크기를 결정하는 값으로 사용합니다. '상대 빈도'를 선택하더라도 엑셀은 기본적으로 '판매 대수'를 기반으로 비율을 계산하여 보여주므로 큰 차이는 없습니다. 각 슬라이스는 시장 점유율의 백분율을 나타냅니다.
+\end{itemize}
+\begin{center}
+    \textit{슬라이드 125 설명: E열(Truck Model Sold), F열(counts), G열(Relative Frequency)이 선택된 모습.}
+\end{center}
+
+\subsubsection{2단계: 파이 차트 삽입}
+\begin{enumerate}
+    \item 엑셀 상단 메뉴에서 \textbf{삽입(Insert)} 탭을 클릭합니다.
+    \item \textbf{차트(Charts)} 그룹에서 \textbf{파이 또는 도넛형 차트 삽입(Insert Pie or Doughnut Chart)} 아이콘을 클릭합니다.
+    \item \textbf{2차원 파이(2-D Pie)} 차트를 선택합니다.
+\end{enumerate}
+\begin{center}
+    \textit{슬라이드 126 설명: 삽입 탭에서 2차원 파이 차트가 선택된 모습.}
+\end{center}
+\begin{center}
+    \textit{슬라이드 127 설명: 각 트럭 모델의 판매 대수를 나타내는 파이 차트가 나타난 모습.}
+\end{center}
+
+\subsubsection{3단계: 차트 서식 지정 및 가독성 향상}
+파이 차트가 생성되면, 정보를 더 명확하게 전달하기 위해 서식을 지정해야 합니다.
+\begin{enumerate}
+    \item \textbf{데이터 레이블 추가:}
+    \begin{itemize}
+        \item 차트를 클릭하면 오른쪽에 나타나는 \textbf{차트 요소(Chart Elements)} 아이콘(\texttt{+})을 클릭합니다.
+        \item \textbf{데이터 레이블(Data Labels)}을 선택합니다. 이렇게 하면 각 슬라이스에 판매 대수가 표시됩니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 127 설명: 데이터 레이블이 추가되어 각 범주별 판매 대수가 표시된 모습.}
+    \end{center}
+
+    \item \textbf{범례(Legend) 및 차트 제목(Chart Title) 설정:}
+    \begin{itemize}
+        \item \textbf{차트 요소} 아이콘에서 \textbf{차트 제목(Chart Title)}과 \textbf{범례(Legend)}가 선택되어 있는지 확인합니다.
+        \item 범례는 각 색상이 어떤 트럭 모델을 나타내는지 보여줍니다 (예: 파란색은 Ford F-Series).
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 128 설명: 차트 요소가 강조되어 있고 차트 제목과 범례가 선택된 모습.}
+        \textit{슬라이드 129 설명: 데이터 레이블이 추가된 모습. 파란색이 Ford F-Series를 나타낸다고 설명.}
+    \end{center}
+
+    \item \textbf{데이터 레이블에 범주 이름 포함 (고급):}
+    \begin{itemize}
+        \item 차트 요소에서 \textbf{데이터 레이블} 옆의 화살표를 클릭한 후 \textbf{기타 옵션(More Options)}을 선택합니다.
+        \item \textbf{데이터 레이블 서식(Format Data Labels)} 작업 창이 나타나면 \textbf{레이블 옵션(Label Options)}에서 \textbf{범주 이름(Category Name)}을 선택합니다.
+        \item 이렇게 하면 각 슬라이스에 트럭 모델 이름과 판매 대수가 함께 표시됩니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 130 설명: 차트 요소가 강조되어 있고 차트 제목, 데이터 레이블, 범례가 선택된 모습. 데이터 레이블을 클릭하여 기타 옵션을 선택하는 과정 설명.}
+        \textit{슬라이드 131 설명: 데이터 레이블이 강조되어 있고 레이블 옵션이 선택된 모습.}
+        \textit{슬라이드 132 설명: 데이터 레이블이 트럭 모델 이름과 판매 대수를 포함하도록 업데이트된 모습.}
+    \end{center}
+    \begin{warningbox}
+    \textbf{주의:} 범주 이름까지 데이터 레이블에 포함하면 차트가 매우 복잡해지고 가독성이 떨어질 수 있습니다. 특히 범주의 수가 많거나 이름이 길 때 더욱 그렇습니다.
+    \end{warningbox}
+\end{enumerate}
+
+\begin{downloadbox}
+\textbf{자료 다운로드:}
+파이 차트 실습 엑셀 파일 (두 번째 워크시트: \texttt{Table\_and\_Pie\_Chart} 참조)
+\end{downloadbox}
+
+\subsubsection{4단계: '파이 오브 파이' 차트 활용 (복잡한 데이터에 대한 해결책)}
+데이터에 작은 시장 점유율을 가진 모델이 많아 파이 차트가 복잡해 보일 때, '파이 오브 파이' 차트를 사용하면 가독성을 크게 높일 수 있습니다.
+\begin{enumerate}
+    \item \textbf{데이터 선택:} '트럭 모델 판매', '판매 대수', '상대 빈도' 열을 다시 선택합니다.
+    \begin{center}
+        \textit{슬라이드 133 설명: 트럭 모델 판매, 판매 대수, 상대 빈도 열이 선택된 모습.}
+    \end{center}
+    \item \textbf{차트 유형 변경:}
+    \begin{itemize}
+        \item 기존 파이 차트를 클릭하고 \textbf{차트 디자인(Chart Design)} 탭으로 이동합니다.
+        \item \textbf{차트 종류 변경(Change Chart Type)}을 클릭합니다.
+        \item \textbf{파이(Pie)} 섹션에서 \textbf{파이 오브 파이(Pie of Pie)}를 선택하고 \textbf{확인(OK)}을 클릭합니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 134 설명: 파이 차트가 강조된 모습.}
+        \textit{슬라이드 135 설명: 파이 오브 파이 차트가 강조된 모습. 특정 섹션을 분리하여 하위 섹션을 만드는 기능 설명.}
+        \textit{슬라이드 136 설명: 첫 번째 파이 차트에서 두 번째 파이 차트가 추가되어 덜 복잡해진 모습.}
+    \end{center}
+
+    \item \textbf{'파이 오브 파이' 서식 지정:}
+    \begin{itemize}
+        \item '파이 오브 파이' 차트를 더블 클릭하여 \textbf{데이터 계열 서식(Format Data Series)} 작업 창을 엽니다.
+        \item \textbf{계열 옵션(Series Options)} 섹션에서 보조 차트에 포함될 항목을 조정할 수 있습니다.
+        \item \textbf{두 번째 그림에 있는 값(Values in second plot):} 기본값은 '하위 4개' 항목을 분리합니다. 이 값을 변경하여 더 많은 항목을 보조 차트로 옮길 수 있습니다 (예: 5, 6 등으로 증가).
+        \item \textbf{두 번째 그림에 있는 백분율(Percentage values in second plot):} 특정 백분율(예: 10\%) 미만의 모든 항목을 보조 차트로 옮길 수 있습니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 138 설명: 계열 옵션이 선택된 모습. 기본적으로 하위 4개 항목을 분리하며, 데이터가 내림차순으로 정렬되어 있어야 함을 강조. 보조 차트 항목 수를 변경하는 방법 설명.}
+        \textit{슬라이드 139 설명: 계열 옵션 창에서 항목 수를 변경하여 파이 차트가 변화하는 모습.}
+        \textit{슬라이드 140 설명: 10\% 미만의 모든 값이 두 번째 차트에 포함되도록 변경된 모습.}
+        \textit{슬라이드 141 설명: 두 번째 파이 차트를 가리키는 화살표. 이 차트의 모든 모델이 시장의 10\% 미만을 차지함을 설명.}
+    \end{center}
+
+    \item \textbf{데이터 레이블을 백분율로 표시:}
+    \begin{itemize}
+        \item 차트 요소에서 \textbf{데이터 레이블}을 선택한 후 \textbf{기타 옵션}으로 이동합니다.
+        \item \textbf{레이블 옵션}에서 \textbf{백분율(Percentage)}을 선택하고 \textbf{값(Values)}은 선택 해제합니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 142 설명: 파이 차트의 데이터 레이블이 선택된 모습.}
+        \textit{슬라이드 143 설명: 파이 차트의 데이터 레이블이 백분율로 변경된 모습. 각 항목이 시장의 10\% 미만을 차지함을 보여줌.}
+    \end{center}
+\end{enumerate}
+\begin{downloadbox}
+\textbf{자료 다운로드:}
+파이 차트 실습 엑셀 파일 (세 번째 워크시트: \texttt{Pie\_of\_Pie} 참조)
+\end{downloadbox}
+
+\begin{summarybox}
+\textbf{파이 차트의 목적:} 데이터를 가장 효과적인 방식으로 요약하여 더 나은 의사소통을 가능하게 하고, 데이터에서 통찰력을 얻어 향후 분석에 활용하는 것입니다. '파이 오브 파이'는 복잡한 데이터를 명확하게 보여주는 좋은 예시입니다.
+\end{summarybox}
+
+\newpage
+\subsection{산점도 생성 및 서식 지정 (Excel)}
+
+이 섹션에서는 엑셀을 사용하여 두 변수 간의 관계를 시각적으로 탐색하는 산점도를 만들고 서식을 지정하는 방법을 단계별로 설명합니다.
+
+\begin{downloadbox}
+\textbf{자료 다운로드:}
+산점도 실습을 위한 엑셀 파일: \texttt{Scatter Plot excel file}
+(첫 번째 워크시트: \texttt{Advertising\_and\_Sales\_Table} 참조)
+\end{downloadbox}
+
+\subsubsection{1단계: 데이터 준비 및 선택}
+\begin{itemize}
+    \item \textbf{데이터 확인:} 광고비(Advertising)와 판매량(Sales) 데이터가 준비되어 있습니다.
+    \item \textbf{변수 식별:}
+    \begin{itemize}
+        \item \textbf{독립 변수 (X축):} 광고비 (Advertising) -- 판매량에 영향을 미친다고 가정하는 변수입니다.
+        \item \textbf{종속 변수 (Y축):} 판매량 (Sales) -- 광고비에 의해 영향을 받는다고 가정하는 변수입니다.
+    \end{itemize}
+    \item \textbf{데이터 선택:} X값과 Y값이 연속된 열에 있어야 합니다. 열 레이블(헤더)을 포함하여 모든 데이터를 선택합니다.
+    \item \textbf{팁:} \texttt{Control + Shift + 아래쪽 화살표} 키를 사용하여 한 번에 모든 데이터를 선택할 수 있습니다.
+\end{itemize}
+\begin{center}
+    \textit{슬라이드 150 설명: A열(Advertising)과 B열(Sales) 두 개의 열로 구성된 스프레드시트. 광고비가 판매량에 영향을 미친다는 가설을 바탕으로 광고비를 독립 변수(X축), 판매량을 종속 변수(Y축)로 설정하는 과정 설명. X축이 시간일 경우 시계열이라고 언급.}
+    \textit{슬라이드 151 설명: 모든 데이터 요소를 한 번에 선택하기 위해 \texttt{Control + Shift + 아래쪽 화살표}를 사용하는 방법 설명. 레이블을 포함하여 선택해도 무방하다고 언급.}
+\end{center}
+
+\subsubsection{2단계: 산점도 삽입}
+\begin{enumerate}
+    \item 엑셀 상단 메뉴에서 \textbf{삽입(Insert)} 탭을 클릭합니다.
+    \item \textbf{차트(Charts)} 그룹에서 \textbf{산점도(X, Y) 또는 거품형 차트 삽입(Insert Scatter (X, Y) or Bubble Chart)} 아이콘을 클릭합니다.
+    \item \textbf{산점도(Scatter)} (점만 표시되는 첫 번째 옵션)를 선택합니다. 선이 연결된 차트는 선택하지 않습니다.
+\end{enumerate}
+\begin{center}
+    \textit{슬라이드 152 설명: 삽입 탭에서 산점도가 선택된 모습.}
+    \textit{슬라이드 153 설명: 판매량과 광고비에 대한 산점도가 나타난 모습. 차트 서식 지정의 필요성 언급.}
+\end{center}
+
+\subsubsection{3단계: 차트 서식 지정 및 가독성 향상}
+산점도가 생성되면, 축 제목 등을 추가하여 차트의 의미를 명확하게 전달해야 합니다.
+\begin{enumerate}
+    \item \textbf{축 제목 추가:}
+    \begin{itemize}
+        \item 차트를 클릭하면 오른쪽에 나타나는 \textbf{차트 요소(Chart Elements)} 아이콘(\texttt{+})을 클릭합니다.
+        \item \textbf{축 제목(Axis Titles)}을 선택합니다. 그러면 X축과 Y축에 '축 제목' 텍스트 상자가 나타납니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 154 설명: 차트 요소가 강조되어 있고 축, 차트 제목, 눈금선이 선택된 모습. 축 제목을 추가하는 방법 설명.}
+        \textit{슬라이드 155 설명: X축 레이블이 선택된 모습.}
+    \end{center}
+    \item \textbf{축 제목 편집:}
+    \begin{itemize}
+        \item X축의 '축 제목' 텍스트 상자를 클릭하고 \texttt{Advertising \$}로 변경합니다.
+        \item Y축의 '축 제목' 텍스트 상자를 클릭하고 \texttt{Sales \$}로 변경합니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 156 설명: 산점도의 X축 레이블이 'Advertising \$'로, Y축 레이블이 'Sales \$'로 변경된 모습.}
+    \end{center}
+
+    \item \textbf{눈금선(Gridlines) 제거 (선택 사항):}
+    \begin{itemize}
+        \item \textbf{차트 요소} 아이콘에서 \textbf{눈금선(Gridlines)}을 선택 해제합니다. 이렇게 하면 차트 배경의 격자선이 사라져 데이터 포인트에 더 집중할 수 있습니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 157 설명: 차트 요소가 강조되어 있고 눈금선이 선택 해제된 모습.}
+    \end{center}
+
+    \item \textbf{추세선(Trendline) 추가 (현재는 제외):}
+    \begin{itemize}
+        \item \textbf{차트 요소} 아이콘에서 \textbf{추세선(Trendline)}을 선택하면 데이터 포인트에 가장 잘 맞는 선이 추가됩니다.
+        \item \textbf{현재 단계에서는 추세선을 추가하지 않습니다.} 추세선은 나중에 회귀 분석과 같은 고급 분석에 사용됩니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 158 설명: 차트 요소가 강조되어 있고 추세선이 선택 해제된 모습. 추세선은 나중에 다른 분석에 사용될 것이라고 설명.}
+    \end{center}
+
+    \item \textbf{데이터 레이블 추가 (선택 사항):}
+    \begin{itemize}
+        \item \textbf{차트 요소} 아이콘에서 \textbf{데이터 레이블(Data Labels)}을 선택하면 각 데이터 포인트의 정확한 값을 표시할 수 있습니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 159 설명: 차트 요소가 강조되어 있고 데이터 레이블이 선택된 모습.}
+    \end{center}
+
+    \item \textbf{차트 스타일 변경 (선택 사항):}
+    \begin{itemize}
+        \item 차트를 클릭하면 오른쪽에 나타나는 \textbf{차트 스타일(Chart Styles)} 아이콘(붓 모양)을 클릭하여 다양한 시각적 스타일을 적용할 수 있습니다. 이는 개인적인 선호도에 따라 선택합니다.
+    \end{itemize}
+    \begin{center}
+        \textit{슬라이드 160 설명: 차트 스타일이 선택된 모습. 다양한 스타일을 선택할 수 있으며, 이는 개인적인 선호도에 따른다고 설명.}
+    \end{center}
+\end{enumerate}
+\begin{downloadbox}
+\textbf{자료 다운로드:}
+산점도 실습 엑셀 파일 (두 번째 워크시트: \texttt{Scatter\_Plot} 참조)
+\end{downloadbox}
+
+\begin{summarybox}
+\textbf{산점도 해석:} 완성된 산점도를 통해 광고비가 증가함에 따라 판매량도 증가하는 경향이 있음을 시각적으로 확인할 수 있습니다. 이는 두 변수 사이에 양의 상관관계가 존재할 가능성을 시사하며, 이러한 시각적 증거는 더 심층적인 통계적 검증의 필요성을 알려줍니다.
+\end{summarybox}
+
+\newpage
+\section{체크리스트: 데이터 시각화 학습 및 활용}
+
+이 체크리스트는 파이 차트와 산점도 학습 및 실제 적용 시 중요한 사항들을 점검하는 데 도움이 됩니다.
+
+\subsection{학습 점검}
+\begin{itemize}
+    \item [ ] 파이 차트의 목적과 적절한 사용 시점을 이해했는가? (범주형 데이터의 비율)
+    \item [ ] 파이 차트가 복잡해질 때 '파이 오브 파이' 차트를 사용하는 이유와 방법을 이해했는가?
+    \item [ ] 산점도의 목적과 적절한 사용 시점을 이해했는가? (두 변수 간의 관계)
+    \item [ ] 독립 변수와 종속 변수의 개념을 명확히 구분하고, 각각 X축과 Y축에 올바르게 배치할 수 있는가?
+    \item [ ] 시계열 그래프가 산점도의 한 종류임을 이해하고 있는가?
+    \item [ ] 각 차트 유형의 시각적 패턴을 통해 데이터에서 어떤 통찰력을 얻을 수 있는지 설명할 수 있는가?
+\end{itemize}
+
+\subsection{엑셀 실습 점검}
+\begin{itemize}
+    \item [ ] 엑셀에서 파이 차트를 성공적으로 생성할 수 있는가?
+    \item [ ] 파이 차트에 데이터 레이블, 범주 이름, 백분율을 추가하고 서식을 지정할 수 있는가?
+    \item [ ] '파이 오브 파이' 차트를 생성하고, 보조 차트에 포함될 항목의 기준(개수 또는 백분율)을 조정할 수 있는가?
+    \item [ ] 엑셀에서 산점도를 성공적으로 생성할 수 있는가?
+    \item [ ] 산점도에 축 제목을 추가하고, X축과 Y축에 올바른 변수 이름을 지정할 수 있는가?
+    \item [ ] 산점도에서 불필요한 눈금선을 제거하거나 데이터 레이블을 추가하는 등 서식을 지정할 수 있는가?
+\end{itemize}
+
+\subsection{데이터 분석 및 커뮤니케이션 점검}
+\begin{itemize}
+    \item [ ] 생성된 차트가 데이터의 핵심 메시지를 명확하고 효과적으로 전달하는가?
+    \item [ ] 차트의 시각적 요소를 통해 얻은 통찰력을 바탕으로 추가적인 질문이나 분석 방향을 제시할 수 있는가?
+    \item [ ] 차트가 비전공자나 처음 보는 사람도 쉽게 이해할 수 있도록 구성되었는가?
+    \item [ ] 데이터 시각화가 단순한 그림 그리기가 아니라, 데이터 요약 및 의사결정 지원 도구임을 인지하고 있는가?
+\end{itemize}
+
+\newpage
+\section{FAQ: 초심자를 위한 질문과 답변}
+
+\begin{itemize}
+    \item \textbf{Q: 파이 차트와 막대 차트는 언제 사용해야 하나요?}
+    \textbf{A:} 파이 차트는 전체에 대한 각 부분의 \textbf{비율}을 보여줄 때 가장 적합합니다. 예를 들어, 시장 점유율이나 예산 분배와 같이 합계가 100\%가 되는 경우에 유용합니다. 반면, 막대 차트는 여러 범주 간의 \textbf{크기 비교}나 시간 경과에 따른 변화를 보여줄 때 더 효과적입니다. 범주의 수가 많거나 비율 차이가 미미할 때는 막대 차트가 파이 차트보다 가독성이 좋습니다.
+
+    \item \textbf{Q: '파이 오브 파이' 차트를 사용하면 항상 좋은가요?}
+    \textbf{A:} '파이 오브 파이'는 메인 파이 차트가 너무 복잡해질 때, 즉 작은 비율의 범주가 너무 많을 때 매우 유용합니다. 하지만 범주의 수가 적거나 모든 범주의 비율이 충분히 클 때는 일반 파이 차트만으로도 충분하며, '파이 오브 파이'는 오히려 차트를 불필요하게 복잡하게 만들 수 있습니다. 데이터의 특성과 전달하고자 하는 메시지에 따라 적절한 차트 유형을 선택하는 것이 중요합니다.
+
+    \item \textbf{Q: 산점도에서 점들이 아무런 패턴 없이 흩어져 있으면 어떻게 해석해야 하나요?}
+    \textbf{A:} 점들이 무작위로 흩어져 있고 특정 방향성이나 군집을 보이지 않는다면, 이는 두 변수 사이에 \textbf{선형적인 관계가 없거나 매우 약하다}는 것을 시사합니다. 즉, 한 변수의 변화가 다른 변수의 변화를 예측하는 데 큰 도움이 되지 않는다는 의미입니다. 하지만 비선형적인 관계가 존재할 가능성도 있으므로, 추가적인 분석이 필요할 수 있습니다.
+
+    \item \textbf{Q: 독립 변수와 종속 변수를 잘못 설정하면 어떤 문제가 발생하나요?}
+    \textbf{A:} 독립 변수와 종속 변수를 잘못 설정하면 차트의 해석이 왜곡될 수 있습니다. 예를 들어, 판매량을 X축에, 광고비를 Y축에 놓으면 광고비가 판매량에 의해 영향을 받는 것처럼 보일 수 있습니다. 이는 우리가 일반적으로 가정하는 인과 관계(광고비가 판매량에 영향을 미침)와 반대이므로, 잘못된 결론을 도출할 위험이 있습니다. 항상 원인으로 생각되는 변수를 X축에, 결과로 생각되는 변수를 Y축에 배치해야 합니다.
+
+    \item \textbf{Q: 엑셀에서 차트를 만들 때 어떤 서식 옵션이 가장 중요한가요?}
+    \textbf{A:} 가장 중요한 서식 옵션은 \textbf{축 제목(Axis Titles)}과 \textbf{차트 제목(Chart Title)}, 그리고 \textbf{데이터 레이블(Data Labels)}입니다. 축 제목은 각 축이 무엇을 나타내는지 명확히 하여 차트의 의미를 이해하는 데 필수적입니다. 차트 제목은 차트 전체의 주제를 요약합니다. 데이터 레이블은 각 데이터 포인트의 정확한 값을 제공하여 오해를 줄이고 정확한 정보를 전달합니다. 불필요한 눈금선 제거 등은 가독성을 높이는 보조적인 역할을 합니다.
+\end{itemize}
+
+\newpage
+\section{빠르게 훑어보기: 1페이지 요약}
+
+\begin{tcolorbox}[colback=myblue!20, colframe=blue!75!black, title=\textbf{데이터 시각화 핵심 요약}]
+
+\textbf{1. 파이 차트 (Pie Charts)}
+\begin{itemize}
+    \item \textbf{목적:} 전체에 대한 각 부분의 \textbf{비율} 시각화 (범주형 데이터).
+    \item \textbf{장점:} 시장 점유율, 예산 분배 등 비율 관계를 직관적으로 파악.
+    \item \textbf{한계:} 범주가 많거나 비율이 작으면 복잡해짐.
+    \item \textbf{해결책: 파이 오브 파이 (Pie of Pie):} 작은 범주들을 묶어 별도 차트로 상세화하여 가독성 향상.
+    \item \textbf{엑셀:} 삽입 탭 $\rightarrow$ 파이 차트 $\rightarrow$ 차트 요소에서 데이터 레이블, 범례, 범주 이름 등 서식 지정.
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{2. 산점도 (Scatter Plots)}
+\begin{itemize}
+    \item \textbf{목적:} \textbf{두 변수 간의 관계} 시각화 (양적 데이터).
+    \item \textbf{변수:}
+    \begin{itemize}
+        \item \textbf{독립 변수 (Independent Variable):} 원인, 예측 변수 $\rightarrow$ \textbf{X축}.
+        \item \textbf{종속 변수 (Dependent Variable):} 결과, 반응 변수 $\rightarrow$ \textbf{Y축}.
+    \end{itemize}
+    \item \textbf{해석:} 점들의 패턴으로 상관관계(양의, 음의, 없음) 파악.
+    \item \textbf{시계열 (Time Series):} X축이 시간일 경우.
+    \item \textbf{엑셀:} 삽입 탭 $\rightarrow$ 산점도 $\rightarrow$ 차트 요소에서 축 제목, 차트 제목, 눈금선, 데이터 레이블 등 서식 지정.
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{3. 공통 시각화 원칙}
+\begin{itemize}
+    \item \textbf{명확성:} 차트 제목, 축 제목, 범례, 데이터 레이블은 필수.
+    \item \textbf{가독성:} 불필요한 요소 제거 (예: 눈금선), 적절한 차트 유형 선택.
+    \item \textbf{목적성:} 데이터의 핵심 메시지를 효과적으로 전달하고, 향후 분석을 위한 통찰력 제공.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

@@ -1,0 +1,1065 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{kotex, xcolor, tcolorbox, booktabs, graphicx, amsmath, amssymb, listings, setspace, fancyhdr, adjustbox}
+\usepackage{hyperref}
+
+% 줄간격 설정
+\onehalfspacing
+% 단락 설정
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+% 표 줄 높이 설정
+\renewcommand{\arraystretch}{1.2}
+
+% 코드 리스팅 설정
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numbersep=6pt,
+  frame=single,
+  captionpos=b, % 캡션을 아래에 배치
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  commentstyle=\color{green!50!black},
+  showstringspaces=false,
+  tabsize=2
+}
+
+% 하이퍼링크 설정
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  filecolor=magenta,
+  urlcolor=cyan,
+  pdftitle={CSCI103 Lecture 2},
+  pdfauthor={UIUC Student},
+  pdfsubject={CSCI E-103: Introduction to the Intellectual Enterprises of CS}
+}
+
+% tcolorbox 스타일 정의
+\tcbset{
+  mybox/.style={
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    boxrule=0.8pt,
+    arc=4mm,
+    boxsep=2mm,
+    left=4mm,
+    right=4mm,
+    top=2mm,
+    bottom=2mm,
+    fonttitle=\bfseries\sffamily,
+    fontupper=\sffamily,
+    fontlower=\sffamily
+  },
+  cautionbox/.style={
+    colback=red!5!white,
+    colframe=red!75!black,
+    boxrule=0.8pt,
+    arc=4mm,
+    boxsep=2mm,
+    left=4mm,
+    right=4mm,
+    top=2mm,
+    bottom=2mm,
+    fonttitle=\bfseries\sffamily,
+    fontupper=\sffamily,
+    fontlower=\sffamily
+  },
+  examplebox/.style={
+    colback=green!5!white,
+    colframe=green!75!black,
+    boxrule=0.8pt,
+    arc=4mm,
+    boxsep=2mm,
+    left=4mm,
+    right=4mm,
+    top=2mm,
+    bottom=2mm,
+    fonttitle=\bfseries\sffamily,
+    fontupper=\sffamily,
+    fontlower=\sffamily
+  }
+}
+
+% 헤더/푸터 설정
+\pagestyle{fancy}
+\fancyhf{} % 모든 헤더/푸터 초기화
+\fancyhead[L]{CSCI103 Lecture 2: 데이터 모델링 및 메타데이터} % 왼쪽 헤더
+\fancyhead[R]{\today} % 오른쪽 헤더
+\fancyfoot[C]{\thepage} % 중앙 푸터
+\renewcommand{\headrulewidth}{0.4pt} % 헤더 구분선
+\renewcommand{\footrulewidth}{0.4pt} % 푸터 구분선
+
+\begin{document}
+
+\begin{tcolorbox}[mybox, title=개요]
+이 문서는 CSCI103 Lecture 2 강의 자료를 통합하여 작성된 시험 대비용 LaTeX 노트입니다.
+데이터 모델링, 메타데이터, 데이터 형식, 압축, 프로파일링 등 핵심 개념을 다룹니다.
+특히, OLTP와 OLAP 시스템의 차이, 다양한 데이터 모델링 기법(스타, 스노우플레이크, 데이터 볼트), 그리고 데이터브릭스 환경에서의 실습(Lab 01) 과정을 상세히 설명합니다.
+비전공자도 쉽게 이해할 수 있도록 배경 설명, 비유, 예시를 풍부하게 포함하며, 과제 및 시험 준비에 필요한 모든 정보를 제공합니다.
+\end{tcolorbox}
+
+\newpage
+\section{용어 정리}
+
+다음 표는 강의에서 다루는 주요 용어들을 쉽게 설명하고 원어와 함께 정리한 것입니다.
+
+\begin{table}[h!]
+\centering
+\caption{주요 용어 정리}
+\label{tab:glossary}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어 (Term)} & \textbf{쉬운 설명 (Easy Explanation)} & \textbf{원어 (Original)} & \textbf{비고 (Notes)} \\
+\midrule
+ACID & 데이터베이스 트랜잭션의 안정성을 보장하는 네 가지 속성 & Atomicity, Consistency, Isolation, Durability & 주로 관계형 데이터베이스와 연관 \\
+BASE & 분산 시스템의 가용성과 확장성을 강조하는 속성 & Basically Available, Soft state, Eventual consistency & NoSQL 시스템에서 주로 사용 \\
+CAP 이론 & 분산 시스템에서 일관성, 가용성, 분할 내성 중 두 가지만 선택 가능 & Consistency, Availability, Partition tolerance & 관계형 DB는 C, NoSQL은 A 선호 \\
+IaaS & 가상 서버, 스토리지 등 IT 인프라를 서비스로 제공 & Infrastructure as a Service & 클라우드 컴퓨팅 모델 \\
+PaaS & 개발 환경 및 플랫폼을 서비스로 제공 & Platform as a Service & 클라우드 컴퓨팅 모델 \\
+SaaS & 소프트웨어 애플리케이션을 서비스로 제공 & Software as a Service & 클라우드 컴퓨팅 모델 \\
+레이크하우스 & 데이터 웨어하우스와 데이터 레이크의 장점을 결합한 아키텍처 & Lakehouse & 데이터브릭스의 핵심 개념 \\
+DAG & 작업의 의존성을 방향성 있는 그래프로 표현 & Directed Acyclic Graph & 스파크 작업 스케줄링에 사용 \\
+ETL & 데이터를 추출, 변환, 로드하는 과정 & Extract, Transform, Load & 데이터 통합의 기본 과정 \\
+스파크 (Spark) & 대규모 데이터 처리를 위한 분산 컴퓨팅 프레임워크 & Spark & 하둡보다 100배 빠름 (메모리 사용) \\
+폴리글랏 (Polyglot) & 여러 프로그래밍 언어를 지원하는 능력 & Polyglot & 스파크가 여러 언어(Python, Scala 등) 지원 \\
+5 Vs of Big Data & 빅데이터의 특징을 나타내는 다섯 가지 요소 & Volume, Velocity, Veracity, Variety, Value & 빅데이터의 본질 이해에 중요 \\
+Veracity & 데이터의 정확성, 신뢰성, 유효성 & Veracity & 데이터 품질과 직결 \\
+개념적 데이터 모델 & 비즈니스 관점에서 데이터의 큰 그림을 정의 & Conceptual Data Model & 비즈니스 사용자 이해에 초점 \\
+논리적 데이터 모델 & 데이터 구조, 관계, 속성 유형을 상세히 정의 & Logical Data Model & 기술적 구현 전 단계 \\
+물리적 데이터 모델 & 실제 데이터 저장 방식에 맞춰 모델을 정의 & Physical Data Model & 특정 데이터베이스 기술에 의존 \\
+NoSQL & 관계형 데이터베이스 외의 다양한 데이터 저장 방식 & Not only SQL & 유연한 스키마, 수평 확장성 \\
+메타데이터 & 데이터에 대한 데이터 & Metadata & 데이터 이해, 관리, 활용에 필수 \\
+데이터 카탈로그 & 메타데이터를 저장하고 관리하는 기술적 리소스 & Data Catalog & 데이터 검색, 거버넌스 지원 \\
+OLTP & 온라인 트랜잭션 처리 시스템 & Online Transaction Processing & 실시간 트랜잭션, 빠른 읽기/쓰기 \\
+OLAP & 온라인 분석 처리 시스템 & Online Analytical Processing & 대규모 데이터 분석, 복잡한 쿼리 \\
+스타 스키마 & 중앙의 팩트 테이블과 주변의 차원 테이블로 구성 & Star Schema & 분석 쿼리 성능 최적화 \\
+스노우플레이크 스키마 & 차원 테이블이 다른 차원 테이블을 참조하는 계층 구조 & Snowflake Schema & 데이터 정규화 수준 높음, 복잡성 증가 \\
+데이터 볼트 & 데이터 웨어하우스 모델링 기법 (허브, 링크, 위성) & Data Vault & 변경 관리 및 감사에 강점 \\
+데이터 컨포먼스 & 데이터의 일관성과 표준화를 보장하는 과정 & Data Conformance & 분석 품질 향상에 필수 \\
+델타 레이크 & 파케이 파일 위에 ACID 트랜잭션 등을 추가한 프로토콜 & Delta Lake & 데이터브릭스의 핵심 데이터 형식 \\
+데이터 압축 & 정보 인코딩에 더 적은 비트를 사용하는 과정 & Data Compression & 저장 공간 절약, I/O 대역폭 감소 \\
+데이터 프로파일링 & 데이터의 품질, 구조, 관계를 분석하는 과정 & Data Profiling & 데이터 품질 문제 식별 \\
+RMSSE & 예측값과 실제값 간의 평균 오차 크기를 측정하는 지표 & Root Mean Square Scaled Error & 모델 성능 평가 지표 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+\section{핵심 개념 및 원리}
+
+\subsection{데이터의 복잡성과 모델링의 필요성}
+
+매일 2.5 퀸틸리언(10$^{18}$) 바이트의 데이터가 생성되며, 이는 계속 증가하고 있습니다. 문서, 소셜 미디어, 클라우드, 웹사이트, IoT 기기, 데이터베이스, 사용자 프로필 등 다양한 소스에서 데이터가 발생합니다. 이처럼 방대하고 다양한 데이터를 효과적으로 관리하고 활용하기 위해서는 데이터 모델링이 필수적입니다.
+
+\begin{tcolorbox}[mybox, title=데이터 모델링이란?]
+데이터 모델링은 데이터를 비즈니스 프로세스 관점에서 조직화하고, 데이터 간의 논리적 관계를 정의하여 비즈니스를 지원하는 과정입니다. 이는 데이터의 구조를 시각적으로 표현하여 이해를 돕고, 데이터 저장 및 검색 효율성을 극대화하는 데 목적이 있습니다.
+\end{tcolorbox}
+
+\subsubsection{데이터 모델링의 3단계}
+데이터 모델링은 일반적으로 세 가지 추상화 수준으로 진행됩니다.
+
+\begin{enumerate}
+    \item \textbf{개념적 데이터 모델 (Conceptual Data Model):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 비즈니스 사용자가 이해할 수 있는 수준에서 데이터의 큰 그림과 핵심 비즈니스 개념을 정의합니다.
+        \item \textbf{직관적 예시:} 은행 업무를 예로 들면, '고객', '계좌', '거래'와 같은 엔티티(개체)와 이들 간의 관계를 정의하는 것입니다. 고객이 계좌를 가지고 있고, 계좌에서 거래가 발생한다는 식입니다.
+        \item \textbf{기술적 설명:} 특정 기술에 종속되지 않고, 비즈니스 요구사항을 기반으로 엔티티, 속성, 관계를 식별합니다. 이는 데이터의 의미(시맨틱)를 정의하는 데 중점을 둡니다.
+    \end{itemize}
+
+    \item \textbf{논리적 데이터 모델 (Logical Data Model):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 개념적 모델을 더 구체화하여 데이터의 구조, 관계, 속성 유형을 상세하게 정의합니다.
+        \item \textbf{직관적 예시:} '고객' 엔티티에 '고객 이름(문자열)', '고객 번호(정수)'와 같은 속성을 추가하고, 각 속성의 데이터 타입을 명시합니다. '고객'과 '주소'가 1대 다 관계를 가질 수 있음을 정의합니다.
+        \item \textbf{기술적 설명:} 특정 데이터베이스 관리 시스템(DBMS)에 독립적이지만, 관계형 모델의 테이블, 컬럼, 기본 키, 외래 키, 관계 등의 개념을 사용하여 데이터를 표현합니다.
+    \end{itemize}
+
+    \item \textbf{물리적 데이터 모델 (Physical Data Model):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 논리적 모델을 실제 데이터 저장 기술(예: 관계형 데이터베이스)에 맞춰 구체적으로 구현하는 모델입니다.
+        \item \textbf{직관적 예시:} '고객'과 '주소'의 다대다 관계를 처리하기 위해 '고객-주소 연결'이라는 중간 테이블(조인 테이블)을 추가하고, 각 테이블의 인덱스, 파티셔닝 전략 등을 정의합니다. 주소 유형을 나타내는 '사용 코드'와 같은 추가 필드를 포함할 수 있습니다.
+        \item \textbf{기술적 설명:} 특정 DBMS의 특징(데이터 타입, 인덱스, 제약 조건, 저장 방식 등)을 반영하여 테이블, 컬럼, 인덱스, 뷰 등을 정의합니다. 성능 최적화를 위한 물리적 설계 요소가 포함됩니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[h!]
+\centering
+\begin{adjustbox}{width=0.8\textwidth}
+\begin{tabular}{p{0.3\textwidth}p{0.6\textwidth}}
+\toprule
+\textbf{모델 단계} & \textbf{설명 및 예시} \\
+\midrule
+\textbf{개념적 모델} & \textbf{비즈니스 관점:} 고객이 제품을 구매하고, 고객은 주소를 가짐. \\
+& \textit{예시:} 고객(이름, 주소) -- 구매 --> 제품(이름, 가격) \\
+\midrule
+\textbf{논리적 모델} & \textbf{구조 및 관계 정의:} 고객 이름(문자열), 고객 번호(정수) 등 속성 타입 명시. \\
+& \textit{예시:} 고객(고객번호:PK, 고객이름:VARCHAR, 주소ID:FK) -- 1:N --> 주소(주소ID:PK, 상세주소:VARCHAR) \\
+\midrule
+\textbf{물리적 모델} & \textbf{저장 기술 구현:} 관계형 DB 테이블, 인덱스, 조인 테이블 추가. \\
+& \textit{예시:} `CUSTOMER` 테이블(고객번호:PK, 이름), `PRODUCT` 테이블(제품ID:PK, 이름), \\
+& `CUSTOMER_ADDRESS` 조인 테이블(고객번호:FK, 주소ID:FK, 사용코드:CHAR(2)) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{데이터 모델링 3단계 요약}
+\label{tab:data_modeling_summary}
+\end{figure}
+
+\subsubsection{데이터 모델링의 이점}
+\begin{itemize}
+    \item \textbf{데이터 가치 극대화:} 데이터의 속성과 관계를 이해하여 최대한의 가치를 얻을 수 있습니다.
+    \item \textbf{시각화:} 데이터 구조를 시각적으로 표현하여 이해를 돕고, 불일치나 오류를 쉽게 발견하고 수정할 수 있습니다.
+    \item \textbf{공통 어휘 및 문서화:} 조직 내 모든 구성원이 데이터를 동일한 방식으로 참조할 수 있는 공통 언어를 제공하여 혼란을 방지합니다.
+    \item \textbf{조기 오류 수정:} 모델링 단계에서 문제를 식별하고 수정함으로써, 개발 후반부에 발생하는 비용을 절감합니다.
+    \item \textbf{효율적인 데이터 저장 및 검색:} 데이터를 가장 효율적인 방식으로 저장하고 검색할 수 있도록 설계합니다.
+\end{itemize}
+
+\subsection{NoSQL 데이터 모델링}
+전통적인 관계형 데이터베이스(SQL)와 달리 NoSQL 데이터베이스는 다양한 데이터 저장 방식을 제공하며, 이에 따라 데이터 모델링 방식에도 차이가 있습니다.
+
+\subsubsection{NoSQL 데이터 저장 유형}
+\begin{itemize}
+    \item \textbf{키-값 저장소 (Key-Value Stores):} 가장 단순한 형태로, 고유한 키와 해당 키에 연결된 값으로 데이터를 저장합니다. (예: Amazon S3, Redis)
+    \item \textbf{빅 테이블 (Big Tables):} 수백만 또는 수십억 개의 행을 저장할 수 있는 대규모 분산 데이터베이스입니다. (예: Google Bigtable, Apache Cassandra, HBase, DynamoDB)
+    \item \textbf{문서 데이터베이스 (Document Databases):} 데이터를 JSON, BSON, XML과 같은 문서 형태로 저장합니다. (예: MongoDB, CouchDB)
+    \item \textbf{그래프 데이터베이스 (Graph Databases):} 노드(개체)와 엣지(관계)를 사용하여 데이터를 저장하며, 복잡한 관계 분석에 적합합니다. (예: Neo4j)
+    \item \textbf{전체 텍스트 검색 (Full-Text Search):} 텍스트 데이터의 효율적인 검색을 위해 사용됩니다. (예: Elasticsearch, Apache Solr)
+\end{itemize}
+
+\subsubsection{NoSQL 모델링의 특징}
+\begin{itemize}
+    \item \textbf{스키마 유연성 (Schema Flexibility):} NoSQL은 '스키마 없음(schema-less)' 또는 '스키마 자유(schema-free)'라고 불리지만, 이는 스키마를 고려하지 않아도 된다는 의미가 아닙니다. 오히려 더 많은 유연성을 제공하므로 모델링에 대한 깊은 고민이 필요합니다. 관계형 DB처럼 데이터를 로드하기 전에 엄격한 스키마를 정의할 필요가 없습니다.
+    \item \textbf{질문 중심 사고 (Question-Oriented Thinking):} 관계형 DB가 '내가 가진 데이터로 무엇을 답할 수 있는가?'에 초점을 맞춘다면, NoSQL은 '비즈니스가 어떤 질문을 하고 싶어 하는가?'에 초점을 맞춰 데이터를 모델링합니다.
+    \item \textbf{비정규화 (Denormalization):} NoSQL 시스템은 대부분 조인(Join)을 효율적으로 지원하지 않으므로, 데이터 중복을 허용하는 비정규화(denormalization)를 선호합니다. 이는 읽기 성능을 향상시키는 데 도움이 됩니다.
+    \item \textbf{와이드 테이블 (Wide Tables):} 수백만 또는 수십억 개의 컬럼을 가질 수 있는 와이드 테이블을 지원하여, 필요한 모든 데이터를 단일 테이블에 저장할 수 있습니다.
+    \item \textbf{데이터 임베딩 vs. 참조 (Embedding vs. Referencing):}
+    \begin{itemize}
+        \item \textbf{임베딩 (Embedding):} 관련 데이터를 하나의 문서나 레코드 안에 직접 포함시키는 방식입니다. 단일 쿼리로 모든 정보를 가져올 수 있어 읽기 성능이 매우 빠릅니다.
+        \item \textbf{참조 (Referencing):} 관계형 DB처럼 다른 테이블의 ID를 참조하는 방식입니다. 여러 쿼리가 필요할 수 있어 임베딩보다 느릴 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}[examplebox, title=데이터 임베딩 예시]
+주문 정보에 제품 정보를 직접 포함하는 경우:
+\begin{verbatim}
+{
+  "order_id": "00001",
+  "customer_id": "C123",
+  "products": [
+    { "product_id": "P001", "name": "Laptop", "price": 1200 },
+    { "product_id": "P002", "name": "Mouse", "price": 25 }
+  ],
+  "order_date": "2023-10-26"
+}
+\end{verbatim}
+이 경우, 주문 ID로 한 번의 쿼리만으로 주문과 관련된 모든 제품 정보를 가져올 수 있습니다.
+\end{examplebox}
+
+\begin{examplebox}[examplebox, title=데이터 참조 예시]
+주문 정보에서 제품 ID만 참조하고 제품 정보는 별도 테이블에 저장하는 경우:
+\begin{verbatim}
+// Order Table
+{
+  "order_id": "00001",
+  "customer_id": "C123",
+  "product_ids": ["P001", "P002"],
+  "order_date": "2023-10-26"
+}
+
+// Product Table
+{ "product_id": "P001", "name": "Laptop", "price": 1200 }
+{ "product_id": "P002", "name": "Mouse", "price": 25 }
+\end{verbatim}
+이 경우, 주문 정보를 가져온 후 다시 제품 ID를 사용하여 제품 테이블에서 정보를 가져와야 하므로 최소 두 번의 쿼리가 필요합니다.
+\end{examplebox}
+
+\begin{tcolorbox}[mybox, title=NoSQL 모델링 규칙]
+\begin{itemize}
+    \item \textbf{비정규화 (Denormalization):} 읽기 성능 향상을 위해 데이터 중복을 허용합니다.
+    \item \textbf{조인 최소화 (Minimal Joins):} 대부분의 NoSQL 시스템은 조인 지원이 없거나 제한적입니다.
+    \item \textbf{데이터 마트 (Data Marts):} 스타 스키마 또는 스노우플레이크 스키마를 활용합니다.
+    \item \textbf{그래프 데이터 저장소 (Graph Data Stores):} 소셜 플랫폼처럼 복잡한 관계를 표현할 때 노드(vertices)와 엣지(edges)를 사용합니다.
+    \item \textbf{인메모리 데이터 저장소 (In-Memory Data Stores):} 빠른 키-값 접근이 필요할 때 사용합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{메타데이터 (Metadata)}
+
+\begin{tcolorbox}[mybox, title=메타데이터란?]
+메타데이터는 '데이터에 대한 데이터'를 의미합니다. 이는 데이터의 의미, 출처, 사용 방법, 소유자, 생성 시점 등 데이터를 설명하는 모든 정보를 포함합니다. 메타데이터는 조직이 정보 자산을 이해하고 관리하며, 데이터로부터 더 큰 비즈니스 가치를 얻는 데 필수적입니다.
+\end{tcolorbox}
+
+\subsubsection{메타데이터가 답하는 질문들}
+메타데이터는 다음과 같은 중요한 질문들에 답하여 데이터의 가치를 높입니다.
+\begin{itemize}
+    \item \textbf{누가 (Who):} 데이터를 생성, 관리, 사용, 소유, 규제하는가?
+    \item \textbf{무엇을 (What):} 데이터의 비즈니스 정의, 사용 규칙, 보안 수준, 약어, 명명 표준은 무엇인가?
+    \item \textbf{어디서 (Where):} 데이터는 어디에 저장되고, 어디서 오며, 어디서 사용되는가? 백업 위치, 지역적 제한은?
+    \item \textbf{왜 (Why):} 데이터를 저장하는 목적과 용도는 무엇이며, 비즈니스 동기는 무엇인가?
+    \item \textbf{언제 (When):} 데이터는 언제 생성/업데이트되었고, 얼마나 오래 저장되어야 하며, 언제 삭제되어야 하는가?
+    \item \textbf{어떻게 (How):} 데이터는 어떻게 포맷되었고, 몇 개의 데이터베이스/소스에 저장되어 있는가?
+\end{itemize}
+
+\subsubsection{메타데이터의 유형}
+\begin{itemize}
+    \item \textbf{비즈니스 메타데이터 (Business Metadata):} 데이터의 비즈니스적 의미를 정의합니다. (예: 온톨로지, 비즈니스 규칙, KPI)
+    \item \textbf{기술적 메타데이터 (Technical Metadata):} 데이터의 기술적 구조와 특성을 정의합니다. (예: 데이터 모델, 데이터 계보(lineage), 저장 방식)
+    \item \textbf{운영 메타데이터 (Operational Metadata):} 데이터의 운영적 측면을 설명합니다. (예: SLA, 데이터 신선도, 사용 패턴)
+\end{itemize}
+
+\subsubsection{데이터 카탈로그 (Data Catalog)}
+데이터 카탈로그는 메타데이터를 저장하고 관리하는 기술적 리소스입니다. 이를 통해 데이터 검색, 데이터 거버넌스, 개인 정보 보호 및 위험 관리, 데이터 가치 평가 등을 지원합니다. 데이터브릭스에도 카탈로그 기능이 내장되어 있습니다.
+
+\subsection{OLTP 시스템 vs. OLAP 시스템}
+
+데이터베이스 시스템은 크게 두 가지 유형으로 나눌 수 있습니다.
+
+\begin{table}[h!]
+\centering
+\caption{OLTP와 OLAP 시스템 비교}
+\label{tab:oltp_olap_comparison}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{0.2\textwidth}p{0.35\textwidth}p{0.35\textwidth}}
+\toprule
+\textbf{특징} & \textbf{OLTP (Online Transaction Processing)} & \textbf{OLAP (Online Analytical Processing)} \\
+\midrule
+\textbf{목적} & 일상적인 비즈니스 운영, 트랜잭션 처리 & 의사 결정 지원, 데이터 분석 \\
+\textbf{데이터 소스} & 운영 데이터베이스 (예: ERP, CRM) & OLTP 시스템에서 추출된 데이터 \\
+\textbf{데이터 특성} & 현재 데이터, 상세하고 원자적 & 이력 데이터, 요약 및 집계 \\
+\textbf{데이터 모델} & 정규화된 ER 다이어그램 (엔티티-관계 모델) & 비정규화된 차원 모델 (스타/스노우플레이크 스키마) \\
+\textbf{주요 작업} & 빠른 읽기/쓰기/업데이트/삭제 (CRUD) & 복잡한 쿼리, 대규모 데이터 스캔 \\
+\textbf{사용자} & 최종 사용자 (고객, 직원) & 데이터 분석가, 비즈니스 사용자 \\
+\textbf{성능 지표} & 트랜잭션 처리량 (Transaction Throughput) & 쿼리 응답 시간 (Query Response Time) \\
+\textbf{데이터 크기} & 기가바이트 (GB) 수준 & 테라바이트 (TB) 이상 \\
+\textbf{업데이트 빈도} & 지속적인 업데이트 & 배치 업데이트 (주기적) \\
+\textbf{예시} & 은행 거래 시스템, 온라인 쇼핑몰 주문 시스템 & 데이터 웨어하우스, 비즈니스 인텔리전스 대시보드 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsubsection{ER 다이어그램 (Entity-Relationship Diagram)}
+ER 다이어그램은 OLTP 시스템에서 관계형 데이터베이스를 모델링하는 데 사용됩니다. 엔티티(개체), 속성(attributes), 엔티티 간의 관계를 시각적으로 표현하며, 데이터의 기술적이고 구체적인 정의(데이터 타입, 기본 키, 외래 키 등)에 중점을 둡니다.
+
+\subsubsection{차원 모델링 (Dimensional Modeling): 스타 스키마 vs. 스노우플레이크 스키마}
+OLAP 시스템에서는 분석 효율성을 위해 차원 모델링을 사용하며, 주로 스타 스키마와 스노우플레이크 스키마가 있습니다.
+
+\begin{enumerate}
+    \item \textbf{스타 스키마 (Star Schema):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 중앙에 하나의 '팩트 테이블(Fact Table)'이 있고, 그 주위를 여러 '차원 테이블(Dimension Table)'이 둘러싸는 형태입니다.
+        \item \textbf{직관적 예시:} '판매'라는 팩트 테이블(거래 금액, 수량 등)이 있고, '고객', '제품', '시간', '지점'과 같은 차원 테이블이 이 판매 팩트와 연결됩니다.
+        \item \textbf{기술적 설명:} 팩트 테이블은 측정 가능한 수치(메트릭)를 포함하고, 차원 테이블은 팩트의 맥락(누가, 무엇을, 언제, 어디서)을 제공합니다. 조인 수가 적어 쿼리 성능이 빠르지만, 데이터 중복이 발생할 수 있습니다 (비정규화).
+    \end{itemize}
+
+    \item \textbf{스노우플레이크 스키마 (Snowflake Schema):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 스타 스키마의 차원 테이블이 다시 다른 차원 테이블을 참조하여 계층 구조를 형성하는 형태입니다.
+        \item \textbf{직관적 예시:} '판매' 팩트 테이블이 '제품' 차원 테이블과 연결되고, '제품' 차원 테이블은 다시 '제품 카테고리' 차원 테이블과 연결되는 식입니다.
+        \item \textbf{기술적 설명:} 스타 스키마보다 더 정규화되어 데이터 중복이 적지만, 더 많은 조인이 필요하여 쿼리 성능이 저하될 수 있습니다. 모델의 복잡성이 증가합니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{table}[h!]
+\centering
+\caption{스타 스키마와 스노우플레이크 스키마 비교}
+\label{tab:star_snowflake_comparison}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{0.2\textwidth}p{0.35\textwidth}p{0.35\textwidth}}
+\toprule
+\textbf{특징} & \textbf{스타 스키마 (Star Schema)} & \textbf{스노우플레이크 스키마 (Snowflake Schema)} \\
+\midrule
+\textbf{구조} & 팩트 테이블 주위에 차원 테이블이 직접 연결 & 차원 테이블이 다른 차원 테이블을 참조하여 계층 형성 \\
+\textbf{정규화 수준} & 낮음 (비정규화) & 높음 (더 정규화됨) \\
+\textbf{데이터 중복} & 높음 & 낮음 \\
+\textbf{조인 수} & 적음 & 많음 \\
+\textbf{쿼리 성능} & 빠름 (단순한 조인) & 느림 (복잡한 조인) \\
+\textbf{구현 복잡성} & 낮음 & 높음 \\
+\textbf{저장 공간} & 더 많이 필요 (중복 데이터) & 더 적게 필요 \\
+\textbf{OLAP 큐브} & 큐브 처리 속도 빠름 & 큐브 처리 속도 느림 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{데이터 웨어하우스 모델링 기법}
+현대 데이터 웨어하우스 모델링에는 크게 세 가지 접근 방식이 있습니다.
+
+\begin{enumerate}
+    \item \textbf{빌 인몬 (Bill Inmon) - 탑다운 접근 (Top-Down Approach):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 데이터 웨어하우스를 먼저 3차 정규화(3NF)된 형태로 구축하고, 그 후에 특정 비즈니스 기능에 맞는 데이터 마트(Data Mart)를 파생시키는 방식입니다.
+        \item \textbf{특징:} 데이터 웨어하우스 자체가 고도로 정규화되어 데이터 중복을 최소화하고 데이터 무결성을 보장합니다. '단일 진실의 원천(Single Source of Truth)'을 강조합니다. 구현 및 유지보수가 복잡하고 쿼리 성능이 느릴 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{랄프 킴볼 (Ralph Kimball) - 바텀업 접근 (Bottom-Up Approach):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 개별 데이터 마트를 먼저 차원 모델(스타/스노우플레이크 스키마)로 구축하고, 이들을 통합하여 데이터 웨어하우스를 형성하는 방식입니다.
+        \item \textbf{특징:} 보고 및 분석에 최적화되어 이해하기 쉽고 쿼리 성능이 빠릅니다. 데이터 마트가 비정규화되어 데이터 중복이 발생할 수 있으며, '단일 진실의 원천'을 유지하기 어려울 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{댄 린스테트 (Dan Linstedt) - 데이터 볼트 (Data Vault):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 인몬과 킴볼 모델의 단점을 보완하기 위해 고안된 모델링 기법으로, 허브(Hubs), 링크(Links), 위성(Satellites)이라는 새로운 개념을 도입합니다.
+        \item \textbf{개념:}
+        \begin{itemize}
+            \item \textbf{허브 (Hubs):} 비즈니스의 핵심 개념(예: 고객, 제품, 주문)을 나타내며, 고유한 비즈니스 키를 저장합니다.
+            \item \textbf{링크 (Links):} 허브 간의 관계를 나타냅니다.
+            \item \textbf{위성 (Satellites):} 허브나 링크의 속성(예: 고객 이름, 주소, 제품 가격)과 해당 속성의 변경 이력을 저장합니다.
+        \end{itemize}
+        \item \textbf{특징:} 변경 관리에 매우 유연하고, 감사 추적성이 뛰어나며, 데이터 로딩 속도가 빠릅니다. 복잡성이 증가할 수 있습니다. 원시 데이터(Raw Vault)와 비즈니스 규칙이 적용된 데이터(Business Vault)를 분리하여 관리합니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{table}[h!]
+\centering
+\caption{데이터 웨어하우스 모델링 기법 비교}
+\label{tab:dwh_modeling_comparison}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{0.2\textwidth}p{0.25\textwidth}p{0.25\textwidth}p{0.25\textwidth}}
+\toprule
+\textbf{특징} & \textbf{인몬 (Inmon)} & \textbf{킴볼 (Kimball)} & \textbf{데이터 볼트 (Data Vault)} \\
+\midrule
+\textbf{접근 방식} & 탑다운 (Top-Down) & 바텀업 (Bottom-Up) & 하이브리드 \\
+\textbf{정규화} & 고도로 정규화 (3NF) & 비정규화 (차원 모델) & 정규화와 비정규화 혼합 \\
+\textbf{핵심 구조} & 정규화된 데이터 웨어하우스 & 차원 모델 기반 데이터 마트 & 허브, 링크, 위성 \\
+\textbf{장점} & 단일 진실의 원천, 데이터 무결성 & 보고/분석 최적화, 이해 용이 & 변경 유연성, 감사 추적성, 빠른 로딩 \\
+\textbf{단점} & 복잡한 구현/유지보수, 느린 쿼리 & 단일 진실의 원천 유지 어려움 & 모델링 복잡성 증가 \\
+\textbf{주요 용도} & 대규모 엔터프라이즈 데이터 통합 & 보고 및 분석 & 운영 유연성, 새로운 소스 추가 용이 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{데이터 아키텍처 레이어 (Bronze, Silver, Gold)}
+데이터 레이크하우스 아키텍처에서는 데이터를 처리하고 정제하는 과정에 따라 세 가지 계층으로 나눕니다.
+
+\begin{enumerate}
+    \item \textbf{브론즈 레이어 (Bronze Layer):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 원본 데이터를 거의 변경 없이 저장하는 초기 수집 영역입니다.
+        \item \textbf{특징:} 엔터프라이즈 애플리케이션, OLTP 데이터베이스 등 다양한 소스에서 CSV, JSON, Parquet, Delta 등 여러 형식의 데이터가 들어옵니다. 최소한의 유효성 검사(예: 타임스탬프 추가, 파일명 기록)만 수행하며, 원본 데이터의 무결성을 유지합니다.
+    \end{itemize}
+
+    \item \textbf{실버 레이어 (Silver Layer):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 브론즈 레이어의 데이터를 정제하고, 변환하며, 다른 데이터 소스와 조인하여 비즈니스 규칙을 적용하는 영역입니다.
+        \item \textbf{특징:} 데이터 정제(클렌징), 정규화, 중복 제거, 데이터 유형 변환 등이 이루어집니다. 데이터 볼트의 Raw Vault와 Business Vault 개념이 이 단계에 해당할 수 있습니다. 데이터 컨포먼스(Data Conformance)를 통해 데이터의 일관성을 확보하기 시작합니다.
+    \end{itemize}
+
+    \item \textbf{골드 레이어 (Gold Layer):}
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 비즈니스 사용자의 분석 및 보고 요구사항에 맞춰 최적화된 형태로 데이터를 집계하고 요약하는 최종 영역입니다.
+        \item \textbf{특징:} 스타 스키마, 데이터 마트, 특수 뷰(View) 등이 생성됩니다. 다양한 유형의 소비자가 쉽게 접근하고 분석할 수 있도록 데이터를 롤업(Roll-up)하고 집계합니다. 보고서, 대시보드, ML 모델 학습 등에 직접 사용됩니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{tcolorbox}[mybox, title=데이터 컨포먼스 (Data Conformance)]
+데이터 컨포먼스는 서로 다른 소스에서 들어온 데이터를 일관된 형식과 의미로 표준화하는 과정입니다. 예를 들어, 우편번호가 '12345' 또는 '123-45'로 입력될 수 있지만, 분석을 위해 '12345'와 같은 5자리 숫자로 통일하는 것입니다. 성별 필드가 'm', 'f', 'male', 'female', '0', '1' 등으로 다양하게 표현될 수 있을 때, 이를 'M'과 'F'로 통일하는 작업도 포함됩니다. 이는 최종 분석의 정확성과 신뢰성을 높이는 데 필수적입니다.
+\end{tcolorbox}
+
+\subsection{도메인 주도 설계 (Domain-Driven Design, DDD)}
+특정 산업 분야(예: 제조, 보험)에서는 데이터 모델을 처음부터 구축하기보다, 해당 산업의 표준화된 엔티티-관계 모델 템플릿을 활용하고 조직의 특정 요구사항에 맞춰 조정하는 도메인 주도 설계를 사용합니다. Open Management Group (OMG)과 같은 기관에서 이러한 템플릿을 제공합니다.
+
+\subsection{데이터 형식 선택}
+데이터를 저장하는 형식(Format)은 파이프라인의 성능, 비용, 유연성에 큰 영향을 미치므로 신중하게 선택해야 합니다.
+
+\subsubsection{데이터 형식 선택 시 고려사항}
+\begin{itemize}
+    \item \textbf{도구 지원:} 모든 도구가 모든 데이터 형식을 지원하는 것은 아닙니다.
+    \item \textbf{저장 및 메모리 제약:} 파일 크기와 메모리 사용량은 중요한 고려 사항입니다.
+    \item \textbf{분할 가능성 (Splitable):} 대용량 파일이 여러 노드에 분산되어 병렬 처리될 수 있는지 여부입니다. 분할 불가능한 파일은 분산 컴퓨팅의 이점을 활용할 수 없습니다.
+    \item \textbf{컬럼 수 및 사용량:} 저장되는 컬럼 수와 분석에 사용되는 컬럼 수를 고려해야 합니다. `SELECT *` 쿼리는 불필요한 데이터를 읽어 성능을 저하시킬 수 있습니다.
+    \item \textbf{데이터 변경 빈도:} 데이터가 얼마나 자주 변경되는지(추가, 업데이트)에 따라 적합한 형식이 달라집니다.
+\end{itemize}
+
+\subsubsection{데이터 형식 분류}
+\begin{enumerate}
+    \item \textbf{텍스트 형식 (Text Formats):}
+    \begin{itemize}
+        \item \textbf{예시:} CSV (Comma Separated Values), JSON (JavaScript Object Notation)
+        \item \textbf{특징:} 사람이 읽기 쉽습니다. 하지만 공간 효율성이 낮고, 데이터 타입이나 구조 검증 기능이 부족하며, 메타데이터가 없거나 중복되어 저장될 수 있습니다. 압축 효율도 낮고, 네이티브 인덱싱이나 검색 기능이 없습니다.
+    \end{itemize}
+
+    \item \textbf{바이너리 형식 (Binary Formats):}
+    \begin{itemize}
+        \item \textbf{예시:} Parquet, Avro, ORC
+        \item \textbf{특징:} 기계가 읽기 쉽고, 공간 효율성이 높으며, 데이터 타입 및 스키마 정보를 내장합니다. 압축 및 인덱싱에 유리합니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{행 기반 vs. 컬럼 기반 형식}
+\begin{itemize}
+    \item \textbf{행 기반 저장소 (Row-Based Stores):}
+    \begin{itemize}
+        \item \textbf{예시:} CSV, JSON, Avro
+        \item \textbf{특징:} 데이터를 행 단위로 저장합니다. 데이터 쓰기 속도가 빠르므로 OLTP 시스템(트랜잭션 처리)에 적합합니다. 데이터 정규화가 업데이트 효율성을 높입니다.
+    \end{itemize}
+
+    \item \textbf{컬럼 기반 저장소 (Column-Based Stores):}
+    \begin{itemize}
+        \item \textbf{예시:} Parquet, ORC
+        \item \textbf{특징:} 데이터를 컬럼 단위로 저장합니다. 특정 컬럼만 읽을 때 I/O 효율성이 높아 대규모 데이터 집계 및 분석(OLAP 시스템)에 적합합니다. 쿼리 속도가 빠릅니다. 비정규화된 데이터 구조에 유리합니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\caption{데이터 형식별 속성 비교}
+\label{tab:data_format_properties}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{형식} & \textbf{컬럼 저장} & \textbf{행 지향} & \textbf{압축 가능} & \textbf{분할 가능} & \textbf{사람이 읽기 가능} & \textbf{바이너리} & \textbf{복잡성} & \textbf{스키마 진화 지원} \\
+\midrule
+CSV & No & Yes & No & Yes & Yes & No & Simple & No \\
+JSON & No & Yes & No & Yes & Yes & No & Medium & Yes \\
+Avro & No & Yes & Yes & Yes & No & Yes & Medium & Yes \\
+Parquet & Yes & No & Yes & Yes & No & Yes & Complex & Yes \\
+ORC & Yes & No & Yes & Yes & No & Yes & Complex & Yes \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsubsection{델타 레이크 (Delta Lake)}
+델타 레이크는 Parquet 파일 형식 위에 구축된 오픈 소스 스토리지 레이어(프로토콜)입니다. Parquet 파일의 장점(컬럼 기반, 압축, 분할 가능)을 유지하면서 다음과 같은 추가 기능을 제공합니다.
+
+\begin{itemize}
+    \item \textbf{ACID 트랜잭션 (ACID Transactions):} 분산 컴퓨팅 환경에서 데이터 무결성과 신뢰성을 보장합니다.
+    \item \textbf{스키마 진화 (Schema Evolution):} 데이터 스키마 변경에 유연하게 대응합니다.
+    \item \textbf{시간 여행 (Time Travel):} 데이터의 과거 버전에 접근하여 특정 시점으로 롤백하거나 변경 이력을 추적할 수 있습니다.
+    \item \textbf{업서트 (Upsert) 작업 간소화:} 기존 행을 업데이트하거나 새 행을 삽입하는 `MERGE` 작업을 단일 명령으로 처리할 수 있습니다.
+    \item \textbf{배치 및 스트리밍 통합:} 배치 처리와 스트리밍 처리를 동일한 테이블에서 지원하여 파이프라인 복잡성을 줄입니다.
+    \item \textbf{트랜잭션 로그 (Transaction Log):} 모든 변경 사항을 기록하여 테이블의 상태를 재구성하고, 데이터 일관성을 유지합니다. (`_delta_log` 디렉토리에 저장)
+\end{itemize}
+
+\subsection{데이터 압축 (Data Compression)}
+데이터 압축은 정보를 인코딩할 때 원본 표현보다 더 적은 비트를 사용하는 과정입니다.
+
+\subsubsection{압축의 중요성}
+\begin{itemize}
+    \item \textbf{디스크 공간 절약:} 저장 비용을 줄입니다.
+    \item \textbf{I/O 대역폭 감소:} 네트워크를 통해 전송되는 데이터 양이 줄어들어 데이터 전송 속도가 빨라집니다.
+    \item \textbf{쿼리 성능 향상:} 더 적은 데이터를 읽으므로 쿼리 실행 시간이 단축됩니다.
+\end{itemize}
+
+\subsubsection{압축 알고리즘 유형}
+\begin{itemize}
+    \item \textbf{손실 압축 (Lossy Compression):} 일부 데이터 손실을 허용하여 압축률을 높입니다. (예: 이미지, 비디오)
+    \item \textbf{무손실 압축 (Lossless Compression):} 원본 데이터를 완벽하게 복원할 수 있습니다. 데이터베이스와 같이 정확성이 중요한 경우에 사용됩니다.
+\end{itemize}
+
+\subsubsection{코덱 (Codec)}
+코덱은 압축기(compressor)와 압축 해제기(decompressor)의 조합입니다. 압축 알고리즘은 압축률과 압축/압축 해제 속도 사이에서 트레이드오프를 가집니다.
+
+\begin{table}[h!]
+\centering
+\caption{인기 있는 압축 코덱 비교}
+\label{tab:compression_codecs}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{코덱} & \textbf{파일 확장자} & \textbf{분할 가능} & \textbf{압축률} & \textbf{압축 속도} \\
+\midrule
+Gzip & .gz & No & 높음 & 중간 \\
+Snappy & .snappy & Yes & 중간 & 매우 빠름 \\
+LZO & .lzo & Yes & 중간 & 빠름 \\
+Zstandard (Zstd) & .zst & Yes & 매우 높음 & 빠름 \\
+Brotli & .br & No & 매우 높음 & 중간 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{데이터 프로파일링 (Data Profiling)}
+데이터 프로파일링은 데이터의 품질, 구조, 관계를 분석하고 이해하는 과정입니다. 데이터 품질 문제(오래된 데이터, 부정확한 데이터)는 비즈니스에 막대한 비용을 초래하므로, 데이터 파이프라인의 소유자와 소비자 모두 데이터 품질을 이해하는 것이 중요합니다.
+
+\subsubsection{데이터 프로파일링의 이점}
+\begin{itemize}
+    \item \textbf{신뢰성 확보:} 데이터의 신뢰도를 높여 의사 결정의 기반을 강화합니다.
+    \item \textbf{더 나은 의사 결정:} 정확하고 신뢰할 수 있는 데이터를 바탕으로 더 나은 비즈니스 결정을 내릴 수 있습니다.
+    \item \textbf{조직화된 데이터:} 데이터의 일관성과 구조를 개선하여 관리를 용이하게 합니다.
+\end{itemize}
+
+\subsubsection{데이터 프로파일링 기법}
+\begin{itemize}
+    \item \textbf{구조적 발견 (Structural Discovery):} 데이터가 일관되고 올바른 형식으로 되어 있는지 확인합니다. (예: 스키마 일치 여부, 기본 통계량 - 최소, 최대, 평균, 표준 편차, 결측치 수)
+    \item \textbf{콘텐츠 발견 (Content Discovery):} 데이터 값 자체의 품질을 평가합니다. (예: Null 값 비율, 유효하지 않은 범위의 값, 잘못된 형식의 값)
+    \item \textbf{관계 발견 (Relationship Discovery):} 서로 다른 데이터 세트 간의 연결을 식별합니다. (예: 퍼지 로직을 사용한 엔티티 해상도, 데이터 병합)
+    \item \textbf{데이터 상관관계 (Data Correlation):} 데이터 포인트 간의 통계적 관계를 분석합니다. (예: 단변량 및 다변량 분석, 요인 분석, 클러스터 분석, 분산 분석)
+    \item \textbf{데이터 시각화 (Data Visualization):} 시각적 도구를 사용하여 데이터의 패턴, 이상치(outliers), 분포 등을 파악합니다. (예: 대시보드, 차트)
+\end{itemize}
+
+\begin{examplebox}[examplebox, title=스파크 데이터 프로파일링 예시]
+스파크 데이터프레임에서 `describe()` 또는 `summary()` 명령을 사용하여 데이터 세트의 통계적 세부 정보를 빠르게 확인할 수 있습니다.
+\begin{lstlisting}[language=Python, caption=Spark DataFrame 요약 통계]
+df.describe().show()
+df.summary().show()
+\end{lstlisting}
+\end{examplebox}
+
+\subsection{데이터 엔지니어링 모범 사례}
+\begin{itemize}
+    \item \textbf{요구사항 이해 및 소비 패턴 모델링:} 데이터 사용자의 요구사항을 명확히 이해하고, 그들의 데이터 소비 패턴에 맞춰 데이터를 모델링합니다.
+    \item \textbf{데이터 품질 가드레일 설정:} 데이터 품질을 보장하기 위한 기준과 프로세스를 수립합니다.
+    \item \textbf{민감 데이터 이해 및 분류:} 개인 정보 등 민감한 데이터를 식별하고 적절하게 분류하여 보호합니다.
+    \item \textbf{메타데이터 관리:} 메타데이터를 최신 상태로 유지하고, 테이블 및 컬럼에 대한 명확한 설명과 주석을 제공합니다.
+    \item \textbf{올바른 파일 형식 선택:} 데이터의 특성과 사용 목적에 맞는 최적의 파일 형식을 선택합니다.
+    \item \textbf{데이터 압축 및 유형 일치:} 데이터를 압축하고, 데이터 유형에 맞는 압축 방식을 선택합니다.
+    \item \textbf{데이터 중복 제거:} 분석 시스템에서도 중복 제거는 중요합니다. 특히 보고 및 집계 시 정확한 계산을 위해 필요합니다.
+\end{itemize}
+
+\newpage
+\section{실습: Lab 01 - 주택 가격 예측}
+
+Lab 01은 데이터브릭스(Databricks) 환경에서 주택 가격을 예측하는 머신러닝 워크플로우를 실습합니다. 이 실습은 데이터 과학 프로젝트의 일반적인 단계를 따릅니다.
+
+\subsection{실습 목표}
+\begin{itemize}
+    \item 데이터브릭스 워크스페이스에서 노트북을 가져오고 실행하는 방법 이해
+    \item 데이터 로드, 탐색, 전처리, 모델링, 평가의 일반적인 데이터 과학 워크플로우 학습
+    \item Spark DataFrame과 Pandas DataFrame 간의 전환 및 Scikit-learn 라이브러리 사용
+    \item Delta Lake 테이블 생성 및 활용
+    \item 데이터 시각화를 통한 데이터 이해 및 모델 분석
+    \item 선형 회귀 모델을 사용하여 주택 가격 예측 및 RMSSE 지표로 모델 성능 평가
+\end{itemize}
+
+\subsection{데이터브릭스 환경 설정 및 노트북 가져오기}
+\begin{enumerate}
+    \item \textbf{노트북 다운로드:} 제공된 Google Drive 링크에서 Lab 01 zip 파일을 다운로드합니다.
+    \item \textbf{워크스페이스 접속:} 데이터브릭스 워크스페이스에 로그인합니다.
+    \item \textbf{노트북 가져오기:}
+    \begin{itemize}
+        \item `Workspace` -> `Home` (또는 원하는 폴더)로 이동합니다.
+        \item 폴더를 생성(`Labs` 등)하고 해당 폴더 안에서 `Import` 버튼을 클릭합니다.
+        \item 다운로드한 zip 파일을 업로드하여 가져옵니다.
+    \end{itemize}
+    \item \textbf{노트북 확인:} 가져온 `lab01` 폴더 안에 `pispark.mml`과 `scikitlearn` 두 개의 노트북이 있는지 확인합니다.
+\end{enumerate}
+
+\begin{cautionbox}[cautionbox, title=중요: 서버리스 환경 제약사항]
+데이터브릭스 무료 에디션(Free Edition)은 서버리스(Serverless) 컴퓨팅 환경을 사용합니다. 현재 서버리스 환경에서는 Spark ML (분산 학습 라이브러리)이 지원되지 않습니다. 따라서 `pispark.mml` 노트북은 실행되지 않거나 오류가 발생할 수 있습니다. \textbf{반드시 `scikitlearn` 버전의 노트북을 사용해야 합니다.} `scikitlearn`은 단일 노드 머신러닝 라이브러리를 사용하며, PySpark Pandas를 통해 분산 Spark DataFrame을 단일 노드 Pandas DataFrame으로 변환하여 처리합니다.
+\end{cautionbox}
+
+\subsection{Lab 01 워크플로우 (Scikit-learn 버전)}
+
+Lab 01은 다음과 같은 단계로 진행됩니다.
+
+\subsubsection{1단계: 비즈니스 이해 (Business Understanding)}
+*   \textbf{목표:} 주어진 주택 가격 데이터를 기반으로 주택 가격을 예측하는 모델을 구축합니다.
+*   \textbf{평가 지표:} RMSSE (Root Mean Square Scaled Error)를 사용하여 예측 모델의 성능을 평가합니다.
+
+\subsubsection{2단계: 환경 설정 및 데이터 로드}
+\begin{enumerate}
+    \item \textbf{스키마 및 볼륨 생성:}
+    \begin{itemize}
+        \item `lab01` 스키마와 `input`, `output` 볼륨을 생성합니다. 이는 데이터 저장 및 관리를 위한 기본 환경을 설정하는 과정입니다.
+        \item \lstset{language=SQL}
+        \begin{lstlisting}[caption=스키마 및 볼륨 생성 코드]
+%sql
+CREATE CATALOG IF NOT EXISTS unity_catalog_demo;
+USE CATALOG unity_catalog_demo;
+CREATE SCHEMA IF NOT EXISTS lab01;
+USE SCHEMA lab01;
+CREATE VOLUME IF NOT EXISTS input;
+CREATE VOLUME IF NOT EXISTS output;
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{CSV 파일 다운로드:}
+    \begin{itemize}
+        \item 공개 GitHub 저장소에서 주택 가격 CSV 파일을 다운로드하여 `input` 볼륨에 저장합니다.
+        \item \lstset{language=bash}
+        \begin{lstlisting}[caption=CSV 파일 다운로드 코드]
+%sh
+wget -O /Volumes/unity_catalog_demo/lab01/input/housing.csv https://raw.githubusercontent.com/apache/spark/master/examples/src/main/resources/housing.csv
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{파일 복사 (선택 사항):}
+    \begin{itemize}
+        \item `dbutils.fs.cp` 명령을 사용하여 `input` 볼륨에서 `output` 볼륨으로 파일을 복사합니다. 이는 파일 이동을 보여주는 예시입니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=파일 복사 코드]
+dbutils.fs.cp("/Volumes/unity_catalog_demo/lab01/input/housing.csv", "/Volumes/unity_catalog_demo/lab01/output/housing.csv")
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{데이터 경로 설정:}
+    \begin{itemize}
+        \item 데이터 파일 경로를 변수로 설정하여 이후 코드에서 쉽게 참조할 수 있도록 합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=데이터 경로 변수 설정 코드]
+housing_path = "/Volumes/unity_catalog_demo/lab01/output/housing.csv"
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{데이터 로드 및 확인:}
+    \begin{itemize}
+        \item CSV 파일을 Spark DataFrame으로 읽어들이고, `display()` 명령으로 데이터를 확인합니다. `df.describe().show()`를 추가하여 통계 요약을 볼 수도 있습니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=데이터 로드 및 확인 코드]
+df = spark.read.csv(housing_path, header=True, inferSchema=True)
+display(df)
+        \end{lstlisting}
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{3단계: 데이터 전처리 및 탐색 (Data Preparation & Exploration)}
+\begin{enumerate}
+    \item \textbf{데이터프레임 확장:}
+    \begin{itemize}
+        \item 기존 데이터프레임에 `date` (Unix 타임스탬프 변환)와 `zipcode` (문자열 캐스팅) 컬럼을 추가합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=데이터프레임 컬럼 추가 코드]
+from pyspark.sql.functions import from_unixtime, col
+df_augmented = df.withColumn("date", from_unixtime(col("date"))) \
+                 .withColumn("zipcode", col("zipcode").cast("string"))
+display(df_augmented)
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{Delta 테이블로 저장:}
+    \begin{itemize}
+        \item 전처리된 데이터를 `table_housing`이라는 Delta 테이블로 저장합니다. Delta Lake는 데이터브릭스의 기본 형식이며, ACID 트랜잭션, 스키마 진화 등의 기능을 제공합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=Delta 테이블 저장 코드]
+df_augmented.write.format("delta").mode("overwrite").saveAsTable("table_housing")
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{테이블 탐색:}
+    \begin{itemize}
+        \item `DESCRIBE EXTENDED table_housing` 명령으로 테이블의 상세 정보를 확인합니다. `provider`가 `delta`인지 확인합니다.
+        \item \lstset{language=SQL}
+        \begin{lstlisting}[caption=Delta 테이블 상세 정보 확인 코드]
+%sql
+DESCRIBE EXTENDED table_housing;
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{기본 쿼리 및 시각화:}
+    \begin{itemize}
+        \item 집 코드별 가격 추세 등 기본적인 SQL 쿼리를 실행하여 데이터를 이해합니다.
+        \item 가격과 주거 면적(`sqft_living`) 간의 상관관계를 시각화합니다.
+        \item \textbf{시각화 방법:} 쿼리 결과 셀 옆의 `+` 버튼을 클릭하고 `Visualization`을 선택합니다. `Scatter plot`을 선택하고 X축을 `sqft_living`, Y축을 `price`로 설정하면 주거 면적이 넓을수록 가격이 높아지는 경향을 확인할 수 있습니다.
+        \item \lstset{language=SQL}
+        \begin{lstlisting}[caption=가격과 주거 면적 상관관계 쿼리]
+%sql
+SELECT price, sqft_living FROM table_housing;
+        \end{lstlisting}
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{4단계: 데이터 모델링 (Data Modeling)}
+\begin{enumerate}
+    \item \textbf{ANSI SQL 모드 비활성화:}
+    \begin{itemize}
+        \item Pandas와 Spark의 호환성을 위해 `spark.sql.ansi.enabled` 설정을 `false`로 변경합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=ANSI SQL 모드 설정 코드]
+spark.conf.set("spark.sql.ansi.enabled", False)
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{특징 엔지니어링 (Feature Engineering):}
+    \begin{itemize}
+        \item `zipcode` 컬럼을 `LabelEncoder`를 사용하여 고유한 숫자 값으로 인코딩합니다.
+        \item 예측 모델에 사용할 특징(features)을 조합합니다.
+        \item Spark DataFrame을 Pandas DataFrame으로 변환하여 Scikit-learn 라이브러리를 사용하고, 다시 Spark DataFrame으로 변환하는 과정을 거칩니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=특징 엔지니어링 코드]
+import pyspark.pandas as ps
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from pyspark.ml.feature import VectorAssembler
+
+# Spark DataFrame을 PySpark Pandas DataFrame으로 변환
+psdf = ps.DataFrame(spark.table("table_housing"))
+
+# Pandas DataFrame으로 변환하여 Scikit-learn LabelEncoder 사용
+pdf = psdf.to_pandas()
+le = LabelEncoder()
+pdf['zipcode_encoded'] = le.fit_transform(pdf['zipcode'])
+
+# 다시 PySpark Pandas DataFrame으로 변환
+psdf_encoded = ps.DataFrame(pdf)
+
+# 특징 조합 (VectorAssembler는 Spark ML이지만, 여기서는 개념 설명)
+# 실제 Scikit-learn에서는 features 리스트를 직접 사용
+features = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'waterfront', 'view', 'condition', 'grade', 'sqft_above', 'sqft_basement', 'yr_built', 'yr_renovated', 'zipcode_encoded', 'lat', 'long', 'sqft_living15', 'sqft_lot15']
+psdf_final = psdf_encoded[features + ['price']]
+
+# 최종 Spark DataFrame으로 변환
+df_final = psdf_final.to_spark()
+display(df_final)
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{훈련/테스트 데이터 분할:}
+    \begin{itemize}
+        \item `randomSplit()` 함수를 사용하여 데이터를 훈련 세트(80\%)와 테스트 세트(20\%)로 나눕니다. 재현성을 위해 `seed` 값을 설정합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=훈련/테스트 데이터 분할 코드]
+train_df, test_df = df_final.randomSplit([0.8, 0.2], seed=123)
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{선형 회귀 모델 학습 및 평가:}
+    \begin{itemize}
+        \item Scikit-learn의 `LinearRegression` 모델을 사용하여 훈련 데이터에 모델을 학습시킵니다.
+        \item 모델의 계수(coefficients)와 절편(intercept)을 출력하고, `mean_squared_error` 및 `r2_score`를 사용하여 모델 성능을 평가합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=선형 회귀 모델 학습 및 평가 코드]
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+
+# Spark DataFrame을 Pandas DataFrame으로 변환
+train_pdf = train_df.toPandas()
+test_pdf = test_df.toPandas()
+
+X_train = train_pdf[features]
+y_train = train_pdf['price']
+X_test = test_pdf[features]
+y_test = test_pdf['price']
+
+# 모델 학습
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# 모델 파라미터 출력
+print(f"Coefficients: {model.coef_}")
+print(f"Intercept: {model.intercept_}")
+
+# 예측
+predictions = model.predict(X_test)
+
+# 모델 평가
+rmse = np.sqrt(mean_squared_error(y_test, predictions))
+r2 = r2_score(y_test, predictions)
+
+print(f"RMSE: {rmse}")
+print(f"R2 Score: {r2}")
+        \end{lstlisting}
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{5단계: 예측 및 모델 분석 (Prediction & Model Analysis)}
+\begin{enumerate}
+    \item \textbf{예측 수행:}
+    \begin{itemize}
+        \item 학습된 모델을 사용하여 테스트 데이터에 대한 예측을 수행하고, 예측 결과를 데이터프레임에 추가합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=예측 수행 코드]
+# 예측 결과를 Pandas DataFrame에 추가
+test_pdf['prediction'] = predictions
+
+# 다시 PySpark Pandas DataFrame으로 변환
+psdf_predictions = ps.DataFrame(test_pdf)
+
+# 최종 Spark DataFrame으로 변환
+df_predictions = psdf_predictions.to_spark()
+display(df_predictions)
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{예측 결과 Delta 테이블로 저장:}
+    \begin{itemize}
+        \item 예측 결과를 `table_predictions`라는 Delta 테이블로 저장하여 영구적으로 보존합니다.
+        \item \lstset{language=Python}
+        \begin{lstlisting}[caption=예측 결과 Delta 테이블 저장 코드]
+df_predictions.write.format("delta").mode("overwrite").saveAsTable("table_predictions")
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{RMSSE 평가 및 시각화:}
+    \begin{itemize}
+        \item 예측값과 실제값 간의 잔차(residual errors)를 계산하고, RMSSE를 기준으로 오차 분포를 시각화합니다.
+        \item \textbf{시각화 방법:} 쿼리 결과 셀 옆의 `+` 버튼을 클릭하고 `Visualization`을 선택합니다.
+        \begin{itemize}
+            \item \textbf{히스토그램:} `Histogram`을 선택하고 X축을 `residual_error`로 설정합니다. `Number of bins`를 조정하여 오차 분포를 확인합니다. 대부분의 오차가 0 근처에 집중되어 있음을 볼 수 있습니다.
+            \item \textbf{파이 차트:} `Pie chart`를 선택하고 X축을 `RMSSE_multiple`, Y축을 `count`로 설정합니다. 이를 통해 RMSSE 1 이내에 들어오는 예측의 비율(예: 80\%)과 RMSSE 2 이내에 들어오는 예측의 비율(예: 96\%)을 확인할 수 있습니다.
+        \end{itemize}
+        \item \lstset{language=SQL}
+        \begin{lstlisting}[caption=RMSSE 평가 및 시각화 쿼리]
+%sql
+WITH errors AS (
+  SELECT
+    price,
+    prediction,
+    (price - prediction) AS residual_error,
+    ABS(price - prediction) / (SELECT STDDEV(price) FROM table_predictions) AS RMSSE_multiple
+  FROM table_predictions
+)
+SELECT
+  CASE
+    WHEN RMSSE_multiple <= 1 THEN 'Within RMSSE 1'
+    WHEN RMSSE_multiple <= 2 THEN 'Within RMSSE 2'
+    ELSE 'Outside RMSSE 2'
+  END AS RMSSE_category,
+  COUNT(*) AS count
+FROM errors
+GROUP BY RMSSE_category;
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{모델 성능 해석:}
+    \begin{itemize}
+        \item 주택 가격의 범위가 매우 넓음(예: 5만 달러에서 5백만 달러)을 고려할 때, RMSSE가 작은 범위(예: 1 또는 2 이내)에 집중되어 있다면 모델이 가격을 상당히 정확하게 예측했다고 볼 수 있습니다.
+    \end{itemize}
+\end{enumerate}
+
+\newpage
+\section{체크리스트}
+
+이 체크리스트는 강의 내용을 학습하고 과제를 수행하며, 최종 문서를 검토하는 데 도움이 됩니다.
+
+\subsection{학습 및 이해 점검}
+\begin{itemize}
+    \item [ ] ACID, BASE, CAP 이론의 개념과 차이를 명확히 이해했는가?
+    \item [ ] IaaS, PaaS, SaaS의 정의와 예시를 설명할 수 있는가?
+    \item [ ] 레이크하우스 아키텍처의 장점을 설명할 수 있는가?
+    \item [ ] 데이터 모델링의 3단계(개념적, 논리적, 물리적)를 설명하고 각 단계의 목적을 이해했는가?
+    \item [ ] NoSQL 데이터 모델링의 특징(비정규화, 임베딩 vs. 참조)을 이해했는가?
+    \item [ ] 메타데이터의 중요성과 유형(비즈니스, 기술, 운영)을 설명할 수 있는가?
+    \item [ ] OLTP와 OLAP 시스템의 주요 차이점을 설명할 수 있는가?
+    \item [ ] 스타 스키마와 스노우플레이크 스키마의 구조와 장단점을 비교할 수 있는가?
+    \item [ ] 인몬, 킴볼, 데이터 볼트 모델링 기법의 특징과 차이점을 이해했는가?
+    \item [ ] 브론즈, 실버, 골드 데이터 레이어의 역할과 목적을 설명할 수 있는가?
+    \item [ ] 데이터 형식(텍스트 vs. 바이너리, 행 기반 vs. 컬럼 기반) 선택의 중요성을 이해했는가?
+    \item [ ] 델타 레이크의 주요 기능(ACID, 스키마 진화, 시간 여행)을 설명할 수 있는가?
+    \item [ ] 데이터 압축의 중요성과 유형(손실 vs. 무손실)을 이해했는가?
+    \item [ ] 데이터 프로파일링의 목적과 주요 기법을 설명할 수 있는가?
+\end{itemize}
+
+\subsection{Lab 01 실습 점검}
+\begin{itemize}
+    \item [ ] Lab 01 노트북(`scikitlearn` 버전)을 데이터브릭스 워크스페이스에 성공적으로 가져왔는가?
+    \item [ ] 스키마 및 볼륨 생성 셀을 성공적으로 실행했는가?
+    \item [ ] CSV 파일 다운로드 및 복사 셀을 성공적으로 실행했는가?
+    \item [ ] Spark DataFrame으로 데이터를 로드하고 `display()`로 확인했는가?
+    \item [ ] `date` 및 `zipcode` 컬럼을 추가하고 데이터프레임을 확장했는가?
+    \item [ ] 확장된 데이터를 `table_housing` Delta 테이블로 저장했는가?
+    \item [ ] `DESCRIBE EXTENDED` 명령으로 `table_housing`의 Delta 형식을 확인했는가?
+    \item [ ] 가격과 주거 면적(`sqft_living`) 간의 상관관계를 산점도(scatter plot)로 시각화했는가?
+    \item [ ] `spark.sql.ansi.enabled` 설정을 `False`로 변경했는가?
+    \item [ ] `zipcode` 컬럼을 `LabelEncoder`로 인코딩하고 특징을 조합했는가?
+    \item [ ] 데이터를 훈련 세트와 테스트 세트로 `randomSplit()`을 사용하여 분할했는가?
+    \item [ ] Scikit-learn `LinearRegression` 모델을 훈련 데이터에 학습시켰는가?
+    \item [ ] 모델의 `RMSE`와 `R2 Score`를 확인했는가?
+    \item [ ] 학습된 모델로 테스트 데이터에 대한 예측을 수행하고 `prediction` 컬럼을 추가했는가?
+    \item [ ] 예측 결과를 `table_predictions` Delta 테이블로 저장했는가?
+    \item [ ] 잔차 오차(`residual_error`)의 분포를 히스토그램으로 시각화했는가?
+    \item [ ] RMSSE 1 및 RMSSE 2 이내에 들어오는 예측의 비율을 파이 차트로 시각화했는가?
+    \item [ ] 모델 성능 평가 결과를 올바르게 해석할 수 있는가?
+\end{itemize}
+
+\newpage
+\section{FAQ (자주 묻는 질문)}
+
+\begin{tcolorbox}[mybox, title=Q: 과제에서 AI 어시스턴트(예: Databricks AI Assistant)를 사용해도 되나요?]
+\textbf{A:} 네, 사용해도 됩니다. 이 과정의 목적은 개념을 학습하는 것이며, AI 어시스턴트와 코파일럿은 현대 시대에 피할 수 없는 도구입니다. 올바른 질문을 통해 이점을 얻는 것은 좋습니다. 다만, 단순히 답을 얻는 것을 넘어, 먼저 스스로 시도하여 개념을 이해하고 '근육 기억'을 형성하는 것이 중요합니다. 그래야 정보가 더 오래 기억됩니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Q: 과제 2.9에서 '데이터베이스 생성'이 무엇을 의미하나요? 스키마와 데이터베이스의 차이는 무엇인가요?]
+\textbf{A:} 과제 2.9에서 '데이터베이스 생성'은 사실상 '스키마 생성'을 의미합니다. 데이터브릭스 유니티 카탈로그(Unity Catalog) 환경에서 '스키마(Schema)'와 '데이터베이스(Database)'는 상호 교환 가능한 용어입니다. 제공된 코드는 카탈로그를 생성하고, 그 안에 스키마를 생성하며, 해당 스키마를 활성 스키마로 설정합니다. 테이블은 이 스키마 안에 생성됩니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Q: 과제에서 데이터베이스 이름을 `_assignment_one` 대신 `username_assignment_one`으로 해야 한다고 되어 있는데, 어떻게 해야 하나요?]
+\textbf{A:} 현재는 자신의 환경에서 작업하므로, `_assignment_one`과 같은 이름으로 진행해도 됩니다. `username_assignment_one`은 과거에 모든 사용자가 공유 환경을 사용할 때 충돌을 피하기 위한 지침이었습니다. 강사가 과제 지침을 수정할 예정이므로, 현재 제공된 코드의 이름으로 따라가세요.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Q: 제 과제 2.9 내용이 강사님이 보여주신 것과 다릅니다. CSV 파일을 테이블로 파싱하라는 내용이 있는데, 더 이상 하지 않나요?]
+\textbf{A:} 네, 더 이상 CSV 파일을 테이블로 파싱할 필요가 없습니다. 강사가 지침을 업데이트하고 다시 업로드했지만, 다운로드한 버전이 이전 버전일 수 있습니다. CSV 테이블 대신 델타 테이블만 생성하면 됩니다. 최신 버전을 다시 다운로드하여 확인하거나, CSV 관련 단계를 건너뛰고 델타 테이블 생성 부분만 진행하세요.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Q: 데이터 자산(data assets)은 어디서 찾을 수 있나요? 온라인에서 직접 찾아야 하나요?]
+\textbf{A:} 아니요, 데이터 자산은 Google Drive의 `assignment 01` 폴더 안에 있습니다. `assignment 01` 폴더에는 과제 노트북과 `data` 디렉토리가 있습니다. `data` 디렉토리 안에 `blog.json`, `people-10m` (parquet 파일), `names` 데이터셋이 있습니다. 이 파일들을 다운로드하여 데이터브릭스 볼륨에 업로드해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Q: 데이터브릭스 볼륨에 데이터를 업로드하는 구체적인 절차는 무엇인가요?]
+\textbf{A:}
+\begin{enumerate}
+    \item 데이터브릭스 워크스페이스에서 `Catalog`로 이동합니다.
+    \item 과제용으로 생성한 카탈로그와 스키마를 선택합니다.
+    \item `Volumes` 탭에서 `Create Volume`을 클릭하여 관리형 볼륨을 생성합니다.
+    \item 생성된 볼륨 안에 `people-10m`, `names`와 같은 디렉토리를 생성합니다.
+    \item 각 디렉토리로 이동하여 `Upload to this volume`을 클릭하고, 로컬에 다운로드한 해당 데이터 파일(예: `blog.json`, `parquet` 파일)을 업로드합니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Q: Pandas DataFrame이 Spark DataFrame보다 느린 이유는 무엇인가요?]
+\textbf{A:} Pandas DataFrame은 기본적으로 단일 노드(single node)에서 작동하도록 설계되었습니다. 즉, 데이터를 하나의 머신 메모리 내에서 처리합니다. 반면 Spark DataFrame은 분산 엔진으로, 여러 워커 노드에 작업을 분할하여 병렬로 처리합니다. 따라서 데이터 세트가 단일 머신의 메모리를 초과하거나 대규모일 경우, Spark DataFrame이 Pandas DataFrame보다 훨씬 빠르게 작업을 완료할 수 있습니다. Spark DataFrame을 Pandas DataFrame으로 변환할 때 느려지는 것은, 분산된 Spark 데이터를 하나의 드라이버 노드로 '수집(collect)'하여 Pandas가 처리할 수 있는 단일 객체로 만들기 때문입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Q: Lab 노트북을 어떻게 공부해야 하나요? 모든 단계를 암기해야 하나요?]
+\textbf{A:} 모든 단계를 암기할 필요는 없습니다. 중요한 것은 '의도'와 '목적'을 이해하는 것입니다. 어떤 ML 프로젝트든 공통적으로 거치는 7~8단계의 스캐폴딩(scaffolding)을 이해하고, 각 단계에서 어떤 종류의 작업(예: 데이터 요약, 훈련/테스트 분할)이 필요한지 아는 것이 중요합니다. 구체적인 명령어(syntax)는 사용하는 언어나 플랫폼에 따라 달라지지만, 개념은 동일합니다. 또한, Lab 내용은 과제와 높은 상관관계를 가지므로, Lab에 익숙해지면 과제 수행에 큰 도움이 될 것입니다.
+\end{tcolorbox}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[mybox, title=데이터 모델링의 핵심]
+데이터 모델링은 방대한 데이터를 비즈니스 관점에서 조직화하고, 효율적인 저장 및 검색을 위해 구조화하는 과정입니다.
+\begin{itemize}
+    \item \textbf{3단계:} 개념적(비즈니스), 논리적(구조), 물리적(구현) 모델로 점진적 구체화.
+    \item \textbf{이점:} 데이터 가치 극대화, 시각화, 공통 어휘, 조기 오류 수정.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=NoSQL 모델링]
+관계형 DB와 달리 유연한 스키마와 비정규화를 선호하며, 조인 대신 데이터 임베딩을 통해 읽기 성능을 최적화합니다.
+\begin{itemize}
+    \item \textbf{유형:} 키-값, 빅 테이블, 문서, 그래프 DB 등.
+    \item \textbf{특징:} 질문 중심 사고, 비정규화, 와이드 테이블.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=메타데이터의 중요성]
+'데이터에 대한 데이터'로, 데이터의 의미, 출처, 사용법 등을 설명하여 데이터 이해, 관리, 활용을 돕습니다.
+\begin{itemize}
+    \item \textbf{유형:} 비즈니스, 기술, 운영 메타데이터.
+    \item \textbf{관리:} 데이터 카탈로그를 통해 메타데이터를 저장하고 검색합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=OLTP vs. OLAP]
+\textbf{OLTP:} 실시간 트랜잭션 처리, 정규화된 ER 모델, 빠른 읽기/쓰기.
+\textbf{OLAP:} 대규모 데이터 분석, 비정규화된 차원 모델(스타/스노우플레이크), 복잡한 쿼리.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=데이터 웨어하우스 모델링]
+\begin{itemize}
+    \item \textbf{인몬:} 탑다운, 3NF 정규화, 단일 진실의 원천.
+    \item \textbf{킴볼:} 바텀업, 차원 모델(스타/스노우플레이크), 보고/분석 최적화.
+    \item \textbf{데이터 볼트:} 허브, 링크, 위성으로 변경 관리 및 감사에 강점.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=데이터 아키텍처 레이어]
+\begin{itemize}
+    \item \textbf{브론즈:} 원본 데이터 수집 (최소한의 변경).
+    \item \textbf{실버:} 데이터 정제, 변환, 비즈니스 규칙 적용 (데이터 컨포먼스).
+    \item \textbf{골드:} 분석 및 보고에 최적화된 집계 데이터 (스타 스키마, 데이터 마트).
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=데이터 형식 및 압축]
+\textbf{형식:} 텍스트(CSV, JSON) vs. 바이너리(Parquet, Avro), 행 기반 vs. 컬럼 기반. 분석에는 컬럼 기반 바이너리 형식이 유리.
+\textbf{델타 레이크:} Parquet + ACID 트랜잭션, 스키마 진화, 시간 여행.
+\textbf{압축:} 디스크 공간 절약, I/O 감소. 무손실 압축(데이터베이스)과 손실 압축(이미지) 구분.
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=데이터 프로파일링]
+데이터 품질(정확성, 신뢰성)을 분석하여 문제점을 식별하고 해결합니다.
+\begin{itemize}
+    \item \textbf{기법:} 구조적/콘텐츠/관계 발견, 상관관계 분석, 시각화.
+    \item \textbf{도구:} Spark `describe()`, `summary()`.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[mybox, title=Lab 01: 주택 가격 예측]
+데이터브릭스에서 Scikit-learn을 활용한 ML 워크플로우 실습.
+\begin{enumerate}
+    \item 데이터 로드, 전처리 (Delta 테이블 저장).
+    \item 데이터 탐색, 시각화 (가격-면적 상관관계).
+    \item 특징 엔지니어링, 훈련/테스트 분할.
+    \item 선형 회귀 모델 학습, 예측.
+    \item 모델 평가 (RMSSE, R2), 잔차 시각화.
+\end{enumerate}
+\end{tcolorbox}
+
+\end{document}

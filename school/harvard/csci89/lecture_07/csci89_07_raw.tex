@@ -1,0 +1,852 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{kotex}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox} % 'most' 옵션으로 다양한 tcolorbox 기능 활성화
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{adjustbox} % 표 크기 조절을 위해 추가
+
+% 줄간격 설정
+\onehalfspacing
+% 단락 설정
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+% 표 줄간격 설정
+\renewcommand{\arraystretch}{1.2}
+
+% listings 환경 설정
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numbersep=6pt,
+  frame=single,
+  captionpos=b, % 캡션을 아래에 배치
+  abovecaptionskip=\baselineskip, % 캡션 위 여백
+  belowcaptionskip=\baselineskip  % 캡션 아래 여백
+}
+
+% 하이퍼링크 설정
+\hypersetup{
+  pdftitle={CSCI89 Lecture 7: 잠재 토픽 모델링},
+  pdfauthor={UIUC Student},
+  pdfsubject={CSCI E-89: Introduction to Artificial Intelligence},
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=green,
+  urlcolor=cyan
+}
+
+% 헤더/푸터 설정
+\pagestyle{fancy}
+\fancyhf{} % 모든 헤더/푸터 초기화
+\fancyhead[L]{CSCI89 Lecture 7: 잠재 토픽 모델링} % 왼쪽 헤더
+\fancyhead[R]{\today} % 오른쪽 헤더 (날짜)
+\fancyfoot[C]{\thepage} % 중앙 푸터 (쪽수)
+\renewcommand{\headrulewidth}{0.4pt} % 헤더 구분선
+\renewcommand{\footrulewidth}{0.4pt} % 푸터 구분선
+
+% tcolorbox 스타일 정의
+\definecolor{myblue}{RGB}{220,230,250}
+\definecolor{mygreen}{RGB}{220,250,230}
+\definecolor{myred}{RGB}{250,220,220}
+\definecolor{myyellow}{RGB}{250,250,220}
+
+\newtcolorbox{summarybox}[1][]{
+  colback=myblue,
+  colframe=blue!75!black,
+  title=\textbf{요약},
+  fonttitle=\bfseries,
+  boxsep=5pt,
+  left=5pt, right=5pt, top=5pt, bottom=5pt,
+  arc=4mm,
+  #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+  colback=myred,
+  colframe=red!75!black,
+  title=\textbf{주의},
+  fonttitle=\bfseries,
+  boxsep=5pt,
+  left=5pt, right=5pt, top=5pt, bottom=5pt,
+  arc=4mm,
+  #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+  colback=mygreen,
+  colframe=green!75!black,
+  title=\textbf{예시},
+  fonttitle=\bfseries,
+  boxsep=5pt,
+  left=5pt, right=5pt, top=5pt, bottom=5pt,
+  arc=4mm,
+  #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+  colback=myyellow,
+  colframe=orange!75!black,
+  title=\textbf{핵심 개념},
+  fonttitle=\bfseries,
+  boxsep=5pt,
+  left=5pt, right=5pt, top=5pt, bottom=5pt,
+  arc=4mm,
+  #1
+}
+
+\begin{document}
+
+\begin{summarybox}
+본 문서는 CSCI89 Lecture 7 강의 내용을 바탕으로 잠재 디리클레 할당(LDA)과 비음수 행렬 분해(NMF)를 통한 토픽 모델링을 다룹니다.
+원-핫 인코딩의 단점과 오토인코더의 개념을 복습하고, 텍스트 데이터의 비지도 학습에서 LDA가 필요한 이유를 설명합니다.
+최대 우도 추정(MLE)의 원리를 이해하고, LDA의 확률적 데이터 생성 과정을 상세히 분석합니다.
+Python과 R을 활용한 LDA 및 NMF 구현 방법을 제시하며, 최적의 토픽 수를 결정하는 코히어런스 및 배타성 지표를 소개합니다.
+\end{summarybox}
+
+\newpage
+\section*{개요}
+이 문서는 인공지능 수업의 핵심 주제인 토픽 모델링에 대한 포괄적인 가이드입니다.
+강의에서 다룬 내용을 바탕으로, 텍스트 데이터에서 숨겨진 의미 구조(잠재 토픽)를 발견하는 방법을 설명합니다.
+원-핫 인코딩의 비효율성과 오토인코더의 압축 원리를 복습하며, 텍스트 데이터의 특성상 일반적인 클러스터링 기법이 한계가 있음을 지적합니다.
+이러한 한계를 극복하기 위해 잠재 디리클레 할당(LDA)과 비음수 행렬 분해(NMF)라는 두 가지 강력한 토픽 모델링 기법을 소개합니다.
+특히 LDA의 확률적 모델링 접근 방식과 최대 우도 추정(MLE)을 통한 파라미터 학습 과정을 자세히 다룹니다.
+Python과 R을 이용한 실제 구현 예시를 통해 이론을 실습과 연결하고, 토픽 모델링 결과의 품질을 평가하고 최적의 토픽 수를 선택하는 기준인 코히어런스(Coherence)와 배타성(Exclusivity)에 대해서도 설명합니다.
+궁극적으로 이 문서는 비전공자나 처음 배우는 사람도 토픽 모델링의 기본 개념부터 실제 적용까지 완벽하게 이해할 수 있도록 돕는 것을 목표로 합니다.
+
+\newpage
+\section*{용어 정리}
+다음 표는 본 문서에서 사용되는 주요 용어들을 쉽게 설명하고 원어와 함께 제시합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+원-핫 인코딩 & 단어를 고유한 위치에 1을, 나머지는 0을 채운 벡터로 표현 & One-Hot Encoding & 희소성, 고차원성 문제 \\
+희소성 & 데이터의 대부분이 0으로 채워져 있는 상태 & Sparsity & 비효율적인 계산 및 정보 표현 \\
+고차원성 & 데이터의 차원(특성 수)이 매우 많은 상태 & High Dimensionality & 계산 복잡도 증가, 과적합 위험 \\
+임베딩 & 단어나 데이터를 저차원 연속 벡터 공간에 매핑 & Embedding & 의미론적 유사성 반영, 희소성 문제 해결 \\
+오토인코더 & 입력 데이터를 압축(인코딩)한 후 다시 복원(디코딩)하는 신경망 & Autoencoder & 차원 축소, 특징 학습 \\
+언더컴플리트 & 오토인코더의 잠재 표현(인코딩) 차원이 입력보다 작은 경우 & Undercomplete & 데이터 압축 목적 \\
+스택 오토인코더 & 여러 개의 오토인코더를 쌓아 올린 심층 신경망 & Stacked Autoencoder & 더 복잡한 특징 학습, 심층 네트워크 \\
+잠재 디리클레 할당 & 문서 내 숨겨진 주제(토픽)를 찾아내는 확률적 모델 & Latent Dirichlet Allocation (LDA) & 비지도 학습, 문서당 여러 토픽 할당 \\
+비음수 행렬 분해 & 행렬을 두 개의 비음수 행렬로 분해하여 토픽을 추출하는 기법 & Non-negative Matrix Factorization (NMF) & 결정론적, LDA보다 해석이 어려울 수 있음 \\
+최대 우도 추정 & 관측된 데이터가 나올 확률을 최대로 만드는 모델 파라미터 추정 & Maximum Likelihood Estimation (MLE) & 모델 파라미터 학습의 핵심 원리 \\
+포아송 분포 & 특정 시간/공간 내 사건 발생 횟수를 모델링하는 이산 확률 분포 & Poisson Distribution & LDA에서 문서의 단어 수 결정 \\
+디리클레 분포 & 확률 벡터를 생성하는 연속 확률 분포 & Dirichlet Distribution & LDA에서 문서의 토픽 분포 결정 \\
+다항 분포 & 여러 범주 중 하나를 선택하는 시행을 여러 번 반복할 때의 확률 분포 & Multinomial Distribution & LDA에서 토픽 내 단어 분포 및 단어 선택 결정 \\
+EM 알고리즘 & 잠재 변수가 있는 모델의 파라미터를 추정하는 반복적 알고리즘 & Expectation-Maximization (EM) Algorithm & LDA 파라미터 학습에 사용 \\
+코히어런스 & 토픽 내 단어들이 얼마나 의미론적으로 일관성이 있는지 측정 & Coherence & 토픽 품질 평가 지표 (높을수록 좋음) \\
+배타성 & 토픽들이 서로 얼마나 겹치지 않고 고유한지 측정 & Exclusivity & 토픽 품질 평가 지표 (높을수록 좋음) \\
+구조적 토픽 모델링 & LDA에 문서 관련 공변량(covariate)을 추가한 확장 모델 & Structural Topic Modeling (STM) & LDA보다 더 풍부한 분석 가능 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section*{핵심 개념·원리}
+
+\subsection*{퀴즈 리뷰: 인코딩과 오토인코더}
+강의에서는 이전 퀴즈를 복습하며 인코딩 방식과 오토인코더의 주요 개념들을 다시 한번 짚어보았습니다.
+
+\subsubsection*{원-핫 인코딩의 단점}
+\begin{conceptbox}
+원-핫 인코딩(One-Hot Encoding)은 단어를 벡터로 표현하는 가장 기본적인 방법 중 하나입니다.
+하지만 이 방식은 두 가지 주요 단점을 가집니다: \textbf{희소성(Sparsity)}과 \textbf{고차원성(High Dimensionality)}.
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{희소성 (Sparsity)}:
+    \begin{itemize}
+        \item 원-핫 인코딩은 단어의 개수만큼의 차원을 가진 벡터에서 해당 단어의 위치만 1이고 나머지는 모두 0으로 채워집니다.
+        \item 예를 들어, 10,000개의 단어가 있는 어휘집에서 한 단어를 표현하면 9,999개의 0과 1개의 1로 구성된 벡터가 됩니다.
+        \item 이렇게 대부분이 0인 벡터는 정보를 효율적으로 표현하지 못하며, 선형 조합(linear combinations)과 같은 계산 시 불필요한 0과의 곱셈 연산이 많아져 비효율적입니다.
+        \item 이 때문에 임베딩(Embedding)과 같은 더 효율적인 표현 방식이 사용됩니다.
+    \end{itemize}
+    \item \textbf{고차원성 (High Dimensionality)}:
+    \begin{itemize}
+        \item 어휘집의 크기가 커질수록 원-핫 인코딩 벡터의 차원도 비례하여 커집니다.
+        \item 이는 모델의 복잡도를 증가시키고, 학습에 필요한 데이터 양을 늘리며, 과적합(overfitting)의 위험을 높일 수 있습니다.
+        \item 희소성과 고차원성은 서로 밀접하게 연결된 문제입니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{오토인코더 (Autoencoder)}
+\begin{conceptbox}
+오토인코더는 입력 데이터를 압축(인코딩)하여 저차원의 잠재 표현(latent representation)을 만들고, 이 잠재 표현을 다시 원래의 입력 데이터로 복원(디코딩)하도록 학습하는 신경망입니다.
+주로 차원 축소(dimensionality reduction)와 특징 학습(feature learning)에 사용됩니다.
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{언더컴플리트 오토인코더 (Undercomplete Autoencoder)}:
+    \begin{itemize}
+        \item 오토인코더의 인코딩 벡터(잠재 표현)의 차원이 입력 데이터의 차원보다 작은 경우를 '언더컴플리트'라고 합니다.
+        \item 이는 데이터를 압축하여 불필요한 정보를 제거하고 핵심 특징만 추출하려는 목적에 부합합니다.
+        \item 예를 들어, 4차원 입력을 2차원 벡터로 압축하여 표현하는 경우를 언더컴플리트라고 합니다. 이는 마치 3차원 데이터를 2차원 평면에 투영하는 것과 유사합니다.
+        \item 반대로, 인코딩 차원이 입력 차원보다 큰 경우는 '오버컴플리트(Overcomplete)'라고 합니다.
+    \end{itemize}
+    \item \textbf{스택 오토인코더 (Stacked Autoencoder)}:
+    \begin{itemize}
+        \item 스택 오토인코더는 여러 개의 오토인코더를 층층이 쌓아 올린 형태의 심층 신경망(Deep Network)입니다.
+        \item 각 오토인코더는 이전 층의 출력을 입력으로 받아 더 추상적인 특징을 학습합니다.
+        \item '스택(Stacked)'이라는 이름 자체가 여러 층을 쌓는다는 의미를 내포하므로, 이는 본질적으로 심층 네트워크를 의미합니다.
+        \item 얕은 네트워크(Shallow Network)는 은닉층(hidden layer)이 하나 이하인 경우를 말하며, 두 개 이상의 은닉층을 가지면 심층 네트워크로 분류됩니다.
+    \end{itemize}
+    \item \textbf{스택 오토인코더의 훈련 방식}:
+    \begin{itemize}
+        \item 스택 오토인코더는 여러 단계로 훈련될 수 있습니다.
+        \item \textbf{단계 1}: 첫 번째 은닉층과 출력층만으로 구성된 얕은 오토인코더를 훈련합니다.
+        \item \textbf{단계 2}: 첫 번째 층의 가중치(coefficients)를 고정(freeze)하고, 두 번째 은닉층을 추가하여 중간 부분을 훈련합니다.
+        \item 이 과정을 반복하여 각 층을 순차적으로 훈련할 수 있습니다.
+        \item 과거에는 각 층의 가중치 스케일이 달라 경사 하강법(gradient descent)의 수렴이 어려울 수 있었기 때문에 이러한 단계별 훈련 방식이 선호되었습니다.
+        \item \textbf{가중치 스케일 문제}: 서로 다른 층의 가중치들이 매우 다른 스케일을 가질 경우, 경사 하강법이 최적점으로 수렴하지 못하고 발산하거나 매우 느리게 수렴할 수 있습니다. 이는 손실 함수의 등고선이 매우 길쭉한 형태를 띠게 되어, 경사 벡터가 최적점 방향이 아닌 다른 방향을 가리키기 때문입니다.
+        \item \textbf{해결책}:
+        \begin{itemize}
+            \item \textbf{Adam 옵티마이저 (Adam Optimizer)}: 지역 곡률(local curvature)에 따라 학습률(learning rate)을 조절하여 경사 벡터의 방향을 효과적으로 조정합니다.
+            \item \textbf{배치 정규화 (Batch Normalization)}: 각 층의 입력 신호를 정규화하여 가중치 스케일 문제를 완화합니다.
+            \item \textbf{숏컷 연결 (Shortcut Connections)}: 일부 층을 건너뛰어 신호가 직접 전달되도록 하여, 신호 스케일 문제를 줄입니다.
+        \end{itemize}
+        \item 이러한 기술들 덕분에 오늘날에는 스택 오토인코더의 모든 층을 한 번에 훈련하는 것이 일반적입니다. 하지만 단계별 훈련 방식도 여전히 유효한 접근법입니다.
+    \end{itemize}
+    \item \textbf{오토인코더의 시퀀스 데이터 활용}:
+    \begin{itemize}
+        \item 오토인코더는 시퀀스(Sequence) 데이터에도 활용될 수 있습니다.
+        \item 예를 들어, LSTM(Long Short-Term Memory) 기반의 인코더-디코더(Encoder-Decoder) 구조에서 인코더는 전체 시퀀스를 하나의 벡터(병목, bottleneck)로 압축하고, 디코더는 이 벡터로부터 원래 시퀀스를 복원합니다.
+        \item 이 병목 벡터는 시퀀스의 시간적 요소를 제거하고 핵심 정보를 담고 있는 단일 표현이 됩니다.
+        \item 문장(단어 시퀀스)을 단일 벡터로 압축하여 표현하는 것이 대표적인 예시입니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{faqbox}
+\textbf{Q: '언더컴플리트'라는 용어는 왜 사용되나요?}
+A: '언더컴플리트(Undercomplete)'는 오토인코더의 잠재 표현(인코딩) 차원이 입력 데이터의 차원보다 작을 때 사용됩니다. 예를 들어, 4차원 입력을 2차원 벡터로 표현한다면, 4차원 정보를 '완전하게(complete)' 표현하지 못하고 '불완전하게(under-complete)' 압축한다는 의미에서 붙여진 이름입니다. 이는 데이터의 핵심 특징을 추출하고 압축하는 목적에 부합합니다.
+
+\textbf{Q: 압축 계층(squeezing layer)의 크기는 어떻게 결정해야 하나요?}
+A: 압축 계층의 크기는 궁극적인 목표에 따라 달라집니다. 만약 원본 데이터를 완벽하게 재구성하는 것이 목표라면, 압축 계층을 만들지 않는 것이 가장 좋습니다. 하지만 실제로는 압축된 표현을 분류(classification)나 다른 다운스트림 작업에 활용하는 것이 목표인 경우가 많습니다. 이 경우, 다양한 크기의 압축 계층(예: 5차원, 10차원)을 실험적으로 적용해보고, 최종 목표(예: 분류 정확도)에 가장 좋은 성능을 보이는 크기를 선택하는 반복적인 접근 방식이 필요합니다. 너무 많이 압축하면 정보 손실이 커져 재구성이 불가능해질 수 있습니다.
+\end{faqbox}
+
+\newpage
+\subsection*{비지도 학습과 문서 클러스터링의 한계}
+\begin{conceptbox}
+비지도 학습(Unsupervised Learning)은 레이블(label)이 없는 데이터에서 패턴이나 구조를 찾아내는 머신러닝의 한 분야입니다.
+클러스터링(Clustering)은 대표적인 비지도 학습 기법으로, 데이터를 유사한 그룹으로 묶는 것을 목표로 합니다.
+\end{conceptbox}
+
+\subsubsection*{일반적인 클러스터링}
+\begin{itemize}
+    \item \textbf{목표}: 데이터 내의 숨겨진 그룹(클러스터)을 식별합니다.
+    \item \textbf{예시}: 마케팅에서 고객 세분화(고객을 연령, 구매 패턴 등에 따라 그룹화)에 활용될 수 있습니다.
+    \item \textbf{알고리즘}: K-평균(K-Means), 계층적 클러스터링(Hierarchical Clustering) 등이 있습니다.
+    \item \textbf{특징}: 일반적으로 각 데이터 포인트는 \textbf{하나의 클러스터에만 속한다}고 가정합니다. 예를 들어, 한 고객은 '학생' 그룹이거나 '은퇴자' 그룹이지, 동시에 두 그룹에 속하는 경우는 드물다고 가정합니다.
+\end{itemize}
+
+\subsubsection*{텍스트 데이터의 복합성}
+\begin{warningbox}
+텍스트 데이터, 특히 문서(document)의 경우 일반적인 클러스터링의 가정이 잘 맞지 않을 수 있습니다.
+하나의 문서가 여러 주제를 동시에 다룰 수 있기 때문입니다.
+\end{warningbox}
+
+\begin{itemize}
+    \item \textbf{문제점}:
+    \begin{itemize}
+        \item 한 뉴스 기사가 경제에 대해 이야기하다가 정치로 전환하거나, 인공지능에 대한 내용을 포함할 수 있습니다.
+        \item 즉, 하나의 문서가 여러 '클러스터'(주제)에 동시에 속할 가능성이 매우 높습니다.
+        \item 이 경우, 각 문서를 하나의 주제로만 분류하는 것은 정보 손실을 초래하거나 현실을 제대로 반영하지 못합니다.
+    \end{itemize}
+    \item \textbf{해결책}:
+    \begin{itemize}
+        \item 이러한 텍스트 데이터의 특성을 반영하기 위해, 각 문서가 \textbf{여러 주제(topics)의 혼합(mixture)}으로 구성된다고 가정하는 비지도 학습 알고리즘이 필요합니다.
+        \item 잠재 디리클레 할당(LDA)이 바로 이러한 문제를 해결하기 위해 고안된 대표적인 기법입니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}
+\textbf{문서의 다중 주제 예시:}
+어떤 문서가 다음과 같이 구성될 수 있습니다.
+\begin{itemize}
+    \item 경제(Topic 1): 60\%
+    \item 정치(Topic 2): 30\%
+    \item 인공지능(Topic 3): 10\%
+\end{itemize}
+이 문서는 특정 하나의 주제에만 속하는 것이 아니라, 여러 주제가 다른 비율로 혼합되어 있습니다. LDA는 이러한 혼합 비율을 추정하여 문서의 숨겨진 구조를 파악합니다.
+\end{examplebox}
+
+\newpage
+\subsection*{최대 우도 추정 (Maximum Likelihood Estimation, MLE)}
+\begin{conceptbox}
+최대 우도 추정(MLE)은 통계 모델의 파라미터(매개변수)를 추정하는 강력한 방법입니다.
+관측된 데이터가 주어졌을 때, 이 데이터를 생성했을 가능성(우도, likelihood)을 가장 높게 만드는 파라미터를 찾는 것이 목표입니다.
+\end{conceptbox}
+
+\subsubsection*{MLE의 기본 원리}
+\begin{itemize}
+    \item \textbf{데이터 관측}: 우리는 실제 세계에서 데이터를 관측합니다 (예: 사람들의 키, 문서의 단어 분포).
+    \item \textbf{모델 가정}: 이 데이터가 어떤 확률 분포(예: 정규 분포, 포아송 분포)로부터 생성되었다고 가정합니다. 이 분포는 알 수 없는 파라미터(예: 평균, 분산)를 가집니다.
+    \item \textbf{우도 함수 정의}: 주어진 파라미터 값에서 관측된 데이터가 나타날 확률을 계산하는 우도 함수를 정의합니다.
+    \item \textbf{파라미터 추정}: 우도 함수를 최대로 만드는 파라미터 값을 찾습니다. 이 파라미터 값이 우리가 추정하고자 하는 최적의 파라미터입니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{정규 분포 예시:}
+\begin{enumerate}
+    \item \textbf{데이터}: 어떤 변수 X에 대한 관측값들을 수집하여 히스토그램을 그립니다. 이 히스토그램은 데이터의 분포를 보여줍니다.
+    \item \textbf{모델 가정}: 이 데이터가 정규 분포(Normal Distribution)에서 나왔다고 가정합니다. 정규 분포는 두 가지 파라미터, 즉 평균($\mu$)과 분산($\sigma^2$)을 가집니다. 우리는 이 파라미터 값을 모릅니다.
+    \item \textbf{우도 계산}:
+    \begin{itemize}
+        \item \textbf{가정 A}: $\mu$와 $\sigma^2$에 대해 특정 값(예: $\mu$가 실제 데이터의 평균보다 훨씬 작은 값)을 가정합니다. 이 파라미터 값에서 관측된 히스토그램과 같은 데이터 샘플을 얻을 확률(우도)은 매우 낮을 것입니다.
+        \item \textbf{가정 B}: $\mu$를 조금 더 실제 데이터의 평균에 가깝게 이동시킵니다. 이 경우, 데이터가 나타날 확률(우도)은 가정 A보다 높아질 것입니다.
+        \item \textbf{가정 C}: $\mu$와 $\sigma^2$를 실제 데이터의 분포와 가장 잘 일치하도록 선택합니다. 이 경우, 데이터가 나타날 확률(우도)은 가장 높아질 것입니다.
+    \end{itemize}
+    \item \textbf{최대 우도 추정치 (MLE)}: 우도 함수를 최대로 만드는 $\mu$와 $\sigma^2$ 값을 찾습니다. 이 값들이 MLE에 의해 추정된 최적의 파라미터가 됩니다.
+\end{enumerate}
+이처럼 MLE는 데이터가 어떻게 생성되었는지에 대한 가정을 바탕으로, 관측된 데이터를 가장 잘 설명하는 파라미터를 찾아내는 매우 자연스럽고 강력한 방법입니다. LDA와 같은 복잡한 모델에서도 이 원리를 사용하여 파라미터를 학습합니다.
+\end{examplebox}
+
+\newpage
+\subsection*{잠재 디리클레 할당 (Latent Dirichlet Allocation, LDA)}
+\begin{conceptbox}
+잠재 디리클레 할당(LDA)은 문서 집합(corpus)에서 "잠재 토픽(latent topics)"을 발견하는 비지도 학습 모델입니다.
+각 문서는 여러 토픽의 혼합으로 구성되고, 각 토픽은 특정 단어들의 분포로 정의된다고 가정합니다.
+\end{conceptbox}
+
+\subsubsection*{LDA의 동기 및 특징}
+\begin{itemize}
+    \item \textbf{잠재 토픽 발견}: LDA는 우리가 직접 정의하지 않은, 문서 내에 숨겨진 추상적인 주제들을 찾아냅니다. 모델이 스스로 토픽을 정의하고, 우리는 나중에 그 토픽에 가장 많이 기여하는 단어들을 보고 토픽의 의미를 해석하고 레이블을 부여합니다.
+    \item \textbf{문서-토픽 혼합}: 각 문서는 여러 토픽이 특정 확률로 혼합된 형태로 표현됩니다. 이는 텍스트 데이터의 복합성을 잘 반영합니다.
+    \item \textbf{확률적 접근}: LDA는 데이터가 특정 확률적 과정을 통해 생성되었다고 가정하고, 이 가정을 바탕으로 파라미터를 추정합니다. 따라서 모델을 여러 번 실행하면 결과가 약간 달라질 수 있습니다.
+    \item \textbf{하이퍼파라미터}: LDA를 사용하기 전에 사용자가 미리 결정해야 하는 중요한 하이퍼파라미터는 \textbf{토픽의 개수(K)}입니다.
+\end{itemize}
+
+\subsubsection*{LDA의 확률적 데이터 생성 과정}
+LDA는 마치 "로봇"이 텍스트를 생성하는 것처럼 가정합니다. 이 과정은 다음과 같은 확률 분포들을 따릅니다.
+
+\begin{enumerate}
+    \item \textbf{문서의 길이 결정 (단어 수 N)}:
+    \begin{itemize}
+        \item 각 문서의 총 단어 수(N)는 \textbf{포아송 분포(Poisson Distribution)}에서 샘플링됩니다.
+        \item 포아송 분포는 특정 시간 간격이나 공간 영역에서 어떤 사건이 발생하는 횟수를 모델링하는 이산 확률 분포입니다.
+        \item 파라미터 $\xi$는 문서의 예상 단어 수(기대값)를 나타냅니다.
+        \item \textbf{예시}: 문서의 평균 길이가 25단어라면, $\xi$는 약 25가 될 것입니다. 실제 문서의 길이는 이 평균을 중심으로 분포합니다.
+    \end{itemize}
+    \item \textbf{문서의 토픽 분포 결정 ($\theta_m$)}:
+    \begin{itemize}
+        \item 각 문서 $m$이 어떤 토픽들을 어떤 비율로 포함할지 나타내는 확률 벡터 $\theta_m$은 \textbf{디리클레 분포(Dirichlet Distribution)}에서 샘플링됩니다.
+        \item 디리클레 분포는 여러 범주에 대한 확률 벡터를 생성하는 연속 확률 분포입니다.
+        \item 파라미터 $\alpha$는 디리클레 분포의 형태를 결정하는 벡터 값 파라미터입니다.
+        \item \textbf{예시}: 문서가 3개의 토픽을 가질 경우, $\theta_m$은 [0.1, 0.2, 0.7]과 같이 합이 1이 되는 3차원 확률 벡터가 됩니다. 이는 문서 $m$이 토픽 1을 10\%, 토픽 2를 20\%, 토픽 3을 70\% 포함한다는 의미입니다.
+        \item 디리클레 분포는 2개의 토픽일 경우 베타 분포(Beta Distribution)의 일반화된 형태입니다.
+    \end{itemize}
+    \item \textbf{각 단어 생성}: 문서의 각 단어($n=1, \dots, N$)에 대해 다음 두 단계를 반복합니다.
+    \begin{itemize}
+        \item \textbf{단어의 토픽 선택 ($Z_n$)}:
+        \begin{itemize}
+            \item 현재 단어 $n$이 어떤 토픽에서 나올지 결정하는 $Z_n$은 문서의 토픽 분포 $\theta_m$을 파라미터로 하는 \textbf{다항 분포(Multinomial Distribution)}에서 샘플링됩니다.
+            \item \textbf{예시}: $\theta_m$이 [0.1, 0.2, 0.7]이라면, 현재 단어는 70\%의 확률로 토픽 3에서 선택될 것입니다. 하지만 확률적으로 토픽 1이나 토픽 2에서 선택될 수도 있습니다.
+        \end{itemize}
+        \item \textbf{단어 자체 선택 ($W_n$)}:
+        \begin{itemize}
+            \item 선택된 토픽 $Z_n$으로부터 실제 단어 $W_n$은 해당 토픽의 단어 분포 $\beta_{Z_n}$을 파라미터로 하는 \textbf{다항 분포}에서 샘플링됩니다.
+            \item 각 토픽은 어휘집(vocabulary) 내의 단어들에 대한 고유한 확률 분포($\beta$)를 가집니다.
+            \item \textbf{예시}: 만약 토픽 3이 선택되었고, 토픽 3이 '경제'에 관한 토픽이라면, '주식', '시장', '환율'과 같은 단어들이 높은 확률로 선택될 것입니다.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{시간 요소 없음 (Bag of Words 가정):}
+LDA는 단어의 순서나 시간적 요소를 고려하지 않습니다. 각 단어는 이전 단어와 독립적으로 생성된다고 가정합니다. 이는 "Bag of Words(단어 주머니)" 모델과 유사하며, 생성된 텍스트가 문법적으로 완벽하거나 자연스럽지 않을 수 있음을 의미합니다. LDA의 목적은 텍스트를 생성하는 것이 아니라, 텍스트의 숨겨진 토픽 구조를 파악하는 것입니다.
+\end{warningbox}
+
+\subsubsection*{EM 알고리즘 (Expectation-Maximization Algorithm)}
+\begin{conceptbox}
+LDA 모델의 파라미터(예: $\alpha$, $\beta$)를 추정하기 위해 \textbf{기대-최대화(Expectation-Maximization, EM) 알고리즘}이 사용됩니다.
+EM 알고리즘은 직접 관측할 수 없는 잠재 변수(latent variables, 예: 각 단어가 어떤 토픽에서 생성되었는지 나타내는 $Z_n$)가 있는 모델의 파라미터를 추정하는 반복적인 방법입니다.
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{잠재 변수}: 우리는 문서의 단어($W_n$)는 관측하지만, 각 단어가 어떤 토픽($Z_n$)에서 나왔는지는 직접 알 수 없습니다. $Z_n$이 바로 잠재 변수입니다.
+    \item \textbf{EM 알고리즘 단계}:
+    \begin{enumerate}
+        \item \textbf{E-단계 (Expectation Step)}: 현재 파라미터 추정치를 사용하여 잠재 변수($Z_n$)의 기대값(확률 분포)을 계산합니다. 즉, 각 단어가 각 토픽에서 나올 확률을 추정합니다.
+        \item \textbf{M-단계 (Maximization Step)}: E-단계에서 계산된 잠재 변수의 기대값을 고정된 값으로 간주하고, 이를 바탕으로 파라미터($\alpha$, $\beta$)의 우도(likelihood)를 최대화하는 새로운 파라미터 추정치를 계산합니다.
+    \end{enumerate}
+    \item 이 두 단계를 파라미터가 수렴할 때까지 반복하여 최적의 파라미터를 찾아냅니다.
+\end{itemize}
+
+\newpage
+\subsection*{비음수 행렬 분해 (Non-negative Matrix Factorization, NMF)}
+\begin{conceptbox}
+비음수 행렬 분해(NMF)는 주어진 행렬 V를 두 개의 비음수 행렬 W와 H로 분해하여 토픽을 추출하는 결정론적(deterministic) 기법입니다.
+LDA와 달리 확률적 모델링 가정을 사용하지 않고, 행렬 대수(matrix algebra)를 기반으로 합니다.
+\end{conceptbox}
+
+\subsubsection*{NMF의 기본 원리}
+\begin{itemize}
+    \item \textbf{목표}: 문서-단어 행렬 V를 두 개의 행렬 W와 H의 곱으로 근사합니다: $V \approx W \times H$.
+    \item \textbf{비음수 제약}: 모든 행렬 V, W, H의 원소는 0 또는 양수여야 합니다. 이는 텍스트 데이터의 단어 빈도(count)와 같은 비음수 특성을 반영합니다.
+    \item \textbf{행렬 V (문서-단어 행렬)}:
+    \begin{itemize}
+        \item 각 행은 하나의 문서를 나타냅니다.
+        \item 각 열은 어휘집의 한 단어를 나타냅니다.
+        \item 각 원소는 해당 문서에서 해당 단어가 나타난 횟수(빈도)를 나타냅니다.
+    \end{itemize}
+    \item \textbf{행렬 W (문서-토픽 행렬)}:
+    \begin{itemize}
+        \item 각 행은 하나의 문서를 나타냅니다.
+        \item 각 열은 하나의 토픽을 나타냅니다.
+        \item 각 원소는 해당 문서가 각 토픽에 얼마나 기여하는지(또는 해당 토픽이 문서에 얼마나 기여하는지)를 나타내는 가중치입니다.
+    \end{itemize}
+    \item \textbf{행렬 H (토픽-단어 행렬)}:
+    \begin{itemize}
+        \item 각 행은 하나의 토픽을 나타냅니다.
+        \item 각 열은 어휘집의 한 단어를 나타냅니다.
+        \item 각 원소는 해당 토픽이 각 단어에 얼마나 기여하는지(또는 해당 단어가 각 토픽에 얼마나 중요한지)를 나타내는 가중치입니다.
+    \item H 행렬의 각 행은 특정 토픽을 구성하는 단어들의 분포를 나타내므로, H를 통해 토픽의 의미를 해석할 수 있습니다.
+    \end{itemize}
+    \item \textbf{근사 (Approximation)}: 항상 V를 W와 H의 정확한 곱으로 표현할 수 있는 것은 아니므로, $V \approx W \times H$와 같이 근사합니다. 이는 주로 L2 노름(norm)과 같은 오차 함수를 최소화하는 방식으로 수행됩니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{NMF 행렬 분해 예시:}
+다음은 간단한 문서-단어 행렬 V를 NMF를 통해 W와 H로 분해하는 예시입니다.
+\begin{itemize}
+    \item \textbf{V (문서-단어 행렬)}:
+    \begin{itemize}
+        \item 어휘집: [cats, dogs, bark, purr, growl]
+        \item 문서 1: "cats meow" $\rightarrow$ [1, 0, 0, 0, 0] (cats 1, meow 1)
+        \item 문서 2: "dogs bark" $\rightarrow$ [0, 1, 1, 0, 0] (dogs 1, bark 1)
+        \item 문서 3: "cats purr dogs growl" $\rightarrow$ [1, 1, 0, 1, 1] (cats 1, dogs 1, purr 1, growl 1)
+    \end{itemize}
+    \item \textbf{분해 결과 (예시)}:
+    \begin{itemize}
+        \item $W = \begin{pmatrix} 1 & 0 \\ 0 & 1 \\ 0.5 & 0.5 \end{pmatrix}$ (문서-토픽 행렬)
+        \item $H = \begin{pmatrix} 1 & 0 & 0 & 1 & 0 \\ 0 & 1 & 1 & 0 & 1 \end{pmatrix}$ (토픽-단어 행렬)
+    \end{itemize}
+    \item \textbf{해석}:
+    \begin{itemize}
+        \item W 행렬을 보면, 문서 1은 토픽 1에 주로 기여하고, 문서 2는 토픽 2에 주로 기여합니다. 문서 3은 토픽 1과 토픽 2에 모두 기여합니다.
+        \item H 행렬을 보면, 토픽 1은 'cats'와 'purr'에 높은 가중치를 가지고, 토픽 2는 'dogs', 'bark', 'growl'에 높은 가중치를 가집니다.
+        \item 이를 통해 토픽 1은 '고양이' 관련 주제, 토픽 2는 '개' 관련 주제로 해석할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{LDA와 NMF 비교}
+\begin{itemize}
+    \item \textbf{LDA}: 확률적 모델링, EM 알고리즘 사용, 파라미터 해석이 직관적일 수 있음.
+    \item \textbf{NMF}: 결정론적 행렬 분해, 최적화 알고리즘 사용, 파라미터 해석이 LDA보다 어려울 수 있음.
+    \item \textbf{장점}: NMF는 LDA보다 계산이 빠르고 구현이 간단할 수 있습니다.
+    \item \textbf{단점}: NMF는 LDA처럼 명확한 확률적 생성 과정을 가정하지 않으므로, 결과의 해석이 덜 직관적일 수 있습니다. 실무에서는 LDA나 STM(구조적 토픽 모델링)이 더 선호되는 경향이 있습니다.
+\end{itemize}
+
+\newpage
+\section*{절차/방법: LDA 및 NMF 구현}
+여기서는 Python과 R을 사용하여 LDA 및 NMF 모델을 구현하고 결과를 해석하는 과정을 설명합니다.
+
+\subsection*{데이터 준비: 문서-단어 행렬 생성}
+LDA와 NMF 모두 입력으로 문서-단어 행렬(Document-Term Matrix, DTM)을 필요로 합니다. 이는 각 문서에 어떤 단어가 몇 번 나타났는지를 기록한 행렬입니다.
+
+\begin{enumerate}
+    \item \textbf{문서 정의}: 분석할 텍스트 문서들을 준비합니다.
+    \item \textbf{전처리 (Preprocessing)}:
+    \begin{itemize}
+        \item \textbf{소문자 변환 (Lowercasing)}: 모든 단어를 소문자로 변환하여 'Cat'과 'cat'을 동일하게 취급합니다.
+        \item \textbf{구두점 제거 (Punctuation Removal)}: 마침표, 쉼표 등 구두점을 제거합니다.
+        \item \textbf{숫자 제거 (Number Removal)}: 숫자를 제거합니다.
+        \item \textbf{불용어 제거 (Stop Word Removal)}: 'a', 'the', 'is'와 같이 의미 없는 일반적인 단어들을 제거합니다.
+        \item \textbf{어간 추출 (Stemming) 또는 표제어 추출 (Lemmatization)}: 단어의 원형을 찾아 'running', 'ran'을 'run'으로 통일합니다. (강의 예시에서는 Stemming을 하지 않아 'bark'와 'barked'가 다른 단어로 처리됨)
+        \item \textbf{공백 제거 (Whitespace Removal)}: 불필요한 공백을 제거합니다.
+    \end{itemize}
+    \item \textbf{벡터화 (Vectorization)}:
+    \begin{itemize}
+        \item \textbf{CountVectorizer (Python)} 또는 \textbf{DocumentTermMatrix (R)}를 사용하여 전처리된 문서들을 문서-단어 행렬로 변환합니다.
+        \item 이 과정에서 어휘집(Vocabulary)이 생성되고, 각 단어는 고유한 인덱스를 가집니다.
+        \item 행렬의 각 셀은 해당 문서에서 특정 단어가 나타난 횟수(빈도)를 나타냅니다.
+        \item 희소 행렬(Sparse Matrix) 형태로 저장되어 메모리 효율성을 높입니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Python을 이용한 LDA 구현}
+\begin{lstlisting}[caption={Python을 이용한 LDA 구현 예시}, label={lst:python_lda}]
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+
+# 1. 문서 정의
+documents = [
+    "Cats are great pets. Cats enjoy purring.",
+    "Dogs are loyal companions. Dogs love long walks.",
+    "Cats purr gently. Cats sleep a lot.",
+    "Dogs bark loudly. Dogs protect their owners.",
+    "Cats enjoy playing. Cats are agile.",
+    "Dogs love to run. Dogs are energetic.",
+    "Cats are independent. Cats are clean.",
+    "Dogs are friendly. Dogs are playful."
+]
+
+# 2. 데이터 전처리 및 벡터화 (CountVectorizer)
+# 불용어(stop words) 제거
+vectorizer = CountVectorizer(stop_words='english')
+X = vectorizer.fit_transform(documents)
+
+# 어휘집 확인 (선택 사항)
+feature_names = vectorizer.get_feature_names_out()
+# print(feature_names) # ['agile', 'bark', 'cats', 'clean', 'companions', 'dogs', 'energetic', 'enjoy', 'exploring', 'friendly', 'gently', 'great', 'independent', 'long', 'love', 'loudly', 'owners', 'pets', 'playful', 'playing', 'protect', 'purr', 'purring', 'run', 'sleep', 'walks']
+
+# 3. LDA 모델 학습
+# n_components: 토픽의 개수 (하이퍼파라미터)
+# random_state: 재현성을 위한 시드
+lda_model = LatentDirichletAllocation(n_components=2, random_state=0)
+lda_model.fit(X)
+
+# 4. 결과 해석
+
+# 4.1. 문서별 토픽 기여도 (Document-Topic Distribution)
+# 각 문서가 각 토픽에 얼마나 기여하는지 확률로 표시
+doc_topic_dist = lda_model.transform(X)
+print("문서별 토픽 기여도 (확률):")
+for i, doc_dist in enumerate(doc_topic_dist):
+    print(f"문서 {i+1}: 토픽 1: {doc_dist[0]:.2f}, 토픽 2: {doc_dist[1]:.2f}")
+
+# 4.2. 토픽별 주요 단어 (Topic-Word Distribution)
+# 각 토픽에 가장 많이 연관된 단어들을 추출
+print("\n토픽별 주요 단어:")
+for topic_idx, topic in enumerate(lda_model.components_):
+    print(f"토픽 {topic_idx+1}:")
+    # 토픽 내 단어 확률을 기준으로 정렬하여 상위 N개 단어 추출
+    top_words_idx = topic.argsort()[:-6:-1] # 상위 5개 단어
+    top_words = [feature_names[i] for i in top_words_idx]
+    print(f"  {', '.join(top_words)}")
+
+# 4.3. 토픽 레이블링 (수동 해석)
+# 위 결과를 바탕으로 토픽에 의미 부여
+# 토픽 1: dogs, long, walks, enjoy, energetic -> '개' 관련 토픽
+# 토픽 2: cats, purr, sleep, gently, great -> '고양이' 관련 토픽
+
+# 4.4. 가장 관련성 높은 문서 추출 (토픽 해석에 활용)
+print("\n각 토픽에 가장 높은 기여도를 가진 문서:")
+for topic_idx in range(lda_model.n_components):
+    # 해당 토픽에 대한 기여도가 가장 높은 문서 인덱스 찾기
+    top_doc_idx = doc_topic_dist[:, topic_idx].argsort()[:-3:-1] # 상위 2개 문서
+    print(f"토픽 {topic_idx+1} (주요 단어: {', '.join([feature_names[i] for i in lda_model.components_[topic_idx].argsort()[:-3:-1]])}):")
+    for doc_idx in top_doc_idx:
+        print(f"  문서 {doc_idx+1} (기여도: {doc_topic_dist[doc_idx, topic_idx]:.2f}): {documents[doc_idx]}")
+\end{lstlisting}
+
+\begin{examplebox}
+\textbf{코드 실행 결과 해석:}
+\begin{itemize}
+    \item \textbf{문서별 토픽 기여도}:
+    \begin{itemize}
+        \item 문서 1: 토픽 1 (0.05), 토픽 2 (0.95) $\rightarrow$ 문서 1은 토픽 2에 크게 기여합니다.
+        \item 문서 4: 토픽 1 (0.93), 토픽 2 (0.07) $\rightarrow$ 문서 4는 토픽 1에 크게 기여합니다.
+    \end{itemize}
+    \item \textbf{토픽별 주요 단어}:
+    \begin{itemize}
+        \item 토픽 1: dogs, long, walks, enjoy, energetic
+        \item 토픽 2: cats, purr, sleep, gently, great
+    \end{itemize}
+    \item \textbf{토픽 레이블링}: 위 결과를 바탕으로 토픽 1은 '개' 관련 토픽, 토픽 2는 '고양이' 관련 토픽으로 수동으로 레이블을 부여할 수 있습니다.
+    \item \textbf{가장 관련성 높은 문서}: 토픽 1에 가장 높은 기여도를 가진 문서를 읽어보면 '개'에 대한 내용임을 확인할 수 있고, 토픽 2에 가장 높은 기여도를 가진 문서를 읽어보면 '고양이'에 대한 내용임을 확인할 수 있습니다. 이는 토픽의 의미를 해석하는 데 큰 도움이 됩니다.
+\end{itemize}
+\end{examplebox}
+
+\begin{faqbox}
+\textbf{Q: 'bark'나 'barked'와 같은 단어가 'dog' 토픽에 포함되지 않는 이유는 무엇인가요?}
+A: 강의 예시에서는 어간 추출(stemming)이나 표제어 추출(lemmatization)과 같은 단어 정규화 과정을 거치지 않았습니다. 따라서 'bark'와 'barked'는 서로 다른 단어로 취급됩니다. 만약 'barked'가 문서에 한 번만 나타나고 'dogs'나 'long'과 같은 다른 단어들이 더 자주 나타난다면, 'barked'는 상위 빈도 단어 목록에 포함되지 않을 수 있습니다. 어간 추출을 적용하면 'bark', 'barked' 등이 모두 'bark'로 처리되어 토픽에 포함될 가능성이 높아집니다.
+\end{faqbox}
+
+\newpage
+\subsection*{R을 이용한 LDA 구현}
+R에서도 Python과 유사하게 LDA 모델을 구현할 수 있습니다. `topicmodels` 패키지가 주로 사용됩니다.
+
+\begin{lstlisting}[caption={R을 이용한 LDA 구현 예시}, label={lst:r_lda}]
+# 1. 필요한 패키지 설치 및 로드 (최초 1회 실행)
+# install.packages("topicmodels")
+# install.packages("tm") # 텍스트 마이닝 패키지
+# install.packages("slam") # 희소 행렬 처리 패키지
+
+library(topicmodels)
+library(tm)
+library(slam)
+
+# 2. 문서 정의
+documents <- c(
+    "Cats are great pets. Cats enjoy purring.",
+    "Dogs are loyal companions. Dogs love long walks.",
+    "Cats purr gently. Cats sleep a lot.",
+    "Dogs bark loudly. Dogs protect their owners.",
+    "Cats enjoy playing. Cats are agile.",
+    "Dogs love to run. Dogs are energetic.",
+    "Cats are independent. Cats are clean.",
+    "Dogs are friendly. Dogs are playful."
+)
+
+# 3. 데이터 전처리 및 문서-단어 행렬 (DTM) 생성
+# Corpus 객체 생성
+corpus <- VCorpus(VectorSource(documents))
+
+# 전처리 함수 정의
+clean_corpus <- function(corpus){
+  corpus <- tm_map(corpus, content_transformer(tolower)) # 소문자 변환
+  corpus <- tm_map(corpus, removePunctuation) # 구두점 제거
+  corpus <- tm_map(corpus, removeNumbers) # 숫자 제거
+  corpus <- tm_map(corpus, removeWords, stopwords("english")) # 불용어 제거
+  corpus <- tm_map(corpus, stripWhitespace) # 공백 제거
+  return(corpus)
+}
+
+corpus <- clean_corpus(corpus)
+
+# 문서-단어 행렬 (DTM) 생성
+dtm <- DocumentTermMatrix(corpus)
+
+# 희소 단어 제거 (선택 사항: 너무 드물게 나타나는 단어 제거)
+# dtm <- removeSparseTerms(dtm, 0.99) # 99% 이상 희소한 단어 제거
+
+# 4. LDA 모델 학습
+# k: 토픽의 개수
+# control: LDA 모델의 파라미터 (예: 시드)
+lda_model_r <- LDA(dtm, k = 2, control = list(seed = 0))
+
+# 5. 결과 해석
+
+# 5.1. 토픽별 주요 단어 (Topic-Word Distribution)
+# 각 토픽에 가장 많이 연관된 단어들을 추출
+print("R LDA 모델 토픽별 주요 단어:")
+terms(lda_model_r, 5) # 상위 5개 단어
+
+# 5.2. 문서별 토픽 기여도 (Document-Topic Distribution)
+# 각 문서가 각 토픽에 얼마나 기여하는지 확률로 표시
+doc_topic_dist_r <- as.data.frame(t(posterior(lda_model_r)$topics))
+colnames(doc_topic_dist_r) <- paste0("Topic", 1:ncol(doc_topic_dist_r))
+print("R LDA 모델 문서별 토픽 기여도 (확률):")
+print(doc_topic_dist_r)
+
+# 5.3. 가장 관련성 높은 문서 추출 (토픽 해석에 활용)
+print("\nR LDA 모델 각 토픽에 가장 높은 기여도를 가진 문서:")
+for (topic_idx in 1:lda_model_r@k) {
+  # 해당 토픽에 대한 기여도가 가장 높은 문서 인덱스 찾기
+  top_doc_indices <- order(doc_topic_dist_r[, topic_idx], decreasing = TRUE)[1:2] # 상위 2개 문서
+  topic_terms <- terms(lda_model_r, 3)[, topic_idx] # 해당 토픽의 상위 3개 단어
+  cat(sprintf("토픽 %d (주요 단어: %s): \n", topic_idx, paste(topic_terms, collapse = ", ")))
+  for (doc_idx in top_doc_indices) {
+    cat(sprintf("  문서 %d (기여도: %.2f): %s\n", doc_idx, doc_topic_dist_r[doc_idx, topic_idx], documents[doc_idx]))
+  }
+}
+\end{lstlisting}
+
+\begin{examplebox}
+\textbf{코드 실행 결과 해석:}
+\begin{itemize}
+    \item \textbf{토픽별 주요 단어}:
+    \begin{itemize}
+        \item 토픽 1: dogs, enjoy, long, walks, energetic
+        \item 토픽 2: cats, purr, sleep, gently, great
+    \end{itemize}
+    \item Python 결과와 유사하게 토픽 1은 '개' 관련, 토픽 2는 '고양이' 관련으로 해석될 수 있습니다.
+    \item \textbf{가장 관련성 높은 문서}: 각 토픽에 대해 가장 높은 기여도를 가진 문서들을 출력하여 토픽의 의미를 더욱 명확히 파악할 수 있습니다. 예를 들어, 토픽 1에 가장 높은 기여도를 가진 문서들은 '개'에 대한 내용을 담고 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\newpage
+\subsection*{Python을 이용한 NMF 구현}
+NMF는 `sklearn.decomposition` 모듈에서 `NMF` 클래스를 통해 구현할 수 있습니다.
+
+\begin{lstlisting}[caption={Python을 이용한 NMF 구현 예시}, label={lst:python_nmf}]
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import NMF
+
+# 1. 문서 정의 (LDA와 동일한 문서 사용)
+documents = [
+    "Cats are great pets. Cats enjoy purring.",
+    "Dogs are loyal companions. Dogs love long walks.",
+    "Cats purr gently. Cats sleep a lot.",
+    "Dogs bark loudly. Dogs protect their owners.",
+    "Cats enjoy playing. Cats are agile.",
+    "Dogs love to run. Dogs are energetic.",
+    "Cats are independent. Cats are clean.",
+    "Dogs are friendly. Dogs are playful."
+]
+
+# 2. 데이터 전처리 및 벡터화 (CountVectorizer)
+vectorizer = CountVectorizer(stop_words='english')
+X = vectorizer.fit_transform(documents)
+feature_names = vectorizer.get_feature_names_out()
+
+# 3. NMF 모델 학습
+# n_components: 토픽의 개수
+# random_state: 재현성을 위한 시드
+nmf_model = NMF(n_components=2, random_state=0, init='nndsvda', max_iter=200)
+W = nmf_model.fit_transform(X) # 문서-토픽 행렬 (W)
+H = nmf_model.components_ # 토픽-단어 행렬 (H)
+
+# 4. 결과 해석
+
+# 4.1. 문서별 토픽 기여도 (W 행렬)
+print("NMF 문서별 토픽 기여도 (W 행렬):")
+for i, doc_topic_weights in enumerate(W):
+    print(f"문서 {i+1}: 토픽 1: {doc_topic_weights[0]:.2f}, 토픽 2: {doc_topic_weights[1]:.2f}")
+
+# 4.2. 토픽별 주요 단어 (H 행렬)
+print("\nNMF 토픽별 주요 단어:")
+for topic_idx, topic in enumerate(H):
+    print(f"토픽 {topic_idx+1}:")
+    top_words_idx = topic.argsort()[:-6:-1] # 상위 5개 단어
+    top_words = [feature_names[i] for i in top_words_idx]
+    print(f"  {', '.join(top_words)}")
+
+# 4.3. 토픽 레이블링 (수동 해석)
+# 위 결과를 바탕으로 토픽에 의미 부여
+# 토픽 1: dogs, long, walks, enjoy, energetic -> '개' 관련 토픽
+# 토픽 2: cats, purr, sleep, gently, great -> '고양이' 관련 토픽
+\end{lstlisting}
+
+\begin{examplebox}
+\textbf{코드 실행 결과 해석:}
+\begin{itemize}
+    \item \textbf{문서별 토픽 기여도 (W 행렬)}: LDA와 유사하게 각 문서가 각 토픽에 얼마나 기여하는지 수치로 나타냅니다. NMF는 확률이 아닌 가중치(weight)를 반환하므로, 합이 1이 아닐 수 있습니다.
+    \item \textbf{토픽별 주요 단어 (H 행렬)}: 각 토픽에 가장 높은 가중치를 가진 단어들을 추출하여 토픽의 의미를 해석합니다. LDA와 유사한 결과를 얻을 수 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\newpage
+\section*{최적 토픽 수 선택: 코히어런스 및 배타성}
+LDA와 NMF에서 토픽의 개수(K)는 사용자가 미리 지정해야 하는 중요한 하이퍼파라미터입니다. 최적의 토픽 수를 결정하는 것은 모델의 성능과 해석 가능성에 큰 영향을 미칩니다. 이를 위해 \textbf{코히어런스(Coherence)}와 \textbf{배타성(Exclusivity)}이라는 두 가지 지표가 주로 사용됩니다.
+
+\begin{conceptbox}
+\textbf{코히어런스 (Coherence)}:
+토픽 내의 단어들이 얼마나 의미론적으로 일관성이 있는지 측정하는 지표입니다.
+높은 코히어런스는 토픽이 잘 정의되고 해석하기 쉬움을 의미합니다.
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{직관}: 특정 토픽의 상위 단어들을 뽑았을 때, 이 단어들이 서로 관련성이 높고 함께 나타나는 경향이 있다면 코히어런스가 높다고 판단합니다.
+    \item \textbf{계산 방식}: 일반적으로 토픽 내 상위 N개 단어 쌍들이 문서 집합에서 얼마나 자주 함께 나타나는지(co-occurrence)를 기반으로 계산됩니다. (예: 'dog'와 'walk'가 같은 문서나 슬라이딩 윈도우 내에서 자주 나타나는지)
+\end{itemize}
+
+\begin{conceptbox}
+\textbf{배타성 (Exclusivity)}:
+토픽들이 서로 얼마나 겹치지 않고 고유한지 측정하는 지표입니다.
+높은 배타성은 토픽들이 서로 명확하게 구분됨을 의미합니다.
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{직관}: 토픽 1의 상위 단어와 토픽 2의 상위 단어가 서로 겹치지 않고 각 토픽에만 고유하게 나타나는 단어가 많을수록 배타성이 높다고 판단합니다.
+    \item \textbf{계산 방식}: 각 토픽의 상위 단어들이 다른 토픽에서는 얼마나 낮은 확률로 나타나는지를 측정합니다.
+\end{itemize}
+
+\subsubsection*{최적 토픽 수 선택 절차}
+\begin{enumerate}
+    \item \textbf{다양한 토픽 수로 모델 학습}: 2개부터 시작하여 10개, 15개 등 다양한 토픽 개수(K)로 LDA 또는 NMF 모델을 학습합니다.
+    \item \textbf{코히어런스 및 배타성 계산}: 각 모델에 대해 코히어런스 점수와 배타성 점수를 계산합니다.
+    \item \textbf{시각적 분석}: 코히어런스 점수를 Y축에, 배타성 점수를 X축에 놓고 각 토픽 수에 해당하는 점들을 플로팅합니다.
+    \item \textbf{최적 토픽 수 선택}:
+    \begin{itemize}
+        \item 일반적으로 코히어런스와 배타성은 서로 상충 관계(trade-off)를 가집니다. 코히어런스가 높아지면 배타성이 낮아지고, 그 반대도 마찬가지인 경우가 많습니다.
+        \item 목표는 두 지표를 동시에 최대화하는 지점, 즉 플롯의 오른쪽 상단 모서리에 가장 가까운 지점을 찾는 것입니다.
+        \item 때로는 두 지표를 정규화(standardize)한 후 가중 평균을 계산하여 최적의 점수를 찾기도 합니다.
+        \item 시각적으로 가장 합리적이고 해석하기 쉬운 토픽 수를 선택하는 것이 중요합니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{coherence_exclusivity_plot.png} % 이미지 파일이 없으므로 주석 처리
+    \caption{코히어런스-배타성 플롯 예시 (가상의 이미지)}
+    \label{fig:coherence_exclusivity}
+\end{figure}
+\textbf{참고}: 위 그림은 코히어런스와 배타성을 시각적으로 분석하는 방법을 보여주는 가상의 예시입니다. 실제 이미지 파일이 없으므로, 이 그림은 LaTeX 컴파일 시 오류를 발생시킬 수 있습니다. 실제 사용 시에는 적절한 이미지 파일로 대체하거나 주석 처리해야 합니다.
+
+\begin{warningbox}
+\textbf{LDA 결과의 비결정성}:
+LDA는 확률적 모델이므로, 동일한 토픽 수와 데이터로 여러 번 모델을 학습하더라도 토픽의 순서나 구성이 약간 달라질 수 있습니다. 따라서 재현성(reproducibility)을 위해 `random_state` 또는 `seed`를 설정하는 것이 중요하며, 여러 번 실행하여 평균적인 성능을 평가하거나 가장 좋은 결과를 선택하는 것이 좋습니다.
+\end{warningbox}
+
+\newpage
+\section*{실습/코드/오류와 해결: R 및 RStudio 사용법}
+강의에서는 구조적 토픽 모델링(STM)을 위해 R 사용법을 간략하게 소개했습니다. STM은 Python에서 공식적으로 지원하는 패키지가 없으므로 R을 사용하는 것이 권장됩니다.
+
+\subsection*{R 및 RStudio 설치 가이드}
+\begin{enumerate}
+    \item \textbf{R 설치}:
+    \begin{itemize}
+        \item 먼저 R 자체를 설치해야 합니다. \href{https://cran.r-project.org/}{CRAN (The Comprehensive R Archive Network)} 웹사이트에서 운영체제(Windows, macOS, Linux)에 맞는 버전을 다운로드하여 설치합니다.
+        \item R은 통계 계산 및 그래픽을 위한 프로그래밍 언어이자 환경입니다.
+    \end{itemize}
+    \item \textbf{RStudio 설치}:
+    \begin{itemize}
+        \item R 설치 후, \href{https://posit.co/download/rstudio-desktop/}{Posit (구 RStudio)} 웹사이트에서 RStudio Desktop 버전을 다운로드하여 설치합니다.
+        \item RStudio는 R을 위한 통합 개발 환경(IDE)으로, 코드 작성, 디버깅, 프로젝트 관리 등을 편리하게 할 수 있도록 돕습니다.
+        \item RStudio를 설치할 때, R이 이미 설치되어 있다면 RStudio가 자동으로 R의 위치를 감지하여 설정할 것입니다.
+    \end{itemize}
+    \item \textbf{클라우드 환경}: 개인 컴퓨터에 설치하기 어렵거나 원치 않는 경우, RStudio Cloud와 같은 클라우드 기반 환경을 사용할 수도 있습니다.
+\end{enumerate}
+
+\subsection*{RStudio 사용법}
+RStudio는 여러 개의 패널(Pane)로 구성되어 있습니다.
+\begin{itemize}
+    \item \textbf{소스 편집기 (Source Editor)}: R 스크립트(.R), R Markdown(.Rmd) 파일 등을 작성하는 곳입니다.
+    \item \textbf{콘솔 (Console)}: R 명령어를 직접 입력하고 실행 결과를 즉시 확인할 수 있습니다.
+    \item \textbf{환경 (Environment)}: 현재 작업 공간에 로드된 변수, 함수 등을 보여줍니다.
+    \item \textbf{파일/플롯/패키지/도움말 (Files/Plots/Packages/Help)}: 파일 탐색, 그래프 출력, 설치된 패키지 관리, 도움말 검색 등을 할 수 있습니다.
+\end{itemize}
+
+\subsubsection*{코드 실행 방법}
+\begin{itemize}
+    \item \textbf{한 줄 실행}: 소스 편집기에서 특정 줄에 커서를 놓고 \texttt{Ctrl + Enter} (Windows/Linux) 또는 \texttt{Cmd + Enter} (macOS)를 누르면 해당 줄이 콘솔에서 실행됩니다.
+    \item \textbf{선택 영역 실행}: 코드 블록을 드래그하여 선택한 후 \texttt{Ctrl + Enter}를 누르면 선택된 코드만 실행됩니다.
+    \item \textbf{청크 실행}: R Markdown 파일에서 코드 청크(chunk) 단위로 실행할 수 있습니다.
+    \item \textbf{디버깅}: 특정 지점에 중단점(breakpoint)을 설정하여 코드 실행을 일시 중지하고 변수 값을 확인할 수 있습니다.
+\end{itemize}
+
+\subsubsection*{패키지 설치 및 로드}
+R에서 특정 기능을 사용하려면 해당 기능을 제공하는 패키지를 설치하고 로드해야 합니다.
+\begin{lstlisting}[caption={R 패키지 설치 및 로드 예시}, label={lst:r_package}]
+# 패키지 설치 (최초 1회만 실행)
+install.packages("stm") # 구조적 토픽 모델링 패키지
+install.packages("topicmodels") # LDA 패키지
+
+# 패키지 로드 (세션 시작 시마다 실행)
+library(stm)
+library(topicmodels)
+\end{lstlisting}
+
+\subsubsection*{R Markdown 파일 사용법}
+\begin{conceptbox}
+R Markdown(.Rmd) 파일은 코드, 텍스트, 이미지 등을 통합하여 보고서나 문서를 작성할 수 있는 강력한 도구입니다.
+Jupyter Notebook과 유사하게 코드 실행 결과가 문서에 포함됩니다.
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{생성}: RStudio에서 \texttt{File -> New File -> R Markdown...}을 선택하여 새 R Markdown 파일을 생성합니다.
+    \item \textbf{구조}: R Markdown 파일은 YAML 헤더, 텍스트, 코드 청크로 구성됩니다.
+    \item \textbf{YAML 헤더}: 문서의 제목, 저자, 출력 형식(HTML, PDF, Word 등) 등을 정의합니다.
+    \item \textbf{텍스트}: 마크다운(Markdown) 문법을 사용하여 일반 텍스트를 작성합니다.
+    \item \textbf{코드 청크}: \texttt{\textasciigrave{}\textasciigrave{}\textasciigrave{}r}로 시작하고 \texttt{\textasciigrave{}\textasciigrave{}\textasciigrave{}}로 끝나는 블록 안에 R 코드를 작성합니다.
+    \item \textbf{청크 옵션}:
+    \begin{itemize}
+        \item \texttt{include=FALSE}: 코드는 실행되지만, 보고서에는 코드와 결과가 표시되지 않습니다.
+        \item \texttt{echo=FALSE}: 코드는 실행되지만, 보고서에는 코드만 표시되지 않고 결과만 표시됩니다.
+        \item \texttt{eval=FALSE}: 코드는 실행되지 않고, 보고서에는 코드만 표시됩니다.
+    \end{itemize}
+    \item \textbf{니팅 (Knitting)}: R Markdown 파일을 HTML, PDF, Word 등으로 변환하는 과정을 '니팅'이라고 합니다. RStudio 상단의 'Knit' 버튼을 클릭하면 됩니다.
+\end{itemize}
+
+\begin{lstlisting}[caption={R Markdown 코드 청크 예시}, label={lst:rmd_chunk}]
+---
+title: "LDA 분석 보고서"
+output: html_document
+---
+
+# 서론
+
+이 문서는 R을 이용한 LDA 분석 결과를 담고 있습니다.

@@ -10,23 +10,24 @@
 %========================================================================================
 
 \usepackage{kotex}
-\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
-\usepackage{amsmath, amssymb, amsthm}
-\usepackage{graphicx}
+% --- 표 관련 ---
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{adjustbox}
+\usepackage{colortbl}
 \renewcommand{\arraystretch}{1.1}
 
-\usepackage{enumitem}
-\setlist{nosep, leftmargin=*, itemsep=0.3em}
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -35,7 +36,288 @@
 \fancyhead[LO]{\leftmark}
 \fancyhead[RE]{6.419}
 \renewcommand{\headrulewidth}{0.5pt}
-\setlength{\headheight}{15pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+%========================================================================================
+% 색상 정의
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+% MIT/Harvard 추가 색상
+\definecolor{mainblue}{RGB}{50, 80, 150}
+\definecolor{subgray}{RGB}{180, 180, 180}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{boxbgcolor}{RGB}{245, 245, 250}
+
+% Stanford CS230 스타일 색상
+\definecolor{myblue}{RGB}{50, 100, 180}
+\definecolor{sblue}{RGB}{70, 130, 180}
+\definecolor{wgray}{RGB}{245, 245, 245}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%========================================================================================
+% 박스 환경
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=주의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=개념,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced,
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=비유,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+% mybox 환경 (UIUC용)
+\newtcolorbox{mybox}[1]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title={#1},
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable
+}
+
+% 추가 환경 (Gemini 생성 콘텐츠에서 사용)
+\newtcolorbox{tipbox}[1][]{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=팁, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{solutionbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=풀이, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{downloadbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=다운로드, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{practicebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=연습, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keypointbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=핵심 포인트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{storybox}[1][]{enhanced, colback=lightyellow, colframe=darkorange!80!black, fonttitle=\bfseries, title=이야기, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathstep}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학 단계, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{systembox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=시스템, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{toolbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=도구, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{bayesbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=베이즈, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{formulabox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=공식, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{strategybox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=전략, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{diagnosisbox}[1][]{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=진단, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{featurebox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=특징, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{faqbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=FAQ, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{notebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=노트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{codeexamplebox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=코드 예제, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keyconceptbox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 개념, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{termbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=용어, arc=2mm, boxrule=0.7pt, breakable, #1}
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% 커스텀 명령어 (Gemini 생성 콘텐츠에서 사용)
+\newcommand{\excel}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\concept}[1]{\textbf{#1}}
+\newcommand{\formula}[1]{\textit{#1}}
+\providecommand{\captionof}[2]{\textbf{#2}}
+\newcommand{\chaptertitle}[2]{\section*{#1: #2}}
+\providecommand{\newsection}{\section}
+
+%========================================================================================
+% 코드 블록
+%========================================================================================
+
+\usepackage{listings}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{
+    style=mystyle,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[chapter]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[chapter]
+\newtheorem{example}{예제}[chapter]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
 
 \usepackage[
     colorlinks=true,
@@ -46,56 +328,40 @@
 ]{hyperref}
 
 %========================================================================================
-% 색상 정의
+% 기타
 %========================================================================================
 
-\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
 
-\definecolor{mainblue}{RGB}{0, 51, 102}
-\definecolor{subblue}{RGB}{230, 240, 255}
-\definecolor{warningred}{RGB}{204, 0, 0}
-\definecolor{conceptgreen}{RGB}{0, 102, 51}
-\definecolor{storypurple}{RGB}{102, 0, 102}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{url}
+\urlstyle{same}
 
 %========================================================================================
-% 박스 환경 (tcolorbox)
+% 메타 정보 박스 명령어
 %========================================================================================
 
-\usepackage[most]{tcolorbox}
-\tcbuselibrary{skins, breakable}
-
-\newtcolorbox{summarybox}[1]{
-  colback=subblue, colframe=mainblue, 
-  title=\textbf{#1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+\textbf{강의명:} & #1 \\[0.3em]
+\textbf{주차:} & #2 \\[0.3em]
+\textbf{교수명:} & #3 \\[0.3em]
+\textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
 }
-
-\newtcolorbox{warningbox}[1]{
-  colback=white, colframe=warningred, 
-  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=0mm,
-  coltitle=white
-}
-
-\newtcolorbox{conceptbox}[1]{
-  colback=white, colframe=conceptgreen, 
-  title=\textbf{💡 #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm,
-  coltitle=white
-}
-
-\newtcolorbox{storybox}[1]{
-  colback=white, colframe=storypurple, 
-  title=\textbf{🎬 #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm,
-  coltitle=white
-}
-
-%========================================================================================
-% 사용자 정의 명령어
-%========================================================================================
-
-
 
 %========================================================================================
 % 문서 시작
@@ -109,11 +375,10 @@
 
 \maketitle
 \tableofcontents
-\newpage
 
 
 %=======================================================================
-% Chapter 1: MIT 6.419x: 고차원의 바다를 항해하는 법
+% Lecture 1: MIT 6.419x: 고차원의 바다를 항해하는 법
 %=======================================================================
 \chapter{MIT 6.419x: 고차원의 바다를 항해하는 법}
 \label{ch:lecture1}
@@ -137,7 +402,6 @@
     \item Module 3: Time Series \& Spatial Data (시간과 공간)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 1. 고차원 데이터 분석과 시각화}
@@ -175,7 +439,7 @@
 % 6. 핵심 개념 상세 설명
 \subsection{1. 차원의 저주 (Curse of Dimensionality)}
 
-\begin{conceptbox}{개념 1: 사막에서 바늘 찾기}
+\begin{conceptbox}[title={개념 1: 사막에서 바늘 찾기}]
 \textbf{한 줄 요약:} 변수($p$)가 늘어날수록 공간의 부피는 기하급수적으로 늘어나고, 데이터 포인트들 사이의 거리는 의미가 없어질 정도로 멀어집니다.
 \end{conceptbox}
 
@@ -192,7 +456,7 @@
 \subsection{2. PCA의 심화: SVD 관점}
 
 
-\begin{conceptbox}{개념 2: 공분산 행렬을 만들지 마라}
+\begin{conceptbox}[title={개념 2: 공분산 행렬을 만들지 마라}]
 \textbf{한 줄 요약:} 변수가 10만 개일 때 공분산 행렬($10만 \times 10만$)을 만들면 컴퓨터가 멈춥니다. SVD를 쓰면 이를 우회하여 바로 주성분을 구할 수 있습니다.
 \end{conceptbox}
 
@@ -213,7 +477,7 @@ $$ \text{Eigenvalue } \lambda_i = \frac{\sigma_i^2}{n-1} $$
 
 \subsection{3. 다차원 척도법 (MDS)}
 
-\begin{conceptbox}{개념 3: 거리표로 지도 복원하기}
+\begin{conceptbox}[title={개념 3: 거리표로 지도 복원하기}]
 \textbf{한 줄 요약:} 데이터의 절대 좌표는 몰라도 됩니다. "누가 누구랑 얼마나 먼가(Distance Matrix)"만 알면 지도를 그릴 수 있습니다.
 \end{conceptbox}
 
@@ -229,7 +493,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 \subsection{4. t-SNE (t-Distributed Stochastic Neighbor Embedding)}
 
 
-\begin{conceptbox}{개념 4: 구겨진 종이 펴기 \& 거리두기}
+\begin{conceptbox}[title={개념 4: 구겨진 종이 펴기 \& 거리두기}]
 \textbf{한 줄 요약:} 고차원에서 '이웃'이었던 관계는 유지하되, 저차원으로 올 때 너무 빽빽해지는 것을 막기 위해 \textbf{t-분포(꼬리가 두꺼운 분포)}를 사용하여 점들을 밀어냅니다.
 \end{conceptbox}
 
@@ -248,7 +512,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 
 \section{실전 시나리오: 넥슨 게임 로그 분석}
 
-\begin{storybox}{Scenario: 유저 행동 패턴 시각화}
+\begin{storybox}[title={Scenario: 유저 행동 패턴 시각화}]
 당신은 '메이플스토리' 데이터 분석가입니다. 500명의 VIP 유저가 수행한 10,000종류의 행동 로그(사냥, 채팅, 거래, 강화 등)를 분석해 유저 유형을 파악하고 싶습니다.
 \end{storybox}
 
@@ -295,7 +559,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 1 핵심 요약}
+\begin{summarybox}[title={Module 1 핵심 요약}]
 \begin{itemize}
     \item \textbf{Curse of Dimensionality:} $p \gg n$이면 공간이 희소해져서 기존 방법이 안 통한다.
     \item \textbf{SVD:} PCA를 수행하는 가장 효율적인 계산법 ($X = U \Sigma V^T$).
@@ -304,11 +568,9 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 2: MIT 6.419x: 연결과 계층의 발견
+% Lecture 2: MIT 6.419x: 연결과 계층의 발견
 %=======================================================================
 \chapter{MIT 6.419x: 연결과 계층의 발견}
 \label{ch:lecture2}
@@ -331,7 +593,6 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
     \item Module 2: Analysis of Networks (네트워크 과학)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 1 (Part B). 고급 군집화 (Advanced Clustering)}
@@ -372,7 +633,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 \subsection{1. K-Means의 한계 (The Convexity Assumption)}
 
 
-\begin{conceptbox}{개념 1: 둥근 구멍에 네모난 못}
+\begin{conceptbox}[title={개념 1: 둥근 구멍에 네모난 못}]
 \textbf{한 줄 요약:} K-Means는 "모든 클러스터는 둥근 공 모양이다"라고 가정합니다. 초승달 모양이나 도넛 모양 데이터는 절대 구분하지 못합니다.
 \end{conceptbox}
 
@@ -387,7 +648,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 
 \subsection{2. 스펙트럴 클러스터링 (Spectral Clustering)}
 
-\begin{conceptbox}{개념 2: 다리 끊기 (Graph Cut)}
+\begin{conceptbox}[title={개념 2: 다리 끊기 (Graph Cut)}]
 \textbf{한 줄 요약:} 데이터를 공간상의 점이 아니라 \textbf{'노드와 엣지로 이루어진 그래프'}로 봅니다. 그룹 간의 연결 다리를 끊어서(Cut) 섬을 만드는 것이 목표입니다.
 \end{conceptbox}
 
@@ -414,7 +675,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 \subsection{3. 계층적 군집화 (Hierarchical Clustering)}
 
 
-\begin{conceptbox}{개념 3: 족보 만들기 (Family Tree)}
+\begin{conceptbox}[title={개념 3: 족보 만들기 (Family Tree)}]
 \textbf{한 줄 요약:} 처음엔 모두가 남남이었다가, 가장 친한 사람끼리 짝을 짓고, 그 커플끼리 또 합치면서 거대한 가족(트리)을 만듭니다.
 \end{conceptbox}
 
@@ -445,7 +706,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 
 \section{실전 시나리오: 넥슨 게임 길드(Guild) 분석}
 
-\begin{storybox}{Scenario: 적대 길드와 동맹 길드 파악}
+\begin{storybox}[title={Scenario: 적대 길드와 동맹 길드 파악}]
 당신은 '리니지'와 같은 MMORPG의 데이터 분석가입니다. 수천 개의 길드가 서로 전쟁하거나 동맹을 맺고 있습니다. 이 복잡한 정치 지형도를 그려야 합니다.
 \end{storybox}
 
@@ -481,7 +742,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 1 (Part B) 핵심 요약}
+\begin{summarybox}[title={Module 1 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{한계:} K-Means는 볼록(Convex)한 형태만 찾을 수 있다.
     \item \textbf{Spectral Clustering:} 데이터를 그래프로 보고, 라플라시안 행렬의 고유벡터를 이용해 비볼록 구조를 분리한다. (Graph Cut)
@@ -490,11 +751,9 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 3: MIT 6.419x: 우연을 걸러내는 기술
+% Lecture 3: MIT 6.419x: 우연을 걸러내는 기술
 %=======================================================================
 \chapter{MIT 6.419x: 우연을 걸러내는 기술}
 \label{ch:lecture3}
@@ -518,7 +777,6 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
     \item Module 2: Analysis of Networks (네트워크 과학)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 1 (Part C). 다중 가설 검정 (Multiple Hypothesis Testing)}
@@ -558,7 +816,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 문제의 배경: 왜 $P < 0.05$로는 부족한가?}
 
-\begin{conceptbox}{개념 1: 로또 당첨의 함정}
+\begin{conceptbox}[title={개념 1: 로또 당첨의 함정}]
 \textbf{한 줄 요약:} 한 번 시도해서 성공할 확률이 희박하더라도, 수만 번 시도하면 누군가는 반드시 성공합니다. 그걸 '실력'이라고 착각하면 안 됩니다.
 \end{conceptbox}
 
@@ -582,7 +840,7 @@ $$ \text{Stress} = \sqrt{\sum_{i,j} (d_{ij} - ||z_i - z_j||)^2} $$
 
 \subsection{2. 해결책 1: FWER 제어 (본페로니 교정)}
 
-\begin{conceptbox}{개념 2: 철통 보안 검색대}
+\begin{conceptbox}[title={개념 2: 철통 보안 검색대}]
 \textbf{한 줄 요약:} 단 하나의 위험물도 비행기에 태우지 않겠다며, 모든 승객을 현미경으로 검사하는 방식입니다. 안전하지만, 비행기를 탈 수 있는 사람이 거의 없습니다.
 \end{conceptbox}
 
@@ -602,7 +860,7 @@ $$ P_{threshold} = \frac{0.05}{20,000} = 0.0000025 $$
 
 \subsection{3. 해결책 2: FDR 제어 (벤자미니-호크버그)}
 
-\begin{conceptbox}{개념 3: 섞여도 괜찮아, 비율만 맞춰}
+\begin{conceptbox}[title={개념 3: 섞여도 괜찮아, 비율만 맞춰}]
 \textbf{한 줄 요약:} 금을 캘 때 돌멩이가 좀 섞여 있어도, 금이 훨씬 많으면 성공입니다. "내가 찾았다고 주장한 것 중 가짜의 비율(FDR)"을 5\%로 유지합니다.
 \end{conceptbox}
 
@@ -651,7 +909,7 @@ P값 결과: $[0.001, 0.009, 0.04, 0.045, 0.6]$
 
 \section{실전 시나리오: 신약 후보 물질 발굴}
 
-\begin{storybox}{Scenario: 수만 개의 화합물 스크리닝}
+\begin{storybox}[title={Scenario: 수만 개의 화합물 스크리닝}]
 당신은 제약회사의 데이터 과학자입니다. 10,000개의 화합물 중 암세포를 죽이는 효과가 있는 후보를 추려야 합니다.
 \end{storybox}
 
@@ -694,7 +952,7 @@ P값 결과: $[0.001, 0.009, 0.04, 0.045, 0.6]$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 1 (Part C) 핵심 요약}
+\begin{summarybox}[title={Module 1 (Part C) 핵심 요약}]
 \begin{itemize}
     \item \textbf{다중 검정 문제:} 가설 검정을 많이 할수록 우연에 의한 가짜 발견(False Positive)이 폭증한다.
     \item \textbf{FWER (본페로니):} $\alpha/m$. 매우 엄격하다. 진짜도 놓칠 위험이 크다.
@@ -703,11 +961,9 @@ P값 결과: $[0.001, 0.009, 0.04, 0.045, 0.6]$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 4: MIT 6.419x: 네트워크의 권력자들
+% Lecture 4: MIT 6.419x: 네트워크의 권력자들
 %=======================================================================
 \chapter{MIT 6.419x: 네트워크의 권력자들}
 \label{ch:lecture4}
@@ -730,7 +986,6 @@ P값 결과: $[0.001, 0.009, 0.04, 0.045, 0.6]$
     \item Module 3: Time Series \& Spatial Data
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 2. 그래프 중심성 (Centrality Measures)}
@@ -770,7 +1025,7 @@ P값 결과: $[0.001, 0.009, 0.04, 0.045, 0.6]$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 연결 중심성 (Degree Centrality)}
 
-\begin{conceptbox}{개념 1: 마당발 (The Popular Kid)}
+\begin{conceptbox}[title={개념 1: 마당발 (The Popular Kid)}]
 \textbf{한 줄 요약:} "내 전화번호부에 친구가 몇 명 저장되어 있는가?" (양적 인기)
 \end{conceptbox}
 
@@ -787,7 +1042,7 @@ $$ C_D(v) = \text{deg}(v) = \text{# of edges connected to } v $$
 \subsection{2. 매개 중심성 (Betweenness Centrality)}
 
 
-\begin{conceptbox}{개념 2: 문지기 (The Gatekeeper / Broker)}
+\begin{conceptbox}[title={개념 2: 문지기 (The Gatekeeper / Broker)}]
 \textbf{한 줄 요약:} "도시 A에서 도시 B로 가는 최단 경로상에 내가 위치하는가?" (흐름 통제권)
 \end{conceptbox}
 
@@ -807,7 +1062,7 @@ $$ C_B(v) = \sum_{s \neq v \neq t} \frac{\sigma_{st}(v)}{\sigma_{st}} $$
 
 \subsection{3. 고유벡터 중심성 (Eigenvector Centrality)}
 
-\begin{conceptbox}{개념 3: 유유상종 (The Influencer)}
+\begin{conceptbox}[title={개념 3: 유유상종 (The Influencer)}]
 \textbf{한 줄 요약:} "친구가 몇 명인지가 중요한 게 아니라, \textbf{누구랑} 친구인지가 중요하다." (질적 인기)
 \end{conceptbox}
 
@@ -827,7 +1082,7 @@ $$ x_i = \frac{1}{\lambda} \sum_{j \in \text{neighbors}(i)} x_j \quad \iff \quad
 \subsection{4. 페이지랭크 (PageRank)}
 
 
-\begin{conceptbox}{개념 4: 구글을 만든 알고리즘 (The Authority)}
+\begin{conceptbox}[title={개념 4: 구글을 만든 알고리즘 (The Authority)}]
 \textbf{한 줄 요약:} 고유벡터 중심성을 \textbf{방향성 그래프(웹)}에 맞게 수정한 버전. "권위 있는 페이지가 링크를 걸어주면 나도 권위가 생긴다."
 \end{conceptbox}
 
@@ -847,7 +1102,7 @@ $$ PR(A) = (1-d) + d \sum_{i \in \text{InLink}(A)} \frac{PR(T_i)}{C(T_i)} $$
 
 \section{실전 시나리오: 넥슨 게임 길드 네트워크 분석}
 
-\begin{storybox}{Scenario: 길드장과 숨은 실세 찾기}
+\begin{storybox}[title={Scenario: 길드장과 숨은 실세 찾기}]
 당신은 MMORPG 게임의 커뮤니티 매니저입니다. 길드 간의 채팅 로그를 분석해 여론을 주도하는 유저를 찾고 싶습니다.
 \end{storybox}
 
@@ -892,7 +1147,7 @@ $$ PR(A) = (1-d) + d \sum_{i \in \text{InLink}(A)} \frac{PR(T_i)}{C(T_i)} $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 2 핵심 요약}
+\begin{summarybox}[title={Module 2 핵심 요약}]
 \begin{itemize}
     \item \textbf{Degree:} 이웃 수. (Local Popularity)
     \item \textbf{Betweenness:} 최단 경로 통과 횟수. (Flow \& Control)
@@ -901,11 +1156,9 @@ $$ PR(A) = (1-d) + d \sum_{i \in \text{InLink}(A)} \frac{PR(T_i)}{C(T_i)} $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 5: MIT 6.419x: 네트워크의 파벌 찾기
+% Lecture 5: MIT 6.419x: 네트워크의 파벌 찾기
 %=======================================================================
 \chapter{MIT 6.419x: 네트워크의 파벌 찾기}
 \label{ch:lecture5}
@@ -928,7 +1181,6 @@ $$ PR(A) = (1-d) + d \sum_{i \in \text{InLink}(A)} \frac{PR(T_i)}{C(T_i)} $$
     \item Module 2 (Part C): Network Models (그래프 생성 모델)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 2 (Part B). 커뮤니티 탐지 (Community Detection)}
@@ -968,7 +1220,7 @@ $$ PR(A) = (1-d) + d \sum_{i \in \text{InLink}(A)} \frac{PR(T_i)}{C(T_i)} $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 커뮤니티의 정의와 목표}
 
-\begin{conceptbox}{개념 1: 학교 식당 풍경}
+\begin{conceptbox}[title={개념 1: 학교 식당 풍경}]
 \textbf{한 줄 요약:} 우리끼리는 시끌벅적하게 떠들고(내부 연결 $\uparrow$), 옆 테이블이랑은 가끔 눈인사만 하는(외부 연결 $\downarrow$) 상태입니다.
 \end{conceptbox}
 
@@ -987,7 +1239,7 @@ $$ PR(A) = (1-d) + d \sum_{i \in \text{InLink}(A)} \frac{PR(T_i)}{C(T_i)} $$
 \subsection{2. 모듈성 (Modularity, $Q$)}
 
 
-\begin{conceptbox}{개념 2: 우연을 가장한 필연 찾기}
+\begin{conceptbox}[title={개념 2: 우연을 가장한 필연 찾기}]
 \textbf{한 줄 요약:} "너네 진짜 친해서 뭉친 거야, 아니면 좁은 방에 있다 보니 우연히 옆에 선 거야?"를 판별하는 점수입니다.
 \end{conceptbox}
 
@@ -1017,7 +1269,7 @@ $$ Q = \frac{1}{2m} \sum_{i,j} \left( \underbrace{A_{ij}}_{\text{실제 연결}}
 
 \subsection{3. 스펙트럴 파티셔닝 (Spectral Partitioning)}
 
-\begin{conceptbox}{개념 3: 그래프를 수직선 위에 줄 세우기}
+\begin{conceptbox}[title={개념 3: 그래프를 수직선 위에 줄 세우기}]
 \textbf{한 줄 요약:} 복잡한 얽타래(그래프)를 1차원 직선 위에 쫙 펴서 나열한 뒤, 사이가 가장 먼 곳을 가위로 싹둑 자릅니다.
 \end{conceptbox}
 
@@ -1044,7 +1296,7 @@ $\lambda_2$가 0에 가까우면 그래프가 이미 두 덩어리로 거의 나
 
 \section{실전 시나리오: 불법 작업장 탐지}
 
-\begin{storybox}{Scenario: 넥슨 게임 내 '작업장' 길드 색출}
+\begin{storybox}[title={Scenario: 넥슨 게임 내 '작업장' 길드 색출}]
 당신은 보안팀 데이터 분석가입니다. 일반 유저 길드와 아이템 파밍용 봇(Bot) 길드(작업장)를 구분해야 합니다.
 \end{storybox}
 
@@ -1081,7 +1333,7 @@ $\lambda_2$가 0에 가까우면 그래프가 이미 두 덩어리로 거의 나
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 2 (Part B) 핵심 요약}
+\begin{summarybox}[title={Module 2 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{Community:} 내부 밀도가 높고 외부 밀도가 낮은 노드 집합.
     \item \textbf{Modularity ($Q$):} 실제 연결과 랜덤 연결(Null Model)의 차이. 군집화의 채점표.
@@ -1089,11 +1341,9 @@ $\lambda_2$가 0에 가까우면 그래프가 이미 두 덩어리로 거의 나
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 6: MIT 6.419x: 세상은 어떻게 연결되는가
+% Lecture 6: MIT 6.419x: 세상은 어떻게 연결되는가
 %=======================================================================
 \chapter{MIT 6.419x: 세상은 어떻게 연결되는가}
 \label{ch:lecture6}
@@ -1117,7 +1367,6 @@ $\lambda_2$가 0에 가까우면 그래프가 이미 두 덩어리로 거의 나
     \item Module 3: Time Series \& Spatial Data (시공간 데이터)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 2 (Part C). 네트워크 생성 모델 (Network Models)}
@@ -1161,7 +1410,7 @@ $\lambda_2$가 0에 가까우면 그래프가 이미 두 덩어리로 거의 나
 \subsection{1. 에르되시-레니 모델 (Erdős-Rényi Model)}
 
 
-\begin{conceptbox}{개념 1: 눈 감고 선 긋기}
+\begin{conceptbox}[title={개념 1: 눈 감고 선 긋기}]
 \textbf{한 줄 요약:} 모든 사람은 평등하고, 누구나 서로 친구가 될 확률($p$)이 똑같습니다. 인싸도 아싸도 없는 평평한 세상입니다.
 \end{conceptbox}
 
@@ -1180,7 +1429,7 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
 \subsection{2. 스토캐스틱 블록 모델 (SBM)}
 
 
-\begin{conceptbox}{개념 2: 유유상종의 수학화}
+\begin{conceptbox}[title={개념 2: 유유상종의 수학화}]
 \textbf{한 줄 요약:} 사람들을 몇 개의 그룹(Block)으로 나누고, "같은 그룹끼리 연결될 확률($p_{in}$)"을 "다른 그룹과 연결될 확률($p_{out}$)"보다 높게 설정합니다.
 \end{conceptbox}
 
@@ -1195,7 +1444,7 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
 
 \subsection{3. 작은 세상과 멱법칙 (Small-World \& Power Law)}
 
-\begin{conceptbox}{개념 3: 좁은 세상 속 거인들}
+\begin{conceptbox}[title={개념 3: 좁은 세상 속 거인들}]
 \textbf{한 줄 요약:} 현실 네트워크는 끼리끼리 뭉쳐있으면서도(Small-World), 소수의 거인(Hub)이 전체를 연결하는 불평등한 구조(Power Law)입니다.
 \end{conceptbox}
 
@@ -1212,7 +1461,7 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
 
 \subsubsection*{B. 멱법칙 분포 (Power Law Distribution)}
 
-\begin{conceptbox}{핵심: 척도 없는 네트워크 (Scale-free)}
+\begin{conceptbox}[title={핵심: 척도 없는 네트워크 (Scale-free)}]
 친구 수가 $k$일 확률 $P(k)$가 $k^{-\gamma}$에 비례합니다.
 그래프를 그리면 $L$자 모양(Long Tail)이 나옵니다.
 \end{conceptbox}
@@ -1225,7 +1474,7 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
 
 \section{실전 시나리오: 넥슨 미디어 파트너십 전략}
 
-\begin{storybox}{Scenario: 신작 게임 마케팅 예산 분배}
+\begin{storybox}[title={Scenario: 신작 게임 마케팅 예산 분배}]
 당신은 본부장으로서 한정된 마케팅 예산을 인플루언서들에게 분배해야 합니다. 네트워크 모델을 이용해 전략을 짭니다.
 \end{storybox}
 
@@ -1266,7 +1515,7 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 2 (Part C) 핵심 요약}
+\begin{summarybox}[title={Module 2 (Part C) 핵심 요약}]
 \begin{itemize}
     \item \textbf{Erdős-Rényi:} 완전 랜덤 그래프. 허브가 없다. (Poisson 분포)
     \item \textbf{SBM:} 그룹 내 연결 확률이 더 높은 모델. 커뮤니티 구조 설명.
@@ -1275,11 +1524,9 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 7: MIT 6.419x: 시간의 패턴을 읽다
+% Lecture 7: MIT 6.419x: 시간의 패턴을 읽다
 %=======================================================================
 \chapter{MIT 6.419x: 시간의 패턴을 읽다}
 \label{ch:lecture7}
@@ -1302,7 +1549,6 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
     \end{itemize}
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 3 (Part A). 시계열 분석 (Time Series Analysis)}
@@ -1343,7 +1589,7 @@ $n$개의 노드에 대해, 모든 가능한 쌍이 확률 $p$로 연결됩니�
 \subsection{1. 추세(Trend)와 계절성(Seasonality) 제거}
 
 
-\begin{conceptbox}{개념 1: 양파 껍질 벗기기}
+\begin{conceptbox}[title={개념 1: 양파 껍질 벗기기}]
 \textbf{한 줄 요약:} 데이터에서 '뻔한 패턴(상승세, 주말 효과)'을 걷어내야, 진짜 중요한 '변화(신호)'가 보입니다. 이를 위해 데이터를 분해합니다.
 \end{conceptbox}
 
@@ -1363,7 +1609,7 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
 \subsection{2. 자기회귀 이동평균 모델 (ARMA / ARIMA)}
 
 
-\begin{conceptbox}{개념 2: 관성(Inertia)과 충격(Shock)}
+\begin{conceptbox}[title={개념 2: 관성(Inertia)과 충격(Shock)}]
 \textbf{한 줄 요약:} "관성대로 가려는 성질(AR)"과 "외부 충격에 반응하는 성질(MA)"을 합쳐서 미래를 그립니다.
 \end{conceptbox}
 
@@ -1387,7 +1633,7 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
 \subsection{3. 칼만 필터 (Kalman Filter)}
 
 
-\begin{conceptbox}{개념 3: 네비게이션의 원리}
+\begin{conceptbox}[title={개념 3: 네비게이션의 원리}]
 \textbf{한 줄 요약:} "내 예측(계산)"과 "센서값(측정)"은 둘 다 부정확합니다. 이 둘을 적절히 섞어서(가중 평균) 최적의 "진짜 위치"를 찾아냅니다.
 \end{conceptbox}
 
@@ -1410,7 +1656,7 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
 
 \section{실전 시나리오: 넥슨 게임 지표 분석}
 
-\begin{storybox}{Scenario 1: 주말 이벤트 효과 분석 (Decomposition)}
+\begin{storybox}[title={Scenario 1: 주말 이벤트 효과 분석 (Decomposition)}]
 토요일에 경험치 2배 이벤트를 했습니다. 접속자가 평일 대비 30\% 늘었습니다. 이게 이벤트 덕분일까요, 아니면 원래 토요일이라서 그런 걸까요?
 \end{storybox}
 \begin{itemize}
@@ -1418,7 +1664,7 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
     \item \textbf{결과:} 계절성을 뺐더니 상승분이 5\%밖에 안 남았습니다. 이벤트 효과는 생각보다 미미했습니다.
 \end{itemize}
 
-\begin{storybox}{Scenario 2: 매치메이킹 시스템 (Kalman Filter)}
+\begin{storybox}[title={Scenario 2: 매치메이킹 시스템 (Kalman Filter)}]
 유저의 실력(MMR)을 측정해야 합니다. 고수도 운 나쁘면 지고, 초보도 버스 타면 이깁니다. 승패(Measurement)는 노이즈 투성이입니다.
 \end{storybox}
 \begin{itemize}
@@ -1445,7 +1691,7 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 3 (Part A) 핵심 요약}
+\begin{summarybox}[title={Module 3 (Part A) 핵심 요약}]
 \begin{itemize}
     \item \textbf{Decomposition:} $Y = T + S + R$. 추세와 계절성을 제거해야 예측이 가능하다.
     \item \textbf{ARIMA:} 과거의 나(AR)와 과거의 오차(MA)를 합쳐 미래를 예측하는 통계적 도구.
@@ -1453,11 +1699,9 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 8: MIT 6.419x: 지도의 빈칸을 채우다
+% Lecture 8: MIT 6.419x: 지도의 빈칸을 채우다
 %=======================================================================
 \chapter{MIT 6.419x: 지도의 빈칸을 채우다}
 \label{ch:lecture8}
@@ -1479,7 +1723,6 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
     \end{itemize}
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 3 (Part B). 공간 통계 (Spatial Statistics)}
@@ -1518,7 +1761,7 @@ $$ Y_t = \underbrace{T_t}_{\text{추세}} + \underbrace{S_t}_{\text{계절성}} 
 \subsection{1. 가우시안 프로세스 (Gaussian Processes, GP)}
 
 
-\begin{conceptbox}{개념 1: 함수의 확률 분포}
+\begin{conceptbox}[title={개념 1: 함수의 확률 분포}]
 \textbf{한 줄 요약:} 점 하나하나를 예측하는 게 아니라, "데이터를 설명할 수 있는 모든 가능한 곡선(함수)들의 모임"을 그립니다.
 \end{conceptbox}
 
@@ -1541,7 +1784,7 @@ $$ f(x) \sim GP(m(x), k(x, x')) $$
 \subsection{2. 크리깅 (Kriging)}
 
 
-\begin{conceptbox}{개념 2: 지능적인 가중 평균}
+\begin{conceptbox}[title={개념 2: 지능적인 가중 평균}]
 \textbf{한 줄 요약:} 단순히 가까운 점을 평균 내는 게 아니라, 공간의 특성(배리오그램)을 분석해서 가장 오차가 적은 황금 비율(가중치)로 섞습니다.
 \end{conceptbox}
 
@@ -1563,7 +1806,7 @@ $$ \hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i) $$
 \subsection{3. 커널 방법론 (The Kernel Connection)}
 
 
-\begin{conceptbox}{개념 3: 공간의 질감(Texture) 정의하기}
+\begin{conceptbox}[title={개념 3: 공간의 질감(Texture) 정의하기}]
 \textbf{한 줄 요약:} "이 지역은 부드러운 언덕인가(RBF), 아니면 거친 자갈밭인가(Matern)?"를 수학식(커널)으로 결정합니다.
 \end{conceptbox}
 
@@ -1589,7 +1832,7 @@ $$ \hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i) $$
 
 \section{실전 시나리오: 넥슨 글로벌 서버 랙(Lag) 지도}
 
-\begin{storybox}{Scenario: 전 세계 유저들의 네트워크 품질 추정}
+\begin{storybox}[title={Scenario: 전 세계 유저들의 네트워크 품질 추정}]
 당신은 넥슨 글로벌 서비스 본부장입니다. 전 세계 곳곳에 흩어진 유저들의 핑(Ping) 데이터를 이용해, 어느 지역에 서버를 증설해야 할지 결정해야 합니다.
 \end{storybox}
 
@@ -1628,7 +1871,7 @@ $$ \hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i) $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 3 (Part B) 핵심 요약}
+\begin{summarybox}[title={Module 3 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{Gaussian Processes:} 함수를 확률적으로 추정하여 예측값과 불확실성(범위)을 동시에 제공한다.
     \item \textbf{Kriging:} 공간적 상관관계(Variogram)를 분석하여 미관측 지점을 정밀하게 보간하는 지구통계학 기법.
@@ -1636,11 +1879,9 @@ $$ \hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i) $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 9: MIT 6.419x: 데이터 과학의 성배
+% Lecture 9: MIT 6.419x: 데이터 과학의 성배
 %=======================================================================
 \chapter{MIT 6.419x: 데이터 과학의 성배}
 \label{ch:lecture9}
@@ -1665,7 +1906,6 @@ $$ \hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i) $$
     \end{itemize}
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 4. 인과 추론 (Causal Inference)}
@@ -1705,7 +1945,7 @@ $$ \hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i) $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 상관관계 vs 인과관계 (Correlation vs Causation)}
 
-\begin{conceptbox}{개념 1: 보기만 하는 것 vs 행동하는 것}
+\begin{conceptbox}[title={개념 1: 보기만 하는 것 vs 행동하는 것}]
 \textbf{한 줄 요약:} 비가 올 때 우산이 펴지는 것을 본다고 해서(상관), 내가 우산을 편다고 비가 오게 만들 수는 없습니다(인과 X).
 \end{conceptbox}
 
@@ -1728,7 +1968,7 @@ $$ \hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i) $$
 
 \subsection{2. 잠재적 결과 프레임워크 (Potential Outcomes Framework)}
 
-\begin{conceptbox}{개념 2: 가지 않은 길 (The Road Not Taken)}
+\begin{conceptbox}[title={개념 2: 가지 않은 길 (The Road Not Taken)}]
 \textbf{한 줄 요약:} 인과 효과를 안다는 것은 '평행우주'의 나를 훔쳐보는 것과 같습니다. "약을 먹은 나"와 "안 먹은 나"를 동시에 비교해야 합니다.
 \end{conceptbox}
 
@@ -1749,7 +1989,7 @@ $$ Y_i^{obs} = W_i Y_i(1) + (1-W_i) Y_i(0) $$
 
 \subsection{3. 처치 효과 (ATE)와 선택 편향}
 
-\begin{conceptbox}{개념 3: 비교할 수 없는 것을 비교하지 마라}
+\begin{conceptbox}[title={개념 3: 비교할 수 없는 것을 비교하지 마라}]
 \textbf{한 줄 요약:} 병원 간 사람은 아프고, 안 간 사람은 건강합니다. 단순히 병원 간 사람의 사망률이 높다고 해서 "병원이 사람을 죽인다"고 할 수 없습니다. 이것이 선택 편향입니다.
 \end{conceptbox}
 
@@ -1769,7 +2009,7 @@ $$ \underbrace{\mathbb{E}[Y|W=1] - \mathbb{E}[Y|W=0]}_{\text{관측된 차이}} 
 
 \section{실전 시나리오: 넥슨 멤버십 효과 분석}
 
-\begin{storybox}{Scenario: 월정액 상품이 진짜 돈을 벌어줄까?}
+\begin{storybox}[title={Scenario: 월정액 상품이 진짜 돈을 벌어줄까?}]
 당신은 '던전앤파이터'의 PM입니다. 월 1만 원짜리 '아라드 패스(멤버십)'를 출시했습니다. 패스 구매자의 월평균 결제액은 10만 원, 비구매자는 3만 원입니다. 패스의 효과가 +7만 원이라고 보고하면 될까요?
 \end{storybox}
 
@@ -1804,7 +2044,7 @@ $$ \underbrace{\mathbb{E}[Y|W=1] - \mathbb{E}[Y|W=0]}_{\text{관측된 차이}} 
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 4 핵심 요약}
+\begin{summarybox}[title={Module 4 핵심 요약}]
 \begin{itemize}
     \item \textbf{상관 $\neq$ 인과:} 같이 움직인다고 해서 원인과 결과는 아니다. (교란변수 주의)
     \item \textbf{잠재적 결과:} 인과 효과 = (약 먹었을 때의 나) - (약 안 먹었을 때의 나). 하나는 볼 수 없으므로 추론해야 한다.
@@ -1813,11 +2053,9 @@ $$ \underbrace{\mathbb{E}[Y|W=1] - \mathbb{E}[Y|W=0]}_{\text{관측된 차이}} 
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 10: MIT 6.419x: 실험 없이 원인을 찾다
+% Lecture 10: MIT 6.419x: 실험 없이 원인을 찾다
 %=======================================================================
 \chapter{MIT 6.419x: 실험 없이 원인을 찾다}
 \label{ch:lecture10}
@@ -1841,7 +2079,6 @@ $$ \underbrace{\mathbb{E}[Y|W=1] - \mathbb{E}[Y|W=0]}_{\text{관측된 차이}} 
     \item Module 5: Deep Learning \& Applications (심화 응용)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 10. 관찰 연구에서의 인과 추론}
@@ -1885,7 +2122,7 @@ $$ \underbrace{\mathbb{E}[Y|W=1] - \mathbb{E}[Y|W=0]}_{\text{관측된 차이}} 
 \subsection{1. 교란 변수와 심슨의 역설}
 
 
-\begin{conceptbox}{개념 1: 통계의 착시 현상}
+\begin{conceptbox}[title={개념 1: 통계의 착시 현상}]
 \textbf{한 줄 요약:} 데이터를 뭉뚱그려(Aggregation) 보면 진실이 가려집니다. 쪼개서(Stratification) 봐야 합니다.
 \end{conceptbox}
 
@@ -1902,7 +2139,7 @@ $$ \underbrace{\mathbb{E}[Y|W=1] - \mathbb{E}[Y|W=0]}_{\text{관측된 차이}} 
 \subsection{2. 성향 점수 매칭 (Propensity Score Matching, PSM)}
 
 
-\begin{conceptbox}{개념 2: 도플갱어 찾기}
+\begin{conceptbox}[title={개념 2: 도플갱어 찾기}]
 \textbf{한 줄 요약:} 약을 먹은 사람과, 안 먹었지만 먹을 뻔했던(성향이 비슷한) 사람을 짝지어서 비교합니다.
 \end{conceptbox}
 
@@ -1922,7 +2159,7 @@ $$ e(x) = P(T=1 | X=x) $$
 \subsection{3. 도구 변수 (Instrumental Variables, IV)}
 
 
-\begin{conceptbox}{개념 3: 자연 실험(Natural Experiment) 이용하기}
+\begin{conceptbox}[title={개념 3: 자연 실험(Natural Experiment) 이용하기}]
 \textbf{한 줄 요약:} 우리가 직접 실험할 수 없을 때, 우연히 발생한 외부 충격(도구)을 이용해 인과관계를 발라냅니다.
 \end{conceptbox}
 
@@ -1945,7 +2182,7 @@ $$ e(x) = P(T=1 | X=x) $$
 \subsection{4. 회귀 불연속 (Regression Discontinuity, RD)}
 
 
-\begin{conceptbox}{개념 4: 깻잎 한 장 차이}
+\begin{conceptbox}[title={개념 4: 깻잎 한 장 차이}]
 \textbf{한 줄 요약:} 커트라인(90점) 바로 위(90점)와 바로 아래(89점) 사람은 실력 차이가 거의 없습니다. 운명만 갈렸을 뿐이죠. 이들을 비교합니다.
 \end{conceptbox}
 
@@ -1963,7 +2200,7 @@ $X$축(점수)에 따른 $Y$축(결과) 그래프를 그렸을 때, 컷오프 �
 
 \section{실전 시나리오: 넥슨 PC방 혜택 분석}
 
-\begin{storybox}{Scenario: PC방 혜택이 진짜 접속 시간을 늘릴까?}
+\begin{storybox}[title={Scenario: PC방 혜택이 진짜 접속 시간을 늘릴까?}]
 당신은 넥슨의 사업 PM입니다. "PC방에서 접속하면 경험치 +20\%" 혜택을 줍니다. PC방 유저의 플레이 시간이 집 유저보다 2배 깁니다. 이게 혜택 덕분일까요?
 \end{storybox}
 
@@ -2004,7 +2241,7 @@ $X$축(점수)에 따른 $Y$축(결과) 그래프를 그렸을 때, 컷오프 �
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 4 (Part B) 핵심 요약}
+\begin{summarybox}[title={Module 4 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{심슨의 역설:} 데이터를 뭉뚱그려 보면 인과관계가 뒤집힐 수 있다. 쪼개 봐야 한다.
     \item \textbf{PSM:} 성향이 비슷한 사람끼리 짝지어(Matching) 비교한다.
@@ -2013,11 +2250,9 @@ $X$축(점수)에 따른 $Y$축(결과) 그래프를 그렸을 때, 컷오프 �
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 11: MIT 6.419x: 보는 눈과 거르는 체
+% Lecture 11: MIT 6.419x: 보는 눈과 거르는 체
 %=======================================================================
 \chapter{MIT 6.419x: 보는 눈과 거르는 체}
 \label{ch:lecture11}
@@ -2041,7 +2276,6 @@ $X$축(점수)에 따른 $Y$축(결과) 그래프를 그렸을 때, 컷오프 �
     \item Module 5 (Part B): Generative Models (VAE, GAN)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 5 (Part A). CNN과 오토인코더}
@@ -2081,7 +2315,7 @@ $X$축(점수)에 따른 $Y$축(결과) 그래프를 그렸을 때, 컷오프 �
 % 6. 핵심 개념 상세 설명
 \subsection{1. 이미지 전처리 및 CNN 구조 설계}
 
-\begin{conceptbox}{개념 1: AI가 보기 좋게 차려주기}
+\begin{conceptbox}[title={개념 1: AI가 보기 좋게 차려주기}]
 \textbf{한 줄 요약:} 제각각인 원본 이미지를 규격화(Resizing, Normalization)하고, 데이터를 뻥튀기(Augmentation)해서 모델을 강하게 키웁니다.
 \end{conceptbox}
 
@@ -2108,7 +2342,7 @@ $X$축(점수)에 따른 $Y$축(결과) 그래프를 그렸을 때, 컷오프 �
 \subsection{2. 오토인코더 (Autoencoder): 압축과 복원}
 
 
-\begin{conceptbox}{개념 2: 기억해서 그려보기}
+\begin{conceptbox}[title={개념 2: 기억해서 그려보기}]
 \textbf{한 줄 요약:} 사진을 보고($X$), 핵심만 기억했다가($Z$), 다시 그려냅니다($\hat{X}$). 잘 그렸는지 비교해서($Loss$) 학습합니다.
 \end{conceptbox}
 
@@ -2128,7 +2362,7 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
 
 \subsection{3. 활용: 이상 탐지 (Anomaly Detection)}
 
-\begin{conceptbox}{개념 3: 모르는 건 못 그린다}
+\begin{conceptbox}[title={개념 3: 모르는 건 못 그린다}]
 \textbf{한 줄 요약:} 정상 데이터만 보고 자란 오토인코더에게 '비정상 데이터'를 보여주면, 복원을 못 해서 에러가 폭발합니다. 이 에러가 바로 '이상 신호'입니다.
 \end{conceptbox}
 
@@ -2150,7 +2384,7 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
 
 \section{실전 시나리오: 넥슨 게임 보안 및 운영}
 
-\begin{storybox}{Scenario 1: 불건전 프로필 이미지 필터링 (CNN)}
+\begin{storybox}[title={Scenario 1: 불건전 프로필 이미지 필터링 (CNN)}]
 유저들이 올리는 프로필 사진 중 성인물이나 혐오 이미지를 걸러내고 싶습니다.
 \end{storybox}
 \begin{itemize}
@@ -2159,7 +2393,7 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
     \item \textbf{효과:} 운영자가 일일이 보던 건수의 90\%를 AI가 1차로 필터링하여 운영 비용을 절감합니다.
 \end{itemize}
 
-\begin{storybox}{Scenario 2: 작업장(매크로) 탐지 (Autoencoder)}
+\begin{storybox}[title={Scenario 2: 작업장(매크로) 탐지 (Autoencoder)}]
 '메이플스토리'에서 사람이 아닌 봇(Bot)이 24시간 사냥하는 것을 잡고 싶습니다. 봇의 패턴은 계속 진화해서 규칙(Rule)으로 잡기 힘듭니다.
 \end{storybox}
 \begin{itemize}
@@ -2188,7 +2422,7 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 5 (Part A) 핵심 요약}
+\begin{summarybox}[title={Module 5 (Part A) 핵심 요약}]
 \begin{itemize}
     \item \textbf{Preprocessing:} Resizing, Normalization, Augmentation은 CNN 성능의 8할이다.
     \item \textbf{CNN:} 이미지의 공간적 특징을 추출(Conv)하고 압축(Pool)하여 분류한다.
@@ -2197,11 +2431,9 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 12: MIT 6.419x: 관계를 학습하다
+% Lecture 12: MIT 6.419x: 관계를 학습하다
 %=======================================================================
 \chapter{MIT 6.419x: 관계를 학습하다}
 \label{ch:lecture12}
@@ -2225,7 +2457,6 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
     \item Module 5 (Part C): Generative Models (VAE, GAN)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Module 5 (Part B). 그래프 신경망 (GNN)}
@@ -2265,7 +2496,7 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 왜 GNN인가? (데이터의 구조)}
 
-\begin{conceptbox}{개념 1: 줄을 설 수 없는 데이터}
+\begin{conceptbox}[title={개념 1: 줄을 설 수 없는 데이터}]
 \textbf{한 줄 요약:} 이미지는 고정된 그리드($3 \times 3$)가 있지만, 소셜 네트워크에서 내 친구는 1명일 수도, 100명일 수도 있어서 기존 CNN 필터를 쓸 수 없습니다.
 \end{conceptbox}
 
@@ -2280,7 +2511,7 @@ $$ \text{Minimize } || X - \hat{X} ||^2 $$
 \subsection{2. 핵심 원리: 메시지 패싱 (Message Passing)}
 
 
-\begin{conceptbox}{개념 2: 소문 퍼뜨리기 (Gossip)}
+\begin{conceptbox}[title={개념 2: 소문 퍼뜨리기 (Gossip)}]
 \textbf{한 줄 요약:} "내 정보"는 "내 이웃들의 정보의 합"으로 정의됩니다. 층(Layer)을 거듭할수록 내 친구의 친구, 그 친구의 친구 정보까지 나에게 도달합니다.
 \end{conceptbox}
 
@@ -2300,7 +2531,7 @@ $$ H^{(l+1)} = \sigma( \underbrace{\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^
 
 \subsection{3. 주요 GNN 알고리즘}
 
-\begin{conceptbox}{개념 3: GNN의 진화}
+\begin{conceptbox}[title={개념 3: GNN의 진화}]
 \textbf{한 줄 요약:} 기본형(GCN)에서 시작해, 대용량 처리를 위한 실전형(GraphSAGE), 중요한 친구를 더 챙기는 고급형(GAT)으로 발전했습니다.
 \end{conceptbox}
 
@@ -2348,7 +2579,7 @@ $$ H^{(l+1)} = \sigma( \underbrace{\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^
 
 \section{실전 시나리오: 넥슨 추천 시스템 및 보안}
 
-\begin{storybox}{Scenario 1: 차세대 게임 추천 시스템 (Link Prediction)}
+\begin{storybox}[title={Scenario 1: 차세대 게임 추천 시스템 (Link Prediction)}]
 기존 협업 필터링(MF)은 "비슷한 구매 이력"만 봤습니다. GNN은 "유저의 사회적 관계"까지 봅니다.
 \end{storybox}
 \begin{itemize}
@@ -2362,7 +2593,7 @@ $$ H^{(l+1)} = \sigma( \underbrace{\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^
     \item \textbf{결과:} "길드장님이 하는 게임"이라며 추천이 뜹니다. 관계 기반의 정교한 추천이 가능해집니다.
 \end{itemize}
 
-\begin{storybox}{Scenario 2: 작업장 탐지 (Node Classification)}
+\begin{storybox}[title={Scenario 2: 작업장 탐지 (Node Classification)}]
 작업장 계정들은 서로 아이템을 주고받는 패턴이 일반 유저와 다릅니다.
 \end{storybox}
 \begin{itemize}
@@ -2390,7 +2621,7 @@ $$ H^{(l+1)} = \sigma( \underbrace{\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Module 5 (Part B) 핵심 요약}
+\begin{summarybox}[title={Module 5 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{GNN:} 불규칙한 그래프 데이터를 처리하는 딥러닝. 관계(Edge)를 통해 정보를 학습한다.
     \item \textbf{Message Passing:} 이웃의 정보를 집계(Aggregate)하고 갱신(Update)하는 GNN의 엔진.
@@ -2398,8 +2629,6 @@ $$ H^{(l+1)} = \sigma( \underbrace{\tilde{D}^{-\frac{1}{2}} \tilde{A} \tilde{D}^
     \item \textbf{활용:} 소셜 네트워크 분석, 정교한 추천 시스템, 지능형 어뷰징 탐지.
 \end{itemize}
 \end{summarybox}
-
-\newpage
 
 
 \end{document}

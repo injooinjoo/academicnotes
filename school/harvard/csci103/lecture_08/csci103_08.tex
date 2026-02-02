@@ -1,0 +1,1931 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Introduction to the Intellectual Enterprises of CS}}
+\fancyhead[R]{\small\textit{Module 08}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myblue}{RGB}{50, 100, 180}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-103: Introduction to the Intellectual Enterprises of CS - Module 08},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\newpage
+\section*{개요}
+본 문서는 CSCI103 Lecture 8 강의 자료를 바탕으로 재현 가능한 머신러닝(Reproducible Machine Learning)의 핵심 개념과 실제 적용 방법을 다룹니다. 지난 강의에서 다룬 스케일링, 고가용성, 데이터 아키텍처 등의 복습을 시작으로, 데이터 과학의 과학적 방법론, 머신러닝 모델 개발의 전반적인 흐름, 그리고 AI, 머신러닝, 딥러닝의 차이를 명확히 설명합니다. 특히, ML 파이프라인의 복잡성을 관리하고 효율성을 높이는 데 필수적인 MLflow 프레임워크의 구성 요소(Tracking, Projects, Models, Registry)와 그 활용법을 상세히 다룹니다. 데이터 및 모델 드리프트의 중요성과 대응 방안을 이해하고, 실제 코드 예시를 통해 XGBoost 및 Scikit-learn 모델을 MLflow로 관리하는 실습 과정을 안내합니다. 이 문서는 머신러닝 개발의 전 과정을 이해하고, 특히 재현성과 관리의 중요성을 강조하여 초심자도 ML 프로젝트를 성공적으로 수행할 수 있도록 돕는 것을 목표로 합니다.
+
+\begin{tcolorbox}[summarybox={주요 학습 목표}]
+\begin{itemize}
+    \item 지난 강의의 핵심 개념(스케일링, 고가용성, 메달리온 패턴 등)을 복습하고 ML 맥락에서 이해합니다.
+    \item 데이터 과학의 과학적 방법론과 ML 모델 개발의 기본 흐름을 파악합니다.
+    \item AI, 머신러닝, 딥러닝의 관계와 ML 학습 유형을 분류하고 예시를 통해 이해합니다.
+    \item ML 파이프라인 내 데이터 엔지니어, 데이터 과학자, ML 엔지니어의 역할을 명확히 구분합니다.
+    \item ML 개발의 복잡성과 과제를 인식하고, ML 플랫폼의 목표를 이해합니다.
+    \item ML 파이프라인의 핵심 구성 요소(Transformer, Estimator, Evaluator, Metric)를 학습합니다.
+    \item 특징 공학(Feature Engineering)의 중요성과 다양한 특징 생성 기법을 습득합니다.
+    \item MLOps의 개념과 MLflow의 주요 구성 요소(Tracking, Projects, Models, Registry)를 상세히 이해합니다.
+    \item MLflow를 활용하여 모델 실험을 추적하고, 모델을 등록 및 관리하는 방법을 실습합니다.
+    \item 데이터 및 모델 드리프트의 유형과 이를 감지하고 대응하는 전략을 학습합니다.
+    \item 실제 코드 예시를 통해 MLflow를 이용한 XGBoost 및 Scikit-learn 모델 개발 과정을 경험합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\section*{용어 정리}
+
+\begin{tcolorbox}[summarybox={핵심 용어 및 설명}]
+다음 표는 강의에서 다루는 주요 용어들을 초심자도 쉽게 이해할 수 있도록 설명합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+\textbf{스케일 아웃} & 컴퓨터 수를 늘려 성능을 높이는 방식 & Scale Out & 수평적 확장 (Horizontal Scaling) \\
+\textbf{스케일 업} & 컴퓨터 성능(CPU, RAM)을 높여 성능을 높이는 방식 & Scale Up & 수직적 확장 (Vertical Scaling) \\
+\textbf{고가용성} & 시스템이 항상 사용 가능한 상태를 유지하는 능력 & High Availability & 장애 발생 시에도 서비스 지속 \\
+\textbf{재해 복구} & 재해 발생 시 시스템을 복구하고 데이터를 복원하는 계획 & Disaster Recovery & US East 1 outage 사례 \\
+\textbf{탄력성} & 워크로드에 따라 자원을 자동으로 늘리거나 줄이는 능력 & Elasticity & 클라우드의 핵심 장점 \\
+\textbf{브릿지 패턴} & 다른 데이터 소스에 연결하는 유연한 디자인 패턴 & Bridge Pattern & Spark의 커넥터 패턴 예시 \\
+\textbf{메달리온 패턴} & 데이터 품질에 따라 Bronze, Silver, Gold 계층으로 나누는 아키텍처 & Medallion Pattern & 멀티홉 패턴 (Multihop Pattern)이라고도 함 \\
+\textbf{BI} & 과거 데이터를 분석하여 '무슨 일이 일어났는지' 파악 & Business Intelligence & 의사결정을 위한 요약 \\
+\textbf{BA} & 미래를 예측하고 '왜 일어났는지' 분석하여 '무슨 일이 일어날지' 예측 & Business Analytics & 진단 및 예측 \\
+\textbf{레이크하우스} & 데이터 레이크와 데이터 웨어하우스의 장점을 결합한 아키텍처 & Lakehouse & 효율적인 데이터 처리 및 ML 지원 \\
+\textbf{과학적 방법론} & 질문, 가설, 실험, 해석, 공유를 통해 지식을 발전시키는 과정 & Scientific Method & 데이터 과학의 기반 \\
+\textbf{규칙 기반 시스템} & '만약 ~라면, ~하라'와 같은 명시적 규칙으로 작동 & Rule-based System & 복잡해지면 관리 어려움 \\
+\textbf{AI 기반 시스템} & 알고리즘과 데이터 학습을 통해 스스로 판단 & AI-based System & 확률적, 확장성 높음 \\
+\textbf{특징 공학} & 원본 데이터에서 모델 학습에 유용한 특징을 만드는 과정 & Feature Engineering & 도메인 지식 중요 \\
+\textbf{AutoML} & 머신러닝 모델 개발 과정을 자동화하는 기술 & Automated ML & 빠르지만 제어권이 적음 \\
+\textbf{지도 학습} & 정답(레이블)이 있는 데이터를 학습하여 예측 & Supervised Learning & 분류, 회귀 \\
+\textbf{비지도 학습} & 정답 없이 데이터의 숨겨진 패턴을 찾는 학습 & Unsupervised Learning & 군집화, 차원 축소 \\
+\textbf{강화 학습} & 시행착오를 통해 최적의 행동을 학습하는 방식 & Reinforcement Learning & 자율주행차, 게임 AI \\
+\textbf{MLOps} & 머신러닝 모델의 개발부터 배포, 운영, 모니터링까지의 전 과정 & Machine Learning Operations & DevOps의 ML 버전 \\
+\textbf{MLflow} & 머신러닝 수명 주기를 관리하는 오픈소스 플랫폼 & MLflow & 실험 추적, 모델 관리, 배포 \\
+\textbf{MLflow Tracking} & 모델 실험의 매개변수, 지표, 아티팩트를 기록하고 비교 & MLflow Tracking & 재현 가능한 실험의 핵심 \\
+\textbf{MLflow Models} & 다양한 프레임워크로 만든 모델을 표준 형식으로 저장 & MLflow Models & 모델의 '맛'(flavor) 지원 \\
+\textbf{MLflow Registry} & 모델을 중앙에서 관리하고 버전, 스테이지를 제어하는 저장소 & MLflow Model Registry & 모델의 '진실의 원천' \\
+\textbf{데이터 드리프트} & 시간이 지남에 따라 데이터의 통계적 특성이 변하는 현상 & Data Drift & 모델 성능 저하의 원인 \\
+\textbf{모델 드리프트} & 모델의 예측 성능이 시간이 지남에 따라 저하되는 현상 & Model Drift & 재훈련 필요성 시사 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{tcolorbox}
+
+\newpage
+\section*{핵심 개념 및 원리}
+
+\subsection*{지난 강의 복습: ML을 위한 기반 지식}
+지난 강의에서는 분산 컴퓨팅 환경에서 효율적인 데이터 처리를 위한 여러 개념을 다루었습니다. 이러한 개념들은 머신러닝 모델을 개발하고 운영하는 데 필수적인 기반 지식이 됩니다.
+
+\subsubsection*{스케일링: 시스템 확장 전략}
+시스템의 성능을 높이는 방법에는 크게 두 가지가 있습니다.
+\begin{itemize}
+    \item \textbf{스케일 업} (Scale Up, 수직적 확장):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 단일 컴퓨터의 성능(CPU, RAM 등)을 높여 처리 능력을 향상시키는 방법입니다.
+        \item \textbf{직관적 예시:} 작은 트럭 한 대가 짐을 많이 싣기 위해 더 큰 엔진을 달거나 적재 공간을 늘리는 것에 비유할 수 있습니다.
+        \item \textbf{기술적 설명:} 기존 서버의 하드웨어 사양을 업그레이드하여 더 많은 작업을 처리할 수 있도록 합니다. 구현이 비교적 간단하지만, 물리적 한계가 존재하며 비용 효율성이 떨어질 수 있습니다.
+    \end{itemize}
+    \item \textbf{스케일 아웃} (Scale Out, 수평적 확장):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 여러 대의 컴퓨터를 추가하여 작업을 분산 처리함으로써 전체 시스템의 성능을 높이는 방법입니다.
+        \item \textbf{직관적 예시:} 짐을 더 많이 나르기 위해 트럭 한 대를 더 추가하는 것에 비유할 수 있습니다. 여러 대의 트럭이 동시에 짐을 나르면 더 빠르게 많은 짐을 운반할 수 있습니다.
+        \item \textbf{기술적 설명:} 클러스터에 더 많은 노드(컴퓨터)를 추가하여 컴퓨팅 자원을 늘립니다. 대규모 데이터 처리 및 머신러닝 작업에 필수적이며, 클라우드 환경에서 탄력적으로 자원을 확장할 수 있는 장점이 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{비기능 요구사항: 시스템의 신뢰성}
+시스템이 얼마나 잘 작동하는지를 나타내는 중요한 특성들입니다.
+\begin{itemize}
+    \item \textbf{고가용성} (High Availability):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 시스템이 장애 발생 시에도 중단 없이 서비스를 제공할 수 있는 능력입니다.
+        \item \textbf{직관적 예시:} 24시간 운영되는 편의점처럼, 언제든 고객이 방문해도 서비스를 받을 수 있는 상태를 유지하는 것입니다.
+        \item \textbf{기술적 설명:} 시스템의 일부 구성 요소에 문제가 생겨도 전체 서비스가 멈추지 않도록 여러 대의 서버를 병렬로 운영하거나, 자동 장애 조치(failover) 기능을 구현하는 것을 의미합니다. 최근 Amazon US East 1 리전의 대규모 서비스 중단 사태는 고가용성의 중요성을 보여주는 사례입니다.
+    \end{itemize}
+    \item \textbf{재해 복구} (Disaster Recovery):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 대규모 재해(예: 자연재해, 대규모 시스템 장애) 발생 시에도 데이터를 보호하고 서비스를 복원하는 계획입니다.
+        \item \textbf{직관적 예시:} 한 도시 전체에 정전이 발생했을 때, 다른 도시의 발전소에서 전력을 공급받아 중요한 시설들이 계속 작동하도록 하는 것과 같습니다.
+        \item \textbf{기술적 설명:} 주 데이터 센터가 완전히 마비되었을 때, 다른 지역의 백업 데이터 센터로 전환하여 서비스를 재개하는 전략입니다. 여러 가용성 영역(Availability Zones)을 활용하여 한 지역의 장애가 전체 서비스에 영향을 미 미치지 않도록 합니다.
+    \end{itemize}
+    \item \textbf{탄력성} (Elasticity):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 시스템이 워크로드 변화에 따라 컴퓨팅 자원을 자동으로 늘리거나 줄일 수 있는 능력입니다.
+        \item \textbf{직관적 예시:} 갑자기 손님이 많아지면 테이블을 더 늘리고 직원을 추가했다가, 손님이 줄면 다시 테이블을 줄이고 직원을 퇴근시키는 식당과 같습니다.
+        \item \textbf{기술적 설명:} 클라우드 환경에서 오토스케일링(Autoscaling) 기능을 사용하여, 트래픽이 증가하면 자동으로 서버 인스턴스를 추가하고, 트래픽이 감소하면 인스턴스를 줄여 비용 효율성을 높입니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{Spark 디자인 패턴: 데이터 처리 효율화}
+Spark와 같은 분산 처리 프레임워크에서는 특정 문제를 해결하기 위한 디자인 패턴이 존재합니다.
+\begin{itemize}
+    \item \textbf{브릿지 패턴} (Bridge Pattern) / \textbf{커넥터 패턴} (Connector Pattern):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 다양한 데이터 소스에 유연하게 연결할 수 있도록 돕는 디자인 패턴입니다.
+        \item \textbf{직관적 예시:} 여러 종류의 전자기기(스마트폰, 태블릿, 노트북)를 하나의 범용 충전기(USB-C)로 충전할 수 있는 것과 같습니다.
+        \item \textbf{기술적 설명:} Spark에서 JDBC 드라이버 등을 사용하여 관계형 데이터베이스, NoSQL 데이터베이스, 클라우드 스토리지 등 다양한 데이터 소스에 연결할 때 사용됩니다. 데이터 소스 변경 시 코드 수정 없이 유연하게 대응할 수 있습니다.
+    \end{itemize}
+    \item \textbf{멀티홉 패턴 / 메달리온 패턴} (Multihop Pattern) / (Medallion Pattern):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 데이터를 품질과 정제 수준에 따라 여러 계층(Bronze, Silver, Gold)으로 나누어 저장하고 처리하는 아키텍처 패턴입니다.
+        \item \textbf{직관적 예시:} 광산에서 캐낸 원석(Bronze)을 정제하여 보석(Silver)으로 만들고, 이를 가공하여 아름다운 장신구(Gold)를 만드는 과정과 같습니다. 각 단계마다 가치가 더해지고 용도가 명확해집니다.
+        \item \textbf{기술적 설명:}
+        \begin{itemize}
+            \item \textbf{Bronze} (원시 데이터): 원본 데이터를 그대로 저장하는 계층입니다.
+            \item \textbf{Silver} (정제된 데이터): Bronze 계층의 데이터를 정제, 표준화, 결합하여 ML 모델 학습이나 분석에 적합한 형태로 만듭니다. 데이터 과학자가 주로 활용합니다.
+            \item \textbf{Gold} (큐레이션된 데이터): Silver 계층의 데이터를 비즈니스 요구사항에 맞춰 집계, 요약하여 BI 대시보드나 최종 사용자 애플리케이션에 제공합니다.
+        \end{itemize}
+        \textbf{장점:}
+        \begin{itemize}
+            \item \textbf{모듈성:} 각 계층이 독립적이어서 개발 및 유지보수가 용이합니다.
+            \item \textbf{견고성:} 한 계층에서 오류가 발생해도 다른 계층에 미치는 영향을 최소화하고, 실패한 계층만 재실행할 수 있습니다.
+            \item \textbf{다양한 사용자 지원:} 원시 데이터부터 비즈니스 보고서까지 다양한 수준의 데이터를 제공하여 데이터 엔지니어, 데이터 과학자, 비즈니스 분석가 등 여러 사용자의 요구를 충족시킵니다.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{BI vs. BA: 데이터 활용의 관점}
+데이터를 분석하여 비즈니스 의사결정에 활용하는 두 가지 주요 관점입니다.
+\begin{itemize}
+    \item \textbf{비즈니스 인텔리전스} (BI, Business Intelligence):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 과거 데이터를 분석하여 '무슨 일이 일어났는지'를 파악하고 요약하여 의사결정을 돕습니다.
+        \item \textbf{직관적 예시:} 지난달 매출 보고서를 보고 어떤 제품이 가장 많이 팔렸는지, 어떤 요일에 매출이 높았는지 파악하는 것입니다.
+        \item \textbf{기술적 설명:} 대시보드, 보고서 등을 통해 현재 및 과거의 비즈니스 성과를 시각화하고 요약하여, 경영진이 현황을 이해하고 전략을 수립하는 데 필요한 정보를 제공합니다.
+    \end{itemize}
+    \item \textbf{비즈니스 분석} (BA, Business Analytics):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 과거 데이터를 바탕으로 '왜 그런 일이 일어났는지'를 진단하고, '미래에 무슨 일이 일어날지'를 예측합니다.
+        \item \textbf{직관적 예시:} 지난달 매출이 감소한 원인을 분석(진단)하고, 다음 분기 매출을 예측(예측)하여 마케팅 전략을 세우는 것입니다.
+        \item \textbf{기술적 설명:} 통계 모델, 머신러닝 알고리즘 등을 활용하여 데이터 간의 관계를 탐색하고, 미래 추세를 예측하며, 최적의 의사결정을 위한 통찰력을 제공합니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[summarybox={BI 도구의 주요 성과 지표 (KPIs)}]
+BI 도구의 성능을 평가할 때 중요한 두 가지 지표는 다음과 같습니다.
+\begin{itemize}
+    \item \textbf{속도/지연 시간} (Speed/Latency): 쿼리 실행 및 결과 도출에 걸리는 시간. 사용자가 빠르게 정보를 얻을 수록 만족도가 높습니다.
+    \item \textbf{동시성} (Concurrency): 동시에 얼마나 많은 사용자를 지원할 수 있는지. 한 명의 분석가뿐만 아니라 수백, 수천 명의 분석가가 동시에 도구를 사용할 수 있어야 합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\subsubsection*{레이크하우스} (Lakehouse): AI + BI 통합 아키텍처
+\begin{itemize}
+    \item \textbf{한 줄 요약:} 데이터 레이크(Data Lake)의 유연성과 데이터 웨어하우스(Data Warehouse)의 구조화된 성능을 결합하여, AI와 BI 워크로드를 모두 지원하는 통합 데이터 아키텍처입니다.
+    \item \textbf{직관적 예시:} 모든 종류의 물건(정형/비정형 데이터)을 보관할 수 있는 대형 창고(데이터 레이크)에, 물건들을 효율적으로 분류하고 검색할 수 있는 선반 시스템(데이터 웨어하우스 기능)을 추가한 것과 같습니다.
+    \item \textbf{기술적 설명:} 단일 플랫폼에서 정형, 반정형, 비정형 데이터를 모두 저장하고, SQL 기반의 효율적인 쿼리, ACID 트랜잭션, 데이터 거버넌스 기능을 제공합니다. 이를 통해 데이터 엔지니어링, BI, 머신러닝 작업을 통합적으로 수행할 수 있습니다.
+\end{itemize}
+
+\subsection*{데이터 과학 및 머신러닝 기초}
+데이터 과학은 데이터로부터 지식을 추출하고 통찰력을 얻는 학문 분야이며, 머신러닝은 이 과정의 핵심 도구입니다.
+
+\subsubsection*{데이터 과학의 정의 및 구성 요소}
+\begin{itemize}
+    \item \textbf{한 줄 요약:} 데이터 과학은 과학적 방법론을 사용하여 실제 문제를 해결하고 비즈니스 가치를 창출하는 학제 간 분야입니다.
+    \item \textbf{구성 요소:}
+    \begin{itemize}
+        \item \textbf{응용 통계 및 수학:} 데이터 패턴을 이해하고 모델을 구축하는 데 필요한 이론적 기반.
+        \item \textbf{도메인 지식:} 특정 산업(마케팅, 석유 생산 등)에 대한 이해를 바탕으로 문제 정의 및 해결책 도출.
+        \item \textbf{컴퓨터 과학 및 소프트웨어 공학:} 데이터 처리, 알고리즘 구현, 시스템 구축에 필요한 기술.
+    \end{itemize}
+    \item \textbf{목적:} 실제 세계의 문제를 해결하고, 환경에 대한 더 나은 이해를 통해 비즈니스를 개선하며, 궁극적으로 인류의 삶을 향상시키는 것입니다.
+\end{itemize}
+
+\subsubsection*{과학적 방법론} (Scientific Method)
+데이터 과학은 과학적 방법론을 따르며, 이는 지속적인 학습과 개선을 가능하게 합니다.
+\begin{itemize}
+    \item \textbf{한 줄 요약:} 질문 제기, 가설 설정, 실험, 결과 해석, 공유의 반복을 통해 지식을 확장하는 체계적인 과정입니다.
+    \item \textbf{단계:}
+    \begin{enumerate}
+        \item \textbf{질문} (Question): "왜 매출이 감소하고 있는가?"와 같이 해결하고자 하는 문제를 명확히 정의합니다.
+        \item \textbf{가설} (Hypothesis): 질문에 대한 잠정적인 답변을 제시합니다. "사용자 참여도가 낮아져 매출이 감소하고 있을 것이다."
+        \item \textbf{실험} (Experimentation): 가설의 옳고 그름을 검증하기 위한 데이터를 수집하고 분석합니다.
+        \item \textbf{결과 해석} (Interpretation): 실험 결과를 분석하여 가설이 맞는지 틀리는지 판단합니다. 가설이 틀렸다면 새로운 가설을 세우고 다시 실험합니다.
+        \item \textbf{결과 공유} (Sharing Results): 얻은 지식과 통찰력을 관련 커뮤니티(과학계 또는 회사 내부)와 공유하여 모두가 학습하고 발전할 수 있도록 합니다.
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection*{규칙 기반 시스템 vs. AI 기반 시스템}
+문제를 해결하는 방식에 따라 시스템을 분류할 수 있습니다.
+\begin{itemize}
+    \item \textbf{규칙 기반 시스템} (Rule-based Systems):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 명시적으로 정의된 '만약 ~라면, ~하라'와 같은 규칙(if-then-else)과 사실(facts)에 기반하여 작동합니다.
+        \item \textbf{장점:} 특정 문제에 대해 예측 가능하고 명확한 결과를 제공합니다.
+        \item \textbf{단점:} 규칙이 많아지면 관리 및 유지보수가 매우 복잡해지고, 새로운 상황에 유연하게 대처하기 어렵습니다.
+    \end{itemize}
+    \item \textbf{AI 기반 시스템} (AI-based Systems) / \textbf{머신러닝} (Machine Learning):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 데이터와 알고리즘을 통해 스스로 학습하여 패턴을 발견하고 예측을 수행합니다. 명시적으로 프로그래밍되지 않습니다.
+        \item \textbf{장점:} 대규모 데이터에서 복잡한 패턴을 학습하고, 규칙 기반 시스템보다 확장성이 높으며, 새로운 데이터에 유연하게 적응할 수 있습니다.
+        \item \textbf{단점:} 더 많은 데이터와 컴퓨팅 자원을 필요로 하며, 결과가 확률적이고 해석이 어려울 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{머신러닝 모델 개발 흐름} (ML Model Development Flow)
+머신러닝 모델을 개발하는 과정은 다음과 같은 연속적인 단계로 이루어집니다.
+\begin{enumerate}
+    \item \textbf{데이터 탐색} (Data Exploration) 및 \textbf{데이터 정제} (Data Wrangling):
+    \begin{itemize}
+        \item 다양한 데이터셋을 수집하고 결합합니다.
+        \item 누락된 값 채우기, 중복 제거, 필터링 등을 통해 데이터 품질을 개선합니다.
+    \end{itemize}
+    \item \textbf{특징 공학} (Feature Engineering):
+    \begin{itemize}
+        \item 정제된 데이터에서 모델 학습에 유용한 새로운 특징(Feature)을 생성합니다.
+        \item 예: 고객의 평균 거래 금액.
+    \end{itemize}
+    \item \textbf{모델 개발} (Model Development):
+    \begin{itemize}
+        \item 생성된 특징을 입력으로 사용하여 모델을 학습시킵니다.
+        \item 모델 평가, 튜닝, 선택 과정을 거쳐 최적의 모델을 찾습니다.
+    \end{itemize}
+    \item \textbf{모델 배포} (Model Deployment) 및 \textbf{추론} (Inferencing):
+    \begin{itemize}
+        \item 학습된 모델을 실제 환경에 배포하여 실시간으로 비즈니스 질문에 대한 예측을 수행합니다.
+    \end{itemize}
+    \item \textbf{모델 모니터링 및 재훈련} (Model Monitoring \& Retraining):
+    \begin{itemize}
+        \item 모델 배포 후에도 모델 성능을 지속적으로 모니터링합니다.
+        \item 모델 드리프트(성능 저하)가 발생하면 새로운 특징을 개발하거나, 더 많은 데이터를 통합하거나, 모델을 재훈련하여 성능을 개선합니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{tcolorbox}[examplebox={과학적 방법론과 ML 파이프라인의 결합}]
+ML 파이프라인은 과학적 방법론의 여러 단계에 기여합니다.
+\begin{itemize}
+    \item \textbf{실험:} 모델을 사용하여 다양한 가설을 테스트할 수 있습니다.
+    \item \textbf{결과 해석:} 모델의 예측 결과를 분석하여 가설의 유효성을 판단합니다.
+    \item \textbf{결과 공유:} 모델 배포를 통해 예측 결과를 비즈니스에 제공합니다.
+\end{itemize}
+최근에는 ChatGPT와 같은 대규모 언어 모델(LLM)이 질문을 생성하고 잠재적인 가설을 제시하는 데 도움을 주어 과학적 방법론의 초기 단계에도 기여할 수 있게 되었습니다.
+\end{tcolorbox}
+
+\subsubsection*{AI vs. 머신러닝 vs. 딥러닝}
+이 세 가지 개념은 서로 계층적인 관계를 가집니다.
+\begin{itemize}
+    \item \textbf{AI} (인공지능, Artificial Intelligence):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 인간이 수행하는 작업을 모방하거나 자동화하는 모든 기술을 포괄하는 가장 넓은 개념입니다.
+        \item \textbf{직관적 예시:} 체스 게임을 하는 컴퓨터, 음성 인식 비서, 로봇 청소기 등 인간처럼 생각하거나 행동하는 것처럼 보이는 모든 시스템.
+        \item \textbf{기술적 설명:} 문제 해결, 학습, 의사결정, 패턴 인식 등 인간 지능의 특정 측면을 모방하는 시스템을 만드는 것을 목표로 합니다. 규칙 기반 시스템도 AI의 한 형태입니다.
+    \end{itemize}
+    \item \textbf{머신러닝} (ML, Machine Learning):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 데이터를 통해 스스로 학습하여 명시적인 프로그래밍 없이도 작업을 수행하는 AI의 하위 분야입니다.
+        \item \textbf{직관적 예시:} 스팸 메일을 자동으로 분류하는 시스템. 스팸 메일의 특징을 학습하여 새로운 메일이 스팸인지 아닌지 판단합니다.
+        \item \textbf{기술적 설명:} 알고리즘을 사용하여 데이터에서 패턴을 찾아내고, 이를 바탕으로 예측이나 결정을 내립니다. 규칙 기반 시스템과 달리 확률적 접근 방식을 사용하며, 더 많은 데이터가 주어질수록 성능이 향상됩니다.
+    \end{itemize}
+    \item \textbf{딥러닝} (DL, Deep Learning):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 복잡한 다층 신경망(Neural Networks)을 사용하여 대규모 비정형 데이터에서 패턴을 학습하는 머신러닝의 하위 분야입니다.
+        \item \textbf{직관적 예시:} 고양이 사진을 보고 고양이를 인식하거나, 사람의 목소리를 이해하여 대화하는 시스템.
+        \item \textbf{기술적 설명:} 인간 뇌의 신경망 구조를 모방한 인공 신경망을 깊게 쌓아 올린 형태로, 이미지, 음성, 텍스트와 같은 비정형 데이터 처리에서 뛰어난 성능을 보입니다. LLM, 자율주행차, Go 게임 챔피언 등 최근 AI의 극적인 성공은 대부분 딥러닝 덕분입니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[summarybox={딥러닝의 발전 요인}]
+딥러닝의 급격한 발전은 다음 두 가지 핵심 요소 덕분입니다.
+\begin{itemize}
+    \item \textbf{대규모 데이터} (Lots of Data): 딥러닝 모델은 매우 '데이터 굶주림(data hungry)'이 강하여, 방대한 양의 데이터가 학습에 필수적입니다.
+    \item \textbf{고성능 컴퓨팅} (High Compute): 복잡한 신경망을 학습시키기 위해서는 GPU와 같은 고성능 컴퓨팅 자원이 대량으로 필요합니다. 클라우드 플랫폼(AWS, Databricks 등)의 발전으로 이러한 컴퓨팅 자원이 저렴하고 쉽게 접근 가능해졌습니다.
+\end{itemize}
+\end{tcolorbox}
+
+\subsubsection*{Spark의 역할: ML 파이프라인의 복잡성 관리}
+Spark와 같은 분산 처리 플랫폼은 머신러닝 모델 개발 과정의 복잡성을 관리하는 데 중요한 역할을 합니다. 모델 자체를 생성하는 것은 전체 과정의 작은 부분에 불과하며, 데이터 구성, 특징 추출, 전처리 등 많은 단계가 필요합니다. Spark는 이러한 복잡한 데이터 파이프라인을 효율적으로 구축하고 관리할 수 있도록 지원합니다.
+
+\subsection*{머신러닝 프레임워크 및 유형}
+다양한 머신러닝 문제와 접근 방식이 존재하며, 이를 해결하기 위한 프레임워크와 학습 유형이 있습니다.
+
+\subsubsection*{ML 프레임워크 종류}
+\begin{itemize}
+    \item \textbf{고전적 및 통계적 알고리즘} (Classical and Statistical Algorithms): 선형 회귀, 로지스틱 회귀, 의사결정 트리, SVM 등 전통적인 알고리즘.
+    \item \textbf{신경망 및 딥러닝} (Neural Net and Deep Learning): 다층 퍼셉트론, CNN, RNN, 트랜스포머 등 복잡한 신경망 기반 알고리즘.
+    \item \textbf{생성형 AI} (Generative AI): LLM(대규모 언어 모델) 및 GAN(생성적 적대 신경망)을 사용하여 새로운 데이터(텍스트, 이미지 등)를 생성.
+\end{itemize}
+
+\subsubsection*{AutoML vs. 노트북 기반 개발}
+ML 파이프라인을 구축하는 방식에 따라 다음과 같이 나눌 수 있습니다.
+\begin{itemize}
+    \item \textbf{AutoML} (Automated ML):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 머신러닝 모델 개발의 여러 단계(데이터 전처리, 특징 선택, 모델 선택, 하이퍼파라미터 튜닝 등)를 자동화하는 기술입니다.
+        \item \textbf{장점:} 더 쉽고 빠르며, '시민 데이터 과학자(Citizen Data Scientist)'와 같이 ML 전문 지식이 부족한 사람도 모델을 개발할 수 있도록 돕습니다.
+        \item \textbf{단점:} 제어권이 적고 사용자 정의(customization)가 제한적입니다.
+    \end{itemize}
+    \item \textbf{노트북 기반 개발} (Notebook-based Development):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} Jupyter Notebook과 같은 환경에서 코드를 직접 작성하여 모델을 개발하는 방식입니다.
+        \item \textbf{장점:} 더 강력하고 유연하며, 모델 개발의 모든 측면을 세밀하게 제어할 수 있습니다.
+        \textbf{단점:} 더 복잡하고 높은 수준의 기술 역량을 요구합니다.
+    \end{itemize}
+\end{itemize}
+Databricks의 'Glass Open AutoML'은 AutoML의 장점(쉬움)과 노트북 기반 개발의 장점(제어권)을 결합하여, AutoML이 생성한 코드를 사용자가 직접 수정하고 개선할 수 있도록 합니다.
+
+\subsubsection*{ML 학습 유형 분류}
+머신러닝 문제는 데이터의 특성과 해결하려는 문제의 종류에 따라 다양하게 분류될 수 있습니다.
+\begin{itemize}
+    \item \textbf{이산} (Discrete) vs. \textbf{연속} (Continuous):
+    \begin{itemize}
+        \item \textbf{이산:} 예측 결과가 정해진 범주(예: 비가 올까/안 올까, 스팸/정상) 중 하나인 경우.
+        \item \textbf{연속:} 예측 결과가 연속적인 숫자 값(예: 내일 강수량, 집값)인 경우.
+    \end{itemize}
+    \item \textbf{지도 학습} (Supervised Learning) vs. \textbf{비지도 학습} (Unsupervised Learning):
+    \begin{itemize}
+        \item \textbf{지도 학습:} 정답(레이블)이 있는 데이터를 학습하여 새로운 데이터에 대한 예측을 수행합니다.
+        \item \textbf{비지도 학습:} 정답 없이 데이터 자체의 숨겨진 패턴이나 구조를 찾아냅니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[examplebox={ML 학습 유형 예시}]
+\begin{itemize}
+    \item \textbf{내일 비가 얼마나 올까?}
+    \begin{itemize}
+        \item \textbf{유형:} 지도 학습 (Supervised Learning) + 연속 (Continuous)
+        \item \textbf{설명:} 과거의 날씨 데이터(기온, 습도 등)와 실제 강수량(정답)을 학습하여 내일의 강수량이라는 연속적인 값을 예측합니다. 이는 \textbf{회귀(Regression)} 문제에 해당합니다.
+    \end{itemize}
+    \item \textbf{내일 비가 올까?}
+    \begin{itemize}
+        \item \textbf{유형:} 지도 학습 (Supervised Learning) + 이산 (Discrete)
+        \item \textbf{설명:} 과거 날씨 데이터와 비가 왔는지/안 왔는지(정답)를 학습하여 내일 비가 올지 안 올지(예/아니오)를 예측합니다. 이는 \textbf{분류(Classification)} 문제에 해당합니다.
+    \end{itemize}
+    \item \textbf{날씨 패턴에 따라 요일을 그룹화할 수 있을까?}
+    \begin{itemize}
+        \item \textbf{유형:} 비지도 학습 (Unsupervised Learning) + 이산 (Discrete)
+        \item \textbf{설명:} 요일별 날씨 데이터에서 유사한 패턴을 가진 요일들을 그룹으로 묶습니다(예: 맑은 요일 그룹, 흐린 요일 그룹). 이는 \textbf{군집화(Clustering)} 문제에 해당합니다.
+    \end{itemize}
+    \item \textbf{소비자 구매에 영향을 미치는 핵심 요인은 무엇일까?}
+    \begin{itemize}
+        \item \textbf{유형:} 비지도 학습 (Unsupervised Learning) + 연속 (Continuous) 또는 이산 (Discrete)
+        \item \textbf{설명:} 수많은 잠재적 요인(가격, 가용성, 브랜드 인지도, 날씨 등) 중에서 실제 구매에 가장 큰 영향을 미치는 몇 가지 핵심 요인을 찾아냅니다. 이는 \textbf{차원 축소(Dimensionality Reduction)} 문제에 해당합니다.
+    \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[summarybox={다양한 머신러닝 유형}]
+\begin{itemize}
+    \item \textbf{회귀} (Regression): 연속적인 숫자 값을 예측합니다 (예: 주택 가격 예측).
+    \item \textbf{분류} (Classification): 데이터를 미리 정의된 범주 중 하나로 분류합니다 (예: 의료 영상에서 암 진단, 스팸 메일 분류).
+    \item \textbf{군집화} (Clustering): 유사한 특성을 가진 데이터 포인트를 그룹으로 묶습니다 (예: 고객 세분화, 고속도로 차선 감지).
+    \item \textbf{연관 규칙} (Association): 데이터셋에서 항목 간의 흥미로운 관계를 찾습니다 (예: 기저귀와 맥주 구매 연관성).
+    \item \textbf{강화 학습} (Reinforcement Learning): 에이전트가 환경과 상호작용하며 시행착오를 통해 최적의 행동 정책을 학습합니다. 명확한 정답이 아닌, 보상 시스템을 통해 장기적인 목표를 달성합니다 (예: 자율주행차, 게임 AI).
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[warningbox={데이터의 중요성}]
+\textbf{더 많은 데이터가 더 복잡한 알고리즘보다 낫다.}
+일반적으로 모델의 예측 성능을 향상시키는 데 있어, 더 많은 양의 데이터를 확보하는 것이 복잡한 알고리즘을 미세 조정하는 것보다 더 큰 영향을 미칩니다. 데이터는 종종 알고리즘 튜닝보다 훨씬 더 큰 결과를 가져옵니다.
+\end{tcolorbox}
+
+\subsection*{ML 역할 및 플랫폼}
+머신러닝 모델을 성공적으로 개발하고 운영하기 위해서는 다양한 전문가의 협업과 효율적인 플랫폼이 필요합니다.
+
+\subsubsection*{ML 파이프라인 내 역할}
+ML 파이프라인은 여러 전문가의 협업을 통해 구축됩니다.
+\begin{itemize}
+    \item \textbf{데이터 엔지니어} (Data Engineer):
+    \begin{itemize}
+        \item \textbf{역할:} 데이터 수집(Ingesting), 저장(Storing), 검증(Validating), 정제(Cleaning), 표준화(Standardizing)를 담당합니다.
+        \item \textbf{산출물:} 정제된 큐레이션 데이터(메달리온 아키텍처의 Silver 계층)를 데이터 과학자에게 전달합니다.
+    \end{itemize}
+    \item \textbf{데이터 과학자} (Data Scientist):
+    \begin{itemize}
+        \item \textbf{역할:} 데이터 엔지니어가 제공한 데이터를 바탕으로 특징(Feature)을 계산하고 선택합니다. 모델을 코딩하고 훈련하며, 검증 작업을 수행합니다.
+        \item \textbf{산출물:} 학습된 모델과 모델 평가 결과.
+    \end{itemize}
+    \item \textbf{ML 엔지니어} (ML Engineer):
+    \begin{itemize}
+        \item \textbf{역할:} 데이터 과학자가 개발한 모델을 검증하고 평가합니다. 모델을 패키징(Packaging), 컨테이너화(Containerizing), 배포(Deploying)하여 실시간 추론(Inferencing)이 가능하도록 서비스합니다.
+        \item \textbf{산출물:} 배포된 모델 서비스.
+    \end{itemize}
+\end{itemize}
+이러한 역할들은 연속적인 사이클을 형성하며, 모델이 배포된 후에도 지속적으로 데이터를 수집하고 모델을 개선하는 과정이 반복됩니다.
+
+\subsubsection*{ML 플랫폼의 목표} (Aspirations of ML Platform)
+이상적인 ML 플랫폼은 다음과 같은 목표를 달성해야 합니다.
+\begin{itemize}
+    \item \textbf{다양한 도구 지원:} 다양한 라이브러리, 언어, 협업 방식을 지원해야 합니다.
+    \item \textbf{다양한 배포 전략 지원:} 다양한 유형의 컴퓨팅 자원(단일 노드, 분산 알고리즘, CPU, GPU)을 지원해야 합니다.
+    \item \textbf{높은 효율성:} 훈련, 튜닝, 추적, 추론 과정에서 낮은 비용과 빠른 속도를 제공해야 합니다.
+    \item \textbf{특징 저장소} (Feature Store): 데이터 과학자가 생성한 특징(Feature)을 관리하고 쉽게 재사용할 수 있도록 저장해야 합니다.
+    \item \textbf{AutoML 지원:} 시민 데이터 과학자를 위해 ML 파이프라인 생성을 간소화해야 합니다.
+    \item \textbf{모델 드리프트 모니터링:} 모델에 입력되는 데이터가 훈련 데이터와 달라지거나 모델 성능이 저하되는 현상(드리프트)을 감지하고 재훈련 필요성을 알려야 합니다.
+    \item \textbf{ML 파이프라인 운영화} (Operationalization): ML 파이프라인을 배포하고 사용자들이 쉽게 접근하여 추론할 수 있도록 해야 합니다.
+    \item \textbf{재현성} (Reproducibility): 동일한 데이터와 코드를 사용하여 모델을 다시 생성했을 때 동일한 결과를 얻을 수 있도록 보장해야 합니다.
+\end{itemize}
+
+\subsection*{ML 수명 주기 및 과제}
+ML 모델은 한 번 만들고 끝나는 것이 아니라, 지속적인 관리와 개선이 필요한 '살아있는 자산'입니다.
+
+\subsubsection*{ML 수명 주기 단계}
+ML 모델의 수명 주기는 다음과 같은 핵심 단계로 구성됩니다.
+\begin{enumerate}
+    \item \textbf{데이터 수집 및 정제} (Data Ingestion \& Cleansing): 원시 데이터를 모델 학습에 적합한 형태로 만듭니다.
+    \item \textbf{특징화} (Featurization): 정제된 데이터에서 모델에 필요한 특징을 추출하거나 생성합니다.
+    \item \textbf{모델 훈련} (Model Training): 특징 데이터를 사용하여 모델을 학습시킵니다.
+    \item \textbf{모델 서빙} (Model Serving) / \textbf{추론} (Inference): 학습된 모델을 배포하여 새로운 데이터에 대한 예측을 수행합니다. 배치(Batch), 실시간(Real-time), HTTP 요청 등 다양한 방식으로 이루어질 수 있습니다.
+    \item \textbf{모델 모니터링} (Model Monitoring): 배포된 모델의 성능을 지속적으로 감시하고 드리프트(성능 저하)를 감지합니다.
+\end{enumerate}
+이러한 단계들은 선형적으로 진행되기도 하지만, 모니터링 결과에 따라 이전 단계(데이터 정제, 특징화, 모델 훈련)로 돌아가 개선 작업을 수행하는 반복적인 사이클을 이룹니다.
+
+\subsubsection*{ML 개발의 복잡성 및 과제}
+ML 프로젝트는 다음과 같은 이유로 빠르게 복잡해지고 전문화된 지식을 요구합니다.
+\begin{itemize}
+    \item \textbf{파편화된 생태계} (Fragmented Ecosystem): Python, Spark, R 등 다양한 언어와 수많은 라이브러리(TensorFlow, PyTorch, Scikit-learn, XGBoost 등)가 존재하여, 특정 프레임워크에 대한 숙련도가 생산성에 큰 영향을 미칩니다.
+    \item \textbf{모델 튜닝의 어려움} (Model Tuning Complexity): 모델 학습뿐만 아니라 하이퍼파라미터 최적화(Hyperparameter Optimization)는 여러 번의 반복과 실험을 필요로 하는 비선형적인 과정입니다.
+    \item \textbf{배포의 비자명성} (Non-trivial Deployment): 모델을 개발하는 것과 실제 운영 환경에 배포하여 안정적으로 서비스하는 것은 별개의 문제입니다. 많은 ML 프로젝트가 프로덕션 단계로 넘어가지 못하는 이유입니다.
+    \item \textbf{모델 관리의 필요성} (Model Management): 모델은 '살아있는 자산'이므로, 한 번 배포했다고 끝나는 것이 아니라 지속적인 관리, 개선, 정당화가 필요합니다. 모델의 예측이 비즈니스 의사결정에 직접적인 영향을 미치기 때문입니다.
+    \item \textbf{협업의 중요성} (Collaboration): 데이터 엔지니어, 데이터 과학자, ML 엔지니어 등 다양한 역할 간의 원활한 협업(Hand-on, Hand-off)이 필수적입니다.
+    \item \textbf{확장성} (Scale): 노트북에서 개발한 모델이 대규모 프로덕션 데이터 볼륨을 처리할 수 있도록 확장되어야 합니다.
+    \item \textbf{거버넌스} (Governance): 모델이 민감한 데이터를 사용하여 훈련될 수 있으므로, 데이터 거버넌스(Unity Catalog)와 유사하게 모델에 대한 접근 제어 및 감사(Audit)가 필요합니다. 모델의 공정성(Fairness)과 설명 가능성(Explainability)은 규제 준수 측면에서 중요합니다.
+\end{itemize}
+
+\begin{tcolorbox}[summarybox={ML 개발의 숨겨진 복잡성}]
+\begin{itemize}
+    \item \textbf{특징 저장소} (Feature Store): 특징을 저장하고 재사용하기 위한 중앙 저장소가 필요합니다.
+    \item \textbf{실험 추적} (Experiment Tracking): 수많은 실험의 매개변수, 지표, 결과를 자동으로 기록하고 재현 가능하도록 관리해야 합니다.
+    \item \textbf{AutoML:} 데이터 과학자의 작업을 간소화하지만, 제어권이 부족할 수 있습니다. Databricks의 'Glass Open AutoML'은 생성된 코드를 수정할 수 있어 이러한 단점을 보완합니다.
+    \item \textbf{클라우드 실행} (Cloud Execution): 클라우드 환경에서 효율적으로 ML 워크로드를 실행해야 합니다.
+    \item \textbf{AB 테스트} (AB Testing): 새로운 모델이 기존 모델(챔피언)보다 우수한지 검증하기 위해 점진적으로 트래픽을 전환하는 과정이 필요합니다.
+    \item \textbf{CI/CD} (Continuous Integration/Continuous Deployment): ML 모델 개발도 소프트웨어 개발처럼 지속적인 통합 및 배포 파이프라인에 통합되어야 합니다.
+    \item \textbf{오케스트레이션} (Orchestration): 데이터 파이프라인, ML 모델 훈련, 추론, BI 대시보드 등 여러 구성 요소를 하나의 워크플로우로 관리해야 합니다.
+    \item \textbf{데이터/모델 드리프트} (Data/Model Drift): 데이터 특성이나 모델 성능 변화를 지속적으로 모니터링하고 대응해야 합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\subsubsection*{ML 파이프라인 구성 요소}
+ML 파이프라인은 데이터 처리 및 모델 학습을 위한 일련의 연결된 단계로 구성됩니다.
+\begin{itemize}
+    \item \textbf{트랜스포머} (Transformer):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 입력 데이터를 받아 변환하여 다른 형태의 데이터를 출력하는 구성 요소입니다. 학습 과정이 없습니다.
+        \item \textbf{직관적 예시:} 원본 사진(입력)을 흑백 사진(출력)으로 바꾸는 필터와 같습니다. 필터 자체는 학습하지 않습니다.
+        \item \textbf{기술적 설명:} 데이터 정제, 특징 추출, 스케일링 등 데이터 전처리 작업에 사용됩니다. 입력은 데이터프레임이고 출력도 데이터프레임입니다.
+        \item \textbf{주요 예시:}
+        \begin{itemize}
+            \item \textbf{StringIndexer:} 문자열 범주형 데이터를 숫자 인덱스로 변환.
+            \item \textbf{OneHotEncoder:} 숫자 인덱스를 원-핫 인코딩 벡터로 변환 (범주형 변수 처리).
+            \item \textbf{StandardScaler:} 데이터를 표준 정규 분포(평균 0, 표준편차 1)로 스케일링하여 정규화.
+            \item \textbf{Imputer:} 데이터셋의 결측값을 채웁니다 (평균, 중앙값, 최빈값 등).
+            \item \textbf{VectorAssembler:} 여러 특징 컬럼을 하나의 벡터 컬럼으로 결합하여 모델 입력 형식에 맞춥니다.
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{에스티메이터} (Estimator):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 입력 데이터를 학습하여 모델을 생성하는 구성 요소입니다. 'fit' 함수를 호출할 때 학습이 일어납니다.
+        \item \textbf{직관적 예시:} 학생(에스티메이터)이 교과서(입력 데이터)를 공부하여 시험 문제(새로운 데이터)를 풀 수 있는 지식(모델)을 얻는 것과 같습니다.
+        \textbf{기술적 설명:} 머신러닝 알고리즘(예: 선형 회귀, 의사결정 트리) 자체를 의미합니다. 입력은 데이터프레임이고 출력은 학습된 모델입니다.
+    \end{itemize}
+    \item \textbf{평가자} (Evaluator) 및 \textbf{지표} (Metric):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 모델의 성능을 측정하고 개선 방향을 제시하는 도구와 기준입니다.
+        \item \textbf{직관적 예시:} 시험 점수(지표)를 통해 학생의 학습 수준(모델 성능)을 평가하고, 어떤 과목을 더 공부해야 할지(개선 방향) 알려주는 것과 같습니다.
+        \item \textbf{기술적 설명:} 모델의 예측 결과와 실제 정답을 비교하여 정확도(Accuracy), F1-Score, RMSE(Root Mean Squared Error) 등 다양한 지표를 계산합니다. 이러한 지표는 모델의 개선 여부를 판단하는 데 필수적입니다.
+        \item \textbf{주요 지표 예시:}
+        \begin{itemize}
+            \item \textbf{정확도} (Accuracy): 전체 예측 중 올바르게 예측한 비율.
+            \item \textbf{F1-Score:} 정밀도(Precision)와 재현율(Recall)의 조화 평균. 불균형 데이터셋에서 유용합니다.
+            \item \textbf{혼동 행렬} (Confusion Matrix): 분류 모델의 성능을 시각적으로 보여주는 표입니다.
+            \begin{itemize}
+                \item \textbf{True Positive} (TP): 실제 양성을 양성으로 올바르게 예측.
+                \item \textbf{True Negative} (TN): 실제 음성을 음성으로 올바르게 예측.
+                \item \textbf{False Positive} (FP): 실제 음성을 양성으로 잘못 예측 (1종 오류).
+                \item \textbf{False Negative} (FN): 실제 양성을 음성으로 잘못 예측 (2종 오류).
+            \end{itemize}
+            혼동 행렬의 모든 값을 이해하는 것은 특정 도메인(예: 의료 진단)에서 오탐(FP)이나 미탐(FN)의 비용이 매우 클 수 있기 때문에 중요합니다.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection*{특징 공학} (Feature Engineering)
+특징 공학은 머신러닝 모델의 성능을 결정하는 가장 중요한 요소 중 하나입니다.
+
+\subsubsection*{정의 및 중요성}
+\begin{itemize}
+    \item \textbf{한 줄 요약:} 원본 데이터(raw data)에서 머신러닝 모델이 학습하기에 더 유용하고 의미 있는 특징(Feature)을 생성하는 과정입니다.
+    \item \textbf{직관적 예시:} 요리사가 신선한 재료(원본 데이터)를 가지고 요리(모델 학습)하기 전에, 재료를 손질하고(정제), 양념을 만들고(특징 생성), 적절한 크기로 자르는(변환) 과정과 같습니다. 좋은 양념과 손질은 요리의 맛(모델 성능)을 결정합니다.
+    \item \textbf{기술적 설명:} 데이터 엔지니어링과 ML의 교차점에 있으며, 도메인 지식과 창의성이 요구됩니다. 단순히 테이블의 컬럼을 사용하는 것을 넘어, 여러 컬럼을 조합하거나 변환하여 모델의 예측력을 높이는 새로운 변수를 만듭니다.
+    \item \textbf{중요성:}
+    \begin{itemize}
+        \item \textbf{모델 성능 향상:} 모델이 데이터의 숨겨진 패턴을 더 잘 이해하도록 돕습니다.
+        \item \textbf{계산 비용 절감:} 특징 생성은 계산 집약적인 작업이므로, 한 번 생성된 특징은 훈련 시간과 추론 시간 모두에서 재사용되어야 합니다.
+        \item \textbf{일관성 유지:} 훈련 시 사용된 특징과 추론 시 사용된 특징이 동일한 방식으로 계산되어야 모델 드리프트를 방지할 수 있습니다.
+        \item \textbf{재사용성:} 사용자 프로필과 같은 공통 특징은 여러 ML 사용 사례에서 재사용될 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{특징 생성 유형 및 예시}
+\begin{itemize}
+    \item \textbf{변환} (Transformations): 기존 컬럼을 직접 변환합니다.
+    \begin{itemize}
+        \item \textbf{예시:} 우편번호(zip code)를 범주형 인코딩(category encoding)으로 변환.
+    \end{itemize}
+    \item \textbf{컨텍스트 특징} (Context Features): 기존 데이터에 외부 정보를 추가합니다.
+    \begin{itemize}
+        \item \textbf{예시:} 구매 데이터에 요일(weekday) 정보를 추가하여 특정 요일의 구매 패턴을 분석.
+    \end{itemize}
+    \item \textbf{특징 증강} (Feature Augmentation): 외부 데이터 소스를 통합하여 특징을 풍부하게 만듭니다.
+    \begin{itemize}
+        \item \textbf{예시:} 판매 데이터에 해당 날짜의 날씨 정보를 추가하여 날씨가 판매에 미치는 영향을 분석.
+    \end{itemize}
+    \item \textbf{사전 계산 특징} (Precomputed Features): 계산 비용이 많이 드는 특징을 미리 계산하여 저장합니다.
+    \begin{itemize}
+        \item \textbf{예시:} 고객 생애 가치(Customer Lifetime Value), 지난 7일/14일/21일/월/년 단위의 구매 이력(rolling values). 이러한 특징은 고객의 다음 구매 시점을 예측하는 데 유용하며, 계산 비용이 매우 높습니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[summarybox={특징 저장소 (Feature Store)}]
+\textbf{특징 저장소} (Feature Store)는 데이터 과학자가 생성한 특징을 중앙에서 관리하고 공유하며 재사용할 수 있도록 돕는 시스템입니다. 이를 통해 특징 생성의 일관성을 유지하고, 중복 계산을 방지하며, 특징의 발견 가능성을 높일 수 있습니다.
+\end{tcolorbox}
+
+\subsection*{MLOps} (Machine Learning Operations)
+MLOps는 머신러닝 모델의 개발부터 배포, 운영, 모니터링까지의 전 과정을 자동화하고 관리하는 방법론입니다.
+
+\subsubsection*{DataOps, MLOps, ModelOps 정의}
+\begin{itemize}
+    \item \textbf{DevOps:} 소프트웨어 개발(Development)과 운영(Operations)을 통합하여 소프트웨어 배포를 자동화하고 효율화하는 방법론입니다.
+    \item \textbf{DataOps:} 데이터 파이프라인의 설계, 구축, 운영을 자동화하고 관리하여 데이터의 품질과 가용성을 높이는 방법론입니다. 데이터 정제, 큐레이션, 골드 테이블 생성 등을 포함합니다.
+    \item \textbf{MLOps:} 머신러닝 모델의 개발, 훈련, 배포, 모니터링, 재훈련 등 전체 수명 주기를 자동화하고 관리하는 방법론입니다. DataOps와 DevOps의 원칙을 ML에 적용한 것입니다.
+    \item \textbf{ModelOps:} MLOps의 하위 개념으로, 특히 훈련된 모델이 실제 데이터에 대해 추론(scoring)을 수행하고, 모델 교체 및 버전 관리를 포함하는 운영 단계에 초점을 맞춥니다.
+\end{itemize}
+MLOps는 데이터 엔지니어의 데이터 파이프라인(DataOps)과 데이터 과학자의 모델 개발 코드(DevOps)를 통합하고, 모델의 검증, 배포, 추적, 관리를 포함하는 포괄적인 접근 방식입니다.
+
+\subsection*{MLflow 개요}
+MLflow는 머신러닝 수명 주기를 관리하기 위한 오픈소스 플랫폼입니다.
+
+\subsubsection*{MLflow란 무엇인가?}
+\begin{itemize}
+    \item \textbf{한 줄 요약:} Databricks에서 개발한 오픈소스 프레임워크로, 머신러닝 실험 추적, 코드 패키징, 모델 배포 및 관리를 위한 표준화된 도구를 제공합니다.
+    \item \textbf{인기 요인:} MLflow는 매우 인기가 많아 Databricks 플랫폼뿐만 아니라 경쟁사에서도 표준으로 채택될 정도로 강력한 기능을 제공합니다.
+    \item \textbf{오픈소스:} 누구나 자유롭게 사용할 수 있으며, Databricks 플랫폼에서 사용하면 Unity Catalog와의 통합, 관리형 추적 서버 등 추가적인 이점을 얻을 수 있습니다.
+    \item \textbf{특징:}
+    \begin{itemize}
+        \item \textbf{프레임워크 및 도구 불가지론적} (Framework and Tool Agnostic): TensorFlow, PyTorch, Scikit-learn 등 어떤 ML 프레임워크나 알고리즘을 사용하든 상관없이 작동합니다.
+        \item \textbf{API 우선} (API First): REST API를 기반으로 구축되어 어떤 라이브러리나 언어에서도 실행(run)이나 모델을 제출할 수 있습니다.
+        \item \textbf{모듈형} (Modular): 여러 구성 요소(Tracking, Projects, Models, Registry)로 나뉘어 있어, 필요에 따라 개별적으로 사용하거나 전체를 통합하여 사용할 수 있습니다.
+        \item \textbf{쉬운 시작 및 확장성:} 로컬 환경에서 단일 개발자가 쉽게 시작할 수 있으며, 대규모 팀에서도 효과적으로 사용할 수 있도록 확장성이 뛰어납니다.
+        \item \textbf{생태계 우선} (Ecosystem First): 언어 런타임에 대한 편향이 없어 다양한 프레임워크에서 쉽게 실행됩니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{MLflow의 주요 구성 요소}
+MLflow는 다음과 같은 네 가지 주요 구성 요소로 이루어져 있습니다.
+\begin{enumerate}
+    \item \textbf{MLflow Tracking} (실험 추적):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 머신러닝 실험의 매개변수(parameters), 지표(metrics), 아티팩트(artifacts), 메타데이터(metadata)를 기록하고 시각화하여 실험 과정을 추적합니다.
+        \item \textbf{목적:} 데이터 과학자가 수많은 실험을 수행하면서 어떤 매개변수로 어떤 결과를 얻었는지 잊어버리지 않도록 돕고, 재현 가능한 실험을 가능하게 합니다.
+    \end{itemize}
+    \item \textbf{MLflow Projects} (코드 패키징):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 머신러닝 코드를 재현 가능한 형식으로 패키징하여 어떤 컴퓨팅 플랫폼에서도 실행할 수 있도록 합니다.
+        \item \textbf{목적:} 다른 환경에서 코드를 실행할 때 필요한 라이브러리 종속성(requirements.txt) 및 환경 설정을 자동으로 관리하여, '내 컴퓨터에서는 되는데...'와 같은 문제를 방지합니다.
+    \end{itemize}
+    \item \textbf{MLflow Models} (모델 표준화):
+    \begin{itemize>
+        \item \textbf{한 줄 요약:} 다양한 ML 프레임워크(Python, R, Spark ML 등)로 훈련된 모델을 표준화된 형식으로 저장하여, 어떤 환경에서도 쉽게 배포하고 사용할 수 있도록 합니다.
+        \item \textbf{목적:} 모델을 생성한 프레임워크와 소비하는 프레임워크가 달라도 호환성을 유지할 수 있도록 '모델 플레이버(model flavors)'를 지원합니다.
+    \end{itemize}
+    \item \textbf{MLflow Model Registry} (모델 중앙 관리):
+    \begin{itemize}
+        \item \textbf{한 줄 요약:} 조직 내 모든 모델을 중앙에서 관리하고, 버전 관리, 스테이지 전환(개발 $\rightarrow$ 스테이징 $\rightarrow$ 프로덕션), 협업 기능을 제공하는 저장소입니다.
+        \item \textbf{목적:} 모델의 '진실의 원천(source of truth)' 역할을 하며, 모델의 발견, 공유, 배포, 감사(audit)를 용이하게 합니다. 수많은 실험 중 가장 우수한 모델만 등록하여 관리합니다.
+    \end{itemize>
+\end{enumerate}
+
+\subsection*{MLflow 상세}
+MLflow의 각 구성 요소는 ML 수명 주기의 특정 단계를 지원합니다.
+
+\subsubsection*{MLflow Tracking: 실험의 기록자}
+MLflow Tracking은 모든 실험의 세부 사항을 기록하여 재현성을 보장합니다.
+\begin{itemize}
+    \item \textbf{실험} (Experiment): 특정 가설을 검증하기 위한 일련의 시도.
+    \item \textbf{실행} (Run): 각 실험 내에서 수행되는 개별적인 모델 훈련 시도. 각 실행은 고유한 ID를 가집니다.
+    \textbf{기록되는 정보:}
+    \begin{itemize}
+        \item \textbf{매개변수} (Parameters): 모델 훈련에 사용된 입력 값 (예: 학습률, 최대 깊이).
+        \item \textbf{지표} (Metrics): 모델의 성능을 나타내는 수치 (예: 정확도, RMSE, F1-Score).
+        \item \textbf{아티팩트} (Artifacts): 모델 파일 자체, 학습 데이터, 시각화 그래프(PNG), 로그 파일 등 실험과 관련된 모든 출력물.
+        \item \textbf{메타데이터} (Metadata): 실행 시간, 실행자, 코드 소스, 사용된 데이터셋 등 실험에 대한 추가 정보.
+    \end{itemize}
+    \item \textbf{AutoLog:} MLflow는 \texttt{autolog()} 기능을 제공하여, 주요 ML 라이브러리(Scikit-learn, TensorFlow 등)의 매개변수와 지표를 자동으로 기록할 수 있습니다. 추가적인 정보는 \texttt{mlflow.log_param()}, \texttt{mlflow.log_metric()}, \texttt{mlflow.log_artifact()} 등을 사용하여 수동으로 기록할 수 있습니다.
+    \item \textbf{UI} (사용자 인터페이스): MLflow Tracking UI를 통해 모든 실험과 실행을 시각적으로 탐색하고 비교할 수 있습니다. 각 실행의 세부 정보(매개변수, 지표, 아티팩트, 메타데이터)를 확인할 수 있으며, 코드가 어디서 왔는지 추적할 수 있어 재현성을 높입니다.
+\end{itemize}
+
+\subsubsection*{MLflow Models: 모델의 표준화된 표현}
+MLflow Models는 다양한 ML 프레임워크로 생성된 모델을 표준화된 형식으로 저장하여, 배포 및 사용을 용이하게 합니다.
+\begin{itemize>
+    \item \textbf{모델 서명} (Model Signature): 모델의 입력 스키마와 출력 스키마를 정의하여, 모델을 호출하는 방법(필요한 입력 데이터의 형식)을 명확히 알려줍니다.
+    \item \textbf{모델 URI} (Model URI): MLflow Tracking 서버나 Model Registry에 저장된 모델을 고유하게 식별하는 경로입니다. \texttt{runs:/<run_id>/<artifact_path>} 또는 \texttt{models:/<model_name>/<version_or_alias>} 형식으로 사용됩니다.
+    \item \textbf{모델 플레이버} (Model Flavors): MLflow는 다양한 ML 프레임워크(예: \texttt{mlflow.sklearn}, \texttt{mlflow.xgboost}, \texttt{mlflow.pytorch})에 특화된 '플레이버'를 제공합니다. 이를 통해 모델을 생성한 프레임워크와 관계없이 표준화된 방식으로 모델을 로드하고 추론할 수 있습니다.
+\end{itemize>
+
+\subsubsection*{MLflow Model Registry: 모델의 중앙 관리소}
+MLflow Model Registry는 조직 내 모델을 중앙에서 관리하고 협업을 지원하는 핵심 구성 요소입니다.
+\begin{itemize>
+    \item \textbf{중앙 집중식 관리:} 모든 모델을 한 곳에 모아 관리하여 모델의 발견 가능성을 높입니다.
+    \item \textbf{버전 관리} (Versioning): 모델이 개선되거나 재훈련될 때마다 새로운 버전을 생성하여 관리합니다 (예: v1, v2). 각 버전은 고유한 매개변수, 지표, 아티팩트를 가집니다.
+    \item \textbf{스테이지 전환} (Stage Transitions): 모델의 수명 주기에 따라 스테이지를 전환합니다 (예: \texttt{None} $\rightarrow$ \texttt{Staging} $\rightarrow$ \texttt{Production} $\rightarrow$ \texttt{Archived}).
+    \begin{itemize>
+        \item \textbf{None:} 초기 등록 상태.
+        \item \textbf{Staging} (스테이징): 테스트 및 검증을 위한 준비 단계.
+        \item \textbf{Production} (프로덕션): 실제 서비스에 배포되어 사용되는 단계.
+        \item \textbf{Archived} (아카이브): 더 이상 사용되지 않는 모델.
+    \end{itemize>
+    \item \textbf{별칭} (Aliases): 특정 모델 버전에 'best', 'latest'와 같은 사람이 읽기 쉬운 별칭을 부여하여, 버전 번호 대신 별칭으로 모델을 참조할 수 있게 합니다. 이는 모델 배포 시 유연성을 높입니다.
+    \item \textbf{협업 및 감사:} 여러 사용자가 모델을 공유하고, 모델의 변경 이력과 승인 과정을 추적할 수 있어 거버넌스 및 규제 준수에 도움이 됩니다.
+\end{itemize>
+
+\subsection*{모델 및 데이터 드리프트}
+ML 모델은 시간이 지남에 따라 성능이 저하될 수 있으며, 이를 '드리프트(Drift)'라고 합니다. 드리프트는 모델 운영에서 가장 중요한 모니터링 대상입니다.
+
+\subsubsection*{드리프트의 원인 및 중요성}
+\begin{itemize>
+    \item \textbf{한 줄 요약:} 모델은 훈련 당시의 데이터 분포와 패턴을 학습하지만, 실제 환경의 데이터는 끊임없이 변하기 때문에 모델의 예측 성능이 시간이 지남에 따라 저하되는 현상입니다.
+    \item \textbf{직관적 예시:} 특정 시점의 유행을 반영하여 옷을 잘 파는 가게가 있다고 가정해 봅시다. 시간이 지나 유행이 바뀌면(데이터 변화), 이 가게의 판매 실적(모델 성능)은 자연스럽게 떨어질 것입니다. 새로운 유행을 반영하여 옷을 다시 준비해야(모델 재훈련) 합니다.
+    \item \textbf{중요성:} 드리프트를 조기에 감지하고 대응하지 않으면, 모델이 잘못된 예측을 계속하여 비즈니스에 큰 손실을 초래할 수 있습니다.
+\end{itemize>
+
+\subsubsection*{드리프트 유형}
+드리프트는 여러 가지 형태로 나타날 수 있으며, 원인에 따라 대응 방식이 달라집니다.
+\begin{itemize>
+    \item \textbf{특징 드리프트} (Feature Drift) / \textbf{데이터 드리프트} (Data Drift):
+    \begin{itemize>
+        \item \textbf{한 줄 요약:} 모델 입력으로 사용되는 특징(Feature) 데이터의 통계적 특성(분포, 평균, 분산 등)이 시간이 지남에 따라 변하는 현상입니다.
+        \item \textbf{원인:} 새로운 고객층 유입, 시장 변화, 데이터 수집 시스템 변경 등.
+        \item \textbf{대응:} 새로운 데이터로 모델을 재훈련하거나, 특징 생성 로직을 재검토하여 변화된 데이터 특성을 반영해야 합니다.
+    \end{itemize>
+    \item \textbf{레이블 드리프트} (Label Drift):
+    \begin{itemize>
+        \item \textbf{한 줄 요약:} 모델이 예측해야 하는 정답(Label)의 정의나 분포가 변하는 현상입니다.
+        \item \textbf{원인:} 레이블링 방식의 변경, 실제 현상의 변화(예: '정상'과 '이상'의 기준 변화).
+        \item \textbf{대응:} 레이블 생성 프로세스를 조사하고, 새로운 레이블링 정책을 반영하여 모델을 재훈련해야 합니다.
+    \end{itemize>
+    \item \textbf{예측 드리프트} (Prediction Drift):
+    \begin{itemize>
+        \item \textbf{한 줄 요약:} 모델의 예측 결과 분포가 시간이 지남에 따라 변하는 현상입니다.
+        \item \textbf{원인:} 특징 드리프트나 레이블 드리프트의 결과일 수 있으며, 모델 자체의 성능 저하를 나타낼 수 있습니다.
+        \item \textbf{대응:} 비즈니스 영향도를 분석하고, 모델의 유효성을 재평가해야 합니다.
+    \end{itemize>
+    \item \textbf{개념 드리프트} (Concept Drift):
+    \begin{itemize>
+        \item \textbf{한 줄 요약:} 입력 특징과 정답 레이블 간의 근본적인 관계(개념) 자체가 변하는 가장 심각한 형태의 드리프트입니다.
+        \item \textbf{직관적 예시:} 코로나19 팬데믹 기간 동안 오프라인 매장 방문객 수(특징)와 매출(정답) 간의 관계가 완전히 바뀐 것과 같습니다. 과거 데이터의 패턴이 더 이상 유효하지 않게 됩니다.
+        \item \textbf{원인:} 경제 위기, 사회적 변화, 기술 혁신 등 외부 환경의 급격한 변화.
+        \item \textbf{대응:} 추가적인 환경 요인을 조사하고, 새로운 데이터 유형을 도입하며, 때로는 완전히 다른 접근 방식이나 모델을 개발해야 합니다.
+    \end{itemize>
+\end{itemize>
+
+\begin{tcolorbox}[summarybox={MLflow와 아키텍처 통합}]
+MLflow는 일반적으로 메달리온 아키텍처의 \textbf{Silver 계층}에 통합됩니다. 데이터 엔지니어가 Bronze 계층의 원시 데이터를 정제하여 Silver 계층에 저장하면, 데이터 과학자는 이 Silver 계층의 데이터를 MLflow를 사용하여 모델 훈련에 활용합니다. 경우에 따라 Gold 계층의 데이터를 사용할 수도 있습니다.
+\end{tcolorbox}
+
+\newpage
+
+\section*{절차/방법: MLflow를 활용한 모델 개발 및 관리}
+MLflow는 머신러닝 모델의 수명 주기를 효율적으로 관리하기 위한 표준화된 워크플로우를 제공합니다.
+
+\subsection*{MLflow를 활용한 모델 개발 및 관리 워크플로우}
+MLflow는 실험 추적, 모델 패키징, 모델 배포 및 관리를 위한 통합된 접근 방식을 제공합니다.
+\begin{enumerate}
+    \item \textbf{실험 추적 (MLflow Tracking):}
+    \begin{itemize}
+        \item \textbf{목표:} 모델 훈련 과정에서 사용된 매개변수, 얻어진 지표, 생성된 아티팩트(모델 파일, 그래프 등)를 기록하고 관리합니다.
+        \item \textbf{방법:} \texttt{mlflow.start_run()}으로 실험 실행을 시작하고, \texttt{mlflow.log_param()}, \texttt{mlflow.log_metric()}, \texttt{mlflow.log_artifact()} 등으로 정보를 기록합니다. \texttt{mlflow.autolog()}를 사용하면 주요 라이브러리의 정보를 자동으로 기록할 수 있습니다.
+        \item \textbf{결과:} MLflow UI를 통해 모든 실행을 시각적으로 비교하고, 최적의 모델을 찾을 수 있습니다.
+    \end{itemize}
+    \item \textbf{모델 패키징 (MLflow Projects):}
+    \begin{itemize}
+        \item \textbf{목표:} 모델 훈련 코드를 재현 가능한 형식으로 패키징하여 다른 환경에서도 쉽게 실행할 수 있도록 합니다.
+        \item \textbf{방법:} \texttt{MLproject} 파일을 사용하여 프로젝트의 종속성(dependencies)과 진입점(entry points)을 정의합니다.
+    \end{itemize}
+    \item \textbf{모델 등록 (MLflow Model Registry):}
+    \begin{itemize}
+        \item \textbf{목표:} 훈련된 모델 중 가장 우수한 모델을 중앙 저장소에 등록하고 버전 관리, 스테이지 전환을 수행합니다.
+        \item \textbf{방법:} \texttt{mlflow.<flavor>.log_model()} 함수를 사용하여 모델을 Tracking 서버에 로깅한 후, \texttt{mlflow.register_model()} 또는 \texttt{mlflow.<flavor>.log_model(registered_model_name=...)}을 통해 Model Registry에 등록합니다.
+        \item \textbf{결과:} 모델은 고유한 이름과 버전 번호를 가지며, \texttt{Staging}, \texttt{Production} 등의 스테이지로 전환될 수 있습니다. \texttt{mlflow.set_registered_model_alias()}를 사용하여 'best', 'latest'와 같은 별칭을 부여할 수 있습니다.
+    \end{itemize}
+    \item \textbf{모델 배포 및 예측 (MLflow Models):}
+    \begin{itemize}
+        \item \textbf{목표:} 등록된 모델을 로드하여 새로운 데이터에 대한 예측을 수행하고, 다양한 환경에 배포합니다.
+        \item \textbf{방법:} \texttt{mlflow.pyfunc.load_model()} 또는 \texttt{mlflow.<flavor>.load_model()}을 사용하여 모델을 로드합니다. 모델 URI(\texttt{models:/<model_name>/<version_or_alias>})를 통해 Registry에서 모델을 참조합니다.
+        \item \textbf{결과:} 로드된 모델은 \texttt{predict()} 메서드를 통해 추론을 수행할 수 있으며, Spark UDF(User-Defined Function)로 래핑하여 대규모 배치 추론에 활용할 수 있습니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{하이퍼파라미터 튜닝 (Optuna, Hyperopt)}
+최적의 모델 성능을 얻기 위해 하이퍼파라미터를 조정하는 과정은 여러 번의 실험을 필요로 합니다. MLflow는 이러한 튜닝 과정을 추적하고 관리하는 데 유용합니다.
+\begin{itemize}
+    \item \textbf{하이퍼파라미터 튜닝 라이브러리:}
+    \begin{itemize}
+        \item \textbf{Optuna:} 유연하고 효율적인 하이퍼파라미터 최적화 프레임워크입니다.
+        \item \textbf{Hyperopt:} 분산 환경에서 하이퍼파라미터 검색을 지원하는 라이브러리입니다.
+    \end{itemize}
+    \item \textbf{MLflow와의 통합:}
+    \begin{itemize}
+        \item 하이퍼파라미터 튜닝 라이브러리를 사용하여 여러 조합의 매개변수로 모델을 훈련할 때, 각 훈련 실행을 MLflow의 \textbf{중첩된 실행(Nested Runs)}으로 기록할 수 있습니다.
+        \item \texttt{mlflow.start_run(nested=True)}를 사용하여 각 튜닝 시도를 별도의 하위 실행으로 기록하면, 각 시도의 매개변수와 지표를 쉽게 비교하고 관리할 수 있습니다.
+        \item 튜닝이 완료되면, 최적의 성능을 보인 하위 실행의 모델을 부모 실행(Parent Run)에 기록하거나 Model Registry에 등록할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{MLflow를 통한 모델 로깅 및 등록}
+\begin{enumerate}
+    \item \textbf{실험 실행 시작:}
+    \begin{lstlisting}[language=Python, caption={MLflow 실행 시작}]
+import mlflow
+
+with mlflow.start_run(run_name="My_Model_Training_Run"):
+    # 모델 훈련 코드
+    # ...
+    pass
+    \end{lstlisting}
+    \item \textbf{매개변수 및 지표 로깅:}
+    \begin{lstlisting}[language=Python, caption={매개변수 및 지표 로깅}]
+    mlflow.log_param("learning_rate", 0.01)
+    mlflow.log_metric("rmse", 0.5)
+    \end{lstlisting}
+    \item \textbf{모델 로깅 (Tracking 서버에 저장):}
+    \begin{lstlisting}[language=Python, caption={모델 로깅 (XGBoost 예시)}]
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+# 데이터 준비 (예시)
+X, y = # ...
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# XGBoost 모델 훈련
+regressor = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=6)
+regressor.fit(X_train, y_train)
+
+# 모델 예측 및 RMSE 계산
+predictions = regressor.predict(X_test)
+rmse = mean_squared_error(y_test, predictions, squared=False)
+
+# MLflow로 모델 로깅
+mlflow.xgboost.log_model(
+    xgboost_model=regressor,
+    artifact_path="xgboost_model",
+    input_example=X_train.head(1), # 모델 서명을 위한 입력 예시
+    signature=mlflow.models.infer_signature(X_train, regressor.predict(X_train)),
+    registered_model_name="MyXGBoostModel" # Registry에 등록할 모델 이름 (선택 사항)
+)
+mlflow.log_metric("test_rmse", rmse)
+    \end{lstlisting}
+    \item \textbf{모델 등록 (Model Registry에 저장):}
+    \begin{lstlisting}[language=Python, caption={모델 등록 (Tracking 서버에서 Registry로)}]
+# 이미 Tracking 서버에 로깅된 모델을 Registry에 등록
+# log_model 호출 시 registered_model_name을 지정했다면 이 단계는 필요 없음
+# 그렇지 않다면, run_id와 artifact_path를 사용하여 등록
+run_id = mlflow.active_run().info.run_id
+model_uri = f"runs:/{run_id}/xgboost_model"
+registered_model = mlflow.register_model(
+    model_uri=model_uri,
+    name="MyXGBoostModel"
+)
+print(f"Model registered as: {registered_model.name} version {registered_model.version}")
+    \end{lstlisting}
+    \item \textbf{모델 스테이지 전환 및 별칭 부여:}
+    \begin{lstlisting}[language=Python, caption={모델 스테이지 전환 및 별칭 부여}]
+client = mlflow.tracking.MlflowClient()
+
+# 모델을 'Production' 스테이지로 전환
+client.transition_model_version_stage(
+    name="MyXGBoostModel",
+    version=registered_model.version,
+    stage="Production"
+)
+
+# 'best' 별칭 부여
+client.set_registered_model_alias(
+    name="MyXGBoostModel",
+    alias="best",
+    version=registered_model.version
+)
+    \end{lstlisting}
+\end{enumerate}
+
+\subsection*{모델 배포 및 예측 (Spark UDF 활용)}
+등록된 모델을 사용하여 새로운 데이터에 대한 예측을 수행하는 방법입니다. 대규모 데이터의 경우 Spark UDF를 활용하면 분산 처리가 가능합니다.
+\begin{enumerate}
+    \item \textbf{모델 로드 (Registry에서):}
+    \begin{lstlisting}[language=Python, caption={모델 로드 (Registry에서 별칭 사용)}]
+import mlflow.pyfunc
+import pandas as pd
+
+# 'best' 별칭이 부여된 모델 로드
+model_uri = "models:/MyXGBoostModel/best"
+loaded_model = mlflow.pyfunc.load_model(model_uri)
+
+# 새로운 데이터로 예측 (Pandas DataFrame)
+new_data = pd.DataFrame(...) # 예측할 새로운 데이터
+predictions = loaded_model.predict(new_data)
+print("Predictions for new data:")
+print(predictions)
+    \end{lstlisting}
+    \item \textbf{Spark UDF를 이용한 배치 추론:}
+    \begin{lstlisting}[language=Python, caption={Spark UDF를 이용한 배치 추론}]
+from pyspark.sql import SparkSession
+import mlflow.pyfunc
+from pyspark.sql.functions import struct
+
+spark = SparkSession.builder.appName("MLflowUDF").getOrCreate()
+
+# Registry에서 모델 로드 (Spark UDF로 래핑)
+model_uri = "models:/MyXGBoostModel/best"
+pyfunc_udf = mlflow.pyfunc.spark_udf(spark, model_uri)
+
+# 예측할 Spark DataFrame 준비 (예시)
+# X_spark_df는 모델 입력 특징 컬럼들을 포함해야 함
+X_spark_df = spark.createDataFrame(pd.DataFrame(...)) 
+
+# UDF를 사용하여 예측 컬럼 추가
+# 모델의 입력 특징 컬럼들을 struct로 묶어 UDF에 전달
+prediction_df = X_spark_df.withColumn(
+    "prediction", 
+    pyfunc_udf(struct(*X_spark_df.columns)) # 모든 특징 컬럼을 UDF 입력으로 전달
+)
+prediction_df.display()
+    \end{lstlisting}
+\end{enumerate}
+
+\newpage
+\section*{실습/코드/오류와 해결}
+
+\subsection*{MLflow Tutorial for XGBoost (XGBoost 예제)}
+이 실습은 MLflow를 사용하여 XGBoost 모델의 전체 수명 주기(실험, 훈련, 튜닝, 등록, 평가, 배포)를 관리하는 방법을 보여줍니다.
+
+\subsubsection*{실습 목표}
+\begin{itemize}
+    \item 합성 데이터 생성 및 시각화.
+    \item XGBoost 모델 훈련 및 MLflow Tracking을 이용한 매개변수, 지표, 아티팩트 로깅.
+    \item Optuna 라이브러리를 활용한 하이퍼파라미터 튜닝 및 중첩된 MLflow 실행으로 추적.
+    \item MLflow Model Registry에 최적 모델 등록 및 버전 관리.
+    \item 등록된 모델 로드 및 평가.
+    \item Spark UDF를 이용한 대규모 배치 추론.
+\end{itemize}
+
+\subsubsection*{환경 설정 및 라이브러리 설치}
+\begin{lstlisting}[language=Python, caption={라이브러리 설치 및 Python 재시작}]
+%pip install mlflow xgboost optuna scikit-learn numpy pandas matplotlib
+# 설치 후 Python 환경을 재시작해야 할 수 있습니다.
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={MLflow 및 Unity Catalog 설정}]
+import mlflow
+import mlflow.xgboost
+import mlflow.pyfunc
+from mlflow.models import infer_signature
+
+# Unity Catalog를 모델 레지스트리로 설정
+# 'main.default' 대신 본인의 카탈로그 이름(예: CSCI103_catalog)으로 변경
+mlflow.set_registry_uri("databricks-uc")
+# 이 예제에서는 카탈로그와 스키마를 직접 지정합니다.
+catalog_name = "CSCI103_catalog" # 본인의 카탈로그 이름으로 변경
+schema_name = "default"
+\end{lstlisting}
+
+\subsubsection*{데이터 생성 및 시각화}
+합성 회귀 데이터셋을 생성하고, 특징 분포, 상관관계, 특징-타겟 관계 등을 시각화하여 데이터의 특성을 이해합니다.
+\begin{lstlisting}[language=Python, caption={합성 데이터 생성 함수 (예시)}]
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_regression
+
+def generate_synthetic_data(n_samples=1000, n_features=10, random_state=42, noise=0.5, nonlinear=False):
+    X, y = make_regression(n_samples=n_samples, n_features=n_features, random_state=random_state, noise=noise)
+    
+    if nonlinear:
+        X = np.sin(X) + X**2 # 비선형성 추가
+    
+    feature_cols = [f"feature_{i}" for i in range(n_features)]
+    df = pd.DataFrame(X, columns=feature_cols)
+    df['target'] = y
+    return df
+
+# 데이터 생성
+data_df = generate_synthetic_data(n_samples=1000, n_features=5, nonlinear=True)
+display(data_df.head())
+\end{lstlisting}
+\begin{lstlisting}[language=Python, caption={EDA 시각화 함수 (예시, 실제 코드는 더 복잡함)}]
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_feature_distribution(df, feature_cols):
+    # 특징 분포 플롯 (예시)
+    for col in feature_cols:
+        plt.figure(figsize=(6, 4))
+        sns.histplot(df[col], kde=True)
+        plt.title(f'Distribution of {col}')
+        plt.show()
+
+def plot_correlation_heatmap(df):
+    # 상관관계 히트맵 (예시)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+    plt.title('Correlation Heatmap')
+    plt.show()
+
+# 실제 노트북에서는 이 함수들이 호출되어 다양한 플롯을 생성합니다.
+# 이 플롯들은 MLflow 아티팩트로 로깅될 수 있습니다.
+\end{lstlisting}
+
+\subsubsection*{모델 훈련 및 로깅 (MLflow Tracking)}
+XGBoost Regressor 모델을 훈련하고, MLflow Tracking을 사용하여 훈련 과정의 모든 세부 사항을 기록합니다.
+\begin{lstlisting}[language=Python, caption={XGBoost 모델 훈련 및 MLflow 로깅}]
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+import os
+
+# 데이터 분할
+X = data_df.drop('target', axis=1)
+y = data_df['target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# MLflow 실행 시작
+with mlflow.start_run(run_name="XGBoost_Baseline_Run") as run:
+    # 모델 매개변수 정의
+    n_estimators = 100
+    learning_rate = 0.1
+    max_depth = 6
+    
+    # 매개변수 로깅
+    mlflow.log_param("n_estimators", n_estimators)
+    mlflow.log_param("learning_rate", learning_rate)
+    mlflow.log_param("max_depth", max_depth)
+
+    # XGBoost 모델 훈련
+    regressor = xgb.XGBRegressor(
+        n_estimators=n_estimators,
+        learning_rate=learning_rate,
+        max_depth=max_depth,
+        random_state=42
+    )
+    regressor.fit(X_train, y_train)
+
+    # 예측 및 RMSE 계산
+    predictions = regressor.predict(X_test)
+    rmse = mean_squared_error(y_test, predictions, squared=False)
+    mlflow.log_metric("test_rmse", rmse)
+    print(f"Test RMSE: {rmse}")
+
+    # 모델 서명 추론
+    signature = infer_signature(X_train, regressor.predict(X_train))
+
+    # MLflow 모델 로깅 (Registry에 등록)
+    # catalog_name과 schema_name을 사용하여 Unity Catalog에 등록
+    model_name = f"{catalog_name}.{schema_name}.xgboost_regression_model"
+    mlflow.xgboost.log_model(
+        xgboost_model=regressor,
+        artifact_path="xgboost_model",
+        input_example=X_train.head(1),
+        signature=signature,
+        registered_model_name=model_name
+    )
+    print(f"Model logged and registered as {model_name}")
+
+    # 특징 중요도 플롯 로깅
+    fig, ax = plt.subplots(figsize=(10, 6))
+    xgb.plot_importance(regressor, ax=ax)
+    plt.title("Feature Importance")
+    \tight_layout()
+    fig_path = "feature_importance.png"
+    plt.savefig(fig_path)
+    mlflow.log_artifact(fig_path)
+    plt.close(fig)
+    os.remove(fig_path) # 임시 파일 삭제
+\end{lstlisting}
+\begin{tcolorbox}[summarybox={MLflow UI에서 실행 확인}]
+위 코드를 실행한 후, Databricks 워크스페이스의 왼쪽 사이드바에서 'Experiments' 아이콘(비커 모양)을 클릭하면 현재 실행 중인 실험과 완료된 실행 목록을 볼 수 있습니다. 각 실행을 클릭하면 로깅된 매개변수, 지표, 아티팩트(예: 특징 중요도 플롯) 및 메타데이터를 확인할 수 있습니다.
+\end{tcolorbox}
+
+\subsubsection*{하이퍼파라미터 튜닝 (Optuna)}
+Optuna를 사용하여 하이퍼파라미터 공간을 탐색하고, 각 튜닝 시도를 MLflow의 중첩된 실행으로 기록합니다.
+\begin{lstlisting}[language=Python, caption={Optuna를 이용한 하이퍼파라미터 튜닝 및 MLflow 중첩 로깅}]
+import optuna
+from optuna.integration import MLflowCallback
+
+def objective(trial):
+    with mlflow.start_run(nested=True): # 중첩된 MLflow 실행 시작
+        # 하이퍼파라미터 검색 공간 정의
+        n_estimators = trial.suggest_int("n_estimators", 50, 500)
+        learning_rate = trial.suggest_float("learning_rate", 0.01, 0.3)
+        max_depth = trial.suggest_int("max_depth", 3, 10)
+
+        # 매개변수 로깅
+        mlflow.log_param("n_estimators", n_estimators)
+        mlflow.log_param("learning_rate", learning_rate)
+        mlflow.log_param("max_depth", max_depth)
+
+        # 모델 훈련
+        regressor = xgb.XGBRegressor(
+            n_estimators=n_estimators,
+            learning_rate=learning_rate,
+            max_depth=max_depth,
+            random_state=42
+        )
+        regressor.fit(X_train, y_train)
+
+        # 예측 및 RMSE 계산
+        predictions = regressor.predict(X_test)
+        rmse = mean_squared_error(y_test, predictions, squared=False)
+        mlflow.log_metric("test_rmse", rmse)
+
+        return rmse
+
+# Optuna 스터디 생성 및 MLflow 콜백 설정
+mlflow_callback = MLflowCallback(
+    tracking_uri=mlflow.get_tracking_uri(),
+    metric_name="test_rmse",
+    create_experiment=False # 기존 실험에 추가
+)
+
+# 하이퍼파라미터 튜닝 실행
+# trials=50은 너무 오래 걸릴 수 있으므로 10~20 정도로 줄여서 테스트 권장
+study = optuna.create_study(direction="minimize")
+study.optimize(objective, n_trials=10, callbacks=[mlflow_callback]) # n_trials를 10으로 줄임
+
+# 최적의 실행 결과 로깅 (부모 실행에)
+with mlflow.start_run(run_name="XGBoost_Hyperparameter_Tuning_Parent_Run") as parent_run:
+    mlflow.log_params(study.best_params)
+    mlflow.log_metric("best_test_rmse", study.best_value)
+    
+    # 최적 모델을 Model Registry에 등록
+    best_trial_run_id = study.best_trial.user_attrs["mlflow_run_id"]
+    best_model_uri = f"runs:/{best_trial_run_id}/xgboost_model"
+    
+    model_name = f"{catalog_name}.{schema_name}.xgboost_regression_model_tuned"
+    registered_model = mlflow.register_model(
+        model_uri=best_model_uri,
+        name=model_name
+    )
+    print(f"Best model registered as {model_name} version {registered_model.version}")
+
+    # 'best' 별칭 부여
+    client = mlflow.tracking.MlflowClient()
+    client.set_registered_model_alias(
+        name=model_name,
+        alias="best",
+        version=registered_model.version
+    )
+\end{lstlisting}
+
+\subsubsection*{모델 로드 및 평가}
+Model Registry에 등록된 모델을 로드하고, 새로운 데이터에 대한 예측을 수행하여 모델의 유효성을 평가합니다.
+\begin{lstlisting}[language=Python, caption={등록된 모델 로드 및 예측}]
+# Registry에서 'best' 별칭으로 모델 로드
+model_uri = f"models:/{catalog_name}.{schema_name}.xgboost_regression_model_tuned/best"
+loaded_model = mlflow.pyfunc.load_model(model_uri)
+
+# 새로운 데이터로 예측
+new_data_for_prediction = generate_synthetic_data(n_samples=5, n_features=5, random_state=100).drop('target', axis=1)
+predictions = loaded_model.predict(new_data_for_prediction)
+print("Predictions for new data:")
+print(predictions)
+\end{lstlisting}
+
+\subsubsection*{Spark UDF를 이용한 배치 추론}
+대규모 데이터셋에 대해 모델을 사용하여 예측을 수행할 때, Spark UDF를 활용하면 분산 처리를 통해 효율성을 높일 수 있습니다.
+\begin{lstlisting}[language=Python, caption={Spark UDF를 이용한 배치 추론}]
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import struct
+
+spark = SparkSession.builder.appName("XGBoostSparkUDF").getOrCreate()
+
+# 예측할 Spark DataFrame 준비
+# 여기서는 예시를 위해 기존 data_df를 사용하지만, 실제로는 새로운 대규모 데이터가 될 수 있습니다.
+spark_df_to_predict = spark.createDataFrame(data_df.drop('target', axis=1))
+
+# MLflow 모델을 Spark UDF로 래핑
+model_uri = f"models:/{catalog_name}.{schema_name}.xgboost_regression_model_tuned/best"
+pyfunc_udf = mlflow.pyfunc.spark_udf(spark, model_uri)
+
+# UDF를 사용하여 예측 컬럼 추가
+# 모델의 입력 특징 컬럼들을 struct로 묶어 UDF에 전달
+prediction_df = spark_df_to_predict.withColumn(
+    "prediction", 
+    pyfunc_udf(struct(*spark_df_to_predict.columns))
+)
+print("Spark DataFrame with predictions:")
+prediction_df.display()
+
+# 예측 결과를 Unity Catalog 테이블에 저장 (선택 사항)
+# prediction_table_name = f"{catalog_name}.{schema_name}.xgboost_predictions"
+# prediction_df.write.mode("overwrite").saveAsTable(prediction_table_name)
+# print(f"Predictions saved to {prediction_table_name}")
+\end{lstlisting}
+
+\newpage
+\subsection*{MLflow with Scikit-learn (Scikit-learn 예제)}
+이 실습은 Scikit-learn 모델을 MLflow로 관리하는 방법을 보여주며, 특히 \texttt{autolog} 기능과 Hyperopt를 사용한 하이퍼파라미터 튜닝에 초점을 맞춥니다.
+
+\subsubsection*{실습 목표}
+\begin{itemize}
+    \item 와인 품질 데이터셋 로드 및 전처리.
+    \item Scikit-learn Gradient Boosting Classifier 모델 훈련 및 \texttt{mlflow.autolog()} 사용.
+    \item Hyperopt 라이브러리를 활용한 하이퍼파라미터 튜닝.
+    \item MLflow Model Registry에 최적 모델 등록.
+    \item Spark UDF를 이용한 배치 추론.
+\end{itemize}
+
+\subsubsection*{환경 설정 및 라이브러리 설치}
+\begin{lstlisting}[language=Python, caption={라이브러리 설치 및 Python 재시작}]
+%pip install mlflow scikit-learn hyperopt
+# 설치 후 Python 환경을 재시작해야 할 수 있습니다.
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python, caption={MLflow 및 Unity Catalog 설정}]
+import mlflow
+import mlflow.sklearn
+from mlflow.models import infer_signature
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("MLflowSklearn").getOrCreate()
+
+# Unity Catalog를 모델 레지스트리로 설정
+mlflow.set_registry_uri("databricks-uc")
+# 이 예제에서는 카탈로그와 스키마를 직접 지정합니다.
+catalog_name = "CSCI103_catalog" # 본인의 카탈로그 이름으로 변경
+schema_name = "default"
+\end{lstlisting}
+
+\subsubsection*{데이터 로드 및 전처리}
+Databricks 데이터셋에서 와인 품질 데이터를 로드하고, 컬럼 이름 정리 및 레이블 생성을 포함한 전처리 작업을 수행합니다.
+\begin{lstlisting}[language=Python, caption={와인 품질 데이터 로드 및 전처리}]
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import roc_auc_score, accuracy_score
+import re
+
+# Databricks 데이터셋에서 와인 데이터 로드
+white_wine_df = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("delimiter", ";") \
+    .load("/databricks-datasets/wine-quality/winequality-white.csv")
+
+red_wine_df = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("delimiter", ";") \
+    .load("/databricks-datasets/wine-quality/winequality-red.csv")
+
+# 컬럼 이름 정리 (공백을 밑줄로 변경)
+def clean_col_names(df):
+    for col in df.columns:
+        new_col = re.sub(r'[^a-zA-Z0-9_]', '', col.replace(' ', '_').lower())
+        df = df.withColumnRenamed(col, new_col)
+    return df
+
+white_wine_df = clean_col_names(white_wine_df).withColumn("is_red", lit(0))
+red_wine_df = clean_col_names(red_wine_df).withColumn("is_red", lit(1))
+
+# 두 데이터셋 결합
+from pyspark.sql.functions import lit
+combined_wine_df = white_wine_df.unionByName(red_wine_df)
+
+# 품질(quality)을 기반으로 이진 분류 레이블 생성 (7 이상이면 '좋음'으로 분류)
+combined_wine_df = combined_wine_df.withColumn("label", (col("quality") >= 7).cast("integer"))
+
+# Pandas DataFrame으로 변환하여 Scikit-learn 사용
+pandas_df = combined_wine_df.toPandas()
+
+# 특징과 레이블 분리
+X = pandas_df.drop(["quality", "label"], axis=1)
+y = pandas_df["label"]
+
+# 훈련 및 테스트 데이터 분할
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+\end{lstlisting}
+
+\subsubsection*{AutoLog 사용 및 모델 훈련}
+\texttt{mlflow.sklearn.autolog()}를 사용하여 Scikit-learn 모델의 매개변수, 지표, 모델 아티팩트를 자동으로 로깅합니다.
+\begin{lstlisting}[language=Python, caption={AutoLog 사용 및 Gradient Boosting Classifier 훈련}]
+# MLflow autologging 활성화
+mlflow.sklearn.autolog()
+
+with mlflow.start_run(run_name="Sklearn_GB_Classifier_Autolog"):
+    # Gradient Boosting Classifier 모델 훈련
+    gb_classifier = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+    gb_classifier.fit(X_train, y_train)
+
+    # 예측 및 AUC 계산
+    y_pred_proba = gb_classifier.predict_proba(X_test)[:, 1]
+    auc_score = roc_auc_score(y_test, y_pred_proba)
+    
+    # autolog가 자동으로 지표를 로깅하지만, 추가적으로 로깅할 수 있음
+    mlflow.log_metric("test_auc_score", auc_score)
+    print(f"Test AUC Score: {auc_score}")
+
+    # autolog는 모델도 자동으로 로깅하지만, 명시적으로 등록할 수도 있음
+    # model_name = f"{catalog_name}.{schema_name}.sklearn_wine_classifier_autolog"
+    # mlflow.sklearn.log_model(
+    #     sk_model=gb_classifier,
+    #     artifact_path="sklearn_model",
+    #     registered_model_name=model_name,
+    #     input_example=X_train.head(1),
+    #     signature=infer_signature(X_train, gb_classifier.predict(X_train))
+    # )
+\end{lstlisting}
+
+\subsubsection*{하이퍼파라미터 튜닝 (Hyperopt)}
+Hyperopt를 사용하여 하이퍼파라미터 검색 공간을 정의하고, 최적의 모델을 찾습니다. SparkTrials를 사용하여 분산 환경에서 튜닝을 수행할 수 있지만, 무료 버전에서는 \texttt{hyperopt.Trials} (로컬)을 사용해야 합니다.
+\begin{lstlisting}[language=Python, caption={Hyperopt를 이용한 하이퍼파라미터 튜닝}]
+from hyperopt import fmin, tpe, hp, Trials, STATUS_OK
+from hyperopt.pyll import scope
+import logging
+
+# Hyperopt 로깅 레벨 설정 (선택 사항)
+logging.getLogger("hyperopt").setLevel(logging.ERROR)
+
+def objective_hyperopt(params):
+    with mlflow.start_run(nested=True): # 중첩된 MLflow 실행 시작
+        # 매개변수 로깅
+        mlflow.log_params(params)
+
+        # 모델 훈련
+        gb_classifier = GradientBoostingClassifier(random_state=42, **params)
+        gb_classifier.fit(X_train, y_train)
+
+        # 예측 및 AUC 계산
+        y_pred_proba = gb_classifier.predict_proba(X_test)[:, 1]
+        auc_score = roc_auc_score(y_test, y_pred_proba)
+        
+        # 지표 로깅
+        mlflow.log_metric("test_auc_score", auc_score)
+
+        # Hyperopt는 최소화 문제를 풀므로, AUC를 음수로 반환
+        return {'loss': -auc_score, 'status': STATUS_OK}
+
+# 하이퍼파라미터 검색 공간 정의
+search_space = {
+    'n_estimators': scope.int(hp.quniform('n_estimators', 50, 200, 10)),
+    'learning_rate': hp.loguniform('learning_rate', -3, 0), # exp(-3) ~ exp(0) = 0.05 ~ 1.0
+    'max_depth': scope.int(hp.quniform('max_depth', 2, 6, 1)),
+    'subsample': hp.uniform('subsample', 0.6, 1.0),
+}
+
+# Hyperopt Trials 객체 생성 (무료 버전에서는 SparkTrials 대신 일반 Trials 사용)
+# trials = SparkTrials(parallelism=4) # Databricks 유료 버전에서 분산 튜닝
+trials = Trials() # 무료 버전에서 로컬 튜닝
+
+# 하이퍼파라미터 튜닝 실행
+# max_evals를 10-20 정도로 줄여서 테스트 권장 (기본 32)
+best_params = fmin(
+    fn=objective_hyperopt,
+    space=search_space,
+    algo=tpe.suggest,
+    max_evals=10, # 평가 횟수 조정
+    trials=trials
+)
+
+print("Best Hyperopt parameters:", best_params)
+
+# 최적의 실행 결과 로깅 (부모 실행에)
+with mlflow.start_run(run_name="Sklearn_Hyperparameter_Tuning_Parent_Run") as parent_run:
+    mlflow.log_params(best_params)
+    
+    # 최적 모델을 Model Registry에 등록
+    # Hyperopt trials에서 최적의 run_id를 찾아서 모델 URI 생성
+    best_trial_run_id = trials.best_trial['misc']['vals']['mlflow_run_id'][0]
+    best_model_uri = f"runs:/{best_trial_run_id}/model" # autolog는 'model'이라는 artifact_path 사용
+    
+    model_name = f"{catalog_name}.{schema_name}.sklearn_wine_classifier_tuned"
+    registered_model = mlflow.register_model(
+        model_uri=best_model_uri,
+        name=model_name
+    )
+    print(f"Best model registered as {model_name} version {registered_model.version}")
+
+    # 'best' 별칭 부여
+    client = mlflow.tracking.MlflowClient()
+    client.set_registered_model_alias(
+        name=model_name,
+        alias="best",
+        version=registered_model.version
+    )
+\end{lstlisting}
+
+\subsubsection*{모델 로드 및 예측}
+등록된 Scikit-learn 모델을 로드하고, Spark UDF를 사용하여 대규모 데이터에 대한 예측을 수행합니다.
+\begin{lstlisting}[language=Python, caption={등록된 모델 로드 및 Spark UDF 예측}]
+# Registry에서 'best' 별칭으로 모델 로드
+model_uri = f"models:/{catalog_name}.{schema_name}.sklearn_wine_classifier_tuned/best"
+loaded_model = mlflow.pyfunc.load_model(model_uri)
+
+# 예측할 Spark DataFrame 준비 (예시)
+spark_df_to_predict_sklearn = spark.createDataFrame(X_test)
+
+# MLflow 모델을 Spark UDF로 래핑
+pyfunc_udf_sklearn = mlflow.pyfunc.spark_udf(spark, model_uri)
+
+# UDF를 사용하여 예측 컬럼 추가
+prediction_df_sklearn = spark_df_to_to_predict_sklearn.withColumn(
+    "prediction", 
+    pyfunc_udf_sklearn(struct(*spark_df_to_predict_sklearn.columns))
+)
+print("Spark DataFrame with Scikit-learn predictions:")
+prediction_df_sklearn.display()
+\end{lstlisting}
+
+\newpage
+\subsection*{일반적인 오류 및 해결}
+
+\subsubsection*{네트워크 오류 (Network Error) 발생 시}
+\begin{tcolorbox}[warningbox={증상}]
+데이터를 Databricks 볼륨(Volume)에 업로드하거나, 노트북 실행 중 외부 리소스에 접근할 때 \texttt{Network Error} 또는 \texttt{Failed to fetch} 메시지가 반복적으로 나타납니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[summarybox={원인 가설}]
+\begin{itemize}
+    \item \textbf{방화벽 또는 VPN:} 회사 네트워크나 개인 방화벽, VPN 설정이 Databricks 서버와의 통신을 차단할 수 있습니다.
+    \item \textbf{광고 차단기/확장 프로그램:} 브라우저의 광고 차단기(Ad Blocker)나 기타 확장 프로그램이 네트워크 요청을 방해할 수 있습니다.
+    \item \textbf{네트워크 불안정:} 일시적인 인터넷 연결 불안정.
+    \item \textbf{브라우저 문제:} 특정 브라우저의 캐시나 설정 문제.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox={수정 방법}]
+\begin{enumerate}
+    \item \textbf{광고 차단기/확장 프로그램 비활성화:}
+    \begin{itemize}
+        \item 현재 사용 중인 브라우저의 모든 광고 차단기 및 불필요한 확장 프로그램을 일시적으로 비활성화한 후 다시 시도합니다.
+        \item 특히 \texttt{block sites}와 같은 특정 사이트 차단 확장 프로그램도 문제가 될 수 있으므로 확인합니다.
+    \end{itemize}
+    \item \textbf{다른 브라우저 또는 시크릿 모드 사용:}
+    \begin{itemize}
+        \item Chrome, Edge 등 다른 웹 브라우저를 사용해 보거나, 현재 브라우저의 시크릿(Incognito) 모드에서 시도합니다. 시크릿 모드는 확장 프로그램의 영향을 덜 받습니다.
+    \end{itemize}
+    \item \textbf{네트워크 환경 변경:}
+    \begin{itemize}
+        \item 가능하다면 다른 네트워크 환경(예: 모바일 핫스팟, 다른 Wi-Fi)에서 시도합니다.
+        \item 회사 네트워크를 사용 중이라면 개인 네트워크로 전환해 봅니다.
+    \end{itemize}
+    \item \textbf{다른 기기 사용:}
+    \begin{itemize}
+        \item 다른 컴퓨터(Windows, Mac 등)에서 시도하여 개인 컴퓨터 환경의 문제인지 확인합니다.
+    \end{itemize}
+    \item \textbf{HAR 파일 캡처 및 공유:}
+    \begin{itemize}
+        \item 위의 방법으로 해결되지 않을 경우, 브라우저 개발자 도구(F12)의 'Network' 탭에서 HAR(HTTP Archive) 파일을 캡처하여 Databricks 지원팀이나 강사에게 전달합니다. HAR 파일은 네트워크 요청 및 응답에 대한 상세 정보를 포함하며, 개인 식별 정보(PII)는 자동으로 제거됩니다.
+        \item HAR 파일 캡처 방법은 일반적으로 브라우저 개발자 도구의 'Network' 탭에서 'Preserve log'를 체크하고, 오류가 발생하는 작업을 수행한 후, 'Export HAR...' 또는 'Save all as HAR' 옵션을 사용합니다.
+    \end{itemize}
+    \item \textbf{새로운 Databricks Free Edition 계정 생성 (최후의 수단):}
+    \begin{itemize}
+        \item 모든 시도가 실패할 경우, 다른 이메일 주소로 새로운 Databricks Free Edition 계정을 생성하여 시도해 볼 수 있습니다. (기존 작업이 손실될 수 있으므로 최후의 수단으로 고려)
+    \end{itemize}
+\end{enumerate}
+\end{tcolorbox}
+
+\subsubsection*{Slack/그룹 연락 문제}
+\begin{tcolorbox}[warningbox={증상}]
+케이스 스터디 그룹원 중 일부가 Slack에 참여하지 않아 연락이 어렵습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[summarybox={원인 가설}]
+\begin{itemize}
+    \item Slack 존재 여부 미인지: 일부 학생이 Slack 채널의 존재를 모르고 있을 수 있습니다.
+    \item 개인 정보 보호 정책: Harvard의 개인 정보 보호 정책으로 인해 이메일 주소 등 직접적인 연락처 공유가 제한될 수 있습니다.
+    \item 활동 부족: 해당 학생이 수업 활동에 적극적이지 않을 수 있습니다.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox={수정 방법}]
+\begin{enumerate}
+    \item \textbf{Canvas 그룹 이메일 기능 활용:}
+    \begin{itemize}
+        \item Canvas의 그룹 기능을 통해 해당 그룹원에게 이메일을 보낼 수 있습니다. Canvas는 학생의 이메일 주소를 직접 노출하지 않으면서 메시지를 전달하는 기능을 제공합니다.
+        \item 그룹 리더 또는 팀원이 Canvas에서 해당 그룹을 선택한 후, 메시지 전송 기능을 사용하여 Slack 참여를 요청하는 메시지를 보냅니다.
+    \end{itemize}
+    \item \textbf{강사/TA에게 알림:}
+    \begin{itemize}
+        \item Canvas 이메일로도 연락이 닿지 않을 경우, 해당 학생의 이름과 상황을 강사 또는 TA에게 Slack 채널이나 이메일로 알려줍니다.
+        \item 강사/TA는 해당 학생에게 직접 연락을 시도하거나, 다른 조치를 취할 수 있습니다.
+    \end{itemize}
+    \item \textbf{Slack 채널에 공지:}
+    \begin{itemize}
+        \item CSCI103 메인 Slack 채널에 해당 학생의 이름을 언급하며 연락이 닿지 않음을 공지하여, 혹시 다른 학생이 해당 학생과 연락할 수 있는 방법이 있는지 문의할 수 있습니다.
+    \end{itemize}
+\end{enumerate}
+\end{tcolorbox}
+
+\newpage
+\section*{체크리스트}
+
+\begin{tcolorbox}[summarybox={학습 및 문서 작성 점검표}]
+이 체크리스트를 활용하여 강의 내용을 완전히 이해하고, 본 문서를 효과적으로 활용할 수 있는지 점검하세요.
+
+\begin{itemize}
+    \item \textbf{개념 이해:}
+    \begin{itemize}
+        \item 스케일 업/아웃, 고가용성, 재해 복구, 탄력성의 차이를 명확히 설명할 수 있는가?
+        \item 메달리온 패턴(Bronze, Silver, Gold)의 각 계층 역할과 장점을 이해하고 있는가?
+        \item BI와 BA의 차이점과 각각의 목적을 설명할 수 있는가?
+        \item 데이터 과학의 구성 요소와 과학적 방법론의 단계를 이해하고 있는가?
+        \item AI, 머신러닝, 딥러닝의 관계와 각 기술의 특징을 설명할 수 있는가?
+        \item 지도/비지도 학습, 이산/연속 데이터의 분류 기준과 각 유형의 ML 문제 예시를 알고 있는가?
+        \item ML 파이프라인의 주요 역할(데이터 엔지니어, 데이터 과학자, ML 엔지니어)을 구분할 수 있는가?
+        \item 특징 공학(Feature Engineering)의 중요성과 다양한 특징 생성 기법을 설명할 수 있는가?
+        \item MLOps의 개념과 MLflow의 4가지 주요 구성 요소(Tracking, Projects, Models, Registry)의 역할을 이해하고 있는가?
+        \item 데이터 및 모델 드리프트의 유형(특징, 레이블, 예측, 개념)과 각 유형의 원인 및 대응 방안을 설명할 수 있는가?
+    \end{itemize}
+    \item \textbf{MLflow 활용:}
+    \begin{itemize}
+        \item \texttt{mlflow.start_run()}을 사용하여 실험 실행을 시작하고 매개변수, 지표, 아티팩트를 로깅할 수 있는가?
+        \item \texttt{mlflow.autolog()}의 기능을 이해하고 활용할 수 있는가?
+        \item MLflow Model Registry에 모델을 등록하고 버전 및 스테이지를 관리할 수 있는가?
+        \item \texttt{models:/<model_name>/<version_or_alias>} 형식의 모델 URI를 사용하여 모델을 로드할 수 있는가?
+        \item Spark UDF를 사용하여 등록된 모델로 대규모 배치 추론을 수행할 수 있는가?
+    \end{itemize}
+    \item \textbf{실습 준비:}
+    \begin{itemize}
+        \item 제공된 코드 예시를 Databricks 환경에서 실행할 수 있는가?
+        \item Unity Catalog 이름(\texttt{CSCI103_catalog})을 올바르게 설정했는가?
+        \item Hyperopt 실습 시 \texttt{SparkTrials} 대신 \texttt{Trials()}를 사용하도록 수정했는가?
+        \item 하이퍼파라미터 튜닝의 \texttt{n_trials} 또는 \texttt{max_evals} 값을 적절히 조절하여 실행 시간을 단축했는가?
+    \end{itemize}
+    \item \textbf{문제 해결:}
+    \begin{itemize}
+        \item 네트워크 오류 발생 시 광고 차단기 비활성화, 브라우저 변경 등 기본적인 문제 해결 단계를 시도할 수 있는가?
+        \item 그룹원과의 연락 문제 발생 시 Canvas 이메일 기능을 활용하고 강사/TA에게 알릴 수 있는가?
+    \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\section*{FAQ (자주 묻는 질문)}
+
+\begin{tcolorbox}[summarybox={초심자를 위한 Q\&A}]
+\begin{itemize}
+    \item \textbf{Q: MLflow Tracking과 MLflow Model Registry의 차이점은 무엇인가요?}
+    \textbf{A:} MLflow Tracking은 \textbf{모든 실험의 기록부}와 같습니다. 수많은 모델 훈련 시도(run)의 매개변수, 지표, 아티팩트를 기록하고 비교하는 데 사용됩니다. 반면, MLflow Model Registry는 \textbf{최종적으로 검증된 모델들의 중앙 저장소}입니다. 수많은 실험 중 가장 우수한 모델만 Registry에 등록하여 버전 관리, 스테이지 전환(개발 $\rightarrow$ 프로덕션)을 통해 모델의 배포 및 운영을 관리합니다. Tracking은 실험 과정, Registry는 모델 자산 관리에 초점을 맞춥니다.
+
+    \item \textbf{Q: 특징 공학(Feature Engineering)이 왜 그렇게 중요한가요? 모델만 잘 만들면 되는 것 아닌가요?}
+    \textbf{A:} 특징 공학은 모델 성능에 \textbf{가장 큰 영향}을 미치는 요소 중 하나입니다. 아무리 좋은 모델 알고리즘을 사용해도, 입력 데이터의 특징이 모델이 학습하기에 적합하지 않다면 좋은 성능을 기대하기 어렵습니다. 특징 공학은 원본 데이터의 숨겨진 패턴을 모델이 더 잘 이해할 수 있도록 '번역'해주는 과정입니다. 잘 만들어진 특징은 모델의 복잡성을 줄이고, 학습 시간을 단축하며, 예측 정확도를 크게 향상시킬 수 있습니다.
+
+    \item \textbf{Q: 데이터 드리프트와 모델 드리프트는 같은 것인가요?}
+    \textbf{A:} 다릅니다. \textbf{데이터 드리프트}는 모델의 입력 데이터(특징)의 통계적 특성이 시간이 지남에 따라 변하는 현상입니다. 예를 들어, 고객 연령 분포가 바뀌는 것입니다. 반면, \textbf{모델 드리프트}는 이러한 데이터 드리프트나 다른 요인으로 인해 모델의 예측 성능이 시간이 지남에 따라 저하되는 현상입니다. 데이터 드리프트는 모델 드리프트의 주요 원인 중 하나이지만, 모델 드리프트는 데이터 드리프트 없이도 발생할 수 있습니다(예: 레이블 정의 변경).
+
+    \item \textbf{Q: AutoML을 사용하면 데이터 과학자의 역할이 줄어드나요?}
+    \textbf{A:} AutoML은 모델 개발의 반복적이고 시간이 많이 소요되는 부분을 자동화하여 데이터 과학자의 생산성을 높여줍니다. 하지만 AutoML은 모든 상황에 최적화된 모델을 제공하지 못하며, 특정 도메인 지식이나 복잡한 문제 해결에는 여전히 데이터 과학자의 전문성이 필요합니다. AutoML은 '시민 데이터 과학자'가 ML에 접근하는 문턱을 낮추고, 숙련된 데이터 과학자는 더 복잡하고 창의적인 문제에 집중할 수 있도록 돕는 도구로 이해하는 것이 좋습니다.
+
+    \item \textbf{Q: MLflow에서 \texttt{runs:/<run_id>/<artifact_path>}와 \texttt{models:/<model_name>/<version_or_alias>}는 언제 사용하나요?}
+    \textbf{A:} \texttt{runs:/<run_id>/<artifact_path>}는 \textbf{MLflow Tracking 서버}에 저장된 특정 실험 실행(run)의 아티팩트(예: 모델 파일)를 참조할 때 사용합니다. 이는 주로 실험 단계에서 특정 실행의 모델을 로드하여 테스트할 때 유용합니다. 반면, \texttt{models:/<model_name>/<version_or_alias>}는 \textbf{MLflow Model Registry}에 등록된 모델을 참조할 때 사용합니다. 이는 모델이 검증을 거쳐 '공식적인' 자산으로 관리될 때 사용하며, 버전 번호나 'best', 'latest'와 같은 별칭을 통해 모델을 참조할 수 있어 배포 및 운영 단계에서 더 편리하고 안정적입니다.
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\section*{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[summarybox={CSCI103 Lecture 8: 재현 가능한 머신러닝 핵심 요약}]
+\textbf{1. ML 기반 지식:}
+\begin{itemize}
+    \item \textbf{스케일링:} \texttt{Scale Up} (성능 증대) vs. \texttt{Scale Out} (컴퓨터 증대).
+    \item \textbf{신뢰성:} \texttt{고가용성} (상시 사용), \texttt{재해 복구} (재해 대비), \texttt{탄력성} (자원 자동 조절).
+    \item \textbf{데이터 아키텍처:} \texttt{메달리온 패턴} (Bronze $\rightarrow$ Silver $\rightarrow$ Gold로 데이터 정제), \texttt{레이크하우스} (AI+BI 통합).
+    \item \textbf{분석 관점:} \texttt{BI} (과거 분석, '무슨 일'), \texttt{BA} (미래 예측, '왜/무슨 일 일어날지').
+\end{itemize}
+
+\textbf{2. 데이터 과학 및 ML:}
+\begin{itemize}
+    \item \textbf{과학적 방법론:} 질문 $\rightarrow$ 가설 $\rightarrow$ 실험 $\rightarrow$ 해석 $\rightarrow$ 공유.
+    \item \textbf{ML 흐름:} 데이터 정제 $\rightarrow$ 특징 공학 $\rightarrow$ 모델 개발 $\rightarrow$ 배포 $\rightarrow$ 모니터링.
+    \item \textbf{ML 계층:} \texttt{AI} $\supset$ \texttt{ML} $\supset$ \texttt{딥러닝}.
+    \item \textbf{ML 유형:} \texttt{지도} (정답 O) vs. \texttt{비지도} (정답 X), \texttt{이산} (범주) vs. \texttt{연속} (숫자).
+    \item \textbf{핵심:} \textbf{더 많은 데이터}가 복잡한 알고리즘보다 중요!
+\end{itemize}
+
+\textbf{3. ML 수명 주기 및 MLOps:}
+\begin{itemize}
+    \item \textbf{ML 역할:} \texttt{데이터 엔지니어} (데이터 준비) $\rightarrow$ \texttt{데이터 과학자} (모델 개발) $\rightarrow$ \texttt{ML 엔지니어} (모델 배포/운영).
+    \item \textbf{ML 파이프라인:} \texttt{Transformer} (데이터 변환), \texttt{Estimator} (모델 학습), \texttt{Evaluator/Metric} (성능 측정).
+    \item \textbf{특징 공학:} 모델 성능의 핵심, \texttt{특징 저장소}로 관리.
+    \item \textbf{MLOps:} \texttt{DataOps} + \texttt{DevOps} $\rightarrow$ \texttt{MLOps} (ML 전 과정 관리).
+\end{itemize}
+
+\textbf{4. MLflow: 재현 가능한 ML의 핵심 도구:}
+\begin{itemize}
+    \item \textbf{오픈소스 플랫폼:} 실험 추적, 코드 패키징, 모델 표준화, 중앙 관리.
+    \item \textbf{주요 구성 요소:}
+    \begin{itemize}
+        \item \texttt{Tracking:} 실험 매개변수, 지표, 아티팩트 기록 (\texttt{mlflow.start_run()}, \texttt{mlflow.autolog()}).
+        \item \texttt{Projects:} 코드 패키징 (\texttt{MLproject} 파일).
+        \item \texttt{Models:} 모델 표준화 (\texttt{model flavors}, \texttt{infer_signature}).
+        \item \texttt{Registry:} 모델 중앙 관리, 버전, 스테이지 (\texttt{Staging}, \texttt{Production}), 별칭 (\texttt{best}, \texttt{latest}).
+    \end{itemize}
+    \item \textbf{활용:} 하이퍼파라미터 튜닝 (\texttt{Optuna}, \texttt{Hyperopt})과 통합, \texttt{Spark UDF}로 대규모 추론.
+\end{itemize}
+
+\textbf{5. 모델 및 데이터 드리프트:}
+\begin{itemize}
+    \item \textbf{정의:} 모델 성능이 시간이 지남에 따라 저하되는 현상.
+    \item \textbf{유형:} \texttt{특징 드리프트} (입력 데이터 변화), \texttt{레이블 드리프트} (정답 변화), \texttt{예측 드리프트} (예측 결과 변화), \texttt{개념 드리프트} (입력-정답 관계 변화).
+    \item \textbf{대응:} 지속적인 모니터링, 재훈련, 특징 재검토.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

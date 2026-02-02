@@ -1,0 +1,1018 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CS109A: Introduction to Data Science}}
+\fancyhead[R]{\small\textit{Module 17}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myblue}{RGB}{50, 100, 180}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CS109A: Introduction to Data Science - Module 17},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\thispagestyle{firstpage}
+
+\metainfo{CS109A: Introduction to Data Science}{Lecture 17}{UIUC Student}{베이즈 분석의 사후 분포 샘플링 기법과 결측치 처리 전략 학습}
+
+\tableofcontents
+
+\newpage
+
+\begin{overviewbox}
+이 문서는 베이즈(Bayes) 분석에서 복잡한 사후 분포(Posterior Distribution)를 다루는 방법과 데이터의 결측치(Missing Data)를 효과적으로 처리하는 전략을 다룹니다.
+주요 목표는 사후 분포의 특성을 추정하기 위한 몬테카를로(Monte Carlo) 시뮬레이션 기법, 특히 거부 샘플링(Rejection Sampling)과 마르코프 체인 몬테카를로(MCMC)의 메트로폴리스-헤이스팅스(Metropolis-Hastings) 알고리즘을 이해하는 것입니다.
+또한, 데이터 분석 시 흔히 발생하는 결측치의 유형을 파악하고, 통계적 편향을 최소화하면서 데이터를 활용하는 다양한 처리 방안을 학습합니다.
+이론적 배경과 실제 코드 예시를 통해 비전공자도 쉽게 접근할 수 있도록 설명합니다.
+\end{overviewbox}
+
+\newsection{용어 정리}
+데이터 과학에서 사용되는 주요 용어들을 정리했습니다. 각 용어의 개념과 중요성을 이해하는 데 도움이 될 것입니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+사전 분포 & 데이터를 관찰하기 전, 모수에 대한 우리의 믿음 & Prior Distribution & 베이즈 추론의 시작점 \\
+가능도 & 주어진 모수에서 현재 데이터가 관찰될 확률 & Likelihood & 데이터가 모수에 대해 알려주는 정보 \\
+사후 분포 & 데이터를 관찰한 후, 모수에 대한 업데이트된 믿음 & Posterior Distribution & 베이즈 추론의 최종 결과 \\
+켤레 사전 분포 & 사후 분포가 사전 분포와 같은 형태를 유지하게 하는 사전 분포 & Conjugate Prior & 수학적 계산을 단순화 \\
+몬테카를로 방법 & 무작위 샘플링을 통해 분포의 특성을 추정하는 시뮬레이션 기법 & Monte Carlo Methods & 복잡한 문제 해결에 유용 \\
+거부 샘플링 & 제안 분포에서 샘플을 생성하고, 특정 기준에 따라 일부를 버려 목표 분포를 따르는 샘플을 얻는 방법 & Rejection Sampling & 고차원에서는 비효율적일 수 있음 \\
+마르코프 체인 & 다음 상태가 현재 상태에만 의존하고 과거 상태에는 독립적인 확률 과정 & Markov Chain & "기억 상실" 속성 \\
+MCMC & 마르코프 체인을 사용하여 목표 분포에서 샘플을 생성하는 몬테카를로 방법 & Markov Chain Monte Carlo & 복잡한 사후 분포 샘플링에 널리 사용 \\
+메트로폴리스-헤이스팅스 & MCMC의 한 종류로, 제안된 샘플을 수락하거나 거부하는 확률적 규칙을 사용 & Metropolis-Hastings Algorithm & MCMC의 핵심 알고리즘 중 하나 \\
+번인 기간 & MCMC 체인이 목표 분포에 수렴하기까지 초기 샘플을 버리는 기간 & Burn-in Period & 초기화 지점의 영향을 줄임 \\
+트레이스 플롯 & MCMC 샘플이 시간(반복)에 따라 어떻게 변화하는지 보여주는 시계열 그래프 & Trace Plot & 수렴 여부 진단에 사용 \\
+유효 샘플 크기 & MCMC 샘플의 독립적인 정보량을 나타내는 지표 & Effective Sample Size (ESS) & 샘플 간 상관관계를 고려 \\
+R-hat & MCMC 체인의 수렴 여부를 진단하는 통계량 & R-hat & 1에 가까울수록 수렴을 의미 \\
+결측치 & 데이터셋에 값이 없는 경우 & Missing Data & 데이터 분석의 일반적인 문제 \\
+MCAR & 결측이 다른 변수나 결측 자체와 완전히 무관하게 발생 & Missing Completely At Random & 가장 이상적인 결측 유형 \\
+MAR & 결측이 관측된 다른 변수와 관련되어 발생 & Missing At Random & 관측된 변수로 결측을 설명 가능 \\
+MNAR & 결측이 관측되지 않은 변수나 결측 자체의 값과 관련되어 발생 & Missing Not At Random & 가장 다루기 어려운 결측 유형 \\
+대체 (결측치) & 결측된 값을 다른 값으로 채우는 과정 & Imputation & 데이터 손실을 줄이는 방법 \\
+결측 지시 변수 & 특정 값이 결측되었음을 나타내는 이진 변수 & Missingness Indicator Variable & 결측의 영향을 모델링 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newsection{강의 공지 및 중간고사 리뷰}
+
+\begin{infobox}[title=11월 첫 수업 공지]
+11월의 첫 수업에 오신 것을 환영합니다! 할로윈 주말은 잘 보내셨기를 바랍니다.
+가끔은 즐거운 시간을 보내는 것도 중요합니다. 저는 아이들과 함께 트릭 오어 트릿을 다녀왔고, 두 개의 베개 커버를 가득 채웠습니다.
+작은 아이는 20파운드, 큰 아이는 10파운드 정도의 사탕을 모았습니다.
+제 아이들은 사탕을 잘 먹지 않으니, 이번 주 언제든 제 사무실에 들러 사탕을 가져가세요!
+\end{infobox}
+
+\begin{infobox}[title=이번 주 마감 기한]
+\begin{itemize}
+    \item \textbf{프로젝트 마일스톤}: 프로젝트 주제를 업데이트하는 것입니다. 데이터를 탐색하고 프로젝트 질문을 재정의하는 시간을 가지세요.
+    \item \textbf{과제 (Problem Set)}: 내일(수업 다음 날)까지 제출해야 하는 과제가 있습니다. 모델링, 결과 해석, 그리고 베이즈(Bayes) 개념이 포함됩니다. 오피스 아워에 참여하여 도움을 받으세요.
+\end{itemize}
+\end{infobox}
+
+\begin{tcolorbox}[infobox, title=강의 중 언급: 오늘의 비밀 단어]
+오늘의 비밀 단어는 \textbf{Rainbow}입니다.
+\end{tcolorbox}
+
+\subsection*{중간고사 성적 분포 및 평가 기준}
+중간고사 성적 분포와 전반적인 평가 기준에 대해 안내합니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-midterm-grades.png}  % Image not found: example-midterm-grades.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{CS109A 및 CS209 중간고사 성적 분포 (백분율)}
+    \label{fig:midterm_grades}
+\end{figure}
+
+\begin{infobox}[title=중간고사 성적 요약]
+\begin{itemize}
+    \item \textbf{CS109A}: 평균 75점, 중앙값 77점, 표준편차 13점. 최고점은 100점.
+    \item \textbf{CS209}: 평균 77.5점 (109A보다 약 2.5점 높음).
+    \item \textbf{분포 특징}: 두 과목 모두 왼쪽으로 치우친(Left-skewed) 분포를 보입니다. 이는 평균이 50점 이상일 때 흔히 나타나는 현상입니다. 80~90점대에 데이터가 집중되어 있습니다.
+    \item \textbf{이봉성(Bimodality) 가능성}: 분포에서 두 개의 봉우리(mode)가 나타날 수 있으며, 이는 그룹 내에 잠재적인 하위 그룹이 존재할 수 있음을 시사합니다.
+    \item \textbf{점수 조정}: Canvas에는 80점 만점으로 표시되지만, 이는 코딩 부분이 아직 반영되지 않았기 때문입니다. 코딩 부분(총점의 20\%)이 추가되면 대부분의 성적이 상향 조정될 것입니다.
+\end{itemize}
+\end{infobox}
+
+\begin{infobox}[title=성적 평가 철학]
+\begin{itemize}
+    \item \textbf{목표}: 학생들의 이해도와 숙련도를 정확하게 반영하는 성적을 부여하는 것이 목표입니다. 성적을 인위적으로 낮추려는 시도는 없습니다.
+    \item \textbf{최종 성적 기여 요소}: 중간고사는 최종 성적의 한 부분일 뿐입니다. 과제(Problem Sets), 퀴즈(Quizzes), 기말고사(Final Exam), 프로젝트(Project) 등 모든 요소가 최종 성적에 기여합니다.
+    \item \textbf{등급 기준}:
+    \begin{itemize}
+        \item 90점 이상: A- 또는 A
+        \item 80점대: B 범위
+    \end{itemize}
+    \item \textbf{경계 조정}: 등급 경계는 자연스러운 점수 간의 간격(gap)을 찾아 미세하게 조정될 수 있습니다. 예를 들어, 90점과 89.99점 사이의 학생은 동일한 수준으로 간주하여 등급 경계를 유연하게 적용합니다.
+    \item \textbf{과거 이력}: 과거에는 대다수의 학생들이 A 또는 A-를 받았고, 그 다음으로 B를 받았으며, 그 이하의 성적을 받은 학생은 소수였습니다.
+\end{itemize}
+성적에 대해 궁금한 점이 있다면 언제든지 저희에게 문의해 주세요. 중간고사 해답은 Ed에 게시되어 있습니다.
+\end{infobox}
+
+\newsection{핵심 개념·원리: 사후 분포 샘플링}
+
+\subsection*{베이즈 분석과 사후 분포의 중요성}
+베이즈 분석은 사전 믿음(prior belief)과 데이터를 통해 얻은 가능도(likelihood)를 결합하여 모수(parameter)에 대한 사후 분포(posterior distribution)를 도출하는 통계적 접근 방식입니다. 이 사후 분포는 미지의 모수를 확률 변수처럼 취급하며, 모수에 대한 우리의 업데이트된 믿음을 나타냅니다.
+
+\begin{infobox}[title=사후 분포의 활용]
+\begin{itemize}
+    \item \textbf{모수 추정}: 미지의 모수에 대한 분포를 제공합니다.
+    \item \textbf{미래 관측치 예측}: 수집된 데이터를 바탕으로 미래 관측치가 어디에 있을지 예측하는 데 사용됩니다. 이는 모수의 자연적인 변동성과 분포를 모두 고려해야 하므로 복잡한 과정입니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{켤레 사전 분포(Conjugate Prior)의 편리함}
+베이즈 분석에서 사전 분포와 가능도를 결합했을 때 사후 분포가 사전 분포와 동일한 형태를 가지는 경우, 이를 켤레 사전 분포라고 합니다. 이는 수학적 계산을 매우 편리하게 만들어 줍니다.
+
+\begin{examplebox}[title=켤레 사전 분포의 예시]
+\begin{itemize}
+    \item \textbf{회귀 문제 (정규 분포 응답 변수)}:
+    \begin{itemize}
+        \item 모수 $\mu$ 또는 $\beta$에 정규 분포(Normal Distribution) 사전 분포를 사용하면, 사후 분포도 정규 분포가 됩니다.
+        \item 분산(variance)의 역수(inverse)에 감마 분포(Gamma Distribution) 사전 분포를 사용하면, 사후 분포도 감마 분포가 됩니다.
+    \end{itemize}
+    \item \textbf{분류 문제 (이항 분포 응답 변수)}:
+    \begin{itemize}
+        \item 이항 분포(Binomial Distribution)의 모수 $P$에 베타 분포(Beta Distribution) 사전 분포를 사용하면, 사후 분포도 베타 분포가 됩니다. (베타-이항 모델)
+    \end{itemize}
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{켤레 사전 분포가 깨지는 경우: 로지스틱 회귀}
+하지만 모든 경우에 켤레 사전 분포를 사용할 수 있는 것은 아닙니다. 특히 로지스틱 회귀(Logistic Regression)와 같이 비선형 함수(logistic function)를 통해 모수와 확률을 연결하는 모델에서는 켤레 사전 분포의 이점이 사라집니다.
+
+\begin{warningbox}[title=로지스틱 회귀의 문제점]
+로지스틱 회귀에서는 미지의 $\beta$ 모수에 정규 분포 사전 분포를 사용하더라도, 사후 분포는 특정 이름이 없는 복잡한 형태를 가지게 됩니다.
+이러한 경우, 사후 분포의 수학적 형태를 직접적으로 알 수 없으므로, 이 분포에서 샘플을 추출하는 것이 어려워집니다.
+\end{warningbox}
+
+\subsection*{사후 분포 샘플링의 필요성: 몬테카를로 방법}
+사후 분포가 복잡하여 명확한 수학적 형태를 가지지 않을 때, 우리는 시뮬레이션을 통해 이 분포의 특성을 추정해야 합니다. 이를 위해 몬테카를로(Monte Carlo) 방법이 사용됩니다. 몬테카를로는 무작위 샘플링을 통해 분포의 평균, 중앙값, 신뢰 구간(credible interval) 등을 추정하는 기법입니다.
+
+\begin{infobox}[title=몬테카를로 방법의 핵심]
+\begin{itemize}
+    \item \textbf{무작위 샘플 생성}: 분포에서 무작위로 많은 샘플을 생성합니다.
+    \item \textbf{경험적 추정}: 생성된 샘플들의 히스토그램을 통해 분포의 모양을 파악하고, 샘플 통계량(평균, 중앙값, 분위수 등)을 계산하여 분포의 특성을 추정합니다.
+    \item \textbf{유사 사례}: 부트스트랩(Bootstrapping)이나 순열 검정(Permutation Testing)과 같이 확률 이론을 직접 적용하기 어려울 때 분포를 경험적으로 추정하는 방식과 유사합니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{두 가지 주요 샘플링 접근 방식}
+복잡한 사후 분포에서 샘플을 추출하기 위한 두 가지 주요 몬테카를로 접근 방식은 다음과 같습니다.
+\begin{enumerate}
+    \item \textbf{거부 샘플링 (Rejection Sampling)}: 다트 던지기와 유사한 방식으로 샘플을 수락하거나 거부합니다.
+    \item \textbf{마르코프 체인 몬테카를로 (Markov Chain Monte Carlo, MCMC)}: 특히 메트로폴리스-헤이스팅스(Metropolis-Hastings) 알고리즘을 사용하여 마르코프 체인을 따라 분포를 탐색합니다.
+\end{enumerate}
+
+\newsection{절차/방법: 사후 분포 샘플링 기법}
+
+\subsection*{1. 거부 샘플링 (Rejection Sampling)}
+거부 샘플링은 목표 분포(target distribution)에서 직접 샘플링하기 어려울 때, 더 쉽게 샘플링할 수 있는 제안 분포(proposal distribution)를 사용하여 목표 분포를 따르는 샘플을 얻는 방법입니다.
+
+\begin{examplebox}[title=거부 샘플링 비유: 다트 던지기]
+단위 원(unit circle)에서 샘플링하고 싶지만, 단위 사각형(unit square)에서만 샘플을 얻을 수 있다고 가정해 봅시다.
+\begin{enumerate}
+    \item 단위 사각형 내에서 무작위로 점(다트)을 던집니다.
+    \item 만약 그 점이 단위 원 안에 떨어지면(목표에 맞으면), 그 점을 유지합니다.
+    \item 만약 그 점이 단위 원 밖에 떨어지면(목표를 벗어나면), 그 점을 버립니다.
+\end{enumerate}
+이 과정을 반복하면, 단위 원 안에 있는 점들만 남게 되어 단위 원의 분포를 따르는 샘플을 얻을 수 있습니다.
+\end{examplebox}
+
+\subsubsection*{거부 샘플링의 원리}
+\begin{enumerate}
+    \item \textbf{목표 분포 ($P(x)$)}: 우리가 샘플링하고자 하는 복잡한 사후 분포입니다.
+    \item \textbf{제안 분포 ($Q(x)$)}: 우리가 쉽게 샘플링할 수 있는 알려진 분포입니다 (예: 정규 분포).
+    \item \textbf{스케일링}: 제안 분포 $Q(x)$에 상수 $M$을 곱하여 $M \cdot Q(x)$가 목표 분포 $P(x)$의 모든 지점에서 $P(x)$보다 크거나 같도록 만듭니다. 즉, $P(x) \le M \cdot Q(x)$를 만족해야 합니다.
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-rejection-sampling.png}  % Image not found: example-rejection-sampling.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{거부 샘플링의 시각적 원리: 제안 분포(빨간색)와 목표 분포(검은색)}
+    \label{fig:rejection_sampling_visual}
+\end{figure}
+
+\subsubsection*{거부 샘플링 절차}
+\begin{enumerate}
+    \item \textbf{샘플 제안}: 제안 분포 $Q(x)$에서 후보 샘플 $x^*$를 추출합니다.
+    \item \textbf{균일 분포 샘플링}: 0과 1 사이의 균일 분포(Uniform Distribution)에서 무작위 값 $u$를 추출합니다.
+    \item \textbf{수락/거부 결정}:
+    \begin{itemize}
+        \item 만약 $u < \frac{P(x^*)}{M \cdot Q(x^*)}$ 이면, $x^*$를 수락(accept)합니다.
+        \item 그렇지 않으면, $x^*$를 거부(reject)하고 1단계로 돌아갑니다.
+    \end{itemize}
+\end{enumerate}
+이 과정을 충분히 반복하면, 수락된 샘플들은 목표 분포 $P(x)$를 따르게 됩니다.
+
+\begin{examplebox}[title=쿠키 몬스터 예시: 다봉형 분포 샘플링]
+쿠키 몬스터가 여러 종류의 쿠키(초콜릿 칩, 오트밀 건포도, 땅콩 버터, 설탕) 직경 분포를 알고 싶어 합니다. 각 쿠키 종류는 다른 정규 분포를 따르며, 이들을 합치면 여러 개의 봉우리(peak)를 가진 복잡한 분포(예: 3개의 봉우리)가 됩니다. 이 복잡한 분포에서 샘플링하는 것이 목표입니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-cookie-monster-pdf.png}  % Image not found: example-cookie-monster-pdf.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{쿠키 직경의 목표 분포 (검은색)와 제안 분포 (빨간색 정규 분포)}
+    \label{fig:cookie_monster_pdf}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{목표 분포}: 여러 정규 분포가 결합된 복잡한 쿠키 직경 분포 (검은색 곡선).
+    \item \textbf{제안 분포}: 단일 정규 분포 (빨간색 곡선). 이 제안 분포는 목표 분포를 완전히 덮도록 스케일링됩니다.
+    \item \textbf{샘플링 과정}:
+    \begin{enumerate}
+        \item 빨간색 제안 분포에서 쿠키 직경 값 $x^*$를 샘플링합니다.
+        \item 0~1 사이의 균일 분포에서 $u$를 샘플링합니다.
+        \item $x^*$ 지점에서 검은색 곡선의 높이와 빨간색 곡선의 높이를 비교합니다.
+        \item 만약 $u$가 $\frac{\text{검은색 곡선 높이}(x^*)}{\text{빨간색 곡선 높이}(x^*)}$보다 작으면 $x^*$를 유지하고, 그렇지 않으면 버립니다.
+    \end{enumerate}
+    \item \textbf{결과}: 이 과정을 반복하면, 수락된 샘플들의 히스토그램은 검은색 목표 분포의 모양을 정확하게 반영하게 됩니다. 이 히스토그램을 통해 사후 평균, 95\% 신뢰 구간(credible interval) 등을 추정할 수 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{거부 샘플링의 한계}
+\begin{itemize}
+    \item \textbf{계산 비효율성}: 고차원 모수 공간(예: 20개 이상의 모수)에서는 제안 분포가 목표 분포를 완전히 덮도록 스케일링하기가 매우 어렵습니다. 이 경우 대부분의 샘플이 거부되어 수락률이 극히 낮아지고, 매우 많은 샘플을 생성해야 하므로 계산 비용이 커집니다 (차원의 저주, Curse of Dimensionality).
+    \item \textbf{제안 분포의 선택}: 제안 분포를 목표 분포와 유사하게 설정하는 것이 중요하지만, 이는 쉽지 않은 문제입니다.
+\end{itemize}
+
+\subsection*{2. 마르코프 체인 몬테카를로 (MCMC)}
+MCMC는 거부 샘플링의 비효율성을 극복하기 위해 고안된 방법입니다. 특히 메트로폴리스-헤이스팅스(Metropolis-Hastings) 알고리즘은 복잡한 사후 분포에서 샘플을 추출하는 데 널리 사용됩니다.
+
+\subsubsection*{마르코프 체인 (Markov Chain)의 개념}
+\begin{infobox}[title=마르코프 속성 (Markovian Property): 기억 상실]
+마르코프 체인은 "기억 상실(memoryless)" 속성을 가진 확률 과정입니다. 이는 다음 상태(time $t+1$)가 오직 현재 상태(time $t$)에만 의존하며, 그 이전의 과거 상태(time $t-1, t-2, \dots$)에는 의존하지 않는다는 의미입니다.
+\end{infobox}
+
+\begin{examplebox}[title=마르코프 속성 비유]
+\begin{itemize}
+    \item \textbf{날씨 예측}: 내일의 날씨를 예측하기 위해 오늘 날씨만 알면 충분하다고 가정한다면, 이는 마르코프 속성을 따릅니다. 과거의 모든 날씨 기록을 알 필요는 없습니다.
+    \item \textbf{주식 시장}: 오늘 주식 가격이 어제 주식 가격에만 의존하고, 그 이전의 가격 변동 과정에는 의존하지 않는다고 가정한다면, 이는 마르코프 과정으로 볼 수 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{MCMC의 목표}
+MCMC는 마르코프 체인을 구성하여 이 체인이 충분히 오랜 시간 동안 진화하면, 체인의 상태들이 우리가 샘플링하고자 하는 목표 분포(사후 분포)를 따르게 하는 것을 목표로 합니다. 즉, 분포를 통해 무작위 걸음(random walk)을 수행하는 것입니다.
+
+\subsubsection*{메트로폴리스-헤이스팅스 (Metropolis-Hastings) 알고리즘}
+메트로폴리스-헤이스팅스 알고리즘은 MCMC의 핵심으로, 현재 위치에서 다음 위치로 이동할지 여부를 확률적으로 결정하여 목표 분포를 탐색합니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-metropolis-hastings-walk.png}  % Image not found: example-metropolis-hastings-walk.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{메트로폴리스-헤이스팅스 알고리즘의 무작위 걸음 개념}
+    \label{fig:metropolis_hastings_walk}
+\end{figure}
+
+\begin{infobox}[title=메트로폴리스-헤이스팅스 알고리즘의 핵심 아이디어]
+\begin{enumerate}
+    \item \textbf{현재 위치}: 분포 내의 현재 모수 값($\theta_t$)을 알고 있습니다.
+    \item \textbf{새로운 위치 제안}: 제안 분포($Q(\theta' | \theta_t)$)를 사용하여 새로운 모수 값($\theta'$)을 제안합니다. 이 제안 분포는 현재 위치 $\theta_t$에 따라 달라질 수 있습니다.
+    \item \textbf{수락/거부 결정}: 제안된 $\theta'$로 이동할지 말지를 확률적으로 결정합니다. 이 결정은 목표 분포(사후 분포)의 높이와 제안 분포의 확률을 고려합니다.
+\end{enumerate}
+\end{infobox}
+
+\subsubsection*{메트로폴리스-헤이스팅스 절차}
+\begin{enumerate}
+    \item \textbf{초기화}: 모수 $\theta$의 초기 값 $\theta_0$를 설정합니다.
+    \item \textbf{반복}: $t=0, 1, 2, \dots$에 대해 다음을 반복합니다.
+    \begin{enumerate}
+        \item \textbf{새로운 값 제안}: 현재 값 $\theta_t$에서 제안 분포 $Q(\theta' | \theta_t)$를 사용하여 새로운 후보 값 $\theta'$를 샘플링합니다. (예: $\theta_t$를 중심으로 하는 정규 분포에서 샘플링)
+        \item \textbf{수락 확률 계산}: 다음 수락 확률 $\alpha$를 계산합니다.
+        \[ \alpha = \min \left( 1, \frac{P(\theta' | \text{data}) \cdot Q(\theta_t | \theta')}{P(\theta_t | \text{data}) \cdot Q(\theta' | \theta_t)} \right) \]
+        여기서 $P(\theta | \text{data})$는 목표 사후 분포의 밀도 함수입니다. 중요한 점은 사후 분포의 정규화 상수(normalizing constant)를 몰라도 비율 계산에는 문제가 없다는 것입니다.
+        \item \textbf{수락/거부}: 0과 1 사이의 균일 분포에서 무작위 값 $u$를 샘플링합니다.
+        \begin{itemize}
+            \item 만약 $u < \alpha$ 이면, 새로운 값 $\theta'$를 수락합니다. 즉, $\theta_{t+1} = \theta'$.
+            \item 그렇지 않으면, 새로운 값을 거부하고 현재 값에 머무릅니다. 즉, $\theta_{t+1} = \theta_t$.
+        \end{itemize}
+    \end{enumerate}
+\end{enumerate}
+
+\begin{infobox}[title=수락 확률 $\alpha$의 직관적 의미]
+\begin{itemize}
+    \item \textbf{확률이 더 높은 곳으로 이동}: 만약 제안된 $\theta'$의 사후 확률 밀도가 현재 $\theta_t$보다 높다면 (즉, "언덕 위로" 이동한다면), $\alpha$는 1에 가까워져 거의 항상 수락됩니다.
+    \item \textbf{확률이 더 낮은 곳으로 이동}: 만약 제안된 $\theta'$의 사후 확률 밀도가 현재 $\theta_t$보다 낮다면 (즉, "언덕 아래로" 이동한다면), $\alpha$는 1보다 작아져 특정 확률로만 수락됩니다. 이는 체인이 지역 최댓값(local maximum)에 갇히지 않고 분포 전체를 탐색할 수 있도록 돕습니다.
+    \item \textbf{제안 분포의 영향}: $Q(\theta_t | \theta')$와 $Q(\theta' | \theta_t)$ 항은 제안 분포가 대칭적이지 않을 때 편향을 보정하는 역할을 합니다.
+\end{itemize}
+\end{infobox}
+
+\newsection{실습/코드/오류와 해결: MCMC를 이용한 로지스틱 회귀}
+
+\subsection*{예시: 스키틀즈(Skittles) 맛 선호도 모델링}
+스키틀즈에서 새로운 망고 맛을 출시하려고 합니다. 각 배치에 들어갈 망고 에센스 재료의 양(dosage, X)이 맛 선호도(Y)에 미치는 영향을 파악하여 최적의 레시피를 찾고자 합니다.
+
+\begin{infobox}[title=데이터 및 모델 설정]
+\begin{itemize}
+    \item \textbf{독립 변수 (X)}: 망고 에센스 재료의 양 (연속형 수치).
+    \item \textbf{종속 변수 (Y)}: 맛을 좋아하는 사람의 수.
+    \item \textbf{데이터 구조}: 각 재료 양(X)에 대해 $N$명의 테스터가 맛을 보고, 그 중 $Y$명이 맛을 좋아한다고 응답한 데이터.
+    \item \textbf{데이터 생성 과정}: 각 테스터의 응답은 베르누이 분포(Bernoulli Distribution)를 따르며, 이를 합산한 $Y$는 이항 분포(Binomial Distribution)를 따릅니다.
+    \item \textbf{모델}: 로지스틱 회귀 모델을 사용하여 재료 양(X)과 맛을 좋아할 확률($P$) 사이의 관계를 모델링합니다.
+    \[ \text{logit}(P) = \log\left(\frac{P}{1-P}\right) = \alpha + \beta X \]
+    여기서 $\alpha$는 절편(intercept), $\beta$는 기울기(slope)입니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{베이즈적 접근: 사전 분포 설정}
+$\alpha$와 $\beta$는 미지의 모수이므로, 베이즈적 접근을 위해 이들에 대한 사전 분포를 설정해야 합니다. 로짓 스케일에서 $\alpha$와 $\beta$는 무한한 값을 가질 수 있으므로, 무한한 범위를 가지는 정규 분포(Normal Distribution)를 사전 분포로 사용합니다.
+
+\begin{infobox}[title=사전 분포 설정 예시]
+\begin{itemize}
+    \item \textbf{기울기 $\beta$}: 관계가 없을 것이라는 중립적인 믿음으로 평균 0을 설정합니다. 사전 정보가 많지 않으므로, 분산(표준편차)을 매우 크게 설정하여 비정보적(non-informative) 사전 분포를 만듭니다.
+    \item \textbf{절편 $\alpha$}: 재료 양이 0일 때 50:50의 확률로 맛을 좋아할 것이라는 믿음으로 평균 0을 설정하고, 마찬가지로 큰 분산을 부여합니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{사후 분포의 형태}
+이항 분포 가능도와 정규 분포 사전 분포를 결합하면, 사후 분포는 복잡한 형태를 가지며, 켤레 사전 분포가 아니므로 명확한 수학적 이름이 없습니다.
+\[ P(\alpha, \beta | \text{data}) \propto P(\text{data} | \alpha, \beta) \cdot P(\alpha) \cdot P(\beta) \]
+\[ P(\alpha, \beta | \text{data}) \propto \left( \prod_{i=1}^{N} \binom{n_i}{y_i} p_i^{y_i} (1-p_i)^{n_i-y_i} \right) \cdot N(\alpha | \mu_\alpha, \sigma_\alpha^2) \cdot N(\beta | \mu_\beta, \sigma_\beta^2) \]
+여기서 $p_i = \frac{e^{\alpha + \beta x_i}}{1 + e^{\alpha + \beta x_i}}$ 입니다.
+이 사후 분포의 정확한 형태는 모르지만, 주어진 $\alpha$와 $\beta$ 값에 대해 사후 분포의 "높이" (정규화 상수를 제외한 부분)는 계산할 수 있습니다.
+
+\subsubsection*{\texttt{pymc}를 이용한 MCMC 샘플링}
+Python의 \texttt{pymc}와 같은 라이브러리는 메트로폴리스-헤이스팅스 알고리즘을 사용하여 복잡한 사후 분포에서 샘플을 추출하는 과정을 자동화합니다.
+
+\begin{lstlisting}[style=pythonstyle, caption={\texttt{pymc}를 이용한 MCMC 모델 설정 및 샘플링 예시}, label={lst:pymc_mcmc}]
+import pymc as pm
+import numpy as np
+
+# 가상의 데이터 (강의 자료의 표와 유사)
+# dosage (X), total_testers (N), liked_flavor (Y)
+data = {
+    'X': np.array([1.88, 1.86, 1.89, 1.90, 1.87, 1.85, 1.91, 1.84]),
+    'N': np.array([60, 62, 58, 61, 59, 60, 63, 57]),
+    'Y': np.array([50, 51, 48, 52, 49, 50, 53, 47])
+}
+
+with pm.Model() as skittles_model:
+    # 1. 사전 분포 정의 (Priors)
+    # 비정보적 사전 분포를 위해 큰 표준편차를 가진 정규 분포 사용
+    alpha = pm.Normal("alpha", mu=0, sigma=100) # 절편
+    beta = pm.Normal("beta", mu=0, sigma=100)   # 기울기
+
+    # 2. 로지스틱 모델 정의 (Likelihood Link)
+    # logit(p) = alpha + beta * X
+    # p = exp(alpha + beta * X) / (1 + exp(alpha + beta * X))
+    p = pm.Deterministic("p", pm.math.invlogit(alpha + beta * data['X']))
+
+    # 3. 데이터의 가능도 정의 (Likelihood of Data)
+    # Y는 이항 분포를 따름 (N, p)
+    observed_data = pm.Binomial("observed_data", n=data['N'], p=p, observed=data['Y'])
+
+    # 4. MCMC 샘플링 수행
+    # draw: 샘플링할 반복 횟수
+    # tune: 번인(burn-in) 기간 (초기 불안정한 샘플 버림)
+    trace = pm.sample(draws=2000, tune=2000, cores=1) # cores=1은 단일 체인 실행
+\end{lstlisting}
+
+\begin{infobox}[title=MCMC 샘플링 과정의 주요 파라미터]
+\begin{itemize}
+    \item \textbf{\texttt{draws}}: 번인 기간 이후에 수집할 샘플의 수입니다. 이 샘플들이 사후 분포를 추정하는 데 사용됩니다.
+    \item \textbf{\texttt{tune} (번인 기간, Burn-in Period)}: MCMC 체인이 목표 분포에 수렴하기까지 초기 불안정한 샘플들을 버리는 기간입니다. 초기화 지점의 영향을 최소화하고 안정적인 샘플을 얻기 위함입니다.
+    \item \textbf{\texttt{cores}}: 병렬로 실행할 MCMC 체인의 수입니다. 여러 체인을 실행하면 수렴 진단에 도움이 됩니다.
+\end{itemize}
+\end{infobox}
+
+\subsection*{MCMC 결과 해석}
+
+\subsubsection*{1. 트레이스 플롯 (Trace Plot)}
+MCMC 샘플링이 완료되면, 각 모수(여기서는 $\alpha$와 $\beta$)에 대한 트레이스 플롯을 확인하여 체인의 수렴 여부를 진단합니다. 트레이스 플롯은 각 반복(iteration)마다 모수 값이 어떻게 변화했는지 보여주는 시계열 그래프입니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-mcmc-trace-plot.png}  % Image not found: example-mcmc-trace-plot.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{MCMC 트레이스 플롯 예시 (alpha 및 beta)}
+    \label{fig:mcmc_trace_plot}
+\end{figure}
+
+\begin{infobox}[title=트레이스 플롯 해석]
+\begin{itemize}
+    \item \textbf{안정성}: 이상적인 트레이스 플롯은 "EKG"처럼 특별한 패턴 없이 무작위로 진동하는 모습을 보여야 합니다. 이는 체인이 목표 분포에 도달하여 안정적으로 샘플링하고 있음을 의미합니다.
+    \item \textbf{수렴 실패 징후}: 만약 트레이스 플롯이 특정 방향으로 추세(trend)를 보이거나, 특정 값에 머무르는 등 패턴을 보인다면, 체인이 아직 수렴하지 않았을 수 있습니다. 이 경우 번인 기간을 늘리거나, 샘플링 횟수를 늘리거나, 초기화 지점을 변경하는 등의 조치가 필요할 수 있습니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{2. 사후 분포 히스토그램 (Posterior Distribution Histogram)}
+트레이스 플롯과 함께 각 모수의 사후 분포 히스토그램(또는 밀도 플롯)을 확인합니다. 이는 MCMC 샘플들이 형성하는 분포의 모양을 보여줍니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-mcmc-posterior-hist.png}  % Image not found: example-mcmc-posterior-hist.png % 실제 이미지 파일이 없으므로 예시로 대체
+    \caption{MCMC 샘플을 이용한 사후 분포 히스토그램 (alpha 및 beta)}
+    \label{fig:mcmc_posterior_hist}
+\end{figure}
+
+\begin{infobox}[title=히스토그램 해석]
+\begin{itemize}
+    \item \textbf{모수 $\beta$}: 스키틀즈 예시에서 $\beta$의 사후 분포는 약 25에서 42 사이의 양수 값을 가집니다. 이는 망고 에센스 재료의 양(X)이 맛 선호도(Y)에 긍정적인 영향을 미친다는 강력한 증거입니다.
+    \item \textbf{중심 경향성}: 분포의 중심(예: 사후 평균)을 파악할 수 있습니다. $\beta$의 경우 약 33~34 정도입니다.
+    \item \textbf{신뢰 구간 (Credible Interval)}: 분포의 95\% 분위수를 찾아 95\% 신뢰 구간을 추정할 수 있습니다. $\beta$의 경우 약 28에서 40 사이가 될 수 있습니다.
+\end{itemize}
+\end{infobox}
+
+\subsubsection*{3. 사후 분포 요약 통계 (Summary Statistics)}
+\texttt{pymc}는 각 모수에 대한 사후 분포의 요약 통계량을 제공합니다.
+
+\begin{lstlisting}[caption={\texttt{pymc} 사후 분포 요약 출력 예시}, label={lst:pymc_summary}]
+# pm.summary(trace) 결과 예시 (강의 자료 기반)
+#                 mean     sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+# alpha        -62.11  10.23  -81.05  -43.02       0.23     0.16    2000.0    1800.0   1.00
+# beta          34.05   5.14   28.01   40.12       0.11     0.08    2000.0    1900.0   1.00
+\end{lstlisting}
+
+\begin{infobox}[title=주요 요약 통계량 설명]
+\begin{itemize}
+    \item \textbf{\texttt{mean} (사후 평균)}: 사후 분포의 평균입니다. $\beta$의 경우 약 34.05입니다.
+    \item \textbf{\texttt{sd} (사후 표준편차)}: 사후 분포의 표준편차입니다. $\beta$의 경우 약 5.14입니다.
+    \item \textbf{\texttt{hdi_3%}, \texttt{hdi_97%} (최고 밀도 구간, Highest Density Interval)}: 사후 분포의 94\% 신뢰 구간입니다 (기본값). $\beta$의 경우 약 28.01에서 40.12 사이입니다.
+    \item \textbf{\texttt{mcse_mean} (MCMC 표준 오차)}: 사후 평균 추정치의 표준 오차입니다. MCMC 샘플이 독립적이지 않기 때문에 단순히 표준편차를 $\sqrt{N}$으로 나눈 것보다 더 정확한 추정치입니다.
+    \item \textbf{\texttt{ess_bulk}, \texttt{ess_tail} (유효 샘플 크기, Effective Sample Size, ESS)}: MCMC 샘플이 독립적인 관측치와 동일한 정보를 제공하는 정도를 나타냅니다. MCMC 샘플은 서로 상관관계가 있기 때문에, 실제 샘플 수(예: 2000개)보다 ESS가 작습니다. ESS가 클수록 추정치의 신뢰도가 높습니다.
+    \item \textbf{\texttt{r_hat} (R-hat)}: MCMC 체인의 수렴 여부를 진단하는 통계량입니다. 이 값이 \textbf{1에 가까울수록} 체인이 잘 수렴했음을 나타냅니다. 1보다 훨씬 큰 값은 수렴 실패를 의미합니다.
+\end{itemize}
+\end{infobox}
+
+\newsection{결측치 처리 (Missing Data Handling)}
+
+데이터 과학에서 결측치(missing data)는 흔히 발생하는 문제이며, 이를 어떻게 처리하느냐에 따라 분석 결과에 큰 영향을 미칠 수 있습니다.
+
+\subsection*{결측치의 형태 및 \texttt{pandas}, \texttt{sklearn}의 동작}
+\begin{itemize}
+    \item \textbf{표시}: Excel 스프레드시트에서는 빈 셀로 나타나거나, CSV 파일에서는 공백으로 표시될 수 있습니다.
+    \item \textbf{\texttt{pandas}}: Python의 \texttt{pandas} 라이브러리는 이러한 결측치를 \texttt{NaN} (Not a Number) 또는 \texttt{NA} (Not Available)와 같은 특수 값으로 처리합니다.
+    \item \textbf{\texttt{sklearn}}: \texttt{scikit-learn}은 기본적으로 \texttt{NaN} 값을 처리하지 못하며, 결측치가 포함된 데이터가 입력되면 오류를 발생시킵니다. 따라서 \texttt{sklearn} 모델을 사용하기 전에 결측치를 명시적으로 처리해야 합니다.
+\end{itemize}
+
+\subsection*{결측치 처리의 기본 전략}
+결측치를 처리하는 가장 기본적인 두 가지 전략은 다음과 같습니다.
+
+\begin{enumerate}
+    \item \textbf{결측치 제거 (Dropping Missing Values)}:
+    \begin{itemize}
+        \item \textbf{행 제거}: 결측치가 포함된 행(관측치) 전체를 제거합니다 (\texttt{df.dropna(axis=0)}).
+        \item \textbf{열 제거}: 결측치가 많은 열(변수) 전체를 제거합니다.
+        \item \textbf{장점}: 구현이 간단합니다.
+        \item \textbf{단점}: 데이터 손실이 발생하여 표본 크기가 줄어들고, 중요한 정보가 유실될 수 있습니다. 특히 결측이 무작위가 아닐 경우 편향된 결과를 초래할 수 있습니다.
+    \end{itemize}
+    \item \textbf{결측치 대체 (Imputation)}:
+    \begin{itemize}
+        \item \textbf{평균/중앙값 대체}: 결측된 값을 해당 변수의 평균(mean) 또는 중앙값(median)으로 채웁니다 (\texttt{df.fillna(df.mean())}).
+        \item \textbf{장점}: 데이터 손실이 없어 표본 크기를 유지할 수 있습니다.
+        \item \textbf{단점}:
+        \begin{itemize}
+            \item 분포의 왜곡: 특히 평균 대체는 데이터의 분산을 과소평가하고, 분포의 모양을 실제와 다르게 만들 수 있습니다.
+            \item 통계적 편향: 추론(inference)을 목표로 할 때 통계적 편향을 유발할 수 있습니다. 예측(prediction)을 목표로 할 때는 상대적으로 덜 심각할 수 있지만, 여전히 문제가 될 수 있습니다.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{결측치 처리의 권장 방법: 결측 지시 변수 (Missingness Indicator Variable)}
+통계적 편향을 최소화하면서 결측치를 처리하는 간단하면서도 효과적인 방법은 \textbf{결측 지시 변수(missingness indicator variable)}를 생성하는 것입니다.
+
+\begin{infobox}[title=결측 지시 변수 생성 절차]
+\begin{enumerate}
+    \item \textbf{결측치 대체}: 결측된 값을 특정 값(예: 0 또는 해당 변수의 평균/중앙값)으로 대체하여 새로운 변수(예: \texttt{X1_star})를 만듭니다.
+    \item \textbf{지시 변수 생성}: 원래 변수에서 결측치가 있었던 위치를 나타내는 새로운 이진 변수(예: \texttt{X1_miss})를 생성합니다. 결측치가 있었으면 1, 없었으면 0의 값을 가집니다.
+    \item \textbf{모델에 포함}: 분석 시 \texttt{X1_star}와 \texttt{X1_miss} 두 변수를 모두 모델에 포함합니다.
+\end{enumerate}
+\end{infobox}
+
+\begin{examplebox}[title=결측 지시 변수 활용 예시]
+\begin{itemize}
+    \item \textbf{수치형 변수}: 원래 변수 \texttt{X1}에 결측치가 있다면, \texttt{X1_star} (결측치를 0으로 대체)와 \texttt{X1_miss} (결측 여부 지시)를 함께 사용합니다. 이를 통해 모델은 결측치가 0으로 대체된 값의 효과와, 해당 값이 원래 결측이었다는 사실의 효과를 동시에 추정할 수 있습니다.
+    \item \textbf{범주형 변수}: 원래 범주형 변수 \texttt{X2} (예: 0 또는 1)에 결측치가 있다면, \texttt{X2_star} (결측치를 새로운 범주, 예: -1 또는 'missing'으로 대체)와 \texttt{X2_miss} (결측 여부 지시)를 함께 사용합니다. 이는 사실상 결측치를 하나의 새로운 범주로 취급하는 것과 유사합니다.
+\end{itemize}
+이 방법은 결측치가 단순히 "없음"이 아니라, 그 자체가 중요한 정보일 수 있다는 점을 모델에 반영할 수 있게 해줍니다.
+\end{examplebox}
+
+\subsection*{결측치의 유형 (Types of Missingness)}
+결측치가 발생하는 메커니즘은 크게 세 가지 유형으로 나눌 수 있으며, 이는 결측치 처리 전략을 선택하는 데 중요한 고려 사항입니다. 하지만 실제로는 어떤 유형인지 정확히 알기 어려운 경우가 많습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.2\textwidth} p{0.75\textwidth}}
+\toprule
+\textbf{유형} & \textbf{설명} \\
+\midrule
+\textbf{완전히 무작위 결측 (MCAR)} & \textbf{Missing Completely At Random} \\
+& 결측이 다른 어떤 변수와도 관련이 없고, 결측된 값 자체와도 무관하게 발생합니다. \\
+& 예: 데이터 입력 중 실수로 일부 값이 무작위로 누락된 경우. \\
+& \textit{가장 이상적인 경우이지만, 실제로는 드뭅니다.} \\
+\midrule
+\textbf{무작위 결측 (MAR)} & \textbf{Missing At Random} \\
+& 결측이 \textbf{관측된 다른 변수}와 관련되어 발생하지만, 결측된 값 자체와는 무관합니다. \\
+& 예: 남성보다 여성이 특정 설문 문항에 응답하지 않는 경향이 있지만, 그 응답하지 않은 내용 자체는 성별 외의 다른 요인과 무관한 경우. \\
+& \textit{관측된 변수를 통해 결측 메커니즘을 설명할 수 있습니다.} \\
+\midrule
+\textbf{비무작위 결측 (MNAR)} & \textbf{Missing Not At Random} \\
+& 결측이 \textbf{관측되지 않은 변수}나 \textbf{결측된 값 자체}와 관련되어 발생합니다. \\
+& 예: 소득이 높은 사람들이 자신의 소득을 기입하지 않는 경향이 있는 경우 (결측된 소득 값 자체가 결측 여부에 영향을 미침). \\
+& 예: 특정 질병을 가진 사람들이 병원 방문 기록을 숨기는 경우 (관측되지 않은 질병이 결측 여부에 영향을 미침). \\
+& \textit{가장 다루기 어려운 유형이며, 편향을 유발할 가능성이 가장 높습니다.} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{warningbox}[title=결측치 유형의 불확실성]
+실제 데이터 분석에서는 결측치가 어떤 유형에 속하는지 정확히 알기 어렵습니다. 따라서 결측 지시 변수를 사용하는 것과 같이, 결측 메커니즘의 영향을 모델에 포함하려는 노력이 중요합니다.
+\end{warningbox}
+
+\newsection{체크리스트}
+
+이 문서를 학습하고 활용하는 데 도움이 되는 체크리스트입니다.
+
+\begin{infobox}[title=학습 점검 체크리스트]
+\begin{itemize}
+    \item \textbf{베이즈 기본 개념}: 사전 분포, 가능도, 사후 분포의 관계를 이해했는가?
+    \item \textbf{켤레 사전 분포}: 켤레 사전 분포가 무엇이며, 왜 유용한지 설명할 수 있는가?
+    \item \textbf{MCMC 필요성}: 로지스틱 회귀와 같이 켤레 사전 분포가 깨질 때 MCMC가 왜 필요한지 설명할 수 있는가?
+    \item \textbf{거부 샘플링}: 거부 샘플링의 원리(다트 비유, 제안/목표 분포)와 절차를 이해했는가?
+    \item \textbf{MCMC 원리}: 마르코프 체인 속성(기억 상실)과 MCMC의 기본 아이디어를 이해했는가?
+    \item \textbf{메트로폴리스-헤이스팅스}: 알고리즘의 단계(제안, 수락 확률 계산, 수락/거부)를 설명할 수 있는가?
+    \item \textbf{MCMC 결과 해석}: 트레이스 플롯, 사후 분포 히스토그램, 요약 통계(ESS, R-hat)를 보고 MCMC 수렴 여부와 모수 추정치를 해석할 수 있는가?
+    \item \textbf{결측치 유형}: MCAR, MAR, MNAR의 차이점을 설명하고 각 유형의 의미를 이해했는가?
+    \item \textbf{결측치 처리 전략}: 결측치 제거, 단순 대체(평균/중앙값), 결측 지시 변수 사용의 장단점을 비교할 수 있는가?
+    \item \textbf{결측 지시 변수}: 결측 지시 변수를 사용하는 이유와 방법을 설명할 수 있는가?
+\end{itemize}
+\end{infobox}
+
+\begin{infobox}[title=코드 활용 체크리스트]
+\begin{itemize}
+    \item \textbf{\texttt{pymc} 모델 설정}: \texttt{pm.Model()} 내에서 사전 분포, 가능도 링크, 관측 데이터를 올바르게 정의할 수 있는가?
+    \item \textbf{\texttt{pm.sample()}}: \texttt{draws}, \texttt{tune} 파라미터의 의미를 이해하고 적절히 설정할 수 있는가?
+    \item \textbf{결과 시각화}: \texttt{pymc} trace plot 및 사후 분포 히스토그램을 생성하고 해석할 수 있는가?
+    \item \textbf{결측치 처리 구현}: \texttt{pandas}를 사용하여 결측치를 확인하고, \texttt{dropna()}, \texttt{fillna()}를 적용하거나 결측 지시 변수를 생성할 수 있는가?
+\end{itemize}
+\end{infobox}
+
+\newsection{FAQ (자주 묻는 질문)}
+
+\begin{tcolorbox}[infobox, title={Q: 왜 베이즈 분석에서 사후 분포를 샘플링해야 하나요?}]
+\textbf{A:} 베이즈 분석의 핵심은 모수에 대한 사후 분포를 얻는 것입니다. 하지만 사전 분포와 가능도를 결합했을 때, 사후 분포가 우리가 아는 정규 분포나 베타 분포처럼 예쁜 형태를 가지지 않는 경우가 많습니다. 이런 경우, 사후 분포의 평균, 중앙값, 신뢰 구간 등을 직접 계산하기 어렵기 때문에, 분포에서 많은 샘플을 추출하여 이 샘플들의 통계량을 통해 분포의 특성을 '경험적으로' 추정해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: 거부 샘플링과 MCMC의 주요 차이점은 무엇인가요?}]
+\textbf{A:} 거부 샘플링은 각 샘플이 독립적으로 생성되고 수락/거부됩니다. 목표 분포를 완전히 덮는 제안 분포가 필요하며, 고차원에서는 대부분의 샘플이 거부되어 비효율적입니다. 반면 MCMC는 마르코프 체인을 따라 샘플을 생성하며, 다음 샘플이 이전 샘플에 의존합니다. 목표 분포를 덮는 제안 분포가 필요 없고, 고차원에서도 비교적 효율적이지만, 샘플 간의 상관관계 때문에 '번인' 기간과 수렴 진단이 필요합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: MCMC에서 '번인(Burn-in)' 기간은 왜 필요한가요?}]
+\textbf{A:} MCMC 체인은 초기화 지점에서 시작하여 목표 사후 분포를 향해 '걸어갑니다'. 이 초기 단계에서는 체인이 아직 목표 분포에 도달하지 못하고 불안정한 상태일 수 있습니다. 번인 기간은 이러한 초기 불안정한 샘플들을 버려서, 체인이 목표 분포에 수렴한 후의 샘플들만을 사용하여 정확한 추론을 할 수 있도록 보장하는 역할을 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: MCMC 결과에서 'R-hat' 값이 1보다 크면 어떻게 해야 하나요?}]
+\textbf{A:} R-hat 값은 MCMC 체인의 수렴 여부를 나타내는 중요한 진단 통계량입니다. R-hat이 1에 가까울수록 체인이 잘 수렴하여 안정적인 샘플을 생성하고 있음을 의미합니다. 만약 R-hat이 1보다 크다면 (일반적으로 1.01 이상), 체인이 아직 수렴하지 않았을 가능성이 높습니다. 이 경우, 샘플링 반복 횟수를 늘리거나, 번인 기간을 늘리거나, 여러 개의 체인을 시작하여 초기화 지점의 영향을 줄이는 등의 조치를 취해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: 결측치를 단순히 평균으로 대체하는 것이 왜 문제가 될 수 있나요?}]
+\textbf{A:} 결측치를 평균으로 대체하면 데이터의 표본 크기를 유지할 수 있지만, 여러 가지 문제가 발생할 수 있습니다. 첫째, 데이터의 분산이 과소평가되어 표준 오차가 실제보다 작게 추정될 수 있습니다. 둘째, 데이터 분포의 모양이 왜곡될 수 있습니다. 셋째, 특히 통계적 추론(예: 가설 검정, 신뢰 구간)을 수행할 때 편향된 결과를 초래할 수 있습니다. 평균 대체는 결측치에 대한 어떠한 정보도 반영하지 못하고, 모든 결측치를 동일한 값으로 처리하기 때문입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title={Q: 결측 지시 변수를 사용하는 것이 왜 더 나은 방법인가요?}]
+\textbf{A:} 결측 지시 변수를 사용하면 결측치가 단순히 '없음'이 아니라, 그 자체가 중요한 정보일 수 있다는 점을 모델에 반영할 수 있습니다. 예를 들어, 특정 질문에 응답하지 않은 것이 그 사람의 어떤 특성과 관련이 있을 수 있습니다. 결측 지시 변수를 모델에 포함함으로써, 우리는 결측 메커니즘이 종속 변수에 미치는 영향을 직접적으로 추정할 수 있으며, 이는 단순한 평균 대체보다 통계적 편향을 줄이는 데 도움이 됩니다.
+\end{tcolorbox}
+
+\newsection{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{summarybox}[title={베이즈 사후 분포 샘플링}]
+\textbf{목표}: 복잡한 사후 분포의 특성(평균, 신뢰 구간 등) 추정.
+\textbf{문제}: 로지스틱 회귀처럼 켤레 사전 분포가 아닐 때 사후 분포의 형태를 알 수 없음.
+\textbf{해결}: 몬테카를로(Monte Carlo) 시뮬레이션.
+\begin{itemize}
+    \item \textbf{거부 샘플링}: 제안 분포에서 샘플 생성 후, 목표 분포와의 높이 비율에 따라 수락/거부. 고차원에서는 비효율적.
+    \item \textbf{MCMC (메트로폴리스-헤이스팅스)}: 마르코프 체인(기억 상실)을 따라 분포를 무작위 탐색. 현재 상태에 기반해 다음 상태 제안 및 확률적으로 수락/거부.
+\end{itemize}
+\textbf{MCMC 진단}:
+\begin{itemize}
+    \item \textbf{번인(Burn-in)}: 초기 불안정한 샘플 버림.
+    \item \textbf{트레이스 플롯}: 수렴 여부 시각적 확인 (패턴 없이 무작위 진동).
+    \item \textbf{R-hat}: 수렴 진단 통계량 (1에 가까워야 함).
+    \item \textbf{ESS}: 유효 샘플 크기 (샘플 간 상관관계 고려).
+\end{itemize}
+\end{summarybox}
+
+\vspace{1em}
+
+\begin{summarybox}[title={결측치 처리 전략}]
+\textbf{문제}: 데이터에 값이 없는 경우 (NaN, NA). \texttt{sklearn}은 기본적으로 처리 불가.
+\textbf{기본 전략}:
+\begin{itemize}
+    \item \textbf{제거}: 행/열 삭제. 데이터 손실, 편향 위험.
+    \item \textbf{대체}: 평균/중앙값 등으로 채움. 표본 크기 유지, 분포 왜곡 및 편향 위험.
+\end{itemize}
+\textbf{권장 전략}: \textbf{결측 지시 변수(Missingness Indicator Variable)}
+\begin{itemize}
+    \item 결측치를 특정 값으로 대체한 변수(\texttt{X_star})와, 결측 여부를 나타내는 이진 변수(\texttt{X_miss})를 함께 모델에 포함.
+    \item 결측 메커니즘의 영향을 모델링하여 편향 감소.
+\end{itemize}
+\textbf{결측치 유형}:
+\begin{itemize}
+    \item \textbf{MCAR (완전히 무작위)}: 결측이 다른 변수나 결측 자체와 무관.
+    \item \textbf{MAR (무작위)}: 결측이 \textbf{관측된 다른 변수}와 관련.
+    \item \textbf{MNAR (비무작위)}: 결측이 \textbf{관측되지 않은 변수}나 \textbf{결측된 값 자체}와 관련. (가장 다루기 어려움)
+\end{itemize}
+\textbf{주의}: 실제 결측치 유형은 알기 어려우므로, 결측 지시 변수 사용이 유연한 대안.
+\end{summarybox}
+
+\end{document}

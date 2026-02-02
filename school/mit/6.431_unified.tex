@@ -10,23 +10,24 @@
 %========================================================================================
 
 \usepackage{kotex}
-\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
-\usepackage{amsmath, amssymb, amsthm}
-\usepackage{graphicx}
+% --- 표 관련 ---
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{adjustbox}
+\usepackage{colortbl}
 \renewcommand{\arraystretch}{1.1}
 
-\usepackage{enumitem}
-\setlist{nosep, leftmargin=*, itemsep=0.3em}
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -35,7 +36,288 @@
 \fancyhead[LO]{\leftmark}
 \fancyhead[RE]{6.431}
 \renewcommand{\headrulewidth}{0.5pt}
-\setlength{\headheight}{15pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+%========================================================================================
+% 색상 정의
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+% MIT/Harvard 추가 색상
+\definecolor{mainblue}{RGB}{50, 80, 150}
+\definecolor{subgray}{RGB}{180, 180, 180}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{boxbgcolor}{RGB}{245, 245, 250}
+
+% Stanford CS230 스타일 색상
+\definecolor{myblue}{RGB}{50, 100, 180}
+\definecolor{sblue}{RGB}{70, 130, 180}
+\definecolor{wgray}{RGB}{245, 245, 245}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%========================================================================================
+% 박스 환경
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=주의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=개념,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced,
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=비유,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+% mybox 환경 (UIUC용)
+\newtcolorbox{mybox}[1]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title={#1},
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable
+}
+
+% 추가 환경 (Gemini 생성 콘텐츠에서 사용)
+\newtcolorbox{tipbox}[1][]{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=팁, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{solutionbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=풀이, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{downloadbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=다운로드, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{practicebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=연습, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keypointbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=핵심 포인트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{storybox}[1][]{enhanced, colback=lightyellow, colframe=darkorange!80!black, fonttitle=\bfseries, title=이야기, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathstep}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학 단계, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{systembox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=시스템, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{toolbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=도구, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{bayesbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=베이즈, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{formulabox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=공식, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{strategybox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=전략, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{diagnosisbox}[1][]{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=진단, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{featurebox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=특징, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{faqbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=FAQ, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{notebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=노트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{codeexamplebox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=코드 예제, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keyconceptbox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 개념, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{termbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=용어, arc=2mm, boxrule=0.7pt, breakable, #1}
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% 커스텀 명령어 (Gemini 생성 콘텐츠에서 사용)
+\newcommand{\excel}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\concept}[1]{\textbf{#1}}
+\newcommand{\formula}[1]{\textit{#1}}
+\providecommand{\captionof}[2]{\textbf{#2}}
+\newcommand{\chaptertitle}[2]{\section*{#1: #2}}
+\providecommand{\newsection}{\section}
+
+%========================================================================================
+% 코드 블록
+%========================================================================================
+
+\usepackage{listings}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{
+    style=mystyle,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[chapter]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[chapter]
+\newtheorem{example}{예제}[chapter]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
 
 \usepackage[
     colorlinks=true,
@@ -46,291 +328,39 @@
 ]{hyperref}
 
 %========================================================================================
-% 색상 정의
+% 기타
 %========================================================================================
 
-\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
 
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{bayespurple}{RGB}{100, 50, 150}
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{conceptpurple}{RGB}{100, 50, 150}
-\definecolor{skillgold}{RGB}{200, 150, 0}
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{conceptpurple}{RGB}{100, 50, 150}
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{conceptpurple}{RGB}{100, 50, 150}
-\definecolor{finalgold}{RGB}{218, 165, 32}
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{storyorange}{RGB}{255, 140, 0}
-\definecolor{purplebox}{RGB}{120, 80, 180}
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{conceptpurple}{RGB}{100, 50, 150}
-\definecolor{systemorange}{RGB}{255, 140, 0}
-\definecolor{mainblue}{RGB}{0, 80, 160}
-\definecolor{subgray}{RGB}{240, 240, 240}
-\definecolor{alertred}{RGB}{200, 50, 50}
-\definecolor{examplegreen}{RGB}{50, 150, 50}
-\definecolor{conceptpurple}{RGB}{100, 50, 150}
-\definecolor{goldstar}{RGB}{220, 160, 0}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{url}
+\urlstyle{same}
 
 %========================================================================================
-% 박스 환경 (tcolorbox)
+% 메타 정보 박스 명령어
 %========================================================================================
 
-\usepackage[most]{tcolorbox}
-\tcbuselibrary{skins, breakable}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 잠깐! 오해하기 쉬워요: #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=storyorange, fonttitle=\bfseries,
-    title={📖 Story Matching: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{toolbox}[1]{
-    colback=purplebox!5!white, colframe=purplebox, fonttitle=\bfseries,
-    title={🛠️ 강력한 도구: #1}, rounded corners
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 잠깐! 오해하기 쉬워요: #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=finalgold, fonttitle=\bfseries,
-    title={🏆 실전 시나리오: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{mathstep}[1]{
-    colback=conceptpurple!5!white, colframe=conceptpurple, fonttitle=\bfseries,
-    title={🛠️ 문제 해결 스킬: #1}, rounded corners
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 잠깐! 오해하기 쉬워요: #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=goldstar, fonttitle=\bfseries,
-    title={📖 실전 시나리오: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{mathstep}[1]{
-    colback=conceptpurple!5!white, colframe=conceptpurple, fonttitle=\bfseries,
-    title={🛠️ CLT 해결 레시피: #1}, rounded corners
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 0의 역설 (Zero Probability Paradox): #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=orange, fonttitle=\bfseries,
-    title={📖 Story Matching: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{mathstep}[1]{
-    colback=conceptpurple!5!white, colframe=conceptpurple, fonttitle=\bfseries,
-    title={🛠️ 절차적 기술 (Skill): #1}, rounded corners
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 잠깐! 오해하기 쉬워요: #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=systemorange, fonttitle=\bfseries,
-    title={📖 실전 시나리오: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{systembox}[1]{
-    colback=systemorange!5!white, colframe=systemorange, fonttitle=\bfseries,
-    title={⚙️ 시스템 공학: #1}, rounded corners
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 함정 주의 (Trap): #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=skillgold, fonttitle=\bfseries,
-    title={📖 Story Scenario: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{mathstep}[1]{
-    colback=conceptpurple!5!white, colframe=conceptpurple, fonttitle=\bfseries,
-    title={🛠️ 문제 해결 스킬: #1}, rounded corners
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 치명적 함정 (Geometric Trap): #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시 계산: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=orange, fonttitle=\bfseries,
-    title={📖 Story Scenario: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{mathstep}[1]{
-    colback=conceptpurple!5!white, colframe=conceptpurple, fonttitle=\bfseries,
-    title={🛠️ 문제 해결 스킬: #1}, rounded corners
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 잠깐! 오해하기 쉬워요: #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=orange, fonttitle=\bfseries,
-    title={📖 스토리 시나리오: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{conceptbox}[1]{
-    colback=white, colframe=mainblue, fonttitle=\bfseries,
-    title={💡 #1}, rounded corners, drop shadow
-}
-
-\newtcolorbox{warningbox}[1]{
-    colback=red!5!white, colframe=alertred, fonttitle=\bfseries,
-    title={⚠️ 잠깐! 오해하기 쉬워요: #1}, rounded corners
-}
-
-\newtcolorbox{examplebox}[1]{
-    colback=green!5!white, colframe=examplegreen, fonttitle=\bfseries,
-    title={📝 예시: #1}, rounded corners
-}
-
-\newtcolorbox{storybox}[1]{
-    colback=yellow!10!white, colframe=orange, fonttitle=\bfseries,
-    title={📖 스토리 시나리오: #1}, rounded corners, fontupper=\small
-}
-
-\newtcolorbox{bayesbox}[1]{
-    colback=bayespurple!5!white, colframe=bayespurple, fonttitle=\bfseries,
-    title={🔮 #1}, rounded corners
-}
-
-%========================================================================================
-% 사용자 정의 명령어
-%========================================================================================
-
-\newcommand{\chaptertitle}[2]{
-    \begin{tcolorbox}[colback=mainblue, colframe=mainblue, sharp corners, boxrule=0pt, top=10pt, bottom=10pt]
-        \centering \Large \bfseries \textcolor{white}{#1: #2}
-    \end{tcolorbox}
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+\textbf{강의명:} & #1 \\[0.3em]
+\textbf{주차:} & #2 \\[0.3em]
+\textbf{교수명:} & #3 \\[0.3em]
+\textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
 }
 
 %========================================================================================
@@ -345,11 +375,10 @@
 
 \maketitle
 \tableofcontents
-\newpage
 
 
 %=======================================================================
-% Chapter 1: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 1: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture1}
@@ -358,7 +387,6 @@
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 % 목차 구조 시각화 (현재 위치 강조)
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
@@ -421,7 +449,7 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 \section{핵심 개념 1: 확률 모형의 수립 (Modeling)}
 
 \subsection{실험과 표본 공간 ($\Omega$)}
-\begin{conceptbox}{표본 공간은 우리가 노는 '운동장'이다}
+\begin{conceptbox}[title={표본 공간은 우리가 노는 '운동장'이다}]
 \begin{itemize}
     \item \textbf{한 줄 요약:} 실험에서 나올 수 있는 모든 결과를 빠짐없이 모아둔 집합입니다.
     \item \textbf{직관적 비유:} 식당의 \textbf{전체 메뉴판}. 내가 무엇을 주문하든, 반드시 메뉴판 안에 있는 것이어야 합니다.
@@ -430,7 +458,7 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 \end{itemize}
 \end{conceptbox}
 
-\begin{warningbox}{Outcome vs Event 구분하기}
+\begin{warningbox}[title={Outcome vs Event 구분하기}]
 \begin{itemize}
     \item \textbf{Outcome (근원 사건):} 주사위를 던져 '1'이 나오는 것. (더 쪼갤 수 없음)
     \item \textbf{Event (사건):} 주사위를 던져 '홀수'가 나오는 것 ($\{1, 3, 5\}$). (Outcome들의 묶음)
@@ -453,7 +481,7 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 
 확률은 감으로 찍는 것이 아닙니다. 러시아 수학자 콜모고로프가 만든 3가지 절대 규칙 위에서만 작동합니다.
 
-\begin{conceptbox}{콜모고로프의 3공리}
+\begin{conceptbox}[title={콜모고로프의 3공리}]
 \begin{enumerate}
     \item \textbf{Non-negativity (비음수성):} 확률은 절대 음수가 될 수 없다.
     \[ P(A) \ge 0 \]
@@ -464,7 +492,7 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 \end{enumerate}
 \end{conceptbox}
 
-\begin{examplebox}{공리의 적용: 케이크 자르기}
+\begin{examplebox}[title={공리의 적용: 케이크 자르기}]
 \begin{itemize}
     \item 전체 케이크($\Omega$)의 크기는 1입니다. (공리 2)
     \item 케이크 한 조각($A$)의 크기는 0보다 큽니다. (공리 1)
@@ -505,7 +533,7 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
     \end{itemize}
 \end{enumerate}
 
-\begin{storybox}{비밀요원 K의 가방 열기 (Counting 시나리오)}
+\begin{storybox}[title={비밀요원 K의 가방 열기 (Counting 시나리오)}]
 비밀요원 K가 3자리 숫자 자물쇠가 달린 가방을 열어야 합니다.
 \begin{enumerate}
     \item \textbf{상황 A (순열):} 비밀번호는 0~9 숫자 중 서로 다른 3개로 이루어져 있고, 순서가 중요합니다.
@@ -573,11 +601,9 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 이번 장에서는 모든 사건이 똑같은 확률로 일어난다고 가정하거나, 이미 확률이 주어졌다고 쳤습니다. 하지만 현실에서 내일 비가 올 확률은 어떻게 알 수 있을까요? 새로운 정보(구름이 꼈다)가 들어오면 확률은 어떻게 바뀔까요? \\
 다음 장 \textbf{Chapter 2: 조건부 확률(Conditional Probability)}에서 그 비밀을 밝혀냅니다. "정보가 곧 확률을 바꿉니다."
 
-\newpage
-
 
 %=======================================================================
-% Chapter 2: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 2: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture2}
@@ -586,7 +612,6 @@ $A \cup B$ & 합집합 (Union) & A \textbf{또는} B가 일어남 \\ \hline
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -646,7 +671,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 \section{핵심 개념 1: 조건부 확률 (Conditional Probability)}
 
 \subsection{표본 공간의 재정의 (Renormalization)}
-\begin{conceptbox}{새로운 정보는 세상을 축소시킨다}
+\begin{conceptbox}[title={새로운 정보는 세상을 축소시킨다}]
 \begin{itemize}
     \item \textbf{한 줄 요약:} 사건 $B$가 일어났다면, $B$ 바깥의 세상은 소멸하고 $B$가 새로운 전체($\Omega_{new}$)가 됩니다.
     \item \textbf{직관적 비유:} 지도 어플에서 '서울시'를 검색하면, 지도 화면(표본 공간)이 대한민국 전체에서 서울시로 확대(Zoom-in)되는 것과 같습니다.
@@ -656,7 +681,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 \end{itemize}
 \end{conceptbox}
 
-\begin{examplebox}{주사위 던지기}
+\begin{examplebox}[title={주사위 던지기}]
 주사위를 던졌는데 \textbf{"짝수가 나왔다(B)"}는 힌트를 받았습니다. 이때 그 숫자가 \textbf{"2 이하(A)"}일 확률은?
 \begin{enumerate}
     \item 원래 세상($\Omega$): $\{1, 2, 3, 4, 5, 6\}$. 확률은 $2/6 = 1/3$.
@@ -686,7 +711,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 \end{itemize}
 
 \subsection{베이즈 정리 (Bayes' Rule)}
-\begin{bayesbox}{시간을 거스르는 추론}
+\begin{bayesbox}[title={시간을 거스르는 추론}]
 \begin{itemize}
     \item \textbf{핵심 사고:} 결과를 관측($B$)한 뒤, 그 원인이 무엇이었는지($A$) 역추적합니다.
     \item \textbf{공식:}
@@ -696,7 +721,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 \end{itemize}
 \end{bayesbox}
 
-\begin{storybox}{공장 불량품 추적 시나리오}
+\begin{storybox}[title={공장 불량품 추적 시나리오}]
 당신은 품질 관리자입니다.
 \begin{itemize}
     \item \textbf{공장 A:} 전체 부품의 60\% 생산 ($P(A)=0.6$), 불량률 1\% ($P(E|A)=0.01$)
@@ -719,7 +744,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 %===========================================================
 \section{핵심 개념 3: 사건의 독립성 (Independence)}
 
-\begin{conceptbox}{정보의 가치 평가}
+\begin{conceptbox}[title={정보의 가치 평가}]
 \begin{itemize}
     \item \textbf{정의:} $P(A \cap B) = P(A)P(B)$
     \item \textbf{의미:} $P(A|B) = P(A)$. 즉, "$B$를 알게 되어도 $A$에 대한 나의 믿음은 변하지 않는다."
@@ -727,7 +752,7 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 \end{itemize}
 \end{conceptbox}
 
-\begin{warningbox}{독립(Independent) vs 배반(Disjoint)}
+\begin{warningbox}[title={독립(Independent) vs 배반(Disjoint)}]
 이 둘을 절대 혼동하면 안 됩니다!
 \begin{itemize}
     \item \textbf{배반 (Disjoint):} $A$와 $B$는 겹치지 않음 ($A \cap B = \emptyset$).
@@ -791,11 +816,9 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 지금까지는 "앞면/뒷면", "성공/실패" 같은 사건(Event) 중심이었습니다. 하지만 "앞면이 100번 중 몇 번 나왔지?"처럼 숫자로 요약하고 싶을 때가 많습니다. \\
 다음 장 \textbf{Chapter 3: 이산 확률 변수(Discrete Random Variables)}에서는 사건을 숫자로 매핑하는 '확률 변수'와 'PMF'라는 강력한 도구를 만납니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 3: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 3: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture3}
@@ -804,7 +827,6 @@ Independent & 독립 & $B$를 아는 것이 $A$ 예측에 도움이 안 됨 ($P(
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -864,7 +886,7 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
 \section{핵심 개념 1: 확률 변수는 '함수'다}
 
 \subsection{확률 변수의 정의 (Mapping)}
-\begin{conceptbox}{Outcome $\to$ Number 변환기}
+\begin{conceptbox}[title={Outcome $\to$ Number 변환기}]
 \begin{itemize}
     \item \textbf{한 줄 요약:} 세상의 모든 결과(Outcome)에 꼬리표(숫자)를 붙이는 규칙입니다.
     \item \textbf{직관적 비유:} \textbf{자판기}입니다. 버튼(Outcome: 앞면, 앞면)을 누르면 음료수(Number: 2)가 나옵니다.
@@ -872,7 +894,7 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
 \end{itemize}
 \end{conceptbox}
 
-\begin{examplebox}{동전 2개 던지기}
+\begin{examplebox}[title={동전 2개 던지기}]
 \begin{itemize}
     \item 표본 공간 $\Omega = \{ HH, HT, TH, TT \}$ (4가지 결과)
     \item \textbf{확률 변수 $X$ 정의:} "앞면의 개수"
@@ -908,7 +930,7 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
     \item \textbf{비유:} 시소(See-saw)의 받침점. 확률(무게)이 큰 쪽으로 중심이 이동합니다.
 \end{itemize}
 
-\begin{toolbox}{기댓값의 선형성 (Linearity of Expectation)}
+\begin{toolbox}[title={기댓값의 선형성 (Linearity of Expectation)}]
 복잡한 문제를 푸는 마법의 열쇠입니다.
 \[ E[X + Y] = E[X] + E[Y] \]
 \textbf{중요:} $X$와 $Y$가 독립이 아니어도(상관 있어도) 무조건 성립합니다.
@@ -931,7 +953,7 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
 \section{핵심 개념 3: 주요 이산 분포 (Story Matching)}
 공식을 외우기 전에, 어떤 \textbf{상황(Story)}에서 이 분포를 쓰는지 파악해야 합니다.
 
-\begin{storybox}{1. 베르누이 \& 이항 분포 (Binomial)}
+\begin{storybox}[title={1. 베르누이 \& 이항 분포 (Binomial)}]
 \textbf{"동전 던지기의 반복"}
 \begin{itemize}
     \item \textbf{상황:} 성공 확률 $p$인 실험을 $n$번 독립적으로 반복했을 때, 성공 횟수 $X$.
@@ -940,7 +962,7 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
 \end{itemize}
 \end{storybox}
 
-\begin{storybox}{2. 기하 분포 (Geometric)}
+\begin{storybox}[title={2. 기하 분포 (Geometric)}]
 \textbf{"성공할 때까지 도전!" (존버 정신)}
 \begin{itemize}
     \item \textbf{상황:} 성공 확률 $p$인 실험을 \textbf{성공할 때까지} 계속할 때, 시도 횟수 $X$.
@@ -949,7 +971,7 @@ $\text{var}(X)$ & 분산 (Variance) & 중심으로부터 데이터가 얼마나 
 \end{itemize}
 \end{storybox}
 
-\begin{storybox}{3. 포아송 분포 (Poisson)}
+\begin{storybox}[title={3. 포아송 분포 (Poisson)}]
 \textbf{"매우 드문 사건의 카운팅"}
 \begin{itemize}
     \item \textbf{상황:} 이항 분포에서 횟수 $n \to \infty$, 확률 $p \to 0$인 극한 상황.
@@ -1020,11 +1042,9 @@ $X$(키)와 $Y$(몸무게)처럼 두 변수를 동시에 고려할 때는, 2차�
 지금까지는 1, 2, 3처럼 뚝뚝 끊어지는 '이산(Discrete)' 데이터만 다뤘습니다. 하지만 시간, 온도, 속도처럼 연속적으로 변하는 데이터는 어떻게 다룰까요? \\
 Unit 2에서는 $\sum$(더하기)가 $\int$(적분)으로 바뀌는 \textbf{연속 확률 변수(Continuous Random Variables)}의 세계로 넘어갑니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 4: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 4: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture4}
@@ -1033,7 +1053,6 @@ Unit 2에서는 $\sum$(더하기)가 $\int$(적분)으로 바뀌는 \textbf{연�
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -1098,7 +1117,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 \subsection{확률 밀도 함수 (PDF, $f_X(x)$)}
 [Image of Integration Area under Curve]
 
-\begin{conceptbox}{높이가 아니라 '면적'이 확률이다}
+\begin{conceptbox}[title={높이가 아니라 '면적'이 확률이다}]
 \begin{itemize}
     \item \textbf{한 줄 요약:} PDF 그래프의 $y$값(높이)은 확률이 아니라 '밀도'이며, 이를 구간으로 \textbf{적분(넓이)}해야 비로소 확률이 됩니다.
     \item \textbf{직관적 비유:} 금속 막대의 어느 한 점을 바늘로 찔렀을 때의 무게는 0입니다. 하지만 일정 길이(구간)를 잘라내면 무게(확률)가 생깁니다.
@@ -1107,7 +1126,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 \end{itemize}
 \end{conceptbox}
 
-\begin{warningbox}{점의 확률은 0이다 ($P(X=x)=0$)}
+\begin{warningbox}[title={점의 확률은 0이다 ($P(X=x)=0$)}]
 많은 분들이 가장 혼란스러워하는 부분입니다.
 \begin{itemize}
     \item 친구가 약속 장소에 "정확히 2.00000...초"에 도착할 확률은? \textbf{0입니다.}
@@ -1122,7 +1141,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 %===========================================================
 \section{핵심 개념 2: 주요 연속 분포 (Story Matching)}
 
-\begin{storybox}{1. 균등 분포 (Uniform): "정보 부재의 공평함"}
+\begin{storybox}[title={1. 균등 분포 (Uniform): "정보 부재의 공평함"}]
 \begin{itemize}
     \item \textbf{스토리:} 버스가 0분에서 10분 사이에 온다는 것만 알고, 다른 정보는 전혀 없을 때.
     \item \textbf{특징:} 그래프가 평평한 박스 모양입니다.
@@ -1130,7 +1149,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 \end{itemize}
 \end{storybox}
 
-\begin{storybox}{2. 지수 분포 (Exponential): "무기억성(Memoryless)"}
+\begin{storybox}[title={2. 지수 분포 (Exponential): "무기억성(Memoryless)"}]
 \begin{itemize}
     \item \textbf{스토리:} 콜센터 전화가 올 때까지 걸리는 대기 시간. (이산 기하 분포의 연속 버전)
     \item \textbf{핵심 성질 (무기억성):} "지난 30분 동안 전화가 안 왔다고 해서, 지금 당장 올 확률이 높아지는 건 아니다."
@@ -1139,7 +1158,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 \end{itemize}
 \end{storybox}
 
-\begin{storybox}{3. 정규 분포 (Normal): "세상의 모든 잡음(Noise)"}
+\begin{storybox}[title={3. 정규 분포 (Normal): "세상의 모든 잡음(Noise)"}]
 \begin{itemize}
     \item \textbf{스토리:} 키, 몸무게, 시험 점수, 측정 오차 등 수많은 작은 원인들이 합쳐진 결과.
     \item \textbf{중요성:} 중심극한정리(CLT)에 의해, 데이터가 충분히 많으면 세상 만사는 정규 분포(종 모양)를 따르게 됩니다.
@@ -1153,7 +1172,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 
 정규 분포 곡선 $e^{-x^2}$은 손으로 적분하는 것이 불가능합니다. 그래서 우리는 모든 정규 분포를 \textbf{표준 정규 분포($Z$)}로 변환하여 미리 계산된 표(Standard Normal Table)를 사용합니다.
 
-\begin{mathstep}{모든 정규 분포를 $N(0, 1)$로 만드는 마법}
+\begin{mathstep}[title={모든 정규 분포를 $N(0, 1)$로 만드는 마법}]
 변수 $X$가 평균 $\mu$, 표준편차 $\sigma$를 가질 때 ($X \sim N(\mu, \sigma^2)$):
 
 \textbf{1단계: Z-score 변환 (공식 암기 필수)}
@@ -1164,7 +1183,7 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 변환된 $Z$값을 이용해 표(CDF)에서 확률 $\Phi(Z)$를 찾습니다.
 \end{mathstep}
 
-\begin{examplebox}{수능 점수 계산}
+\begin{examplebox}[title={수능 점수 계산}]
 평균이 50점($\mu=50$), 표준편차가 10점($\sigma=10$)인 시험에서 70점 이상 받을 확률은?
 \begin{enumerate}
     \item \textbf{표준화:} $z = \frac{70 - 50}{10} = 2$. (나는 평균보다 2$\sigma$만큼 잘했다.)
@@ -1231,11 +1250,9 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 하나의 변수(키)만으로는 세상을 설명하기 부족합니다. 키($X$)와 몸무게($Y$)는 서로 관계가 있지 않을까요? \\
 다음 장 \textbf{Chapter 5: 다변수 연속 확률 변수}에서는 2차원 평면 위에서의 적분(이중 적분)과 상관관계(Correlation)를 다룹니다. "적분 기호가 두 개($\iint$)로 늘어납니다!"
 
-\newpage
-
 
 %=======================================================================
-% Chapter 5: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 5: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture5}
@@ -1244,7 +1261,6 @@ $Z$ & 표준 정규 분포 & 평균 0, 분산 1로 통일된 기준 정규 분�
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -1307,7 +1323,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
  
 
 \subsection{결합 PDF ($f_{X,Y}$): 확률은 부피다}
-\begin{conceptbox}{지형도(Surface)의 부피 구하기}
+\begin{conceptbox}[title={지형도(Surface)의 부피 구하기}]
 \begin{itemize}
     \item \textbf{한 줄 요약:} 평면의 땅($x,y$) 위에 확률이라는 흙을 쌓아 올린 산입니다.
     \item \textbf{직관적 비유:} 지도 위의 등고선. 특정 지역(A)에 비가 올 확률은 그 지역 위에 떠 있는 구름의 \textbf{부피}와 같습니다.
@@ -1334,7 +1350,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 
 두 변수 $X, Y$가 독립이라는 것은 $f_{X,Y}(x,y) = f_X(x)f_Y(y)$로 인수분해된다는 뜻입니다. 하지만 \textbf{수식만 보면 100\% 틀립니다.}
 
-\begin{warningbox}{기하학적 함정 (The Geometry Trap)}
+\begin{warningbox}[title={기하학적 함정 (The Geometry Trap)}]
 수식이 곱하기로 쪼개지더라도, \textbf{정의역(Support)의 모양}을 반드시 확인해야 합니다.
 \begin{itemize}
     \item \textbf{직사각형 (Rectangle):} $a \le x \le b, c \le y \le d$
@@ -1350,7 +1366,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
  
 \end{warningbox}
 
-\begin{examplebox}{삼각형 위에서의 균등 분포}
+\begin{examplebox}[title={삼각형 위에서의 균등 분포}]
 영역 $A = \{(x,y) | 0 \le y \le x \le 1\}$ (삼각형) 위에서 균등하게 분포하는 $(X,Y)$가 있습니다. 면적이 $1/2$이므로 높이(PDF)는 2입니다. ($f_{X,Y}(x,y)=2$)
 \begin{enumerate}
     \item \textbf{주변 PDF 구하기 ($f_X(x)$):}
@@ -1368,7 +1384,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 
 통계학의 패러다임 전환이 일어나는 구간입니다. 동전의 앞면 확률 $\Theta$를 고정된 상수($0.5$)가 아니라, \textbf{분포를 가진 확률 변수}로 바라봅니다.
 
-\begin{storybox}{로봇의 위치 추정 (Localization)}
+\begin{storybox}[title={로봇의 위치 추정 (Localization)}]
 로봇이 복도($X$)의 어딘가에 있습니다.
 \begin{enumerate}
     \item \textbf{Prior (사전 확률):} 로봇은 처음에 자신이 복도 중앙 쯤($\Theta \approx 5m$)에 있다고 믿습니다. (정규분포)
@@ -1377,7 +1393,7 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 \end{enumerate}
 \end{storybox}
 
-\begin{mathstep}{베이지안 추론의 3단계}
+\begin{mathstep}[title={베이지안 추론의 3단계}]
 \textbf{목표:} 관측 데이터 $x$를 보고 미지의 파라미터 $\Theta$의 분포를 찾아라.
 
 \[ f_{\Theta|X}(\theta|x) = \frac{f_\Theta(\theta) \cdot f_{X|\Theta}(x|\theta)}{f_X(x)} \]
@@ -1430,11 +1446,9 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 지금까지는 $X, Y$를 그대로 사용했습니다. 만약 $Z = X + Y$나 $W = X/Y$처럼 변수들을 지지고 볶아서 \textbf{새로운 변수}를 만들면, 그 변수의 PDF는 어떻게 될까요? \\
 다음 장 \textbf{Chapter 6: 파생 변수의 분포(Derived Distributions)}에서 미분의 반격, \textbf{야코비안(Jacobian)}이 등장합니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 6: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 6: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture6}
@@ -1443,7 +1457,6 @@ Posterior & 사후 확률 ($f_{\Theta|X}$) & 데이터를 본 후 수정된 파�
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -1507,11 +1520,10 @@ $E[X|Y]$ & 조건부 기댓값 & $Y$에 따라 값이 변하는 \textbf{확률 �
 입력 $X$가 함수 $g(X)$를 통과하면 $Y$의 분포는 어떻게 될까요? 단순히 $X$의 확률을 대입하면 안 됩니다. \textbf{공간이 왜곡(Stretch \& Squeeze)}되기 때문입니다.
 
 
-
 \subsection{2단계 접근법 (The 2-Step Method)}
 MIT에서 권장하는 가장 안전하고 강력한 풀이법입니다.
 
-\begin{mathstep}{CDF 먼저 구하고 미분하라!}
+\begin{mathstep}[title={CDF 먼저 구하고 미분하라!}]
 \textbf{1단계: CDF $F_Y(y)$ 구하기 (Accumulate)} \\
 $Y$의 사건을 $X$의 사건으로 번역합니다.
 \[ F_Y(y) = P(Y \le y) = P(g(X) \le y) = P(X \le g^{-1}(y)) \]
@@ -1525,7 +1537,7 @@ $Y$의 사건을 $X$의 사건으로 번역합니다.
 만약 $y=g(x)$가 1:1 대응이라면, 공식을 바로 쓸 수 있습니다.
 \[ f_Y(y) = f_X(x) \cdot \frac{1}{|g'(x)|} \]
 
-\begin{conceptbox}{밀가루 반죽 비유}
+\begin{conceptbox}[title={밀가루 반죽 비유}]
 \begin{itemize}
     \item 밀가루 반죽($X$)을 넓게 펴면($g'$이 큼), 두께(밀도)는 얇아집니다. $\to$ 나누기 $g'$
     \item 반죽을 좁게 뭉치면($g'$이 작음), 두께(밀도)는 두꺼워집니다.
@@ -1541,7 +1553,6 @@ $Y$의 사건을 $X$의 사건으로 번역합니다.
 $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼루션(Convolution)} 적분입니다.
 
 
-
 \subsection{분할 정복 논리}
 \begin{itemize}
     \item $X$가 $x$로 고정되었다고 칩시다.
@@ -1551,7 +1562,7 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼�
     \[ f_Z(z) = \int_{-\infty}^{\infty} f_X(x) f_Y(z-x) \, dx \]
 \end{itemize}
 
-\begin{conceptbox}{Flip and Drag (뒤집고 밀기)}
+\begin{conceptbox}[title={Flip and Drag (뒤집고 밀기)}]
 이 적분 식의 기하학적 의미입니다.
 \begin{enumerate}
     \item \textbf{Flip:} $f_Y$ 그래프를 y축 대칭시킵니다 ($x \to -x$).
@@ -1564,7 +1575,6 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼�
 % 8. 핵심 개념 3: 공분산과 상관계수
 %===========================================================
 \section{핵심 개념 3: 관계의 척도 (Correlation)}
-
 
 
 [Image of scatter plots with different correlation coefficients]
@@ -1580,7 +1590,7 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼�
     \end{itemize}
 \end{itemize}
 
-\begin{warningbox}{Uncorrelated $\neq$ Independent}
+\begin{warningbox}[title={Uncorrelated $\neq$ Independent}]
 가장 많이 틀리는 함정입니다.
 \begin{itemize}
     \item \textbf{Uncorrelated ($\rho=0$):} "직선 관계"가 없다는 뜻입니다.
@@ -1607,12 +1617,11 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼�
 \end{itemize}
 
 
-
 \subsection{반복 기댓값의 법칙 (Law of Iterated Expectations)}
 \[ E[E[X|Y]] = E[X] \]
 "부분의 평균들을 다시 평균 내면 전체 평균이 된다."
 
-\begin{mathstep}{LIE 사용법: Divide and Conquer}
+\begin{mathstep}[title={LIE 사용법: Divide and Conquer}]
 복잡한 $E[X]$를 구할 때:
 \begin{enumerate}
     \item 상황을 가르는 변수 $Y$를 찾습니다. (Divide)
@@ -1626,7 +1635,7 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼�
 %===========================================================
 \section{실전 응용: 금융 포트폴리오의 위험 관리}
 
-\begin{storybox}{주식 분산 투자의 원리}
+\begin{storybox}[title={주식 분산 투자의 원리}]
 당신이 주식 A와 B에 절반씩 투자해서 포트폴리오 $Z = 0.5X + 0.5Y$를 만들었습니다.
 \begin{itemize}
     \item 수익률($E[Z]$)은 단순 평균입니다.
@@ -1657,11 +1666,9 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼�
 지금까지는 한 번의 실험이나 고정된 시점의 확률을 다뤘습니다. 하지만 주식 가격이나 대기 행렬처럼 \textbf{시간에 따라 변하는 확률}은 어떻게 다룰까요? \\
 이제 Unit 3 \textbf{"확률 과정(Random Processes)"}으로 넘어가 베르누이 프로세스와 포아송 프로세스를 배웁니다. "시간($t$)이 변수로 들어옵니다!"
 
-\newpage
-
 
 %=======================================================================
-% Chapter 7: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 7: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture7}
@@ -1670,7 +1677,6 @@ $Z = X + Y$일 때, $Z$의 PDF는 단순한 합이 아닙니다. \textbf{컨볼�
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -1733,7 +1739,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 분포의 모양(PDF)을 몰라도, \textbf{평균($\mu$)}과 \textbf{분산($\sigma^2$)}만 안다면 확률의 한계(Limit)를 설정할 수 있습니다. 이것은 리스크 관리(Risk Management)의 기초입니다.
 
 \subsection{1. 마르코프 부등식 (Markov Inequality)}
-\begin{conceptbox}{평균의 시소 원리}
+\begin{conceptbox}[title={평균의 시소 원리}]
 \begin{itemize}
     \item \textbf{조건:} 데이터가 음수가 아닐 때 ($X \ge 0$).
     \item \textbf{직관:} 평균(무게중심)이 정해져 있다면, 아주 큰 값이 나올 확률은 작아야만 합니다. 그래야 시소가 균형을 잡으니까요.
@@ -1742,7 +1748,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 \end{itemize}
 \end{conceptbox}
 
-\begin{examplebox}{연봉 분포 미스터리}
+\begin{examplebox}[title={연봉 분포 미스터리}]
 어떤 회사의 평균 연봉이 5,000만 원이라는 것만 알고 있습니다. 이 회사에서 5억 원(평균의 10배) 이상 받는 사람은 최대 몇 명일까요?
 \begin{itemize}
     \item 정확한 분포는 모릅니다. 하지만 마르코프 부등식에 의해:
@@ -1752,7 +1758,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 \end{examplebox}
 
 \subsection{2. 체비셰프 부등식 (Chebyshev Inequality)}
-\begin{conceptbox}{분산이 알려주는 거리의 제약}
+\begin{conceptbox}[title={분산이 알려주는 거리의 제약}]
 \begin{itemize}
     \item \textbf{조건:} 모든 분포에 적용 가능. (분산 $\sigma^2$을 알 때)
     \item \textbf{직관:} 분산(퍼짐)이 작다면, 데이터는 평균 근처에 모여 있어야 합니다. 평균에서 멀리 떨어진 꼬리(Tail) 확률은 급격히 줄어듭니다.
@@ -1778,7 +1784,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
     \item 분산이 0이라는 뜻은, 분포가 평균 $\mu$ 한 점에 뾰족하게 모인다는 뜻입니다. (불확실성 소멸)
 \end{itemize}
 
-\begin{warningbox}{약법칙(Weak) vs 강법칙(Strong)}
+\begin{warningbox}[title={약법칙(Weak) vs 강법칙(Strong)}]
 \begin{itemize}
     \item \textbf{약법칙 (WLLN):} "오차가 발생할 확률이 0이 된다." (가끔 튀는 놈이 나올 수는 있지만, 그 가능성이 희박해짐)
     \item \textbf{강법칙 (SLLN):} "결과값 자체가 100\% 확률로 진실에 꽂힌다." (시뮬레이션 그래프가 진동하다가 결국 일직선이 됨)
@@ -1793,7 +1799,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 
 이 챕터의 하이라이트입니다. LLN이 "평균으로 간다"는 \textbf{위치}를 알려줬다면, CLT는 "\textbf{어떤 모양}으로 가는가?"를 알려줍니다.
 
-\begin{conceptbox}{모든 길은 정규 분포로 통한다}
+\begin{conceptbox}[title={모든 길은 정규 분포로 통한다}]
 원래 데이터가 이항 분포든, 균등 분포든, 지수 분포든 상관없습니다.
 \textbf{"독립적인 확률 변수들을 많이 더하면($S_n$) 그 합의 분포는 정규 분포($N$)에 가까워진다."}
 \end{conceptbox}
@@ -1802,7 +1808,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 \subsection{CLT 문제 해결 3단계 레시피}
 복잡한 합의 확률을 구해야 할 때, 다음 절차를 따르세요.
 
-\begin{mathstep}{표준화(Standardization) 후 근사}
+\begin{mathstep}[title={표준화(Standardization) 후 근사}]
 \textbf{상황:} $S_n = X_1 + \dots + X_n$ (합계)의 확률을 구하고 싶다.
 
 \textbf{1단계: 평균과 분산 계산}
@@ -1824,7 +1830,7 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 %===========================================================
 \section{실전 응용: 게임 서버 용량 설계 (Capacity Planning)}
 
-\begin{storybox}{넥슨 서버 개발자의 고민}
+\begin{storybox}[title={넥슨 서버 개발자의 고민}]
 신규 게임 출시를 앞두고 있습니다.
 \begin{itemize}
     \item 유저 1명의 접속 트래픽($X_i$)은 평균 10MB($\mu$), 표준편차 5MB($\sigma$)입니다. (분포는 모름, 아마도 지수 분포?)
@@ -1888,11 +1894,9 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 지금까지는 $n \to \infty$로 갈 때의 '분포'를 봤습니다. 이제 시간 $t$가 흐르면서 사건이 발생하는 \textbf{'과정(Process)'}을 다룹니다. \\
 다음 장 \textbf{Chapter 8: 베르누이와 포아송 프로세스}에서는 "동전을 영원히 던지는 상황"과 "콜센터 전화가 계속 오는 상황"을 모델링합니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 8: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 8: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture8}
@@ -1901,7 +1905,6 @@ CLT & 중심 극한 정리 & "많이 합치면 종 모양(정규 분포)이 된�
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -1963,8 +1966,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 \section{핵심 개념 1: 디지털 시계의 심장박동 (Bernoulli)}
 
 
-
-\begin{conceptbox}{정의: 매 순간의 동전 던지기}
+\begin{conceptbox}[title={정의: 매 순간의 동전 던지기}]
 시간 $t=1, 2, 3, \dots$ 마다 독립적으로 성공($p$) 또는 실패($1-p$)가 결정됩니다.
 \begin{itemize}
     \item \textbf{핵심 성질 (Fresh Start):} 매 슬롯은 독립입니다. 과거에 실패가 100번 연속 나왔어도, 이번 슬롯의 성공 확률은 여전히 $p$입니다. (도박사의 오류 방지)
@@ -1995,7 +1997,6 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 \section{핵심 개념 2: 빗방울처럼 떨어지는 사건들 (Poisson)}
 
 
-
 베르누이 과정의 시간 슬롯을 $\Delta \to 0$으로 아주 잘게 쪼개면 \textbf{포아송 과정}이 됩니다.
 \begin{itemize}
     \item $p$는 아주 작아지고, $n$은 아주 커지지만, 곱($np$)은 $\lambda t$로 일정하게 유지됩니다.
@@ -2006,7 +2007,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 이 표를 머릿속에 넣는 것이 이번 단원의 목표입니다. 이산과 연속은 쌍둥이입니다.
 
 \begin{center}
-\renewcommand{\arraystretch}{1.5}
+
 \begin{tabular}{c|c|c}
 \toprule
 \rowcolor{subgray} \textbf{질문 (Perspective)} & \textbf{베르누이 (Discrete)} & \textbf{포아송 (Continuous)} \\ \midrule
@@ -2018,7 +2019,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 \end{tabular}
 \end{center}
 
-\begin{warningbox}{기하 분포와 지수 분포의 관계}
+\begin{warningbox}[title={기하 분포와 지수 분포의 관계}]
 기하 분포의 막대 그래프 폭을 아주 좁게 만들면 지수 분포의 매끄러운 곡선이 됩니다.
 둘 다 \textbf{"무기억성(Memoryless)"}을 가지는 유일한 분포들입니다.
 \end{conceptbox}
@@ -2030,7 +2031,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 
 여러 개의 확률 흐름(Stream)이 만날 때 어떤 일이 벌어질까요?
 
-\begin{systembox}{1. 병합 (Merging)}
+\begin{systembox}[title={1. 병합 (Merging)}]
 
 \begin{itemize}
     \item \textbf{상황:} PC 접속자 흐름($\lambda_1$)과 모바일 접속자 흐름($\lambda_2$)이 서버로 들어옵니다.
@@ -2040,7 +2041,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 \end{itemize}
 \end{systembox}
 
-\begin{systembox}{2. 분할 (Splitting)}
+\begin{systembox}[title={2. 분할 (Splitting)}]
 
 \begin{itemize}
     \item \textbf{상황:} 전체 트래픽($\lambda$) 중 스팸 메일을 확률 $p$로 걸러냅니다.
@@ -2059,7 +2060,7 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 %===========================================================
 \section{실전 응용: 게임 아이템과 서버 관리}
 
-\begin{storybox}{Nexon 게임 기획 및 서버 운영}
+\begin{storybox}[title={Nexon 게임 기획 및 서버 운영}]
 \textbf{상황 1: 아이템 강화 (베르누이 - Timing)}
 강화 성공 확률이 1\%($p=0.01$)입니다. 유저가 성공할 때까지 평균 몇 번 시도해야 할까요?
 \begin{itemize}
@@ -2095,11 +2096,9 @@ Splitting & 분할 & 하나의 흐름을 확률 $p$로 두 갈래로 나누는 �
 지금까지는 과거가 미래에 영향을 주지 않는(Memoryless) 특수한 상황만 다뤘습니다. 하지만 현실에서는 \textbf{"오늘 비가 오면 내일 비가 올 확률이 높다"}처럼 과거 상태가 미래에 영향을 줍니다. \\
 Unit 3의 마지막 장 \textbf{Chapter 9: 마르코프 체인(Markov Chains)}에서는 "바로 직전의 과거(State)"가 미래를 결정하는 조금 더 현실적인 모델을 배웁니다.
 
-\newpage
-
 
 %=======================================================================
-% Chapter 9: 📚 이 교재의 전체 구조 (Roadmap)
+% Lecture 9: 📚 이 교재의 전체 구조 (Roadmap)
 %=======================================================================
 \chapter{📚 이 교재의 전체 구조 (Roadmap)}
 \label{ch:lecture9}
@@ -2108,7 +2107,6 @@ Unit 3의 마지막 장 \textbf{Chapter 9: 마르코프 체인(Markov Chains)}�
 % 1. 전체 목차 (TOC) - 구조 명시
 %===========================================================
 
-\newpage
 
 \section*{📚 이 교재의 전체 구조 (Roadmap)}
 \begin{itemize}
@@ -2172,7 +2170,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 [Image of Markov Chain state transition diagram with 3 nodes and arrows]
 
 \subsection{마르코프 성질 (The Markov Property)}
-\begin{conceptbox}{과거 세탁의 원칙}
+\begin{conceptbox}[title={과거 세탁의 원칙}]
 \begin{itemize}
     \item \textbf{정의:} 내일의 상태($X_{n+1}$)를 예측하는 데 필요한 정보는 오직 오늘($X_n$)뿐입니다. 어제($X_{n-1}$) 날씨가 어땠는지는 상관없습니다.
     \item \textbf{수식:}
@@ -2204,7 +2202,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
     \item \textbf{흡수 (Absorbing):} 나한테서 나로 가는 확률이 100\%($p_{ii}=1$)인 재귀 상태. (블랙홀)
 \end{itemize}
 
-\begin{warningbox}{접근 가능성(Accessibility) 체크}
+\begin{warningbox}[title={접근 가능성(Accessibility) 체크}]
 서로 왔다 갔다 할 수 있는 상태끼리 묶어서 '클래스(Class)'라고 부릅니다.
 마르코프 체인 문제를 풀 땐 가장 먼저 \textbf{"전체 시스템이 몇 개의 덩어리(Recurrent Classes)로 쪼개져 있는가?"}를 파악해야 합니다.
 \end{warningbox}
@@ -2219,7 +2217,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 \subsection{평형 방정식 (Balance Equations)}
 수조의 물 높이가 일정하다면, \textbf{"들어오는 물 = 나가는 물"}이어야 합니다.
 
-\begin{conceptbox}{Global Balance Equation}
+\begin{conceptbox}[title={Global Balance Equation}]
 상태 $j$에 대해:
 \[ \pi_j = \sum_{k} \pi_k p_{kj} \]
 \textbf{(나가는 양) = (들어오는 양의 합)}
@@ -2229,7 +2227,7 @@ $\pi_j$ & 정상 상태 확률 & 먼 미래($n \to \infty$)에 내가 $j$에 있
 \end{itemize}
 \end{conceptbox}
 
-\begin{mathstep}{정상 상태($\pi$) 구하는 법}
+\begin{mathstep}[title={정상 상태($\pi$) 구하는 법}]
 \begin{enumerate}
     \item \textbf{연립 방정식 세우기:} 모든 상태 $j$에 대해 $\pi_j = \sum \pi_k p_{kj}$를 씁니다.
     \item \textbf{정규화 조건 추가:} 위 식만으로는 해가 안 나옵니다. 반드시 아래 식을 추가하세요.
@@ -2260,7 +2258,7 @@ MIT 6.431에서 가장 우아하고 강력한 문제 해결 테크닉입니다. 
 
 [Image of User Funnel Markov Chain: Install -> Tutorial -> Play -> Purchase or Churn]
 
-\begin{storybox}{Nexon 모바일 게임 유저 분석}
+\begin{storybox}[title={Nexon 모바일 게임 유저 분석}]
 유저의 상태를 다음과 같이 정의합니다.
 \begin{itemize}
     \item 상태 1: 튜토리얼 (시작)
@@ -2302,8 +2300,6 @@ MIT 6.431에서 가장 우아하고 강력한 문제 해결 테크닉입니다. 
 우리는 \textbf{불확실성을 집합으로 정의}하는 것부터 시작해(Unit 1), \textbf{확률 변수라는 함수}로 세상을 모델링하고(Unit 2), 무한한 데이터 속에서 \textbf{극한의 법칙}을 발견하고, 마지막으로 \textbf{시간에 따른 변화(Process)}까지 다루었습니다(Unit 3).
 
 이제 여러분은 "불확실한 세상"을 두려워하는 것이 아니라, \textbf{수학적 모델로 구조화하고 예측할 수 있는 눈}을 가지게 되었습니다. 이 지식은 머신러닝, 통계, 금융, 공학 어디서든 가장 든든한 무기가 될 것입니다.
-
-\newpage
 
 
 \end{document}

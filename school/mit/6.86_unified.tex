@@ -10,23 +10,24 @@
 %========================================================================================
 
 \usepackage{kotex}
-\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
-\usepackage{amsmath, amssymb, amsthm}
-\usepackage{graphicx}
+% --- 표 관련 ---
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{adjustbox}
+\usepackage{colortbl}
 \renewcommand{\arraystretch}{1.1}
 
-\usepackage{enumitem}
-\setlist{nosep, leftmargin=*, itemsep=0.3em}
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -35,7 +36,288 @@
 \fancyhead[LO]{\leftmark}
 \fancyhead[RE]{6.86}
 \renewcommand{\headrulewidth}{0.5pt}
-\setlength{\headheight}{15pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+%========================================================================================
+% 색상 정의
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+% MIT/Harvard 추가 색상
+\definecolor{mainblue}{RGB}{50, 80, 150}
+\definecolor{subgray}{RGB}{180, 180, 180}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{boxbgcolor}{RGB}{245, 245, 250}
+
+% Stanford CS230 스타일 색상
+\definecolor{myblue}{RGB}{50, 100, 180}
+\definecolor{sblue}{RGB}{70, 130, 180}
+\definecolor{wgray}{RGB}{245, 245, 245}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%========================================================================================
+% 박스 환경
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=주의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=개념,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced,
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=비유,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+% mybox 환경 (UIUC용)
+\newtcolorbox{mybox}[1]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title={#1},
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable
+}
+
+% 추가 환경 (Gemini 생성 콘텐츠에서 사용)
+\newtcolorbox{tipbox}[1][]{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=팁, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{solutionbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=풀이, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{downloadbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=다운로드, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{practicebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=연습, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keypointbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=핵심 포인트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{storybox}[1][]{enhanced, colback=lightyellow, colframe=darkorange!80!black, fonttitle=\bfseries, title=이야기, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathstep}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학 단계, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{systembox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=시스템, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{toolbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=도구, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{bayesbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=베이즈, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{formulabox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=공식, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{strategybox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=전략, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{diagnosisbox}[1][]{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=진단, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{featurebox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=특징, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{faqbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=FAQ, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{notebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=노트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{codeexamplebox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=코드 예제, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keyconceptbox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 개념, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{termbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=용어, arc=2mm, boxrule=0.7pt, breakable, #1}
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% 커스텀 명령어 (Gemini 생성 콘텐츠에서 사용)
+\newcommand{\excel}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\concept}[1]{\textbf{#1}}
+\newcommand{\formula}[1]{\textit{#1}}
+\providecommand{\captionof}[2]{\textbf{#2}}
+\newcommand{\chaptertitle}[2]{\section*{#1: #2}}
+\providecommand{\newsection}{\section}
+
+%========================================================================================
+% 코드 블록
+%========================================================================================
+
+\usepackage{listings}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{
+    style=mystyle,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[chapter]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[chapter]
+\newtheorem{example}{예제}[chapter]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
 
 \usepackage[
     colorlinks=true,
@@ -46,56 +328,40 @@
 ]{hyperref}
 
 %========================================================================================
-% 색상 정의
+% 기타
 %========================================================================================
 
-\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
 
-\definecolor{mainblue}{RGB}{0, 51, 102}
-\definecolor{subblue}{RGB}{230, 240, 255}
-\definecolor{warningred}{RGB}{204, 0, 0}
-\definecolor{conceptgreen}{RGB}{0, 102, 51}
-\definecolor{storypurple}{RGB}{102, 0, 102}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{url}
+\urlstyle{same}
 
 %========================================================================================
-% 박스 환경 (tcolorbox)
+% 메타 정보 박스 명령어
 %========================================================================================
 
-\usepackage[most]{tcolorbox}
-\tcbuselibrary{skins, breakable}
-
-\newtcolorbox{summarybox}[1]{
-  colback=subblue, colframe=mainblue, 
-  title=\textbf{#1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+\textbf{강의명:} & #1 \\[0.3em]
+\textbf{주차:} & #2 \\[0.3em]
+\textbf{교수명:} & #3 \\[0.3em]
+\textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
 }
-
-\newtcolorbox{warningbox}[1]{
-  colback=white, colframe=warningred, 
-  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=0mm,
-  coltitle=white
-}
-
-\newtcolorbox{conceptbox}[1]{
-  colback=white, colframe=conceptgreen, 
-  title=\textbf{💡 #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm,
-  coltitle=white
-}
-
-\newtcolorbox{storybox}[1]{
-  colback=white, colframe=storypurple, 
-  title=\textbf{🎬 #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm,
-  coltitle=white
-}
-
-%========================================================================================
-% 사용자 정의 명령어
-%========================================================================================
-
-
 
 %========================================================================================
 % 문서 시작
@@ -109,11 +375,10 @@
 
 \maketitle
 \tableofcontents
-\newpage
 
 
 %=======================================================================
-% Chapter 1: MIT 6.86x: 예측의 미학
+% Lecture 1: MIT 6.86x: 예측의 미학
 %=======================================================================
 \chapter{MIT 6.86x: 예측의 미학}
 \label{ch:lecture1}
@@ -137,7 +402,6 @@
     \item Unit 3: Neural Networks
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 1. 학습의 기초 (Fundamentals of Learning)}
@@ -178,7 +442,7 @@
 \subsection{1. 학습 문제의 정의 (Formalizing the Problem)}
 
 
-\begin{conceptbox}{개념 1: 함수 근사 (Function Approximation)}
+\begin{conceptbox}[title={개념 1: 함수 근사 (Function Approximation)}]
 \textbf{한 줄 요약:} 머신러닝은 입력($x$)과 출력($y$) 사이의 숨겨진 관계식($f^*$)을 데이터($S_n$)를 통해 역추적하는 과정입니다.
 \end{conceptbox}
 
@@ -202,7 +466,7 @@
 
 \subsection{2. 가설 공간 (Hypothesis Space, $\mathcal{H}$)}
 
-\begin{conceptbox}{개념 2: 수색 범위 설정}
+\begin{conceptbox}[title={개념 2: 수색 범위 설정}]
 \textbf{한 줄 요약:} "세상의 모든 함수" 중에서 정답을 찾을 수는 없습니다. "직선 중에서 찾자" 혹은 "곡선 중에서 찾자"처럼 탐색 범위를 제한해야 합니다.
 \end{conceptbox}
 
@@ -223,7 +487,7 @@
 
 \subsection{3. 지도 학습 vs 비지도 학습}
 
-\begin{conceptbox}{개념 3: 정답지의 유무}
+\begin{conceptbox}[title={개념 3: 정답지의 유무}]
 \textbf{한 줄 요약:} 문제집 뒤에 해설지가 있으면 지도 학습, 해설지 없이 문제들의 유형을 스스로 정리해야 하면 비지도 학습입니다.
 \end{conceptbox}
 
@@ -245,7 +509,7 @@
 \subsection{4. 일반화 (Generalization)}
 
 
-\begin{conceptbox}{개념 4: 머신러닝의 존재 이유}
+\begin{conceptbox}[title={개념 4: 머신러닝의 존재 이유}]
 \textbf{한 줄 요약:} 연습문제(Training Data)를 100점 맞는 건 의미 없습니다. 실전 수능(Unseen Data)을 잘 보는 것이 진짜 목표입니다.
 \end{conceptbox}
 
@@ -268,7 +532,7 @@
 
 \section{실전 시나리오: 넥슨 게임 이탈자 예측}
 
-\begin{storybox}{Scenario: 완벽한 예측 모델의 함정}
+\begin{storybox}[title={Scenario: 완벽한 예측 모델의 함정}]
 당신은 유저 이탈 예측 모델을 만들었습니다.
 과거 1년 치 데이터($S_n$)로 학습시켰더니, 정확도 99.9\%($E_{in} \approx 0$)가 나왔습니다.
 "완벽해!"라고 외치며 실 서버에 배포했습니다.
@@ -302,7 +566,7 @@
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 1 핵심 요약}
+\begin{summarybox}[title={Unit 1 핵심 요약}]
 \begin{itemize}
     \item \textbf{목표:} 데이터($S_n$)를 이용해 미지의 함수 $f^*$에 근사하는 $h$를 찾는다.
     \item \textbf{가설 공간($\mathcal{H}$):} 탐색 범위를 제한하는 것. 필연적으로 편견(Bias)을 동반한다.
@@ -311,11 +575,9 @@
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 2: MIT 6.86x: 딥러닝의 시작점
+% Lecture 2: MIT 6.86x: 딥러닝의 시작점
 %=======================================================================
 \chapter{MIT 6.86x: 딥러닝의 시작점}
 \label{ch:lecture2}
@@ -339,7 +601,6 @@
     \item Unit 3: Neural Networks (선형 분류기의 적층)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 2. 선형 분류기 (Linear Classifiers)}
@@ -379,10 +640,9 @@
 % 6. 핵심 개념 상세 설명
 \subsection{1. 기하학적 구조: 결정 경계 (Decision Boundary)}
 
-\begin{conceptbox}{개념 1: 공간을 가르는 칼}
+\begin{conceptbox}[title={개념 1: 공간을 가르는 칼}]
 \textbf{한 줄 요약:} 법선 벡터 $\theta$는 "정답(Positive)이 있는 방향"을 가리키고, 초평면은 그 $\theta$에 수직인 벽입니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{1) 초평면 (Hyperplane)}
@@ -401,7 +661,7 @@ $\theta$는 단순한 기울기가 아닙니다. 초평면과 \textbf{수직(Ort
 
 \subsection{2. 퍼셉트론 알고리즘 (Perceptron Algorithm)}
 
-\begin{conceptbox}{개념 2: 실수에서 배운다 (Mistake Driven)}
+\begin{conceptbox}[title={개념 2: 실수에서 배운다 (Mistake Driven)}]
 \textbf{한 줄 요약:} 맞추면 가만히 있고, 틀렸을 때만 $\theta$를 수정합니다.
 \end{conceptbox}
 
@@ -424,10 +684,9 @@ $$ \theta_{new} = \theta_{old} + y^{(i)} x^{(i)} $$
 
 \subsection{3. 업데이트의 기하학적 해석 (Geometric Intuition)}
 
-\begin{conceptbox}{개념 3: 벡터의 회전}
+\begin{conceptbox}[title={개념 3: 벡터의 회전}]
 \textbf{한 줄 요약:} $\theta$에 $x$를 더하면, 벡터의 합 원리에 의해 $\theta$가 $x$ 쪽으로 회전합니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{상황 분석}
@@ -447,10 +706,9 @@ $$ \theta_{new} = \theta_{old} + y^{(i)} x^{(i)} $$
 
 \subsection{4. 선형 분리 가능성 (Linear Separability)}
 
-\begin{conceptbox}{개념 4: 자 하나로 가를 수 있는가?}
+\begin{conceptbox}[title={개념 4: 자 하나로 가를 수 있는가?}]
 \textbf{한 줄 요약:} 직선 하나로 Red팀과 Blue팀을 완벽히 나눌 수 있어야만 퍼셉트론이 작동합니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{한계: XOR 문제}
@@ -461,10 +719,9 @@ $$ \theta_{new} = \theta_{old} + y^{(i)} x^{(i)} $$
 
 \subsection{5. 퍼셉트론 수렴 정리 (Perceptron Convergence Theorem)}
 
-\begin{conceptbox}{개념 5: 언제 끝나는가?}
+\begin{conceptbox}[title={개념 5: 언제 끝나는가?}]
 \textbf{한 줄 요약:} 데이터가 선형 분리만 가능하다면, 퍼셉트론은 유한한 횟수 내에 반드시 정답을 찾습니다. 그 횟수는 "도로 폭($\gamma$)"에 달려 있습니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{핵심 변수}
@@ -485,7 +742,7 @@ $$ k \le \left( \frac{R}{\gamma} \right)^2 $$
 
 \section{실전 시나리오: 스팸 메일 필터}
 
-\begin{storybox}{Scenario: 초기 스팸 필터}
+\begin{storybox}[title={Scenario: 초기 스팸 필터}]
 당신은 1990년대 개발자입니다. "광고"라는 단어가 들어가면 스팸($+1$), 아니면 정상($-1$)인 분류기를 만듭니다.
 \end{storybox}
 
@@ -519,7 +776,7 @@ $$ k \le \left( \frac{R}{\gamma} \right)^2 $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 2 핵심 요약}
+\begin{summarybox}[title={Unit 2 핵심 요약}]
 \begin{itemize}
     \item \textbf{구조:} $\text{sign}(\theta \cdot x)$. $\theta$는 초평면의 법선 벡터다.
     \item \textbf{알고리즘:} $\theta_{new} = \theta + yx$. 틀린 데이터를 더해서 벡터를 회전시킨다.
@@ -528,11 +785,9 @@ $$ k \le \left( \frac{R}{\gamma} \right)^2 $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 3: MIT 6.86x: 가장 안전한 경계선
+% Lecture 3: MIT 6.86x: 가장 안전한 경계선
 %=======================================================================
 \chapter{MIT 6.86x: 가장 안전한 경계선}
 \label{ch:lecture3}
@@ -555,7 +810,6 @@ $$ k \le \left( \frac{R}{\gamma} \right)^2 $$
     \item Unit 4: Feature Engineering (비선형 데이터 다루기)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 3. 마진 최대화와 SVM (Maximum Margin \& SVM)}
@@ -594,7 +848,7 @@ $$ k \le \left( \frac{R}{\gamma} \right)^2 $$
 \subsection{1. 힌지 손실 (Hinge Loss)}
 
 
-\begin{conceptbox}{개념 1: 턱걸이는 인정하지 않는다}
+\begin{conceptbox}[title={개념 1: 턱걸이는 인정하지 않는다}]
 \textbf{한 줄 요약:} 정답을 맞췄더라도, 경계선에서 충분히 멀리 떨어져 있지 않으면(확신이 없으면) 벌점을 부과합니다.
 \end{conceptbox}
 
@@ -618,7 +872,7 @@ $$ Loss(y, z) = \max(0, 1 - yz), \quad (z = \theta \cdot x) $$
 \subsection{2. SVM의 목적 함수 (Primal Formulation)}
 
 
-\begin{conceptbox}{개념 2: 도로 확장 공사}
+\begin{conceptbox}[title={개념 2: 도로 확장 공사}]
 \textbf{한 줄 요약:} 도로의 폭(Margin)을 넓히는 것은 수학적으로 법선 벡터의 길이 $\|\theta\|$를 줄이는 것과 같습니다.
 \end{conceptbox}
 
@@ -638,7 +892,7 @@ $$ \text{subject to } y^{(i)}(\theta \cdot x^{(i)} + \theta_0) \ge 1 \quad (\for
 
 \subsection{3. 정칙화 (Regularization)와 Soft Margin}
 
-\begin{conceptbox}{개념 3: 융통성 있는 보안관}
+\begin{conceptbox}[title={개념 3: 융통성 있는 보안관}]
 \textbf{한 줄 요약:} 완벽한 분리가 불가능할 때, "도로를 침범하는 것"을 일부 허용하되 벌금을 물려서 균형을 맞춥니다.
 \end{conceptbox}
 
@@ -663,7 +917,7 @@ $\lambda$는 "마진(안전)"을 얼마나 중요하게 생각하는지 나타�
 
 \section{실전 시나리오: 자율주행 차선 인식}
 
-\begin{storybox}{Scenario: 넥슨 카트라이더 자율주행 모드}
+\begin{storybox}[title={Scenario: 넥슨 카트라이더 자율주행 모드}]
 당신은 카트라이더의 AI 주행 보조 시스템을 개발합니다. 트랙 위에서 "주행 가능 구역(Positive)"과 "벽/장애물(Negative)"을 구분해야 합니다.
 \end{storybox}
 
@@ -701,7 +955,7 @@ $\lambda$는 "마진(안전)"을 얼마나 중요하게 생각하는지 나타�
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 3 핵심 요약}
+\begin{summarybox}[title={Unit 3 핵심 요약}]
 \begin{itemize}
     \item \textbf{목표:} 단순 분류가 아니라, 가장 안전한 분류(Max Margin)를 한다.
     \item \textbf{Hinge Loss:} $\max(0, 1-yz)$. 1 이상의 여유를 갖고 맞추도록 강제한다.
@@ -710,11 +964,9 @@ $\lambda$는 "마진(안전)"을 얼마나 중요하게 생각하는지 나타�
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 4: MIT 6.86x: 가장 낮은 곳을 향하여
+% Lecture 4: MIT 6.86x: 가장 낮은 곳을 향하여
 %=======================================================================
 \chapter{MIT 6.86x: 가장 낮은 곳을 향하여}
 \label{ch:lecture4}
@@ -737,7 +989,6 @@ $\lambda$는 "마진(안전)"을 얼마나 중요하게 생각하는지 나타�
     \item Unit 5: Non-linear Classification (Neural Nets)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 4. 최적화 방법론 (Optimization)}
@@ -777,10 +1028,9 @@ $\lambda$는 "마진(안전)"을 얼마나 중요하게 생각하는지 나타�
 % 6. 핵심 개념 상세 설명
 \subsection{1. 경사 하강법 (Gradient Descent, GD)}
 
-\begin{conceptbox}{개념 1: 안개 낀 산에서 내려오기}
+\begin{conceptbox}[title={개념 1: 안개 낀 산에서 내려오기}]
 \textbf{한 줄 요약:} 현재 위치에서 발밑을 더듬어 경사가 가장 급한 쪽으로 한 걸음씩 내려갑니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{1) 알고리즘}
@@ -802,7 +1052,7 @@ $$ \theta_{t+1} = \theta_t - \eta \nabla_\theta J(\theta_t) $$
 
 \subsection{2. 확률적 경사 하강법 (Stochastic Gradient Descent, SGD)}
 
-\begin{conceptbox}{개념 2: 술 취한 사람의 귀가}
+\begin{conceptbox}[title={개념 2: 술 취한 사람의 귀가}]
 \textbf{한 줄 요약:} 전체의 의견을 듣지 않고, 지나가는 사람(데이터) 한 명 붙잡고 길을 물어서 갑니다. 비틀거리지만(Noisy), 결국 집(최적해)으로 갑니다.
 \end{conceptbox}
 
@@ -826,10 +1076,9 @@ $$ \mathbb{E}[\nabla Loss(x^{(i)})] = \nabla J(\theta) $$
 
 \subsection{3. SGD의 수렴성과 학습률 스케줄링}
 
-\begin{conceptbox}{개념 3: 멈추는 법을 배워라}
+\begin{conceptbox}[title={개념 3: 멈추는 법을 배워라}]
 \textbf{한 줄 요약:} GD는 바닥에 오면 알아서 멈추지만, SGD는 바닥에서도 계속 진동합니다. 따라서 갈수록 보폭($\eta$)을 줄여야 합니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{1) GD vs SGD의 경로 비교}
@@ -850,7 +1099,7 @@ SGD가 수학적으로 수렴하기 위한 학습률 $\eta_t$의 조건입니다
 
 \section{실전 시나리오: 넷플릭스 추천 시스템 학습}
 
-\begin{storybox}{Scenario: 수억 명의 시청 기록 학습}
+\begin{storybox}[title={Scenario: 수억 명의 시청 기록 학습}]
 당신은 전 세계 2억 명의 유저 데이터를 이용해 추천 알고리즘을 학습시킵니다.
 \end{storybox}
 
@@ -895,7 +1144,7 @@ SGD가 수학적으로 수렴하기 위한 학습률 $\eta_t$의 조건입니다
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 4 핵심 요약}
+\begin{summarybox}[title={Unit 4 핵심 요약}]
 \begin{itemize}
     \item \textbf{Gradient Descent (GD):} 전체 데이터 사용. 안정적이지만 $O(n)$으로 느리다.
     \item \textbf{Stochastic GD (SGD):} 데이터 1개 사용. $O(1)$로 빠르지만 불안정(Noisy)하다.
@@ -904,11 +1153,9 @@ SGD가 수학적으로 수렴하기 위한 학습률 $\eta_t$의 조건입니다
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 5: MIT 6.86x: 데이터를 조각하는 기술
+% Lecture 5: MIT 6.86x: 데이터를 조각하는 기술
 %=======================================================================
 \chapter{MIT 6.86x: 데이터를 조각하는 기술}
 \label{ch:lecture5}
@@ -932,7 +1179,6 @@ SGD가 수학적으로 수렴하기 위한 학습률 $\eta_t$의 조건입니다
     \item Unit 3: Neural Networks (특징을 스스로 학습하기)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 2 (Part B). 특징 공학 (Feature Engineering)}
@@ -973,7 +1219,7 @@ SGD가 수학적으로 수렴하기 위한 학습률 $\eta_t$의 조건입니다
 \subsection{1. 비선형성 (Non-linearity)의 필요성}
 
 
-\begin{conceptbox}{개념 1: 직선의 한계}
+\begin{conceptbox}[title={개념 1: 직선의 한계}]
 \textbf{한 줄 요약:} 동그라미 안에 있는 점과 밖에 있는 점은 자 하나로 가를 수 없습니다. 가위(비선형 모델)가 필요하거나, 종이를 접어야(특징 변환) 합니다.
 \end{conceptbox}
 
@@ -988,7 +1234,7 @@ SGD가 수학적으로 수렴하기 위한 학습률 $\eta_t$의 조건입니다
 
 \subsection{2. 특징 변환 (Feature Mapping)}
 
-\begin{conceptbox}{개념 2: 차원 띄우기 (Lifting)}
+\begin{conceptbox}[title={개념 2: 차원 띄우기 (Lifting)}]
 \textbf{한 줄 요약:} 2차원 바닥에 흩어진 구슬들을 3차원 공중으로 띄우면, 그 사이로 판(평면)을 끼워 넣을 수 있습니다.
 \end{conceptbox}
 
@@ -1013,7 +1259,7 @@ $$ \theta \cdot x + \theta_0 \quad \xrightarrow{\text{Transformation}} \quad \th
 
 \subsection{3. 다항식 특징 (Polynomial Features)}
 
-\begin{conceptbox}{개념 3: 곱셈으로 특징 만들기}
+\begin{conceptbox}[title={개념 3: 곱셈으로 특징 만들기}]
 \textbf{한 줄 요약:} 원래 변수들을 서로 곱해서($x_1^2, x_1 x_2$) 새로운 정보를 만들어냅니다.
 \end{conceptbox}
 
@@ -1035,7 +1281,7 @@ $$ w_0 + w_1 x_1 + w_2 x_2 + w_3 x_1^2 + w_4 x_2^2 + w_5 x_1 x_2 = 0 $$
 
 \subsection{4. 장점과 주의점 (The Trade-off)}
 
-\begin{conceptbox}{개념 4: 공짜 점심은 없다}
+\begin{conceptbox}[title={개념 4: 공짜 점심은 없다}]
 \textbf{한 줄 요약:} 표현력(Power)이 좋아지지만, 그만큼 계산 비용과 과적합(Overfitting) 위험이 폭증합니다.
 \end{conceptbox}
 
@@ -1048,7 +1294,7 @@ $$ D \approx d^Q $$
     \item \textbf{통계적 문제:} 변수가 100만 개인데 데이터가 1만 개라면? $\rightarrow$ $p \gg n$ 문제 발생 $\rightarrow$ \textbf{과적합(Overfitting)}.
 \end{itemize}
 
-\begin{warningbox}{커널 트릭 (Kernel Trick) 예고}
+\begin{warningbox}[title={커널 트릭 (Kernel Trick) 예고}]
 "특징 개수가 100만 개라도, 실제로 $\phi(x)$를 계산하지 않고 내적값 $\phi(x) \cdot \phi(y)$만 빠르게 구할 수 있다면?"
 이것이 다음 단원에서 배울 \textbf{SVM 커널 트릭}의 핵심 아이디어입니다.
 \end{warningbox}
@@ -1057,7 +1303,7 @@ $$ D \approx d^Q $$
 
 \section{실전 시나리오: 불법 프로그램(핵) 사용자 탐지}
 
-\begin{storybox}{Scenario: 넥슨 FPS 게임 '서든어택'의 에임봇 탐지}
+\begin{storybox}[title={Scenario: 넥슨 FPS 게임 '서든어택'의 에임봇 탐지}]
 당신은 보안팀입니다. 유저의 마우스 움직임 데이터를 분석해 '에임봇(Auto-aim)' 사용자를 잡고 싶습니다.
 \end{storybox}
 
@@ -1096,7 +1342,7 @@ $$ D \approx d^Q $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 2 (Part B) 핵심 요약}
+\begin{summarybox}[title={Unit 2 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{문제:} 현실 데이터는 직선 하나로 나뉘지 않는다 (Non-linear).
     \item \textbf{해결:} 데이터를 고차원으로 매핑($\phi(x)$)하면 선형 분리가 가능해진다.
@@ -1106,11 +1352,9 @@ $$ D \approx d^Q $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 6: MIT 6.86x: 차원의 저주를 피하는 지름길
+% Lecture 6: MIT 6.86x: 차원의 저주를 피하는 지름길
 %=======================================================================
 \chapter{MIT 6.86x: 차원의 저주를 피하는 지름길}
 \label{ch:lecture6}
@@ -1135,7 +1379,6 @@ $$ D \approx d^Q $$
     \item Unit 7: Neural Networks (딥러닝)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 6. 커널 방법 (Kernel Methods)}
@@ -1175,7 +1418,7 @@ $$ D \approx d^Q $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 듀얼 문제 (Dual Problem)와 내적의 발견}
 
-\begin{conceptbox}{개념 1: 관점의 전환}
+\begin{conceptbox}[title={개념 1: 관점의 전환}]
 \textbf{한 줄 요약:} "데이터의 절대적 위치(좌표)"는 중요하지 않습니다. "데이터끼리 얼마나 닮았나(내적)"가 중요합니다.
 \end{conceptbox}
 
@@ -1193,7 +1436,7 @@ $$ \max_{\alpha} \sum \alpha_i - \frac{1}{2} \sum_{i,j} y^{(i)} y^{(j)} \alpha_i
 
 \subsection{2. 커널 트릭 (Kernel Trick)}
 
-\begin{conceptbox}{개념 2: 웜홀(Wormhole) 타기}
+\begin{conceptbox}[title={개념 2: 웜홀(Wormhole) 타기}]
 \textbf{한 줄 요약:} $\phi(x)$를 계산해서 고차원으로 날아간 뒤 내적하고 다시 돌아오는 대신, 그냥 땅바닥에서 $K(x, z)$만 계산하면 똑같은 결과가 나옵니다.
 \end{conceptbox}
 
@@ -1218,7 +1461,7 @@ $$ K(x, z) = \phi(x) \cdot \phi(z) $$
 
 \subsection{3. 대표적인 커널: 가우시안 (RBF) 커널}
 
-\begin{conceptbox}{개념 3: 무한 차원의 마법}
+\begin{conceptbox}[title={개념 3: 무한 차원의 마법}]
 \textbf{한 줄 요약:} 데이터 주변에 산봉우리(유사도)를 세워서 지형을 만듭니다. 이는 수학적으로 데이터를 \textbf{무한대 차원}으로 보낸 것과 같습니다.
 \end{conceptbox}
 
@@ -1238,7 +1481,7 @@ $$ K(x, z) = \exp\left( -\gamma \| x - z \|^2 \right) $$
 
 \subsection{4. 커널 SVM (Kernel SVM)}
 
-\begin{conceptbox}{개념 4: 휘어지는 경계선}
+\begin{conceptbox}[title={개념 4: 휘어지는 경계선}]
 \textbf{한 줄 요약:} 고차원에서는 평면으로 잘랐지만, 이를 다시 원래 차원으로 투영해보면 꼬불꼬불한 곡선이 되어 있습니다.
 \end{conceptbox}
 
@@ -1256,7 +1499,7 @@ $$ K(x, z) = \exp\left( -\gamma \| x - z \|^2 \right) $$
 
 \section{실전 시나리오: 넥슨 게임 봇(Bot) 탐지}
 
-\begin{storybox}{Scenario: 인간과 봇의 움직임 구분}
+\begin{storybox}[title={Scenario: 인간과 봇의 움직임 구분}]
 당신은 '던전앤파이터'의 보안팀입니다. 봇들의 마우스 이동 경로를 분석하여 차단하려 합니다.
 \end{storybox}
 
@@ -1300,7 +1543,7 @@ $$ K(x, z) = \exp\left( -\gamma \| x - z \|^2 \right) $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 6 핵심 요약}
+\begin{summarybox}[title={Unit 6 핵심 요약}]
 \begin{itemize}
     \item \textbf{Dual Problem:} SVM은 데이터의 좌표가 아니라 '내적(유사도)'만 있으면 풀 수 있다.
     \item \textbf{Kernel Trick:} $K(x, z) = \phi(x) \cdot \phi(z)$. 고차원 변환 없이 고차원 내적값을 계산하는 지름길.
@@ -1309,11 +1552,9 @@ $$ K(x, z) = \exp\left( -\gamma \| x - z \|^2 \right) $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 7: MIT 6.86x: 뇌를 모방하다
+% Lecture 7: MIT 6.86x: 뇌를 모방하다
 %=======================================================================
 \chapter{MIT 6.86x: 뇌를 모방하다}
 \label{ch:lecture7}
@@ -1337,7 +1578,6 @@ $$ K(x, z) = \exp\left( -\gamma \| x - z \|^2 \right) $$
     \item Unit 4: Backpropagation (학습의 원리)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 3 (Part A). 신경망 기초 (Neural Network Basics)}
@@ -1378,7 +1618,7 @@ $$ K(x, z) = \exp\left( -\gamma \| x - z \|^2 \right) $$
 \subsection{1. 피드포워드 신경망 (FNN)}
 
 
-\begin{conceptbox}{개념 1: 정보의 조립 라인}
+\begin{conceptbox}[title={개념 1: 정보의 조립 라인}]
 \textbf{한 줄 요약:} 데이터가 공장 컨베이어 벨트(Layer)를 지나가면서 점점 더 추상적이고 고급진 정보로 가공되어 출력됩니다.
 \end{conceptbox}
 
@@ -1397,7 +1637,7 @@ $$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden
 
 \subsection{2. 활성화 함수가 왜 필요한가?}
 
-\begin{conceptbox}{개념 2: 선형 + 선형 = 선형}
+\begin{conceptbox}[title={개념 2: 선형 + 선형 = 선형}]
 \textbf{한 줄 요약:} 활성화 함수(비선형)가 없으면, 신경망을 100층을 쌓아도 그냥 1층짜리 선형 회귀랑 똑같아집니다.
 \end{conceptbox}
 
@@ -1442,7 +1682,7 @@ $$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden
 
 \subsection{4. 출력층 설계 (Output Layer)}
 
-\begin{conceptbox}{개념 3: 문제 유형에 따른 마무으리}
+\begin{conceptbox}[title={개념 3: 문제 유형에 따른 마무으리}]
 \textbf{한 줄 요약:} 마지막 층의 활성화 함수는 "우리가 풀고 싶은 문제"가 무엇이냐에 따라 결정됩니다.
 \end{conceptbox}
 
@@ -1466,7 +1706,7 @@ $$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden
 
 \section{실전 시나리오: 넥슨 캐릭터 직업 추천 AI}
 
-\begin{storybox}{Scenario: 뉴비에게 딱 맞는 직업은?}
+\begin{storybox}[title={Scenario: 뉴비에게 딱 맞는 직업은?}]
 신규 유저의 플레이 스타일 데이터($x$)를 분석해 전사, 마법사, 도적 중 하나를 추천해 주는 AI를 만듭니다.
 \end{storybox}
 
@@ -1507,7 +1747,7 @@ $$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 3 (Part A) 핵심 요약}
+\begin{summarybox}[title={Unit 3 (Part A) 핵심 요약}]
 \begin{itemize}
     \item \textbf{FNN:} 입력 $\to$ 은닉 $\to$ 출력으로 흐르는 가장 기초적인 신경망.
     \item \textbf{비선형성:} 활성화 함수가 있어야 딥러닝이 선형 회귀보다 똑똑해진다.
@@ -1516,11 +1756,9 @@ $$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 8: MIT 6.86x: 오차를 통해 배우다
+% Lecture 8: MIT 6.86x: 오차를 통해 배우다
 %=======================================================================
 \chapter{MIT 6.86x: 오차를 통해 배우다}
 \label{ch:lecture8}
@@ -1544,7 +1782,6 @@ $$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden
     \item Unit 5: Recurrent Neural Networks (순차 데이터)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 4. 역전파와 학습의 원리 (Backpropagation)}
@@ -1584,7 +1821,7 @@ $$ \text{Input} \xrightarrow{W_1} \text{Hidden 1} \xrightarrow{W_2} \text{Hidden
 % 6. 핵심 개념 상세 설명
 \subsection{1. 역전파 알고리즘 (Backpropagation)}
 
-\begin{conceptbox}{개념 1: 책임 소재 따지기 (The Blame Game)}
+\begin{conceptbox}[title={개념 1: 책임 소재 따지기 (The Blame Game)}]
 \textbf{한 줄 요약:} 결과가 틀렸을 때, 출력층에서부터 거꾸로 거슬러 올라가며 각 뉴런이 오차에 기여한 만큼(기울기) 가중치를 수정합니다.
 \end{conceptbox}
 
@@ -1610,7 +1847,7 @@ $$ \frac{\partial L}{\partial w} = \underbrace{\frac{\partial L}{\partial y}}_{\
 
 \subsection{2. 손실 함수 (Loss Function)}
 
-\begin{conceptbox}{개념 2: 채점 기준표}
+\begin{conceptbox}[title={개념 2: 채점 기준표}]
 \textbf{한 줄 요약:} 문제의 유형(회귀 vs 분류)에 따라 "얼마나 틀렸는지"를 계산하는 방식이 다릅니다.
 \end{conceptbox}
 
@@ -1627,7 +1864,7 @@ $$ \frac{\partial L}{\partial w} = \underbrace{\frac{\partial L}{\partial y}}_{\
 \end{tabular}
 \end{table}
 
-\begin{warningbox}{왜 분류 문제에 MSE를 안 쓰나요?}
+\begin{warningbox}[title={왜 분류 문제에 MSE를 안 쓰나요?}]
 Sigmoid + MSE 조합을 쓰면, 오차가 엄청 큰데도 미분값(Gradient)이 0에 가까워져서 학습이 안 되는 현상이 발생합니다. 반면 \textbf{Cross-Entropy}는 로그 함수 특성상 틀리면 미분값이 폭발적으로 커져서 "정신 차려!"라고 강하게 피드백을 줍니다.
 \end{warningbox}
 
@@ -1635,7 +1872,7 @@ Sigmoid + MSE 조합을 쓰면, 오차가 엄청 큰데도 미분값(Gradient)�
 
 \subsection{3. 초기화와 학습률 (Initialization \& Learning Rate)}
 
-\begin{conceptbox}{개념 3: 시작이 반이다}
+\begin{conceptbox}[title={개념 3: 시작이 반이다}]
 \textbf{한 줄 요약:} 출발점(초기화)을 잘 잡고, 보폭(학습률)을 적절히 조절해야 산 아래로 잘 내려갈 수 있습니다.
 \end{conceptbox}
 
@@ -1657,7 +1894,7 @@ $$ \eta_t = \eta_0 / (1 + kt) \quad (\text{시간이 갈수록 줄어듦}) $$
 
 \subsection{4. 학습 안정화 기법: 배치 정규화 \& 드롭아웃}
 
-\begin{conceptbox}{개념 4: 흔들리지 않는 편안함}
+\begin{conceptbox}[title={개념 4: 흔들리지 않는 편안함}]
 \textbf{한 줄 요약:} 딥러닝은 깊어질수록 학습이 불안정해집니다. 이를 막기 위해 데이터를 강제로 정렬하거나(Batch Norm), 일부러 핸디캡을 줍니다(Dropout).
 \end{conceptbox}
 
@@ -1678,7 +1915,7 @@ $$ \eta_t = \eta_0 / (1 + kt) \quad (\text{시간이 갈수록 줄어듦}) $$
 
 \section{실전 시나리오: 넥슨 게임 이탈(Churn) 방지 모델}
 
-\begin{storybox}{Scenario: VIP 유저가 떠나는 이유 찾기}
+\begin{storybox}[title={Scenario: VIP 유저가 떠나는 이유 찾기}]
 당신은 넥슨의 PM입니다. "이번 달에 접속할 것"이라고 예측(0.9)했던 VIP 유저가 실제로는 접속하지 않았습니다(Target 0.0). 오차가 큽니다.
 \end{storybox}
 
@@ -1713,7 +1950,7 @@ $$ \eta_t = \eta_0 / (1 + kt) \quad (\text{시간이 갈수록 줄어듦}) $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 4 핵심 요약}
+\begin{summarybox}[title={Unit 4 핵심 요약}]
 \begin{itemize}
     \item \textbf{역전파 (Backprop):} Chain Rule을 이용해 오차의 책임(Gradient)을 각 가중치에 배분한다.
     \item \textbf{손실 함수:} 회귀는 MSE, 분류는 Cross-Entropy가 국룰이다.
@@ -1722,11 +1959,9 @@ $$ \eta_t = \eta_0 / (1 + kt) \quad (\text{시간이 갈수록 줄어듦}) $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 9: MIT 6.86x: 컴퓨터가 세상을 보는 법
+% Lecture 9: MIT 6.86x: 컴퓨터가 세상을 보는 법
 %=======================================================================
 \chapter{MIT 6.86x: 컴퓨터가 세상을 보는 법}
 \label{ch:lecture9}
@@ -1749,7 +1984,6 @@ $$ \eta_t = \eta_0 / (1 + kt) \quad (\text{시간이 갈수록 줄어듦}) $$
     \item Unit 4: Backpropagation (학습 원리)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 3 (Part B). 합성곱 신경망 (CNN)}
@@ -1790,7 +2024,7 @@ CNN은 사람의 시각 피질 구조를 모방하여 만들어졌습니다. \te
 \subsection{1. 합성곱 계층 (Convolutional Layer)}
 
 
-\begin{conceptbox}{개념 1: 도장 찍기 (Sliding Window)}
+\begin{conceptbox}[title={개념 1: 도장 찍기 (Sliding Window)}]
 \textbf{한 줄 요약:} 필터(도장)를 이미지 왼쪽 위부터 오른쪽 아래까지 꾹꾹 눌러가며(Sliding) 특정 패턴이 있는지 검사합니다.
 \end{conceptbox}
 
@@ -1820,7 +2054,7 @@ CNN은 사람의 시각 피질 구조를 모방하여 만들어졌습니다. \te
 \subsection{2. 풀링 계층 (Pooling Layer)}
 
 
-\begin{conceptbox}{개념 2: 요약 노트 만들기}
+\begin{conceptbox}[title={개념 2: 요약 노트 만들기}]
 \textbf{한 줄 요약:} 너무 디테일한 정보는 버리고, "여기에 뭔가 있었다"는 핵심 정보만 남겨서 이미지 사이즈를 줄입니다.
 \end{conceptbox}
 
@@ -1839,7 +2073,7 @@ CNN은 사람의 시각 피질 구조를 모방하여 만들어졌습니다. \te
 \subsection{3. CNN의 전체 구조 (Architecture)}
 
 
-\begin{conceptbox}{개념 3: 샌드위치 구조}
+\begin{conceptbox}[title={개념 3: 샌드위치 구조}]
 \textbf{한 줄 요약:} [특징 추출]과 [분류]의 두 단계로 나뉩니다.
 \end{conceptbox}
 
@@ -1860,7 +2094,7 @@ $$ \text{Flatten} \to \text{Fully Connected} \to \text{Softmax} $$
 
 \section{실전 시나리오: 넥슨 게임 에셋 자동 태깅}
 
-\begin{storybox}{Scenario: 수만 개의 아이콘 정리하기}
+\begin{storybox}[title={Scenario: 수만 개의 아이콘 정리하기}]
 당신은 넥슨의 테크 PM입니다. 20년 치 게임 아이콘(검, 방패, 포션 등) 5만 개가 폴더에 뒤섞여 있습니다. 이를 자동으로 분류하는 AI를 만듭니다.
 \end{storybox}
 
@@ -1897,7 +2131,7 @@ $$ \text{Flatten} \to \text{Fully Connected} \to \text{Softmax} $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 3 (Part B) 핵심 요약}
+\begin{summarybox}[title={Unit 3 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{CNN:} 이미지를 1줄로 펴지 않고, 도장(Filter)을 찍으며 특징을 찾는다.
     \item \textbf{Conv Layer:} 특징 탐지기. Stride로 간격 조절, Padding으로 크기 유지.
@@ -1906,11 +2140,9 @@ $$ \text{Flatten} \to \text{Fully Connected} \to \text{Softmax} $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 10: MIT 6.86x: 기억을 가진 신경망
+% Lecture 10: MIT 6.86x: 기억을 가진 신경망
 %=======================================================================
 \chapter{MIT 6.86x: 기억을 가진 신경망}
 \label{ch:lecture10}
@@ -1935,7 +2167,6 @@ $$ \text{Flatten} \to \text{Fully Connected} \to \text{Softmax} $$
     \item Unit 6: Unsupervised Learning (군집화)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 5. 순환 신경망 (RNN)}
@@ -1976,7 +2207,7 @@ RNN은 이전 단계의 출력(Hidden State)을 현재 단계의 입력으로 �
 \subsection{1. RNN의 핵심 아이디어: "기억(Memory)"}
 
 
-\begin{conceptbox}{개념 1: 돌림 노래 (Loop)}
+\begin{conceptbox}[title={개념 1: 돌림 노래 (Loop)}]
 \textbf{한 줄 요약:} 현재의 나($h_t$)는 어제의 기억($h_{t-1}$)과 오늘의 경험($x_t$)이 합쳐져서 만들어집니다.
 \end{conceptbox}
 
@@ -1997,7 +2228,7 @@ $$ h_t = \tanh(W_{hh} h_{t-1} + W_{xh} x_t + b) $$
 \subsection{2. LSTM (Long Short-Term Memory)}
 
 
-\begin{conceptbox}{개념 2: 정보의 고속도로와 문지기}
+\begin{conceptbox}[title={개념 2: 정보의 고속도로와 문지기}]
 \textbf{한 줄 요약:} 중요한 정보는 고속도로(Cell State)에 태워 끝까지 보내고, 불필요한 정보는 휴게소(Forget Gate)에서 버립니다.
 \end{conceptbox}
 
@@ -2018,7 +2249,7 @@ LSTM은 \textbf{셀 상태(Cell State, $C_t$)}라는 정보 전용 통로를 뚫
 \subsection{3. 어텐션(Attention) 메커니즘}
 
 
-\begin{conceptbox}{개념 3: 컨닝 페이퍼 (Cheat Sheet)}
+\begin{conceptbox}[title={개념 3: 컨닝 페이퍼 (Cheat Sheet)}]
 \textbf{한 줄 요약:} 시험 볼 때(출력할 때) 모든 걸 외워서 풀려 하지 말고, 필요할 때마다 교과서(입력 문장)의 해당 부분을 훔쳐보세요.
 \end{conceptbox}
 
@@ -2037,7 +2268,7 @@ LSTM조차도 아무리 긴 문장이라도 결국 마지막에 하나의 벡터
 
 \section{실전 시나리오: 글로벌 게임 실시간 번역}
 
-\begin{storybox}{Scenario: '메이플스토리 월드' 글로벌 채팅}
+\begin{storybox}[title={Scenario: '메이플스토리 월드' 글로벌 채팅}]
 한국 유저와 미국 유저가 실시간으로 소통합니다. 채팅 번역 시스템을 구축합니다.
 \end{storybox}
 
@@ -2076,7 +2307,7 @@ LSTM조차도 아무리 긴 문장이라도 결국 마지막에 하나의 벡터
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 5 핵심 요약}
+\begin{summarybox}[title={Unit 5 핵심 요약}]
 \begin{itemize}
     \item \textbf{RNN:} 출력이 입력으로 돌아오는 루프 구조. 순차 데이터 처리에 특화됨.
     \item \textbf{LSTM:} 셀 상태(Cell State)와 게이트(Gate)를 도입하여 장기 기억력을 확보함.
@@ -2085,11 +2316,9 @@ LSTM조차도 아무리 긴 문장이라도 결국 마지막에 하나의 벡터
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 11: MIT 6.86x: 정답 없는 세계의 질서
+% Lecture 11: MIT 6.86x: 정답 없는 세계의 질서
 %=======================================================================
 \chapter{MIT 6.86x: 정답 없는 세계의 질서}
 \label{ch:lecture11}
@@ -2112,7 +2341,6 @@ LSTM조차도 아무리 긴 문장이라도 결국 마지막에 하나의 벡터
     \item Unit 5: Generative Models (데이터 생성)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 4. 군집화 (Clustering)}
@@ -2153,7 +2381,7 @@ LSTM조차도 아무리 긴 문장이라도 결국 마지막에 하나의 벡터
 \subsection{1. K-Means 알고리즘과 좌표 하강법}
 
 
-\begin{conceptbox}{개념 1: 깃발 꽂기 게임}
+\begin{conceptbox}[title={개념 1: 깃발 꽂기 게임}]
 \textbf{한 줄 요약:} 깃발(중심)을 꽂고 사람들이 가장 가까운 깃발로 모입니다. 사람이 모인 곳의 한가운데로 깃발을 다시 옮깁니다. 이를 반복합니다.
 \end{conceptbox}
 
@@ -2183,7 +2411,7 @@ $$ J(r, \mu) = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_n - \mu_k||^2 $$
 \subsection{2. K-Medoids 알고리즘}
 
 
-\begin{conceptbox}{개념 2: 평균의 함정과 실제 대표 선출}
+\begin{conceptbox}[title={개념 2: 평균의 함정과 실제 대표 선출}]
 \textbf{한 줄 요약:} K-Means는 허공에 있는 평균을 중심으로 잡지만, K-Medoids는 실제 데이터 중 하나를 대장(Representative)으로 뽑습니다.
 \end{conceptbox}
 
@@ -2213,7 +2441,7 @@ $$ J(r, \mu) = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_n - \mu_k||^2 $$
 
 \section{실전 시나리오: 넥슨 유저 세분화 (User Segmentation)}
 
-\begin{storybox}{Scenario: 고래(Whale) 유저와 일반 유저 분류}
+\begin{storybox}[title={Scenario: 고래(Whale) 유저와 일반 유저 분류}]
 당신은 게임 내 유저들을 '과금러', '즐겜러', '폐인' 등으로 자동 분류하고 싶습니다.
 \end{storybox}
 
@@ -2252,7 +2480,7 @@ $$ J(r, \mu) = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_n - \mu_k||^2 $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 4 핵심 요약}
+\begin{summarybox}[title={Unit 4 핵심 요약}]
 \begin{itemize}
     \item \textbf{Clustering:} 정답 없이 데이터의 구조를 찾는 비지도 학습.
     \item \textbf{K-Means:} 중심 할당 $\leftrightarrow$ 중심 이동을 반복하는 좌표 하강법 알고리즘.
@@ -2261,11 +2489,9 @@ $$ J(r, \mu) = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_n - \mu_k||^2 $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 12: MIT 6.86x: 데이터 압축과 추천의 원리
+% Lecture 12: MIT 6.86x: 데이터 압축과 추천의 원리
 %=======================================================================
 \chapter{MIT 6.86x: 데이터 압축과 추천의 원리}
 \label{ch:lecture12}
@@ -2289,7 +2515,6 @@ $$ J(r, \mu) = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_n - \mu_k||^2 $$
     \item Unit 5: Generative Models
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 4 (Part B). 차원 축소와 행렬 분해}
@@ -2330,7 +2555,7 @@ $$ J(r, \mu) = \sum_{n=1}^{N} \sum_{k=1}^{K} r_{nk} ||x_n - \mu_k||^2 $$
 \subsection{1. PCA의 머신러닝적 접근: 재구성 오차}
 
 
-\begin{conceptbox}{개념 1: 파일 압축과 해제}
+\begin{conceptbox}[title={개념 1: 파일 압축과 해제}]
 \textbf{한 줄 요약:} 좋은 압축이란, 압축을 풀었을 때 원본과 가장 똑같은 상태여야 합니다. 손실(Error)을 최소화하는 압축 방법을 찾습니다.
 \end{conceptbox}
 
@@ -2354,7 +2579,7 @@ $$ \text{Minimize } J = \frac{1}{N} \sum_{n=1}^{N} || x_n - \hat{x}_n ||^2 $$
 \subsection{2. 추천 시스템: 행렬 분해 (Matrix Factorization)}
 
 
-\begin{conceptbox}{개념 2: 빈칸 채우기 퍼즐}
+\begin{conceptbox}[title={개념 2: 빈칸 채우기 퍼즐}]
 \textbf{한 줄 요약:} 거대한 구멍 숭숭 뚫린 행렬을 두 개의 꽉 찬 작은 행렬의 곱으로 쪼개서, 빈칸의 값을 추론합니다.
 \end{conceptbox}
 
@@ -2386,7 +2611,7 @@ $$ \min_{U, V} \sum_{(u,i) \in \text{Observed}} (r_{ui} - \mathbf{u}_u \cdot \ma
 
 \section{실전 시나리오: 넷플릭스 영화 추천}
 
-\begin{storybox}{Scenario: 당신이 아직 안 본 '명작' 찾기}
+\begin{storybox}[title={Scenario: 당신이 아직 안 본 '명작' 찾기}]
 당신은 넷플릭스 엔지니어입니다. 유저 A가 '아이언맨', '어벤져스'에는 5점을 줬고, '노트북'에는 평점을 안 남겼습니다. A에게 '노트북'을 추천해야 할까요?
 \end{storybox}
 
@@ -2424,7 +2649,7 @@ $$ \min_{U, V} \sum_{(u,i) \in \text{Observed}} (r_{ui} - \mathbf{u}_u \cdot \ma
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 4 (Part B) 핵심 요약}
+\begin{summarybox}[title={Unit 4 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{PCA:} 데이터의 재구성 오차를 최소화하는 평면을 찾아 차원을 축소한다.
     \item \textbf{행렬 분해 (MF):} $R \approx UV^T$. 희소 행렬을 분해하여 숨겨진 패턴을 찾는다.
@@ -2433,11 +2658,9 @@ $$ \min_{U, V} \sum_{(u,i) \in \text{Observed}} (r_{ui} - \mathbf{u}_u \cdot \ma
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 13: MIT 6.86x: 시행착오의 과학
+% Lecture 13: MIT 6.86x: 시행착오의 과학
 %=======================================================================
 \chapter{MIT 6.86x: 시행착오의 과학}
 \label{ch:lecture13}
@@ -2460,7 +2683,6 @@ $$ \min_{U, V} \sum_{(u,i) \in \text{Observed}} (r_{ui} - \mathbf{u}_u \cdot \ma
     \item Unit 5 (Part B): Q-Learning (환경을 모를 때)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 5 (Part A). 강화 학습 기초 (RL Fundamentals)}
@@ -2482,7 +2704,7 @@ $$ \min_{U, V} \sum_{(u,i) \in \text{Observed}} (r_{ui} - \mathbf{u}_u \cdot \ma
 \hline
 \textbf{용어 (Term)} & \textbf{직관적 의미 (Meaning)} \\
 \hline
-\textbf{Agent & Environment} & 플레이어(나)와 게임 세상(월드). \\
+\textbf{Agent \& Environment} & 플레이어(나)와 게임 세상(월드). \\
 \hline
 \textbf{State ($S$)} & 현재 내 상황. (예: HP 50, 보스 앞) \\
 \hline
@@ -2506,7 +2728,7 @@ $$ \min_{U, V} \sum_{(u,i) \in \text{Observed}} (r_{ui} - \mathbf{u}_u \cdot \ma
 [Image of reinforcement learning agent environment loop]
 
 
-\begin{conceptbox}{개념 1: 세상을 정의하는 5가지 요소}
+\begin{conceptbox}[title={개념 1: 세상을 정의하는 5가지 요소}]
 \textbf{한 줄 요약:} 세상은 상태($S$), 행동($A$), 물리 법칙($P$), 보상($R$), 그리고 시간 관념($\gamma$)으로 이루어져 있습니다.
 \end{conceptbox}
 
@@ -2529,7 +2751,7 @@ $$ \text{MDP} = (S, A, P, R, \gamma) $$
 
 \subsection{2. 벨만 방정식 (Bellman Equations)}
 
-\begin{conceptbox}{개념 2: 가치(Value)의 재귀적 정의}
+\begin{conceptbox}[title={개념 2: 가치(Value)의 재귀적 정의}]
 \textbf{한 줄 요약:} 어떤 상태의 가치는 "지금 받는 현찰" + "미래에 받을 것으로 예상되는 돈의 현재 가치"입니다.
 \end{conceptbox}
 
@@ -2573,7 +2795,7 @@ $$ V^*(s) = \max_a \left[ R(s,a) + \gamma \sum_{s'} P(s'|s,a) V^*(s') \right] $$
 
 \section{실전 시나리오: 넥슨 게임 오토 플레이 AI}
 
-\begin{storybox}{Scenario: 모바일 RPG 자동 사냥}
+\begin{storybox}[title={Scenario: 모바일 RPG 자동 사냥}]
 당신은 넥슨의 AI 개발자입니다. 신규 RPG 게임의 '자동 사냥' 기능을 강화 학습으로 구현하려 합니다.
 \end{storybox}
 
@@ -2619,7 +2841,7 @@ $$ V^*(s) = \max_a \left[ R(s,a) + \gamma \sum_{s'} P(s'|s,a) V^*(s') \right] $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 5 (Part A) 핵심 요약}
+\begin{summarybox}[title={Unit 5 (Part A) 핵심 요약}]
 \begin{itemize}
     \item \textbf{MDP:} 강화 학습을 수학적으로 정의하는 틀 ($S, A, P, R, \gamma$).
     \item \textbf{벨만 방정식:} $V(s) = R + \gamma V(s')$. 가치는 재귀적으로 정의된다.
@@ -2628,11 +2850,9 @@ $$ V^*(s) = \max_a \left[ R(s,a) + \gamma \sum_{s'} P(s'|s,a) V^*(s') \right] $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 14: MIT 6.86x: 경험으로 완성하는 지능
+% Lecture 14: MIT 6.86x: 경험으로 완성하는 지능
 %=======================================================================
 \chapter{MIT 6.86x: 경험으로 완성하는 지능}
 \label{ch:lecture14}
@@ -2655,7 +2875,6 @@ $$ V^*(s) = \max_a \left[ R(s,a) + \gamma \sum_{s'} P(s'|s,a) V^*(s') \right] $$
     \item Unit 6: Unsupervised Learning (군집화)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 5 (Part B). Q-러닝 (Q-Learning)}
@@ -2697,7 +2916,7 @@ Q-러닝은 \textbf{"Model-free(환경 모델 없음)"} 강화 학습의 대표 
 % 6. 핵심 개념 상세 설명
 \subsection{1. Q-러닝의 핵심: Q-테이블과 업데이트}
 
-\begin{conceptbox}{개념 1: 나만의 맛집 리스트 작성}
+\begin{conceptbox}[title={개념 1: 나만의 맛집 리스트 작성}]
 \textbf{한 줄 요약:} 빈 노트(Table)를 들고 다니면서, 행동을 해보고 점수(Reward)가 좋으면 노트에 적힌 점수를 높이고, 나쁘면 깎습니다.
 \end{conceptbox}
 
@@ -2722,7 +2941,7 @@ $$ Q(s, a) \leftarrow \underbrace{Q(s, a)}_{\text{기존 예상}} + \alpha \left
 
 \subsection{2. 탐험(Exploration) vs 활용(Exploitation)}
 
-\begin{conceptbox}{개념 2: 단골집 vs 신상 맛집}
+\begin{conceptbox}[title={개념 2: 단골집 vs 신상 맛집}]
 \textbf{한 줄 요약:} 아는 것만 하면 발전이 없고(Local Optima), 모험만 하면 실속이 없습니다. 둘의 균형을 잡아야 합니다.
 \end{conceptbox}
 
@@ -2745,7 +2964,7 @@ $$ Q(s, a) \leftarrow \underbrace{Q(s, a)}_{\text{기존 예상}} + \alpha \left
 
 \subsection{3. 딥 Q-네트워크 (DQN, Deep Q-Network)}
 
-\begin{conceptbox}{개념 3: 노트를 뇌로 바꾸다}
+\begin{conceptbox}[title={개념 3: 노트를 뇌로 바꾸다}]
 \textbf{한 줄 요약:} 상태가 너무 많아서 표(Table)를 그릴 수 없으니, 상태를 입력하면 Q값을 계산해주는 '함수(신경망)'를 만듭니다.
 \end{conceptbox}
 
@@ -2768,7 +2987,7 @@ $$ Q(s, a) \approx f_w(s, a) $$
 
 \section{실전 시나리오: 넥슨 카트라이더 AI}
 
-\begin{storybox}{Scenario: 드리프트 장인 AI 만들기}
+\begin{storybox}[title={Scenario: 드리프트 장인 AI 만들기}]
 당신은 카트라이더 AI 개발자입니다. AI에게 "최적의 드리프트 타이밍"을 가르치고 싶습니다.
 \end{storybox}
 
@@ -2809,7 +3028,7 @@ $$ Q(s, a) \approx f_w(s, a) $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 5 (Part B) 핵심 요약}
+\begin{summarybox}[title={Unit 5 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{Model-free:} 룰을 몰라도 경험($S, A, R, S'$)만으로 학습한다.
     \item \textbf{Q-Function:} 행동의 가치를 평가하는 함수. $Target - Current$ 오차를 줄이며 학습한다.
@@ -2817,8 +3036,6 @@ $$ Q(s, a) \approx f_w(s, a) $$
     \item \textbf{DQN:} Q-Table 대신 신경망을 사용하여 무한한 상태 공간을 커버한다.
 \end{itemize}
 \end{summarybox}
-
-\newpage
 
 
 \end{document}

@@ -10,23 +10,24 @@
 %========================================================================================
 
 \usepackage{kotex}
-\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\parskip}{0.5em}
 \setlength{\parindent}{0pt}
 
-\usepackage{amsmath, amssymb, amsthm}
-\usepackage{graphicx}
+% --- 표 관련 ---
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{adjustbox}
+\usepackage{colortbl}
 \renewcommand{\arraystretch}{1.1}
 
-\usepackage{enumitem}
-\setlist{nosep, leftmargin=*, itemsep=0.3em}
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -35,7 +36,288 @@
 \fancyhead[LO]{\leftmark}
 \fancyhead[RE]{18.6501}
 \renewcommand{\headrulewidth}{0.5pt}
-\setlength{\headheight}{15pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+%========================================================================================
+% 색상 정의
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+\definecolor{lightblue}{RGB}{220, 235, 255}
+\definecolor{lightgreen}{RGB}{220, 255, 235}
+\definecolor{lightyellow}{RGB}{255, 250, 220}
+\definecolor{lightpurple}{RGB}{240, 230, 255}
+\definecolor{lightgray}{gray}{0.95}
+\definecolor{lightpink}{RGB}{255, 235, 245}
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+% MIT/Harvard 추가 색상
+\definecolor{mainblue}{RGB}{50, 80, 150}
+\definecolor{subgray}{RGB}{180, 180, 180}
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{boxbgcolor}{RGB}{245, 245, 250}
+
+% Stanford CS230 스타일 색상
+\definecolor{myblue}{RGB}{50, 100, 180}
+\definecolor{sblue}{RGB}{70, 130, 180}
+\definecolor{wgray}{RGB}{245, 245, 245}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%========================================================================================
+% 박스 환경
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=주의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=개념,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\newtcolorbox{analogybox}[1][]{
+    enhanced,
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=비유,
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable,
+    #1
+}
+
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+% mybox 환경 (UIUC용)
+\newtcolorbox{mybox}[1]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title={#1},
+    arc=2mm,
+    boxrule=0.7pt,
+    breakable
+}
+
+% 추가 환경 (Gemini 생성 콘텐츠에서 사용)
+\newtcolorbox{tipbox}[1][]{enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=팁, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{solutionbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=풀이, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{downloadbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=다운로드, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{practicebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=연습, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keypointbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=핵심 포인트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{storybox}[1][]{enhanced, colback=lightyellow, colframe=darkorange!80!black, fonttitle=\bfseries, title=이야기, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathstep}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학 단계, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{systembox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=시스템, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{toolbox}[1][]{enhanced, colback=boxgray, colframe=black!40, fonttitle=\bfseries, title=도구, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{bayesbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=베이즈, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{formulabox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=공식, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{mathbox}[1][]{enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=수학, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{strategybox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=전략, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{diagnosisbox}[1][]{enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=진단, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{featurebox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=특징, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{faqbox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=FAQ, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{notebox}[1][]{enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=노트, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{codeexamplebox}[1][]{enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=코드 예제, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{keyconceptbox}[1][]{enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 개념, arc=2mm, boxrule=0.7pt, breakable, #1}
+\newtcolorbox{termbox}[1][]{enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries, title=용어, arc=2mm, boxrule=0.7pt, breakable, #1}
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% 커스텀 명령어 (Gemini 생성 콘텐츠에서 사용)
+\newcommand{\excel}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\concept}[1]{\textbf{#1}}
+\newcommand{\formula}[1]{\textit{#1}}
+\providecommand{\captionof}[2]{\textbf{#2}}
+\newcommand{\chaptertitle}[2]{\section*{#1: #2}}
+\providecommand{\newsection}{\section}
+
+%========================================================================================
+% 코드 블록
+%========================================================================================
+
+\usepackage{listings}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{
+    style=mystyle,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm, amsfonts}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[chapter]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[chapter]
+\newtheorem{example}{예제}[chapter]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
 
 \usepackage[
     colorlinks=true,
@@ -46,80 +328,40 @@
 ]{hyperref}
 
 %========================================================================================
-% 색상 정의
+% 기타
 %========================================================================================
 
-\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
 
-\definecolor{mainblue}{RGB}{0, 51, 102}
-\definecolor{subblue}{RGB}{230, 240, 255}
-\definecolor{warningred}{RGB}{204, 0, 0}
-\definecolor{conceptgreen}{RGB}{0, 102, 51}
-\definecolor{storypurple}{RGB}{102, 0, 102}
-\definecolor{mainblue}{RGB}{0, 51, 102}
-\definecolor{subblue}{RGB}{230, 240, 255}
-\definecolor{warningred}{RGB}{204, 0, 0}
-\definecolor{conceptgreen}{RGB}{0, 102, 51}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{url}
+\urlstyle{same}
 
 %========================================================================================
-% 박스 환경 (tcolorbox)
+% 메타 정보 박스 명령어
 %========================================================================================
 
-\usepackage[most]{tcolorbox}
-\tcbuselibrary{skins, breakable}
-
-\newtcolorbox{summarybox}[1]{
-  colback=subblue, colframe=mainblue, 
-  title=\textbf{#1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+\textbf{강의명:} & #1 \\[0.3em]
+\textbf{주차:} & #2 \\[0.3em]
+\textbf{교수명:} & #3 \\[0.3em]
+\textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
 }
-
-\newtcolorbox{warningbox}[1]{
-  colback=white, colframe=warningred, 
-  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=0mm,
-  coltitle=white
-}
-
-\newtcolorbox{conceptbox}[1]{
-  colback=white, colframe=conceptgreen, 
-  title=\textbf{💡 #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm,
-  coltitle=white
-}
-
-\newtcolorbox{storybox}[1]{
-  colback=white, colframe=storypurple, 
-  title=\textbf{🎬 #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm,
-  coltitle=white
-}
-
-\newtcolorbox{summarybox}[1]{
-  colback=subblue, colframe=mainblue, 
-  title=\textbf{#1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm
-}
-
-\newtcolorbox{warningbox}[1]{
-  colback=white, colframe=warningred, 
-  title=\textbf{⚠️ #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=0mm,
-  coltitle=white
-}
-
-\newtcolorbox{conceptbox}[1]{
-  colback=white, colframe=conceptgreen, 
-  title=\textbf{💡 #1}, fonttitle=\bfseries,
-  boxrule=0.5mm, arc=2mm,
-  coltitle=white
-}
-
-%========================================================================================
-% 사용자 정의 명령어
-%========================================================================================
-
-
 
 %========================================================================================
 % 문서 시작
@@ -133,11 +375,10 @@
 
 \maketitle
 \tableofcontents
-\newpage
 
 
 %=======================================================================
-% Chapter 1: MIT 18.6501: 통계학의 수학적 기초
+% Lecture 1: MIT 18.6501: 통계학의 수학적 기초
 %=======================================================================
 \chapter{MIT 18.6501: 통계학의 수학적 기초}
 \label{ch:lecture1}
@@ -162,7 +403,6 @@
     \item Unit 4: Hypothesis Testing
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 1. 통계적 모델링과 우도 (Modeling, Identifiability, Likelihood)}
@@ -200,7 +440,7 @@
 % 6. 핵심 개념 상세 설명
 \subsection{1. 통계적 모델 (Statistical Model)}
 
-\begin{conceptbox}{개념 1: 통계적 모델이란 무엇인가?}
+\begin{conceptbox}[title={개념 1: 통계적 모델이란 무엇인가?}]
 \textbf{한 줄 요약:} 현실의 막연한 데이터를 엄밀한 수학적 집합(Set)과 확률(Probability)로 번역하는 과정입니다.
 \end{conceptbox}
 
@@ -229,7 +469,7 @@
     \item $\{P_\theta\}$ = 베르누이 분포 $\text{Ber}(p)$ 들의 집합.
 \end{itemize}
 
-\begin{warningbox}{오해 방지: 잘 정의된 모델(Well-specified)이란?}
+\begin{warningbox}[title={오해 방지: 잘 정의된 모델(Well-specified)이란?}]
 "모델을 세운다"는 것은 가정을 한다는 뜻입니다. 만약 실제 데이터는 '주사위(1~6)'인데, 모델을 '동전(0,1)'으로 세우면 어떻게 될까요?
 \begin{itemize}
     \item 실제 데이터 생성 원리 $P$가 우리 모델 집합 $\{P_\theta\}$ 안에 없을 때, 이를 \textbf{Misspecified Model}이라고 합니다.
@@ -241,7 +481,7 @@
 
 \subsection{2. 식별 가능성 (Identifiability)}
 
-\begin{conceptbox}{개념 2: 이 모델로 정답을 찾을 수 있는가?}
+\begin{conceptbox}[title={개념 2: 이 모델로 정답을 찾을 수 있는가?}]
 \textbf{한 줄 요약:} 서로 다른 원인(파라미터)이 서로 다른 결과(분포)를 만들어야만, 결과를 보고 원인을 역추적할 수 있습니다.
 \end{conceptbox}
 
@@ -272,7 +512,7 @@ $\mu_1$과 $\mu_2$의 조합은 무수히 많습니다. 데이터만으로는 �
 
 \subsection{3. 우도 (Likelihood)}
 
-\begin{conceptbox}{개념 3: 관점의 대전환}
+\begin{conceptbox}[title={개념 3: 관점의 대전환}]
 \textbf{한 줄 요약:} "데이터가 주어졌을 때, 이 파라미터가 정답일 점수는 몇 점인가?"를 계산하는 함수입니다.
 \end{conceptbox}
 
@@ -338,7 +578,7 @@ $$ \ell_n(\theta) = \sum_{i=1}^n \log f(X_i; \theta) $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 1 핵심 요약}
+\begin{summarybox}[title={Unit 1 핵심 요약}]
 \begin{itemize}
     \item \textbf{통계적 모델:} 데이터를 설명하기 위한 수학적 가정 $(E, \{P_\theta\})$.
     \item \textbf{식별 가능성:} 파라미터가 다르면 분포도 달라야 한다 ($\theta \neq \theta' \implies P_\theta \neq P_{\theta'}$). 이것이 보장되어야 추정이 가능하다.
@@ -347,11 +587,9 @@ $$ \ell_n(\theta) = \sum_{i=1}^n \log f(X_i; \theta) $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 2: MIT 18.6501: 통계적 추론의 핵심
+% Lecture 2: MIT 18.6501: 통계적 추론의 핵심
 %=======================================================================
 \chapter{MIT 18.6501: 통계적 추론의 핵심}
 \label{ch:lecture2}
@@ -376,7 +614,6 @@ $$ \ell_n(\theta) = \sum_{i=1}^n \log f(X_i; \theta) $$
     \item Unit 4: Hypothesis Testing (가설 검정)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 2. 점 추정 (Point Estimation)}
@@ -416,7 +653,7 @@ $$ \ell_n(\theta) = \sum_{i=1}^n \log f(X_i; \theta) $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 추정량(Estimator)의 정의와 본질}
 
-\begin{conceptbox}{개념 1: 추정량은 숫자가 아니라 '함수'이자 '확률변수'다}
+\begin{conceptbox}[title={개념 1: 추정량은 숫자가 아니라 '함수'이자 '확률변수'다}]
 \textbf{한 줄 요약:} 추정량은 데이터가 들어오면 정답을 내놓는 '기계'이며, 들어오는 데이터가 랜덤하므로 기계가 내놓는 답도 랜덤하게 변합니다.
 \end{conceptbox}
 
@@ -437,7 +674,7 @@ $$ \hat{\theta}_n = g(X_1, ..., X_n) $$
 \subsection{2. 최대우도추정 (MLE, Maximum Likelihood Estimation)}
 
 
-\begin{conceptbox}{개념 2: 가장 그럴듯한 범인 찾기}
+\begin{conceptbox}[title={개념 2: 가장 그럴듯한 범인 찾기}]
 \textbf{한 줄 요약:} "현재의 데이터가 관찰될 확률을 수학적으로 가장 높여주는 $\theta$ 값을 정답으로 채택하자."
 \end{conceptbox}
 
@@ -471,7 +708,7 @@ $$ P(X=x) = \frac{e^{-\lambda}\lambda^x}{x!} $$
 
 \subsection{3. 적률법 (MoM, Method of Moments)}
 
-\begin{conceptbox}{개념 3: 평균을 평균에 맞춘다}
+\begin{conceptbox}[title={개념 3: 평균을 평균에 맞춘다}]
 \textbf{한 줄 요약:} "이론적인 평균(Population Mean)이 실제 데이터의 평균(Sample Mean)과 같아야 한다"는 단순한 믿음에서 출발합니다.
 \end{conceptbox}
 
@@ -488,7 +725,7 @@ $k$번째 이론적 적률(Moment) $m_k(\theta) = \mathbb{E}[X^k]$을 구하고,
 $$ \mathbb{E}[X] = \bar{X} \quad (\text{1차 모멘트 매칭}) $$
 미지수가 2개면 2차 모멘트($E[X^2]$)까지 사용합니다.
 
-\begin{warningbox}{MLE vs MoM: 누가 더 좋은가?}
+\begin{warningbox}[title={MLE vs MoM: 누가 더 좋은가?}]
 일반적으로 \textbf{MLE가 더 정밀(Efficient)}합니다. 하지만 MLE는 계산이 복잡하거나 미분이 불가능할 수 있습니다. 이때 계산이 쉬운 \textbf{MoM}을 먼저 구해서 MLE를 찾기 위한 \textbf{초기값(Initial Guess)}으로 사용하는 경우가 많습니다.
 \end{warningbox}
 
@@ -497,7 +734,7 @@ $$ \mathbb{E}[X] = \bar{X} \quad (\text{1차 모멘트 매칭}) $$
 \subsection{4. 추정량의 성질 (Properties): 성적표 매기기}
 
 
-\begin{conceptbox}{개념 4: Bias-Variance Trade-off}
+\begin{conceptbox}[title={개념 4: Bias-Variance Trade-off}]
 \textbf{한 줄 요약:} 좋은 추정량은 영점이 잘 잡혀있어야 하고(Low Bias), 쏠 때마다 탄착군이 좁게 모여야 합니다(Low Variance).
 \end{conceptbox}
 
@@ -522,7 +759,7 @@ $$ \text{MSE}(\hat{\theta}) = \mathbb{E}[(\hat{\theta} - \theta)^2] = \underbrac
 
 \section{실전 시나리오: 모바일 게임 가챠 확률 검증}
 
-\begin{storybox}{Scenario: 유저들의 불만}
+\begin{storybox}[title={Scenario: 유저들의 불만}]
 당신은 게임 회사 넥슨의 PM입니다. "전설 아이템 획득 확률($p$)이 1\%라고 했는데, 너무 안 나온다!"라는 유저 불만이 폭주합니다.
 데이터를 확인해보니, 100명의 유저가 가챠를 돌렸고 그중 딱 1명만 성공했습니다. ($n=100, \sum x_i = 1$)
 \end{storybox}
@@ -555,7 +792,7 @@ $$ \text{MSE}(\hat{\theta}) = \mathbb{E}[(\hat{\theta} - \theta)^2] = \underbrac
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 2 핵심 요약}
+\begin{summarybox}[title={Unit 2 핵심 요약}]
 \begin{itemize}
     \item \textbf{추정량(Estimator):} 데이터의 함수이자 확률변수. 분포를 가진다.
     \item \textbf{MLE:} 우도(Likelihood)를 최대화하는 값을 찾는다. (미분 $\nabla \ell = 0$)
@@ -564,11 +801,9 @@ $$ \text{MSE}(\hat{\theta}) = \mathbb{E}[(\hat{\theta} - \theta)^2] = \underbrac
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 3: MIT 18.6501: 무한한 데이터의 힘
+% Lecture 3: MIT 18.6501: 무한한 데이터의 힘
 %=======================================================================
 \chapter{MIT 18.6501: 무한한 데이터의 힘}
 \label{ch:lecture3}
@@ -593,7 +828,6 @@ $$ \text{MSE}(\hat{\theta}) = \mathbb{E}[(\hat{\theta} - \theta)^2] = \underbrac
     \item Unit 4: Hypothesis Testing (가설 검정)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 3. 점근적 성질 (Asymptotic Properties)}
@@ -634,7 +868,7 @@ $$ \text{MSE}(\hat{\theta}) = \mathbb{E}[(\hat{\theta} - \theta)^2] = \underbrac
 \subsection{1. 일치성 (Consistency)}
 
 
-\begin{conceptbox}{개념 1: 좋은 추정량의 최소 자격 요건}
+\begin{conceptbox}[title={개념 1: 좋은 추정량의 최소 자격 요건}]
 \textbf{한 줄 요약:} 데이터가 쌓일수록 추정값의 오차가 0으로 줄어들어, 결국 참값과 같아져야 합니다.
 \end{conceptbox}
 
@@ -656,7 +890,7 @@ $$ \forall \epsilon > 0, \quad \lim_{n \to \infty} P(|\hat{\theta}_n - \theta^*|
 \subsection{2. 점근적 정규성 (Asymptotic Normality)}
 
 
-\begin{conceptbox}{개념 2: 모든 길은 정규분포로 통한다}
+\begin{conceptbox}[title={개념 2: 모든 길은 정규분포로 통한다}]
 \textbf{한 줄 요약:} 원래 데이터 분포가 무엇이든 상관없이, "추정 오차"의 분포는 종 모양(Bell Curve)을 따릅니다.
 \end{conceptbox}
 
@@ -676,7 +910,7 @@ $$ \sqrt{n}(\hat{\theta}_n - \theta^*) \xrightarrow{d} \mathcal{N}(0, \sigma^2_{
 \subsection{3. 피셔 정보와 크래머-라오 하한 (CRLB)}
 
 
-\begin{conceptbox}{개념 3: 추정 정밀도의 물리적 한계선}
+\begin{conceptbox}[title={개념 3: 추정 정밀도의 물리적 한계선}]
 \textbf{한 줄 요약:} 정보가 많을수록(곡선이 뾰족할수록) 분산은 작아지며, 그 한계는 피셔 정보의 역수입니다.
 \end{conceptbox}
 
@@ -704,7 +938,7 @@ $$ I(\theta) = - \mathbb{E}\left[ \frac{\partial^2}{\partial \theta^2} \log f(X;
 
 \subsection{4. 델타 방법 (Delta Method)}
 
-\begin{conceptbox}{개념 4: 함수를 통과한 추정량의 분포}
+\begin{conceptbox}[title={개념 4: 함수를 통과한 추정량의 분포}]
 \textbf{한 줄 요약:} $\hat{\theta}$가 정규분포라면, $g(\hat{\theta})$도 (근사적으로) 정규분포이며, 분산은 '기울기 제곱'만큼 변합니다.
 \end{conceptbox}
 
@@ -720,7 +954,7 @@ $$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\t
 
 \section{실전 시나리오: 모바일 게임 리텐션(재접속률) 예측}
 
-\begin{storybox}{Scenario: 대규모 업데이트의 성패}
+\begin{storybox}[title={Scenario: 대규모 업데이트의 성패}]
 넥슨에서 대규모 업데이트를 진행했습니다. 전체 유저의 재접속률 $p$를 추정하려 합니다.
 \end{storybox}
 
@@ -759,7 +993,7 @@ $$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\t
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 3 핵심 요약}
+\begin{summarybox}[title={Unit 3 핵심 요약}]
 \begin{itemize}
     \item \textbf{Consistency:} $n \to \infty$이면 추정량은 참값이 된다.
     \item \textbf{Asymptotic Normality:} 추정 오차는 $\sqrt{n}$ 스케일에서 정규분포 $\mathcal{N}(0, I(\theta)^{-1})$를 따른다.
@@ -768,11 +1002,9 @@ $$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\t
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 4: MIT 18.6501: 불확실성의 수치화
+% Lecture 4: MIT 18.6501: 불확실성의 수치화
 %=======================================================================
 \chapter{MIT 18.6501: 불확실성의 수치화}
 \label{ch:lecture4}
@@ -796,7 +1028,6 @@ $$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\t
     \item Unit 5: Hypothesis Testing (최종 판결)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 4. 신뢰 구간 (Confidence Intervals)}
@@ -837,7 +1068,7 @@ $$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\t
 \subsection{1. 신뢰 구간의 정의와 철학}
 
 
-\begin{conceptbox}{개념 1: 움직이는 것은 '고리(구간)'이지 '기둥(참값)'이 아니다}
+\begin{conceptbox}[title={개념 1: 움직이는 것은 '고리(구간)'이지 '기둥(참값)'이 아니다}]
 \textbf{한 줄 요약:} 참값 $\theta$는 신만이 아는 고정된 상수입니다. 우리가 데이터를 뽑을 때마다 변하는 것은 신뢰 구간입니다.
 \end{conceptbox}
 
@@ -849,7 +1080,7 @@ $$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\t
     \item \textbf{주의:} 이미 바닥에 떨어진 고리(계산된 구간)를 보고 "기둥이 이 안에 들어올 확률 95\%"라고 말하면 안 됩니다. 기둥은 들어와 있거나(1), 안 들어와 있거나(0) 둘 중 하나입니다.
 \end{itemize}
 
-\begin{warningbox}{오개념 주의: Frequentist View}
+\begin{warningbox}[title={오개념 주의: Frequentist View}]
 "이 구간 $[0.4, 0.6]$ 안에 참값이 있을 확률은 95\%다" $\rightarrow$ \textbf{틀렸습니다!} \\
 "수많은 평행우주에서 실험을 반복했을 때, 만들어진 구간들의 95\%가 참값을 포함한다" $\rightarrow$ \textbf{맞습니다.}
 \end{warningbox}
@@ -859,7 +1090,7 @@ $$ \sqrt{n}(g(\hat{\theta}_n) - g(\theta)) \xrightarrow{d} \mathcal{N}(0, [g'(\t
 \subsection{2. 점근적 신뢰 구간 구성법 (The Recipe)}
 
 
-\begin{conceptbox}{개념 2: 정규분포를 역이용하여 구간 만들기}
+\begin{conceptbox}[title={개념 2: 정규분포를 역이용하여 구간 만들기}]
 \textbf{한 줄 요약:} $\hat{\theta}$가 정규분포를 따른다는 사실(Unit 3)을 이용해, 거꾸로 $\theta$의 범위를 추적합니다.
 \end{conceptbox}
 
@@ -893,7 +1124,7 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 
 \subsection{3. 보수적 신뢰 구간 (Conservative CI)}
 
-\begin{conceptbox}{개념 3: 잘 모를 땐 최악의 상황을 가정하라}
+\begin{conceptbox}[title={개념 3: 잘 모를 땐 최악의 상황을 가정하라}]
 \textbf{한 줄 요약:} $I(\theta)$를 정확히 계산하기 귀찮거나 데이터가 적을 때, 분산이 가장 커지는 경우(Worst Case)를 대입하여 넓은 구간을 잡습니다.
 \end{conceptbox}
 
@@ -911,7 +1142,7 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 
 \section{실전 시나리오: A/B 테스트 신뢰 구간}
 
-\begin{storybox}{Scenario: 웹사이트 배너 클릭률 비교}
+\begin{storybox}[title={Scenario: 웹사이트 배너 클릭률 비교}]
 당신은 e커머스 앱의 PM입니다. 기존 배너(A)와 신규 배너(B)의 클릭률(CTR) 차이를 분석합니다.
 \end{storybox}
 
@@ -956,7 +1187,7 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 4 핵심 요약}
+\begin{summarybox}[title={Unit 4 핵심 요약}]
 \begin{itemize}
     \item \textbf{철학:} 신뢰 구간은 랜덤한 구간이며, 참값 $\theta$는 고정되어 있다. "95\% 확률로 포함한다"는 것은 반복 실험 시의 성공률을 의미한다.
     \item \textbf{구성법:} $\hat{\theta} \pm 1.96 \times \text{Standard Error}$.
@@ -965,11 +1196,9 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 5: MIT 18.6501: 의사결정의 수학적 최적화
+% Lecture 5: MIT 18.6501: 의사결정의 수학적 최적화
 %=======================================================================
 \chapter{MIT 18.6501: 의사결정의 수학적 최적화}
 \label{ch:lecture5}
@@ -994,7 +1223,6 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
     \item Unit 3: Asymptotic Properties
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 2 (Part B). 가설 검정 (Hypothesis Testing)}
@@ -1036,7 +1264,7 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 % 6. 핵심 개념 상세 설명
 \subsection{1. 가설 검정의 구조: 비대칭적 싸움}
 
-\begin{conceptbox}{개념 1: 법정 공방 (Courtroom Trial)}
+\begin{conceptbox}[title={개념 1: 법정 공방 (Courtroom Trial)}]
 \textbf{한 줄 요약:} 가설 검정은 두 가설이 대등하게 싸우는 것이 아니라, "무죄 추정의 원칙" 하에 유죄의 증거를 찾는 과정입니다.
 \end{conceptbox}
 
@@ -1059,7 +1287,7 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 \subsection{2. 두 가지 종류의 오류 (Type I \& Type II Error)}
 
 
-\begin{conceptbox}{개념 2: 억울한 누명 vs 범인 놓침}
+\begin{conceptbox}[title={개념 2: 억울한 누명 vs 범인 놓침}]
 \textbf{한 줄 요약:} 우리는 신이 아니기에 오류를 피할 수 없습니다. 어떤 오류가 더 치명적인지 파악해야 합니다.
 \end{conceptbox}
 
@@ -1090,7 +1318,7 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 
 \subsection{3. 유의 수준($\alpha$)과 검정력(Power): 최적화 문제}
 
-\begin{conceptbox}{개념 3: 제약 조건 하의 최적화}
+\begin{conceptbox}[title={개념 3: 제약 조건 하의 최적화}]
 \textbf{한 줄 요약:} "무고한 사람을 가둘 확률은 5\% 미만으로 하되($\alpha \le 0.05$), 그 한도 내에서 최대한 많은 범인을 잡아라(Max Power)."
 \end{conceptbox}
 
@@ -1121,7 +1349,7 @@ $$ \mathcal{I} = \left[ \hat{\theta}_n - \frac{q_{\alpha/2}}{\sqrt{n I(\hat{\the
 \subsection{4. p-value의 정확한 정의와 오해}
 
 
-\begin{conceptbox}{개념 4: 증거의 강도(Strength of Evidence)}
+\begin{conceptbox}[title={개념 4: 증거의 강도(Strength of Evidence)}]
 \textbf{한 줄 요약:} "피고인이 무죄($H_0$)라고 치자. 근데 이런 데이터가 나올 확률이 로또 1등 당첨 확률만큼 낮네? 그럼 무죄가 아닌가보다."
 \end{conceptbox}
 
@@ -1140,7 +1368,7 @@ $$ p\text{-value} = P(T(X) \ge t_{obs} \mid H_0 \text{ is true}) $$
 
 \section{실전 시나리오: 넥슨 신규 아이템 매출 분석}
 
-\begin{storybox}{Scenario: 업데이트 효과 검증}
+\begin{storybox}[title={Scenario: 업데이트 효과 검증}]
 당신은 '카트라이더'의 신규 카트바디를 출시했습니다.
 기존 일평균 매출은 1억 원($\mu_0 = 1$)입니다. 업데이트 후 30일간 데이터를 보니 평균 1.05억 원($\bar{X} = 1.05$)이 되었습니다. 표준편차는 $\sigma = 0.2$입니다.
 \end{storybox}
@@ -1183,7 +1411,7 @@ $$ p\text{-value} = P(T(X) \ge t_{obs} \mid H_0 \text{ is true}) $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 2 (Part B) 핵심 요약}
+\begin{summarybox}[title={Unit 2 (Part B) 핵심 요약}]
 \begin{itemize}
     \item \textbf{구조:} $H_0$(보수적) vs $H_1$(입증 목표). 무죄 추정의 원칙.
     \item \textbf{오류:} Type I(거짓 발견, $\alpha$)이 Type II(놓침, $\beta$)보다 더 심각하게 다뤄진다.
@@ -1192,11 +1420,9 @@ $$ p\text{-value} = P(T(X) \ge t_{obs} \mid H_0 \text{ is true}) $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 6: MIT 18.6501: 최적의 검정 레시피
+% Lecture 6: MIT 18.6501: 최적의 검정 레시피
 %=======================================================================
 \chapter{MIT 18.6501: 최적의 검정 레시피}
 \label{ch:lecture6}
@@ -1221,7 +1447,6 @@ $$ p\text{-value} = P(T(X) \ge t_{obs} \mid H_0 \text{ is true}) $$
     \item Unit 7: Goodness of Fit (적합도 검정)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 6. 검정 방법론 (Testing Methodology)}
@@ -1261,7 +1486,7 @@ $$ p\text{-value} = P(T(X) \ge t_{obs} \mid H_0 \text{ is true}) $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 네이만-피어슨 보조정리 (Neyman-Pearson Lemma)}
 
-\begin{conceptbox}{개념 1: 가장 강력한 검정(UMP)을 만드는 레시피}
+\begin{conceptbox}[title={개념 1: 가장 강력한 검정(UMP)을 만드는 레시피}]
 \textbf{한 줄 요약:} 두 개의 점($\theta_0$ vs $\theta_1$)을 비교할 때, 직관이나 감이 아니라 \textbf{"우도의 비율"}을 기준으로 삼는 것이 수학적으로 가장 정확하다.
 \end{conceptbox}
 
@@ -1282,7 +1507,7 @@ $$ \frac{L(\theta_1)}{L(\theta_0)} > k \quad (\text{즉, } H_1\text{의 우도�
 
 \subsection{2. 우도비 검정 (LRT)과 윌크스 정리}
 
-\begin{conceptbox}{개념 2: 만능열쇠 (Universal Key)}
+\begin{conceptbox}[title={개념 2: 만능열쇠 (Universal Key)}]
 \textbf{한 줄 요약:} 복잡한 모델이라도 "제약 있는 우도"와 "제약 없는 우도"의 비율만 계산하면, 카이제곱 분포를 이용해 바로 검정할 수 있습니다.
 \end{conceptbox}
 
@@ -1305,7 +1530,7 @@ $$ -2 \log \lambda \xrightarrow{d} \chi^2_d $$
 \subsection{3. 통계적 검정의 삼위일체 (The Holy Trinity)}
 
 
-\begin{conceptbox}{개념 3: 우도 산(Mountain) 등반하기}
+\begin{conceptbox}[title={개념 3: 우도 산(Mountain) 등반하기}]
 \textbf{한 줄 요약:} $H_0$가 틀렸다는 것을 입증하기 위해 산의 높이(LRT), 너비(Wald), 기울기(Score) 중 하나를 잽니다.
 \end{conceptbox}
 
@@ -1340,7 +1565,7 @@ $$ -2 \log \lambda \xrightarrow{d} \chi^2_d $$
 
 \subsection{4. t-test: 데이터가 적을 때의 현실}
 
-\begin{conceptbox}{개념 4: 모르는 게 있으면 꼬리가 두꺼워진다}
+\begin{conceptbox}[title={개념 4: 모르는 게 있으면 꼬리가 두꺼워진다}]
 \textbf{한 줄 요약:} 분산 $\sigma^2$을 몰라서 표본분산 $S^2$을 대충 써야 할 때, 그 불안감만큼 기각 기준을 엄격하게(꼬리를 두껍게) 만듭니다.
 \end{conceptbox}
 
@@ -1356,7 +1581,7 @@ $n \to \infty$가 되면 $S \to \sigma$가 되므로 t-분포는 정규분포와
 
 \section{실전 계산: 불공정 동전 판별 (Wald Test)}
 
-\begin{storybox}{Scenario: 카지노의 의심}
+\begin{storybox}[title={Scenario: 카지노의 의심}]
 카지노에서 어떤 동전이 앞면($p$)이 너무 많이 나온다는 제보가 들어왔습니다.
 $H_0: p = 0.5$ vs $H_1: p \neq 0.5$.
 데이터: $n=100$번 던져서 앞면이 60번 나옴 ($\hat{p} = 0.6$).
@@ -1396,7 +1621,7 @@ $H_0: p = 0.5$ vs $H_1: p \neq 0.5$.
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 6 핵심 요약}
+\begin{summarybox}[title={Unit 6 핵심 요약}]
 \begin{itemize}
     \item \textbf{Neyman-Pearson:} 단순 가설 대립 시 우도비(Likelihood Ratio)가 검정력 최강(UMP)이다.
     \item \textbf{Wilks' Theorem:} $-2 \log (\text{우도비}) \sim \chi^2$. 복잡한 모델 검정의 만능열쇠.
@@ -1410,11 +1635,9 @@ $H_0: p = 0.5$ vs $H_1: p \neq 0.5$.
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 7: MIT 18.6501: 모델 자체에 대한 의심
+% Lecture 7: MIT 18.6501: 모델 자체에 대한 의심
 %=======================================================================
 \chapter{MIT 18.6501: 모델 자체에 대한 의심}
 \label{ch:lecture7}
@@ -1438,7 +1661,6 @@ $H_0: p = 0.5$ vs $H_1: p \neq 0.5$.
     \item Unit 8: General Linear Models (회귀 분석의 확장)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 7. 적합도 검정 (Goodness of Fit)}
@@ -1478,7 +1700,7 @@ $H_0: p = 0.5$ vs $H_1: p \neq 0.5$.
 % 6. 핵심 개념 상세 설명
 \subsection{1. 이산 데이터와 다항 분포 (The Setup)}
 
-\begin{conceptbox}{개념 1: 연속을 이산으로 (Discretization)}
+\begin{conceptbox}[title={개념 1: 연속을 이산으로 (Discretization)}]
 \textbf{한 줄 요약:} 모양을 비교하기 가장 쉬운 방법은, 구간(Bin)을 나누어 각 구간에 몇 개가 들어갔는지 세는 것입니다. (히스토그램 만들기)
 \end{conceptbox}
 
@@ -1495,7 +1717,7 @@ $H_0: p = 0.5$ vs $H_1: p \neq 0.5$.
 
 \subsection{2. 피어슨의 카이제곱 검정 (Pearson's $\chi^2$ Test)}
 
-\begin{conceptbox}{개념 2: 현실(Observed)과 이론(Expected)의 거리}
+\begin{conceptbox}[title={개념 2: 현실(Observed)과 이론(Expected)의 거리}]
 \textbf{한 줄 요약:} 단순히 차이를 제곱해서 더하는 게 아니라, "기대값이 큰 곳은 오차도 크다"는 점을 감안하여 \textbf{표준화}한 거리입니다.
 \end{conceptbox}
 
@@ -1515,7 +1737,6 @@ $$ T_n = \sum_{j=1}^K \frac{(N_j - n p_j^0)^2}{n p_j^0} = \sum_{j=1}^K \frac{(\t
 \end{itemize}
 
 
-
 \subsubsection*{3) 점근적 성질 (Asymptotic Property)}
 $n \to \infty$일 때,
 $$ T_n \xrightarrow{d} \chi^2_{K-1} $$
@@ -1526,7 +1747,7 @@ $$ T_n \xrightarrow{d} \chi^2_{K-1} $$
 
 \subsection{3. 복합 가설 검정 (Composite Goodness of Fit)}
 
-\begin{conceptbox}{개념 3: 옷을 몸에 맞췄다면, 심사 기준을 높여라}
+\begin{conceptbox}[title={개념 3: 옷을 몸에 맞췄다면, 심사 기준을 높여라}]
 \textbf{한 줄 요약:} 파라미터를 몰라서 데이터로 추정($\hat{\theta}$)한 뒤 검정할 때는, 이미 데이터를 한 번 훔쳐본 셈이므로 자유도(df)를 깎아서 패널티를 줍니다.
 \end{conceptbox}
 
@@ -1548,7 +1769,7 @@ $$ T_n = \sum \frac{(N_j - n p_j(\hat{\theta}))^2}{n p_j(\hat{\theta})} \xrighta
 
 \section{실전 시나리오: 확률형 아이템(가챠) 조작 의혹 검증}
 
-\begin{storybox}{Scenario: 유저들의 봉기}
+\begin{storybox}[title={Scenario: 유저들의 봉기}]
 당신은 넥슨의 게임 운영자입니다. 유저들이 "전설/영웅/일반 아이템 확률이 공지된 것과 다르다!"고 소송을 제기했습니다.
 공지 확률: 전설(10\%), 영웅(30\%), 일반(60\%). ($K=3$)
 \end{storybox}
@@ -1595,7 +1816,7 @@ $$ T_n = \sum \frac{(N_j - n p_j(\hat{\theta}))^2}{n p_j(\hat{\theta})} \xrighta
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 7 핵심 요약}
+\begin{summarybox}[title={Unit 7 핵심 요약}]
 \begin{itemize}
     \item \textbf{관점 전환:} 파라미터 값이 아니라 분포의 모양(Shape)을 검정한다.
     \item \textbf{카이제곱 통계량:} $\sum \frac{(O-E)^2}{E}$. 관측값과 기대값의 표준화된 거리.
@@ -1604,11 +1825,9 @@ $$ T_n = \sum \frac{(N_j - n p_j(\hat{\theta}))^2}{n p_j(\hat{\theta})} \xrighta
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 8: MIT 18.6501: 설명에서 예측으로
+% Lecture 8: MIT 18.6501: 설명에서 예측으로
 %=======================================================================
 \chapter{MIT 18.6501: 설명에서 예측으로}
 \label{ch:lecture8}
@@ -1633,7 +1852,6 @@ $$ T_n = \sum \frac{(N_j - n p_j(\hat{\theta}))^2}{n p_j(\hat{\theta})} \xrighta
     \item Unit 4: Hypothesis Testing (심화)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 3. 선형 회귀 (Linear Regression)}
@@ -1673,7 +1891,7 @@ $$ T_n = \sum \frac{(N_j - n p_j(\hat{\theta}))^2}{n p_j(\hat{\theta})} \xrighta
 % 6. 핵심 개념 상세 설명
 \subsection{1. 선형 회귀 모델의 구조 (The Setup)}
 
-\begin{conceptbox}{개념 1: 행렬로 세상을 표현하다}
+\begin{conceptbox}[title={개념 1: 행렬로 세상을 표현하다}]
 \textbf{한 줄 요약:} 복잡한 연립방정식 문제를 $\mathbf{Y} = \mathbf{X}\beta + \epsilon$이라는 우아한 행렬식 하나로 압축합니다.
 \end{conceptbox}
 
@@ -1699,7 +1917,7 @@ $$ \mathbf{Y} = \mathbf{X}\beta + \epsilon $$
 \subsection{2. 최소자승법 (Least Squares Estimation, LSE)}
 
 
-\begin{conceptbox}{개념 2: 오차의 제곱을 최소화하라}
+\begin{conceptbox}[title={개념 2: 오차의 제곱을 최소화하라}]
 \textbf{한 줄 요약:} 모든 데이터 점들과 직선 사이의 거리(잔차) 제곱합을 최소로 만드는 $\beta$를 찾습니다.
 \end{conceptbox}
 
@@ -1718,7 +1936,7 @@ $$ \hat{\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y} $$
 \subsection{3. 기하학적 해석: 직교 투영 (Projection)}
 
 
-\begin{conceptbox}{개념 3: 그림자 놀이}
+\begin{conceptbox}[title={개념 3: 그림자 놀이}]
 \textbf{한 줄 요약:} 우리의 예측값 $\hat{Y}$는 실제 데이터 $Y$를 $\mathbf{X}$가 만드는 평면(공간) 위로 \textbf{수직으로 내리꽂은 그림자}입니다.
 \end{conceptbox}
 
@@ -1743,7 +1961,7 @@ $$ \hat{Y} = P Y, \quad \text{where } P = \mathbf{X}(\mathbf{X}^T \mathbf{X})^{-
 
 \subsection{4. 가우스-마르코프 정리 (Gauss-Markov Theorem)}
 
-\begin{conceptbox}{개념 4: 왜 하필 LSE인가?}
+\begin{conceptbox}[title={개념 4: 왜 하필 LSE인가?}]
 \textbf{한 줄 요약:} 데이터가 정규분포가 아니더라도, 오차의 평균이 0이고 분산이 일정하다면 LSE가 \textbf{"가장 분산이 작은(정밀한) 선형 추정량"}임이 수학적으로 보장됩니다.
 \end{conceptbox}
 
@@ -1771,7 +1989,7 @@ $$ \hat{\beta} \sim \mathcal{N}\left(\beta, \sigma^2 (\mathbf{X}^T \mathbf{X})^{
 $$ T = \frac{\hat{\beta}_j - 0}{\text{SE}(\hat{\beta}_j)} \sim t_{n-p} $$
 여기서 $\text{SE}(\hat{\beta}_j)$는 $\hat{\sigma} \sqrt{(\mathbf{X}^T \mathbf{X})^{-1}_{jj}}$ 입니다.
 
-\begin{warningbox}{코크란의 정리 (Cochran's Theorem)}
+\begin{warningbox}[title={코크란의 정리 (Cochran's Theorem)}]
 우리가 t-분포를 쓸 수 있는 이유는 \textbf{"추정된 계수($\hat{\beta}$)와 잔차($\hat{\epsilon}$)가 서로 독립"}이라는 수학적 성질 덕분입니다. 이는 기하학적으로 투영된 그림자($\hat{Y}$)와 수직선($e$)이 직교하기 때문에 성립합니다.
 \end{warningbox}
 
@@ -1779,7 +1997,7 @@ $$ T = \frac{\hat{\beta}_j - 0}{\text{SE}(\hat{\beta}_j)} \sim t_{n-p} $$
 
 \section{실전 시나리오: 넷플릭스 시청 시간 예측}
 
-\begin{storybox}{Scenario: 새로운 드라마의 성공 예측}
+\begin{storybox}[title={Scenario: 새로운 드라마의 성공 예측}]
 당신은 넷플릭스의 데이터 과학자입니다. 신규 드라마의 '첫 달 시청 시간($Y$)'을 예측하려 합니다.
 \end{storybox}
 
@@ -1824,7 +2042,7 @@ $$ T = \frac{\hat{\beta}_j - 0}{\text{SE}(\hat{\beta}_j)} \sim t_{n-p} $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 3 핵심 요약}
+\begin{summarybox}[title={Unit 3 핵심 요약}]
 \begin{itemize}
     \item \textbf{모델:} $Y = \mathbf{X}\beta + \epsilon$. 현실을 선형 결합으로 근사한다.
     \item \textbf{LSE:} 잔차 제곱합을 최소화하는 방법. $\hat{\beta} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T Y$.
@@ -1833,11 +2051,9 @@ $$ T = \frac{\hat{\beta}_j - 0}{\text{SE}(\hat{\beta}_j)} \sim t_{n-p} $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 9: MIT 18.6501: 모든 데이터를 위한 통계
+% Lecture 9: MIT 18.6501: 모든 데이터를 위한 통계
 %=======================================================================
 \chapter{MIT 18.6501: 모든 데이터를 위한 통계}
 \label{ch:lecture9}
@@ -1863,7 +2079,6 @@ $$ T = \frac{\hat{\beta}_j - 0}{\text{SE}(\hat{\beta}_j)} \sim t_{n-p} $$
     \item Unit 10: Classification (머신러닝으로의 연결)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 9. 일반화 선형 모형 (GLM)}
@@ -1903,7 +2118,7 @@ GLM은 정규분포, 베르누이 분포, 포아송 분포 등을 \textbf{지수
 % 6. 핵심 개념 상세 설명
 \subsection{1. 지수족 분포 (Exponential Family)}
 
-\begin{conceptbox}{개념 1: 통계학의 만능 플랫폼}
+\begin{conceptbox}[title={개념 1: 통계학의 만능 플랫폼}]
 \textbf{한 줄 요약:} 정규분포, 베르누이, 포아송 등은 겉보기엔 다르지만, 사실 $f(y) = h(y)e^{\eta T(y) - A(\eta)}$라는 \textbf{공통 DNA}를 가진 가족입니다.
 \end{conceptbox}
 
@@ -1927,7 +2142,7 @@ $$ f(y; \theta) = h(y) \exp\left( \eta(\theta) \cdot T(y) - A(\theta) \right) $$
 \subsection{2. 연결 함수 (Link Function)}
 
 
-\begin{conceptbox}{개념 2: 무한의 세계와 유한의 세계를 잇다}
+\begin{conceptbox}[title={개념 2: 무한의 세계와 유한의 세계를 잇다}]
 \textbf{한 줄 요약:} 선형 회귀 결과값 $X\beta$는 $-\infty \sim \infty$ 범위를 가지지만, 우리가 원하는 평균 $\mu$는 범위가 제한적입니다(확률은 0~1). 이 둘을 이어주는 다리입니다.
 \end{conceptbox}
 
@@ -1954,7 +2169,7 @@ $$ f(y; \theta) = h(y) \exp\left( \eta(\theta) \cdot T(y) - A(\theta) \right) $$
 
 \subsection{3. 추정 알고리즘: IRLS}
 
-\begin{conceptbox}{개념 3: 산을 오르는 반복적인 걸음}
+\begin{conceptbox}[title={개념 3: 산을 오르는 반복적인 걸음}]
 \textbf{한 줄 요약:} 선형 회귀처럼 한 번에 답($\beta$)이 나오지 않습니다. 직선을 긋고(Linear), 가중치를 조절하고(Reweight), 다시 긋는 과정을 반복(Iterative)합니다.
 \end{conceptbox}
 
@@ -1972,7 +2187,7 @@ GLM의 로그 우도 함수를 미분하면, $\beta$가 지수함수($e^{X\beta}
 
 \section{실전 시나리오: 대학원 합격 예측 (로지스틱)}
 
-\begin{storybox}{Scenario: GPA와 합격률의 관계}
+\begin{storybox}[title={Scenario: GPA와 합격률의 관계}]
 학생들의 GPA($X$)에 따른 합격 여부($Y \in \{0, 1\}$)를 분석합니다.
 \end{storybox}
 
@@ -2015,7 +2230,7 @@ GLM의 로그 우도 함수를 미분하면, $\beta$가 지수함수($e^{X\beta}
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 9 핵심 요약}
+\begin{summarybox}[title={Unit 9 핵심 요약}]
 \begin{itemize}
     \item \textbf{지수족(Exponential Family):} GLM의 수학적 기반. 로그 우도가 오목(Concave)하여 최적화가 쉽다.
     \item \textbf{연결 함수(Link Function):} $g(\mu) = X\beta$. 선형 예측값을 데이터 범위에 맞게 변환한다.
@@ -2025,11 +2240,9 @@ GLM의 로그 우도 함수를 미분하면, $\beta$가 지수함수($e^{X\beta}
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 10: MIT 18.6501: 가정을 버리고 데이터 그대로
+% Lecture 10: MIT 18.6501: 가정을 버리고 데이터 그대로
 %=======================================================================
 \chapter{MIT 18.6501: 가정을 버리고 데이터 그대로}
 \label{ch:lecture10}
@@ -2053,7 +2266,6 @@ GLM의 로그 우도 함수를 미분하면, $\beta$가 지수함수($e^{X\beta}
     \item Unit 5: PCA (차원 축소)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 4. 밀도 추정 (Density Estimation)}
@@ -2093,10 +2305,9 @@ GLM의 로그 우도 함수를 미분하면, $\beta$가 지수함수($e^{X\beta}
 % 6. 핵심 개념 상세 설명
 \subsection{1. 히스토그램 (Histogram)}
 
-\begin{conceptbox}{개념 1: 디지털 모자이크}
+\begin{conceptbox}[title={개념 1: 디지털 모자이크}]
 \textbf{한 줄 요약:} 데이터 공간을 격자(Bin)로 나누고, 각 칸에 떨어진 데이터 개수만큼 높이를 올리는 계단 함수입니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{1) 한계점}
@@ -2109,7 +2320,7 @@ GLM의 로그 우도 함수를 미분하면, $\beta$가 지수함수($e^{X\beta}
 
 \subsection{2. 커널 밀도 추정 (KDE, Kernel Density Estimation)}
 
-\begin{conceptbox}{개념 2: 벽돌 대신 모래를 쌓자}
+\begin{conceptbox}[title={개념 2: 벽돌 대신 모래를 쌓자}]
 \textbf{한 줄 요약:} 각 데이터 포인트 위치에 '커널(Kernel)'이라는 작은 확률의 언덕을 쌓고, 이 언덕들을 모두 더해서 전체 지형을 만듭니다.
 \end{conceptbox}
 
@@ -2133,10 +2344,9 @@ $$ \hat{f}_n(x) = \frac{1}{nh} \sum_{i=1}^n K\left( \frac{x - X_i}{h} \right) $$
 
 \subsection{3. 편향-분산 트레이드오프 (Bias-Variance Trade-off)}
 
-\begin{conceptbox}{개념 3: 너무 섬세해도, 너무 둔감해도 안 된다}
+\begin{conceptbox}[title={개념 3: 너무 섬세해도, 너무 둔감해도 안 된다}]
 \textbf{한 줄 요약:} 대역폭 $h$가 작으면 노이즈까지 따라그리고(과적합), $h$가 크면 중요 특징을 뭉개버립니다(과소적합).
 \end{conceptbox}
-
 
 
 우리의 목표는 추정함수 $\hat{f}$와 실제함수 $f$ 사이의 차이(MSE)를 줄이는 것입니다.
@@ -2160,7 +2370,7 @@ $$ \text{MSE} = \text{Bias}^2 + \text{Variance} $$
 
 \subsection{4. 최적의 대역폭 선택 (Optimal Bandwidth)}
 
-\begin{conceptbox}{개념 4: 중용(Golden Mean)을 찾아서}
+\begin{conceptbox}[title={개념 4: 중용(Golden Mean)을 찾아서}]
 \textbf{한 줄 요약:} Bias와 Variance의 합이 최소가 되는 지점을 미분으로 찾습니다.
 \end{conceptbox}
 
@@ -2176,7 +2386,7 @@ $$ h_{opt} \propto n^{-1/5} $$
 
 \section{실전 시나리오: 게임 유저 플레이 타임 분석}
 
-\begin{storybox}{Scenario: 평균의 함정 탈출}
+\begin{storybox}[title={Scenario: 평균의 함정 탈출}]
 당신은 MMORPG 게임의 PM입니다. "유저들의 평균 플레이 타임은 2시간입니다"라는 보고를 받았습니다. 그래서 2시간짜리 콘텐츠를 만들었는데 망했습니다. 왜일까요?
 \end{storybox}
 
@@ -2221,7 +2431,7 @@ $$ h_{opt} \propto n^{-1/5} $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 4 핵심 요약}
+\begin{summarybox}[title={Unit 4 핵심 요약}]
 \begin{itemize}
     \item \textbf{비모수 통계:} 특정 분포($\mathcal{N}$)를 가정하지 않고 함수 $f$ 자체를 추정한다.
     \item \textbf{히스토그램:} 쉽지만 각지고, 구간 설정에 민감하다.
@@ -2231,11 +2441,9 @@ $$ h_{opt} \propto n^{-1/5} $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 11: MIT 18.6501: 데이터의 본질을 찾아서
+% Lecture 11: MIT 18.6501: 데이터의 본질을 찾아서
 %=======================================================================
 \chapter{MIT 18.6501: 데이터의 본질을 찾아서}
 \label{ch:lecture11}
@@ -2260,7 +2468,6 @@ $$ h_{opt} \propto n^{-1/5} $$
     \item Unit 6: Clustering (K-means, Hierarchical)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 5. 주성분 분석 (PCA)}
@@ -2300,7 +2507,7 @@ PCA는 고차원 데이터의 정보를 최대한 보존하면서 저차원으�
 % 6. 핵심 개념 상세 설명
 \subsection{1. 차원 축소의 철학: 분산은 정보다}
 
-\begin{conceptbox}{개념 1: 심장 박동기 모니터}
+\begin{conceptbox}[title={개념 1: 심장 박동기 모니터}]
 \textbf{한 줄 요약:} 변화가 없는(분산 0) 데이터는 죽은 데이터입니다. 요동치는(분산 큰) 데이터가 살아있는 정보입니다.
 \end{conceptbox}
 
@@ -2320,7 +2527,7 @@ PCA는 고차원 데이터의 정보를 최대한 보존하면서 저차원으�
 \subsection{2. 기하학적 해석: 최적의 좌표축 찾기}
 
 
-\begin{conceptbox}{개념 2: 럭비공 돌리기}
+\begin{conceptbox}[title={개념 2: 럭비공 돌리기}]
 \textbf{한 줄 요약:} 데이터 구름(Cloud)의 모양에 맞춰서 좌표축을 회전시킵니다. 가장 길쭉한 쪽이 $x$축(PC1), 그 다음 넓은 쪽이 $y$축(PC2)이 되도록요.
 \end{conceptbox}
 
@@ -2341,7 +2548,7 @@ PC1과 반드시 \textbf{수직(Orthogonal)}이면서, 남은 분산을 가장 �
 
 \subsection{3. 수학적 엔진: 공분산 행렬과 고유값 분해}
 
-\begin{conceptbox}{개념 3: 모든 것은 고유값 문제로 통한다}
+\begin{conceptbox}[title={개념 3: 모든 것은 고유값 문제로 통한다}]
 \textbf{한 줄 요약:} "분산을 최대화하는 축을 찾아라"라는 복잡한 미적분 문제가, 놀랍게도 선형대수의 $Av = \lambda v$를 푸는 문제로 바뀝니다.
 \end{conceptbox}
 
@@ -2367,7 +2574,7 @@ $$ S v_j = \lambda_j v_j $$
 
 \subsection{4. 차원 축소의 실행 (Dimension Reduction)}
 
-\begin{conceptbox}{개념 4: 정보의 압축}
+\begin{conceptbox}[title={개념 4: 정보의 압축}]
 \textbf{한 줄 요약:} 중요도가 낮은(고유값이 작은) 축은 과감히 버립니다.
 \end{conceptbox}
 
@@ -2384,7 +2591,7 @@ $$ S v_j = \lambda_j v_j $$
 
 \section{실전 시나리오: 넥슨 유저 세분화 (User Segmentation)}
 
-\begin{storybox}{Scenario: 너무 많은 게임 지표들}
+\begin{storybox}[title={Scenario: 너무 많은 게임 지표들}]
 당신은 넥슨의 데이터 분석가입니다. 유저들의 플레이 패턴을 분석하려고 보니 지표가 너무 많습니다.
 (변수 20개: 총 킬 수, 데스 수, 어시스트, 가한 피해량, 받은 피해량, 힐량, 타워 철거 수, CS, 골드 획득량...)
 변수가 20개라 시각화도 안 되고, 군집화(Clustering)를 돌려도 결과가 엉망입니다.
@@ -2420,7 +2627,7 @@ $$ S v_j = \lambda_j v_j $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 5 핵심 요약}
+\begin{summarybox}[title={Unit 5 핵심 요약}]
 \begin{itemize}
     \item \textbf{철학:} 분산(Variance)이 클수록 정보가 많다.
     \item \textbf{목표:} 정보를 최대한 보존하면서 변수의 개수(차원)를 줄이자.
@@ -2430,11 +2637,9 @@ $$ S v_j = \lambda_j v_j $$
 \end{itemize}
 \end{summarybox}
 
-\newpage
-
 
 %=======================================================================
-% Chapter 12: MIT 18.6501: 빅데이터의 딜레마와 돌파구
+% Lecture 12: MIT 18.6501: 빅데이터의 딜레마와 돌파구
 %=======================================================================
 \chapter{MIT 18.6501: 빅데이터의 딜레마와 돌파구}
 \label{ch:lecture12}
@@ -2459,7 +2664,6 @@ $$ S v_j = \lambda_j v_j $$
     \item Unit 13: Robustness (이상치 대응)
 \end{itemize}
 
-\newpage
 
 % 2. 현재 단원 제목
 \section{Unit 12. 고차원 회귀와 희소성 (High-dimensional Regression \& Sparsity)}
@@ -2499,10 +2703,9 @@ $$ S v_j = \lambda_j v_j $$
 % 6. 핵심 개념 상세 설명
 \subsection{1. 문제의 본질: $p > n$ 일 때 발생하는 일}
 
-\begin{conceptbox}{개념 1: 식보다 미지수가 많다}
+\begin{conceptbox}[title={개념 1: 식보다 미지수가 많다}]
 \textbf{한 줄 요약:} 해가 하나로 정해지지 않고 무수히 많으며, 컴퓨터는 그중에서 "노이즈까지 외워버린" 최악의 해를 선택하게 됩니다.
 \end{conceptbox}
-
 
 
 \subsubsection*{1) 수학적 불능 (Singularity)}
@@ -2519,7 +2722,7 @@ OLS 해 $\hat{\beta} = (X^T X)^{-1} X^T Y$를 구하려면 역행렬이 존재�
 
 \subsection{2. 희소성 가정 (Sparsity Assumption)}
 
-\begin{conceptbox}{개념 2: 오컴의 면도날 (Occam's Razor)}
+\begin{conceptbox}[title={개념 2: 오컴의 면도날 (Occam's Razor)}]
 \textbf{한 줄 요약:} "현상은 복잡해 보이지만, 실제로 결과($Y$)를 조종하는 핵심 변수($\beta_j \neq 0$)는 극소수($s$)일 것이다."
 \end{conceptbox}
 
@@ -2532,7 +2735,7 @@ $$ \|\beta^*\|_0 := \sum_{j=1}^p \mathbb{I}(\beta^*_j \neq 0) = s \ll n $$
 
 \subsection{3. 규제화 (Regularization): Ridge vs LASSO}
 
-\begin{conceptbox}{개념 3: 벌점(Penalty) 시스템}
+\begin{conceptbox}[title={개념 3: 벌점(Penalty) 시스템}]
 \textbf{한 줄 요약:} "문제를 잘 푸는 것(RSS 최소화)"도 중요하지만, "답안지가 복잡하면(계수가 크면)" 감점을 시키는 새로운 채점 기준을 도입합니다.
 \end{conceptbox}
 
@@ -2558,10 +2761,9 @@ $$ \text{Penalty} = \sum |\beta_j| $$
 
 \subsection{4. LASSO의 기하학적 해석 (The Geometry of Sparsity)}
 
-\begin{conceptbox}{개념 4: 둥근 원과 뾰족한 마름모}
+\begin{conceptbox}[title={개념 4: 둥근 원과 뾰족한 마름모}]
 \textbf{한 줄 요약:} L1 페널티 영역(마름모)은 모서리가 뾰족해서, 최적해가 축(Axis) 위에서 형성될 확률이 매우 높습니다. 축 위에 있다는 것은 해당 좌표값이 0이라는 뜻입니다.
 \end{conceptbox}
-
 
 
 이 그림은 Unit 12의 하이라이트입니다.
@@ -2585,7 +2787,7 @@ $$ \text{Penalty} = \sum |\beta_j| $$
 
 \subsection{5. 이론적 보장 (Theoretical Guarantees)}
 
-\begin{conceptbox}{개념 5: 신(Oracle)과의 대결}
+\begin{conceptbox}[title={개념 5: 신(Oracle)과의 대결}]
 \textbf{한 줄 요약:} LASSO는 우리가 "진짜 중요한 변수가 무엇인지 미리 알고 있을 때(Oracle)" 수행하는 추정만큼이나 훌륭한 성능을 냅니다.
 \end{conceptbox}
 
@@ -2601,7 +2803,7 @@ $$ \| \hat{\beta}_{LASSO} - \beta^* \|^2 \le C \frac{s \log p}{n} $$
 
 \section{실전 시나리오: 넥슨 게임 로그 분석}
 
-\begin{storybox}{Scenario: 이탈 유저를 찾아라}
+\begin{storybox}[title={Scenario: 이탈 유저를 찾아라}]
 당신은 넥슨의 데이터 분석가입니다. '메이플스토리' 유저 중 누가 다음 달에 게임을 접을지(Churn) 예측하고 싶습니다.
 \end{storybox}
 
@@ -2642,7 +2844,7 @@ $$ \| \hat{\beta}_{LASSO} - \beta^* \|^2 \le C \frac{s \log p}{n} $$
 \end{quote}
 
 % 11. 단원 요약 박스
-\begin{summarybox}{Unit 12 핵심 요약}
+\begin{summarybox}[title={Unit 12 핵심 요약}]
 \begin{itemize}
     \item \textbf{문제:} $p \gg n$이면 OLS는 불가능하거나 과적합된다.
     \item \textbf{가정:} 희소성(Sparsity). 중요한 변수는 소수($s$)다.
@@ -2651,8 +2853,6 @@ $$ \| \hat{\beta}_{LASSO} - \beta^* \|^2 \le C \frac{s \log p}{n} $$
     \item \textbf{이론:} $s \log p / n$ 속도로 수렴하여 고차원에서도 작동한다.
 \end{itemize}
 \end{summarybox}
-
-\newpage
 
 
 \end{document}

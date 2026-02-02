@@ -1,0 +1,957 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{kotex, geometry, hyperref, xcolor, tcolorbox, booktabs, graphicx, amsmath, amssymb, listings, setspace, fancyhdr, adjustbox}
+
+\usepackage[margin=25mm]{geometry}
+\onehalfspacing
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.2}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numbersep=6pt,
+  frame=single,
+  captionpos=b,
+  aboveskip=1em,
+  belowskip=1em,
+  xleftmargin=0.75cm,
+  xrightmargin=0.75cm,
+  showstringspaces=false,
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  commentstyle=\color{gray}\itshape
+}
+
+\hypersetup{
+  pdftitle={CSCI103 Lecture 13: 데이터 이니셔티브 가치 극대화 및 지속적 개선},
+  pdfauthor={UIUC Student},
+  pdfsubject={CSCI E-103: Introduction to the Intellectual Enterprises of CS}
+}
+
+% Define custom colors for tcolorbox
+\definecolor{myblue}{RGB}{220,230,241}
+\definecolor{mygreen}{RGB}{220,241,220}
+\definecolor{myred}{RGB}{241,220,220}
+\definecolor{myyellow}{RGB}{255,250,205}
+
+% Custom tcolorboxes
+\newtcolorbox{summarybox}[1][]{
+  colback=myblue!10!white,
+  colframe=myblue!75!black,
+  fonttitle=\bfseries,
+  title={요약},
+  #1
+}
+
+\newtcolorbox{warningbox}[1][]{
+  colback=myred!10!white,
+  colframe=myred!75!black,
+  fonttitle=\bfseries,
+  title={주의},
+  #1
+}
+
+\newtcolorbox{examplebox}[1][]{
+  colback=mygreen!10!white,
+  colframe=mygreen!75!black,
+  fonttitle=\bfseries,
+  title={예시},
+  #1
+}
+
+\newtcolorbox{conceptbox}[1][]{
+  colback=myyellow!10!white,
+  colframe=myyellow!75!black,
+  fonttitle=\bfseries,
+  title={핵심 개념},
+  #1
+}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{CSCI103 Lecture 13: 데이터 이니셔티브 가치 극대화 및 지속적 개선}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\begin{document}
+
+\begin{summarybox}
+\textbf{개요: CSCI103 Lecture 13 - 데이터 이니셔티브 가치 극대화 및 지속적 개선}
+
+본 문서는 CSCI103 Lecture 13 강의 내용을 바탕으로, 데이터 이니셔티브 투자에서 최대 가치를 얻고 지속적인 개선을 달성하기 위한 핵심 전략을 다룹니다.
+최종 과제 안내를 시작으로, 소프트웨어 개발 수명 주기(SDLC)의 각 단계와 견고하고 확장 가능한 데이터 제품 및 서비스 구축 방법을 설명합니다.
+특히, 서비스 수준 계약(SLA)의 중요성과 비용 절감 전략을 상세히 다루며, 자동화된 인프라 관리를 위한 지속적인 통합 및 배포(CI/CD)와 Infrastructure as Code(IaC) 개념을 심층적으로 탐구합니다.
+Databricks 플랫폼의 워크스페이스 조직, 데이터 메시, 그리고 관측 가능성(Observability) 및 모니터링(시스템 테이블, 이상 감지, 레이크하우스 모니터링, DQX) 기능이 소개됩니다.
+마지막으로, Databricks Asset Bundles(DABs)를 활용한 프로젝트 아티팩트 관리 및 CI/CD 통합 방안을 실습 예시와 함께 제시하여, 데이터 플랫폼 운영의 효율성과 안정성을 극대화하는 방법을 종합적으로 이해할 수 있도록 돕습니다.
+\end{summarybox}
+
+\newpage
+\section*{용어 정리}
+\begin{table}[h!]
+\centering
+\caption{주요 용어 및 설명}
+\label{tab:glossary}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+SDLC & 소프트웨어 개발의 전 과정 & Software Development Life Cycle & 개발, 스테이징, 프로덕션 단계 포함 \\
+SLA & 서비스 제공자와 사용자 간의 성능 약속 & Service Level Agreement & 가용성, 성능, 응답 시간 등 \\
+CI/CD & 코드 변경 사항을 자동으로 통합하고 배포하는 과정 & Continuous Integration/Continuous Delivery & 개발 효율성 및 배포 속도 향상 \\
+IaC & 인프라를 코드로 정의하고 관리하는 방법 & Infrastructure as Code & 반복 가능하고 일관된 인프라 구축 \\
+RTO & 재해 발생 후 시스템 복구 목표 시간 & Recovery Time Objective & 비즈니스 연속성 계획의 핵심 지표 \\
+RPO & 재해 발생 시 데이터 손실 허용 최대 시간 & Recovery Point Objective & 백업 및 복구 전략 수립에 중요 \\
+Data Mesh & 데이터를 제품처럼 취급하는 분산 아키텍처 & Data Mesh & 데이터 도메인 중심의 데이터 관리 \\
+MLOps & 머신러닝 모델의 개발부터 배포, 운영까지의 과정 & Machine Learning Operations & ML 모델의 CI/CD 및 모니터링 \\
+Observability & 시스템 내부 상태를 외부에서 추론할 수 있는 능력 & Observability & 모니터링보다 포괄적인 개념 \\
+Databricks Asset Bundles (DABs) & Databricks 프로젝트 자산을 패키징하고 배포하는 도구 & Databricks Asset Bundles & CI/CD를 위한 프로젝트 단위 배포 \\
+Unity Catalog & Databricks의 통합 데이터 거버넌스 솔루션 & Unity Catalog & 데이터, ML 모델, 노트북 등에 대한 접근 제어 \\
+TPC-DS & 분석 및 의사결정 지원 시스템 성능 벤치마크 & Transaction Processing Performance Council - Decision Support & 데이터 웨어하우스 쿼리 속도 측정 \\
+TPC-DI & 데이터 통합 시스템 성능 벤치마크 & Transaction Processing Performance Council - Data Integration & 데이터 웨어하우스 로딩 속도 측정 \\
+Spot Instances & 클라우드 제공자의 유휴 컴퓨팅 자원 & Spot Instances & 저렴하지만 회수될 수 있는 인스턴스 \\
+Serverless & 서버 관리 없이 코드 실행에만 집중하는 컴퓨팅 모델 & Serverless Computing & 사용량 기반 과금, 빠른 시작 \\
+Wheel Files & Python 패키지 배포 형식 & Wheel Files & 공유 라이브러리 빌드 및 재사용 \\
+Anomaly Detection & 데이터에서 비정상적인 패턴을 자동으로 감지하는 기능 & Anomaly Detection & AI 기반 데이터 품질 모니터링 \\
+Lakehouse Monitoring & Databricks에서 테이블 중심으로 데이터 품질을 모니터링하는 기능 & Lakehouse Monitoring & 프로파일링, 드리프트 감지 포함 \\
+DQX & Databricks Labs에서 개발한 코드 기반 데이터 품질 프레임워크 & Databricks Quality eXpectations & PySpark 파이프라인 내 품질 검사 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\newpage
+\section{최종 과제 안내}
+
+\begin{conceptbox}
+\textbf{최종 과제 개요}
+최종 과제는 팀 프로젝트로 진행되며, 데이터 이니셔티브의 가치를 극대화하고 지속적인 개선을 목표로 합니다. 팀원들과 협력하여 데이터 제품 및 서비스를 개발하고, 그 과정과 결과를 발표해야 합니다.
+\end{conceptbox}
+
+최종 과제는 지난 밤에 Canvas에 공개되었으며, Canvas의 'People' 페이지에서 새로운 팀을 확인할 수 있습니다. 팀 프로젝트이므로, 팀원들에게 가능한 한 빨리 연락하여 소개하고 원활한 의사소통을 시작하는 것이 중요합니다. 연휴 기간이지만 상당한 작업량이 예상되므로, 충분한 시간을 확보하여 과제를 수행해야 합니다.
+
+\subsection{발표 형식 및 내용}
+각 팀은 최종 강의일(15일)에 발표를 진행합니다. 발표에는 다음 내용이 포함되어야 합니다.
+
+\begin{enumerate}
+    \item \textbf{문제 정의 (Problem Statement):} 해결하고자 하는 비즈니스 문제 또는 데이터 관련 과제를 명확히 제시합니다.
+    \item \textbf{팀 소개 (Team Introduction):} 각 팀원은 자신의 역할을 맡아 소개합니다. 팀 규모를 고려할 때, 각 역할은 두 명의 팀원으로 구성될 수 있습니다.
+    \item \textbf{설계 및 아키텍처 검토 (Design and Architecture Review):} 데이터 아키텍트가 담당하며, 확장성(Scalability), 품질(Quality), 성능(Performance), 신뢰성(Reliability), 거버넌스(Governance) 측면을 고려하여 설계 및 아키텍처를 설명합니다.
+    \item \textbf{데이터 파이프라인 검토 (Data Pipeline Review):} 데이터 엔지니어가 담당하며, 데이터 수집, 변환, 로딩 과정을 설명합니다.
+    \item \textbf{ML 모델 검토 (ML Model Review):} ML 실무자가 담당하며, 모델 개발 과정과 결과를 설명합니다.
+    \item \textbf{BI 대시보드 검토 (BI Dashboard Review):} 데이터 분석가가 담당하며, 비즈니스 인텔리전스 대시보드를 시연하고 주요 인사이트를 요약합니다.
+    \item \textbf{인사이트 요약 및 다음 단계 (Summarize Insights and Next Steps):} 프로젝트를 통해 얻은 주요 인사이트를 요약하고, 향후 개선 또는 확장 계획을 제시합니다.
+\end{enumerate}
+
+\subsection{발표 지침}
+\begin{itemize}
+    \item \textbf{슬라이드 수:} 20장 이내로 제한합니다.
+    \item \textbf{발표 시간:} 15분 발표, 5분 Q\&A로 총 20분입니다.
+    \item \textbf{전원 발표:} 모든 팀원이 발표에 참여해야 합니다. 한 명이 슬라이드 쇼를 진행할 수 있지만, 모든 팀원이 발표의 일부를 맡아야 합니다.
+    \item \textbf{외부 게스트:} 외부 게스트가 참석하여 발표를 검토하고 피드백을 제공할 예정입니다.
+    \item \textbf{팀 이름:} 팀 이름을 정해야 합니다.
+    \item \textbf{발표 순서:} 기본적으로 그룹 번호 순서로 진행되지만, 팀원 중 다른 시간대에 거주하여 늦은 저녁 시간이 되는 경우 우선적으로 발표할 수 있도록 예외를 적용합니다. 해당되는 경우 미리 알려주세요.
+\end{itemize}
+
+\newpage
+\section{데이터 파이프라인 운영 및 최적화}
+
+\begin{conceptbox}
+\textbf{데이터 파이프라인 운영 및 최적화 목표}
+데이터 파이프라인은 비즈니스에 가치를 제공하는 핵심 요소입니다. 이를 효과적으로 운영하고 최적화하기 위해서는 초기 설계 단계부터 확장성, 효율성, 보안을 고려해야 하며, 지속적인 모니터링과 개선을 통해 안정적인 서비스를 제공해야 합니다.
+\end{conceptbox}
+
+\subsection{견고하고 확장 가능한 데이터 제품 및 서비스 구축}
+데이터 파이프라인을 구축할 때 고려해야 할 중요한 사항들은 다음과 같습니다.
+
+\begin{enumerate}
+    \item \textbf{사용 사례 이해:}
+    비즈니스 과제와 도메인별 특성을 깊이 이해하는 것이 중요합니다. 파이프라인이 해결하고자 하는 실제 문제를 명확히 파악해야 합니다.
+
+    \item \textbf{요구사항 정의:}
+    기능적 요구사항(Functional Requirements)과 비기능적 요구사항(Non-functional Requirements)을 모두 명확히 정의해야 합니다. 특히 성능(Performance) 및 확장성(Scale)과 관련된 서비스 수준 계약(SLA)을 고려해야 합니다.
+
+    \item \textbf{확장성을 고려한 구축 (Build for Scale):}
+    초기에 소규모로 작동하는 시스템을 구축한 후, 실제 부하가 가해졌을 때 시스템이 무너지는 경우가 많습니다. 이는 전체 프로젝트를 위험에 빠뜨릴 수 있으므로, 모델을 소비할 사용자 또는 소비자의 수를 미리 고려하여 적절한 확장을 지원할 수 있도록 설계해야 합니다.
+
+    \item \textbf{반복 가능한 패턴 및 프레임워크 사용:}
+    구성(Configuration) 기반의 반복 가능한 패턴과 프레임워크를 사용하여 일관성과 효율성을 높입니다.
+
+    \item \textbf{모범 사례 문서화:}
+    팀 내부는 물론 조직 전체의 다른 팀을 위해서도 모범 사례를 문서화하여 지식 공유와 일관된 개발을 촉진합니다.
+
+    \item \textbf{초기 성능 튜닝:}
+    파이프라인이 효율적이고 비용 효과적인지 확인하기 위해 개발 초기 단계부터 성능 튜닝을 수행합니다.
+
+    \item \textbf{인프라 효율성:}
+    \begin{itemize}
+        \item \textbf{스토리지 수명 주기 (Storage Lifecycle):} 데이터 유형에 맞는 적절한 스토리지를 사용합니다. 자주 사용되지 않는 데이터는 저비용 스토리지로 이동하여 비용을 절감합니다.
+        \item \textbf{클러스터 자동 종료 (Auto-termination of Clusters):} 사용되지 않는 클러스터는 자동으로 종료되도록 설정하여 불필요한 리소스 낭비를 방지합니다.
+    \end{itemize}
+
+    \item \textbf{보안 및 비즈니스 연속성:}
+    데이터와 모델 자체의 보안을 보장하고, 모델이 비즈니스 요구사항과 일치하며 노후화되지 않도록 관리합니다.
+
+    \item \textbf{관측 가능성 (Observability):}
+    파이프라인과 생성된 모델이 제대로 작동하는지 모니터링할 수 있어야 합니다. 또한, 사용자 사용량, 성능, 지연 시간 등을 모니터링하여 문제 발생 시 신속하게 대응할 수 있도록 합니다.
+
+    \item \textbf{자동화 및 CI/CD 투자:}
+    인프라를 코드로 관리(Infrastructure as Code)하여 반복 가능성을 높이고, 자동화된 테스트를 통해 모델이 예상대로 작동하는지 쉽게 확인할 수 있도록 합니다.
+
+    \item \textbf{센터 오브 엑설런스 (Center of Excellence) 구축:}
+    조직 내 중앙 그룹이 모범 사례를 홍보하고, 견고한 파이프라인 구축에 대한 전문 지식을 제공하며, 방법론을 통합하고 지원을 제공합니다.
+\end{enumerate}
+
+\subsection{소프트웨어 개발 수명 주기 (SDLC) 단계}
+데이터 파이프라인 개발에는 여러 단계가 있으며, 각 단계는 특정 목표와 리소스 활용 전략을 가집니다.
+
+\begin{enumerate}
+    \item \textbf{개발 단계 (Development Phase)}
+    \begin{itemize}
+        \item \textbf{목표:} 요구사항 이해, 비즈니스 로직 구현, 테스트 케이스 생성 및 테스트 수행.
+        \item \textbf{리소스:} 일반적으로 단일 노드 클러스터와 같은 소규모 리소스를 사용합니다. 스팟 인스턴스(Spot Instances)는 일반 인스턴스보다 80~90\% 저렴하므로 비용 효율적인 개발에 활용될 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{스테이징 단계 (Staging Phase)}
+    \begin{itemize}
+        \item \textbf{목표:} 개발 단계를 벗어나 프로덕션 환경으로의 배포를 준비하는 단계입니다.
+        \item \textbf{데이터셋:} 프로덕션 환경과 유사하거나 더 큰 규모의 데이터셋을 사용하여 테스트합니다.
+        \item \textbf{테스트:} 테스트 범위를 확대하고, 파이프라인을 자동화합니다.
+        \item \textbf{소스 제어:} 파이프라인 코드를 Git 또는 다른 소스 제어 시스템에 체크인하여 반복 가능성을 확보합니다.
+        \item \textbf{트리거:} 대화형(Interactive) 트리거에서 자동화된(Automated) 트리거로 전환을 시작합니다.
+        \item \textbf{자격 증명:} 개별 사용자 자격 증명 대신 파이프라인 운영을 위한 서비스 주체(Service Principles)를 설정하고 사용합니다.
+    \end{itemize}
+
+    \item \textbf{프로덕션 단계 (Production Phase)}
+    \begin{itemize}
+        \item \textbf{목표:} 파이프라인과 생성된 모델이 비즈니스 또는 대중에게 사용 가능하도록 배포되는 최종 단계입니다.
+        \item \textbf{자동화:} 모든 것이 완전히 자동화됩니다.
+        \item \textbf{정책 및 자격 증명:} 올바른 정책이 적용되고, 서비스 주체만 파이프라인에 필요한 자격 증명을 제공하는 데 사용됩니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{서비스 수준 계약 (SLA)}
+SLA는 서비스 제공자와 사용자 간의 서비스 품질에 대한 공식적인 약속입니다. 다양한 워크로드 유형에 따라 SLA 지표가 달라집니다.
+
+\begin{enumerate}
+    \item \textbf{배치 (Batch) 워크로드:}
+    처리해야 할 데이터 볼륨과 전체 처리 시간으로 정의됩니다. 예를 들어, 특정 시간 내에 대량의 데이터를 처리해야 하는 요구사항입니다.
+
+    \item \textbf{스트리밍 (Streaming) 워크로드:}
+    초당 트랜잭션 수(TPS, Transactions Per Second)로 측정됩니다. 파이프라인이 초당 1,000 또는 10,000 트랜잭션을 처리할 수 있어야 하는 것과 같습니다.
+
+    \item \textbf{비즈니스 인텔리전스 (BI) 워크로드:}
+    주로 지연 시간(Latency)으로 측정됩니다. 사용자가 버튼을 클릭한 시점부터 시각화된 결과가 화면에 나타나는 시간(예: 0.5초 또는 1초)을 의미합니다.
+
+    \item \textbf{동시성 (Concurrency):}
+    시스템을 동시에 사용하는 사용자 수를 나타냅니다. 한 명의 사용자가 시스템을 사용하는 것보다 천 명의 사용자가 동시에 상호작용하는 것이 훨씬 더 많은 인프라를 요구합니다.
+
+    \item \textbf{가용성 (Availability):}
+    시스템이 얼마나 자주 다운되는지, 또는 반대로 얼마나 오랫동안 사용 가능한 상태를 유지하는지를 나타냅니다.
+    \begin{itemize}
+        \item \textbf{계산:} (총 가동 시간) / (총 가동 시간 + 총 다운 시간) $\times$ 100\%
+        \item \textbf{예시:} 99.999\% 가용성은 '5-Nines'라고 불리며, 1년에 단 5분만 다운타임을 허용하는 매우 엄격한 기준입니다. 99.99\% (4-Nines)는 조금 더 여유로운 기준을 제공합니다. 비즈니스 요구사항에 따라 허용 가능한 다운타임이 결정됩니다.
+    \end{itemize}
+
+    \item \textbf{재해 복구 (Disaster Recovery):}
+    시스템에 문제가 발생했을 때 얼마나 빨리 복구할 수 있는지를 나타냅니다.
+    \begin{itemize}
+        \item \textbf{RTO (Recovery Time Objective):} 시스템을 기능적인 상태로 복원하는 데 걸리는 목표 시간입니다. 예를 들어, RTO가 15분이라면 시스템은 15분 이내에 다시 작동해야 합니다.
+        \item \textbf{RPO (Recovery Point Objective):} 데이터를 신뢰할 수 있는 백업 시점으로 되돌릴 수 있는 최대 시간입니다. 예를 들어, RPO가 15분이라면 최대 15분 전의 데이터까지 복구할 수 있어야 합니다.
+        \item \textbf{고가용성 (High Availability):} 데이터 센터 다운과 같은 문제를 피하기 위해 다중 지역(Multi-region) 시스템을 사용하여 한 지역이 다운되더라도 다른 지역에서 시스템이 계속 작동하도록 할 수 있습니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{비용 절감 전략}
+데이터 플랫폼 운영 비용을 효과적으로 관리하고 절감하는 것은 매우 중요합니다.
+
+\begin{enumerate}
+    \item \textbf{플랫폼 선택:}
+    최고의 가격 대비 성능을 제공하면서도 적절한 제어 기능을 제공하는 플랫폼을 선택해야 합니다. 성능, 비용, 제어 사이의 균형을 찾는 것이 중요합니다.
+
+    \item \textbf{업계 벤치마크 활용:}
+    플랫폼 선택에 도움이 되는 두 가지 중요한 업계 벤치마크가 있습니다.
+    \begin{itemize}
+        \item \textbf{TPC-DS (Transaction Processing Performance Council - Decision Support):} 분석 및 의사결정 지원을 위한 벤치마크입니다. 데이터 웨어하우스에서 데이터를 얼마나 빨리 쿼리할 수 있는지를 측정합니다. BI 지연 시간 및 동시성과 관련이 있습니다. Databricks가 이 분야에서 기록을 세웠습니다.
+        \item \textbf{TPC-DI (Transaction Processing Performance Council - Data Integration):} 데이터 통합 벤치마크입니다. 플랫폼이 데이터 웨어하우스를 얼마나 빨리 구축하고 데이터를 로드할 수 있는지를 나타냅니다. 데이터 수집 프로세스 시간을 최소화하는 것이 목표입니다.
+    \end{itemize}
+
+    \item \textbf{가정하지 말고 검증:}
+    성능 요구사항에 대한 가정을 세우기보다는 실험을 통해 검증하는 시간을 가져야 합니다.
+
+    \item \textbf{코드 최적화:}
+    더 효율적인 코드를 작성하여 시스템 효율성을 높입니다.
+    \begin{itemize}
+        \item \textbf{데이터프레임 API 활용:} 자체 개발 UDF(User Defined Functions) 대신 고도로 최적화된 데이터프레임 API를 활용합니다. UDF는 Python 엔진 시작 등 비효율적인 요소를 포함할 수 있습니다.
+        \item \textbf{ML 훈련 중 캐싱:} ML 훈련 시 캐싱을 사용하여 이전에 계산된 값과 데이터 구조를 재사용하여 성능을 크게 향상시킵니다.
+        \item \textbf{바이너리 형식 사용:} Delta 또는 Parquet과 같은 바이너리 형식을 사용하여 데이터 크기를 줄이고 효율성을 높입니다. CSV와 같은 텍스트 파일은 매번 전체 레코드를 읽어야 하지만, 바이너리 형식은 더 효율적이고 빠르며 비용을 절감합니다.
+    \end{itemize}
+
+    \item \textbf{인프라 최적화:}
+    \begin{itemize}
+        \item \textbf{적절한 인프라 사용:} 인스턴스 유형, 크기, 클러스터 내 인스턴스 수 등 적절한 인프라를 사용합니다. 너무 작으면 성능이 저하되고, 너무 크면 비용이 많이 듭니다.
+        \item \textbf{거버넌스:} 클러스터 크기(인스턴스 수) 및 인스턴스 유형에 대한 거버넌스 정책을 수립하여 불필요하게 큰 클러스터 생성을 방지합니다. 환경 태그를 사용하여 클러스터 유형을 지정할 수 있습니다.
+        \item \textbf{오토스케일링 (Autoscaling):} 현재 요구사항에 따라 클러스터가 자동으로 확장 및 축소되도록 설정합니다. 컴퓨팅 수요가 증가하면 확장하고, 수요가 줄어들면 축소하여 비용을 절감합니다.
+        \item \textbf{자동 종료 (Auto-termination):} 사용자가 클러스터를 끄는 것을 잊었을 경우, 일정 시간(예: 30분) 비활성 상태 후 클러스터가 자동으로 종료되어 리소스를 해제합니다. 주말 동안 실행되는 클러스터로 인한 수천 달러의 비용 낭비를 방지할 수 있습니다.
+        \item \textbf{스팟 인스턴스 (Spot Instances):} 인스턴스 비용을 최대 90\%까지 절감할 수 있습니다. 미션 크리티컬한 작업에는 권장되지 않지만, 모델 훈련과 같은 작업에는 매우 효과적입니다. (클라우드 제공자가 컴퓨팅 자원이 필요할 경우 인스턴스를 회수할 수 있습니다.)
+    \end{itemize}
+
+    \item \textbf{최신 Spark 버전 사용:}
+    Spark의 각 업데이트에는 버그 수정 및 많은 성능 향상이 포함됩니다. 최신 버전의 Spark를 사용하면 더 나은 품질, 더 많은 기능, 더 높은 효율성을 얻을 수 있습니다.
+
+    \item \textbf{서버리스 (Serverless)로 전환:}
+    클러스터 사용에서 서버리스 환경으로 전환하는 것을 고려합니다. 서버리스는 사용한 만큼만 비용을 지불하며, 클러스터는 컴퓨팅을 수행하지 않아도 실행 중인 동안 비용이 발생합니다. 서버리스는 클러스터 시작 시간(1분)보다 훨씬 빠른 5초 이내에 시작되는 장점도 있습니다.
+
+    \item \textbf{모니터링 및 경고 (Monitoring and Alerting):}
+    오랫동안 실행되거나 과도하게 큰 클러스터를 감지하고, 많은 비용이 발생하기 전에 클러스터를 중지할 수 있도록 모니터링 및 경고 시스템을 구축합니다. 태그를 사용하여 리소스 사용자를 식별하면, 데이터 센터 청구서에서 어떤 프로젝트, 팀 또는 애플리케이션이 비정상적인 지출을 유발하는지 쉽게 파악할 수 있습니다.
+\end{enumerate}
+
+\newpage
+\section{지속적인 통합 및 배포 (CI/CD)}
+
+\begin{conceptbox}
+\textbf{CI/CD 개요}
+CI/CD는 소프트웨어 개발의 핵심적인 방법론으로, 코드 변경 사항을 자동으로 통합(Continuous Integration)하고, 테스트를 거쳐 배포(Continuous Delivery/Deployment)하는 과정을 의미합니다. 이를 통해 개발 속도를 높이고, 오류를 조기에 발견하며, 안정적인 소프트웨어 릴리스를 가능하게 합니다.
+\end{conceptbox}
+
+\subsection{CI/CD의 기본 개념}
+\begin{enumerate}
+    \item \textbf{지속적인 통합 (Continuous Integration, CI):}
+    개발자가 코드를 변경하고 Git 저장소에 체크인(commit)하는 즉시, 자동화된 빌드 및 테스트가 트리거됩니다. 이 과정이 성공하면, 코드는 자동으로 다음 단계(예: 스테이징 환경)로 푸시될 수 있습니다. 만약 실패하면 개발자에게 즉시 알림이 전송되어 문제를 수정할 수 있도록 합니다.
+
+    \item \textbf{지속적인 배포 (Continuous Delivery/Deployment, CD):}
+    CI 단계를 통과하고 스테이징 환경에서 테스트를 완료한 코드는 배포 준비가 된 상태가 됩니다.
+    \begin{itemize}
+        \item \textbf{Continuous Delivery:} 코드가 프로덕션 환경에 배포될 준비가 되었지만, 실제 배포는 수동 승인을 통해 이루어집니다.
+        \item \textbf{Continuous Deployment:} 모든 회귀 테스트(Regression Testing)를 통과하면 코드가 완전히 자동으로 프로덕션에 배포됩니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ci_cd_flow.png} % Placeholder for CI/CD flow diagram
+    \caption{CI/CD 워크플로우 (개념도)}
+    \label{fig:ci_cd_flow}
+\end{figure}
+
+\textbf{CI/CD 워크플로우:}
+개발자가 변경 사항을 커밋하면, 빌드가 자동으로 수행되고 테스트가 실행됩니다. 성공하면 스테이징 환경으로 이동하여 추가 테스트를 거치고, 이 또한 성공하면 프로덕션 환경으로 마이그레이션됩니다. 이 과정은 '코드(Code) $\rightarrow$ 빌드(Build) $\rightarrow$ 릴리스(Release) $\rightarrow$ 배포(Deploy) $\rightarrow$ 테스트(Test) $\rightarrow$ 운영(Operate)'의 흐름을 따릅니다.
+
+\begin{warningbox}
+\textbf{자동 롤백/페일오버}
+스테이징 또는 프로덕션 환경에 새로운 버전을 배포할 때 문제가 발생할 경우를 대비하여, 자동으로 이전 버전으로 롤백하거나 페일오버할 수 있는 메커니즘을 갖추는 것이 중요합니다.
+\end{warningbox}
+
+\subsection{데이터 플랫폼에서의 CI/CD}
+Databricks와 같은 데이터 플랫폼에서 CI/CD를 구현할 때는 다음과 같은 사항을 고려합니다.
+
+\begin{enumerate}
+    \item \textbf{다중 환경 관리:}
+    개발(Development), 스테이징(Staging), 프로덕션(Production)과 같은 여러 환경을 관리합니다. Databricks에서는 이러한 환경이 '워크스페이스(Workspaces)'에 느슨하게 매핑됩니다.
+
+    \item \textbf{로컬 개발 및 버전 관리:}
+    개발자는 IDE를 사용하여 로컬에서 개발하고, 개발된 아티팩트(artifacts)를 버전 관리 시스템(예: Git)에 체크인합니다. 일반적인 SDLC 관행(체크아웃, 병합, 푸시, 커밋)을 따릅니다.
+
+    \item \textbf{아티팩트 이동:}
+    CI/CD 프로세스는 개발된 아티팩트를 한 환경에서 다른 환경으로 이동시키는 역할을 합니다 (예: 개발 $\rightarrow$ 스테이징 $\rightarrow$ 프로덕션).
+
+    \item \textbf{공유 라이브러리 (Wheel Files):}
+    고수준 로직에는 노트북이 사용되지만, 팀 간에 공유되는 라이브러리 등은 일반적으로 '휠 파일(wheel files)' 형태로 개발됩니다. 이 휠 파일은 CI 단계에서 빌드 서버에서 한 번 빌드된 후, 아티팩토리(Artifactory)나 저장소에 저장되어 배포 단계에서 여러 환경에 푸시될 수 있습니다. 이는 환경마다 빌드를 반복하는 오버헤드를 방지합니다.
+\end{enumerate}
+
+\newpage
+\section{인프라 자동화: Infrastructure as Code (IaC)}
+
+\begin{conceptbox}
+\textbf{Infrastructure as Code (IaC) 개요}
+IaC는 클라우드 인프라(VM, 네트워크, 보안 그룹 등)와 데이터 플랫폼(워크스페이스)을 수동 클릭이나 스크립트 대신 코드로 정의하고 관리하는 접근 방식입니다. 이를 통해 인프라 구축 및 변경을 반복 가능하고 일관되며 예측 가능하게 만듭니다.
+\end{conceptbox}
+
+\subsection{IaC의 핵심 원칙}
+\begin{enumerate}
+    \item \textbf{모든 것을 코드로 정의:}
+    구축하려는 모든 인프라 요소를 코드로 작성합니다. 이는 AWS 콘솔이나 Azure 포털에서 수동으로 클릭하거나 자체 스크립트를 사용하는 대신, 표준화된 코드를 통해 인프라를 생성하고 관리하는 것을 의미합니다.
+
+    \item \textbf{지속적인 테스트 및 배포:}
+    진행 중인 모든 작업을 지속적으로 테스트하고 배포합니다. 이는 CI/CD 파이프라인과 통합되어 인프라 변경 사항도 코드 변경 사항처럼 관리됩니다.
+
+    \item \textbf{작고 독립적인 변경 단위:}
+    독립적으로 변경할 수 있는 작고 단순한 구성 요소를 구축합니다. 인프라의 특정 부분을 변경해야 할 경우, 해당 구성 요소를 제어하는 코드만 수정하고 재배포하여 인플레이스(in-place) 변경을 수행할 수 있습니다.
+
+    \item \textbf{클라우드 인프라 및 워크스페이스 인프라:}
+    Databricks와 같은 데이터 플랫폼의 경우, IaC는 클라우드 인프라(예: VM, VNET, 보안 그룹)뿐만 아니라 Databricks 워크스페이스 자체의 인프라(예: 클러스터, 작업, 노트북 설정)에도 적용될 수 있습니다.
+\end{enumerate}
+
+\subsection{자동화 도구 비교: 구성 관리 vs. 프로비저닝}
+IaC 도구는 크게 '구성 관리(Configuration Management)'와 '프로비저닝(Provisioning)' 두 가지 유형으로 나눌 수 있습니다.
+
+\begin{table}[h!]
+\centering
+\caption{구성 관리 도구와 프로비저닝 도구 비교}
+\label{tab:iac_tools_comparison}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{llll}
+\toprule
+\textbf{특징} & \textbf{구성 관리 (Configuration Management)} & \textbf{프로비저닝 (Provisioning)} & \textbf{예시} \\
+\midrule
+\textbf{목적} & 이미 프로비저닝된 인프라 내 소프트웨어 컴포넌트 변경 & 인프라를 처음부터 구축하거나 변경 & Chef, Puppet, Ansible (구성 관리) \\
+& (예: 라이브러리 업데이트) & (예: VM, 네트워크 생성) & Terraform, CloudFormation, Bicep (프로비저닝) \\
+\textbf{변경 방식} & \textbf{가변적 (Mutable)}: 인플레이스(in-place) 변경 & \textbf{불변적 (Immutable)}: 스크래치부터 재배포 & \\
+\textbf{특성} & 절차적(Procedural): 특정 언어(JavaScript, Ruby) 사용 & 선언적(Declarative): 원하는 최종 상태를 정의 & Terraform은 HCL(HashiCorp Configuration Language) 사용 \\
+\textbf{에이전트} & 에이전트 기반: 변경 적용을 위해 머신에 에이전트 필요 & 에이전트리스: API 레이어가 서비스 레이어 역할 & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{구성 관리 (Configuration Management):}
+    Chef, Puppet, Ansible과 같은 도구들이 여기에 속합니다. 이미 구축된 인프라 내에서 소프트웨어 컴포넌트(예: 라이브러리)를 변경하는 데 사용됩니다. 이는 '가변적(mutable)'이며, 인플레이스(in-place) 변경을 수행합니다. 일반적으로 절차적(procedural)이며, 변경을 적용하기 위해 대상 머신에 에이전트가 필요합니다.
+
+    \item \textbf{프로비저닝 (Provisioning):}
+    Terraform, CloudFormation(AWS), Bicep(Azure)과 같은 도구들이 여기에 속합니다. 인프라를 처음부터 구축하거나 대규모 변경을 수행하는 데 사용됩니다. 이는 '불변적(immutable)'이며, 변경 시에는 스크래치부터 다시 배포하는 경향이 있습니다. 일반적으로 선언적(declarative)이며, 에이전트가 필요 없이 API 레이어를 통해 작동합니다.
+
+    \item \textbf{Databricks와 Terraform:}
+    Databricks는 Terraform과 강력한 파트너십을 맺고 있으며, Databricks의 거의 모든 측면(워크스페이스, 인프라)을 Terraform을 사용하여 자동화할 수 있습니다. Terraform은 클라우드 불가지론적(cloud agnostic)이며, 코드 재사용성, 반복 가능성, 예측 가능성이 뛰어납니다. 또한 REST API를 지원하여 사용자 정의 래퍼를 구축할 수 있습니다. Terraform은 Databricks 워크스페이스뿐만 아니라 그 기반이 되는 클라우드 인프라(가상 네트워크, 서브넷, 보안 그룹 등)도 자동화할 수 있습니다.
+\end{itemize}
+
+\subsection{Terraform 데모 예시}
+Terraform은 선언적 스크립트를 사용하여 인프라를 정의합니다.
+
+\begin{examplebox}
+\textbf{Terraform 스크립트 예시 (Azure 리소스 생성)}
+아래는 Azure에서 가상 네트워크(VNET)를 생성하는 Terraform 스크립트의 일부입니다. 이 스크립트는 구독, 지역, DNS 규칙, 공용 IP 사용 여부 등을 선언적으로 정의합니다.
+
+\begin{lstlisting}[language=HCL, caption={Terraform Azure VNET 생성 예시}, label={lst:terraform_azure_vnet}]
+resource "azurerm_virtual_network" "example" {
+  name                = "example-vnet"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  dns_servers         = ["10.0.0.4", "10.0.0.5"]
+  # public_ip_enabled = false (예시에서 언급된 public IP 제어)
+}
+\end{lstlisting}
+\end{examplebox}
+
+\begin{enumerate}
+    \item \textbf{스크립트 구성:}
+    `provider.tf`와 같은 파일에 인프라 정의 스크립트를 작성합니다. Terraform은 `TF state`라는 상태 파일을 자동으로 생성하여, 이전에 생성된 인프라의 상태를 추적하고 관리합니다. 이를 통해 부분적인 변경이나 업데이트가 가능하며, 전체를 처음부터 다시 배포할 필요 없이 필요한 부분만 수정할 수 있습니다.
+
+    \item \textbf{Terraform 명령:}
+    \begin{itemize}
+        \item \textbf{\texttt{terraform plan}:} 스크립트를 실행하기 전에 변경될 내용을 미리 보여주는 드라이 런(dry run)을 수행합니다. 추가될 항목, 변경될 항목, 파괴될 항목 등을 보고서 형태로 제공합니다.
+        \item \textbf{\texttt{terraform apply}:} 실제 스크립트를 실행하여 인프라를 구축하거나 변경합니다. 이 명령을 실행하면 Azure 리소스와 Databricks 리소스가 생성되어 워크스페이스가 준비됩니다.
+    \end{itemize}
+\end{enumerate}
+이러한 과정을 통해 인프라 구축이 고도로 반복 가능하고 표준화됩니다.
+
+\newpage
+\section{워크스페이스 조직 및 데이터 메시}
+
+\begin{conceptbox}
+\textbf{워크스페이스 조직 및 데이터 메시 개요}
+데이터 플랫폼에서 '워크스페이스'는 격리 경계를 제공하는 중요한 단위입니다. 조직의 규모와 복잡성이 커짐에 따라 워크스페이스를 효과적으로 조직하는 전략이 필요하며, '데이터 메시'는 데이터를 제품처럼 취급하여 분산된 데이터 관리를 가능하게 하는 아키텍처 개념입니다.
+\end{conceptbox}
+
+\subsection{워크스페이스 조직 (Workspace Organization)}
+Databricks와 같은 데이터 플랫폼에서 '워크스페이스'는 격리 경계를 제공하는 핵심 단위입니다.
+
+\begin{enumerate}
+    \item \textbf{격리 경계:}
+    워크스페이스는 자체 클러스터, 작업, 노트북, 폴더 구조를 가지며, 다른 워크스페이스와 격리됩니다. 이는 특정 URL로 접근할 수 있는 독립적인 환경으로 볼 수 있습니다. 예를 들어, 개발, 스테이징, 프로덕션을 위한 세 개의 다른 워크스페이스(URL)를 가질 수 있습니다.
+
+    \item \textbf{환경 진화:}
+    전통적으로는 개발(Dev), 스테이징(Staging), 프로덕션(Production)의 세 가지 환경만 가졌지만, 이제는 비즈니스 라인(Line of Business, LOB)이나 프로젝트별로 세분화된 격리 환경을 요구하는 경우가 많습니다.
+    \begin{itemize}
+        \item 예를 들어, LOB 1은 자체 개발, 스테이징, 프로덕션 환경을 가질 수 있으며, LOB 1 내의 여러 프로젝트도 자체 격리 전략을 원할 수 있습니다.
+        \item 성숙한 조직에서는 수백에서 수천 개의 워크스페이스를 운영하는 것이 드물지 않습니다.
+    \end{itemize}
+
+    \item \textbf{중앙 집중식 사용자 관리:}
+    이러한 격리를 구동하는 데 필요한 사용자, 그룹, 서비스 주체 등은 Active Directory 또는 Intra와 같은 중앙 집중식 SSO(Single Sign-On) 시스템에서 관리됩니다. 기업 수준에서 사용자 및 그룹을 프로비저닝하고, 권한이 있는 사용자만 특정 프로젝트 워크스페이스에 로그인할 수 있습니다.
+
+    \item \textbf{공유 프로젝트:}
+    두 개 이상의 LOB가 공통 데이터 도메인을 공유하는 경우, 해당 LOB를 아우르는 공유 프로젝트 워크스페이스를 가질 수도 있습니다.
+
+    \item \textbf{표준화된 프로비저닝의 중요성:}
+    수천 개의 워크스페이스를 수동으로 배포하는 것은 불가능하므로, 반복 가능하고 표준화된 프로비저닝 방식(IaC)이 매우 중요합니다. 이는 워크스페이스뿐만 아니라 데이터 플랫폼의 데이터가 저장되는 스토리지 계정(Storage Accounts)에도 적용되어야 합니다. 임의의 스토리지 계정 생성을 방지하고, 표준화된 계층 구조를 통해 스토리지를 관리해야 합니다.
+\end{enumerate}
+
+\subsection{데이터 메시 (Data Mesh)}
+데이터 메시는 데이터를 조직의 인프라나 프로젝트가 아닌 '제품'으로 취급하는 개념입니다.
+
+\begin{enumerate}
+    \item \textbf{데이터를 제품으로 취급:}
+    데이터 메시의 핵심은 데이터를 그 자체로 가치를 지닌 제품으로 간주하는 것입니다.
+
+    \item \textbf{Databricks와 데이터 메시:}
+    Databricks와 같은 데이터 플랫폼은 데이터 메시 아키텍처에 매우 잘 부합합니다. 워크스페이스는 데이터 도메인을 생성할 수 있는 가장 낮은 수준의 격리 경계를 형성합니다.
+
+    \item \textbf{데이터 메시의 4가지 특징:}
+    \begin{itemize}
+        \item \textbf{잘 조직된 데이터 도메인 (Well-organized Data Domains):} 마케팅, 영업, 공급망과 같이 잘 정의된 데이터 도메인을 가집니다.
+        \item \textbf{데이터 소유자 및 연합 거버넌스 (Data Owners and Federated Governance):} 각 데이터 도메인은 자체 데이터 소유자를 가지며, 데이터 거버넌스에 대한 책임을 집니다.
+        \item \textbf{인프라 관점의 셀프 서비스 (Self-served from an Infrastructure Perspective):} 데이터 소유자가 자체 데이터 도메인을 생성할 수 있도록 인프라 프로비저닝이 표준화되어 셀프 서비스가 가능해야 합니다.
+        \item \textbf{Unity Catalog:} Databricks의 Unity Catalog는 이러한 데이터 도메인들을 묶어주는 '접착제' 역할을 합니다. 서로 다른 도메인에서 생성된 데이터를 결합하여 최종 데이터 제품을 형성할 수 있도록 돕습니다.
+    \end{itemize}
+
+    \item \textbf{메달리온 아키텍처와의 연관성:}
+    데이터 플랫폼 관점에서 메달리온 아키텍처(Bronze $\rightarrow$ Silver $\rightarrow$ Gold)의 골드(Gold) 레이어는 여러 데이터 도메인에서 파생된 데이터 제품으로 볼 수 있습니다.
+\end{enumerate}
+
+\newpage
+\section{Databricks에서의 CI/CD 및 MLOps}
+
+\begin{conceptbox}
+\textbf{Databricks CI/CD 및 MLOps}
+Databricks는 소스 코드 제어 시스템과의 긴밀한 통합을 통해 CI/CD 및 MLOps를 지원합니다. 이를 통해 데이터 파이프라인과 ML 모델의 개발, 배포, 운영을 효율적으로 자동화하고 관리할 수 있습니다.
+\end{conceptbox}
+
+\subsection{CI/CD 파이프라인 (Azure DevOps 예시)}
+CI/CD 또는 DevOps는 소스 코드 제어 시스템(예: GitHub, Bitbucket)과 DevOps 시스템(예: Azure DevOps, Jenkins)의 조합으로 구현됩니다.
+
+\begin{enumerate}
+    \item \textbf{파이프라인 구성:}
+    전통적으로는 빌드 파이프라인(Build Pipeline)과 릴리스 파이프라인(Release Pipeline)으로 나뉘었지만, 최근에는 단일 스테이지 접근 방식(Single Stage Approach)으로 통합되는 추세입니다.
+    \begin{itemize}
+        \item \textbf{빌드 파이프라인:} 단위 테스트, 통합 테스트를 실행하고, 휠 파일(wheel files)과 같은 라이브러리를 빌드합니다.
+        \item \textbf{릴리스 파이프라인:} 특정 액션(예: 소스 코드 제어 시스템의 변경) 또는 수동 게이팅(Manual Gating)에 따라 빌드된 자산을 한 환경에서 다른 환경으로 이동시킵니다.
+    \end{itemize}
+
+    \item \textbf{자동화된 트리거:}
+    소스 코드 제어 시스템에 코드를 푸시하면 빌드 파이프라인이 자동으로 트리거되어 일련의 단계를 실행합니다. 이는 코드가 변경되는 즉시 테스트를 수행하여 문제를 조기에 발견하고, 소프트웨어 릴리스 주기를 단축시킵니다.
+
+    \item \textbf{API 지원:}
+    Databricks와 같은 데이터 플랫폼은 아티팩트를 내보내고 가져오는 데 필요한 강력한 API를 제공합니다. 이를 통해 DevOps 빌드 서버는 Databricks 플랫폼과 상호작용하여 자산을 빌드하고, 테스트하며, 다른 환경으로 푸시할 수 있습니다.
+
+    \item \textbf{클러스터 관리:}
+    개발 환경에서는 대화형(Interactive) 클러스터를 사용하는 반면, 프로덕션 환경에서는 자동화된 작업 클러스터(Automated Job Cluster)를 사용하는 것이 일반적입니다. CI/CD 프로세스 중에 이러한 클러스터 유형 간의 전환이 이루어집니다.
+\end{enumerate}
+
+\subsection{MLOps (Machine Learning Operations)}
+MLOps는 ML 모델의 개발, 배포, 운영을 위한 DevOps 원칙을 적용한 것입니다.
+
+\begin{enumerate}
+    \item \textbf{MLOps 특징:}
+    실험 관리, 피처 스토어(Feature Stores), 모델 레지스트리(Model Registries)와 같은 기능을 포함합니다. 모델 레지스트리에서는 모델을 '챌린저(Challenger)'에서 '챔피언(Champion)'으로 승격시키는 등의 관리가 이루어집니다.
+
+    \item \textbf{모델 배포 전략:}
+    \begin{itemize}
+        \item \textbf{모델 이동:} 모델을 한 번 훈련한 후, 보안 또는 레지스트리 기능을 사용하여 모델을 한 환경에서 다른 환경으로 이동시키는 방법입니다. 하지만 훈련 데이터가 특정 환경에 종속될 수 있으므로 항상 이상적이지는 않습니다.
+        \item \textbf{훈련 코드 이동:} 훈련 코드를 환경 간에 이동시킨 후, 각 환경에서 모델을 다시 훈련하는 방법입니다. 이는 환경별 데이터 특성을 고려할 때 더 적합할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{Databricks의 MLOps 지원:}
+    Databricks는 폴더 구조, API를 통한 소스 코드 제어 시스템과의 연동 등을 통해 MLOps를 강력하게 지원합니다. MLOps는 개발 초기부터 고려되어야 하며, 플랫폼 자체에서 강력한 지원을 제공해야 합니다.
+\end{enumerate}
+
+\newpage
+\section{관측 가능성 (Observability) 및 모니터링}
+
+\begin{conceptbox}
+\textbf{관측 가능성 및 모니터링 개요}
+데이터 플랫폼의 관측 가능성과 모니터링은 시스템의 상태를 이해하고, 문제 발생 시 신속하게 진단하며, 데이터 품질을 보장하는 데 필수적입니다. Databricks는 시스템 테이블, 대시보드, AI 기반 이상 감지, 레이크하우스 모니터링, DQX와 같은 다양한 도구를 제공합니다.
+\end{conceptbox}
+
+\subsection{시스템 테이블 (System Tables)}
+Databricks는 플랫폼 내에서 발생하는 다양한 메타데이터와 사용량 정보를 '시스템 테이블' 형태로 제공합니다. 이 테이블들은 Unity Catalog의 `system` 카탈로그 아래에 위치합니다.
+
+\begin{enumerate}
+    \item \textbf{활용 분야:}
+    \begin{itemize}
+        \item \textbf{빌링 (Billing):} `system.billing` 스키마에서 사용량 정보를 확인하여, 조직 내 다양한 부서나 프로젝트에 비용을 청구(chargeback)하는 데 활용할 수 있습니다. SKU, 사용 시작/종료 시간, 사용자 정의 태그(Custom Tags), 사용량 등을 상세하게 제공합니다. 사용자 정의 태그는 사용량을 세분화하여 특정 프로젝트나 팀의 지출을 파악하는 데 매우 중요합니다.
+        \item \textbf{컴퓨트 (Compute):} `system.compute` 스키마에서 클러스터 사용 정보를 확인할 수 있습니다. 클러스터 이름, 소유자, 생성/삭제 시간, 노드 유형(예: AWS R5X large), 메모리/CPU 사용량 등을 통해 클러스터의 효율적인 사용 여부를 모니터링할 수 있습니다.
+        \item \textbf{감사 (Auditing):} `system.access` 스키마에서 누가 어떤 데이터에 언제 접근했는지, 무엇이 삭제되었는지 등의 감사 정보를 확인할 수 있습니다. 이는 보안 및 규정 준수에 매우 중요합니다.
+    \end{itemize}
+
+    \item \textbf{강점:}
+    시스템 테이블은 매우 세분화된 원격 측정(telemetry) 데이터를 제공하여, 관리자가 워크스페이스를 모니터링하고 다양한 분석을 수행할 수 있도록 합니다.
+\end{enumerate}
+
+\subsection{대시보드 (Dashboards)}
+Databricks는 시스템 테이블을 기반으로 하는 다양한 내장 대시보드를 제공하며, 사용자는 이를 통해 시각적으로 시스템 상태를 파악할 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{기능:}
+    작업 시스템 대시보드(Job System Dashboard)와 같은 대시보드는 사용자 정의 태그를 기반으로 사용량을 분석하고, 사용량 스파이크, 작업 실패 패턴 등을 시각적으로 보여줍니다.
+    \item \textbf{활용:}
+    관리자는 대시보드를 통해 시스템의 전반적인 상태를 한눈에 파악하고, 문제 발생 시 신속하게 원인을 추적할 수 있습니다. 이러한 대시보드는 시스템 테이블에 대한 SQL 쿼리를 기반으로 구축됩니다.
+\end{enumerate}
+
+\subsection{데이터 품질 모니터링}
+데이터 팀은 데이터 품질보다는 데이터 전달(delivery)에 대한 SLA를 가지는 경우가 많습니다. 데이터 품질 문제는 주로 사후 대응적으로 관리되며, 원인 분석이 어려울 수 있습니다. Databricks는 이러한 문제를 해결하기 위해 사전 예방적인 데이터 품질 모니터링 기능을 제공합니다.
+
+\subsubsection{이상 감지 (Anomaly Detection)}
+AI 기반으로 데이터 품질 문제를 자동으로 감지하고 경고하는 기능입니다.
+
+\begin{enumerate}
+    \item \textbf{활성화:}
+    Unity Catalog에서 카탈로그 또는 특정 스키마 수준에서 이상 감지를 활성화할 수 있습니다.
+
+    \item \textbf{검사 차원:}
+    \begin{itemize}
+        \item \textbf{신선도 (Freshness):} 스키마 내 모든 테이블의 데이터가 얼마나 최신 상태인지 확인합니다.
+        \item \textbf{완전성 (Completeness):} 스키마 내 데이터의 완전성을 확인합니다.
+    \end{itemize}
+
+    \item \textbf{AI 기반 학습:}
+    Databricks는 백엔드에서 AI를 사용하여 파이프라인의 트렌드를 지속적으로 학습합니다. 예를 들어, 특정 테이블이 30분마다 새로 고쳐지고, 약 2,000개의 행이 추가되거나 6,000개의 행이 수정된다는 패턴을 학습합니다.
+
+    \item \textbf{사전 예방적 경고:}
+    학습된 트렌드를 기반으로 신선도나 완전성에 이상이 감지되면(예: 데이터가 오래되거나, 예상치 못한 데이터 불완전성), 관리자에게 사전 예방적으로 경고를 보냅니다.
+
+    \item \textbf{루트 원인 분석 (Root Cause Analysis):}
+    데이터 lineage(데이터 흐름) 정보를 활용하여, 테이블의 문제가 발생했을 때 어떤 상위 작업(job)이 실패했는지 등을 파악하여 근본 원인을 분석하는 데 도움을 줍니다.
+\end{enumerate}
+
+\begin{examplebox}
+\textbf{이상 감지 대시보드 예시}
+이상 감지 대시보드는 "이 스키마에 문제가 있습니다. 스키마 아래 테이블이 오래되었습니다. 영향이 매우 클 것입니다. 원인은 일부 작업이 실패했기 때문입니다."와 같은 메시지를 시각적으로 보여줍니다.
+\end{examplebox}
+
+\subsubsection{레이크하우스 모니터링 (Lakehouse Monitoring)}
+테이블을 중심으로 데이터 품질을 모니터링하는 포괄적인 시스템입니다. ML 모델이나 파이프라인이 결국 테이블에 데이터를 쓰기 때문에, 테이블을 모니터링함으로써 파이프라인과 모델 모두를 효과적으로 모니터링할 수 있다는 철학을 가집니다.
+
+\begin{enumerate}
+    \item \textbf{테이블 유형:}
+    \begin{itemize}
+        \item \textbf{스냅샷 테이블 (Snapshot Table):} 특정 시점의 데이터를 담는 테이블.
+        \item \textbf{시계열 테이블 (Time Series Table):} 시간 기반 컬럼을 포함하는 테이블.
+        \item \textbf{추론 테이블 (Inference Table):} ML 모델의 예측 결과가 기록되는 테이블.
+    \end{itemize}
+    이러한 테이블 유형에 따라 모니터가 자동으로 다르게 작동합니다.
+
+    \item \textbf{생성 아티팩트:}
+    모니터를 설정하면 다음 세 가지 지원 테이블과 대시보드가 자동으로 생성됩니다.
+    \begin{itemize}
+        \item \textbf{프로파일링 테이블 (Profiling Table):} 테이블의 데이터 분포, 최소/최대/중앙값, 표준 편차, 고유 값, null/0 비율 등 통계적 프로필을 기록합니다.
+        \item \textbf{드리프트 테이블 (Drift Table):} 데이터 분포의 변화(드리프트)를 감지합니다. ML 모델의 경우 KS 테스트, 카이제곱 테스트 등 모델 드리프트 감지에 사용되는 통계 지표를 계산합니다.
+        \item \textbf{대시보드 (Dashboard):} 프로파일링 및 드리프트 테이블의 데이터를 시각화하여 데이터 품질 상태를 한눈에 보여줍니다.
+    \end{itemize}
+
+    \item \textbf{활용:}
+    \begin{itemize}
+        \item \textbf{프로파일링:} 컬럼의 예상 최소/최대값, 범주형 값 등이 벗어나는 경우 즉시 알림을 받을 수 있습니다.
+        \item \textbf{드리프트 감지:} 모델의 계절적 변화나 입력 데이터 변화로 인한 모델 동작 변화(드리프트)를 빠르게 감지할 수 있습니다.
+        \item \textbf{대시보드:} 행 수 변화, null/0 비율이 높은 컬럼, 특정 컬럼의 드리프트 지표 등을 시각적으로 확인하여 잠재적인 문제를 파악할 수 있습니다. 예를 들어, 특정 날짜에 'preferred payment method' 컬럼에 null 값이 급증하거나 'number of reviews' 컬럼에 0이 많아지는 현상을 감지할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{설정:}
+    테이블의 'Quality' 탭에서 데이터 품질 모니터링을 활성화하고 구성할 수 있습니다. 스냅샷, 시계열, 예측 테이블 유형을 선택하면, 모니터가 선택에 따라 자동으로 작동 방식을 조정합니다. 모니터는 스케줄에 따라 주기적으로 실행될 수 있습니다(예: 1시간마다, 매일, 매주).
+\end{enumerate}
+
+\subsubsection{DQX (Databricks Quality eXpectations)}
+DQX는 Databricks Labs에서 개발한 코드 기반 데이터 품질 프레임워크입니다. 파이프라인 코드 내에서 데이터 품질 검사를 수행할 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{활용:}
+    PySpark로 파이프라인을 개발할 때 DQX 라이브러리를 사용하여 데이터 품질 규칙을 적용할 수 있습니다. Spark의 선언적 파이프라인(Declarative Pipelines)에 내장된 '기대치(Expectations)'와 유사한 기능을 제공합니다.
+
+    \item \textbf{YAML 기반 규칙 정의:}
+    YAML 파일을 사용하여 데이터 품질 규칙을 선언적으로 정의할 수 있습니다.
+    \begin{examplebox}
+    \textbf{DQX YAML 규칙 예시}
+    \begin{lstlisting}[language=YAML, caption={DQX YAML 규칙 정의 예시}, label={lst:dqx_yaml_rules}]
+rules:
+  - id: id_not_null_not_empty
+    column: ID
+    expectation: not_null_not_empty
+    criticality: ERROR
+  - id: age_range
+    column: Age
+    expectation: between(18, 120)
+    criticality: ERROR
+  - id: country_in_list
+    column: Country
+    expectation: in_list(['Germany', 'France'])
+    criticality: WARNING
+  - id: id_unique
+    column: ID
+    expectation: is_unique
+    criticality: ERROR
+    \end{lstlisting}
+    \end{examplebox}
+    위 예시처럼 `not_null_not_empty`, `between`, `in_list`, `is_unique`와 같은 내장 함수를 사용하여 규칙을 정의하고, `ERROR` 또는 `WARNING`과 같은 중요도(criticality)를 지정할 수 있습니다. 사용자 정의 함수도 작성할 수 있습니다.
+
+    \item \textbf{DQ 엔진 적용:}
+    정의된 규칙을 DQ 엔진에 설정하고, Spark 데이터프레임에 적용합니다.
+    \begin{lstlisting}[language=Python, caption={DQX 엔진 적용 예시}, label={lst:dqx_engine_apply}]
+from dqx import DQEngine
+from pyspark.sql import SparkSession
+
+# SparkSession 초기화 (예시)
+spark = SparkSession.builder.appName("DQX_Demo").getOrCreate()
+
+# 샘플 데이터프레임 생성 (예시)
+data = [("1", 25, "Germany"), ("2", 30, "France"), ("3", 15, "USA"), ("4", None, "Germany")]
+columns = ["ID", "Age", "Country"]
+df = spark.createDataFrame(data, columns)
+
+# YAML 규칙 로드 (예시: rules.yaml 파일에서 로드)
+yaml_rules = """
+rules:
+  - id: id_not_null_not_empty
+    column: ID
+    expectation: not_null_not_empty
+    criticality: ERROR
+  - id: age_range
+    column: Age
+    expectation: between(18, 120)
+    criticality: ERROR
+  - id: country_in_list
+    column: Country
+    expectation: in_list(['Germany', 'France'])
+    criticality: WARNING
+  - id: id_unique
+    column: ID
+    expectation: is_unique
+    criticality: ERROR
+"""
+# 실제 코드에서는 yaml.safe_load(file_content) 사용
+
+dq_engine = DQEngine(spark_session=spark, rules=yaml_rules)
+result = dq_engine.run(df)
+
+valid_df = result.get_valid_dataframe()
+invalid_df = result.get_invalid_dataframe()
+errors = result.get_errors()
+
+print("Valid Data:")
+valid_df.show()
+print("Invalid Data:")
+invalid_df.show()
+print("Detected Errors:")
+for error in errors:
+    print(error)
+\end{lstlisting}
+    \item \textbf{결과:}
+    규칙을 통과한 행은 '유효 데이터프레임(valid dataframe)'으로, 규칙을 통과하지 못한 행은 '무효 데이터프레임(invalid dataframe)'으로 반환됩니다. 또한, 어떤 규칙이 어떤 행에서 실패했는지에 대한 오류 정보도 제공됩니다.
+\end{enumerate}
+
+\newpage
+\section{Databricks Asset Bundles (DABs)}
+
+\begin{conceptbox}
+\textbf{Databricks Asset Bundles (DABs) 개요}
+Databricks Asset Bundles(DABs)는 Databricks 프로젝트의 모든 자산(작업, 컴퓨트, 노트북 등)을 하나의 선언적인 패키지로 묶어 관리하고 배포하는 도구입니다. 이는 CI/CD 프로세스를 간소화하고, 프로젝트를 환경 간에 이식 가능하게 만드는 데 핵심적인 역할을 합니다.
+\end{conceptbox}
+
+\subsection{DABs의 필요성 및 개념}
+Databricks는 매우 풍부한 API를 제공하여 클러스터 생성, 작업 생성, 노트북 내보내기/가져오기 등 플랫폼 내 거의 모든 서브시스템과 상호작용할 수 있습니다. 하지만 이러한 API를 직접 사용하여 CI/CD를 구현하려면 많은 스크립팅 작업이 필요하여 번거로울 수 있습니다.
+
+DABs는 이러한 문제를 해결하기 위해 다음과 같은 기능을 제공합니다.
+\begin{itemize}
+    \item \textbf{선언적 정의:} 프로젝트가 어떤 작업(jobs), 컴퓨트(compute), 노트북(notebooks) 폴더 등으로 구성되는지 YAML 파일에 선언적으로 정의합니다.
+    \item \textbf{패키징 및 배포:} 정의된 패키지 구조를 사용하여 프로젝트를 다른 환경(예: 개발 $\rightarrow$ 스테이징 $\rightarrow$ 프로덕션)으로 푸시하고, 해당 환경에 작업과 클러스터를 자동으로 생성합니다.
+    \item \textbf{이식성:} 프로젝트의 모든 자산을 하나의 자가 포함(self-contained)된 엔티티로 묶어 환경 간 이동을 용이하게 합니다.
+\end{itemize}
+
+\subsection{Databricks CLI 및 DABs 데모}
+Databricks CLI(Command Line Interface)는 로컬 터미널에서 Databricks 플랫폼과 상호작용할 수 있게 해주는 도구입니다. DABs는 이 CLI를 통해 관리됩니다.
+
+\begin{enumerate}
+    \item \textbf{Databricks CLI 활성화 및 프로필 설정:}
+    CLI를 사용하여 특정 Databricks 워크스페이스와 통신하기 위해 프로필을 설정합니다. 관리자는 수천 개의 워크스페이스를 가질 수 있으므로, 어떤 워크스페이스와 상호작용할지 명확히 지정해야 합니다.
+    \begin{lstlisting}[language=bash, caption={Databricks CLI 활성화 및 클러스터 목록 조회}, label={lst:databricks_cli_activate}]
+# Databricks CLI 활성화 (예시)
+databricks activate
+
+# 특정 워크스페이스 프로필 사용 (예시)
+databricks --profile E2_demo_field clusters list
+\end{lstlisting}
+
+    \item \textbf{DABs 프로젝트 초기화 (\texttt{databricks bundle init}):}
+    `databricks bundle init` 명령을 사용하여 새로운 DABs 프로젝트를 초기화합니다. 이 명령은 Python 또는 SQL 템플릿을 선택하고, 선언적 파이프라인이나 샘플 Python 패키지 스텁(stub)을 포함할지, 서버리스 컴퓨트를 사용할지 등을 묻습니다.
+    \begin{lstlisting}[language=bash, caption={DABs 프로젝트 초기화}, label={lst:databricks_bundle_init}]
+databricks bundle init
+# What template should I use? (default Python template)
+# What is the name of your project? (Harvard Labs)
+# Do you want to include a stub for a declarative pipeline? (yes)
+# Do you want to include a stub for a sample Python package? (yes)
+# Do you want to use serverless compute? (yes)
+\end{lstlisting}
+    이 명령은 `Harvard Labs`와 같은 이름의 폴더를 생성하고, 그 안에 `databricks.yml` 파일과 `source`, `tests`, `resources` 등의 하위 폴더를 생성합니다.
+
+    \item \textbf{\texttt{databricks.yml} 파일:}
+    이 파일은 번들의 핵심으로, 프로젝트의 모든 구성 요소를 정의합니다.
+    \begin{itemize}
+        \item \textbf{번들 이름 (bundle name):} 프로젝트의 식별 이름.
+        \item \textbf{리소스 (resources):} `demo_job.yml`과 같은 작업 정의 파일을 포함합니다. 작업 정의는 Databricks UI에서 YAML 형식으로 내보낼 수 있습니다.
+        \item \textbf{변수 (variables):} 환경별로 다를 수 있는 프로젝트 이름, 카탈로그 이름 등을 변수로 정의합니다.
+        \item \textbf{대상 배포 (target deployments):} 개발(development), 프로덕션(production)과 같은 배포 대상을 정의합니다. 각 대상은 특정 워크스페이스를 가리키며, 해당 환경에 대한 특정 변수나 작업 정의 오버라이드(override)를 포함할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{리소스 폴더 (\texttt{resources}):}
+    여기에 작업 정의 YAML 파일(예: `demo_job.yml`)이 포함됩니다. 이 파일은 여러 태스크(task)를 정의하며, 각 태스크는 특정 노트북(예: `create_bronze_table.py`, `create_silver_table.py`)을 가리키고 매개변수를 받을 수 있습니다.
+
+    \item \textbf{소스 폴더 (\texttt{source}):}
+    여기에 실제 노트북 파일(예: `create_bronze_table.py`, `create_silver_table.py`)이 포함됩니다.
+
+    \item \textbf{번들 유효성 검사 (\texttt{databricks bundle validate}):}
+    배포 전에 `databricks.yml` 파일과 그 안에 정의된 모든 구성 요소의 유효성을 검사합니다.
+    \begin{lstlisting}[language=bash, caption={DABs 번들 유효성 검사}, label={lst:databricks_bundle_validate}]
+databricks --profile E2_demo_field bundle validate
+# (Validation is OK 메시지 출력)
+\end{lstlisting}
+
+    \item \textbf{번들 배포 (\texttt{databricks bundle deploy}):}
+    특정 대상(target) 환경에 번들을 배포합니다. 이 명령은 YAML 파일의 해당 섹션을 사용하여 작업, 클러스터, 노트북 등을 해당 환경에 생성합니다.
+    \begin{lstlisting}[language=bash, caption={DABs 번들 배포 (개발 환경)}, label={lst:databricks_bundle_deploy_dev}]
+databricks --profile E2_demo_field bundle deploy -t development
+# (배포 완료 후, Databricks UI의 Jobs 섹션에 새로운 작업 생성 확인)
+\end{lstlisting}
+    이 명령을 실행하면 Databricks UI의 'Jobs' 섹션에 새로운 작업(예: `development_demo3_dab`)이 생성되고, 해당 작업에는 정의된 태스크(예: `create_bronze_table`, `create_silver_table`)와 노트북이 연결됩니다.
+
+    \item \textbf{번들 작업 실행 (\texttt{databricks bundle run}):}
+    배포된 번들 내의 특정 작업을 실행합니다. 이는 배포 후 단위 테스트나 통합 테스트를 수행하는 데 활용될 수 있습니다.
+    \begin{lstlisting}[language=bash, caption={DABs 번들 작업 실행}, label={lst:databricks_bundle_run}]
+databricks --profile E2_demo_field bundle run -t development demo03_job
+# (Databricks UI의 Jobs 섹션에서 작업이 실행되는 것을 확인)
+\end{lstlisting}
+    이 명령은 Databricks 환경 내에서 해당 작업을 시작하고, 작업의 진행 상황을 모니터링할 수 있습니다.
+
+    \item \textbf{프로덕션 환경 배포:}
+    개발 환경과 동일한 방식으로 프로덕션 환경에도 번들을 배포할 수 있습니다. 이때 `databricks.yml` 파일의 프로덕션 섹션에 정의된 오버라이드(override)가 적용됩니다.
+    \begin{lstlisting}[language=bash, caption={DABs 번들 배포 (프로덕션 환경)}, label={lst:databricks_bundle_deploy_prod}]
+databricks --profile E2_demo_field bundle deploy -t production
+# (배포 완료 후, Databricks UI의 Jobs 섹션에 새로운 프로덕션 작업 생성 확인)
+\end{lstlisting}
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Terraform과 DABs의 차이점}
+\begin{itemize}
+    \item \textbf{Terraform:} Databricks 워크스페이스 자체와 그 기반이 되는 클라우드 인프라(가상 네트워크, 보안 그룹 등)를 처음부터 프로비저닝하고 관리하는 데 사용됩니다.
+    \item \textbf{DABs:} 이미 프로비저닝된 Databricks 워크스페이스 내에서 특정 프로젝트의 아티팩트(작업, 클러스터, 노트북, ML 모델 등)를 패키징하고 환경 간에 이동시키는 데 사용됩니다.
+\end{itemize}
+DABs는 Databricks 수준의 자산을 관리하는 강력한 CI/CD DevOps 메커니즘을 형성합니다.
+\end{warningbox}
+
+\subsection{CI/CD 파이프라인 통합}
+DABs는 CI/CD 파이프라인에 쉽게 통합될 수 있습니다.
+\begin{itemize}
+    \item \textbf{Git 폴더 통합:} Databricks는 Git 폴더를 통해 소스 코드 저장소와 직접 통합됩니다. 개발자는 Databricks UI 내에서 Git 작업을 수행할 수 있습니다.
+    \item \textbf{파이프라인 내 CLI 사용:} Azure DevOps 또는 GitHub Actions와 같은 CI/CD 파이프라인 내에서 `databricks bundle` 명령을 호출할 수 있습니다. 빌드 서버에 Databricks CLI를 설치한 후, 수동으로 실행했던 `deploy`나 `run` 명령을 파이프라인 스크립트에서 실행하여 자동화된 배포 및 테스트를 구현합니다.
+    \item \textbf{생성 지원:} Databricks Assistant는 YAML 번들 파일을 쉽게 구성하는 데 도움을 줄 수 있으며, UI 기반 헬퍼 기능도 개발 중입니다.
+\end{itemize}
+
+\newpage
+\section{체크리스트}
+
+\begin{summarybox}
+\textbf{학습 및 과제 점검표}
+이 체크리스트는 강의 내용을 효과적으로 학습하고 최종 과제를 준비하는 데 도움이 됩니다.
+\end{summarybox}
+
+\subsection*{학습 점검}
+\begin{itemize}
+    \item [ ] 최종 과제 요구사항 및 발표 지침을 완전히 이해했는가?
+    \item [ ] SDLC의 개발, 스테이징, 프로덕션 각 단계의 목표와 특징을 설명할 수 있는가?
+    \item [ ] 배치, 스트리밍, BI, 동시성 워크로드별 SLA 지표를 이해하고 있는가?
+    \item [ ] 가용성(Availability) 및 재해 복구(RTO, RPO) 개념을 설명할 수 있는가?
+    \item [ ] 데이터 플랫폼 비용 절감 전략(코드, 인프라, 서버리스 등)을 이해하고 있는가?
+    \item [ ] CI/CD의 개념과 데이터 플랫폼에서의 적용 방식을 설명할 수 있는가?
+    \item [ ] IaC의 원칙과 구성 관리/프로비저닝 도구의 차이점을 설명할 수 있는가?
+    \item [ ] Databricks 워크스페이스 조직 및 데이터 메시 개념을 이해하고 있는가?
+    \item [ ] Databricks 시스템 테이블을 통한 관측 가능성 및 모니터링 방법을 알고 있는가?
+    \item [ ] 이상 감지, 레이크하우스 모니터링, DQX 등 데이터 품질 관리 도구를 이해하고 있는가?
+    \item [ ] Databricks Asset Bundles(DABs)의 역할과 사용법(CLI 명령)을 이해하고 있는가?
+\end{itemize}
+
+\subsection*{과제 준비 점검}
+\begin{itemize}
+    \item [ ] 팀원들과 연락하여 역할을 분담하고 초기 계획을 수립했는가?
+    \item [ ] 발표 내용(문제 정의, 팀 소개, 설계/아키텍처, 파이프라인, ML 모델, BI 대시보드, 인사이트, 다음 단계)을 모두 포함했는가?
+    \item [ ] 발표 슬라이드 수(20장 이내) 및 시간(15분 발표, 5분 Q\&A)을 준수했는가?
+    \item [ ] 모든 팀원이 발표에 참여할 수 있도록 역할을 배분했는가?
+    \item [ ] 팀 이름을 정하고, 발표 순서 관련 예외 사항이 있다면 미리 알렸는가?
+    \item [ ] 데이터 제품/서비스의 확장성, 품질, 성능, 신뢰성, 거버넌스를 고려했는가?
+    \item [ ] 데이터 파이프라인 및 ML 모델의 개발 과정을 명확히 설명할 수 있는가?
+    \item [ ] BI 대시보드를 통해 얻은 핵심 인사이트를 효과적으로 요약했는가?
+\end{itemize}
+
+\newpage
+\section{FAQ (자주 묻는 질문)}
+
+\begin{conceptbox}
+\textbf{초심자를 위한 FAQ}
+데이터 플랫폼 및 CI/CD, IaC 개념은 처음 접하는 사람들에게 혼란스러울 수 있습니다. 다음 질문과 답변을 통해 주요 개념에 대한 이해를 돕습니다.
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{Q: SDLC의 각 단계(개발, 스테이징, 프로덕션)는 왜 필요한가요?}
+    \textbf{A:} 각 단계는 소프트웨어 개발의 위험을 관리하고 품질을 보장하기 위해 존재합니다. 개발 단계에서는 아이디어를 빠르게 구현하고 테스트하며, 스테이징에서는 실제 환경과 유사한 조건에서 최종 검증을 수행합니다. 프로덕션은 최종 사용자에게 서비스를 제공하는 단계로, 안정성과 성능이 최우선입니다. 단계별 분리를 통해 문제를 조기에 발견하고, 프로덕션 환경의 안정성을 유지할 수 있습니다.
+
+    \item \textbf{Q: 99.999\% 가용성(5-Nines)은 왜 그렇게 달성하기 어려운가요?}
+    \textbf{A:} 99.999\% 가용성은 1년에 단 5분 15초의 다운타임만을 허용하는 매우 엄격한 기준입니다. 이는 시스템의 모든 구성 요소(하드웨어, 소프트웨어, 네트워크, 전력 등)가 거의 완벽하게 작동해야 함을 의미합니다. 단일 장애 지점(Single Point of Failure)을 제거하고, 자동 복구 메커니즘, 다중 지역 배포 등 복잡하고 비용이 많이 드는 아키텍처가 필요하기 때문에 달성하기 어렵습니다.
+
+    \item \textbf{Q: Infrastructure as Code(IaC)가 수동으로 인프라를 설정하는 것보다 좋은 점은 무엇인가요?}
+    \textbf{A:} IaC는 인프라를 코드로 관리하므로, 수동 설정 시 발생할 수 있는 인적 오류를 줄이고 일관성을 보장합니다. 또한, 코드를 통해 인프라를 버전 관리하고, 필요할 때마다 동일한 환경을 빠르고 반복적으로 구축할 수 있습니다. 이는 개발, 테스트, 프로덕션 환경 간의 불일치를 줄이고, 재해 복구 시에도 신속한 복구를 가능하게 합니다.
+
+    \item \textbf{Q: 구성 관리(Configuration Management)와 프로비저닝(Provisioning) 도구는 언제 사용해야 하나요?}
+    \textbf{A:} 프로비저닝 도구(예: Terraform)는 가상 머신, 네트워크, 데이터베이스 등 인프라 자원을 처음부터 생성하거나 대규모로 변경할 때 사용합니다. 반면, 구성 관리 도구(예: Ansible)는 이미 생성된 인프라 내에서 소프트웨어(예: 운영체제 설정, 애플리케이션 설치, 라이브러리 업데이트)를 구성하고 관리할 때 사용합니다. 두 가지는 상호 보완적으로 사용될 수 있습니다.
+
+    \item \textbf{Q: 데이터 메시(Data Mesh)는 모든 조직에 필요한가요?}
+    \textbf{A:} 데이터 메시는 데이터를 제품처럼 취급하고 데이터 도메인별로 분산된 소유권을 부여하는 아키텍처입니다. 이는 대규모의 복잡한 조직에서 데이터 사일로(data silo)를 해소하고 데이터 활용도를 높이는 데 효과적입니다. 하지만 소규모 조직이나 데이터 요구사항이 단순한 경우에는 전통적인 중앙 집중식 데이터 웨어하우스/레이크하우스 아키텍처가 더 적합할 수 있습니다. 조직의 규모, 데이터 복잡성, 문화적 준비도 등을 고려하여 도입 여부를 결정해야 합니다.
+
+    \item \textbf{Q: Databricks Asset Bundles(DABs)와 Terraform은 어떻게 다른가요?}
+    \textbf{A:} Terraform은 Databricks 워크스페이스 자체와 그 기반이 되는 클라우드 인프라(가상 네트워크, 보안 그룹 등)를 생성하고 관리하는 데 중점을 둡니다. 반면, DABs는 이미 생성된 Databricks 워크스페이스 내에서 특정 프로젝트의 자산(작업, 노트북, 클러스터 설정, ML 모델 등)을 패키징하고 환경 간에 배포하는 데 사용됩니다. 즉, Terraform은 '워크스페이스'를, DABs는 '워크스페이스 내 프로젝트'를 관리하는 데 특화되어 있습니다.
+\end{itemize}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=myblue!5!white, colframe=myblue!75!black, title=\textbf{CSCI103 Lecture 13 핵심 요약}]
+
+\textbf{1. 최종 과제:}
+\begin{itemize}
+    \item 팀 프로젝트: 문제 정의, 팀 소개, 설계/아키텍처, 데이터 파이프라인, ML 모델, BI 대시보드, 인사이트/다음 단계 발표.
+    \item 15분 발표 + 5분 Q\&A, 20장 슬라이드 이내, 전원 발표.
+\end{itemize}
+
+\textbf{2. 데이터 파이프라인 최적화:}
+\begin{itemize}
+    \item \textbf{SDLC:} 개발 $\rightarrow$ 스테이징 $\rightarrow$ 프로덕션 단계별 관리.
+    \item \textbf{SLA:} 배치, 스트리밍, BI, 동시성, 가용성(5-Nines), 재해 복구(RTO, RPO) 고려.
+    \item \textbf{비용 절감:} 코드 최적화(데이터프레임 API, 캐싱, 바이너리 형식), 인프라 최적화(오토스케일링, 자동 종료, 스팟 인스턴스, 서버리스), 최신 Spark 버전 사용.
+\end{itemize}
+
+\textbf{3. CI/CD 및 IaC:}
+\begin{itemize}
+    \item \textbf{CI/CD:} 코드 변경 시 자동 빌드/테스트/배포로 개발 속도 향상, 오류 조기 발견.
+    \item \textbf{IaC:} 인프라를 코드로 정의(Terraform 등)하여 반복 가능하고 일관된 환경 구축.
+    \item \textbf{도구 비교:} 구성 관리(Ansible)는 소프트웨어 변경, 프로비저닝(Terraform)은 인프라 구축.
+\end{itemize}
+
+\textbf{4. 워크스페이스 및 데이터 메시:}
+\begin{itemize}
+    \item \textbf{워크스페이스:} Databricks의 격리 단위, LOB/프로젝트별 세분화된 조직화.
+    \item \textbf{데이터 메시:} 데이터를 제품으로 취급, 도메인 소유권, 셀프 서비스 인프라, Unity Catalog로 통합.
+\end{itemize}
+
+\textbf{5. 관측 가능성 및 모니터링:}
+\begin{itemize}
+    \item \textbf{시스템 테이블:} 빌링, 컴퓨트, 감사 정보 제공 (Unity Catalog `system` 스키마).
+    \item \textbf{데이터 품질:}
+    \begin{itemize}
+        \item \textbf{이상 감지:} AI 기반 신선도/완전성 자동 모니터링, 사전 예방적 경고.
+        \item \textbf{레이크하우스 모니터링:} 테이블 중심 프로파일링/드리프트 감지, 대시보드 제공.
+        \item \textbf{DQX:} 코드 기반(YAML) 데이터 품질 규칙 정의 및 적용.
+    \end{itemize}
+\end{itemize}
+
+\textbf{6. Databricks Asset Bundles (DABs):}
+\begin{itemize}
+    \item \textbf{목적:} Databricks 프로젝트 자산(작업, 노트북, 컴퓨트)을 패키징하여 CI/CD 간소화.
+    \item \textbf{사용법:} `databricks bundle init`, `databricks.yml` 정의, `databricks bundle deploy/run` 명령.
+    \item \textbf{통합:} CI/CD 파이프라인(Azure DevOps, GitHub Actions)에서 CLI 명령으로 자동화.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

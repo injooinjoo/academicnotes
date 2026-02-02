@@ -1,0 +1,1498 @@
+\documentclass[11pt,a4paper]{article}
+\begin{document}
+
+\newpage
+\section*{개요}
+이 문서는 UIUC의 BADM-572 '데이터 기반 의사결정' 과목 중 '추론 및 예측 통계 모듈 1'의 핵심 내용을 담고 있습니다.
+데이터를 활용한 합리적인 의사결정을 위해 가설 설정, 결과 분석, 그리고 평균 및 비율에 대한 단측/양측 검정 방법을 상세히 다룹니다.
+특히, 통계적 사고방식과 Excel을 활용한 실습 과정을 통해 비전공자도 쉽게 이해하고 실제 문제에 적용할 수 있도록 구성되었습니다.
+이 문서는 시험 대비를 위한 완벽한 학습 자료가 될 것입니다.
+
+\vspace{1em}
+
+\begin{summarybox}
+\textbf{핵심 목표:}
+\begin{itemize}
+    \item 통계적 문해력(Statistical Literacy) 향상
+    \item 데이터 요약 및 통찰력 확보
+    \item 표본 통계를 활용한 모집단 추론 능력 배양
+    \item 가설 검정의 기본 원리 및 실제 적용 능력 습득
+\end{itemize}
+\end{summarybox}
+
+\newpage
+\section*{용어 정리}
+
+다음 표는 이 문서에서 사용되는 주요 통계 용어들을 비전공자도 쉽게 이해할 수 있도록 설명합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+\textbf{가설 검정} & 어떤 주장이 사실인지 통계적으로 확인하는 과정 & Hypothesis Testing & 과학적 연구의 핵심 단계 \\
+\textbf{귀무 가설} & 우리가 '기각'하려고 시도하는 기존의 믿음이나 주장 & Null Hypothesis (H0) & '차이가 없다', '효과가 없다'는 내용 \\
+\textbf{대립 가설} & 귀무 가설과 반대되는, 우리가 증명하고 싶은 주장 & Alternate Hypothesis (HA or H1) & '차이가 있다', '효과가 있다'는 내용 \\
+\textbf{유의 수준} & 귀무 가설이 사실인데도 잘못 기각할 확률 (허용 오차) & Significance Level ($\alpha$) & 보통 0.05 (5\%) 사용 \\
+\textbf{p-값} & 관측된 데이터가 귀무 가설 하에서 나타날 확률 & p-value & p-값이 $\alpha$보다 작으면 귀무 가설 기각 \\
+\textbf{제1종 오류} & 귀무 가설이 사실인데 잘못 기각하는 오류 & Type I Error ($\alpha$) & '제조업자 위험', '위양성' \\
+\textbf{제2종 오류} & 귀무 가설이 거짓인데 잘못 기각하지 않는 오류 & Type II Error ($\beta$) & '소비자 위험', '위음성' \\
+\textbf{단측 검정} & 특정 방향(크거나 작거나)으로의 차이만 검정 & One-Tail Test & 대립 가설에 '>', '<' 포함 \\
+\textbf{양측 검정} & 양쪽 방향(다르다)으로의 차이를 모두 검정 & Two-Tail Test & 대립 가설에 '$\ne$' 포함 \\
+\textbf{표본 평균} & 표본 데이터의 평균 & Sample Mean ($\bar{x}$) & 모집단 평균을 추정하는 데 사용 \\
+\textbf{표본 표준편차} & 표본 데이터의 퍼진 정도 & Sample Standard Deviation (s) & 모집단 표준편차를 추정하는 데 사용 \\
+\textbf{표준 오차} & 표본 평균이 모집단 평균과 얼마나 차이 날 수 있는지 & Standard Error (SE) & 표본 크기가 커질수록 작아짐 \\
+\textbf{t-값} & 표본 평균이 귀무 가설의 평균으로부터 표준 오차 단위로 얼마나 떨어져 있는지 & t-statistic & 검정 통계량 중 하나 \\
+\textbf{t-분포} & 표본 크기가 작거나 모집단 표준편차를 모를 때 사용하는 분포 & t-distribution & 정규 분포와 유사하지만 꼬리가 더 두꺼움 \\
+\textbf{자유도} & 통계량을 계산할 때 자유롭게 변할 수 있는 값의 개수 & Degrees of Freedom (df) & 보통 표본 크기 - 1 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{주요 통계 용어 및 설명}
+\label{tab:glossary}
+
+\newpage
+\section{모듈 1: 비즈니스를 위한 추론 및 예측 통계}
+
+\subsection{강의 소개}
+
+\subsubsection*{환영합니다: 비즈니스를 위한 추론 및 예측 통계!}
+
+데이터는 우리 주변에 항상 존재하며, 매일 더 많은 데이터가 생성되고 있습니다. 하지만 우리는 이 데이터를 통해 더 나은 결정을 내리고 있을까요? 이 질문에 답하기 위해 통계학을 공부하는 것이 중요합니다.
+
+\begin{summarybox}
+\textbf{통계학을 공부하는 이유:}
+\begin{itemize}
+    \item 데이터는 어디에나 있으며, 올바른 의사결정을 위해 데이터를 이해해야 합니다.
+    \item 통계는 GDP, 인플레이션, 실업률 같은 경제 지표부터 스포츠 선수 성적, 복권 당첨 확률까지 다양한 분야에서 활용됩니다.
+    \item 데이터 분석은 농업, 의료, 금융, 유통, 제조, 교육 등 모든 분야에서 중요합니다.
+    \item 통계는 결과에 영향을 미치는 요인을 식별하고, 이를 통해 더 유리한 결과를 만들 수 있도록 돕습니다.
+    \item 통계는 데이터를 이해하는 데 도움을 주며, 고용주들이 신입 사원에게 가장 중요하게 요구하는 기술 중 하나입니다. (LinkedIn 1위 '핫 스킬', Google 수석 경제학자 Hal Varian: "향후 10년간 가장 섹시한 직업은 통계학자")
+\end{itemize}
+\end{summarybox}
+
+\subsubsection*{통계학이란 무엇인가?}
+
+통계학은 단순히 데이터를 수학적 방법으로 처리하는 것을 넘어섭니다.
+가장 중요한 것은 '유용한 데이터를 얻는 방법'을 알고, '결과를 올바르게 해석하는 것'입니다.
+
+\begin{cautionbox}
+\textbf{통계학의 오용 가능성:}
+통계학은 의도적으로 또는 부주의하게 쉽게 오용될 수 있는 분야입니다.
+\begin{itemize}
+    \item \textbf{올바른 방법:} 데이터가 올바르게 수집되고, 분석이 올바르게 수행되며, 결과가 올바르게 제시될 때, 통계는 세상을 이해하고 더 나은 결정을 내리는 데 큰 도움이 됩니다.
+    \item \textbf{잘못된 방법:} 잘못된 데이터로 시작하거나, 부적절한 방법론을 사용하거나, 결과를 잘못 해석하면 오히려 해를 끼칠 수 있습니다.
+\end{itemize}
+\end{cautionbox}
+
+\subsubsection*{무엇을 배우게 될까요?}
+
+이 과정은 여러분을 데이터 과학자나 통계학자로 만들지는 않습니다.
+하지만 통계적 분석의 기본을 이해하고, 관리자로서 데이터 과학자들에게 올바른 질문을 던지고, 결과를 해석하며, 더 나은 결정을 내리는 데 필요한 기술을 제공합니다.
+
+\begin{summarybox}
+\textbf{주요 학습 목표 (Macro Objectives):}
+\begin{itemize}
+    \item \textbf{통계적 문해력(Statistically Literate) 향상:} 통계 정보를 이해하고 비판적으로 평가하는 능력.
+    \item \textbf{데이터 요약 방법 학습:} 방대한 데이터를 의미 있는 형태로 정리하는 기술.
+    \item \textbf{요약된 데이터에서 통찰력 얻기:} 요약된 정보에서 숨겨진 패턴이나 의미를 발견하는 능력.
+    \item \textbf{표본 추출 및 표본 통계의 중요성 이해:} 전체 모집단을 대표하는 표본을 얻는 방법과 그 중요성.
+    \item \textbf{표본 통계를 사용하여 모집단에 대한 추론하기:} 작은 표본 데이터를 기반으로 전체 모집단에 대해 결론을 내리는 방법.
+\end{itemize}
+\end{summarybox}
+
+\subsubsection*{어떻게 배우게 될까요?}
+
+이 과정에서는 다양한 활동을 통해 주제를 깊이 이해하게 됩니다.
+
+\begin{itemize}
+    \item \textbf{비디오 강의 (Video lectures):} 이론적 개념을 배우고, 다양한 문제와 설정에 적용하는 방법을 익힙니다.
+    \item \textbf{Excel 실습 (Excel illustrations):} 대규모 데이터 세트에 학습한 방법론을 적용하고 결과를 해석하는 방법을 보여줍니다. 단순히 결과를 도출하는 것을 넘어, 그 결과가 실제로 무엇을 의미하는지 이해하는 데 중점을 둡니다.
+    \item \textbf{채점 퀴즈 (Graded quizzes):} 학습 자료를 숙달했는지 확인합니다. 통계 개념은 서로 연결되어 있으므로, 다음 단계로 넘어가기 전에 각 주제를 잘 이해하는 것이 중요합니다. 자가 평가를 통해 준비가 되었는지 확인하고, 필요하면 추가 자료를 활용하여 복습합니다.
+    \item \textbf{동료 평가 과제 (Peer reviewed assignments):} 정량적이지 않은 질문이나 시나리오에 대해 설명하거나 비판하는 과제입니다. 다른 학생들의 답변을 읽고 댓글을 달면서 데이터 분석 기반 보고서에 반응하는 기술을 연마하고, 의사결정자에게 필요한 여러 기술을 통합합니다.
+\end{itemize}
+
+이 과정은 쉬운 주제가 아니지만, 도구를 적용하는 데 중점을 둘 것입니다. 때로는 건조하게 느껴질 수 있는 개념도 결과를 이해하는 데 필요한 만큼만 다룰 것입니다. 꾸준히 노력하면 이 매혹적인 과학의 아름다움과 힘을 발견할 수 있을 것입니다.
+
+\newpage
+\subsection{Lesson 1-1: 가설 설정}
+
+\subsubsection{Lesson 1-1.1: 가설 설정}
+
+가설 검정은 모든 과학적 연구의 중요한 단계입니다.
+우리는 일상생활과 비즈니스에서 가설 검정의 중요성을 보여주는 다양한 사례를 접합니다.
+
+\begin{examplebox}
+\textbf{가설 검정의 실제 사례:}
+\begin{itemize}
+    \item \textbf{폭스바겐 배출가스 스캔들 (VW Emission Scandal):} 폭스바겐이 디젤 차량의 배출가스를 조작했다는 사실이 웨스트버지니아 대학교 연구진에 의해 밝혀졌습니다. 연구진은 폭스바겐 차량의 배출량이 신뢰 구간 내에 들지 않는다는 것을 발견했고, 반복된 테스트에서도 동일한 결과가 나오자 폭스바겐의 주장이 거짓임을 확신했습니다. 통계적 증거는 거대 기업의 주장을 반박하는 데 결정적인 역할을 했습니다.
+    \item \textbf{랜스 암스트롱 (Lance Armstrong):} 유명 사이클 선수 랜스 암스트롱은 혈액 검사를 통해 금지 약물 사용이 적발되어 모든 업적을 박탈당했습니다. 이는 '약물 미사용'이라는 주장이 통계적 증거에 의해 기각된 사례입니다.
+    \item \textbf{알츠하이머병 연구 데이터 조작:} 주요 제약 회사들이 관련된 알츠하이머병 연구에서 데이터가 조작된 사례도 있었습니다. 이는 통계가 잘못 사용될 때 얼마나 심각한 결과를 초래할 수 있는지를 보여줍니다.
+    \item \textbf{의료 검사 오류:} 우리가 아는 누군가 또는 우리 자신이 잘못된 의료 검사 결과를 받은 경험도 있을 수 있습니다. 이 모든 사례는 '어떤 주장이 사실인가?'를 통계적으로 검증하는 가설 검정의 중요성을 강조합니다.
+\end{itemize}
+\end{examplebox}
+
+이 모든 예시들은 '가설 검정(Hypothesis Testing)'의 중요성을 보여줍니다. 가설 검정은 이전 과정에서 배운 '신뢰 구간(Confidence Interval)'의 확장이며, '추론 통계(Inferential Statistics)'의 한 분야입니다.
+
+\subsubsection*{과학적 방법의 단계}
+
+모든 과학적 연구는 일련의 단계를 따릅니다.
+
+\begin{enumerate}
+    \item \textbf{문제 식별 (Identify a problem):} 연구를 시작할 문제나 현상을 정의합니다.
+    \item \textbf{문제 연구 (Study the problem):} 문헌 조사나 예비 테스트를 통해 문제에 대한 이해를 심화합니다.
+    \item \textbf{가설 설정 (Formulate a hypothesis):} 연구 질문에 대한 잠정적인 답을 제시합니다.
+    \item \textbf{실험 수행 (Conduct an experiment):} 가설을 검증하기 위한 데이터를 수집합니다.
+    \item \textbf{결과 분석 (Analyze the results):} 수집된 데이터를 통계적으로 분석합니다.
+    \item \textbf{결론 도출 (Make a conclusion):} 분석 결과를 바탕으로 가설의 수용 또는 기각 여부를 결정합니다.
+\end{enumerate}
+
+이 모듈에서는 특히 \textbf{가설 설정}과 \textbf{결과 분석 및 결론 도출}에 중점을 둘 것입니다. 가설 검정 과정은 가설을 설정하는 것부터 시작합니다.
+
+\subsubsection*{가설 설정}
+
+가설에는 두 가지 유형이 있습니다: 귀무 가설(Null Hypothesis)과 대립 가설(Alternate Hypothesis). 이 두 가설은 모든 가능성을 포괄해야 합니다.
+
+\begin{itemize}
+    \item \textbf{귀무 가설 (Null hypothesis, H0):}
+    \begin{itemize}
+        \item 우리가 '기대하는 일' 또는 '현재의 믿음'을 나타냅니다.
+        \item 예를 들어, 폭스바겐 연구에서 연구자들은 폭스바겐이 보고한 결과(배출량이 기준치 이내)를 기대했습니다.
+        \item 귀무 가설은 우리가 표본 증거를 사용하여 '기각'하려고 시도하는 주장입니다.
+    \end{itemize}
+    \item \textbf{대립 가설 (Alternate hypothesis, HA 또는 H1):}
+    \begin{itemize}
+        \item 귀무 가설 외의 '모든 다른 가능성'을 나타냅니다.
+        \item 폭스바겐의 경우, 실제 배출량이 보고된 것보다 높다는 것이 대립 가설이 됩니다.
+        \item 귀무 가설을 설정하면 대립 가설은 그 '보완(complement)' 관계에 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{cautionbox}
+\textbf{가설 설정의 중요 규칙:}
+\begin{itemize}
+    \item \textbf{상호 배타적 (Mutually Exclusive):} H0와 HA는 동시에 참일 수 없습니다.
+    \item \textbf{총체적 포괄 (Collectively Cover All Possibilities):} H0와 HA를 합치면 모든 가능한 상황을 설명해야 합니다.
+    \item \textbf{등호 포함 (Equality in H0):} 귀무 가설(H0)에는 항상 등호($=, \ge, \le$)가 포함되어야 합니다. 이는 통계적 검정의 기준점을 제공하기 위함입니다.
+\end{itemize}
+\end{cautionbox}
+
+\begin{examplebox}
+\textbf{예시 1: 모집단 평균 (학생 부채)}
+\begin{itemize}
+    \item \textbf{상황:} 2015년 졸업생의 평균 학자금 대출액은 35,000달러라고 알려져 있습니다. '굿딜 대학교'는 자교 학생들의 부채가 이보다 적을 것이라고 믿습니다.
+    \item \textbf{주장 1 (현재 믿음):} 굿딜 대학교 졸업생의 평균 부채는 다른 졸업생들과 다르지 않다. 즉, 35,000달러이다. (이것이 귀무 가설이 됩니다.)
+    \item \textbf{주장 2 (굿딜 대학교의 주장):} 굿딜 대학교 졸업생의 평균 부채는 35,000달러보다 적다. (이것이 대립 가설이 됩니다.)
+    \item \textbf{가설 표기:}
+        \begin{itemize}
+            \item H0: $\mu \ge \$35,000$ (평균 부채가 35,000달러 이상이다)
+            \item HA: $\mu < \$35,000$ (평균 부채가 35,000달러 미만이다)
+        \end{itemize}
+        대립 가설($\mu < \$35,000$)부터 설정하는 것이 더 쉬울 수 있습니다. 그러면 귀무 가설은 그 보완 관계($\mu \ge \$35,000$)가 됩니다.
+\end{itemize}
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{예시 2: 모집단 평균 (초콜릿 봉지 무게)}
+\begin{itemize}
+    \item \textbf{상황:} 초콜릿 제조 공장에서 300g으로 표시된 초콜릿 봉지를 생산합니다. 품질 관리팀은 정확성을 확인하기 위해 50개의 봉지를 표본으로 추출합니다.
+    \item \textbf{현재 믿음:} 봉지는 올바르게 채워지고 있다. (300g이다)
+    \item \textbf{대립 주장:} 봉지는 올바르게 채워지지 않고 있다. (300g이 아니다)
+    \item \textbf{가설 표기:}
+        \begin{itemize}
+            \item H0: $\mu = 300$ (평균 무게는 300g이다)
+            \item HA: $\mu \ne 300$ (평균 무게는 300g이 아니다)
+        \end{itemize}
+        이것은 전형적인 품질 관리 예시이며, '다르다'는 양방향의 차이를 검정하므로 '양측 검정(Two-tail test)'이 됩니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{단측 검정(One-tail)과 양측 검정(Two-tail)}
+
+가설의 형태에 따라 검정 방식이 달라집니다.
+
+\begin{itemize}
+    \item \textbf{단측 검정 (One-tail test):}
+    \begin{itemize}
+        \item 귀무 가설이 특정 값보다 '크거나 같다'($\ge$) 또는 '작거나 같다'($\le$)와 같이 한쪽 방향의 값을 허용할 때 사용합니다.
+        \item 대립 가설은 특정 값보다 '작다'($<$) 또는 '크다'($>$)와 같이 한쪽 방향을 주장합니다.
+        \item \textbf{예시:} 학생 부채 ($\text{H0}: \mu \ge \$35,000$, $\text{HA}: \mu < \$35,000$)
+    \end{itemize}
+    \item \textbf{양측 검정 (Two-tail test):}
+    \begin{itemize}
+        \item 귀무 가설이 모집단 모수에 대해 '특정 값과 같다'($=$)고 명시할 때 사용합니다.
+        \item 대립 가설은 특정 값과 '다르다'($\ne$)고 주장합니다.
+        \item \textbf{예시:} 초콜릿 봉지 무게 ($\text{H0}: \mu = 300$, $\text{HA}: \mu \ne 300$)
+    \end{itemize}
+\end{itemize}
+
+\begin{examplebox}
+\textbf{예시: ACT 점수 (등호의 중요성)}
+\begin{itemize}
+    \item \textbf{상황:} 우리 대학 신입생의 평균 ACT 점수가 24점보다 높다고 믿고 있습니다. 이 믿음이 여전히 사실인지 확인하고 싶습니다.
+    \item \textbf{현재 믿음:} $\mu > 24$ (평균 ACT 점수가 24점보다 높다).
+    \item \textbf{가설 설정:}
+        \begin{itemize}
+            \item 대립 가설(HA)에 등호가 없으므로, HA: $\mu > 24$ 로 설정합니다.
+            \item 귀무 가설(H0)에는 등호가 포함되어야 하므로, H0: $\mu \le 24$ 로 설정합니다.
+        \end{itemize}
+    \item \textbf{결론:} 귀무 가설에는 항상 등호가 포함되어야 합니다. 이는 가설을 설정하는 데 필수적인 부분입니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{가능한 가설 검정 유형}
+
+평균을 검정할 때 세 가지 가능한 가설 세트가 있습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{ll}
+\toprule
+\textbf{유형} & \textbf{가설 설정} \\
+\midrule
+\textbf{양측 검정 (Two-tail)} & H0: $\mu = \mu_0$ \\
+& HA: $\mu \ne \mu_0$ \\
+\midrule
+\textbf{단측 검정 (One-tail)} & H0: $\mu \ge \mu_0$ \\
+& HA: $\mu < \mu_0$ \\
+\cmidrule{2-2}
+& H0: $\mu \le \mu_0$ \\
+& HA: $\mu > \mu_0$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{모집단 평균에 대한 가설 검정 유형}
+\label{tab:hypothesis_types}
+
+\begin{cautionbox}
+\textbf{통계 소프트웨어의 가설 입력:}
+대부분의 통계 소프트웨어는 대립 가설만 입력하도록 요구합니다 (같지 않다, 작다, 크다).
+이는 귀무 가설에 항상 등호가 포함되어야 한다는 규칙과, 귀무 가설과 대립 가설이 모든 가능성을 포괄해야 한다는 원칙에 따라 귀무 가설이 자동으로 추론되기 때문입니다.
+때로는 사람들이 게으름 때문에 H0: $\mu = \mu_0$ 와 HA: $\mu < \mu_0$ 와 같이 표기하기도 하지만, 기술적으로는 부정확합니다. 그러나 대립 가설을 통해 단측 검정이 수행될 것임을 모두가 알고 있습니다.
+\end{cautionbox}
+
+\begin{examplebox}
+\textbf{연습 문제: 직원 근속 기간}
+\begin{itemize}
+    \item \textbf{상황:} 한 회사의 웹사이트는 직원들이 평균 25년 동안 회사에 머문다고 홍보합니다. 이 주장은 오랫동안 유지되어 왔습니다. 새로운 HR 이사는 이 주장이 여전히 사실인지 확인하고 싶습니다.
+    \item \textbf{H0와 HA는 무엇일까요?}
+    \item \textbf{해답:}
+        \begin{itemize}
+            \item \textbf{H0 (귀무 가설):} $\mu = 25$ (평균 근속 기간은 25년이다)
+            \item \textbf{HA (대립 가설):} $\mu \ne 25$ (평균 근속 기간은 25년이 아니다)
+        \end{itemize}
+    \item \textbf{설명:} 이는 모집단 평균에 대한 가설 검정이며, '다르다'를 검정하므로 양측 검정입니다. HR 이사는 근속 기간이 25년보다 길거나 짧아졌는지 모두 확인하고 싶어 합니다.
+\end{itemize}
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{예시 3: 모집단 비율 (소매점 고객 유입)}
+\begin{itemize}
+    \item \textbf{상황:} 한 매장 관리자가 새로운 위치로 소매점을 옮기는 것을 고려하고 있습니다. 새로운 위치에서는 유사한 매장의 고객 유입이 더 많다고 알려져 있습니다. 월세 인상으로 인해 고객 유입이 최소 20\% 증가해야 합니다. 매장 관리자는 이 위치로 옮겨야 할까요?
+    \item \textbf{문제:} 고객 유입이 최소 20\% 증가할 것인가? (모집단 비율에 대한 검정)
+    \item \textbf{가설 설정:}
+        \begin{itemize}
+            \item $p$: 고객 유입 증가율
+            \item \textbf{HA (대립 가설):} $p < 0.20$ (고객 유입 증가율이 20\% 미만이다)
+            \item \textbf{H0 (귀무 가설):} $p \ge 0.20$ (고객 유입 증가율이 20\% 이상이다)
+        \end{itemize}
+    \item \textbf{설명:} 관리자는 고객 유입이 20\% 미만으로 증가할 경우에만 이사를 반대할 것입니다. 따라서 이는 단측 검정입니다. 대립 가설을 먼저 설정한 다음 귀무 가설을 보완적으로 설정하는 것이 더 쉬울 수 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{예시 4: 모집단 비율 (영양 보충제 효과)}
+\begin{itemize}
+    \item \textbf{상황 1: 일반적인 주장 검정}
+        \begin{itemize}
+            \item \textbf{주장:} 한 영양 보충제는 고객의 80\%가 신체적 웰빙이 개선되었다고 보고한다고 주장합니다. 한 신문 기자가 이 주장을 검증하고 싶어 합니다.
+            \item \textbf{가설 설정:}
+                \begin{itemize}
+                    \item $p$: 신체적 웰빙이 개선되었다고 보고한 고객의 비율
+                    \item \textbf{H0:} $p = 0.80$ (개선되었다고 보고한 비율은 80\%이다)
+                    \item \textbf{HA:} $p \ne 0.80$ (개선되었다고 보고한 비율은 80\%가 아니다)
+                \end{itemize}
+            \item \textbf{설명:} 이는 양측 검정입니다. 기자는 비율이 80\%보다 높거나 낮은지 모두 관심이 있습니다.
+        \end{itemize}
+    \item \textbf{상황 2: '최소한' 주장 검정}
+        \begin{itemize}
+            \item \textbf{주장:} 한 영양 보충제는 고객의 '최소한' 80\%가 신체적 웰빙이 개선되었다고 주장합니다. 한 신문 기자가 이 주장을 검증하고 싶어 합니다.
+            \item \textbf{가설 설정:}
+                \begin{itemize}
+                    \item \textbf{H0:} $p \ge 0.80$ (개선되었다고 보고한 비율은 80\% 이상이다)
+                    \item \textbf{HA:} $p < 0.80$ (개선되었다고 보고한 비율은 80\% 미만이다)
+                \end{itemize}
+            \item \textbf{설명:} 이는 단측 검정입니다. 기자는 주장이 과장되었는지 (즉, 80\% 미만인지)에 주로 관심이 있습니다.
+        \end{itemize}
+    \item \textbf{상황 3: 기자의 특정 의심}
+        \begin{itemize}
+            \item \textbf{주장:} 한 영양 보충제는 고객의 80\%가 신체적 웰빙이 개선되었다고 주장합니다. 한 신문 기자는 이 비율이 '너무 높다'고 생각하여 연구하고 싶어 합니다.
+            \item \textbf{가설 설정:}
+                \begin{itemize}
+                    \item \textbf{HA:} $p < 0.80$ (기자는 비율이 80\%보다 낮다고 생각한다)
+                    \item \textbf{H0:} $p \ge 0.80$ (귀무 가설은 HA의 보완이므로 80\% 이상이다)
+                \end{itemize}
+            \item \textbf{설명:} 이 역시 단측 검정입니다. 연구 질문이 귀무 가설과 대립 가설을 설정하는 데 중요한 역할을 한다는 것을 보여줍니다.
+        \end{itemize}
+\end{examplebox}
+
+\subsubsection*{가설 검정의 첫 번째 단계}
+
+모든 과학적 연구는 관심 변수에 대한 질문을 던지는 것으로 시작합니다. 가설 검정은 이 질문을 귀무 가설과 대립 가설의 형태로 공식화하는 것으로 시작합니다.
+
+\begin{summarybox}
+\textbf{가설 검정의 1단계:}
+\begin{itemize}
+    \item \textbf{귀무 가설 (H0):} 사실이라고 믿어지는 주장입니다. 데이터 수집 및 분석은 이 귀무 가설을 기반으로 합니다.
+    \item \textbf{대립 가설 (HA):} 귀무 가설과 반대되는 주장입니다.
+    \item \textbf{결정:} 수집된 데이터가 귀무 가설과 모순되면 귀무 가설을 기각합니다. 다음 레슨에서 이 방법을 배울 것입니다.
+\end{itemize}
+\end{summarybox}
+
+\newpage
+\subsection{Lesson 1-2: 결과 분석}
+
+\subsubsection{Lesson 1-2.1: 결과 분석}
+
+가설을 설정한 후에는 데이터를 수집하고 분석을 시작할 수 있습니다. 실험 수행은 이전 과정에서 다룬 '데이터 생성' 및 '표본 연구 수행' 원칙을 따릅니다. 여기서는 데이터가 올바른 절차를 통해 얻어졌다고 가정하고, 데이터 분석을 진행하는 방법에 초점을 맞춥니다.
+
+\subsubsection*{유의 수준 ($\alpha$)}
+
+데이터 분석을 시작하기 전에 '유의 수준($\alpha$)'을 설정해야 합니다. 이는 가설을 검정하는 데 사용될 기준입니다.
+
+\begin{itemize}
+    \item \textbf{유의 수준 ($\alpha$):} 귀무 가설이 사실임에도 불구하고 우리가 잘못 기각할 확률을 의미합니다. 즉, 제1종 오류를 저지를 최대 허용 확률입니다.
+    \item \textbf{신뢰 수준 (Confidence Level):} $1 - \alpha$ 로 계산됩니다. 예를 들어, $\alpha = 0.05$이면 신뢰 수준은 95\%입니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{예시: 초콜릿 봉지 무게 (유의 수준)}
+\begin{itemize}
+    \item \textbf{상황:} 초콜릿 제조 공장에서 300g으로 표시된 봉지를 생산합니다. 품질 관리팀은 정확성을 확인하기 위해 50개의 봉지를 표본으로 추출합니다.
+    \item \textbf{가설:} H0: $\mu = 300$, HA: $\mu \ne 300$ (양측 검정)
+    \item \textbf{유의 수준 설정:} $\alpha = 0.05$로 설정하면, 이는 우리가 귀무 가설(평균 무게가 300g이다)이 사실인데도 불구하고 잘못 기각할 확률을 5\%로 허용하겠다는 의미입니다.
+    \item \textbf{시각화:} 정규 분포 곡선에서 양쪽 꼬리 부분에 각각 $\alpha/2 = 2.5\%$씩의 면적이 할당됩니다. 이 파란색 음영 영역에 표본 평균이 떨어지면 귀무 가설을 기각하게 됩니다.
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{제1종 오류와 제2종 오류}
+
+분석 과정에서 우리는 두 가지 유형의 실수를 저지를 수 있습니다.
+
+\begin{itemize}
+    \item \textbf{제1종 오류 (Type I error):}
+    \begin{itemize}
+        \item 귀무 가설(H0)이 \textbf{사실인데도 불구하고 잘못 기각}하는 오류입니다.
+        \item 이 오류를 저지를 확률은 유의 수준 $\alpha$와 같습니다.
+    \end{itemize}
+    \item \textbf{제2종 오류 (Type II error):}
+    \begin{itemize}
+        \item 귀무 가설(H0)이 \textbf{거짓인데도 불구하고 잘못 기각하지 않는} (즉, 채택하는) 오류입니다.
+        \item 이 오류를 저지를 확률은 $\beta$로 표기합니다.
+    \end{itemize}
+\end{itemize}
+
+다음 표는 가설 검정에서 발생할 수 있는 의사결정의 결과를 요약합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{현실 - H0: $\mu = 300$이 참} & \textbf{현실 - H0: $\mu = 300$이 거짓} \\
+\midrule
+\textbf{결정 - H0: $\mu = 300$ 기각} & \textbf{제1종 오류 ($\alpha$)} & \checkmark (올바른 결정) \\
+\textbf{결정 - H0: $\mu = 300$ 기각하지 않음} & \checkmark (올바른 결정) & \textbf{제2종 오류 ($\beta$)} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{제1종 오류와 제2종 오류}
+\label{tab:type_errors}
+
+\begin{examplebox}
+\textbf{오류의 맥락별 명칭:}
+\begin{itemize}
+    \item \textbf{제조업 환경 (Manufacturing Setting):}
+        \begin{itemize}
+            \item \textbf{제1종 오류 (제조업자 위험):} 생산 라인이 불필요하게 중단되는 경우. (실제로는 문제가 없는데도 문제가 있다고 판단)
+            \item \textbf{제2종 오류 (소비자 위험):} 조정이 필요한 생산 라인을 중단하지 않아 불량품이 소비자에게 전달되는 경우. (실제로는 문제가 있는데도 문제가 없다고 판단)
+        \end{itemize}
+    \item \textbf{의료 환경 (Medical Setting):}
+        \begin{itemize}
+            \item \textbf{제1종 오류 (위양성, False Positive):} 건강한 환자를 검사 결과가 '병이 있다'고 잘못 진단하는 경우.
+            \item \textbf{제2종 오류 (위음성, False Negative):} 병이 있는 환자를 검사 결과가 '병이 없다'고 잘못 진단하는 경우. (예: 랜스 암스트롱이 약물 검사에서 음성 판정을 받았으나 실제로는 약물을 사용한 경우)
+        \end{itemize}
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{유의 수준 ($\alpha$) 설정의 중요성}
+
+$\alpha$ 값은 분석을 시작하기 전에 설정해야 합니다. 이는 우리가 표본을 통해 얻은 결과가 귀무 가설과 얼마나 다를 때 귀무 가설을 기각할 것인지를 결정하는 기준이 됩니다.
+
+\begin{itemize}
+    \item \textbf{일반적인 $\alpha$ 값:}
+    \begin{itemize}
+        \item 보통 $\alpha = 0.05$ (5\%)로 설정됩니다. 이는 귀무 가설을 기각하기 위해 '강력한 증거'가 필요함을 의미합니다.
+        \item $\alpha = 0.01$ (1\%)은 매우 강력한 증거를 요구하며, $\alpha = 0.10$ (10\%)은 비교적 약한 증거로도 기각할 수 있음을 의미합니다.
+    \end{itemize}
+    \item \textbf{$\alpha$와 $\beta$의 상충 관계 (Trade-off):}
+    \begin{itemize}
+        \item 표본 크기가 고정된 상태에서 $\alpha$를 줄이면 $\beta$는 증가합니다 ($\alpha \downarrow \to \beta \uparrow$). 즉, 제1종 오류를 줄이려 하면 제2종 오류를 저지를 확률이 높아집니다.
+        \item 우리는 $\alpha$ 값을 직접 설정하지만, $\beta$ 값은 여러 매개변수에 따라 계산됩니다.
+        \item \textbf{표본 크기 증가의 이점:} 표본 크기($n$)를 늘리면 $\alpha$와 $\beta$를 동시에 줄일 수 있습니다 ($n \uparrow \to \alpha \downarrow \text{ and } \beta \downarrow$). 하지만 표본 크기를 늘리는 데는 비용이 수반됩니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{평균 검정 단계}
+
+가설 검정의 전체 과정은 다음과 같은 4단계로 요약할 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{H0와 HA 설정 (State H0 and HA):} 귀무 가설과 대립 가설을 명확히 정의합니다.
+    \item \textbf{유의 수준 $\alpha$ 지정 (Specify the significance level $\alpha$):} 제1종 오류를 허용할 최대 확률을 결정합니다.
+    \item \textbf{표본 데이터에 대한 p-값 계산 (Calculate the p-value for the sample data):} 관측된 표본 데이터가 귀무 가설 하에서 나타날 확률을 계산합니다.
+    \item \textbf{H0 기각 또는 기각하지 않음 (Reject or not reject H0):} p-값과 $\alpha$를 비교하여 귀무 가설에 대한 결정을 내립니다.
+\end{enumerate}
+
+다음 레슨에서는 3단계인 p-값 계산과 4단계인 결론 도출에 대해 자세히 살펴보겠습니다.
+
+\newpage
+\subsection{Lesson 1-3: 평균에 대한 양측 검정}
+
+\subsubsection{Lesson 1-3.1: 평균에 대한 양측 검정}
+
+이 레슨에서는 가설 검정의 세 번째 단계인 'p-값 계산'에 초점을 맞춥니다.
+
+\subsubsection*{p-값 (p-value)}
+
+\begin{summarybox}
+\textbf{p-값의 정의:}
+\begin{itemize}
+    \item p-값은 관측된 검정 통계량을 기반으로 귀무 가설(H0)을 기각할 경우 발생할 수 있는 \textbf{제1종 오류의 가장 큰 확률}입니다.
+    \item 즉, 귀무 가설이 실제로 참이라고 가정했을 때, 우리가 얻은 표본 데이터 또는 그보다 더 극단적인 데이터가 나올 확률입니다.
+\end{itemize}
+\end{summarybox}
+
+p-값이 작다는 것은 귀무 가설이 참일 때 현재의 표본을 얻을 확률이 매우 낮다는 것을 의미합니다. 이는 귀무 가설에 반하는 강력한 증거가 됩니다.
+
+\begin{examplebox}
+\textbf{예시 1: 모집단 평균 (초콜릿 봉지 무게 재방문)}
+\begin{itemize}
+    \item \textbf{상황:} 초콜릿 제조 공장에서 300g으로 표시된 봉지를 생산합니다. 품질 관리팀은 정확성을 확인하기 위해 50개의 봉지를 표본으로 추출합니다. 분석은 5\% 유의 수준에서 수행됩니다.
+    \item \textbf{가설:} H0: $\mu = 300$, HA: $\mu \ne 300$
+    \item \textbf{표본 데이터:} $\bar{x} = 294.6$, $s = 11$, $n = 50$
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{평균 검정 단계 적용}
+
+1.  \textbf{H0와 HA 설정:} H0: $\mu = 300$, HA: $\mu \ne 300$
+2.  \textbf{유의 수준 $\alpha$ 지정:} $\alpha = 0.05$
+3.  \textbf{표본 데이터에 대한 p-값 계산:} $\bar{x} = 294.6$, $s = 11$, $n = 50$
+4.  \textbf{H0 기각 또는 기각하지 않음:} (이 단계는 p-값 계산 후 진행)
+
+\subsubsection*{통계적 검정의 개념}
+
+통계적 검정은 귀무 가설과 대립 가설에 명시된 모수를 추정하는 통계량의 '표본 분포(Sampling Distribution)'에 의존합니다. 이는 '중심 극한 정리(Central Limit Theorem)'에 기반합니다.
+
+\begin{itemize}
+    \item \textbf{중심 극한 정리:} 모집단에서 표본을 반복적으로 추출하면, 이 표본들의 평균은 중심(모집단 평균) 주위에 모이고, 그 변동성은 '표준 오차(Standard Error)'에 의해 결정됩니다.
+    \item \textbf{표준 오차 계산:} $\text{SE} = s / \sqrt{n} = 11 / \sqrt{50} \approx 1.55$
+    \item \textbf{질문:} 귀무 가설이 참이라고 가정했을 때, 우리가 얻은 표본(평균 294.6)처럼 귀무 가설의 평균(300)과 '이만큼이나' 다른 표본을 얻을 확률은 얼마일까요?
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{example-sampling-distribution.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+    \captionof{figure}{표본 분포와 표본 데이터 분포의 비교 (가상의 이미지)}
+    \label{fig:sampling_distribution}
+    \vspace{0.5em}
+    \textbf{설명:}
+    \begin{itemize}
+        \item \textbf{좁고 높은 곡선 (평균=300, 표준 오차=1.55):} 귀무 가설이 참일 때 표본 평균들의 분포를 나타냅니다. 대부분의 표본 평균은 300g 근처에 모여 있을 것입니다.
+        \item \textbf{넓고 낮은 곡선 (평균=294.6, 표준편차=11):} 우리가 실제로 얻은 50개 봉지 표본의 무게 분포를 나타냅니다. 이 표본의 평균은 294.6g입니다.
+        \item \textbf{비교:} 두 분포를 함께 보면, 우리가 얻은 표본 평균(294.6)이 귀무 가설의 평균(300)으로부터 상당히 왼쪽에 떨어져 있음을 알 수 있습니다. p-값은 바로 이 '이만큼이나 다른' 표본을 얻을 확률을 의미합니다.
+    \end{itemize}
+\end{figure}
+
+\subsubsection*{p-값 계산}
+
+p-값을 찾기 위해 먼저 't-값(test statistic)'을 계산해야 합니다. t-값은 표본 평균이 귀무 가설의 평균으로부터 몇 표준 오차만큼 떨어져 있는지를 나타냅니다.
+
+\begin{itemize}
+    \item \textbf{t-분포 사용:} 평균을 검정할 때는 t-분포를 사용합니다. t-분포는 정규 분포와 유사한 종 모양의 곡선이지만, '자유도(degrees of freedom, df = $n-1$)'에 따라 퍼진 정도가 달라집니다.
+    \item \textbf{t-값 공식:}
+    \[ t = \frac{\bar{x} - \mu_0}{s / \sqrt{n}} \]
+    여기서, $\bar{x}$는 표본 평균, $\mu_0$는 귀무 가설의 모집단 평균, $s$는 표본 표준편차, $n$은 표본 크기입니다.
+    \item \textbf{초콜릿 봉지 예시 t-값 계산:}
+    \[ t = \frac{294.6 - 300}{11 / \sqrt{50}} = \frac{-5.4}{1.5556} \approx -3.47 \]
+    우리의 표본은 귀무 가설의 평균으로부터 왼쪽으로 3.47 표준 오차만큼 떨어져 있습니다. 이는 '이상치(outlier)'에 해당하며, 발생 확률이 매우 낮습니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{example-t-distribution.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+    \captionof{figure}{t-분포에서 t-값 -3.47의 위치 (가상의 이미지)}
+    \label{fig:t_value_location}
+    \vspace{0.5em}
+    \textbf{설명:}
+    \begin{itemize}
+        \item t-분포에서 t-값 -3.47은 왼쪽 꼬리 부분에 매우 멀리 떨어져 있습니다.
+        \item \textbf{p-값 계산 (Excel 함수):} Excel의 `T.DIST(x, deg_freedom, cumulative)` 함수를 사용하여 t-값보다 작거나 같은 누적 확률을 계산합니다.
+        \begin{itemize}
+            \item `x`: 계산된 t-값 (-3.47)
+            \item `deg_freedom`: 자유도 ($n-1 = 50-1 = 49$)
+            \item `cumulative`: 1 (누적 확률을 의미)
+        \end{itemize}
+        \item \textbf{결과:} `T.DIST(-3.47, 49, 1)` $\approx 0.00055$
+        \item 이 p-값은 우리가 얻은 표본처럼 왼쪽 꼬리에 위치하거나 더 극단적인 표본을 얻을 확률이 0.00055 (10만 분의 55)임을 의미합니다. 이는 매우 낮은 확률입니다.
+    \end{itemize}
+\end{figure}
+
+\subsubsection*{p-값 해석 및 결론 도출}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{example-p-value-two-tail.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+    \captionof{figure}{양측 검정에서 p-값의 시각화 (가상의 이미지)}
+    \label{fig:p_value_interpretation}
+    \vspace{0.5em}
+    \textbf{설명:}
+    \begin{itemize}
+        \item t-분포에서 t-값 -3.47과 +3.47의 양쪽 꼬리 영역에 각각 0.00055의 확률이 표시됩니다.
+        \item 우리의 $\alpha$ 값(0.05)은 표본 간의 자연스러운 변동으로 허용할 수 있는 차이의 한계를 설정합니다. 이 한계는 대략 2 표준 오차 정도입니다.
+        \item \textbf{두 가지 가능성:}
+            \begin{enumerate}
+                \item 귀무 가설이 참인데, 우리가 매우 운이 나쁘게도 이렇게 극단적인 표본을 얻었다.
+                \item 표본 데이터가 귀무 가설에 반하는 강력한 증거를 제공하며, 귀무 가설은 기각되어야 한다.
+            \end{enumerate}
+        \item \textbf{가장 그럴듯한 설명:} 두 번째 결론이 더 그럴듯합니다. 폭스바겐 사례에서도 연구자들은 처음에는 운이 나빴다고 생각했지만, 반복된 실험에서도 동일한 결과가 나오자 폭스바겐의 주장이 거짓임을 확신했습니다.
+    \end{itemize}
+\end{figure}
+
+\begin{summarybox}
+\textbf{양측 검정의 결론 규칙:}
+\begin{itemize}
+    \item \textbf{규칙:} p-값이 $\alpha$보다 작으면 귀무 가설(H0)을 기각합니다.
+    \item \textbf{양측 검정의 p-값:} 양측 검정에서는 p-값이 양쪽 꼬리에 걸쳐 분할되므로, 계산된 단측 p-값에 2를 곱해야 합니다.
+    \item \textbf{초콜릿 봉지 예시 결론:}
+        \begin{itemize}
+            \item 단측 p-값 = 0.00055
+            \item 양측 p-값 = $2 \times 0.00055 = 0.0011$
+            \item $\alpha = 0.05$와 비교: $0.0011 < 0.05$ 이므로, 귀무 가설을 기각합니다.
+            \item $\alpha = 0.01$와 비교: $0.0011 < 0.01$ 이므로, 0.01 유의 수준에서도 귀무 가설을 기각합니다.
+        \end{itemize}
+    \item \textbf{의미:} 생산 라인 관리자는 생산을 중단하고 조정을 해야 합니다. 그렇지 않으면 평균적으로 300g보다 적은 무게의 봉지를 계속 생산하게 될 것입니다.
+\end{itemize}
+\end{summarybox}
+
+\newpage
+\subsubsection{Lesson 1-3.2: 평균에 대한 양측 검정 (Excel)}
+
+Excel을 사용하여 초콜릿 봉지 무게 예시를 직접 계산해 보겠습니다.
+
+\begin{examplebox}
+\textbf{예시 1: 모집단 평균 (초콜릿 봉지 무게) - Excel 실습}
+\begin{itemize}
+    \item \textbf{상황:} 초콜릿 제조 공장에서 300g으로 표시된 봉지를 생산합니다. 품질 관리팀은 정확성을 확인하기 위해 50개의 봉지를 표본으로 추출합니다. 분석은 5\% 유의 수준에서 수행됩니다.
+    \item \textbf{가설:} H0: $\mu = 300$, HA: $\mu \ne 300$
+    \item \textbf{표본 데이터:} $\bar{x} = 294.6$, $s = 11$, $n = 50$
+\end{itemize}
+\end{examplebox}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{excel_chocolate_weights_data.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+    \captionof{figure}{Excel 데이터 시트 (가상의 이미지)}
+    \label{fig:excel_data_sheet}
+    \vspace{0.5em}
+    \textbf{설명:}
+    \begin{itemize}
+        \item Excel 워크시트의 'Data' 탭에 50개의 초콜릿 봉지 무게 데이터가 A열에 입력되어 있습니다.
+        \item D열에는 'Mean Weight', 'Standard Deviation', 'Sample Size', 'Significance Level', 'Critical Value of t', 'p-value' 등의 레이블이 있습니다.
+    \end{itemize}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{데이터 입력 및 기본 통계량 계산:}
+    \begin{itemize}
+        \item A열에 50개의 무게 데이터를 입력합니다.
+        \item \textbf{평균 무게 (Mean Weight):} `E2` 셀에 `=AVERAGE(A1:A50)`을 입력합니다. 결과는 약 `294.609`가 나옵니다.
+        \item \textbf{표준편차 (Standard Deviation):} `E3` 셀에 `=STDEV.S(A1:A50)`을 입력합니다. 결과는 약 `10.98013`이 나옵니다. (문제에서는 반올림하여 11로 사용)
+        \item \textbf{표본 크기 (Sample Size):} `E4` 셀에 `=COUNT(A1:A50)`을 입력합니다. 결과는 `50`이 나옵니다.
+        \item \textbf{유의 수준 (Significance Level):} `E5` 셀에 `0.05`를 입력합니다.
+        \item \textbf{가설 평균 (Hypothesized Mean):} `E6` 셀에 `300`을 입력합니다.
+    \end{itemize}
+
+    \item \textbf{t-값 계산:}
+    \begin{itemize}
+        \item t-값 공식: $t = (\bar{x} - \mu_0) / (s / \sqrt{n})$
+        \item `E7` 셀에 `=(E2-E6)/(E3/SQRT(E4))`를 입력합니다.
+        \item 결과는 약 `-3.47174`가 나옵니다.
+    \end{itemize}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{excel_t_value_calculation.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+        \captionof{figure}{Excel에서 t-값 계산 (가상의 이미지)}
+        \label{fig:excel_t_value}
+        \vspace{0.5em}
+        \textbf{설명:}
+        \begin{itemize}
+            \item 계산된 t-값 -3.47은 표본 평균이 가설 평균 300으로부터 왼쪽으로 3.47 표준 오차만큼 떨어져 있음을 의미합니다.
+        \end{itemize}
+    \end{figure}
+
+    \item \textbf{p-값 계산:}
+    \begin{itemize}
+        \item `E8` 셀에 `=T.DIST(E7, E4-1, 1)`을 입력합니다.
+        \item `T.DIST` 함수는 주어진 t-값보다 작거나 같은 누적 확률을 반환합니다.
+        \item 결과는 약 `0.000545`가 나옵니다. 이는 왼쪽 꼬리 부분의 확률입니다.
+    \end{itemize}
+
+    \item \textbf{양측 p-값 및 결론:}
+    \begin{itemize}
+        \item 우리는 양측 검정(HA: $\mu \ne 300$)을 수행하고 있으므로, 계산된 단측 p-값에 2를 곱해야 합니다.
+        \item 양측 p-값 = $2 \times 0.000545 = 0.00109$
+        \item 이 양측 p-값을 유의 수준 $\alpha = 0.05$와 비교합니다.
+        \item $0.00109 < 0.05$ 이므로, 귀무 가설을 기각합니다.
+    \end{itemize}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{excel_p_value_conclusion.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+        \captionof{figure}{Excel에서 p-값 계산 및 결론 (가상의 이미지)}
+        \label{fig:excel_p_value_conclusion}
+        \vspace{0.5em}
+        \textbf{설명:}
+        \begin{itemize}
+            \item 양측 p-값 0.00109는 유의 수준 0.05보다 작습니다.
+            \item \textbf{결론:} 귀무 가설을 기각합니다. 이는 초콜릿 봉지의 평균 무게가 300g이 아니라는 대립 가설을 지지합니다. 즉, 기계가 올바르게 작동하지 않고 있으며 조정이 필요합니다.
+        \end{itemize}
+    \end{figure}
+\end{enumerate}
+
+\newpage
+\subsection{Lesson 1-4: 평균에 대한 단측 검정}
+
+\subsubsection{Lesson 1-4.1: 평균에 대한 단측 검정}
+
+이제 단측 검정을 수행하는 방법을 살펴보겠습니다. 학생 부채 예시를 다시 사용합니다.
+
+\begin{examplebox}
+\textbf{예시: 학생 부채 (단측 평균 검정)}
+\begin{itemize}
+    \item \textbf{상황:} 2015년 졸업생의 평균 학자금 대출액은 35,000달러입니다. '굿딜 대학교'는 자교 학생들의 부채가 이보다 적을 것이라고 믿습니다. 이 대학은 졸업생 150명을 대상으로 설문 조사를 실시하여 평균 부채가 33,800달러이고 표준편차가 10,000달러임을 확인했습니다.
+    \item \textbf{질문:} 5\% 유의 수준에서 굿딜 대학교의 주장을 뒷받침할 충분한 증거가 있을까요?
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{평균 검정 단계 적용}
+
+1.  \textbf{H0와 HA 설정:}
+    \begin{itemize}
+        \item 굿딜 대학교는 학생들의 부채가 전국 평균보다 '낮다'고 주장하므로, 이것이 대립 가설이 됩니다.
+        \item H0: $\mu \ge \$35,000$ (평균 부채가 35,000달러 이상이다)
+        \item HA: $\mu < \$35,000$ (평균 부채가 35,000달러 미만이다)
+    \end{itemize}
+2.  \textbf{유의 수준 $\alpha$ 지정:} $\alpha = 0.05$
+3.  \textbf{표본 데이터에 대한 p-값 계산:} $\bar{x} = 33,800$, $s = 10,000$, $n = 150$
+4.  \textbf{H0 기각 또는 기각하지 않음:} (p-값 계산 후 진행)
+
+\subsubsection*{p-값 계산}
+
+\begin{itemize}
+    \item \textbf{t-값 공식:}
+    \[ t = \frac{\bar{x} - \mu_0}{s / \sqrt{n}} \]
+    \item \textbf{학생 부채 예시 t-값 계산:}
+    \[ t = \frac{33,800 - 35,000}{10,000 / \sqrt{150}} = \frac{-1,200}{816.496} \approx -1.47 \]
+    우리의 표본은 귀무 가설의 평균으로부터 왼쪽으로 1.47 표준 오차만큼 떨어져 있습니다.
+    \item \textbf{p-값 계산 (Excel 함수):} `T.DIST(x, deg_freedom, cumulative)`
+        \begin{itemize}
+            \item `x`: -1.47
+            \item `deg_freedom`: $n-1 = 150-1 = 149$
+            \item `cumulative`: 1
+        \end{itemize}
+    \item \textbf{결과:} `T.DIST(-1.47, 149, 1)` $\approx 0.0718 \approx 0.072$
+\end{itemize}
+
+\subsubsection*{p-값 해석 및 결론 도출}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{one_tail_left_p_value.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+    \captionof{figure}{단측 검정 (왼쪽 꼬리)에서 p-값의 시각화 (가상의 이미지)}
+    \label{fig:one_tail_left_p_value}
+    \vspace{0.5em}
+    \textbf{설명:}
+    \begin{itemize}
+        \item t-분포에서 t-값 -1.47의 왼쪽 꼬리 영역에 p-값 0.072가 표시됩니다.
+        \item \textbf{결론 규칙:} p-값이 $\alpha$보다 작으면 귀무 가설을 기각합니다.
+        \item \textbf{학생 부채 예시 결론:}
+            \begin{itemize}
+                \item p-값 = 0.072
+                \item $\alpha = 0.05$와 비교: $0.072 > 0.05$ 이므로, 귀무 가설을 기각하지 않습니다.
+            \end{itemize}
+        \item \textbf{의미:} 굿딜 대학교는 자교 졸업생들의 부채가 전국 평균보다 적다는 것을 보여줄 충분한 증거를 제시하지 못했습니다. 즉, 그들의 주장을 통계적으로 뒷받침할 수 없습니다.
+    \end{itemize}
+\end{figure}
+
+\begin{examplebox}
+\textbf{연습 문제: ACT 점수 (단측 검정)}
+\begin{itemize}
+    \item \textbf{상황:} 우리 대학 신입생의 평균 ACT 점수가 24점보다 높다고 믿고 있습니다. 대학은 200명의 학생을 선정하여 평균 ACT 점수가 24.8점이고 표준편차가 6.1점임을 확인했습니다.
+    \item \textbf{질문:} 5\% 유의 수준에서 이 주장을 뒷받침할 충분한 증거가 있을까요?
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{연습 문제 해결}
+
+1.  \textbf{H0와 HA 설정:}
+    \begin{itemize}
+        \item 대학은 평균 ACT 점수가 24점보다 '높다'고 주장하므로, 이것이 대립 가설이 됩니다.
+        \item H0: $\mu \le 24$ (평균 ACT 점수가 24점 이하이다)
+        \item HA: $\mu > 24$ (평균 ACT 점수가 24점보다 높다)
+    \end{itemize}
+2.  \textbf{유의 수준 $\alpha$ 지정:} $\alpha = 0.05$
+3.  \textbf{표본 데이터:} $\bar{x} = 24.8$, $s = 6.1$, $n = 200$
+
+\subsubsection*{p-값 계산}
+
+\begin{itemize}
+    \item \textbf{t-값 계산:}
+    \[ t = \frac{24.8 - 24}{6.1 / \sqrt{200}} = \frac{0.8}{0.4313} \approx 1.85 \]
+    \item \textbf{p-값 계산 (Excel 함수):} `T.DIST(x, deg_freedom, cumulative)`
+        \begin{itemize}
+            \item `x`: 1.85
+            \item `deg_freedom`: $n-1 = 200-1 = 199$
+            \item `cumulative`: 1
+        \end{itemize}
+    \item \textbf{결과:} `T.DIST(1.85, 199, 1)` $\approx 0.967102$
+    \item \textbf{주의:} 이 값은 t-값 1.85의 '왼쪽' 누적 확률입니다. 우리의 대립 가설은 $\mu > 24$이므로, 우리는 '오른쪽 꼬리'의 확률을 원합니다. 따라서 1에서 이 값을 빼야 합니다.
+    \item \textbf{오른쪽 꼬리 p-값:} $1 - 0.967102 \approx 0.032898 \approx 0.033$
+\end{itemize}
+
+\subsubsection*{p-값 해석 및 결론 도출}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{one_tail_right_p_value.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+    \captionof{figure}{단측 검정 (오른쪽 꼬리)에서 p-값의 시각화 (가상의 이미지)}
+    \label{fig:one_tail_right_p_value}
+    \vspace{0.5em}
+    \textbf{설명:}
+    \begin{itemize}
+        \item t-분포에서 t-값 1.85의 오른쪽 꼬리 영역에 p-값 0.033이 표시됩니다.
+        \item \textbf{결론 규칙:} p-값이 $\alpha$보다 작으면 귀무 가설을 기각합니다.
+        \item \textbf{ACT 점수 예시 결론:}
+            \begin{itemize}
+                \item p-값 = 0.033
+                \item $\alpha = 0.05$와 비교: $0.033 < 0.05$ 이므로, 귀무 가설을 기각합니다.
+            \end{itemize}
+        \item \textbf{의미:} 대립 가설을 지지합니다. 즉, 대학의 주장대로 신입생의 평균 ACT 점수가 24점보다 높다는 것이 통계적으로 올바른 것으로 보입니다.
+    \end{itemize}
+\end{figure}
+
+\subsubsection*{가설 검정 유형 요약}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lll}
+\toprule
+\textbf{유형} & \textbf{가설 설정} & \textbf{기각 규칙} \\
+\midrule
+\textbf{양측 검정 (Two-Tail)} & H0: $\mu = \mu_0$ & p-값 (양측) $< \alpha$ 이면 H0 기각 \\
+& HA: $\mu \ne \mu_0$ & (단측 p-값 $\times$ 2) $< \alpha$ \\
+\midrule
+\textbf{단측 검정 (One-Tail)} & H0: $\mu \ge \mu_0$ & p-값 (왼쪽 꼬리) $< \alpha$ 이면 H0 기각 \\
+& HA: $\mu < \mu_0$ & \\
+\cmidrule{2-3}
+& H0: $\mu \le \mu_0$ & p-값 (오른쪽 꼬리) $< \alpha$ 이면 H0 기각 \\
+& HA: $\mu > \mu_0$ & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\captionof{table}{가설 검정 유형별 가설 및 기각 규칙}
+\label{tab:hypothesis_summary}
+
+\begin{itemize}
+    \item \textbf{양측 검정:} 표본 통계량이 평균으로부터 양쪽 방향으로 너무 많이 벗어날 때 귀무 가설을 기각합니다. p-값을 계산한 후 2를 곱하여 $\alpha$와 비교합니다.
+    \item \textbf{단측 검정:} 대립 가설이 주장하는 방향(왼쪽 또는 오른쪽 꼬리)으로만 기각 영역이 존재합니다. 계산된 p-값을 $\alpha$와 직접 비교합니다.
+\end{itemize}
+
+\newpage
+\subsubsection{Lesson 1-4.2: 평균에 대한 좌측 단측 검정 (Excel)}
+
+Excel을 사용하여 설문 조사 완료 시간 예시를 직접 계산해 보겠습니다.
+
+\begin{examplebox}
+\textbf{예시: 설문 조사 완료 시간 (좌측 단측 검정)}
+\begin{itemize}
+    \item \textbf{상황:} 고객 관계 부서는 고객 설문 조사를 계획하고 있습니다. 설문 조사가 20분 미만으로 완료되기를 원합니다. 65명의 직원에게 설문 조사를 실시하고 완료 시간을 기록했습니다.
+    \item \textbf{질문:} 0.05 유의 수준에서 설문 조사를 완료하는 평균 시간이 20분 미만이라고 주장할 수 있을까요?
+\end{itemize}
+\end{examplebox}
+
+\subsubsection*{가설 설정}
+
+\begin{itemize}
+    \item \textbf{목표:} 평균 완료 시간이 20분 미만임을 주장하고 싶습니다.
+    \item \textbf{HA (대립 가설):} $\mu < 20$ (평균 완료 시간은 20분 미만이다)
+    \item \textbf{H0 (귀무 가설):} $\mu \ge 20$ (평균 완료 시간은 20분 이상이다)
+    \item \textbf{결론:} 만약 귀무 가설을 기각하지 못하면, 설문 조사가 너무 길어서 고객들이 완료하지 않을 가능성이 있다고 판단할 것입니다.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{excel_survey_data.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+    \captionof{figure}{Excel 설문 조사 데이터 시트 (가상의 이미지)}
+    \label{fig:excel_survey_data}
+    \vspace{0.5em}
+    \textbf{설명:}
+    \begin{itemize}
+        \item Excel 워크시트의 'Data' 탭에 65명의 직원 설문 조사 완료 시간 데이터가 A열에 입력되어 있습니다.
+        \item C열에는 'Mean', 'Standard deviation', 'Significance level', 'hypothesized mean', 't-value', 'p-value' 등의 레이블이 있습니다.
+    \end{itemize}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{데이터 입력 및 기본 통계량 계산:}
+    \begin{itemize}
+        \item A열에 65개의 완료 시간 데이터를 입력합니다.
+        \item \textbf{평균 (Mean):} `D3` 셀에 `=AVERAGE(A1:A65)`을 입력합니다. 결과는 약 `18.03077`이 나옵니다.
+        \item \textbf{표준편차 (Standard deviation):} `D4` 셀에 `=STDEV.S(A1:A65)`을 입력합니다. 결과는 약 `3.716388`이 나옵니다.
+        \item \textbf{유의 수준 (Significance level):} `D5` 셀에 `0.05`를 입력합니다.
+        \item \textbf{가설 평균 (hypothesized mean):} `D6` 셀에 `20`을 입력합니다.
+    \end{itemize}
+
+    \item \textbf{t-값 계산:}
+    \begin{itemize}
+        \item `D7` 셀에 `=(D3-D6)/(D4/SQRT(COUNT(A1:A65)))`를 입력합니다. (COUNT 함수로 n을 직접 계산)
+        \item 결과는 약 `-4.27201`이 나옵니다.
+    \end{itemize}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{excel_survey_t_value.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+        \captionof{figure}{Excel에서 설문 조사 t-값 계산 (가상의 이미지)}
+        \label{fig:excel_survey_t_value}
+        \vspace{0.5em}
+        \textbf{설명:}
+        \begin{itemize}
+            \item t-값이 -4.27로, 3 표준편차 이상 떨어져 있으므로 p-값이 매우 작을 것으로 예상됩니다.
+        \end{itemize}
+    \end{figure}
+
+    \item \textbf{p-값 계산:}
+    \begin{itemize}
+        \item `D8` 셀에 `=T.DIST(D7, COUNT(A1:A65)-1, 1)`을 입력합니다.
+        \item `T.DIST` 함수는 주어진 t-값보다 작거나 같은 누적 확률을 반환하며, 이는 좌측 단측 검정의 p-값에 해당합니다.
+        \item 결과는 약 `3.27938E-05` (즉, 0.0000327938)가 나옵니다.
+    \end{itemize}
+
+    \item \textbf{결론:}
+    \begin{itemize}
+        \item p-값 ($0.0000327938$)을 유의 수준 $\alpha = 0.05$와 비교합니다.
+        \item $0.0000327938 < 0.05$ 이므로, 귀무 가설을 기각합니다.
+    \end{itemize}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.7\textwidth]{excel_survey_p_value_conclusion.png} % 이미지 파일이 없으므로 주석 처리하고 텍스트로 설명
+        \captionof{figure}{Excel에서 설문 조사 p-값 계산 및 결론 (가상의 이미지)}
+        \label{fig:excel_survey_p_value_conclusion}
+        \vspace{0.5em}
+        \textbf{설명:}
+        \begin{itemize}
+            \item p-값이 유의 수준보다 훨씬 작으므로 귀무 가설을 기각합니다.
+            \item \textbf{의미:} 설문 조사를 완료하는 평균 시간이 20분 미만이라는 대립 가설이 지지됩니다. 따라서 이 설문 조사는 고객에게 보내기에 적합하다고 판단할 수 있습니다.
+        \end{itemize}
+    \end{figure}
+\end{enumerate}
+
+\newpage
+\section*{체크리스트}
+
+이 문서를 통해 학습한 내용을 점검하고, 실제 문제 해결에 적용할 준비가 되었는지 확인하세요.
+
+\begin{itemize}
+    \item \textbf{개념 이해:}
+    \begin{itemize}
+        \item 통계학이 비즈니스 의사결정에 왜 중요한지 설명할 수 있는가?
+        \item 귀무 가설과 대립 가설의 차이를 명확히 설명하고 올바르게 설정할 수 있는가?
+        \item 제1종 오류와 제2종 오류의 의미와 실제 사례를 들어 설명할 수 있는가?
+        \item 유의 수준($\alpha$)의 역할과 $\alpha$, $\beta$, 표본 크기($n$) 간의 관계를 이해하는가?
+        \item p-값의 의미를 설명하고, p-값을 통해 가설을 어떻게 기각하는지 아는가?
+    \end{itemize}
+    \item \textbf{절차 숙달:}
+    \begin{itemize}
+        \item 가설 검정의 4단계(가설 설정, $\alpha$ 지정, p-값 계산, 결론 도출)를 순서대로 적용할 수 있는가?
+        \item 모집단 평균에 대한 양측 검정 및 단측 검정(좌측/우측) 가설을 올바르게 설정할 수 있는가?
+        \item 주어진 표본 데이터로 t-값을 계산할 수 있는가?
+        \item Excel의 `AVERAGE`, `STDEV.S`, `COUNT`, `SQRT`, `T.DIST` 함수를 사용하여 p-값을 계산할 수 있는가?
+        \item 계산된 p-값을 유의 수준과 비교하여 귀무 가설 기각 여부를 결정하고, 그 의미를 해석할 수 있는가?
+    \end{itemize}
+    \item \textbf{실습 능력:}
+    \begin{itemize}
+        \item 초콜릿 봉지 무게 예시(양측 검정)를 Excel로 직접 해결하고 결과를 해석할 수 있는가?
+        \item 학생 부채 예시(좌측 단측 검정)를 Excel로 직접 해결하고 결과를 해석할 수 있는가?
+        \item ACT 점수 예시(우측 단측 검정)를 Excel로 직접 해결하고 결과를 해석할 수 있는가?
+        \item 설문 조사 완료 시간 예시(좌측 단측 검정)를 Excel로 직접 해결하고 결과를 해석할 수 있는가?
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section*{FAQ (자주 묻는 질문)}
+
+\textbf{Q1: 귀무 가설(H0)에 왜 항상 등호가 포함되어야 하나요?}
+\textbf{A1:} 가설 검정은 기본적으로 '귀무 가설이 참이다'라는 가정 하에 데이터를 분석하고, 이 가정이 얼마나 타당한지 평가하는 과정입니다. 등호($=, \ge, \le$)가 있어야만 특정 기준점(예: $\mu=300$)을 설정하고, 이 기준점으로부터 표본 데이터가 얼마나 벗어나는지 통계적으로 측정할 수 있습니다. 등호가 없으면 명확한 기준점을 설정하기 어렵습니다.
+
+\textbf{Q2: p-값이 정확히 무엇을 의미하나요?}
+\textbf{A2:} p-값은 귀무 가설이 실제로 참이라고 가정했을 때, 우리가 관측한 표본 데이터 또는 그보다 더 극단적인 결과가 나올 확률입니다. 예를 들어, p-값이 0.01이라면, 귀무 가설이 참인데도 불구하고 현재와 같은 극단적인 데이터를 얻을 확률이 1\%밖에 안 된다는 뜻입니다. 이 확률이 낮을수록 귀무 가설이 틀렸을 가능성이 높다고 판단합니다.
+
+\textbf{Q3: 유의 수준($\alpha$)은 어떻게 설정해야 하나요?}
+\textbf{A3:} $\alpha$는 제1종 오류(귀무 가설이 참인데 기각하는 오류)를 허용할 최대 확률입니다. 일반적으로 비즈니스 분야에서는 0.05(5\%)를 많이 사용합니다. 하지만 오류의 심각성에 따라 달라질 수 있습니다. 예를 들어, 신약 개발처럼 제1종 오류가 매우 치명적일 경우 0.01(1\%)과 같이 더 엄격한 $\alpha$를 설정하기도 합니다.
+
+\textbf{Q4: 제1종 오류와 제2종 오류 중 어떤 것이 더 중요한가요?}
+\textbf{A4:} 어떤 오류가 더 중요한지는 상황에 따라 다릅니다. 제조업에서는 불량품을 생산하는 것(제2종 오류)보다 멀쩡한 생산 라인을 멈추는 것(제1종 오류)이 덜 치명적일 수 있습니다. 반면, 의료 진단에서는 실제 병이 있는데 놓치는 것(제2종 오류)이 오진(제1종 오류)보다 더 위험할 수 있습니다. 따라서 상황의 맥락을 고려하여 두 오류의 균형을 맞추는 것이 중요합니다.
+
+\textbf{Q5: 표본 크기($n$)가 커지면 왜 더 좋은가요?}
+\textbf{A5:} 표본 크기가 커지면 표본이 모집단을 더 잘 대표하게 됩니다. 이는 표본 평균의 표준 오차를 줄여주어, 모집단 모수를 더 정확하게 추정할 수 있게 합니다. 결과적으로, 표본 크기가 커지면 제1종 오류($\alpha$)와 제2종 오류($\beta$)를 동시에 줄일 수 있어 가설 검정의 '검정력(Power)'이 향상됩니다.
+
+\newpage
+\section*{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=summarycolor, colframe=blue!75!black, title=\textbf{모듈 1 핵심 요약: 가설 검정의 기초}]
+
+\textbf{1. 통계학의 중요성:}
+\begin{itemize}
+    \item 데이터 홍수 속 올바른 의사결정 도구.
+    \item 모든 산업 분야에서 필수적인 '핫 스킬'.
+    \item 데이터 이해, 통찰력 확보, 미래 예측.
+\end{itemize}
+
+\textbf{2. 가설 설정 (Hypothesis Formulation):}
+\begin{itemize}
+    \item \textbf{H0 (귀무 가설):} 현재의 믿음, '차이 없음' 주장. (등호 포함)
+    \item \textbf{HA (대립 가설):} 우리가 증명하려는 주장, '차이 있음'. (H0의 보완)
+    \item \textbf{유형:}
+        \begin{itemize}
+            \item \textbf{양측 검정 ($\ne$):} H0: $\mu = \mu_0$, HA: $\mu \ne \mu_0$
+            \item \textbf{단측 검정 ($<, >$):} H0: $\mu \ge \mu_0$, HA: $\mu < \mu_0$ 또는 H0: $\mu \le \mu_0$, HA: $\mu > \mu_0$
+        \end{itemize}
+\end{itemize}
+
+\textbf{3. 결과 분석 (Analyzing the Result):}
+\begin{itemize}
+    \item \textbf{유의 수준 ($\alpha$):} 제1종 오류(H0가 참인데 기각)를 허용할 최대 확률 (보통 0.05).
+    \item \textbf{제1종 오류 ($\alpha$):} 제조업자 위험 (불필요한 중단), 위양성 (건강한데 병 있다고 진단).
+    \item \textbf{제2종 오류 ($\beta$):} 소비자 위험 (불량품 통과), 위음성 (병 있는데 없다고 진단).
+    \item $\alpha \downarrow \implies \beta \uparrow$. $n \uparrow \implies \alpha \downarrow, \beta \downarrow$.
+\end{itemize}
+
+\textbf{4. p-값 계산 및 결론 (p-value & Conclusion):}
+\begin{itemize}
+    \item \textbf{p-값:} H0가 참일 때, 관측된 데이터 또는 더 극단적인 데이터가 나올 확률.
+    \item \textbf{t-값:} 표본 평균이 H0의 평균으로부터 몇 표준 오차만큼 떨어져 있는지.
+        \[ t = \frac{\bar{x} - \mu_0}{s / \sqrt{n}} \]
+    \item \textbf{Excel 함수:}
+        \begin{itemize}
+            \item `T.DIST(t, df, 1)`: t-값보다 작거나 같은 누적 확률 (왼쪽 꼬리).
+            \item `1 - T.DIST(t, df, 1)`: t-값보다 크거나 같은 누적 확률 (오른쪽 꼬리).
+        \end{itemize}
+    \item \textbf{결론 규칙:}
+        \begin{itemize}
+            \item \textbf{p-값 $< \alpha$ 이면 H0 기각.}
+            \item \textbf{양측 검정:} (단측 p-값 $\times$ 2) $< \alpha$
+            \item \textbf{단측 검정:} p-값 $< \alpha$
+        \end{itemize}
+\end{itemize}
+
+\textbf{5. Excel 실습:}
+\begin{itemize}
+    \item `AVERAGE`, `STDEV.S`, `COUNT`, `SQRT`로 기본 통계량 계산.
+    \item `T.DIST`로 p-값 계산 후 $\alpha$와 비교하여 의사결정.
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\newpage
+\section*{개요}
+이 문서는 '추론 및 예측 통계 모듈 1'의 후반부 내용을 다루며, 가설 검정의 핵심 원리와 실제 적용 방법을 상세히 설명합니다. 평균에 대한 단측 검정(우측 꼬리)과 비율에 대한 가설 검정(단측 및 양측)에 중점을 둡니다. 각 검정 유형별로 가설 설정, 유의수준 지정, p-값 계산, 그리고 귀무가설 기각 여부 결정의 4단계 절차를 명확히 제시합니다. 특히 Excel을 활용한 실습 예제를 통해 비전공자도 쉽게 따라 할 수 있도록 구체적인 계산 과정과 해석을 제공합니다.
+
+\newpage
+\section*{용어 정리}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+\textbf{귀무가설} & 현재의 믿음이나 변화가 없다는 주장. & Null Hypothesis ($H_0$) & 항상 등호(=)를 포함해야 합니다. \\
+\textbf{대립가설} & 귀무가설과 반대되는 주장. 우리가 증명하고자 하는 것. & Alternative Hypothesis ($H_A$) & 등호가 없습니다. \\
+\textbf{유의수준} & 귀무가설이 사실인데도 기각할 확률의 최대 허용치. & Level of Significance ($\alpha$) & 보통 0.05 (5\%) 또는 0.01 (1\%) 사용. \\
+\textbf{p-값} & 귀무가설이 사실일 때, 현재 관측된 표본 데이터 또는 그보다 더 극단적인 데이터가 나올 확률. & p-value & p-값이 $\alpha$보다 작으면 귀무가설 기각. \\
+\textbf{단측 검정} & 대립가설이 특정 방향(크다 또는 작다)을 주장하는 검정. & One-Tail Test & 우측 꼬리 검정(Right-Tail), 좌측 꼬리 검정(Left-Tail). \\
+\textbf{양측 검정} & 대립가설이 특정 값과 다르다(크거나 작다)고 주장하는 검정. & Two-Tail Test & 대립가설에 등호가 없는 부등호($\ne$)가 사용됩니다. \\
+\textbf{표본 평균} & 표본 데이터의 평균. & Sample Mean ($\bar{x}$) & 모집단 평균($\mu$)을 추정하는 데 사용. \\
+\textbf{가설 평균} & 귀무가설에서 주장하는 모집단 평균 값. & Hypothesized Mean ($\mu_0$) & \\
+\textbf{표본 비율} & 표본에서 특정 특성을 가진 개체의 비율. & Sample Proportion ($\hat{p}$) & 모집단 비율($p$)을 추정하는 데 사용. \\
+\textbf{가설 비율} & 귀무가설에서 주장하는 모집단 비율 값. & Hypothesized Proportion ($p_0$) & \\
+\textbf{t-값} & 표본 평균이 가설 평균으로부터 표준 오차의 몇 배만큼 떨어져 있는지를 나타내는 값. & t-value & 평균 검정 시 사용. \\
+\textbf{z-값} & 표본 비율이 가설 비율로부터 표준 오차의 몇 배만큼 떨어져 있는지를 나타내는 값. & z-value & 비율 검정 시 사용. \\
+\textbf{표준 오차} & 표본 통계량(평균, 비율 등)의 표본 분포 표준 편차. & Standard Error (SE) & 표본 통계량의 변동성을 나타냅니다. \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section*{핵심 개념 및 원리}
+
+가설 검정은 모집단에 대한 주장이 타당한지 여부를 표본 데이터를 통해 통계적으로 평가하는 과정입니다. 이 과정은 크게 네 가지 단계로 진행됩니다.
+
+\begin{enumerate}
+    \item \textbf{가설 설정 ($H_0$와 $H_A$)}: 우리가 검정하고자 하는 주장을 귀무가설($H_0$)과 대립가설($H_A$)로 명확히 정의합니다. 귀무가설은 항상 등호(=)를 포함하며, 현재의 믿음이나 변화가 없다는 주장을 나타냅니다. 대립가설은 귀무가설과 반대되는 주장으로, 우리가 통계적으로 증명하고자 하는 바를 나타냅니다.
+    \item \textbf{유의수준 ($\alpha$) 지정}: 귀무가설이 실제로 참인데도 불구하고 우리가 이를 기각할 위험(제1종 오류)을 얼마나 감수할 것인지를 결정하는 기준입니다. 일반적으로 0.05 (5\%) 또는 0.01 (1\%)을 사용합니다.
+    \item \textbf{p-값 계산}: 수집된 표본 데이터가 귀무가설이 참이라는 가정하에 얼마나 '극단적인' 값인지를 나타내는 확률입니다. p-값이 작을수록 관측된 데이터가 귀무가설 하에서 발생하기 매우 어렵다는 것을 의미합니다.
+    \item \textbf{결론 도출 (귀무가설 기각 또는 기각 실패)}: 계산된 p-값을 유의수준 $\alpha$와 비교하여 귀무가설을 기각할지 말지를 결정합니다.
+\end{enumerate}
+
+\subsection*{평균에 대한 우측 꼬리 검정 (Right-Tail Test for Mean)}
+평균에 대한 우측 꼬리 검정은 모집단 평균이 특정 값보다 '크다'는 주장을 검정할 때 사용됩니다.
+
+\begin{itemize}
+    \item \textbf{가설 설정}:
+    \begin{itemize}
+        \item $H_0: \mu \le \mu_0$ (모집단 평균은 가설 평균 $\mu_0$보다 작거나 같다)
+        \item $H_A: \mu > \mu_0$ (모집단 평균은 가설 평균 $\mu_0$보다 크다)
+    \end{itemize}
+    \item \textbf{검정 통계량 (t-값)}: 표본 평균($\bar{x}$)이 가설 평균($\mu_0$)으로부터 얼마나 떨어져 있는지를 표준 오차($s/\sqrt{n}$) 단위로 측정합니다.
+    $$t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}}$$
+    여기서 $s$는 표본 표준 편차, $n$은 표본 크기입니다.
+    \item \textbf{p-값}: 계산된 t-값보다 크거나 같은 값이 나올 확률을 의미하며, 이는 t-분포의 오른쪽 꼬리 면적에 해당합니다.
+    \item \textbf{결정}: p-값이 유의수준 $\alpha$보다 작으면 귀무가설을 기각하고, 모집단 평균이 $\mu_0$보다 크다는 대립가설을 채택합니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{예시: 도시의 휘발유 가격}
+어떤 도시의 시장이 휘발유 가격이 높다는 불만을 접수했습니다. 주 전체의 무연 휘발유 평균 가격은 \$2.79였습니다. 시장은 이 도시의 휘발유 가격이 주 평균보다 높은지 알고 싶어 합니다.
+
+\begin{itemize}
+    \item \textbf{가설}:
+    \begin{itemize}
+        \item $H_0: \mu \le 2.79$ (도시의 휘발유 가격은 주 평균보다 낮거나 같다)
+        \item $H_A: \mu > 2.79$ (도시의 휘발유 가격은 주 평균보다 높다)
+    \end{itemize}
+    \item \textbf{해석}: 대립가설이 '크다($>$)'를 포함하므로 우측 꼬리 검정입니다. 만약 표본 평균이 가설 평균보다 훨씬 높게 나와 p-값이 유의수준보다 작다면, 도시의 휘발유 가격이 실제로 높다고 결론 내릴 수 있습니다.
+\end{itemize}
+\end{examplebox}
+
+\subsection*{비율에 대한 가설 검정 (Testing the Proportion)}
+비율에 대한 가설 검정은 모집단에서 특정 특성을 가진 개체의 비율($p$)이 특정 값($p_0$)과 같은지, 다른지, 크거나 작은지를 검정할 때 사용됩니다.
+
+\begin{itemize}
+    \item \textbf{가설 설정}: 평균 검정과 유사하게, 대립가설의 형태에 따라 좌측 꼬리, 우측 꼬리, 양측 검정으로 나뉩니다.
+    \begin{itemize}
+        \item \textbf{좌측 꼬리}: $H_0: p \ge p_0$, $H_A: p < p_0$
+        \item \textbf{우측 꼬리}: $H_0: p \le p_0$, $H_A: p > p_0$
+        \item \textbf{양측}: $H_0: p = p_0$, $H_A: p \ne p_0$
+    \end{itemize}
+    \item \textbf{정규 근사 조건}: 비율은 이산 변수(성공/실패)이지만, 표본 크기가 충분히 크면 정규 분포로 근사하여 검정할 수 있습니다. 일반적으로 다음 두 조건이 충족되어야 합니다.
+    \begin{itemize}
+        \item $n \times p_0 \ge 5$
+        \item $n \times (1 - p_0) \ge 5$
+    \end{itemize}
+    여기서 $n$은 표본 크기, $p_0$는 가설 비율입니다.
+    \item \textbf{검정 통계량 (z-값)}: 표본 비율($\hat{p}$)이 가설 비율($p_0$)로부터 얼마나 떨어져 있는지를 표준 오차 단위로 측정합니다.
+    $$z = \frac{\hat{p} - p_0}{\sqrt{\frac{p_0(1-p_0)}{n}}}$$
+    여기서 $\hat{p}$는 표본 비율, $p_0$는 가설 비율, $n$은 표본 크기입니다.
+    \item \textbf{p-값}: 계산된 z-값에 따라 정규 분포에서 해당 꼬리(또는 양쪽 꼬리)의 면적을 계산합니다.
+    \item \textbf{결정}: p-값이 유의수준 $\alpha$보다 작으면 귀무가설을 기각합니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{예시: NFL 선수 뇌 손상 비율}
+미국 신경학회 연구에 따르면 은퇴한 NFL 선수 중 40\% 이상이 외상성 뇌 손상 징후를 보인다고 주장합니다. 이 주장을 검정하려면 다음과 같이 가설을 설정합니다.
+
+\begin{itemize}
+    \item \textbf{가설}:
+    \begin{itemize}
+        \item $H_0: p \le 0.40$ (뇌 손상 비율은 40\% 이하이다)
+        \item $H_A: p > 0.40$ (뇌 손상 비율은 40\% 초과이다)
+    \end{itemize}
+    \item \textbf{해석}: 연구의 주장이 '40\% 이상'이므로 대립가설은 '크다($>$)'가 됩니다. 이는 우측 꼬리 검정입니다.
+\end{itemize}
+\end{examplebox}
+
+\begin{warningbox}
+\textbf{통계적 유의성 vs. 실질적 중요성}
+통계적으로 유의미한 결과(p-값이 작아 귀무가설 기각)가 항상 실질적으로 중요하거나 의미 있는 발견을 의미하는 것은 아닙니다. 특히 표본 크기가 매우 클 경우, 아주 작은 차이도 통계적으로 유의미하게 나타날 수 있습니다. 따라서 통계적 유의성 외에 효과 크기(effect size)와 실제적인 의미를 함께 고려해야 합니다.
+
+\textbf{귀무가설 기각 실패의 의미}
+귀무가설을 기각하지 못했다고 해서 귀무가설이 '참'이라는 의미는 아닙니다. 단지 현재의 데이터로는 귀무가설을 기각할 충분한 증거가 없다는 뜻입니다. 이는 제2종 오류(귀무가설이 거짓인데 기각하지 못하는 오류)의 가능성을 내포합니다.
+\end{warningbox}
+
+\newpage
+\section*{절차/방법: Excel을 활용한 가설 검정}
+
+Excel을 사용하여 평균 또는 비율에 대한 가설 검정을 수행하는 단계는 다음과 같습니다.
+
+\subsection*{1. 평균에 대한 우측 꼬리 검정 (Right-Tail Test for Mean in Excel)}
+
+\begin{enumerate}
+    \item \textbf{가설 설정}: 문제의 주장을 바탕으로 귀무가설($H_0$)과 대립가설($H_A$)을 설정합니다. 우측 꼬리 검정의 경우 $H_A: \mu > \mu_0$ 형태입니다.
+    \item \textbf{유의수준 ($\alpha$) 지정}: 문제에서 주어진 유의수준을 확인합니다 (예: 0.05).
+    \item \textbf{데이터 요약}: Excel에서 제공된 데이터를 사용하여 다음 값을 계산합니다.
+    \begin{itemize}
+        \item 표본 평균 ($\bar{x}$): \texttt{=AVERAGE(데이터 범위)}
+        \item 표본 표준 편차 ($s$): \texttt{=STDEV.S(데이터 범위)}
+        \item 표본 크기 ($n$): \texttt{=COUNT(데이터 범위)}
+        \item 가설 평균 ($\mu_0$): 문제에서 주어진 값
+    \end{itemize}
+    \item \textbf{t-값 계산}: 다음 공식을 사용하여 t-값을 계산합니다.
+    $$t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}}$$
+    Excel에서는 각 값이 입력된 셀을 참조하여 계산합니다. 예를 들어, $\bar{x}$가 E3, $\mu_0$가 E8, $s$가 E4, $n$이 E5 셀에 있다면, `=(E3-E8)/(E4/SQRT(E5))`와 같이 입력합니다.
+    \item \textbf{p-값 계산}: 우측 꼬리 검정의 p-값은 t-분포에서 계산된 t-값보다 큰 영역의 확률입니다. Excel의 \texttt{T.DIST} 함수는 왼쪽 꼬리 누적 확률을 반환하므로, 1에서 이 값을 빼야 합니다.
+    \begin{itemize}
+        \item 자유도 (df): $n-1$
+        \item Excel 수식: `1 - T.DIST(t-값, 자유도, 1)`
+        \item 예시: `1 - T.DIST(E11, E5-1, 1)` (E11에 t-값이, E5에 n이 있다고 가정)
+    \end{itemize}
+    \item \textbf{결론 도출}:
+    \begin{itemize}
+        \item p-값 < $\alpha$: 귀무가설을 기각합니다. 대립가설이 지지됩니다.
+        \item p-값 $\ge \alpha$: 귀무가설을 기각하지 못합니다. 대립가설을 지지할 충분한 증거가 없습니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{2. 비율에 대한 좌측 꼬리 검정 (Left-Tail Test for Proportion in Excel)}
+
+\begin{enumerate}
+    \item \textbf{가설 설정}: $H_0: p \ge p_0$, $H_A: p < p_0$
+    \item \textbf{유의수준 ($\alpha$) 지정}: 문제에서 주어진 유의수준을 확인합니다 (예: 0.05).
+    \item \textbf{데이터 요약}:
+    \begin{itemize}
+        \item 표본 비율 ($\hat{p}$): 성공 횟수 / 표본 크기
+        \item 가설 비율 ($p_0$): 문제에서 주어진 값
+        \item 표본 크기 ($n$): 문제에서 주어진 값
+    \end{itemize}
+    \item \textbf{정규 근사 조건 확인}: $n \times p_0 \ge 5$ 이고 $n \times (1 - p_0) \ge 5$ 인지 확인합니다. 이 조건이 충족되어야 z-검정을 사용할 수 있습니다.
+    \item \textbf{z-값 계산}: 다음 공식을 사용하여 z-값을 계산합니다.
+    $$z = \frac{\hat{p} - p_0}{\sqrt{\frac{p_0(1-p_0)}{n}}}$$
+    Excel에서는 각 값이 입력된 셀을 참조하여 계산합니다. 예를 들어, $\hat{p}$가 G3, $p_0$가 G4, $n$이 G5 셀에 있다면, `=(G3-G4)/SQRT(G4*(1-G4)/G5)`와 같이 입력합니다.
+    \item \textbf{p-값 계산}: 좌측 꼬리 검정의 p-값은 z-분포에서 계산된 z-값보다 작거나 같은 영역의 확률입니다. Excel의 \texttt{NORM.S.DIST} 함수는 기본적으로 왼쪽 꼬리 누적 확률을 반환합니다.
+    \begin{itemize}
+        \item Excel 수식: `NORM.S.DIST(z-값, 1)`
+        \item 예시: `NORM.S.DIST(G7, 1)` (G7에 z-값이 있다고 가정)
+    \end{itemize}
+    \item \textbf{결론 도출}: p-값 < $\alpha$ 이면 귀무가설을 기각하고, 대립가설이 지지됩니다.
+\end{enumerate}
+
+\subsection*{3. 비율에 대한 우측 꼬리 검정 (Right-Tail Test for Proportion in Excel)}
+
+\begin{enumerate}
+    \item \textbf{가설 설정}: $H_0: p \le p_0$, $H_A: p > p_0$
+    \item \textbf{유의수준 ($\alpha$) 지정}: 문제에서 주어진 유의수준을 확인합니다 (예: 0.05).
+    \item \textbf{데이터 요약}: 좌측 꼬리 검정과 동일하게 $\hat{p}$, $p_0$, $n$을 준비합니다.
+    \item \textbf{정규 근사 조건 확인}: $n \times p_0 \ge 5$ 이고 $n \times (1 - p_0) \ge 5$ 인지 확인합니다.
+    \item \textbf{z-값 계산}: 좌측 꼬리 검정과 동일한 공식과 Excel 수식을 사용합니다.
+    \item \textbf{p-값 계산}: 우측 꼬리 검정의 p-값은 z-분포에서 계산된 z-값보다 크거나 같은 영역의 확률입니다. Excel의 \texttt{NORM.S.DIST} 함수는 왼쪽 꼬리 누적 확률을 반환하므로, 1에서 이 값을 빼야 합니다.
+    \begin{itemize}
+        \item Excel 수식: `1 - NORM.S.DIST(z-값, 1)`
+        \item 예시: `1 - NORM.S.DIST(I7, 1)` (I7에 z-값이 있다고 가정)
+    \end{itemize}
+    \item \textbf{결론 도출}: p-값 < $\alpha$ 이면 귀무가설을 기각하고, 대립가설이 지지됩니다.
+\end{enumerate}
+
+\subsection*{4. 비율에 대한 양측 꼬리 검정 (Two-Tail Test for Proportion in Excel)}
+
+\begin{enumerate}
+    \item \textbf{가설 설정}: $H_0: p = p_0$, $H_A: p \ne p_0$
+    \item \textbf{유의수준 ($\alpha$) 지정}: 문제에서 주어진 유의수준을 확인합니다 (예: 0.05). 양측 검정에서는 이 $\alpha$가 양쪽 꼬리에 절반씩($\alpha/2$) 분배됩니다.
+    \item \textbf{데이터 요약}: 좌측/우측 꼬리 검정과 동일하게 $\hat{p}$, $p_0$, $n$을 준비합니다.
+    \item \textbf{정규 근사 조건 확인}: $n \times p_0 \ge 5$ 이고 $n \times (1 - p_0) \ge 5$ 인지 확인합니다.
+    \item \textbf{z-값 계산}: 좌측/우측 꼬리 검정과 동일한 공식과 Excel 수식을 사용합니다. z-값은 양수 또는 음수가 될 수 있습니다.
+    \item \textbf{p-값 계산}: 양측 검정의 p-값은 계산된 z-값의 절댓값보다 더 극단적인 값이 양쪽 꼬리에서 나올 확률입니다.
+    \begin{itemize}
+        \item 먼저, 계산된 z-값에 해당하는 한쪽 꼬리 p-값을 구합니다.
+        \begin{itemize}
+            \item z-값이 양수일 경우 (오른쪽 꼬리): `1 - NORM.S.DIST(z-값, 1)`
+            \item z-값이 음수일 경우 (왼쪽 꼬리): `NORM.S.DIST(z-값, 1)`
+        \end{itemize}
+        \item 이 한쪽 꼬리 p-값에 2를 곱하여 양측 p-값을 구합니다.
+        \item 예시: `(1 - NORM.S.DIST(ABS(I7), 1)) * 2` (I7에 z-값이 있다고 가정, ABS는 절댓값 함수)
+    \end{itemize}
+    \item \textbf{결론 도출}: 양측 p-값 < $\alpha$ 이면 귀무가설을 기각하고, 대립가설이 지지됩니다.
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Excel 함수 사용 시 주의사항}
+\begin{itemize}
+    \item \texttt{T.DIST(x, deg\_freedom, cumulative)}: x보다 작거나 같은 값의 누적 확률(왼쪽 꼬리)을 반환합니다. 우측 꼬리 p-값을 구하려면 `1 - T.DIST(...)`를 사용해야 합니다.
+    \item \texttt{NORM.S.DIST(z, cumulative)}: z보다 작거나 같은 값의 누적 확률(왼쪽 꼬리)을 반환합니다. 우측 꼬리 p-값을 구하려면 `1 - NORM.S.DIST(...)`를 사용해야 합니다.
+    \item 양측 검정 시에는 한쪽 꼬리 p-값에 2를 곱하는 것을 잊지 마세요.
+\end{itemize}
+\end{warningbox}
+
+\newpage
+\section*{실습/코드/오류와 해결}
+
+여기서는 실제 시나리오를 바탕으로 Excel에서 가설 검정을 수행하는 과정을 단계별로 살펴봅니다.
+
+\subsection*{1. 평균에 대한 우측 꼬리 검정: 도시 휘발유 가격}
+
+\textbf{시나리오}: 대도시 시장이 높은 휘발유 가격에 대한 불만을 접수했습니다. 주 평균 무연 휘발유 가격은 \$2.79였습니다. 5\% 유의수준에서 이 도시의 휘발유 가격이 더 높다는 증거가 있는지 확인합니다.
+
+\textbf{가설}:
+$H_0: \mu \le 2.79$
+$H_A: \mu > 2.79$ (우측 꼬리 검정)
+$\alpha = 0.05$
+
+\textbf{Excel 계산 과정}:
+데이터가 'Average Price of Gas'라는 열에 133개의 항목으로 있다고 가정합니다.
+
+\begin{tcolorbox}[title=Excel Worksheet (가상)]
+\begin{tabular}{ll}
+\toprule
+\textbf{레이블 (Column D)} & \textbf{값/수식 (Column E)} \\
+\midrule
+Mean & \texttt{=AVERAGE(A:A)} $\rightarrow$ 2.9415 \\
+Std Dev & \texttt{=STDEV.S(A:A)} $\rightarrow$ 0.39187 \\
+Count & \texttt{=COUNT(A:A)} $\rightarrow$ 133 \\
+Level of Significance & 0.05 \\
+Hypothesized Mean & 2.79 \\
+t-value & \texttt{=(E3-E8)/(E4/SQRT(E5))} $\rightarrow$ 4.4587 \\
+p-value & \texttt{=1-T.DIST(E11, E5-1, 1)} $\rightarrow$ 8.72591E-06 \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\textbf{결과 해석}:
+\begin{itemize}
+    \item 표본 평균($\bar{x}$)은 \$2.9415로, 가설 평균($\mu_0$) \$2.79보다 높습니다.
+    \item t-값은 4.4587로, 표본 평균이 가설 평균으로부터 표준 오차의 4.4587배만큼 떨어져 있음을 나타냅니다. 이는 매우 큰 값으로, 이미 꼬리 영역에 깊숙이 들어와 있음을 시사합니다.
+    \item p-값은 8.72591E-06 (약 0.0000087)입니다.
+    \item p-값 (0.0000087) < $\alpha$ (0.05) 이므로 귀무가설을 기각합니다.
+\end{itemize}
+
+\textbf{결론}: 5\% 유의수준에서 이 도시의 휘발유 가격이 주 평균보다 높다는 통계적 증거가 있습니다. 시장은 이 문제의 원인을 조사해야 합니다.
+
+\subsection*{2. 비율에 대한 좌측 꼬리 검정: 스마트폰 불량률}
+
+\textbf{시나리오}: 스마트폰 제조업체는 기기의 10\% 미만이 1년 이내에 고장 난다고 주장합니다. 소비자 단체는 500대의 스마트폰을 테스트하여 38대가 12개월 이내에 고장 났음을 발견했습니다. 5\% 유의수준에서 이 데이터가 제조업체의 주장을 지지하는지 확인합니다.
+
+\textbf{가설}:
+$H_0: p \ge 0.10$
+$H_A: p < 0.10$ (좌측 꼬리 검정)
+$\alpha = 0.05$
+
+\textbf{Excel 계산 과정}:
+
+\begin{tcolorbox}[title=Excel Worksheet (가상)]
+\begin{tabular}{ll}
+\toprule
+\textbf{레이블 (Column F)} & \textbf{값/수식 (Column G)} \\
+\midrule
+sample Prop & \texttt{=38/500} $\rightarrow$ 0.076 \\
+hypothesize p & 0.1 \\
+n & 500 \\
+level of sig & 0.05 \\
+z & \texttt{=(G3-G4)/SQRT(G4*(1-G4)/G5)} $\rightarrow$ -1.7889 \\
+p-value & \texttt{=NORM.S.DIST(G7, 1)} $\rightarrow$ 0.03682 \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\textbf{결과 해석}:
+\begin{itemize}
+    \item 표본 비율($\hat{p}$)은 0.076 (7.6\%)으로, 가설 비율($p_0$) 0.10 (10\%)보다 낮습니다.
+    \item z-값은 -1.7889입니다.
+    \item p-값은 0.03682입니다.
+    \item p-값 (0.03682) < $\alpha$ (0.05) 이므로 귀무가설을 기각합니다.
+\end{itemize}
+
+\textbf{결론}: 5\% 유의수준에서 제조업체의 주장(10\% 미만 고장)을 지지할 충분한 증거가 있습니다.
+
+\subsection*{3. 비율에 대한 우측 꼬리 검정: 경찰 야간 범죄 비율}
+
+\textbf{시나리오}: 경찰서장은 야간 근무 인력이 더 필요하다고 생각합니다. 현재 인력 수준은 범죄의 68\%가 야간에 발생한다는 믿음에 기반합니다. 서장은 이것이 야간 범죄 비율을 과소평가한 것이라고 생각합니다. 과거 데이터에 따르면 2000건의 범죄 중 1430건이 야간에 발생했습니다. 5\% 유의수준에서 이를 검정합니다.
+
+\textbf{가설}:
+$H_0: p \le 0.68$
+$H_A: p > 0.68$ (우측 꼬리 검정)
+$\alpha = 0.05$
+
+\textbf{Excel 계산 과정}:
+
+\begin{tcolorbox}[title=Excel Worksheet (가상)]
+\begin{tabular}{ll}
+\toprule
+\textbf{레이블 (Column H)} & \textbf{값/수식 (Column I)} \\
+\midrule
+sample Prop & \texttt{=1430/2000} $\rightarrow$ 0.715 \\
+hypothesize p & 0.68 \\
+n & 2000 \\
+level of sig & 0.05 \\
+z & \texttt{=(I3-I4)/SQRT(I4*(1-I4)/I5)} $\rightarrow$ 3.35547 \\
+p-value & \texttt{=1-NORM.S.DIST(I7, 1)} $\rightarrow$ 0.0004 \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\textbf{결과 해석}:
+\begin{itemize}
+    \item 표본 비율($\hat{p}$)은 0.715 (71.5\%)로, 가설 비율($p_0$) 0.68 (68\%)보다 높습니다.
+    \item z-값은 3.35547입니다.
+    \item p-값은 0.0004입니다.
+    \item p-값 (0.0004) < $\alpha$ (0.05) 이므로 귀무가설을 기각합니다.
+\end{itemize}
+
+\textbf{결론}: 5\% 유의수준에서 경찰서장의 주장(야간 범죄 비율이 68\%보다 높다)이 옳다는 증거가 있습니다. 추가 인력 배치가 필요할 수 있습니다.
+
+\subsection*{4. 비율에 대한 양측 꼬리 검정: 앱 쿠폰 성공률}
+
+\textbf{시나리오}: 다이렉트 메일 마케팅 회사가 쿠폰 배포에 앱을 사용하기 시작했습니다. 앱을 사용하는 무작위 고객 1000명 중 94명이 제품을 구매했습니다. 이 성공률이 기존의 7\% 성공률과 다른지 궁금합니다. 5\% 유의수준에서 이를 검정합니다.
+
+\textbf{가설}:
+$H_0: p = 0.07$
+$H_A: p \ne 0.07$ (양측 꼬리 검정)
+$\alpha = 0.05$
+
+\textbf{Excel 계산 과정}:
+
+\begin{tcolorbox}[title=Excel Worksheet (가상)]
+\begin{tabular}{ll}
+\toprule
+\textbf{레이블 (Column H)} & \textbf{값/수식 (Column I)} \\
+\midrule
+sample Prop & \texttt{=94/1000} $\rightarrow$ 0.094 \\
+hypothesize p & 0.07 \\
+n & 1000 \\
+level of sig & 0.05 \\
+z & \texttt{=(I2-I3)/SQRT(I3*(1-I3)/I4)} $\rightarrow$ 2.97455 \\
+p-value (One-Tail) & \texttt{=1-NORM.S.DIST(I7, 1)} $\rightarrow$ 0.00147 \\
+p-value (Two-Tail) & \texttt{=I8*2} $\rightarrow$ 0.00293 \\
+\bottomrule
+\end{tabular}
+\end{tcolorbox}
+
+\textbf{결과 해석}:
+\begin{itemize}
+    \item 표본 비율($\hat{p}$)은 0.094 (9.4\%)로, 가설 비율($p_0$) 0.07 (7\%)보다 높습니다.
+    \item z-값은 2.97455입니다.
+    \item 한쪽 꼬리 p-값은 0.00147입니다.
+    \item 양측 p-값은 $0.00147 \times 2 = 0.00293$입니다.
+    \item 양측 p-값 (0.00293) < $\alpha$ (0.05) 이므로 귀무가설을 기각합니다.
+\end{itemize}
+
+\textbf{결론}: 5\% 유의수준에서 앱을 통한 쿠폰 배포의 성공률이 기존의 7\% 성공률과 다르다는 증거가 있습니다. 이는 앱 마케팅 방식이 기존 방식과 다른 효과를 낸다는 것을 의미합니다.
+
+\newpage
+\section*{체크리스트}
+
+가설 검정 학습 및 실습 시 다음 체크리스트를 활용하여 누락 없이 진행되었는지 확인하세요.
+
+\begin{itemize}
+    \item \textbf{가설 설정}:
+    \begin{itemize}
+        \item 귀무가설($H_0$)과 대립가설($H_A$)을 명확하게 설정했는가?
+        \item $H_0$에 등호(=)가 포함되었는가?
+        \item 대립가설의 방향(크다, 작다, 다르다)에 따라 올바른 검정 유형(좌측, 우측, 양측)을 선택했는가?
+    \end{itemize}
+    \item \textbf{유의수준 ($\alpha$) 지정}:
+    \begin{itemize}
+        \item 문제에서 요구하는 유의수준을 정확히 확인했는가?
+    \end{itemize}
+    \item \textbf{데이터 준비 및 요약}:
+    \begin{itemize}
+        \item 필요한 모든 데이터(표본 평균/비율, 표준 편차, 표본 크기, 가설 평균/비율)를 정확히 추출하거나 계산했는가?
+        \item 비율 검정의 경우, 정규 근사 조건($n \times p_0 \ge 5$ 및 $n \times (1 - p_0) \ge 5$)을 확인했는가?
+    \end{itemize}
+    \item \textbf{검정 통계량 계산}:
+    \begin{itemize}
+        \item 평균 검정 시 t-값, 비율 검정 시 z-값을 올바른 공식으로 계산했는가?
+        \item Excel 함수 사용 시 셀 참조가 정확한가?
+    \end{itemize}
+    \item \textbf{p-값 계산}:
+    \begin{itemize}
+        \item 검정 유형(좌측, 우측, 양측)에 따라 올바른 Excel 함수(\texttt{T.DIST}, \texttt{NORM.S.DIST})와 계산 방식(1-누적확률, 2배)을 적용했는가?
+        \item p-값이 0과 1 사이의 올바른 확률 값으로 나왔는가?
+    \end{itemize}
+    \item \textbf{결론 도출}:
+    \begin{itemize}
+        \item p-값과 $\alpha$를 정확히 비교했는가?
+        \item p-값 < $\alpha$ 일 때 귀무가설을 기각하고, p-값 $\ge \alpha$ 일 때 귀무가설을 기각하지 못한다고 올바르게 결론 내렸는가?
+        \item 통계적 결론을 문제의 맥락에 맞게 해석하여 실질적인 의미를 부여했는가?
+    \end{itemize}
+    \item \textbf{오류 가능성 고려}:
+    \begin{itemize}
+        \item 통계적 유의성이 항상 실질적 중요성을 의미하지 않음을 이해하고 있는가?
+        \item 귀무가설 기각 실패가 귀무가설이 참임을 의미하지 않음을 이해하고 있는가?
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section*{FAQ}
+
+초심자들이 가설 검정 과정에서 자주 혼동하거나 궁금해하는 질문들을 Q\&A 형식으로 정리했습니다.
+
+\begin{itemize}
+    \item \textbf{Q: 귀무가설($H_0$)에는 왜 항상 등호(=)가 들어가야 하나요?}
+    \textbf{A:} 가설 검정은 귀무가설이 '참'이라는 가정하에 표본 데이터의 발생 확률(p-값)을 계산합니다. 등호가 있어야 특정 값($\mu_0$ 또는 $p_0$)을 기준으로 분포를 설정하고 검정 통계량을 계산할 수 있기 때문입니다. 만약 등호가 없다면, '크거나 같다' 또는 '작거나 같다'와 같은 범위가 되어 기준점을 명확히 설정하기 어렵습니다.
+
+    \item \textbf{Q: p-값이 작으면 왜 귀무가설을 기각하나요?}
+    \textbf{A:} p-값은 귀무가설이 참일 때 현재 관측된 표본 데이터 또는 그보다 더 극단적인 데이터가 나올 확률입니다. 만약 이 p-값이 매우 작다면, 귀무가설이 참인데도 불구하고 우리가 이런 데이터를 얻을 확률이 매우 낮다는 뜻입니다. 이는 귀무가설이 사실이 아닐 가능성이 높다는 강력한 증거가 되므로, 귀무가설을 기각하고 대립가설을 채택하게 됩니다.
+
+    \item \textbf{Q: 단측 검정과 양측 검정은 언제 사용하나요?}
+    \textbf{A:} 대립가설이 특정 방향(예: '더 크다' 또는 '더 작다')을 주장할 때는 단측 검정을 사용합니다. 예를 들어, '새로운 약이 기존 약보다 효과가 좋다'는 주장은 단측 검정입니다. 반면, 대립가설이 단순히 '다르다'(크거나 작을 수 있음)고 주장할 때는 양측 검정을 사용합니다. 예를 들어, '새로운 앱의 성공률이 기존과 다르다'는 주장은 양측 검정입니다.
+
+    \item \textbf{Q: Excel에서 \texttt{T.DIST}나 \texttt{NORM.S.DIST} 함수를 사용할 때 '1'을 넣는 것과 '1-'을 하는 것의 차이는 무엇인가요?}
+    \textbf{A:} 이 함수들은 기본적으로 '누적 확률'을 계산하며, 이는 분포의 왼쪽 꼬리부터 특정 값까지의 면적을 의미합니다.
+    \begin{itemize}
+        \item \textbf{좌측 꼬리 검정}: z-값 또는 t-값보다 작은 영역의 확률이 필요하므로, 함수가 반환하는 값을 그대로 사용합니다 (예: \texttt{NORM.S.DIST(z, 1)}).
+        \item \textbf{우측 꼬리 검정}: z-값 또는 t-값보다 큰 영역의 확률이 필요합니다. 전체 확률(1)에서 왼쪽 꼬리 누적 확률을 빼야 합니다 (예: \texttt{1 - NORM.S.DIST(z, 1)}).
+    \end{itemize}
+
+    \item \textbf{Q: 비율 검정에서 $n \times p_0 \ge 5$ 및 $n \times (1 - p_0) \ge 5$ 조건은 왜 중요한가요?}
+    \textbf{A:} 비율은 본질적으로 이항 분포를 따르는 이산 변수입니다. 하지만 표본 크기($n$)가 충분히 크면 이항 분포를 정규 분포로 근사하여 z-검정을 사용할 수 있습니다. 이 두 조건은 이러한 정규 근사가 타당한지 여부를 판단하는 기준입니다. 이 조건이 충족되지 않으면 z-검정 결과의 신뢰도가 떨어질 수 있습니다.
+\end{itemize}
+
+\newpage
+\section*{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=myblue!5!white, colframe=myblue!75!black, title=\textbf{가설 검정 핵심 요약}]
+\textbf{목표}: 모집단에 대한 주장을 표본 데이터로 평가
+
+\textbf{4단계 절차}:
+\begin{enumerate}
+    \item \textbf{가설 설정}: $H_0$ (등호 포함, 현재 믿음), $H_A$ (우리가 증명할 것)
+    \item \textbf{유의수준 ($\alpha$)}: 제1종 오류 허용치 (예: 0.05)
+    \item \textbf{p-값 계산}: 귀무가설 하에서 관측 데이터의 극단성 확률
+    \item \textbf{결론}: p-값 < $\alpha$ $\rightarrow$ $H_0$ 기각 (대립가설 지지)
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=mygreen!5!white, colframe=mygreen!75!black, title=\textbf{평균 검정 (t-검정)}]
+\textbf{언제}: 모집단 평균($\mu$)에 대한 주장 검정
+\textbf{검정 통계량}: $t = \frac{\bar{x} - \mu_0}{s/\sqrt{n}}$
+\textbf{Excel p-값}:
+\begin{itemize}
+    \item \textbf{우측 꼬리 ($H_A: \mu > \mu_0$)}: \texttt{1 - T.DIST(t, df, 1)}
+\end{itemize}
+\textbf{주의}: \texttt{T.DIST}는 왼쪽 꼬리 누적 확률 반환
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=mygreen!5!white, colframe=mygreen!75!black, title=\textbf{비율 검정 (z-검정)}]
+\textbf{언제}: 모집단 비율($p$)에 대한 주장 검정
+\textbf{정규 근사 조건}: $n \times p_0 \ge 5$ \textbf{AND} $n \times (1 - p_0) \ge 5$
+\textbf{검정 통계량}: $z = \frac{\hat{p} - p_0}{\sqrt{\frac{p_0(1-p_0)}{n}}}$
+\textbf{Excel p-값}:
+\begin{itemize}
+    \item \textbf{좌측 꼬리 ($H_A: p < p_0$)}: \texttt{NORM.S.DIST(z, 1)}
+    \item \textbf{우측 꼬리 ($H_A: p > p_0$)}: \texttt{1 - NORM.S.DIST(z, 1)}
+    \item \textbf{양측 꼬리 ($H_A: p \ne p_0$)}: \texttt{(1 - NORM.S.DIST(ABS(z), 1)) * 2}
+\end{itemize}
+\textbf{주의}: \texttt{NORM.S.DIST}는 왼쪽 꼬리 누적 확률 반환
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=myred!5!white, colframe=myred!75!black, title=\textbf{중요한 오해}]
+\begin{itemize}
+    \item \textbf{통계적 유의성 $\ne$ 실질적 중요성}: p-값이 작다고 항상 중요한 발견은 아님.
+    \item \textbf{$H_0$ 기각 실패 $\ne$ $H_0$ 참}: 증거가 부족할 뿐, 참이라고 단정할 수 없음.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

@@ -1,0 +1,1299 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{CSCI E-103: Introduction to the Intellectual Enterprises of CS}}
+\fancyhead[R]{\small\textit{Module 14}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myblue}{RGB}{50, 100, 180}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={CSCI E-103: Introduction to the Intellectual Enterprises of CS - Module 14},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\thispagestyle{firstpage}
+
+\metainfo{CSCI103}{Lecture 14}{UIUC Student}{
+이 문서는 CSCI103 Lecture 14 강의 내용을 바탕으로 작성된 종합 학습 노트입니다.
+데이터브릭스(Databricks) 플랫폼의 최신 기능과 로드맵, 그리고 데이터 인텔리전스, 거버넌스, AI 에이전트 구축, 데이터 웨어하우징 및 엔지니어링 분야의 주요 투자 영역을 다룹니다.
+특히 Lakebase, Agent Bricks, AI Parse Document, Databricks One, ABAC 등 새롭게 출시되거나 출시 예정인 기능들을 비전공자도 이해하기 쉽게 설명합니다.
+또한, 퀴즈 2와 과제 3의 상세 해설을 포함하여 핵심 개념과 문제 해결 방법을 명확히 제시합니다.
+이 문서는 시험 대비 및 데이터브릭스 플랫폼 이해를 위한 독립적인 학습 자료로 활용될 수 있도록 구성되었습니다.
+}
+
+\tableofcontents
+
+\newpage
+
+% 본문 시작
+\section*{용어 정리}
+
+다음 표는 강의에서 다루는 주요 용어들을 비전공자도 이해하기 쉽게 설명합니다.
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+데이터브릭스 (Databricks) & 데이터 분석, AI 모델 개발, 데이터 웨어하우징을 위한 통합 플랫폼 & Databricks & 레이크하우스 아키텍처 기반 \\
+레이크하우스 (Lakehouse) & 데이터 레이크의 유연성과 데이터 웨어하우스의 구조적 장점을 결합한 아키텍처 & Lakehouse & 데이터브릭스의 핵심 \\
+OLTP & 실시간 트랜잭션 처리 (예: 은행 거래) & Online Transaction Processing & Lakebase가 이 역할을 수행 \\
+OLAP & 대규모 데이터 분석 및 보고 (예: 비즈니스 인텔리전스) & Online Analytical Processing & 데이터브릭스의 전통적 강점 \\
+델타 레이크 (Delta Lake) & 데이터 레이크에 ACID 트랜잭션, 스키마 적용, 시간 여행 기능을 제공하는 오픈 소스 저장소 계층 & Delta Lake & 데이터 일관성 및 신뢰성 확보 \\
+아이스버그 (Iceberg) & 대규모 분석 데이터셋을 위한 오픈 테이블 형식 & Iceberg & 델타 레이크와 유사한 역할 \\
+레이크베이스 (Lakebase) & 데이터브릭스에서 제공하는 트랜잭션 데이터베이스 (PostgreSQL 기반) & Lakebase & OLTP 워크로드 지원 \\
+에이전트 브릭스 (Agent Bricks) & AI 에이전트를 쉽게 구축하고 배포할 수 있도록 돕는 도구 & Agent Bricks & AutoML과 유사한 방식 \\
+AIBI & 데이터브릭스에서 제공하는 비즈니스 인텔리전스 및 대시보드 기능 & AIBI (AI-powered BI) & 대시보드와 지니(Genie) 포함 \\
+레이크플로우 (LakeFlow) & 데이터 수집, ETL, 스트리밍 처리를 위한 데이터 엔지니어링 도구 & LakeFlow & 데이터 파이프라인 구축 \\
+앱스 (Apps) & 데이터브릭스 플랫폼 위에 구축되는 사용자 친화적인 애플리케이션 & Apps & 대시보드보다 양방향 소통 가능 \\
+마켓플레이스 (Marketplace) & 데이터, 모델, 코드를 발견하고 공유하는 플랫폼 & Marketplace & 내부/외부 공유 가능 \\
+ABAC & 속성 기반 접근 제어. 데이터의 특정 속성(예: PII)에 따라 접근 권한을 부여 & Attribute-Based Access Control & RBAC보다 유연하고 강력 \\
+RBAC & 역할 기반 접근 제어. 사용자 역할에 따라 접근 권한을 부여 & Role-Based Access Control & 전통적인 접근 제어 방식 \\
+MCP 서버 & 모델, 코드, 데이터 등을 포함하는 사용자 정의 서버 & MCP Servers & AI 에이전트가 참조 가능 \\
+AI Parse Document & SQL 함수를 사용하여 PDF 등 문서에서 구조화된 데이터를 추출하는 기능 & AI Parse Document & 비정형 데이터를 정형화 \\
+서버리스 GPU 컴퓨트 & GPU 자원을 필요할 때만 사용하고 사용량에 따라 비용을 지불하는 방식 & Serverless GPU Compute & AI/ML 워크로드 가속화 \\
+멀티 스테이트먼트 트랜잭션 & 여러 SQL 문장을 하나의 논리적 단위로 묶어 모두 성공하거나 모두 실패하도록 처리 & Multi-statement Transaction & 데이터 일관성 유지 \\
+저장 프로시저 (Stored Procedure) & 미리 정의된 SQL 코드 블록으로, 복잡한 작업을 효율적으로 수행 & Stored Procedure & 데이터베이스 로직 캡슐화 \\
+레이크브릿지 (Lakebridge) & 레거시 데이터 시스템에서 데이터브릭스로 데이터를 마이그레이션하는 도구 & Lakebridge & 데이터 마이그레이션 간소화 \\
+공간 SQL (Spatial SQL) & 지리적 데이터(위치, 영역 등)를 처리하고 분석하는 SQL 기능 & Spatial SQL & 지도 기반 분석 가능 \\
+오토로더 (Autoloader) & 클라우드 스토리지에서 증분적으로 데이터를 로드하는 기능 & Autoloader & 스트리밍 데이터 수집 \\
+체크포인팅 (Checkpointing) & 스트리밍 처리 상태를 주기적으로 저장하여 장애 발생 시 복구 지점을 제공 & Checkpointing & 스트리밍의 내결함성 확보 \\
+아이뎀포턴트 싱크 (Idempotent Sink) & 동일한 작업을 여러 번 수행해도 결과가 항상 동일하도록 보장하는 데이터 저장소 & Idempotent Sink & 정확히 한 번 처리(Exactly-Once) 지원 \\
+브로드캐스트 변수 (Broadcast Variable) & Spark 드라이버에서 워커 노드로 읽기 전용 데이터를 효율적으로 배포하는 변수 & Broadcast Variable & 네트워크 오버헤드 감소 \\
+셔플 (Shuffle) & Spark에서 데이터를 재분배하여 병렬 처리를 가능하게 하는 과정 & Shuffle & 성능 병목의 원인이 될 수 있음 \\
+AQE (Adaptive Query Execution) & Spark SQL 쿼리 실행 계획을 런타임에 동적으로 조정하여 성능을 최적화하는 기능 & Adaptive Query Execution & 쿼리 성능 자동 개선 \\
+SCD (Slowly Changing Dimension) & 시간이 지남에 따라 변경되는 차원 데이터를 관리하는 기법 & Slowly Changing Dimension & 데이터 웨어하우징에서 중요 \\
+옵투나 (Optuna) & 하이퍼파라미터 최적화를 위한 오픈 소스 프레임워크 & Optuna & 머신러닝 모델 성능 향상 \\
+원-핫 인코딩 (One-Hot Encoding) & 범주형 데이터를 이진 벡터 형태로 변환하는 기법 & One-Hot Encoding & 머신러닝 모델 입력 준비 \\
+앙상블 학습 (Ensemble Learning) & 여러 모델을 결합하여 단일 모델보다 더 나은 예측 성능을 얻는 기법 & Ensemble Learning & 모델 강건성 향상 \\
+PCA (Principal Component Analysis) & 고차원 데이터를 저차원으로 축소하는 통계 기법 & Principal Component Analysis & 차원 축소 \\
+MLflow 모델 레지스트리 & 머신러닝 모델의 버전 관리, 배포, 거버넌스를 위한 중앙 집중식 저장소 & MLflow Model Registry & 모델 수명 주기 관리 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section*{핵심 개념 및 원리}
+
+\subsection{데이터브릭스 플랫폼의 진화와 레이크하우스 아키텍처}
+
+데이터브릭스는 데이터 레이크의 유연성과 데이터 웨어하우스의 구조적 장점을 결합한 레이크하우스 아키텍처를 기반으로 합니다. 이는 분석(OLAP)과 트랜잭션(OLTP) 워크로드를 모두 지원하며, 데이터 인텔리전스, 거버넌스, AI 에이전트 구축, 데이터 웨어하우징 및 엔지니어링 분야에 집중적으로 투자하고 있습니다.
+
+\begin{tcolorbox}[summary={레이크하우스 아키텍처의 중요성}]
+레이크하우스는 기존의 데이터 레이크와 데이터 웨어하우스의 장점을 결합하여, 모든 데이터 유형(정형, 비정형)을 저장하고, SQL 분석부터 머신러닝까지 다양한 워크로드를 단일 플랫폼에서 처리할 수 있도록 합니다. 이는 데이터 사일로(silo)를 제거하고 데이터 관리의 복잡성을 줄여줍니다.
+\end{tcolorbox}
+
+\subsubsection{주요 투자 영역}
+데이터브릭스는 다음 네 가지 핵심 영역에 집중하여 플랫폼을 발전시키고 있습니다.
+\begin{enumerate}
+    \item \textbf{데이터 인텔리전스 기능 (Data Intelligence Capabilities):} 플랫폼 자체를 더 스마트하게 만들어 사용자가 해야 할 작업을 줄이고 자동화를 늘립니다.
+    \item \textbf{내장된 데이터 거버넌스, 보안 및 공유 도구 (Built-in Data Governance, Security and Sharing Tools):} 데이터의 안전한 관리와 효율적인 공유를 위한 기능을 강화합니다.
+    \item \textbf{AI 에이전트 구축 도구 (Tools to Build AI Agents):} AI 에이전트 개발 및 배포를 위한 프레임워크와 환경을 제공합니다.
+    \item \textbf{데이터 웨어하우징, 데이터 마이그레이션 및 데이터 엔지니어링 (Warehousing, Data Migration and Data Engineering):} 데이터 파이프라인 구축, 레거시 시스템 마이그레이션, 고성능 데이터 웨어하우징을 지원합니다.
+\end{enumerate}
+
+\subsection{새로운 기능 및 로드맵}
+
+강의에서는 아직 완전히 안정화되지 않았지만, 공개 프리뷰(Public Preview) 또는 곧 출시될 예정인 데이터브릭스의 새로운 기능들을 소개합니다.
+
+\subsubsection{Lakebase: 트랜잭션 데이터베이스의 새로운 패러다임}
+Lakebase는 데이터브릭스 플랫폼에 새롭게 추가된 트랜잭션 데이터베이스(OLTP) 기능으로, PostgreSQL 구현을 기반으로 합니다.
+
+\begin{tcolorbox}[summary={Lakebase의 핵심 특징}]
+Lakebase는 전통적인 관계형 데이터베이스의 기능을 제공하면서도, 클라우드 네이티브 환경에 최적화된 혁신적인 특징들을 가집니다.
+\end{tcolorbox}
+
+\begin{itemize}
+    \item \textbf{스토리지와 컴퓨트 분리 (Storage and Compute Segregation):}
+    \begin{itemize}
+        \item \textbf{개념:} 데이터 저장소(스토리지)와 데이터 처리 엔진(컴퓨트)이 독립적으로 작동합니다.
+        \item \textbf{장점:} 컴퓨트 자원은 워크로드에 따라 동적으로 확장(scale up)되거나 축소(scale down)될 수 있으며, 사용하지 않을 때는 0으로 줄어들어 비용을 절감할 수 있습니다. 이는 전통적인 데이터베이스 서버가 항상 실행되어야 하는 방식과 근본적으로 다릅니다.
+        \item \textbf{비유:} 마치 수도꼭지(컴퓨트)를 틀 때만 물(데이터 처리)이 나오고, 잠그면 물이 나오지 않지만 물탱크(스토리지)의 물은 그대로 있는 것과 같습니다.
+    \end{itemize}
+    \item \textbf{브랜칭 (Branching):}
+    \begin{itemize}
+        \item \textbf{개념:} Git과 유사하게 데이터베이스의 여러 버전을 생성하고 관리할 수 있습니다. 기본적으로 프로덕션(Production) 브랜치와 개발(Development) 브랜치가 제공됩니다.
+        \item \textbf{장점:} 개발팀은 프로덕션 환경에 영향을 주지 않고 안전하게 새로운 기능을 개발하고 테스트할 수 있습니다.
+        \item \textbf{비유:} 소프트웨어 개발에서 코드를 복사하여 새로운 기능을 개발하고, 문제가 없으면 원본 코드에 병합하는 것과 같습니다.
+    \end{itemize}
+    \item \textbf{스냅샷 및 시간 여행 (Snapshots and Time Travel):}
+    \begin{itemize}
+        \item \textbf{개념:} 특정 시점의 데이터베이스 상태를 저장하고, 필요할 때 해당 시점으로 복구하거나 과거 데이터를 조회할 수 있습니다.
+        \item \textbf{장점:} 데이터 손실 위험을 줄이고, 데이터 변경 이력을 쉽게 추적할 수 있습니다.
+    \end{itemize}
+    \item \textbf{SQL 편집기 및 모니터링 (SQL Editor and Monitoring):}
+    \begin{itemize}
+        \item \textbf{개념:} SQL 쿼리를 작성하고 실행할 수 있는 환경과 쿼리 성능, 시스템 운영을 모니터링하는 기능을 제공합니다.
+    \end{itemize}
+    \item \textbf{카탈로그 통합 (Catalog Integration):}
+    \begin{itemize}
+        \item \textbf{개념:} Lakebase 데이터베이스를 데이터브릭스 유니티 카탈로그(Unity Catalog)에 연결하여 관리할 수 있습니다.
+        \item \textbf{장점:} 데이터브릭스 플랫폼의 다른 데이터 소스와 함께 Lakebase 데이터를 통합적으로 관리하고 접근할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[example={Lakebase 카탈로그 생성 예시}]
+유니티 카탈로그에서 Lakebase 유형의 카탈로그를 생성하여 기존 Lakebase 데이터베이스 인스턴스와 연결할 수 있습니다.
+\begin{lstlisting}[language=SQL, caption=Lakebase 카탈로그 생성 과정]
+-- 1. Databricks UI에서 Catalog -> Create Catalog 선택
+-- 2. Type에서 'Lakebase Postgress' 선택
+-- 3. 카탈로그 이름 지정 (예: my_lakebase_catalog)
+-- 4. Autoscaling 설정 (컴퓨트 자원 자동 확장/축소)
+-- 5. 연결할 Lakebase 데이터베이스 인스턴스 선택
+-- 6. 데이터베이스 이름 지정 (예: my_db)
+-- 7. 'Create database if doesn't exist' 선택 후 생성
+\end{lstlisting}
+이렇게 생성된 카탈로그를 통해 SQL 쿼리로 Lakebase 데이터에 접근할 수 있습니다: \texttt{SELECT * FROM my_lakebase_catalog.my_db.my_table;}
+\end{tcolorbox}
+
+\subsubsection{Databricks One: 비즈니스 사용자를 위한 통합 포털}
+Databricks One은 비즈니스 사용자가 데이터브릭스 플랫폼의 다양한 기능을 쉽게 접근하고 활용할 수 있도록 설계된 통합 포털입니다.
+
+\begin{tcolorbox}[summary={Databricks One의 특징}]
+Databricks One은 대시보드, 지니(Genie), 레이크하우스 앱 등 비즈니스 관련 자산들을 한곳에 모아 사용자 경험을 단순화합니다.
+\end{tcolorbox}
+
+\begin{itemize}
+    \item \textbf{계정 수준 접근 (Account Level Access):} 여러 워크스페이스에 분산된 자산들을 계정 전체에서 통합적으로 볼 수 있습니다.
+    \item \textbf{사용자 정의 URL (Vanity URL):} \texttt{companyxyz.com}과 같이 회사 도메인에 맞는 URL을 설정할 수 있습니다.
+    \item \textbf{도메인 통합 (Domain Integration):} 마케팅, 재무, 기술 등 비즈니스 도메인별로 대시보드, 지니 공간, 앱을 구성하여 직관적인 검색 및 탐색을 가능하게 합니다.
+\end{itemize}
+
+\subsubsection{Apps: 양방향 소통이 가능한 애플리케이션}
+데이터브릭스 Apps는 플랫폼의 큐레이션된 데이터 위에 구축되는 사용자 친화적인 애플리케이션입니다.
+
+\begin{tcolorbox}[summary={Apps의 특징 및 대시보드와의 차이점}]
+Apps는 대시보드처럼 데이터를 시각화할 뿐만 아니라, 사용자가 데이터를 직접 수정하고 플랫폼의 다른 서비스(모델, 벡터 검색 등)와 상호작용할 수 있는 양방향 기능을 제공합니다.
+\end{tcolorbox}
+
+\begin{itemize}
+    \item \textbf{다양한 프레임워크 지원:} Dash, Flask, Gradio, Shiny (Python), NodeJS, React 등 다양한 웹 프레임워크를 사용하여 앱을 개발할 수 있습니다.
+    \item \textbf{양방향 통신:} 대시보드가 주로 데이터를 읽는 단방향인 반면, Apps는 사용자가 데이터를 읽고(Read) 수정(Write)할 수 있는 양방향 통신을 지원합니다. 예를 들어, 사용자가 데이터의 특정 값을 직접 수정하여 반영할 수 있습니다.
+    \textbf{확장성:} 수평적 확장(Horizontal Scaling)을 지원하여 많은 사용자에게 안정적으로 서비스를 제공할 수 있습니다.
+\end{itemize}
+
+\begin{tcolorbox}[example={Apps 생성 예시}]
+데이터브릭스 컴퓨트(Compute) 섹션에서 'Apps'를 선택하여 새로운 앱을 생성할 수 있습니다.
+\begin{lstlisting}[language=Python, caption=Streamlit 기반 Hello World 앱 예시]
+# Streamlit 템플릿을 사용하여 간단한 데이터 앱 생성
+# 1. Databricks UI에서 Compute -> Apps 선택
+# 2. 'Create new app' 클릭
+# 3. 템플릿으로 'Streamlit' 선택
+# 4. 'Data App' 또는 'Hello World' 템플릿 선택
+# 5. 앱 이름 지정 후 생성
+# 이 앱은 파이프라인의 골드(Gold) 계층 데이터를 시각화하고,
+# 사용자가 특정 값을 수정할 수 있는 인터페이스를 제공할 수 있습니다.
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsubsection{AIBI (AI-powered Business Intelligence)}
+AIBI는 대시보드와 지니(Genie) 기능을 통합하여 비즈니스 인텔리전스를 강화합니다.
+
+\begin{itemize}
+    \item \textbf{대시보드 구독:} Slack, Teams 채널 구독, 계정 수준 사용자 구독, 다중 페이지 구독, CSV 첨부 등 다양한 보고 기능을 제공합니다.
+    \item \textbf{지니 (Genie):}
+    \begin{itemize}
+        \item \textbf{개념:} 자연어 질문을 통해 데이터에 대한 사실적(factual) 답변을 얻을 수 있는 도구입니다.
+        \item \textbf{연구 모드 (Research Mode):} '무엇(What)'에 대한 질문을 넘어 '왜(Why)'라는 가설 기반의 질문에 답할 수 있도록 돕는 기능입니다. 예를 들어, "관세가 오르면 내 포트폴리오에 어떤 영향을 미칠까?"와 같은 질문에 대해 다양한 시나리오와 사고 과정을 제시합니다.
+        \item \textbf{문서 업로드 및 동적 지식 추출:} CSV, Excel, PDF 등 다양한 형식의 문서를 업로드하여 구조화된 데이터와 결합하여 분석할 수 있습니다. 이를 통해 비정형 문서에서 비즈니스 컨텍스트를 추출하고 통찰력을 풍부하게 합니다.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{AI 에이전트 구축 도구}
+데이터브릭스는 AI 에이전트 개발을 위한 다양한 도구와 기능을 제공합니다.
+
+\begin{itemize}
+    \item \textbf{Agent Bricks:} 정보 추출, 지식 보조, 멀티 에이전트 감독, 커스텀 LLM 생성 등 다양한 유형의 에이전트를 AutoML처럼 쉽게 구축할 수 있도록 돕습니다. 데이터셋 위치와 추출할 필드를 지정하는 것만으로 에이전트를 생성할 수 있습니다.
+    \item \textbf{온라인 피처 스토어 (Online Feature Store):} 머신러닝 모델 학습 및 추론에 필요한 피처(특징)를 저장하고 관리하는 저장소입니다. 기존에는 델타 테이블로 백업되었으나, 이제 Lakebase로도 백업될 예정입니다.
+    \item \textbf{AI Parse Document:} SQL 함수를 사용하여 PDF 문서 등에서 구조화된 데이터(테이블, 정보)를 쉽게 추출할 수 있습니다. 이는 비정형 문서를 정형 데이터로 변환하는 강력한 도구입니다.
+    \item \textbf{최신 모델 지원:} Llama, Gemini, Claude, ChatGPT 등 최신 대규모 언어 모델(LLM)을 데이터브릭스 플랫폼에서 최적화된 GPU 서빙을 통해 빠르게 사용할 수 있도록 제공합니다.
+    \item \textbf{서버리스 GPU 컴퓨트 및 MCP 서버:} 특정 사용 사례에 대한 추가 가속을 위해 GPU 컴퓨트를 서버리스 형태로 제공하며, AI 에이전트가 상호작용할 수 있는 MCP(Model, Code, Data) 서버를 지원합니다.
+\end{itemize}
+
+\subsubsection{데이터 및 AI 거버넌스}
+데이터브릭스는 데이터의 보안, 품질, 공유를 위한 강력한 거버넌스 도구를 제공합니다.
+
+\begin{itemize}
+    \item \textbf{ABAC (Attribute-Based Access Control):}
+    \begin{itemize}
+        \item \textbf{개념:} 역할(Role)이 아닌 데이터의 속성(Attribute)에 기반하여 접근 권한을 제어하는 방식입니다. 예를 들어, 특정 컬럼이 PII(개인 식별 정보) 태그를 가지고 있다면, 해당 태그에 대한 정책을 자동으로 적용하여 접근을 제한합니다.
+        \item \textbf{장점:} RBAC(Role-Based Access Control)보다 유연하고 확장성이 뛰어납니다. 새로운 데이터셋이 추가되더라도 태그만 올바르게 지정되면 기존 정책이 자동으로 적용되어 관리자의 부담을 줄입니다.
+    \end{itemize}
+    \item \textbf{마켓플레이스의 MCP 서버 (MCP in the Marketplace):} 조직 내 사용자 정의 데이터, 모델, 코드를 포함하는 MCP 서버를 마켓플레이스에 등록하여 AI 에이전트가 참조하고 활용할 수 있도록 합니다. 이 MCP 서버는 유니티 카탈로그의 거버넌스 하에 관리됩니다.
+    \item \textbf{아이스버그 클라이언트와의 공유 (Sharing to Iceberg Clients):} 델타 공유(Delta Sharing) 프로토콜을 통해 델타 테이블뿐만 아니라 아이스버그 형식의 데이터도 공유할 수 있습니다. 유니폼(Uniform) 또는 관리형 아이스버그(Managed Iceberg)를 통해 델타 메타데이터가 생성되어 공유가 가능해집니다.
+    \item \textbf{ABAC을 통한 공유 (Sharing with ABAC):} 델타 공유 시 민감한 행이나 컬럼이 있는 경우, ABAC 정책 자체가 수신자 측으로 전달되어 데이터 복사 없이도 정책 기반의 접근 제어가 가능해집니다. 이는 데이터 공유의 보안과 유연성을 크게 향상시킵니다.
+\end{itemize}
+
+\subsubsection{데이터 웨어하우징, 마이그레이션 및 엔지니어링}
+데이터브릭스는 전통적인 데이터베이스 기능을 강화하고, 데이터 마이그레이션 및 엔지니어링 워크플로우를 간소화합니다.
+
+\begin{itemize}
+    \item \textbf{멀티 스테이트먼트 트랜잭션 및 저장 프로시저 (Multi-statement Transaction and Stored Procedures):} 관계형 데이터베이스에서 흔히 사용되는 여러 SQL 문장을 하나의 트랜잭션으로 묶어 처리하는 기능과, 복잡한 로직을 캡슐화하는 저장 프로시저를 지원합니다. 이는 데이터 일관성을 보장하고 코드 재사용성을 높입니다.
+    \item \textbf{공간 SQL (Spatial SQL):} 지리적 데이터(예: 위도, 경도, 다각형)를 SQL 쿼리로 직접 처리하고 분석할 수 있는 기능을 제공합니다. 재난 지역 분석, 위치 기반 서비스 등 다양한 공간 분석 시나리오에 활용될 수 있습니다.
+    \item \textbf{LakeFlow Connect:} 다양한 외부 데이터 소스(파일, 관계형 데이터베이스, 마케팅 클라우드 등)와의 연결을 지원하여 데이터 수집을 간소화합니다. 특히 제로 카피 ETL(Zero-Copy ETL)을 통해 효율적인 데이터 통합을 가능하게 합니다.
+    \item \textbf{LakeFlow Designer:} 시각적인 UI를 통해 데이터 파이프라인을 설계할 수 있는 도구입니다. 소스, 필터, 조인, 집계, AI 함수 등 다양한 오퍼레이터를 드래그 앤 드롭 방식으로 구성하면 Spark 선언적 코드(Spark Declarative Pipelines)가 자동으로 생성됩니다.
+    \item \textbf{Lakebridge:} 20개 이상의 레거시 데이터 스토어에서 데이터브릭스로 데이터를 마이그레이션하는 데 도움을 주는 오픈 소스 도구입니다. 분석기(Analyzer), 변환기(Converter), 데이터 검증기(Data Validator) 기능을 포함하여 마이그레이션 과정을 간소화합니다.
+\end{itemize}
+
+\begin{tcolorbox}[caution={기능 출시 단계}]
+데이터브릭스의 새로운 기능들은 다음 단계를 거쳐 출시됩니다.
+\begin{itemize}
+    \item \textbf{베타 (Beta):} 초기 개발 단계, 제한된 사용자에게 제공.
+    \item \textbf{프라이빗 프리뷰 (Private Preview):} 일부 고객에게만 접근 권한 부여.
+    \item \textbf{퍼블릭 프리뷰 (Public Preview):} 문서화되어 일반 사용자도 체험 가능.
+    \item \textbf{GA (Generally Available):} 정식 출시, 프로덕션 환경에서 사용 권장.
+\end{itemize}
+많은 기업들은 GA 단계에서만 프로덕션에 기능을 도입하는 경향이 있습니다.
+\end{tcolorbox}
+
+\newpage
+\section*{퀴즈 2 해설}
+
+퀴즈 2는 Spark, Delta Lake, 스트리밍, 머신러닝 등 데이터브릭스 플랫폼의 핵심 개념을 평가합니다. 다음은 각 문제에 대한 상세 해설입니다.
+
+\subsection{데이터 처리 및 최적화}
+
+\begin{enumerate}
+    \item \textbf{테이블 생성 시 타임스탬프를 날짜로 변환:}
+    \begin{itemize}
+        \item \textbf{문제:} 타임스탬프 컬럼을 날짜 컬럼으로 변환하여 테이블을 생성하는 방법.
+        \item \textbf{해설:} \texttt{GENERATED ALWAYS AS} 절을 사용하여 타임스탬프 컬럼에서 날짜를 자동으로 생성할 수 있습니다. 이는 파티셔닝과 필터링에 유용하며, \texttt{IDENTITY} 절과 함께 사용될 수도 있습니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=SQL, caption=GENERATED ALWAYS AS 예시]
+CREATE TABLE my_table (
+  event_timestamp TIMESTAMP,
+  event_date DATE GENERATED ALWAYS AS (CAST(event_timestamp AS DATE))
+) USING DELTA;
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{Spark 최적화의 4가지 S:}
+    \begin{itemize}
+        \item \textbf{문제:} Spark 최적화의 일반적인 문제 영역 4가지.
+        \item \textbf{해설:} 데이터 스큐(Data Skew), 셔플(Shuffles), 스필(Spills), 스몰 파일(Small Files)입니다. 이 중 일부는 AQE(Adaptive Query Execution)에 의해 자동으로 해결되지만, 복잡한 프로젝트에서는 수동 최적화가 필요할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{Delta Lake의 특징:}
+    \begin{itemize}
+        \item \textbf{문제:} Delta Lake에 대한 설명 중 옳은 것.
+        \item \textbf{해설:} Delta Lake는 파티션 프루닝(Partition Pruning) 및 Z-오더링(Z-ordering)과 같은 최적화 기법을 사용합니다. 최근에는 리퀴드 클러스터링(Liquid Clustering)이 이들을 대체하며, 블룸 필터링(Bloom Filtering)도 있습니다. 또한, Delta Lake는 오픈 소스 및 오픈 포맷이며, 높은 확장성을 제공합니다.
+    \end{itemize}
+
+    \item \textbf{데이터 백업 및 시간 여행:}
+    \begin{itemize}
+        \item \textbf{문제:} 동료가 데이터를 수동으로 백업 폴더에 복사하는 상황에서, 더 나은 방법.
+        \item \textbf{해설:} Delta Lake의 시간 여행(Time Travel) 기능을 활용하면 모든 트랜잭션이 자동으로 기록되므로, 특정 시점으로 쉽게 되돌아갈 수 있습니다. 수동 복사 없이 데이터 변경 이력을 관리할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{중복 행 제거:}
+    \begin{itemize}
+        \item \textbf{문제:} SQL에서 중복 행을 제거하는 방법.
+        \item \textbf{해설:} \texttt{SELECT DISTINCT * FROM table_name;}을 사용하여 모든 컬럼에 대해 중복되는 행을 제거할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{쿼리 파라미터화:}
+    \begin{itemize}
+        \item \textbf{문제:} 배치 날짜(batch date)를 입력 파라미터로 사용하여 테이블을 쿼리하는 방법.
+        \item \textbf{해설:} 노트북 환경에서는 위젯(Widgets)을 사용하여 쿼리를 파라미터화할 수 있습니다. 순수 SQL에서는 SQL 변수나 명명된/명명되지 않은 파라미터를 사용할 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{Spark의 AQE (Adaptive Query Execution):}
+    \begin{itemize}
+        \item \textbf{문제:} Spark의 AQE가 무엇인지.
+        \item \textbf{해설:} AQE는 Spark SQL 쿼리 실행 계획을 런타임에 동적으로 조정하여 성능을 최적화하는 쿼리 최적화 도구입니다.
+    \end{itemize}
+
+    \item \textbf{Lakehouse가 데이터 레이크 및 데이터 웨어하우스 의존성을 대체하는 방법:}
+    \begin{itemize}
+        \item \textbf{문제:} Lakehouse가 기존 데이터 레이크 및 데이터 웨어하우스의 의존성을 대체하는 방법.
+        \item \textbf{해설:} Lakehouse는 배치 및 스트리밍 분석을 모두 가능하게 하며, 스토리지와 컴퓨트를 분리하고, Parquet과 같은 표준 데이터 형식을 사용하며, 다양한 API를 지원합니다. 따라서 모든 보기가 정답입니다.
+    \end{itemize}
+
+    \item \textbf{특정 컬럼에 대한 중복 행 제거:}
+    \begin{itemize}
+        \item \textbf{문제:} \texttt{product_id} 컬럼에 대해 고유한 행을 반환하는 코드 블록.
+        \item \textbf{해설:} \texttt{dropDuplicates()} 메서드를 사용하고, 중복을 확인할 컬럼 이름을 리스트 형태로 전달합니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=dropDuplicates 예시]
+df.dropDuplicates(["product_id"])
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{SQL \texttt{MERGE INTO} 명령어:}
+    \begin{itemize}
+        \item \textbf{문제:} 조건에 따라 행을 삽입, 업데이트, 삭제하는 SQL 명령어.
+        \item \textbf{해설:} \texttt{MERGE INTO}는 단일 명령으로 조건부 삽입, 업데이트, 삭제를 수행할 수 있는 강력한 SQL 구문입니다.
+    \end{itemize}
+
+    \item \textbf{컬럼 값의 최대/최소값 표시:}
+    \begin{itemize}
+        \item \textbf{문제:} \texttt{product_id}별로 \texttt{value} 컬럼의 최대값과 최소값을 보여주는 데이터프레임 생성.
+        \item \textbf{해설:} \texttt{groupBy()}와 \texttt{agg()} 메서드를 사용하여 \texttt{product_id}별로 \texttt{min()}과 \texttt{max()} 집계 함수를 적용합니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=groupBy 및 agg 예시]
+from pyspark.sql.functions import min, max
+df.groupBy("product_id").agg(min("value").alias("min_value"), max("value").alias("max_value"))
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{모델 생성의 가장 효과적인 형태:}
+    \begin{itemize}
+        \item \textbf{문제:} 모델 생성의 가장 효과적인 형태.
+        \item \textbf{해설:} 사용 사례(use case)에 따라 다릅니다. 특정 모델이나 방법론이 항상 최고라고 할 수는 없습니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{스트리밍 처리}
+
+\begin{enumerate}
+    \item \textbf{Delta 테이블 위에 스트리밍 뷰 생성:}
+    \begin{itemize}
+        \item \textbf{문제:} Delta 테이블 위에 스트리밍 뷰를 생성하는 SQL 문.
+        \item \textbf{해설:} \texttt{readStream} 옵션을 사용하여 Delta 테이블을 스트리밍 소스로 읽고, \texttt{trigger(availableNow=True)}와 같은 트리거 옵션을 지정하여 스트리밍 쿼리를 실행합니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=SQL, caption=스트리밍 뷰 생성 예시]
+CREATE OR REPLACE TEMPORARY VIEW sales_stream_view AS
+SELECT * FROM read_files(
+  'path/to/delta_table',
+  format => 'delta',
+  read_options => map('maxFilesPerTrigger', '1')
+);
+        \end{lstlisting}
+        (강의에서는 \texttt{CREATE OR REPLACE TEMP VIEW sales_stream AS SELECT * FROM STREAM(table_name)} 형태를 언급했으나, \texttt{read_files} 또는 \texttt{spark.readStream.format("delta").load()}가 일반적입니다.)
+    \end{itemize}
+
+    \item \textbf{구조화된 스트리밍의 내결함성 (Fault Tolerance):}
+    \begin{itemize}
+        \item \textbf{문제:} 구조화된 스트리밍이 종단 간 내결함성을 위해 사용하는 기술.
+        \item \textbf{해설:} 체크포인팅(Checkpointing)과 아이뎀포턴트 싱크(Idempotent Sinks)의 조합을 통해 "정확히 한 번(Exactly-Once)" 처리를 보장하여 내결함성을 확보합니다.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Spark 고급 기능}
+
+\begin{enumerate}
+    \item \textbf{브로드캐스트 변수 (Broadcast Variables):}
+    \begin{itemize}
+        \item \textbf{문제:} 브로드캐스트 변수에 대한 설명 중 옳은 것.
+        \item \textbf{해설:} 브로드캐스트 변수는 불변(immutable)하며, 클러스터 전체에 공유되지 않고 각 워커 노드에 로컬로 복사됩니다.
+    \end{itemize}
+
+    \item \textbf{셔플 (Shuffle)의 정의:}
+    \begin{itemize}
+        \item \textbf{문제:} 셔플에 대한 설명.
+        \item \textbf{해설:} 셔플은 Spark에서 데이터를 클러스터 전체에 재분배하여 병렬 처리를 가능하게 하는 과정입니다. 이는 성능 병목의 주요 원인이 될 수 있습니다.
+    \end{itemize}
+
+    \item \textbf{브로드캐스트 조인 (Broadcast Join)의 유효성:}
+    \begin{itemize}
+        \item \textbf{문제:} 큰 데이터프레임과 작은 데이터프레임을 \texttt{item_id} 컬럼으로 조인할 때, \texttt{broadcast}가 유효한 조인 타입인지.
+        \item \textbf{해설:} \texttt{broadcast}는 유효한 조인 타입이 아닙니다. \texttt{broadcast()} 함수는 작은 데이터프레임을 브로드캐스트하여 조인 성능을 향상시키는 데 사용됩니다.
+        \item \textbf{예시:} \texttt{df_large.join(broadcast(df_small), "item_id")}
+    \end{itemize}
+
+    \item \textbf{파티션 수 변경:}
+    \begin{itemize}
+        \item \textbf{문제:} 데이터프레임의 파티션 수를 12개에서 24개로 효율적으로 변경하는 코드 블록.
+        \item \textbf{해설:} 파티션 수를 늘릴 때는 \texttt{repartition()}을 사용합니다. \texttt{coalesce()}는 파티션 수를 줄일 때 사용되며 오버헤드가 적습니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=repartition 예시]
+df.repartition(24)
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{배열 컬럼 폭발 (Explode):}
+    \begin{itemize}
+        \item \textbf{문제:} 배열 타입의 \texttt{attribute} 컬럼을 개별 행으로 폭발시키는 방법.
+        \item \textbf{해설:} \texttt{explode()} 함수는 \texttt{select()} 문 내에서 사용되어 배열의 각 요소를 새로운 행으로 변환합니다. \texttt{explode}는 데이터프레임의 메서드가 아닙니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=explode 예시]
+from pyspark.sql.functions import explode
+df.select("item_id", explode("attribute").alias("attribute_value"))
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{데이터를 Python 리스트로 가져오기:}
+    \begin{itemize}
+        \item \textbf{문제:} 최대 5개의 행을 Python 리스트로 가져오는 방법.
+        \item \textbf{해설:} \texttt{filter()}로 조건을 적용한 후, \texttt{take(n)} 메서드를 사용하여 \texttt{n}개의 행을 Python 리스트로 가져옵니다. \texttt{collect()}는 모든 행을 가져오므로 대규모 데이터프레임에서는 메모리 부족을 유발할 수 있어 위험합니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=filter 및 take 예시]
+df.filter(df.store_id == 25).take(5)
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{컬럼 이름이 다른 데이터프레임 조인:}
+    \begin{itemize}
+        \item \textbf{문제:} \texttt{transaction_df}와 \texttt{items_df}를 \texttt{item_id}와 \texttt{product_id} 컬럼으로 외부 조인하는 방법.
+        \item \textbf{해설:} 조인 조건에 \texttt{df1.column_name == df2.column_name} 형식을 사용하여 명시적으로 컬럼을 비교해야 합니다. 단순히 컬럼 이름 리스트를 전달하는 것은 컬럼 이름이 동일할 때만 작동합니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=컬럼 이름이 다른 조인 예시]
+transaction_df.join(items_df, transaction_df.item_id == items_df.product_id, "outer")
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{Delta Log 폴더 구조:}
+    \begin{itemize}
+        \item \textbf{문제:} Delta 테이블의 \texttt{_delta_log} 폴더 구조에 대한 설명.
+        \item \textbf{해설:} 모든 Delta 테이블에는 \texttt{_delta_log} 폴더가 있으며, 각 JSON 파일은 단일 트랜잭션을 나타냅니다. 약 10개의 JSON 파일마다 체크포인트 파일(Parquet 형식)이 생성되어 복구 시간을 단축합니다.
+    \end{itemize}
+
+    \item \textbf{클라우드 객체 스토리지에서 증분 데이터 수집:}
+    \begin{itemize}
+        \item \textbf{문제:} 클라우드 객체 스토리지에서 증분적으로 데이터를 수집하는 방법.
+        \item \textbf{해설:} 파일 기반의 증분 수집에는 \texttt{cloudFiles} 형식을 사용하는 오토로더(Autoloader)가 적합합니다. SQL에서는 \texttt{COPY INTO} 명령어를 사용할 수 있습니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=Autoloader 예시]
+spark.readStream.format("cloudFiles") \
+  .option("cloudFiles.format", "csv") \
+  .option("cloudFiles.schemaLocation", "path/to/schema_location") \
+  .load("path/to/source_data") \
+  .writeStream \
+  .option("checkpointLocation", "path/to/checkpoint") \
+  .option("mergeSchema", "true") \
+  .trigger(availableNow=True) \
+  .toTable("target_table")
+        \end{lstlisting}
+    \end{itemize}
+\end{enumerate}
+
+\subsection{머신러닝}
+
+\begin{enumerate}
+    \item \textbf{경사 부스팅 트리(Gradient Boosted Tree)의 병렬화:}
+    \begin{itemize}
+        \item \textbf{문제:} 경사 부스팅 트리 알고리즘의 훈련을 병렬화하기 어려운 이유.
+        \item \textbf{해설:} 경사 부스팅은 이전 반복의 데이터에 의존하여 다음 단계를 수행하므로, 본질적으로 순차적이며 병렬화하기 어렵습니다.
+    \end{itemize}
+
+    \item \textbf{회귀 문제에 부적합한 평가 지표:}
+    \begin{itemize}
+        \item \textbf{문제:} 회귀 문제에 적합하지 않은 평가 지표.
+        \item \textbf{해설:} F1 점수(F1 score)는 분류(classification) 문제에 사용되는 지표입니다. 회귀 문제에는 MSE, RMSE, MAE, R-squared 등이 사용됩니다.
+    \end{itemize}
+
+    \item \textbf{Spark를 사용한 하이퍼파라미터 최적화:}
+    \begin{itemize}
+        \item \textbf{문제:} Spark에서 하이퍼파라미터 최적화를 위해 사용되는 라이브러리.
+        \item \textbf{해설:} 과거에는 Hyperopt가 많이 사용되었으나, 현재는 Optuna가 개발이 활발하며 널리 사용됩니다. 이는 주로 단일 노드 머신러닝 모델(예: scikit-learn)에 적용됩니다.
+    \end{itemize}
+
+    \item \textbf{범주형 특성을 이진 지표 변수로 변환:}
+    \begin{itemize}
+        \item \textbf{문제:} 범주형 특성을 이진 지표 변수(binary indicator feature variables)로 변환하는 기법.
+        \item \textbf{해설:} 원-핫 인코딩(One-Hot Encoding)은 범주형 데이터를 머신러닝 모델이 이해할 수 있는 숫자 형태로 변환하는 일반적인 방법입니다.
+    \end{itemize}
+
+    \item \textbf{두 모델 결합:}
+    \begin{itemize}
+        \item \textbf{문제:} 특정 조건(예: 값 < 5 또는 >= 5)에 따라 두 모델을 결합하는 방법.
+        \item \textbf{해설:} 앙상블 학습(Ensemble Learning)은 여러 모델의 출력을 결합하여 전체적인 예측 성능을 향상시키는 기법입니다.
+    \end{itemize}
+
+    \item \textbf{하이퍼옵트(Hyperopt) 목적 함수:}
+    \begin{itemize}
+        \item \textbf{문제:} Hyperopt의 \texttt{fmin} 함수를 사용하여 R-squared 값을 최적화할 때 주의할 점.
+        \item \textbf{해설:} \texttt{fmin}은 최소화(minimization) 함수이므로, R-squared 값을 최대화하려면 목적 함수에서 \texttt{-r_squared}를 반환해야 합니다.
+    \end{itemize}
+
+    \item \textbf{불균형 데이터셋 처리:}
+    \begin{itemize}
+        \item \textbf{문제:} 불균형 데이터셋(imbalanced datasets)을 처리하는 기술.
+        \item \textbf{해설:} 오버샘플링(Oversampling), 언더샘플링(Undersampling), SMOTE(Synthetic Minority Over-sampling Technique) 등이 있습니다.
+    \end{itemize}
+
+    \item \textbf{차원 축소 (Dimensionality Reduction):}
+    \begin{itemize}
+        \item \textbf{문제:} 차원 축소에 사용되는 기술.
+        \item \textbf{해설:} 주성분 분석(PCA, Principal Component Analysis)은 고차원 데이터를 저차원으로 축소하는 대표적인 통계 기법입니다.
+    \end{itemize}
+
+    \item \textbf{결측 범주형 특성 대체 (Imputation):}
+    \begin{itemize}
+        \item \textbf{문제:} 결측 범주형 특성을 대체하는 방법.
+        \item \textbf{해설:} 범주형 특성의 결측값을 대체할 때는 최빈값(mode)을 사용하는 것이 일반적입니다. 숫자형 데이터의 경우 평균(mean)이나 중앙값(median)을 사용할 수 있습니다. Spark.ml의 \texttt{Imputer} 함수나 윈도우 함수를 활용할 수도 있습니다.
+    \end{itemize}
+
+    \item \textbf{MLflow 모델 레지스트리:}
+    \begin{itemize}
+        \item \textbf{문제:} MLflow 모델 레지스트리의 목적.
+        \item \textbf{해설:} 머신러닝 모델의 저장, 거버넌스, 버전 관리, 배포를 위한 중앙 집중식 저장소입니다. 모델의 수명 주기 관리를 돕고, Unity Catalog와 통합되어 있습니다.
+    \end{itemize}
+
+    \item \textbf{결측 데이터 처리 방법:}
+    \begin{itemize}
+        \item \textbf{문제:} 결측 데이터를 처리하는 방법.
+        \item \textbf{해설:} 결측값 대체(Imputation)는 결측 데이터를 처리하는 일반적인 방법입니다.
+    \end{itemize}
+
+    \item \textbf{MLflow \texttt{search_runs}:}
+    \begin{itemize}
+        \item \textbf{문제:} MLflow 실험에서 가장 높은 정확도를 가진 실행 ID를 식별하는 방법.
+        \item \textbf{해설:} \texttt{mlflow.search_runs()} 함수를 사용하여 실험 ID를 지정하고, 정확도(accuracy)를 기준으로 내림차순 정렬하여 가장 높은 값을 찾습니다.
+        \item \textbf{예시:}
+        \begin{lstlisting}[language=Python, caption=mlflow.search_runs 예시]
+runs = mlflow.search_runs(experiment_ids=[experiment_id], order_by=["metrics.accuracy DESC"], max_results=1)
+best_run_id = runs.iloc[0].run_id
+        \end{lstlisting}
+    \end{itemize}
+
+    \item \textbf{MLflow \texttt{autolog}의 목적:}
+    \begin{itemize}
+        \item \textbf{문제:} MLflow \texttt{autolog}의 목적.
+        \item \textbf{해설:} \texttt{autolog}는 모델 학습 시 파라미터, 아티팩트, 메트릭을 수동으로 로깅할 필요 없이 자동으로 로깅해주는 편의 기능입니다.
+    \end{itemize}
+
+    \item \textbf{Pandas 데이터프레임에서 PySpark 데이터프레임 생성:}
+    \begin{itemize}
+        \item \textbf{문제:} Pandas 데이터프레임에서 PySpark 데이터프레임을 효율적으로 생성하는 방법.
+        \item \textbf{해설:} \texttt{spark.createDataFrame(pandas_df)} 또는 \texttt{pandas_df.to_spark()} 메서드를 사용합니다.
+    \end{itemize}
+\end{enumerate}
+
+\newpage
+\section*{과제 3 해설}
+
+과제 3은 Kinesis/Kafka 스트리밍, SCD(Slowly Changing Dimension), 이미지 처리, UDF(User Defined Function) 등 실제 데이터 엔지니어링 및 분석 시나리오를 다룹니다.
+
+\subsection{스트리밍 데이터 수집 및 처리}
+
+\subsubsection{Kinesis와 Kafka 비교}
+Kinesis와 Kafka는 모두 실시간 스트리밍 데이터를 처리하는 데 사용되지만, 몇 가지 중요한 차이점이 있습니다.
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lll}
+\toprule
+\textbf{특징} & \textbf{Kinesis (AWS)} & \textbf{Kafka (오픈 소스)} \\
+\midrule
+\textbf{관리 주체} & AWS에서 완전 관리형 서비스 제공 & Confluent 등에서 상용 버전 제공, 오픈 소스 버전도 있음 \\
+\textbf{클라우드 의존성} & AWS에 종속적 & 클라우드에 독립적 (Cloud Agnostic) \\
+\textbf{확장 단위} & 샤드(Shard) 단위로 확장/축소 (각 샤드 비용 발생) & 파티션(Partition) 단위로 확장/축소 \\
+\textbf{메시지 분배} & 샤드에 따라 메시지 라우팅 & 프로듀서가 파티션에 라운드 로빈 또는 키 기반으로 메시지 푸시 \\
+\textbf{유사 서비스} & Azure Event Hub, Google Pub/Sub & - \\
+\textbf{특징} & 스트림 처리 언어(KSQL) 및 다양한 커넥터 제공 (상용 버전) & - \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\subsubsection{CSV 파일에서 날짜 추출 및 테이블 생성}
+클라우드 스토리지에서 CSV 파일을 읽을 때, 파일 이름에 포함된 날짜 정보를 추출하여 새로운 컬럼으로 추가하는 과정입니다.
+
+\begin{itemize}
+    \item \textbf{\texttt{_metadata} 필드 활용:} 오토로더(Autoloader)와 같은 기능을 통해 파일을 읽으면 \texttt{_metadata}라는 숨겨진 필드가 생성됩니다. 이 필드에는 파일 경로, 이름, 크기 등 다양한 메타데이터가 포함됩니다.
+    \item \textbf{파일 이름에서 날짜 파싱:} \texttt{_metadata.file_name}에서 정규 표현식(Regular Expression)이나 문자열 함수(replace, to_date)를 사용하여 날짜를 추출하고, 이를 새로운 \texttt{update_date} 컬럼으로 추가합니다.
+    \item \textbf{파티셔닝:} 추출된 날짜 컬럼을 기준으로 테이블을 파티셔닝하여 쿼리 성능을 향상시킬 수 있습니다.
+\end{itemize}
+
+\begin{tcolorbox}[example={파일 이름에서 날짜 추출 예시 (SQL)}]
+\begin{lstlisting}[language=SQL, caption=파일 이름에서 날짜 추출]
+CREATE TABLE my_data (
+  -- 기존 컬럼들
+  update_date DATE GENERATED ALWAYS AS (
+    TO_DATE(REGEXP_EXTRACT(_metadata.file_name, '(\\d{4}-\\d{2}-\\d{2})'), 'yyyy-MM-dd')
+  )
+) USING DELTA
+PARTITIONED BY (update_date);
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsubsection{Kafka 스트리밍 데이터 처리}
+Kafka 서버에서 센서 데이터를 읽어와 처리하고 Delta 테이블에 저장하는 과정입니다.
+
+\begin{itemize}
+    \item \textbf{Kafka 스트림 읽기:} Kafka 스트림은 키-값(Key-Value) 쌍으로 데이터를 전달하며, \texttt{value} 필드에 JSON 형식의 센서 데이터가 포함됩니다.
+    \item \textbf{JSON 파싱:} \texttt{value} 필드를 문자열로 캐스팅한 후, \texttt{from_json} 함수를 사용하여 JSON 데이터를 구조화된 컬럼으로 파싱합니다.
+    \item \textbf{중복 제거 및 증분 처리:} \texttt{dropDuplicates()}와 \texttt{ID}, \texttt{timestamp} 컬럼을 사용하여 정확히 한 번(Exactly-Once) 처리를 보장합니다.
+    \item \textbf{\texttt{availableNow} 트리거:} \texttt{trigger(availableNow=True)}는 스트림이 현재 사용 가능한 모든 레코드를 마이크로 배치(micro-batches)로 처리하고 중지하도록 합니다. 이는 \texttt{once=True} (현재는 deprecated)와 유사하지만, 대규모 데이터를 더 효율적으로 처리합니다.
+    \item \textbf{체크포인팅:} 스트리밍 쿼리의 상태를 저장하는 체크포인트 위치를 지정하여, 스트림이 중단되더라도 중단된 지점부터 다시 시작할 수 있도록 내결함성을 확보합니다.
+\end{itemize}
+
+\begin{tcolorbox}[example={Kafka 스트리밍 처리 예시}]
+\begin{lstlisting}[language=Python, caption=Kafka 스트리밍 처리]
+from pyspark.sql.functions import from_json, col
+from pyspark.sql.types import StructType, StringType, LongType, DoubleType
+
+# Kafka 서버 IP 주소 및 토픽 설정
+kafka_bootstrap_servers = "your_kafka_ip:9092"
+kafka_topic = "sensor_data"
+
+# 센서 데이터 스키마 정의
+sensor_schema = StructType() \
+  .add("user_id", LongType()) \
+  .add("device_id", LongType()) \
+  .add("steps", LongType()) \
+  .add("calories", DoubleType()) \
+  .add("timestamp", LongType())
+
+# Kafka 스트림 읽기
+kafka_df = spark.readStream \
+  .format("kafka") \
+  .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
+  .option("subscribe", kafka_topic) \
+  .load()
+
+# JSON 값 파싱 및 컬럼 추출
+parsed_df = kafka_df.selectExpr("CAST(value AS STRING)") \
+  .select(from_json(col("value"), sensor_schema).alias("data")) \
+  .select("data.*")
+
+# 중복 제거 (ID와 타임스탬프 기반)
+processed_df = parsed_df.dropDuplicates(["user_id", "timestamp"])
+
+# Delta 테이블에 스트리밍 쓰기
+query = processed_df.writeStream \
+  .format("delta") \
+  .outputMode("append") \
+  .option("checkpointLocation", "/mnt/your_volume/checkpoints/sensor_data") \
+  .trigger(availableNow=True) \
+  .toTable("sensor_data_stream_table")
+
+# 스트림 시작 (실제 환경에서는 query.awaitTermination() 사용)
+# query.start()
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsubsection{스트리밍 관련 이론 질문}
+\begin{itemize}
+    \item \textbf{초기 위치 (Initial Position):} Kafka와 같은 스트리밍 소스에서 데이터를 읽기 시작할 위치를 제어합니다 (예: \texttt{earliest} - 가장 오래된 레코드부터, \texttt{latest} - 가장 최신 레코드부터). 이는 Kafka의 데이터 보존 기간(retention date)과 관련이 있습니다.
+    \item \textbf{체크포인트 위치 (Checkpoint Location):} Spark 스트리밍이 처리 상태를 저장하는 볼륨 내의 경로입니다. 스트림이 중단되면 이 위치에서 마지막으로 처리된 상태를 로드하여 중단된 지점부터 다시 시작할 수 있습니다.
+    \item \textbf{트리거 (Trigger) 및 처리 시간 (Processing Time):}
+    \begin{itemize}
+        \item \textbf{트리거:} 스트리밍 쿼리가 언제 실행될지 정의합니다. \texttt{processingTime='10 seconds'}는 10초마다 스트림을 실행하도록 지시합니다. \texttt{availableNow=True}는 현재 사용 가능한 모든 데이터를 한 번 처리하고 중지합니다.
+        \item \textbf{처리 시간:} 트리거의 한 종류로, 지정된 시간 간격마다 스트림을 실행합니다.
+    \end{itemize}
+\end{itemize}
+
+\subsection{이미지 데이터 처리 및 UDF 활용}
+
+\subsubsection{이미지 데이터 읽기 및 사용자 ID 추출}
+클라우드 스토리지에 저장된 이미지 파일을 읽고, 파일 이름에서 사용자 ID를 추출하여 컬럼으로 추가하는 과정입니다.
+
+\begin{itemize}
+    \item \textbf{\texttt{COPY INTO} 명령어:} SQL 기반으로 클라우드 스토리지에서 Delta 테이블로 데이터를 증분적으로 복사하는 데 사용됩니다. 오토로더의 SQL 버전이라고 볼 수 있습니다.
+    \item \textbf{파일 이름에서 사용자 ID 추출:} \texttt{_metadata.file_name}에서 정규 표현식을 사용하여 사용자 ID를 추출하고, 이를 정수형 컬럼으로 변환합니다.
+    \item \textbf이미지 데이터 표시:} 데이터브릭스 서버리스 환경에서는 \texttt{display()} 명령어가 이미지 데이터를 자동으로 렌더링하지 않을 수 있으므로, Pillow와 같은 라이브러리를 사용하여 이미지를 직접 열고 표시해야 합니다.
+\end{itemize}
+
+\begin{tcolorbox}[example={이미지 데이터 읽기 및 사용자 ID 추출 (SQL)}]
+\begin{lstlisting}[language=SQL, caption=이미지 데이터 읽기 및 사용자 ID 추출]
+COPY INTO image_data_table
+FROM (SELECT
+        _metadata.file_path AS image_path,
+        REGEXP_EXTRACT(_metadata.file_name, 'user_(\\d+)\\.png', 1) + 1 AS user_id, -- 예시: user_id 추출 및 +1
+        _metadata.file_name AS image_filename
+      FROM 's3://your-bucket/images/')
+FILEFORMAT = CSV -- 또는 IMAGE
+PATTERN = '.*\\.png'
+FORMAT_OPTIONS ('header' = 'true')
+COPY_OPTIONS ('mergeSchema' = 'true');
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsubsection{이미지 반전 처리 (PySpark UDF)}
+PySpark UDF(User Defined Function)를 사용하여 이미지 데이터를 처리하고 반전시키는 과정입니다.
+
+\begin{itemize}
+    \item \textbf{Pillow 라이브러리 활용:} Python의 이미지 처리 라이브러리인 Pillow(PIL)를 사용하여 이미지를 로드하고 반전시킵니다.
+    \item \textbf{UDF 정의:} 이미지 데이터를 입력받아 반전된 이미지를 반환하는 Python 함수를 정의합니다.
+    \item \textbf{\texttt{for_each} 또는 \texttt{withColumn} + UDF:}
+    \begin{itemize}
+        \item \textbf{\texttt{for_each}:} 데이터프레임의 각 행에 대해 정의된 함수를 적용합니다. 이 경우, 함수 내에서 이미지를 직접 저장하거나 표시하는 로직을 포함할 수 있습니다.
+        \item \textbf{\texttt{withColumn} + Spark UDF:} Python 함수를 Spark UDF로 등록한 후, \texttt{withColumn}을 사용하여 새로운 컬럼에 반전된 이미지 데이터를 저장할 수 있습니다. 이 방법은 Spark의 최적화 기능을 활용할 수 있어 대규모 데이터 처리 시 더 효율적입니다.
+    \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[example={이미지 반전 UDF 예시}]
+\begin{lstlisting}[language=Python, caption=이미지 반전 UDF]
+from PIL import Image
+import io
+import base64
+from pyspark.sql.functions import udf, col
+from pyspark.sql.types import BinaryType
+
+# 이미지 반전 함수 정의
+def invert_image(image_bytes):
+    if image_bytes is None:
+        return None
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        inverted_image = Image.eval(image, lambda x: 255 - x)
+        output_buffer = io.BytesIO()
+        inverted_image.save(output_buffer, format="PNG") # 원본 이미지 형식 유지
+        return output_buffer.getvalue()
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        return None
+
+# UDF 등록
+invert_image_udf = udf(invert_image, BinaryType())
+
+# 데이터프레임에 UDF 적용
+# 'image_content' 컬럼에 이미지의 바이너리 데이터가 있다고 가정
+inverted_df = image_df.withColumn("inverted_image_content", invert_image_udf(col("image_content")))
+
+# forEach를 사용하여 각 행에 함수 적용 (예시)
+# def process_and_save_inverted_image(row):
+#     inverted_bytes = invert_image(row.image_content)
+#     if inverted_bytes:
+#         # inverted_bytes를 파일로 저장하거나 다른 처리 수행
+#         pass
+# image_df.foreach(process_and_save_inverted_image)
+\end{lstlisting}
+\end{tcolorbox}
+
+\subsection{데이터 로딩 및 아키텍처 이론}
+
+\subsubsection{증분 데이터 로딩 (Incremental Data Loading)의 장점}
+\begin{itemize}
+    \item \textbf{효율성:} 전체 데이터를 다시 로드하는 대신 변경된 부분만 처리하여 리소스 사용량과 처리 시간을 줄입니다.
+    \item \textbf{실시간/준실시간 처리:} 최신 데이터를 빠르게 반영하여 실시간 분석 및 의사결정을 지원합니다.
+    \textbf{변경 데이터 캡처 (CDC, Change Data Capture):} Delta Lake는 변경 데이터 피드(Change Data Feed) 기능을 통해 테이블의 변경 사항(삽입, 업데이트, 삭제)을 기록하고 이를 스트림으로 발행할 수 있어 효율적인 CDC를 가능하게 합니다.
+\end{itemize}
+
+\subsubsection{스트리밍 처리와 배치 처리의 장단점}
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{lll}
+\toprule
+\textbf{특징} & \textbf{스트리밍 처리 (Streaming Processing)} & \textbf{배치 처리 (Batch Processing)} \\
+\midrule
+\textbf{데이터 처리 방식} & 실시간/준실시간으로 지속적인 데이터 흐름 처리 & 일정 시간 동안 축적된 대규모 데이터를 한 번에 처리 \\
+\textbf{지연 시간} & 매우 낮음 (수 밀리초 ~ 수 초) & 높음 (수 분 ~ 수 시간) \\
+\textbf{리소스 사용} & 지속적으로 리소스 사용, 효율적인 메모리 관리 필요 & 특정 시간 동안 집중적으로 리소스 사용 \\
+\textbf{내결함성} & 체크포인팅, 아이뎀포턴트 싱크로 \texttt{Exactly-Once} 처리 가능 & 일반적으로 재시작 시 전체 재처리 \\
+\textbf{복잡성} & \texttt{Exactly-Once} 처리, 상태 관리 등 복잡성 높음 & 상대적으로 단순 \\
+\textbf{주요 사용처} & 실시간 대시보드, 이상 감지, 사기 탐지 & 월말 보고서, 대규모 데이터 변환 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\subsubsection{작업 스케줄링 및 오케스트레이터}
+\begin{itemize}
+    \item \textbf{목적:} 여러 데이터 처리 작업(노트북, SQL 쿼리, 스트리밍 작업 등)을 논리적인 순서로 연결하고 실행을 자동화하여 데이터 파이프라인을 구축합니다.
+    \item \textbf{데이터브릭스 워크플로우/파이프라인:} 데이터브릭스 워크플로우(Workflows) 또는 Delta Live Tables(DLT)와 같은 파이프라인 기능을 사용하여 DAG(Directed Acyclic Graph) 형태로 작업을 정의하고 오케스트레이션할 수 있습니다.
+    \item \textbf{메달리온 아키텍처 (Medallion Architecture):}
+    \begin{itemize}
+        \item \textbf{브론즈 (Bronze) 계층:} 원본 데이터를 거의 변경 없이 저장하는 초기 계층입니다. 모든 원본 데이터의 완전한 기록을 보존합니다.
+        \item \textbf{실버 (Silver) 계층:} 브론즈 계층의 데이터를 정제하고 변환하여 비즈니스 규칙을 적용한 계층입니다. 중복 제거, 결측값 처리, 데이터 형식 통일 등이 이루어집니다.
+        \item \textbf{골드 (Gold) 계층:} 실버 계층의 데이터를 특정 비즈니스 요구사항(예: 보고서, 대시보드, ML 모델)에 맞게 집계하고 최적화한 최종 계층입니다.
+    \end{itemize}
+    이러한 계층 구조는 데이터 품질을 향상시키고, 데이터 소비자가 쉽게 접근할 수 있도록 합니다. 각 계층은 별도의 노트북이나 작업을 통해 처리되며, 워크플로우로 연결됩니다.
+\end{itemize}
+
+\newpage
+\section*{체크리스트}
+
+이 체크리스트를 활용하여 학습 내용을 점검하고 시험을 준비하세요.
+
+\begin{itemize}
+    \item \textbf{플랫폼 및 아키텍처 이해}
+    \begin{itemize}
+        \item \_ Databricks의 4가지 주요 투자 영역을 설명할 수 있는가?
+        \item \_ Lakehouse 아키텍처의 장점과 기존 데이터 레이크/웨어하우스와의 차이점을 이해하는가?
+    \end{itemize}
+    \item \textbf{주요 신규 기능}
+    \begin{itemize}
+        \item \_ Lakebase의 스토리지/컴퓨트 분리, 브랜칭, 시간 여행 개념을 설명할 수 있는가?
+        \item \_ Databricks One이 비즈니스 사용자에게 제공하는 가치를 이해하는가?
+        \item \_ Apps가 대시보드와 다른 점(양방향 소통)을 설명할 수 있는가?
+        \item \_ AIBI Genie의 연구 모드와 문서 업로드 기능을 이해하는가?
+        \item \_ AI Parse Document의 활용 사례를 설명할 수 있는가?
+        \_ ABAC(Attribute-Based Access Control)이 RBAC보다 강력한 이유를 설명할 수 있는가?
+        \item \_ 멀티 스테이트먼트 트랜잭션과 저장 프로시저의 필요성을 이해하는가?
+        \item \_ 공간 SQL(Spatial SQL)의 활용 분야를 아는가?
+        \item \_ LakeFlow Connect와 LakeFlow Designer의 역할을 설명할 수 있는가?
+    \end{itemize}
+    \item \textbf{퀴즈 2 핵심 개념}
+    \begin{itemize}
+        \item \_ \texttt{GENERATED ALWAYS AS}를 이용한 컬럼 생성 방법을 아는가?
+        \item \_ Spark 최적화의 4가지 S(Skew, Shuffles, Spills, Small Files)를 아는가?
+        \_ Delta Lake의 시간 여행, 파티션 프루닝, Z-오더링, 리퀴드 클러스터링을 이해하는가?
+        \item \_ \texttt{DISTINCT} 및 \texttt{dropDuplicates()}를 이용한 중복 제거 방법을 아는가?
+        \item \_ 노트북 위젯을 이용한 쿼리 파라미터화 방법을 아는가?
+        \item \_ 스트리밍의 내결함성(체크포인팅, 아이뎀포턴트 싱크)을 이해하는가?
+        \item \_ 브로드캐스트 변수의 특징(불변성, 로컬 복사)을 아는가?
+        \item \_ \texttt{repartition()}과 \texttt{coalesce()}의 차이점을 아는가?
+        \item \_ \texttt{explode()} 함수를 이용한 배열 컬럼 처리 방법을 아는가?
+        \item \_ \texttt{take()}와 \texttt{collect()}의 차이점과 주의사항을 아는가?
+        \item \_ MLflow 모델 레지스트리 및 \texttt{autolog}의 목적을 아는가?
+        \item \_ 하이퍼파라미터 최적화(Optuna) 및 차원 축소(PCA) 개념을 아는가?
+        \item \_ 불균형 데이터셋 처리 기법(오버/언더샘플링, SMOTE)을 아는가?
+    \end{itemize}
+    \item \textbf{과제 3 핵심 개념}
+    \begin{itemize}
+        \item \_ Kinesis와 Kafka의 주요 차이점을 설명할 수 있는가?
+        \item \_ \texttt{_metadata} 필드에서 파일 정보를 추출하는 방법을 아는가?
+        \item \_ SCD Type 1과 Type 2의 차이점과 \texttt{MERGE INTO}를 이용한 구현 방법을 아는가?
+        \item \_ Kafka 스트림을 읽고 JSON을 파싱하여 Delta 테이블에 쓰는 과정을 이해하는가?
+        \item \_ \texttt{availableNow} 트리거와 체크포인트 위치의 중요성을 아는가?
+        \item \_ \texttt{COPY INTO} 명령어를 이용한 이미지 데이터 수집 방법을 아는가?
+        \_ PySpark UDF를 이용한 이미지 처리(예: 반전) 방법을 아는가?
+        \item \_ 증분 데이터 로딩의 장점과 메달리온 아키텍처를 설명할 수 있는가?
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section*{FAQ (자주 묻는 질문)}
+
+\begin{itemize}
+    \item \textbf{Q: Lakebase는 기존 PostgreSQL과 무엇이 다른가요?}
+    \textbf{A:} Lakebase는 클라우드 환경에 최적화되어 스토리지와 컴퓨트가 분리됩니다. 이는 컴퓨트 자원을 워크로드에 따라 동적으로 확장/축소하고, 사용하지 않을 때는 0으로 줄여 비용을 절감할 수 있게 합니다. 또한, Git과 유사한 브랜칭 기능을 제공하여 개발 및 테스트 환경 관리가 용이합니다.
+
+    \item \textbf{Q: Databricks Apps와 대시보드의 주요 차이점은 무엇인가요?}
+    \textbf{A:} 대시보드는 주로 데이터를 시각화하고 소비하는 단방향 도구입니다. 반면 Apps는 데이터를 시각화할 뿐만 아니라, 사용자가 데이터를 직접 수정하거나 플랫폼의 다른 서비스(예: ML 모델)와 상호작용할 수 있는 양방향 기능을 제공합니다. Apps는 더 복잡한 비즈니스 로직을 포함할 수 있습니다.
+
+    \item \textbf{Q: ABAC(Attribute-Based Access Control)이 RBAC(Role-Based Access Control)보다 더 강력한 이유는 무엇인가요?}
+    \textbf{A:} RBAC는 사용자의 '역할'에 따라 권한을 부여하는 반면, ABAC은 데이터 자체의 '속성'(예: PII 태그)에 따라 권한을 부여합니다. 이로 인해 ABAC은 새로운 데이터셋이나 컬럼이 추가될 때마다 역할을 수정할 필요 없이, 속성 기반 정책이 자동으로 적용되어 관리의 유연성과 확장성이 훨씬 뛰어납니다.
+
+    \item \textbf{Q: Spark 스트리밍에서 \texttt{availableNow=True}와 \texttt{once=True}의 차이점은 무엇인가요?}
+    \textbf{A:} \texttt{once=True}는 스트림이 시작될 때 사용 가능한 모든 데이터를 한 번에 처리하고 종료하는 방식이었습니다. \texttt{availableNow=True}는 \texttt{once=True}와 유사하게 현재 사용 가능한 모든 데이터를 처리하지만, 이를 마이크로 배치(micro-batches)로 나누어 처리함으로써 대규모 데이터 처리 시 Spark 워커 노드에 과부하가 걸리는 것을 방지하고 더 효율적인 처리를 가능하게 합니다. \texttt{once=True}는 현재 deprecated 되었습니다.
+
+    \item \textbf{Q: MLflow \texttt{collect()} 메서드를 사용할 때 주의할 점은 무엇인가요?}
+    \textbf{A:} \texttt{collect()}는 Spark 데이터프레임의 모든 데이터를 드라이버 노드의 메모리로 가져와 Python 리스트로 반환합니다. 데이터프레임의 크기가 매우 클 경우, 드라이버 노드의 메모리 부족(Out-Of-Memory) 오류를 유발할 수 있습니다. 디버깅 목적으로 소량의 데이터에만 사용하고, 대규모 데이터에는 \texttt{take(n)}과 같이 제한된 수의 행을 가져오는 메서드를 사용하는 것이 안전합니다.
+\end{itemize}
+
+\newpage
+\section*{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[title=\textbf{Databricks Lecture 14 핵심 요약}, colback=white, colframe=black!20!white, sharp corners, boxrule=0.5mm, breakable]
+
+\begin{tcolorbox}[summary={플랫폼 진화: 레이크하우스와 데이터 인텔리전스}]
+\begin{itemize}
+    \item \textbf{레이크하우스:} 데이터 레이크 + 데이터 웨어하우스 장점 결합. OLAP/OLTP 모두 지원.
+    \item \textbf{4대 투자 영역:} 데이터 인텔리전스, 거버넌스/보안/공유, AI 에이전트, 웨어하우징/마이그레이션/엔지니어링.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[summary={주요 신규 기능 (Public Preview/Upcoming)}]
+\begin{itemize}
+    \item \textbf{Lakebase (OLTP):} PostgreSQL 기반 트랜잭션 DB. 스토리지/컴퓨트 분리, 브랜칭, 시간 여행.
+    \item \textbf{Databricks One:} 비즈니스 사용자 통합 포털. 계정 수준 접근, 대시보드/Genie/Apps 통합.
+    \item \textbf{Apps:} 양방향 소통 가능 앱. 대시보드와 달리 데이터 수정 가능. 다양한 프레임워크 지원.
+    \item \textbf{AIBI Genie:} 자연어 질의 응답. '연구 모드'로 '왜' 질문 분석. 문서 업로드 지원.
+    \item \textbf{AI 에이전트:} Agent Bricks (AutoML 유사), 온라인 피처 스토어, AI Parse Document (SQL로 PDF 파싱).
+    \textbf{거버넌스:} ABAC (속성 기반 접근 제어), Iceberg 클라이언트 공유, 마켓플레이스 MCP 서버.
+    \item \textbf{엔지니어링:} 멀티 스테이트먼트 트랜잭션, 저장 프로시저, 공간 SQL, LakeFlow Connect/Designer.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[summary={퀴즈 2 & 과제 3 핵심 개념}]
+\begin{itemize}
+    \item \textbf{Spark 최적화:} 4S (Skew, Shuffles, Spills, Small Files), AQE.
+    \item \textbf{Delta Lake:} 시간 여행, 파티션 프루닝, Z-오더링, 리퀴드 클러스터링.
+    \item \textbf{스트리밍:} 체크포인팅, 아이뎀포턴트 싱크, \texttt{availableNow} 트리거, 초기 위치.
+    \item \textbf{SQL/DataFrame:} \texttt{GENERATED ALWAYS AS}, \texttt{DISTINCT}, \texttt{dropDuplicates()}, \texttt{MERGE INTO}, \texttt{explode()}, \texttt{take()} vs \texttt{collect()}.
+    \item \textbf{ML:} 하이퍼파라미터 최적화 (Optuna), 차원 축소 (PCA), 불균형 데이터셋 처리 (SMOTE), MLflow 모델 레지스트리.
+    \item \textbf{데이터 엔지니어링:} Kinesis vs Kafka, SCD Type 1/2, \texttt{_metadata} 활용, PySpark UDF, 메달리온 아키텍처.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[caution={핵심 주의사항}]
+\begin{itemize}
+    \item \textbf{기능 출시 단계:} 베타 $\rightarrow$ 프라이빗 프리뷰 $\rightarrow$ 퍼블릭 프리뷰 $\rightarrow$ GA. GA 단계에서 프로덕션 사용 권장.
+    \item \textbf{\texttt{collect()} 위험성:} 대규모 데이터프레임에서 메모리 부족 유발 가능. 디버깅용으로만 사용.
+    \item \textbf{Lakebase 비용:} 컴퓨트 자원 사용량에 따라 비용 발생. 사용하지 않을 때 0으로 스케일 다운하여 비용 절감.
+\end{itemize}
+\end{tcolorbox}
+
+\end{tcolorbox}
+
+\end{document}

@@ -1,0 +1,1047 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{kotex, geometry, hyperref, xcolor, tcolorbox, booktabs, graphicx, amsmath, amssymb, listings, setspace, fancyhdr, adjustbox}
+
+\onehalfspacing
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.2}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numbersep=6pt,
+  frame=single,
+  captionpos=b,
+  commentstyle=\color{gray},
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  showstringspaces=false
+}
+
+\hypersetup{
+  pdftitle={CSCI89 Lecture 3: 순환 신경망과 자연어 처리},
+  pdfauthor={UIUC Student},
+  pdfsubject={CSCI E-89: Introduction to Artificial Intelligence}
+}
+
+% Define colors for tcolorbox
+\definecolor{myblue}{RGB}{220,230,240}
+\definecolor{mygreen}{RGB}{220,240,230}
+\definecolor{myred}{RGB}{240,220,220}
+\definecolor{myyellow}{RGB}{240,240,220}
+
+% Custom tcolorboxes
+\newtcolorbox{summarybox}[1]{
+  colback=myblue!5!white,
+  colframe=myblue!75!black,
+  fonttitle=\bfseries,
+  title=#1,
+  boxsep=5pt,
+  arc=4pt,
+  boxrule=1pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+}
+
+\newtcolorbox{cautionbox}[1]{
+  colback=myred!5!white,
+  colframe=myred!75!black,
+  fonttitle=\bfseries,
+  title=#1,
+  boxsep=5pt,
+  arc=4pt,
+  boxrule=1pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+}
+
+\newtcolorbox{examplebox}[1]{
+  colback=mygreen!5!white,
+  colframe=mygreen!75!black,
+  fonttitle=\bfseries,
+  title=#1,
+  boxsep=5pt,
+  arc=4pt,
+  boxrule=1pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+}
+
+\newtcolorbox{tipbox}[1]{
+  colback=myyellow!5!white,
+  colframe=myyellow!75!black,
+  fonttitle=\bfseries,
+  title=#1,
+  boxsep=5pt,
+  arc=4pt,
+  boxrule=1pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{} % Clear all header and footer fields
+\fancyhead[L]{CSCI89 Lecture 3: 순환 신경망과 자연어 처리}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\begin{document}
+
+\newpage
+\section*{개요}
+본 문서는 CSCI E-89 강의의 세 번째 내용을 통합하여 순환 신경망(RNN)의 기본 개념부터 자연어 처리(NLP)의 핵심 기술까지 다룹니다. 특히 RNN의 구조, 파라미터 계산, LSTM의 작동 원리, 그리고 텍스트 데이터를 모델에 입력하기 위한 전처리 기법(토큰화, 어간 추출, 표제어 추출, 임베딩)을 상세히 설명합니다. 실제 텍스트 분류 예제를 통해 이론적 지식이 어떻게 적용되는지 보여주며, 비전공자도 쉽게 이해할 수 있도록 풍부한 설명과 예시를 제공합니다.
+
+\newpage
+\section*{용어 정리}
+다음 표는 본 문서에서 사용되는 주요 용어들을 정리하고 쉽게 설명합니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+순환 신경망 & 시퀀스(순서가 있는) 데이터를 처리하는 데 특화된 신경망. & Recurrent Neural Network (RNN) & 이전 단계의 정보를 기억하여 다음 단계에 활용 \\
+장단기 기억망 & RNN의 한 종류로, 장기 의존성 문제를 해결하기 위해 고안된 복잡한 구조. & Long Short-Term Memory (LSTM) & 셀 상태(Cell State)와 게이트(Gate)를 통해 정보 흐름 제어 \\
+자연어 처리 & 컴퓨터가 인간의 언어를 이해하고 생성하도록 하는 인공지능 분야. & Natural Language Processing (NLP) & 텍스트 분류, 번역, 요약 등 다양한 응용 \\
+토큰화 & 텍스트를 의미 있는 작은 단위(토큰)로 나누는 과정. & Tokenization & 단어, 문장, 문자 등이 토큰이 될 수 있음 \\
+어간 추출 & 단어의 접미사나 접두사를 제거하여 단어의 '어간'을 찾는 과정. & Stemming & 결과가 실제 단어가 아닐 수 있으며, 차원 축소에 유용 \\
+표제어 추출 & 단어를 사전적 의미를 가지는 '표제어'로 변환하는 과정. & Lemmatization & 어간 추출보다 정확하며, 품사 정보 활용 \\
+임베딩 & 단어나 문장 같은 이산적인 데이터를 연속적인 숫자 벡터로 변환하는 기법. & Embedding & 고차원 희소 벡터를 저차원 밀집 벡터로 효율적으로 표현 \\
+원-핫 인코딩 & 단어를 고유한 위치에 1을, 나머지는 0을 가지는 벡터로 표현하는 방식. & One-Hot Encoding & 희소(Sparse)하며, 단어 간 유사성 표현 어려움 \\
+희소 벡터 & 대부분의 요소가 0인 벡터. & Sparse Vector & 메모리 비효율적, 계산 낭비 발생 가능 \\
+밀집 벡터 & 대부분의 요소가 0이 아닌 벡터. & Dense Vector & 정보 압축 및 효율적인 계산 가능 \\
+OOV 토큰 & 모델 학습 시 사용된 어휘 사전에 없는 단어를 나타내는 특별한 토큰. & Out-Of-Vocabulary (OOV) Token & 사전에 없는 단어 처리 방식 중 하나 \\
+드롭아웃 & 신경망 훈련 중 일부 뉴런을 무작위로 비활성화하여 과적합을 방지하는 기법. & Dropout & 모델의 일반화 성능 향상 \\
+이진 교차 엔트로피 & 이진 분류 문제에서 모델의 예측 확률과 실제 레이블 간의 차이를 측정하는 손실 함수. & Binary Cross-Entropy & 로지스틱 회귀와 같은 이진 분류 모델에 적합 \\
+시그모이드 함수 & 입력 값을 0과 1 사이의 확률 값으로 변환하는 활성화 함수. & Sigmoid Function & 이진 분류 모델의 출력 레이어에 주로 사용 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section*{핵심 개념·원리}
+
+\subsection{순환 신경망 (Recurrent Neural Network, RNN)의 이해}
+\begin{summarybox}{순환 신경망 (RNN) 핵심 요약}
+RNN은 시퀀스 데이터를 처리하는 데 특화된 신경망으로, 이전 단계의 정보를 '기억'하여 현재 단계의 예측에 활용합니다. 이는 텍스트, 음성, 시계열 데이터와 같이 순서가 중요한 데이터에 특히 유용합니다.
+\end{summarybox}
+
+\subsubsection{RNN의 기본 구조와 작동 원리}
+RNN은 일반적인 신경망(피드포워드 신경망)과 달리, 은닉층의 출력이 다음 시점의 은닉층 입력으로 다시 들어가는 '순환(recurrent)' 연결을 가집니다. 이 순환 연결 덕분에 RNN은 시퀀스 데이터의 시간적 의존성을 학습할 수 있습니다.
+
+\begin{examplebox}{RNN의 직관적 비유: 문장 읽기}
+우리가 문장을 읽을 때, 각 단어의 의미는 그 앞의 단어들과의 관계 속에서 이해됩니다. 예를 들어 "나는 사과를 먹었다"라는 문장에서 '먹었다'는 '사과'와 연결되어 의미를 완성합니다. RNN도 이와 유사하게, '사과'라는 단어를 처리할 때 '나는'이라는 정보와 '사과를'이라는 정보를 함께 고려하여 '먹었다'를 예측하거나 이해합니다.
+\end{examplebox}
+
+\subsubsection{Simple RNN의 파라미터 계산}
+RNN 모델의 복잡성을 이해하는 한 가지 방법은 학습 가능한 파라미터(가중치와 바이어스)의 수를 계산하는 것입니다. 이는 모델의 크기와 계산 비용을 가늠하는 데 중요합니다.
+
+강의에서는 `SimpleRNN(2, input_shape=(None, 4))`와 같은 Keras 코드를 예시로 들었습니다.
+\begin{itemize}
+    \item `SimpleRNN(2)`: 이 순환 레이어에는 2개의 뉴런(또는 은닉 상태)이 있습니다. 이는 출력 `y` 벡터가 2차원임을 의미합니다.
+    \item `input_shape=(None, 4)`: 입력 데이터의 형태를 나타냅니다.
+        \begin{itemize}
+            \item `None`: 시간 스텝(time steps)의 수는 가변적임을 의미합니다. 훈련 중 네트워크가 자동으로 시간 스텝 수를 파악합니다.
+            \item `4`: 각 시간 스텝에서 입력 `x` 벡터의 차원이 4임을 의미합니다. 즉, 각 시점에 4개의 특성(feature)이 입력됩니다.
+        \end{itemize}
+\end{itemize}
+
+\begin{tcolorbox}[title=\textbf{SimpleRNN 파라미터 계산 공식}, colback=myblue!10!white, colframe=myblue!75!black]
+SimpleRNN 레이어의 총 파라미터 수는 다음과 같이 계산됩니다:
+$$ \text{총 파라미터 수} = (\text{입력 특성 수} \times \text{은닉 뉴런 수}) + (\text{은닉 뉴런 수} \times \text{은닉 뉴런 수}) + \text{은닉 뉴런 수} $$
+여기서:
+\begin{itemize}
+    \item \textbf{입력 특성 수}: 각 시간 스텝에서 들어오는 입력 벡터의 차원 (예: 4).
+    \item \textbf{은닉 뉴런 수}: RNN 레이어 내의 뉴런 수 (예: 2).
+    \item \textbf{은닉 뉴런 수} (세 번째 항): 각 뉴런에 대한 바이어스(bias) 수.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{examplebox}{SimpleRNN 파라미터 계산 예시}
+`SimpleRNN(2, input_shape=(None, 4))`의 경우:
+\begin{itemize}
+    \item 입력 특성 수 = 4
+    \item 은닉 뉴런 수 = 2
+\end{itemize}
+계산:
+\begin{itemize}
+    \item 입력에서 은닉층으로의 가중치: $4 \times 2 = 8$
+    \item 이전 은닉 상태에서 현재 은닉층으로의 가중치: $2 \times 2 = 4$
+    \item 바이어스: $2$ (각 은닉 뉴런에 하나씩)
+\end{itemize}
+총 파라미터 수 = $8 + 4 + 2 = 14$
+
+이는 각 뉴런이 4개의 입력(`x` 벡터)과 2개의 순환 입력(`y` 벡터)을 받고, 1개의 바이어스를 가지므로 $(4+2+1) \times 2 = 14$로도 계산할 수 있습니다.
+\end{examplebox}
+
+\subsubsection{RNN의 다양한 입출력 아키텍처}
+RNN은 시퀀스 데이터를 처리하는 방식에 따라 다양한 입출력 구조를 가질 수 있습니다. Keras에서는 `return_sequences` 옵션을 통해 출력을 제어합니다.
+
+\begin{itemize}
+    \item \textbf{다대다 (Many-to-Many):} 입력 시퀀스에 대해 출력 시퀀스를 생성합니다.
+        \begin{itemize}
+            \item 예시: 기계 번역 (입력 문장 -> 출력 문장).
+            \item `return_sequences=True` (기본값)로 설정하면 각 시간 스텝의 출력을 모두 반환합니다.
+        \end{itemize}
+    \item \textbf{다대일 (Many-to-One):} 입력 시퀀스에 대해 단일 출력을 생성합니다.
+        \begin{itemize}
+            \item 예시: 감성 분석 (입력 문장 -> 긍정/부정).
+            \item `return_sequences=False`로 설정하면 마지막 시간 스텝의 출력만 반환합니다.
+        \end{itemize}
+    \item \textbf{일대다 (One-to-Many):} 단일 입력에 대해 출력 시퀀스를 생성합니다.
+        \begin{itemize}
+            \item 예시: 이미지 캡셔닝 (입력 이미지 -> 이미지 설명 문장).
+            \item 이 경우, 단일 입력 후에는 '가짜(fake) 0 벡터'를 입력으로 넣어 시퀀스를 생성합니다.
+        \end{itemize}
+\end{itemize}
+
+\begin{cautionbox}{주의: RNN의 출력과 `return_sequences`}
+RNN 레이어는 기본적으로 각 시간 스텝마다 출력을 생성합니다. `return_sequences=True`는 이 모든 출력을 다음 레이어로 전달하는 반면, `return_sequences=False`는 마지막 시간 스텝의 출력만 전달합니다. 이는 모델의 목적에 따라 적절히 선택해야 합니다.
+\end{cautionbox}
+
+\subsection{인코더-디코더 (Encoder-Decoder) 아키텍처}
+\begin{summarybox}{인코더-디코더 핵심 요약}
+인코더-디코더는 입력 시퀀스를 고정된 크기의 '컨텍스트 벡터'로 압축하는 인코더와, 이 컨텍스트 벡터로부터 출력 시퀀스를 생성하는 디코더로 구성됩니다. 이는 정보 압축과 변환에 유용합니다.
+\end{summarybox}
+
+\subsubsection{정보 압축을 위한 병목 (Bottleneck)}
+인코더-디코더는 오토인코더(Autoencoder)의 한 형태로 볼 수 있으며, 특히 '병목(bottleneck)' 구조를 통해 정보 압축을 수행합니다.
+
+\begin{examplebox}{인코더-디코더의 비유: 요약과 확장}
+긴 문장(입력 시퀀스)을 읽고 핵심 아이디어(컨텍스트 벡터)를 한 문장으로 요약한 다음, 그 핵심 아이디어로부터 원래 문장과 유사하거나 다른 언어의 문장(출력 시퀀스)을 다시 작성하는 것과 같습니다. 핵심 아이디어가 바로 '병목'을 통과한 압축된 정보입니다.
+\end{examplebox}
+
+\begin{itemize}
+    \item \textbf{오토인코더 (Autoencoder):} 입력 데이터를 자기 자신으로 매핑하는 신경망입니다. 이 과정에서 중간에 저차원의 '병목' 레이어를 두어 데이터의 중요한 특징을 압축하여 학습합니다.
+        \begin{itemize}
+            \item \textbf{노이즈 제거 오토인코더 (Denoising Autoencoder):} 손상된 이미지나 노이즈가 포함된 텍스트를 입력으로 받아 원본 데이터를 복원하도록 훈련됩니다. 병목 레이어는 노이즈와 같은 중요하지 않은 정보를 걸러내고 핵심 정보만 압축하는 방법을 학습합니다.
+        \end{itemize}
+    \item \textbf{번역에서의 활용:} RNN 기반 인코더-디코더는 2014년부터 2017년까지 기계 번역의 지배적인 기술이었습니다.
+        \begin{itemize}
+            \item 인코더가 원어 문장(시퀀스)을 하나의 컨텍스트 벡터로 압축합니다.
+            \item 디코더가 이 컨텍스트 벡터로부터 대상 언어의 문장(시퀀스)을 생성합니다.
+            \item \textbf{한계:} 하나의 고정된 컨텍스트 벡터가 긴 문장의 모든 정보를 담기 어렵다는 '정보 병목' 문제가 있었습니다. 이는 나중에 어텐션 메커니즘(Attention Mechanism)을 사용하는 트랜스포머(Transformer) 모델로 해결됩니다.
+        \end{itemize}
+\end{itemize}
+
+\subsection{장단기 기억망 (Long Short-Term Memory, LSTM)의 이해}
+\begin{summarybox}{LSTM 핵심 요약}
+LSTM은 RNN의 '장기 의존성(long-term dependency)' 문제를 해결하기 위해 고안된 특수한 RNN 구조입니다. '셀 상태(Cell State)'와 '게이트(Gate)' 메커니즘을 통해 정보를 선택적으로 기억하거나 잊어버리면서 장기적인 패턴을 학습할 수 있습니다.
+\end{summarybox}
+
+\subsubsection{LSTM의 두 가지 기억: 셀 상태 (C)와 은닉 상태 (H)}
+LSTM은 두 가지 주요 '기억'을 가집니다.
+\begin{itemize}
+    \item \textbf{셀 상태 (Cell State, C):} 장기 기억의 역할을 합니다. 정보가 셀 상태를 따라 흐르면서 게이트에 의해 추가되거나 제거됩니다.
+    \item \textbf{은닉 상태 (Hidden State, H):} 단기 기억의 역할을 하며, 현재 시점의 출력과 다음 시점의 입력으로 사용됩니다.
+\end{itemize}
+
+\begin{tcolorbox}[title=\textbf{C와 H의 차원 관계}, colback=myblue!10!white, colframe=myblue!75!black]
+LSTM 구조 내에서 셀 상태(C)와 은닉 상태(H)는 항상 동일한 차원(dimension)을 가집니다. 이는 게이트를 통한 연산(요소별 곱셈, 덧셈)이 차원을 변경하지 않기 때문입니다.
+\end{tcolorbox}
+
+\begin{examplebox}{C와 H의 차원 관계 직관적 이해}
+LSTM 셀 내부의 연산들을 살펴보면, 셀 상태(C)와 은닉 상태(H)는 서로 더해지거나(summation), 요소별로 곱해지는(element-wise multiplication) 방식으로 상호작용합니다. 벡터의 덧셈이나 요소별 곱셈은 벡터의 차원을 변경하지 않습니다. 따라서, C와 H는 항상 같은 차원을 유지해야 합니다. 예를 들어, `LSTM(5)`라고 지정하면 C와 H 모두 5차원 벡터가 됩니다.
+\end{examplebox}
+
+\subsubsection{LSTM의 게이트 메커니즘}
+LSTM은 세 가지 주요 게이트를 통해 셀 상태의 정보 흐름을 제어합니다. 각 게이트는 시그모이드 활성화 함수를 사용하여 0과 1 사이의 값을 출력하며, 이는 정보의 '얼마나'를 통과시킬지 결정합니다.
+\begin{itemize}
+    \item \textbf{망각 게이트 (Forget Gate):} 이전 셀 상태에서 어떤 정보를 '잊어버릴지' 결정합니다.
+    \item \textbf{입력 게이트 (Input Gate):} 현재 입력과 이전 은닉 상태로부터 어떤 새로운 정보를 '셀 상태에 추가할지' 결정합니다.
+    \item \textbf{출력 게이트 (Output Gate):} 셀 상태를 기반으로 현재 시점의 은닉 상태(H)와 출력(Y)을 '얼마나 내보낼지' 결정합니다.
+\end{itemize}
+각 게이트는 독립적인 완전 연결(Fully Connected, Dense) 서브 네트워크로 구성되며, `LSTM(N)`에서 `N`은 각 서브 네트워크의 뉴런 수를 의미합니다. 따라서 `LSTM(N)`은 총 $4 \times N$개의 뉴런을 내부적으로 가집니다.
+
+\subsection{양방향 순환 신경망 (Bidirectional RNN/LSTM)}
+\begin{summarybox}{양방향 RNN/LSTM 핵심 요약}
+양방향 RNN/LSTM은 입력 시퀀스를 순방향과 역방향으로 모두 처리하여, 각 시점의 출력에 대해 과거와 미래의 모든 문맥 정보를 활용할 수 있도록 합니다. 이는 특히 텍스트와 같이 전체 문맥이 중요한 데이터에 유용합니다.
+\end{summarybox}
+
+\subsubsection{양방향 처리의 필요성}
+일반적인 RNN은 과거의 정보만을 기반으로 현재를 예측합니다. 하지만 많은 시퀀스 데이터, 특히 자연어에서는 미래의 정보(문장의 뒷부분)가 현재의 의미를 이해하는 데 중요할 수 있습니다.
+
+\begin{examplebox}{양방향 RNN의 비유: 문장 전체 읽기}
+독일어와 같이 문장의 부정어가 마지막에 오는 언어의 경우, 문장의 끝을 읽어야만 전체 문장이 긍정적인지 부정적인지 정확히 판단할 수 있습니다. 순방향으로만 읽는다면 문장 끝에 도달하기 전까지는 정확한 의미를 파악하기 어렵습니다. 양방향 RNN은 문장을 앞에서부터 읽고(순방향), 뒤에서부터도 읽어(역방향) 두 정보를 모두 활용하여 더 풍부한 문맥 이해를 가능하게 합니다.
+\end{examplebox}
+
+\subsubsection{구조와 파라미터 계산}
+양방향 RNN/LSTM은 두 개의 독립적인 RNN/LSTM 레이어를 가집니다. 하나는 입력 시퀀스를 순방향으로 처리하고, 다른 하나는 역방향으로 처리합니다. 두 레이어의 출력은 최종적으로 연결(concatenate)되어 다음 레이어의 입력으로 사용됩니다.
+
+\begin{tcolorbox}[title=\textbf{양방향 RNN/LSTM의 파라미터 및 출력 차원}, colback=myblue!10!white, colframe=myblue!75!black]
+\begin{itemize}
+    \item \textbf{파라미터 수:} 양방향 레이어는 두 개의 독립적인 단방향 레이어를 포함하므로, 단방향 레이어의 파라미터 수의 \textbf{정확히 두 배}가 됩니다.
+    \item \textbf{출력 차원:} 각 단방향 레이어의 출력이 연결되므로, 양방향 레이어의 출력 차원 또한 단방향 레이어 출력 차원의 \textbf{두 배}가 됩니다.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{examplebox}{양방향 LSTM 파라미터 계산 예시}
+만약 `LSTM(128)` 레이어가 8320개의 파라미터를 가진다면, `Bidirectional(LSTM(128))` 레이어는 $8320 \times 2 = 16640$개의 파라미터를 가집니다.
+
+이후에 연결되는 `Dense` 레이어의 파라미터는 단순히 두 배가 되지 않을 수 있습니다. 예를 들어, `Dense(1)` 레이어는 단일 바이어스를 가지므로, 양방향 LSTM의 출력이 2배가 되어 입력이 2배가 되더라도 바이어스는 하나만 추가되어 파라미터가 $32 \times 2 + 1 = 65$와 같이 계산됩니다.
+\end{examplebox}
+
+\subsection{자연어 처리 (Natural Language Processing, NLP) 개요}
+\begin{summarybox}{NLP 핵심 요약}
+NLP는 컴퓨터가 인간의 자연어를 이해하고, 해석하고, 생성할 수 있도록 하는 인공지능 분야입니다. 언어학적 지식과 인공지능 기술을 결합하여 다양한 언어 관련 문제를 해결합니다.
+\end{summarybox}
+
+\subsubsection{AI, 머신러닝, NLP의 관계}
+\begin{itemize}
+    \item \textbf{인공지능 (Artificial Intelligence, AI):} 인간의 지능을 모방하는 광범위한 분야입니다. 규칙 기반 시스템(하드코딩된 규칙)부터 복잡한 학습 알고리즘까지 모두 포함합니다.
+        \begin{itemize}
+            \item 예시: 의사가 특정 증상에 대한 처방 규칙을 컴퓨터에 입력하여 진단하는 시스템.
+        \end{itemize}
+    \item \textbf{머신러닝 (Machine Learning, ML):} 데이터와 결과(레이블)를 입력으로 받아 '규칙'을 스스로 학습하는 AI의 하위 분야입니다.
+        \begin{itemize}
+            \item 예시: 선형 회귀 모델이 데이터로부터 최적의 $\beta_0, \beta_1$ 계수를 학습하여 예측 규칙을 생성하는 것.
+        \end{itemize}
+    \item \textbf{자연어 처리 (NLP):} 언어학(언어의 구조, 의미)과 인공지능(특히 머신러닝, 딥러닝)이 결합된 다학제 분야입니다. 컴퓨터가 인간 언어를 이해하고 생성하도록 하는 것이 목표입니다.
+        \begin{itemize}
+            \item NLP는 때로는 언어학적 규칙(예: 단어를 어근 형태로 줄이는 규칙)을 하드코딩하여 사용하기도 하므로, 순수 머신러닝의 범주를 넘어 AI의 더 넓은 영역에 걸쳐 있습니다.
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{NLP의 도전 과제}
+인간의 언어는 모호하고, 문맥에 따라 의미가 달라지며, 배경 지식을 요구하는 경우가 많아 컴퓨터가 이해하기 매우 어렵습니다.
+\begin{itemize}
+    \item \textbf{모호성 (Ambiguity):} "Court to try shooting defendant." (법원이 피고를 총살하려 한다? 아니면 법원이 피고의 총격 사건을 심리한다?)와 같이 문장의 해석이 여러 가지일 수 있습니다.
+    \item \textbf{배경 지식 (Background Knowledge):} 특정 분야의 전문 지식이나 상식이 없으면 문장의 의미를 정확히 파악하기 어렵습니다.
+\end{itemize}
+
+\subsubsection{NLP의 주요 응용 분야}
+\begin{itemize}
+    \item \textbf{텍스트 분류 (Text Classification):} 스팸 메일 감지, 뉴스 기사 주제 분류, 감성 분석 (긍정/부정).
+    \item \textbf{개체명 인식 (Named Entity Recognition, NER):} 텍스트에서 사람 이름, 조직, 장소 등 고유한 개체를 식별합니다. (예: 번역 시 고유명사는 번역하지 않고 그대로 두는 것이 중요).
+    \item \textbf{감성 분석 (Sentiment Analysis):} 텍스트에 담긴 감정(긍정, 부정, 중립)을 파악합니다. (예: 영화 리뷰 분석). 비꼬는 표현(sarcasm) 등은 매우 어려운 문제입니다.
+    \item \textbf{정보 검색 (Information Retrieval):} 대규모 텍스트 데이터에서 관련성 높은 정보를 찾아냅니다. (예: 검색 엔진). TF-IDF, BM25 등의 기법이 사용됩니다.
+    \item \textbf{광학 문자 인식 (Optical Character Recognition, OCR):} 이미지 형태의 텍스트를 컴퓨터가 편집 가능한 텍스트로 변환합니다. (예: 문서 스캔).
+    \item \textbf{기계 번역 (Machine Translation):} 한 언어의 문장을 다른 언어로 번역합니다. (예: 구글 번역).
+    \item \textbf{텍스트 요약 (Text Summarization):} 긴 텍스트의 핵심 내용을 추출하여 짧은 요약문을 생성합니다.
+    \item \textbf{음성 인식 (Speech Recognition):} 음성 데이터를 텍스트로 변환합니다. (예: 음성 비서).
+    \item \textbf{질의응답 시스템 (Question Answering Systems):} 질문에 대한 답변을 텍스트에서 찾아 제공합니다. (예: "프랑스의 수도는?").
+    \item \textbf{챗봇 (Chatbots):} 사용자와 대화하며 질문에 답하거나 작업을 수행합니다. (예: ChatGPT). 질의응답 시스템과 유사하지만 대화의 연속성이 중요합니다.
+    \item \textbf{토픽 모델링 (Topic Modeling):} 텍스트 문서 집합에서 숨겨진 주제(topic)를 찾아내고, 각 문서가 어떤 주제로 구성되어 있는지 분석합니다. 비지도 학습의 일종입니다.
+    \item \textbf{임상 응용 (Clinical Applications):} 의료 문헌 분석, 증상 기반 질병 진단 지원 등 의료 분야에서의 NLP 활용.
+    \item \textbf{언어 생성 (Language Generation):} 인간과 유사한 자연스러운 텍스트를 생성합니다.
+\end{itemize}
+
+\newpage
+\section*{절차/방법: 텍스트 전처리 및 모델 구축}
+
+\subsection{텍스트 전처리 (Text Preprocessing) 과정}
+신경망에 텍스트를 입력하기 전에, 텍스트를 컴퓨터가 이해할 수 있는 형태로 변환하는 전처리 과정이 필수적입니다. 주요 단계는 토큰화, 어간 추출, 표제어 추출입니다.
+
+\subsubsection{토큰화 (Tokenization)}
+\begin{summarybox}{토큰화 핵심 요약}
+토큰화는 텍스트를 의미 있는 최소 단위인 '토큰(token)'으로 분할하는 과정입니다. 일반적으로 단어가 토큰이 되지만, 문장, 문자, N-그램 등 다양한 단위로 토큰화할 수 있습니다.
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{정의:} 텍스트를 개별 단위(토큰)로 분리하는 과정입니다.
+    \item \textbf{토큰의 종류:}
+        \begin{itemize}
+            \item \textbf{단어 토큰화 (Word Tokenization):} 가장 일반적인 형태로, 텍스트를 개별 단어로 나눕니다. 구두점도 별도의 토큰으로 처리될 수 있습니다.
+            \item \textbf{문장 토큰화 (Sentence Tokenization):} 텍스트를 개별 문장으로 나눕니다.
+            \item \textbf{N-그램 토큰화 (N-gram Tokenization):} N개의 연속된 단어를 하나의 토큰으로 간주합니다 (예: 2-그램은 두 단어).
+            \item \textbf{문자 토큰화 (Character Tokenization):} 텍스트를 개별 문자로 나눕니다.
+            \item \textbf{서브워드 토큰화 (Subword Tokenization):} 단어를 더 작은 의미 단위(서브워드)로 분할합니다. (예: 'un-happy'를 'un'과 'happy'로).
+        \end{itemize}
+    \item \textbf{불용어 (Stop Words):} 'the', 'a', 'is'와 같이 자주 등장하지만 텍스트의 핵심 의미를 파악하는 데 크게 기여하지 않는 단어들입니다. 텍스트 분류와 같은 작업에서는 불용어를 제거하는 것이 모델 성능 향상에 도움이 될 수 있습니다.
+\end{itemize}
+
+\begin{examplebox}{NLTK를 이용한 토큰화 예시}
+\texttt{NLTK} (Natural Language Toolkit) 라이브러리는 파이썬에서 텍스트를 토큰화하는 데 널리 사용됩니다.
+\begin{lstlisting}[language=Python, caption={NLTK 단어 토큰화 예시}, label={lst:nltk_word_tokenize}]
+import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+
+text = "Henry Ford's innovation profoundly impacted the automotive industry. He revolutionized mass production."
+
+# 단어 토큰화
+word_tokens = word_tokenize(text)
+print("단어 토큰:", word_tokens)
+# 출력: ['Henry', 'Ford', "'s", 'innovation', 'profoundly', 'impacted', 'the', 'automotive', 'industry', '.', 'He', 'revolutionized', 'mass', 'production', '.']
+
+# 문장 토큰화
+sent_tokens = sent_tokenize(text)
+print("문장 토큰:", sent_tokens)
+# 출력: ["Henry Ford's innovation profoundly impacted the automotive industry.", "He revolutionized mass production."]
+\end{lstlisting}
+\end{examplebox}
+\begin{tipbox}{라이브러리 사용 권장}
+직접 토큰화 로직을 구현하는 것보다 NLTK와 같은 라이브러리를 사용하는 것이 좋습니다. 라이브러리는 'can't'와 같은 축약형이나 구두점 처리 등 복잡한 예외 상황을 더 잘 처리합니다.
+\end{tipbox}
+
+\subsubsection{어간 추출 (Stemming)}
+\begin{summarybox}{어간 추출 핵심 요약}
+어간 추출은 단어의 접미사나 접두사를 제거하여 단어의 '어간(stem)'을 찾는 과정입니다. 이는 단어의 다양한 형태를 하나의 공통된 형태로 줄여 어휘 사전을 축소하고 모델의 차원을 줄이는 데 사용됩니다.
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{정의:} 단어의 형태학적 변형(예: running, runs, ran)을 무시하고 단어의 '어간'을 추출하는 기법입니다. 주로 접미사를 제거하는 방식으로 작동합니다.
+    \item \textbf{목적:} 어휘 사전에 포함될 단어의 수를 줄여 모델의 복잡성을 낮춥니다.
+    \item \textbf{특징:} 어간 추출의 결과는 종종 실제 사전에 없는 단어 형태일 수 있습니다. (예: 'electric' -> 'electr', 'octopus' -> 'octop').
+    \item \textbf{종류:}
+        \begin{itemize}
+            \item \textbf{Porter Stemmer (포터 스테머):} 1979년에 개발된 가장 유명한 어간 추출 알고리즘 중 하나입니다. 규칙 기반으로 접미사를 제거합니다. (예: 'transportation' -> 'transport', 'electric' -> 'electr').
+            \item \textbf{Snowball Stemmer (스노볼 스테머):} Porter Stemmer의 개선 버전으로, 여러 언어를 지원하며 정확도가 향상되었습니다.
+            \item \textbf{Lancaster Stemmer (랭커스터 스테머):} Porter Stemmer보다 더 공격적으로 단어를 자릅니다.
+        \end{itemize}
+\end{itemize}
+
+\begin{examplebox}{NLTK를 이용한 어간 추출 예시}
+\begin{lstlisting}[language=Python, caption={NLTK Porter Stemmer 예시}, label={lst:nltk_stemming}]
+from nltk.stem import PorterStemmer, SnowballStemmer
+from nltk.tokenize import word_tokenize
+
+text = "Henry Ford's innovation profoundly impacted the automotive industry. He revolutionized mass production."
+tokens = word_tokenize(text)
+
+porter_stemmer = PorterStemmer()
+snowball_stemmer = SnowballStemmer("english") # 언어 지정
+
+stemmed_porter = [porter_stemmer.stem(token) for token in tokens]
+stemmed_snowball = [snowball_stemmer.stem(token) for token in tokens]
+
+print("원본 토큰:", tokens)
+print("Porter Stemmer 결과:", stemmed_porter)
+# 예시 출력: ['henri', 'ford', "'s", 'innov', 'profoundli', 'impact', 'the', 'automot', 'industri', '.', 'he', 'revolut', 'mass', 'product', '.']
+print("Snowball Stemmer 결과:", stemmed_snowball)
+# 예시 출력: ['henri', 'ford', "'s", 'innov', 'profound', 'impact', 'the', 'automot', 'industri', '.', 'he', 'revolut', 'mass', 'product', '.']
+\end{lstlisting}
+\begin{cautionbox}{어간 추출의 특징}
+'Henry'가 'Henri'로, 'profoundly'가 'profoundli' 또는 'profound'로 변하는 것을 볼 수 있습니다. 이는 어간 추출이 단어를 사전형으로 만드는 것이 아니라, 단순히 규칙에 따라 접미사를 제거하여 '어간'을 찾는 과정이기 때문입니다. 결과가 실제 사전에 없는 단어일 수 있습니다.
+\end{cautionbox}
+\end{examplebox}
+
+\subsubsection{표제어 추출 (Lemmatization)}
+\begin{summarybox}{표제어 추출 핵심 요약}
+표제어 추출은 단어를 사전적 의미를 가지는 '표제어(lemma)'로 변환하는 과정입니다. 어간 추출보다 더 정교하며, 단어의 품사(명사, 동사 등) 정보를 활용하여 정확한 원형을 찾습니다.
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{정의:} 단어의 다양한 형태를 문법적 규칙에 따라 '표제어(lemma)' 또는 사전형으로 변환하는 기법입니다. (예: 'driving', 'drove', 'driven' -> 'drive').
+    \item \textbf{목적:} 어간 추출과 마찬가지로 차원 축소를 목표로 하지만, 결과가 항상 실제 사전에 있는 단어 형태를 유지합니다.
+    \item \textbf{특징:} 어간 추출보다 계산 비용이 더 많이 듭니다. 단어의 품사(Part-of-Speech, POS) 정보를 먼저 식별해야 하는 경우가 많습니다.
+    \item \textbf{도구:}
+        \begin{itemize}
+            \item \textbf{WordNetLemmatizer (NLTK):} NLTK에서 제공하는 표제어 추출 도구입니다. 품사 태깅이 필요하며, 주로 영어에 사용됩니다. 학술 연구에서 인기가 많습니다.
+            \item \textbf{SpaCy:} 산업 환경에서 많이 사용되는 라이브러리로, WordNetLemmatizer보다 빠르고 효율적입니다.
+        \end{itemize}
+\end{itemize}
+
+\begin{examplebox}{NLTK와 SpaCy를 이용한 표제어 추출 예시}
+\begin{lstlisting}[language=Python, caption={NLTK WordNetLemmatizer 및 SpaCy 예시}, label={lst:nltk_lemmatization}]
+import nltk
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
+# nltk.download('averaged_perceptron_tagger') # 품사 태깅을 위해 필요
+
+import spacy
+# python -m spacy download en_core_web_sm # SpaCy 모델 다운로드
+
+text = "Henry Ford's innovation profoundly impacted the automotive industry. He revolutionized mass production."
+tokens = word_tokenize(text)
+
+# NLTK WordNetLemmatizer
+lemmatizer = WordNetLemmatizer()
+lemmatized_nltk = [lemmatizer.lemmatize(token, pos='v') for token in tokens] # 동사(v)로 가정
+# 실제 사용 시에는 품사 태깅 후 해당 품사에 맞는 pos 인자를 전달해야 합니다.
+# 예: nltk.pos_tag(tokens) 후 각 단어의 품사를 기반으로 lemmatize 호출
+
+print("NLTK Lemmatizer (동사 가정) 결과:", lemmatized_nltk)
+# 예시 출력: ['Henry', 'Ford', "'s", 'innovation', 'profoundly', 'impact', 'the', 'automotive', 'industry', '.', 'He', 'revolutionize', 'mass', 'production', '.']
+
+# SpaCy Lemmatization
+nlp = spacy.load("en_core_web_sm")
+doc = nlp(text)
+lemmatized_spacy = [token.lemma_ for token in doc]
+
+print("SpaCy Lemmatizer 결과:", lemmatized_spacy)
+# 예시 출력: ['Henry', 'Ford', "'s", 'innovation', 'profoundly', 'impact', 'the', 'automotive', 'industry', '.', 'he', 'revolutionize', 'mass', 'production', '.']
+\end{lstlisting}
+\begin{cautionbox}{어간 추출 vs. 표제어 추출}
+\begin{itemize}
+    \item \textbf{어간 추출 (Stemming):} 'driving' -> 'driv'. 빠르고 간단하지만, 결과가 실제 단어가 아닐 수 있습니다.
+    \item \textbf{표제어 추출 (Lemmatization):} 'driving' -> 'drive'. 느리고 복잡하지만, 결과가 항상 실제 사전에 있는 단어입니다.
+\end{itemize}
+어떤 방법을 사용할지는 작업의 목적과 요구되는 정확도에 따라 달라집니다. 텍스트 분류와 같이 의미의 정확한 복원보다 차원 축소가 중요한 경우에는 어간 추출도 충분히 효과적일 수 있습니다.
+\end{cautionbox}
+\end{examplebox}
+
+\subsection{텍스트 분류 모델 구축 (실습)}
+강의에서는 20 Newsgroups 데이터셋을 사용하여 텍스트 분류 모델을 구축하는 과정을 설명했습니다. 목표는 게시물의 내용을 기반으로 '하키(hockey)' 관련 게시물인지 '판매(for sale)' 관련 게시물인지 분류하는 것입니다.
+
+\subsubsection{데이터셋 준비}
+\begin{itemize}
+    \item \textbf{데이터셋:} `sklearn.datasets.fetch_20newsgroups`를 사용하여 20개의 뉴스그룹 중 'rec.sport.hockey'와 'misc.forsale' 두 가지 카테고리만 선택합니다.
+    \item \textbf{분리:} 훈련(train) 데이터셋과 테스트(test) 데이터셋으로 나눕니다.
+    \item \textbf{레이블:} 'for sale'은 0, 'hockey'는 1로 레이블링됩니다.
+\end{itemize}
+
+\subsubsection{텍스트를 숫자로 변환: 임베딩 (Embedding)}
+\begin{summarybox}{임베딩 레이어 핵심 요약}
+임베딩 레이어는 단어와 같은 이산적인(discrete) 데이터를 저차원의 연속적인(continuous) 숫자 벡터로 변환하는 신경망 레이어입니다. 이는 고차원의 희소(sparse)한 원-핫 인코딩의 비효율성을 해결하고, 단어 간의 의미적 유사성을 벡터 공간에 반영하여 모델의 학습 효율과 성능을 높입니다.
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{원-핫 인코딩의 한계:}
+        \begin{itemize}
+            \item \textbf{희소성 (Sparsity):} 어휘 사전의 크기가 커질수록 벡터의 대부분이 0이 되어 메모리 낭비가 심합니다. (예: 10,000개 단어 사전에서 각 단어는 10,000차원 벡터).
+            \item \textbf{의미 관계 부족:} 단어 간의 유사성이나 관계를 표현할 수 없습니다. 모든 단어는 서로 독립적으로 간주됩니다.
+        \end{itemize}
+    \item \textbf{임베딩의 필요성:}
+        \begin{itemize}
+            \item \textbf{차원 축소 (Dimensionality Reduction):} 고차원의 희소 벡터를 저차원의 밀집(dense) 벡터로 변환하여 효율성을 높입니다.
+            \item \textbf{의미 학습 (Semantic Learning):} 학습 가능한 파라미터(가중치)를 통해 단어의 의미적 유사성을 벡터 공간에 반영합니다. (예: '왕'과 '여왕'은 벡터 공간에서 가까이 위치).
+        \end{itemize}
+    \item \textbf{작동 원리:}
+        \begin{itemize}
+            \item 임베딩 레이어는 입력으로 단어의 인덱스(정수)를 받습니다.
+            \item 내부적으로는 각 단어 인덱스에 해당하는 '임베딩 벡터'를 가집니다. 이 벡터들은 모델 훈련 과정에서 함께 학습됩니다.
+            \item `Embedding(input_dim, output_dim)`:
+                \begin{itemize}
+                    \item `input_dim`: 어휘 사전의 크기 (총 단어 수 + OOV 토큰).
+                    \item `output_dim`: 임베딩 벡터의 차원 (예: 128).
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+\begin{examplebox}{임베딩의 비유: 사람의 특징 벡터}
+사람을 '남성'과 '여성'으로 분류할 때, 원-핫 인코딩은 '남성'을 [1, 0], '여성'을 [0, 1]로 표현합니다. 이는 두 범주가 완전히 독립적임을 나타냅니다.
+
+하지만 임베딩은 각 범주에 대해 학습 가능한 숫자(예: 남성 -> 0.8, 여성 -> 0.2)를 할당하여, 이 숫자가 모델의 다른 부분에서 의미 있는 방식으로 사용되도록 합니다. 더 복잡한 경우, '성별', '나이', '직업' 등 여러 특징을 나타내는 벡터로 사람을 표현할 수 있습니다. 임베딩은 이러한 특징 벡터를 데이터로부터 스스로 학습합니다.
+\end{examplebox}
+
+\begin{cautionbox}{임베딩 레이어의 효율성}
+수학적으로 임베딩 레이어는 선형 활성화 함수와 바이어스가 없는 완전 연결(Dense) 레이어와 유사하게 볼 수 있습니다. 그러나 실제 구현에서는 단어 인덱스를 직접 사용하여 해당 임베딩 벡터를 '조회(lookup)'하는 방식으로 작동하므로, 고차원 원-핫 벡터에 대한 행렬 곱셈을 수행하는 것보다 훨씬 계산적으로 효율적입니다.
+\end{cautionbox}
+
+\subsubsection{과적합 방지: 드롭아웃 (Dropout)}
+\begin{summarybox}{드롭아웃 핵심 요약}
+드롭아웃은 신경망의 과적합(overfitting)을 방지하기 위한 정규화(regularization) 기법입니다. 훈련 과정에서 무작위로 일부 뉴런의 연결을 끊어 모델이 특정 특징에 과도하게 의존하는 것을 막고 일반화 성능을 향상시킵니다.
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{정의:} 훈련 단계에서 각 미니 배치(mini-batch)마다 무작위로 특정 비율의 뉴런을 비활성화(출력을 0으로 설정)합니다.
+    \item \textbf{작동 방식:}
+        \begin{itemize}
+            \item `Dropout(0.2)`: 각 뉴런이 20\%의 확률로 비활성화됩니다.
+            \item 비활성화된 뉴런은 해당 훈련 스텝에서 가중치 업데이트에 참여하지 않습니다.
+            \item 매 훈련 스텝마다 무작위로 다른 뉴런들이 비활성화되므로, 모델은 다양한 '하위 네트워크'를 학습하는 효과를 얻습니다.
+        \end{itemize}
+    \item \textbf{종류:}
+        \begin{itemize}
+            \item \textbf{일반 드롭아웃:} 입력 레이어나 LSTM의 출력에 적용되어 특정 특성 값들을 0으로 만듭니다.
+            \item \textbf{순환 드롭아웃 (Recurrent Dropout):} LSTM 내부의 순환 연결에 적용되어 은닉 상태의 일부를 0으로 만듭니다.
+        \end{itemize}
+\end{itemize}
+
+\begin{examplebox}{드롭아웃의 비유: 팀워크 훈련}
+한 팀의 모든 구성원이 항상 완벽하게 제 역할을 한다고 가정하면, 특정 구성원이 없으면 팀 전체가 무너질 수 있습니다. 드롭아웃은 훈련 중에 무작위로 팀원 몇 명을 쉬게 하는 것과 같습니다. 이렇게 하면 나머지 팀원들은 어떤 상황에서도 팀의 목표를 달성하는 방법을 학습하게 되어, 특정 개인에게 의존하지 않는 더 강하고 유연한 팀(모델)이 됩니다.
+\end{examplebox}
+
+\subsubsection{모델 아키텍처}
+강의에서 제시된 텍스트 분류 모델은 다음과 같은 간단한 LSTM 기반 구조를 가집니다.
+\begin{lstlisting}[language=Python, caption={텍스트 분류 모델 아키텍처}, label={lst:model_architecture}]
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dropout, Dense
+
+def build_model(max_features, embedding_dim, max_len):
+    model = Sequential()
+    # 1. 임베딩 레이어: 단어 인덱스를 밀집 벡터로 변환
+    model.add(Embedding(input_dim=max_features + 1, output_dim=embedding_dim, input_length=max_len))
+    # 2. 드롭아웃: 임베딩 레이어 출력에 적용하여 과적합 방지
+    model.add(Dropout(0.2))
+    # 3. LSTM 레이어: 시퀀스 데이터의 장기 의존성 학습
+    model.add(LSTM(128)) # 128개의 은닉 상태
+    # 4. 드롭아웃: LSTM 레이어 출력에 적용하여 과적합 방지
+    model.add(Dropout(0.2))
+    # 5. 완전 연결 레이어: 최종 분류를 위한 Dense 레이어
+    # 이진 분류이므로 1개 뉴런과 시그모이드 활성화 함수 사용
+    model.add(Dense(1, activation='sigmoid'))
+
+    # 모델 컴파일
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    return model
+\end{lstlisting}
+
+\begin{itemize}
+    \item \textbf{Embedding Layer:} `max_features + 1` (어휘 사전 크기 + OOV) 차원의 입력을 `embedding_dim` (예: 128) 차원의 밀집 벡터로 변환합니다. `input_length`는 각 시퀀스의 최대 길이입니다.
+    \item \textbf{Dropout Layer:} 임베딩 레이어의 출력에 적용됩니다.
+    \item \textbf{LSTM Layer:} 128개의 은닉 상태를 가지는 LSTM 레이어입니다. `return_sequences`가 지정되지 않았으므로 기본값인 `False`가 적용되어 마지막 시간 스텝의 출력만 다음 레이어로 전달됩니다.
+    \item \textbf{Dropout Layer:} LSTM 레이어의 출력에 적용됩니다.
+    \item \textbf{Dense Layer:} 1개의 뉴런과 `sigmoid` 활성화 함수를 사용하여 이진 분류를 수행합니다.
+\end{itemize}
+
+\subsubsection{손실 함수 (Loss Function)와 활성화 함수 (Activation Function)}
+\begin{itemize}
+    \item \textbf{시그모이드 활성화 함수 (Sigmoid Activation Function):}
+        \begin{itemize}
+            \item 정의: 입력 값을 0과 1 사이의 값으로 변환하는 함수입니다.
+            \item 공식: $\sigma(z) = \frac{1}{1 + e^{-z}}$
+            \item 활용: 이진 분류 문제에서 출력 레이어에 사용되어 예측 확률을 나타냅니다. 로지스틱 회귀(Logistic Regression)의 핵심입니다.
+        \end{itemize}
+    \item \textbf{이진 교차 엔트로피 (Binary Cross-Entropy):}
+        \begin{itemize}
+            \item 정의: 이진 분류 문제에서 모델의 예측 확률과 실제 레이블(0 또는 1) 간의 차이를 측정하는 손실 함수입니다.
+            \item 공식: $L = - (y \log(\hat{y}) + (1 - y) \log(1 - \hat{y}))$
+            \item 활용: 시그모이드 활성화 함수와 함께 이진 분류 모델의 손실 함수로 사용됩니다.
+        \item \textbf{주의:} 이진 분류 문제에서 평균 제곱 오차(Mean Squared Error, MSE)는 적절하지 않습니다. MSE는 확률 분포가 아닌 연속적인 값의 예측에 더 적합하며, 이진 분류에서는 경사 하강법의 수렴을 방해하는 등의 문제가 발생할 수 있습니다.
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{데이터 전처리 상세 과정}
+모델에 텍스트를 입력하기 위해 다음 단계를 거칩니다.
+\begin{itemize}
+    \item \textbf{최대 특성 수 (max\_features):} 어휘 사전에 포함할 가장 빈번한 단어의 수를 지정합니다 (예: 10,000개). 이는 모델의 복잡성을 제어하고 희소성을 줄입니다.
+    \item \textbf{최대 길이 (max\_len):} 각 텍스트 시퀀스의 최대 길이를 지정합니다 (예: 500). 길이가 긴 텍스트는 잘리고, 짧은 텍스트는 0으로 채워집니다(패딩).
+    \item \textbf{OOV (Out-Of-Vocabulary) 토큰:} `max_features`에 포함되지 않는 단어들을 처리하기 위한 특별한 토큰입니다. 일반적으로 인덱스 0을 OOV 토큰에 할당합니다.
+    \item \textbf{단어 빈도 계산 및 인덱싱:}
+        \begin{enumerate}
+            \item 훈련 텍스트를 토큰화합니다.
+            \item 각 토큰의 빈도를 계산합니다.
+            \item 빈도 순으로 정렬하여 상위 `max_features`개의 단어만 선택합니다.
+            \item 각 단어에 고유한 인덱스를 부여합니다 (OOV는 0, 나머지는 1부터 시작).
+        \end{enumerate}
+    \item \textbf{텍스트를 인덱스 시퀀스로 변환:} 각 텍스트를 해당 단어 인덱스의 시퀀스로 변환합니다. 사전에 없는 단어는 OOV 인덱스(0)로 대체됩니다.
+\end{itemize}
+
+\begin{examplebox}{텍스트를 인덱스 시퀀스로 변환 예시}
+원본 텍스트: "This is a test sentence."
+어휘 사전: {'this': 1, 'is': 2, 'a': 3, 'test': 4, 'sentence': 5, 'OOV': 0}
+
+변환된 인덱스 시퀀스: [1, 2, 3, 4, 5]
+
+만약 "new word here"라는 텍스트가 들어오고 'new', 'word', 'here'가 사전에 없다면:
+변환된 인덱스 시퀀스: [0, 0, 0]
+\end{examplebox}
+
+\subsubsection{모델 훈련 및 평가}
+\begin{itemize}
+    \item \textbf{훈련:} `model.fit()` 함수를 사용하여 훈련 데이터와 레이블로 모델을 훈련합니다. `epochs` (훈련 반복 횟수)와 `batch_size` (미니 배치 크기)를 지정합니다.
+    \item \textbf{평가:} `model.evaluate()` 함수를 사용하여 테스트 데이터셋에서 모델의 성능을 평가합니다. `accuracy` (정확도)는 분류 문제에서 모델의 예측이 얼마나 정확한지를 나타내는 지표입니다.
+\end{itemize}
+
+\begin{tcolorbox}[title=\textbf{전처리 기법별 성능 비교 (예시)}, colback=myblue!10!white, colframe=myblue!75!black]
+강의에서 제시된 결과는 다음과 같습니다.
+\begin{itemize}
+    \item \textbf{토큰화만 적용:} 테스트 정확도 약 93.5\%
+    \item \textbf{토큰화 + 어간 추출 적용:} 테스트 정확도 약 96.8\%
+    \item \textbf{토큰화 + 표제어 추출 적용:} 테스트 정확도 약 93.8\%
+\end{itemize}
+이 예시에서는 어간 추출이 가장 좋은 성능을 보였습니다. 이는 어간 추출이 어휘 사전을 효과적으로 줄여 모델이 더 일반적인 패턴을 학습하도록 도왔기 때문일 수 있습니다. 하지만 이는 데이터셋과 모델에 따라 달라질 수 있으므로, 항상 여러 방법을 실험해봐야 합니다.
+\end{tcolorbox}
+
+\newpage
+\section*{실습/코드: 텍스트 분류 모델 구현}
+이 섹션에서는 20 Newsgroups 데이터셋을 사용하여 텍스트 분류 모델을 구현하는 과정을 단계별로 보여줍니다. 토큰화, 어간 추출, 표제어 추출을 적용한 세 가지 시나리오를 비교합니다.
+
+\begin{tipbox}{과제 2번 및 3번 관련 힌트}
+과제 2번은 'Bag of Words' 방식을 사용하여 텍스트 분류를 수행합니다. 이는 시간 정보를 잃지만, 특정 분류 문제에서 효율적일 수 있습니다. 과제 3번은 순환 신경망을 사용하여 텍스트 분류를 수행하며, 본 실습과 유사한 접근 방식을 사용합니다.
+\end{tipbox}
+
+\subsection{환경 설정 및 데이터 로딩}
+\begin{lstlisting}[language=Python, caption={환경 설정 및 데이터 로딩}, label={lst:setup_data_load}]
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_20newsgroups
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dropout, Dense
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer, SnowballStemmer, WordNetLemmatizer
+# from nltk.corpus import wordnet # WordNetLemmatizer 사용 시 필요
+# import spacy # SpaCy 사용 시 필요
+
+# NLTK 데이터 다운로드 (최초 1회 실행)
+# nltk.download('punkt')
+# nltk.download('wordnet')
+# nltk.download('omw-1.4')
+# nltk.download('averaged_perceptron_tagger')
+
+# 20 Newsgroups 데이터셋 로드
+categories = ['rec.sport.hockey', 'misc.forsale']
+train_data = fetch_20newsgroups(subset='train', categories=categories, shuffle=True, random_state=42)
+test_data = fetch_20newsgroups(subset='test', categories=categories, shuffle=True, random_state=42)
+
+train_texts = train_data.data
+train_labels = train_data.target
+test_texts = test_data.data
+test_labels = test_data.target
+
+print(f"훈련 데이터 개수: {len(train_texts)}")
+print(f"테스트 데이터 개수: {len(test_texts)}")
+print(f"카테고리: {train_data.target_names}")
+
+# 예시 데이터 확인
+print("\n--- 훈련 데이터 예시 ---")
+print(f"텍스트 (53번째): {train_texts[52][:200]}...")
+print(f"레이블 (53번째): {train_labels[52]} ({train_data.target_names[train_labels[52]]})") # 0: for sale
+print(f"텍스트 (65번째): {train_texts[64][:200]}...")
+print(f"레이블 (65번째): {train_labels[64]} ({train_data.target_names[train_labels[64]]})") # 1: hockey
+\end{lstlisting}
+
+\subsection{모델 정의 함수}
+앞서 설명한 LSTM 기반 모델 아키텍처를 함수로 정의합니다.
+\begin{lstlisting}[language=Python, caption={텍스트 분류 모델 정의 함수}, label={lst:model_def_func}]
+def build_lstm_model(max_features, embedding_dim, max_len):
+    model = Sequential()
+    model.add(Embedding(input_dim=max_features + 1, output_dim=embedding_dim, input_length=max_len))
+    model.add(Dropout(0.2))
+    model.add(LSTM(128))
+    model.add(Dropout(0.2))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    return model
+\end{lstlisting}
+
+\subsection{시나리오 1: 토큰화만 적용}
+텍스트를 단어 토큰으로만 분할하고, 어간 추출이나 표제어 추출은 적용하지 않습니다.
+\begin{lstlisting}[language=Python, caption={시나리오 1: 토큰화만 적용}, label={lst:scenario1_tokenize}]
+# 전처리 파라미터
+max_features = 10000 # 가장 빈번한 10000개 단어 사용
+max_len = 500        # 시퀀스 최대 길이
+embedding_dim = 128  # 임베딩 벡터 차원
+
+# 1. 토큰화 및 단어 인덱스 생성
+# Keras Tokenizer는 자동으로 단어 빈도를 계산하고 인덱스를 부여합니다.
+# num_words는 max_features + 1 (OOV 포함)
+tokenizer = Tokenizer(num_words=max_features, oov_token="<OOV>")
+tokenizer.fit_on_texts(train_texts)
+
+# 텍스트를 인덱스 시퀀스로 변환
+train_sequences = tokenizer.texts_to_sequences(train_texts)
+test_sequences = tokenizer.texts_to_sequences(test_texts)
+
+# 시퀀스 패딩 (최대 길이 맞추기)
+train_padded = pad_sequences(train_sequences, maxlen=max_len, padding='post', truncating='post')
+test_padded = pad_sequences(test_sequences, maxlen=max_len, padding='post', truncating='post')
+
+print("\n--- 시나리오 1: 토큰화만 적용 ---")
+print(f"훈련 데이터 패딩 후 형태: {train_padded.shape}")
+print(f"테스트 데이터 패딩 후 형태: {test_padded.shape}")
+print(f"단어 사전 크기: {len(tokenizer.word_index)}") # 실제 단어 인덱스 수
+
+# OOV 예시 (강의에서 언급된 philip_ws@spk.hp.com)
+# 이메일 주소는 빈번하지 않아 OOV로 처리될 가능성이 높음
+example_text = "From: philip_ws@spk.hp.com (Philip W. S)"
+example_sequence = tokenizer.texts_to_sequences([example_text])
+print(f"예시 텍스트: '{example_text}'")
+print(f"변환된 시퀀스 (OOV 포함): {example_sequence}")
+# 출력에서 0은 OOV 토큰을 의미합니다.
+
+# 2. 모델 구축 및 훈련
+model_tokenize = build_lstm_model(max_features, embedding_dim, max_len)
+print("\n--- 모델 요약 (토큰화만) ---")
+model_tokenize.summary()
+
+history_tokenize = model_tokenize.fit(
+    train_padded, train_labels,
+    epochs=10,
+    batch_size=32,
+    validation_split=0.2 # 훈련 데이터의 20%를 검증 데이터로 사용
+)
+
+# 3. 모델 평가
+loss_tokenize, accuracy_tokenize = model_tokenize.evaluate(test_padded, test_labels)
+print(f"\n테스트 정확도 (토큰화만): {accuracy_tokenize:.4f}")
+
+# 결과 시각화
+plt.figure(figsize=(12, 4))
+plt.subplot(1, 2, 1)
+plt.plot(history_tokenize.history['accuracy'], label='Train Accuracy')
+plt.plot(history_tokenize.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Accuracy (Tokenization Only)')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot(history_tokenize.history['loss'], label='Train Loss')
+plt.plot(history_tokenize.history['val_loss'], label='Validation Loss')
+plt.title('Loss (Tokenization Only)')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.tight_layout()
+plt.show()
+\end{lstlisting}
+
+\subsection{시나리오 2: 토큰화 + 어간 추출 적용}
+텍스트를 토큰화한 후, Porter Stemmer를 사용하여 각 단어의 어간을 추출합니다.
+\begin{lstlisting}[language=Python, caption={시나리오 2: 토큰화 + 어간 추출 적용}, label={lst:scenario2_stemming}]
+porter_stemmer = PorterStemmer()
+
+def stem_text(text):
+    tokens = word_tokenize(text)
+    stemmed_tokens = [porter_stemmer.stem(token) for token in tokens]
+    return " ".join(stemmed_tokens)
+
+# 훈련 및 테스트 텍스트에 어간 추출 적용
+train_texts_stemmed = [stem_text(text) for text in train_texts]
+test_texts_stemmed = [stem_text(text) for text in test_texts]
+
+print("\n--- 시나리오 2: 토큰화 + 어간 추출 적용 ---")
+# 예시 텍스트 확인 (강의에서 언급된 octopus -> octop)
+example_original = train_texts[64][:200]
+example_stemmed = stem_text(example_original)
+print(f"원본 텍스트 (65번째): {example_original}...")
+print(f"어간 추출 후 텍스트: {example_stemmed}...")
+# 'octopus'가 'octop'으로, 'years'가 'year'로 변환되는 것을 볼 수 있습니다.
+
+# 1. 토큰화 및 단어 인덱스 생성 (어간 추출된 텍스트 사용)
+tokenizer_stem = Tokenizer(num_words=max_features, oov_token="<OOV>")
+tokenizer_stem.fit_on_texts(train_texts_stemmed)
+
+train_sequences_stem = tokenizer_stem.texts_to_sequences(train_texts_stemmed)
+test_sequences_stem = tokenizer_stem.texts_to_sequences(test_texts_stemmed)
+
+train_padded_stem = pad_sequences(train_sequences_stem, maxlen=max_len, padding='post', truncating='post')
+test_padded_stem = pad_sequences(test_sequences_stem, maxlen=max_len, padding='post', truncating='post')
+
+print(f"훈련 데이터 패딩 후 형태 (어간 추출): {train_padded_stem.shape}")
+print(f"단어 사전 크기 (어간 추출): {len(tokenizer_stem.word_index)}")
+
+# 2. 모델 구축 및 훈련
+model_stem = build_lstm_model(max_features, embedding_dim, max_len)
+print("\n--- 모델 요약 (어간 추출) ---")
+model_stem.summary()
+
+history_stem = model_stem.fit(
+    train_padded_stem, train_labels,
+    epochs=10,
+    batch_size=32,
+    validation_split=0.2
+)
+
+# 3. 모델 평가
+loss_stem, accuracy_stem = model_stem.evaluate(test_padded_stem, test_labels)
+print(f"\n테스트 정확도 (어간 추출): {accuracy_stem:.4f}")
+
+# 결과 시각화
+plt.figure(figsize=(12, 4))
+plt.subplot(1, 2, 1)
+plt.plot(history_stem.history['accuracy'], label='Train Accuracy')
+plt.plot(history_stem.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Accuracy (Stemming)')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot(history_stem.history['loss'], label='Train Loss')
+plt.plot(history_stem.history['val_loss'], label='Validation Loss')
+plt.title('Loss (Stemming)')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.tight_layout()
+plt.show()
+\end{lstlisting}
+
+\subsection{시나리오 3: 토큰화 + 표제어 추출 적용}
+텍스트를 토큰화한 후, NLTK의 WordNetLemmatizer를 사용하여 각 단어의 표제어를 추출합니다. (품사 태깅이 필요하지만, 여기서는 단순화를 위해 동사로 가정합니다.)
+\begin{lstlisting}[language=Python, caption={시나리오 3: 토큰화 + 표제어 추출 적용}, label={lst:scenario3_lemmatize}]
+lemmatizer = WordNetLemmatizer()
+
+def lemmatize_text(text):
+    tokens = word_tokenize(text)
+    # 실제 사용 시에는 nltk.pos_tag를 사용하여 각 단어의 정확한 품사를 파악해야 합니다.
+    # 여기서는 단순화를 위해 모든 단어를 동사(v)로 가정합니다.
+    lemmatized_tokens = [lemmatizer.lemmatize(token, pos='v') for token in tokens]
+    return " ".join(lemmatized_tokens)
+
+# 훈련 및 테스트 텍스트에 표제어 추출 적용
+train_texts_lemmatized = [lemmatize_text(text) for text in train_texts]
+test_texts_lemmatized = [lemmatize_text(text) for text in test_texts]
+
+print("\n--- 시나리오 3: 토큰화 + 표제어 추출 적용 ---")
+# 예시 텍스트 확인 (강의에서 언급된 driving -> drive)
+example_text_drive = "I was driving my car."
+example_lemmatized_drive = lemmatize_text(example_text_drive)
+print(f"원본 텍스트: '{example_text_drive}'")
+print(f"표제어 추출 후 텍스트: '{example_lemmatized_drive}'")
+# 'driving'이 'drive'로 변환되는 것을 볼 수 있습니다.
+
+# 1. 토큰화 및 단어 인덱스 생성 (표제어 추출된 텍스트 사용)
+tokenizer_lem = Tokenizer(num_words=max_features, oov_token="<OOV>")
+tokenizer_lem.fit_on_texts(train_texts_lemmatized)
+
+train_sequences_lem = tokenizer_lem.texts_to_sequences(train_texts_lemmatized)
+test_sequences_lem = tokenizer_lem.texts_to_sequences(test_texts_lemmatized)
+
+train_padded_lem = pad_sequences(train_sequences_lem, maxlen=max_len, padding='post', truncating='post')
+test_padded_lem = pad_sequences(test_sequences_lem, maxlen=max_len, padding='post', truncating='post')
+
+print(f"훈련 데이터 패딩 후 형태 (표제어 추출): {train_padded_lem.shape}")
+print(f"단어 사전 크기 (표제어 추출): {len(tokenizer_lem.word_index)}")
+
+# 2. 모델 구축 및 훈련
+model_lem = build_lstm_model(max_features, embedding_dim, max_len)
+print("\n--- 모델 요약 (표제어 추출) ---")
+model_lem.summary()
+
+history_lem = model_lem.fit(
+    train_padded_lem, train_labels,
+    epochs=10,
+    batch_size=32,
+    validation_split=0.2
+)
+
+# 3. 모델 평가
+loss_lem, accuracy_lem = model_lem.evaluate(test_padded_lem, test_labels)
+print(f"\n테스트 정확도 (표제어 추출): {accuracy_lem:.4f}")
+
+# 결과 시각화
+plt.figure(figsize=(12, 4))
+plt.subplot(1, 2, 1)
+plt.plot(history_lem.history['accuracy'], label='Train Accuracy')
+plt.plot(history_lem.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Accuracy (Lemmatization)')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot(history_lem.history['loss'], label='Train Loss')
+plt.plot(history_lem.history['val_loss'], label='Validation Loss')
+plt.title('Loss (Lemmatization)')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.tight_layout()
+plt.show()
+\end{lstlisting}
+
+\newpage
+\section*{체크리스트}
+본 문서를 학습하고 과제를 수행하며 점검할 수 있는 체크리스트입니다.
+
+\begin{tcolorbox}[title=\textbf{학습 점검 체크리스트}, colback=mygreen!5!white, colframe=mygreen!75!black]
+\begin{itemize}
+    \item \textbf{RNN 기본 이해:} 순환 신경망이 시퀀스 데이터를 어떻게 처리하는지 이해했는가?
+    \item \textbf{RNN 파라미터 계산:} `SimpleRNN` 레이어의 파라미터 수를 직접 계산할 수 있는가?
+    \item \textbf{LSTM 작동 원리:} LSTM의 셀 상태(C)와 은닉 상태(H), 그리고 게이트 메커니즘을 설명할 수 있는가? C와 H의 차원이 왜 같은지 이해했는가?
+    \item \textbf{양방향 RNN:} 양방향 RNN이 필요한 이유와 파라미터/출력 차원 변화를 이해했는가?
+    \item \textbf{NLP 개요:} NLP의 주요 응용 분야와 도전 과제를 설명할 수 있는가?
+    \item \textbf{텍스트 전처리:} 토큰화, 어간 추출, 표제어 추출의 정의, 목적, 차이점을 명확히 구분할 수 있는가? 각 기법의 장단점은 무엇인가?
+    \item \textbf{임베딩 레이어:} 임베딩 레이어가 왜 필요하며, 원-핫 인코딩의 한계를 어떻게 극복하는지 설명할 수 있는가?
+    \item \textbf{드롭아웃:} 드롭아웃이 과적합을 어떻게 방지하는지 이해했는가?
+    \item \textbf{손실/활성화 함수:} 이진 분류 문제에서 시그모이드와 이진 교차 엔트로피를 사용하는 이유를 설명할 수 있는가?
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{과제 수행 체크리스트}, colback=myblue!5!white, colframe=myblue!75!black]
+\begin{itemize}
+    \item \textbf{데이터 로딩:} 20 Newsgroups 데이터셋을 올바르게 로드하고 훈련/테스트 데이터로 분리했는가?
+    \item \textbf{텍스트 전처리 구현:} 토큰화, 어간 추출, 표제어 추출 함수를 정확히 구현했는가?
+    \item \textbf{OOV 처리:} OOV 토큰을 포함하여 단어 인덱싱을 올바르게 처리했는가?
+    \item \textbf{시퀀스 패딩:} `pad_sequences`를 사용하여 시퀀스 길이를 통일했는가?
+    \item \textbf{모델 구축:} `Embedding`, `LSTM`, `Dropout`, `Dense` 레이어를 사용하여 모델을 올바르게 정의했는가?
+    \item \textbf{모델 훈련 및 평가:} 모델을 훈련하고 테스트 데이터셋에서 정확도를 평가했는가?
+    \item \textbf{결과 분석:} 각 전처리 기법(토큰화만, 어간 추출, 표제어 추출)에 따른 모델 성능 변화를 분석하고 설명할 수 있는가?
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\section*{FAQ (자주 묻는 질문)}
+
+\begin{tcolorbox}[title=\textbf{Q1: RNN 파라미터 계산은 어떻게 하나요?}, colback=myyellow!5!white, colframe=myyellow!75!black]
+\textbf{A1:} `SimpleRNN(은닉 뉴런 수, input_shape=(None, 입력 특성 수))`의 경우, 파라미터 수는 `(입력 특성 수 * 은닉 뉴런 수) + (은닉 뉴런 수 * 은닉 뉴런 수) + 은닉 뉴런 수`로 계산됩니다. 이는 입력 가중치, 순환 가중치, 바이어스의 합입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Q2: LSTM의 셀 상태(C)와 은닉 상태(H)는 왜 같은 차원인가요?}, colback=myyellow!5!white, colframe=myyellow!75!black]
+\textbf{A2:} LSTM 내부에서 C와 H는 요소별 덧셈(summation)과 요소별 곱셈(element-wise multiplication) 연산을 통해 상호작용합니다. 이러한 연산들은 벡터의 차원을 변경하지 않으므로, C와 H는 항상 동일한 차원을 유지해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Q3: 양방향 RNN은 왜 필요한가요?}, colback=myyellow!5!white, colframe=myyellow!75!black]
+\textbf{A3:} 일반 RNN은 과거 정보만으로 현재를 예측하지만, 텍스트와 같은 시퀀스 데이터에서는 미래 정보(문장의 뒷부분)가 현재의 의미를 이해하는 데 중요할 수 있습니다. 양방향 RNN은 순방향과 역방향으로 모두 학습하여 과거와 미래의 모든 문맥 정보를 활용하여 더 정확한 예측을 가능하게 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Q4: 어간 추출(Stemming)과 표제어 추출(Lemmatization)의 차이는 무엇인가요?}, colback=myyellow!5!white, colframe=myyellow!75!black]
+\textbf{A4:} 어간 추출은 단어의 접미사를 단순히 잘라내어 '어간'을 찾습니다. 빠르지만 결과가 실제 사전에 없는 단어일 수 있습니다 (예: 'driving' -> 'driv'). 표제어 추출은 단어의 품사 정보를 활용하여 사전적 의미를 가지는 '표제어'를 찾습니다. 느리지만 결과가 항상 실제 단어입니다 (예: 'driving' -> 'drive').
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Q5: 임베딩 레이어는 왜 사용하나요?}, colback=myyellow!5!white, colframe=myyellow!75!black]
+\textbf{A5:} 임베딩 레이어는 고차원의 희소(sparse)한 원-핫 인코딩의 비효율성을 해결하고, 단어 간의 의미적 유사성을 저차원의 밀집(dense) 벡터 공간에 반영하기 위해 사용됩니다. 이는 모델의 학습 효율과 성능을 높이는 데 기여합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Q6: OOV(Out-Of-Vocabulary) 단어는 어떻게 처리하나요?}, colback=myyellow!5!white, colframe=myyellow!75!black]
+\textbf{A6:} OOV 단어는 모델 학습 시 사용된 어휘 사전에 없는 단어를 의미합니다. 일반적으로 OOV 토큰을 위한 특별한 인덱스(예: 0)를 사전에 할당하고, 사전에 없는 단어가 나타나면 이 OOV 인덱스로 대체합니다. 이는 모델이 새로운 단어를 만나도 처리할 수 있도록 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Q7: 드롭아웃(Dropout)은 왜 사용하나요?}, colback=myyellow!5!white, colframe=myyellow!75!black]
+\textbf{A7:} 드롭아웃은 신경망의 과적합을 방지하기 위한 정규화 기법입니다. 훈련 과정에서 무작위로 일부 뉴런의 연결을 끊어 모델이 특정 특징에 과도하게 의존하는 것을 막고, 다양한 하위 네트워크를 학습하는 효과를 통해 모델의 일반화 성능을 향상시킵니다.
+\end{tcolorbox}
+
+\newpage
+\section*{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[title=\textbf{CSCI89 Lecture 3 핵심 요약}, colback=myblue!10!white, colframe=myblue!75!black, sharp corners, boxsep=3mm, left=3mm, right=3mm, top=3mm, bottom=3mm]
+\textbf{1. 순환 신경망 (RNN)의 이해}
+\begin{itemize}
+    \item 시퀀스 데이터 처리 특화 (텍스트, 음성, 시계열).
+    \item 이전 정보 기억 (은닉 상태).
+    \item \textbf{파라미터 계산:} `(입력 특성 수 + 은닉 뉴런 수 + 1) * 은닉 뉴런 수`.
+    \item \textbf{입출력 유형:} 다대다, 다대일, 일대다 (Keras `return_sequences` 옵션).
+\end{itemize}
+
+\textbf{2. 장단기 기억망 (LSTM)}
+\begin{itemize}
+    \item RNN의 장기 의존성 문제 해결.
+    \item \textbf{두 가지 기억:} 셀 상태(C, 장기 기억)와 은닉 상태(H, 단기 기억).
+    \item \textbf{게이트 메커니즘:} 망각, 입력, 출력 게이트로 정보 흐름 제어.
+    \item \textbf{C와 H 차원:} 항상 동일. `LSTM(N)`은 내부적으로 $4 \times N$ 뉴런.
+\end{itemize}
+
+\textbf{3. 양방향 RNN/LSTM}
+\begin{itemize}
+    \item 순방향/역방향 시퀀스 동시 처리로 전체 문맥 활용.
+    \item \textbf{파라미터 수:} 단방향의 2배.
+    \item \textbf{출력 차원:} 단방향의 2배 (연결(concatenate) 때문).
+\end{itemize}
+
+\textbf{4. 자연어 처리 (NLP) 개요}
+\begin{itemize}
+    \item 컴퓨터가 인간 언어를 이해/생성하는 AI 분야.
+    \item \textbf{도전 과제:} 언어의 모호성, 문맥, 배경 지식 필요.
+    \item \textbf{주요 응용:} 텍스트 분류, NER, 감성 분석, 기계 번역, 챗봇 등.
+\end{itemize}
+
+\textbf{5. 텍스트 전처리 기법}
+\begin{itemize}
+    \item \textbf{토큰화:} 텍스트를 의미 단위(단어, 문장 등)로 분할. 불용어 처리.
+    \item \textbf{어간 추출 (Stemming):} 단어의 접미사 제거 (예: 'running' $\rightarrow$ 'runn'). 빠르지만 실제 단어가 아닐 수 있음. 차원 축소.
+    \item \textbf{표제어 추출 (Lemmatization):} 단어를 사전형(표제어)으로 변환 (예: 'driving' $\rightarrow$ 'drive'). 정확하지만 품사 정보 필요, 비용 높음.
+\end{itemize}
+
+\textbf{6. 텍스트를 숫자로: 임베딩 (Embedding)}
+\begin{itemize}
+    \item 고차원 희소(Sparse) 원-핫 인코딩의 한계 극복.
+    \item 단어 인덱스를 저차원 밀집(Dense) 벡터로 변환.
+    \item 단어 간 의미적 유사성 학습.
+    \item \textbf{OOV (Out-Of-Vocabulary):} 사전에 없는 단어 처리 (특별 인덱스 할당).
+\end{itemize}
+
+\textbf{7. 모델 정규화: 드롭아웃 (Dropout)}
+\begin{itemize}
+    \item 훈련 중 무작위로 뉴런 연결 끊어 과적합 방지.
+    \item 모델의 일반화 성능 향상.
+\end{itemize}
+
+\textbf{8. 텍스트 분류 모델 (LSTM 기반)}
+\begin{itemize}
+    \item \textbf{아키텍처:} `Embedding -> Dropout -> LSTM -> Dropout -> Dense(Sigmoid)`.
+    \item \textbf{손실 함수:} 이진 분류에 `Binary Cross-Entropy` 사용 (MSE 부적합).
+    \item \textbf{평가 지표:} `Accuracy`.
+    \item \textbf{전처리 영향:} 토큰화, 어간 추출, 표제어 추출 등 전처리 방식에 따라 모델 성능 변화.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

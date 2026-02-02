@@ -1,0 +1,2245 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{BADM-572: Data-Driven Decision Making}}
+\fancyhead[R]{\small\textit{Module 08}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={BADM-572: Data-Driven Decision Making - Module 08},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\thispagestyle{firstpage}
+
+\metainfo{Inferential and Predictive Statistics Module 4}{다중 선형 회귀 및 더미 변수 활용}{Prof. Fataneh Taghaboni-Dutta}{다중 선형 회귀 분석, 질적 데이터의 더미 변수 변환, 그리고 다중 범주 더미 변수 활용법을 학습하여 복잡한 비즈니스 예측 모델을 구축하고 해석합니다.}
+
+\tableofcontents
+
+\newpage
+
+\begin{summarybox}
+이 문서는 'Inferential and Predictive Statistics Module 4'의 첫 번째 파트(Lesson 4-1)를 다룹니다.
+단순 선형 회귀 분석을 넘어 여러 독립 변수를 활용하는 다중 선형 회귀 분석의 기본 개념, 모델 개발 방법, 그리고 Excel을 이용한 실습 및 결과 해석에 초점을 맞춥니다.
+특히, 조정된 R-제곱(Adjusted R-squared)의 중요성과 각 독립 변수의 유의성 검정 방법을 이해하고, 이를 통해 최적의 예측 모델을 구축하는 과정을 상세히 설명합니다.
+\end{summarybox}
+
+\newpage
+\section{개요}
+\addcontentsline{toc}{section}{개요}
+이 문서는 UIUC의 BADM-572: Data-Driven Decision Making 과목의 'Inferential and Predictive Statistics Module 4' 중 첫 번째 부분에 해당하는 내용을 담고 있습니다.
+다중 선형 회귀(Multiple Linear Regression)의 핵심 원리와 비즈니스 의사결정에 어떻게 활용되는지를 학습하는 것이 목표입니다.
+단순 선형 회귀가 하나의 독립 변수만을 사용하는 반면, 다중 선형 회귀는 여러 독립 변수를 동시에 고려하여 종속 변수를 예측함으로써 현실의 복잡한 상황을 더 정확하게 모델링할 수 있습니다.
+이 파트에서는 다중 회귀 모델의 개념 소개, Excel을 활용한 모델 개발 절차, 그리고 도출된 결과의 해석 방법에 대해 깊이 있게 다룹니다.
+특히, 모델의 설명력을 평가하는 조정된 R-제곱과 각 변수의 유의성을 판단하는 p-값의 중요성을 강조하며, 이를 통해 불필요한 변수를 제거하고 예측력을 높이는 과정을 배웁니다.
+
+\newpage
+\section{용어 정리}
+\addcontentsline{toc}{section}{용어 정리}
+
+\begin{definitionbox}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.15\textwidth} p{0.45\textwidth} p{0.2\textwidth} p{0.1\textwidth}}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+다중 선형 회귀 & 여러 개의 원인(독립 변수)으로 하나의 결과(종속 변수)를 예측하는 통계 기법. & Multiple Linear Regression & 단순 회귀의 확장 \\
+종속 변수 & 예측하고자 하는 결과 변수. & Response/Dependent Variable & 보통 $y$로 표기 \\
+독립 변수 & 결과를 예측하는 데 사용되는 원인 변수. & Explanatory/Independent Variable & 보통 $x$로 표기 \\
+최소 제곱법 & 예측 오차를 최소화하여 최적의 회귀선을 찾는 방법. & Least Squares Method & 회귀 모델의 기본 원리 \\
+잔차 & 실제 값과 모델이 예측한 값의 차이. & Residuals & 예측 오차 \\
+R-제곱 & 모델이 종속 변수의 전체 변동 중 얼마나 설명하는지 나타내는 비율. & R-squared ($R^2$) & 모델 설명력 지표 \\
+조정된 R-제곱 & 독립 변수 개수에 따라 R-제곱이 과대평가되는 경향을 보정하여, 다중 회귀 모델의 설명력을 더 정확하게 평가하는 지표. & Adjusted R-squared & 다중 회귀에서 더 중요 \\
+p-값 & 특정 독립 변수가 종속 변수와 유의미한 관계가 없을 확률. & p-value & 변수의 유의성 판단 기준 \\
+유의 수준 & p-값을 비교하여 가설을 기각할지 결정하는 기준값 (일반적으로 0.05). & Significance Level ($\alpha$) & 통계적 판단 기준 \\
+더미 변수 & 범주형 데이터를 회귀 분석에 사용할 수 있도록 0과 1로 변환한 변수. & Dummy Variable & 질적 데이터 처리 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{definitionbox}
+
+\newpage
+\section{모듈 4: 추론 및 예측 통계}
+
+\subsection{Lesson 4-1: 모델 소개}
+
+\subsubsection{Lesson 4-1.1: 모델 소개}
+
+\begin{tcolorbox}[title=\textbf{다중 선형 회귀의 필요성}]
+우리는 일상생활에서 복잡한 예측 문제에 직면합니다. 예를 들어, Zillow는 어떻게 주택 가격을 추정할까요? Netflix는 어떤 영화를 추천해야 할지 어떻게 알까요? 금융 기관은 누가 대출을 불이행할 가능성이 높은지 어떻게 판단할까요?
+
+이러한 질문들은 단순히 하나의 요인만으로 답할 수 없습니다. 주택 가격은 위치, 크기, 건축 연도 등 여러 요인에 의해 결정되며, 영화 추천은 사용자의 시청 기록, 장르 선호도, 다른 사용자의 패턴 등 복합적인 데이터를 기반으로 이루어집니다.
+
+단순 선형 회귀(Simple Linear Regression)는 하나의 독립 변수(원인)로 하나의 종속 변수(결과)를 예측하는 데 사용됩니다. 하지만 현실의 많은 문제들은 여러 원인이 복합적으로 작용하여 결과를 만들어냅니다. 이러한 복잡한 상황을 분석하고 예측하기 위해 \textbf{다중 선형 회귀(Multiple Linear Regression)}가 필요합니다. 다중 선형 회귀는 여러 독립 변수를 동시에 고려하여 종속 변수를 예측함으로써, 단순 선형 회귀보다 훨씬 더 정교하고 현실적인 분석을 가능하게 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{다중 선형 회귀 모델의 특징}]
+\begin{itemize}
+    \item \textbf{하나의 종속 변수(Response/Dependent Variable):} 우리가 예측하고자 하는 결과는 여전히 하나입니다. 예를 들어, 주택 가격, 영화 시청 여부, 대출 불이행 여부 등입니다.
+    \item \textbf{여러 개의 독립 변수(Explanatory/Independent Variables):} 종속 변수에 영향을 미치는 여러 요인들을 동시에 모델에 포함할 수 있습니다. 독립 변수의 개수에는 이론적인 제한이 없습니다.
+\end{itemize}
+이러한 특징 덕분에 다중 회귀 모델은 단순 선형 회귀 모델보다 훨씬 더 복잡한 상황을 다룰 수 있으며, 더 정확한 예측과 통찰력을 제공합니다.
+\end{tcolorbox}
+
+\begin{examplebox}[title=\textbf{예시: 아동 비만 예측 모델}]
+신생아를 대상으로 한 연구에서는 아동 및 청소년 비만을 예측하는 방정식을 개발했습니다. 이 연구의 목표는 어떤 아기가 비만 위험이 가장 높은지 파악하여 예방 조치를 취하는 것이었습니다.
+
+이 모델은 다음의 여러 요인(독립 변수)을 기반으로 아기가 비만이 될 확률(종속 변수)을 예측합니다:
+\begin{itemize}
+    \item 어머니의 BMI (체질량 지수)
+    \item 아버지의 BMI
+    \item 가구 구성원 수
+    \item 어머니의 직업 범주 (범주형 데이터)
+    \item 임신 중 어머니의 흡연 여부 (범주형 데이터)
+    \item 아기의 출생 체중
+\end{itemize}
+총 7개의 독립 변수가 사용되었으며, 이 중 일부는 수치형(예: 가구 구성원 수, 출생 체중)이고 일부는 범주형(예: 어머니의 직업, 흡연 여부)입니다. 이 모듈에서는 어떤 변수가 예측 모델에 유용한지, 그리고 예측 공식을 어떻게 개발하는지 배우게 됩니다.
+\end{examplebox}
+
+\begin{tcolorbox}[title=\textbf{최소 제곱 추정 (Least Square Estimation)}]
+다중 선형 회귀도 단순 선형 회귀와 마찬가지로 \textbf{최소 제곱법(Least Squares Method)}을 사용하여 회귀 방정식을 찾습니다. 최소 제곱법은 실제 값과 예측 값 사이의 오차(잔차) 제곱합을 최소화하는 회귀선을 찾는 방법입니다.
+
+다중 회귀에서는 각 독립 변수($x_1, x_2, \dots, x_k$)마다 고유한 기울기($b_1, b_2, \dots, b_k$)를 가집니다. 회귀 방정식은 다음과 같이 표현됩니다:
+\[ \hat{y} = b_0 + b_1x_1 + b_2x_2 + \dots + b_kx_k \]
+여기서:
+\begin{itemize}
+    \item $\hat{y}$ (y-hat): 독립 변수 $x_1, x_2, \dots, x_k$의 값이 주어졌을 때 종속 변수 $y$의 평균 값에 대한 점 추정치(point estimate)입니다.
+    \item $b_0$: 절편(intercept)으로, 모든 독립 변수가 0일 때 $y$의 예측 값입니다.
+    \item $b_i$: $i$번째 독립 변수 $x_i$의 기울기(slope) 또는 회귀 계수(regression coefficient)입니다. 다른 모든 독립 변수가 일정할 때 $x_i$가 1단위 증가할 때 $\hat{y}$가 변화하는 양을 나타냅니다.
+\end{itemize}
+$\hat{y}$는 어디까지나 추정치이므로, 단순 선형 회귀에서와 마찬가지로 실제 값과의 오차(잔차)가 존재합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{회귀 모델의 가정 (Regression Model Assumptions)}]
+회귀 분석이 유효하려면 몇 가지 가정이 충족되어야 합니다. 단순 선형 회귀에서 학습했던 가정들은 다중 선형 회귀에서도 동일하게 적용됩니다. 이러한 가정들은 주로 잔차(예측 오차)를 분석하여 확인합니다.
+
+\begin{enumerate}
+    \item \textbf{평균이 0인 가정 (Mean of Zero Assumption):} 잔차의 평균은 0이어야 합니다. 이는 모델이 체계적인 편향 없이 예측한다는 것을 의미합니다.
+    \item \textbf{등분산성 가정 (Constant Variance Assumption):} 잔차의 분산은 모든 독립 변수 값에 대해 일정해야 합니다. 즉, 예측 오차의 크기가 독립 변수 값에 따라 달라지지 않아야 합니다.
+    \item \textbf{정규성 가정 (Normality Assumption):} 잔차는 정규 분포를 따라야 합니다. 이는 통계적 추론(예: 신뢰 구간, 가설 검정)의 정확성을 보장합니다.
+    \item \textbf{독립성 가정 (Independence Assumption):} 잔차들은 서로 독립적이어야 합니다. 즉, 한 잔차가 다른 잔차에 영향을 미치지 않아야 합니다. 이는 데이터 수집 과정에서 발생할 수 있는 자기 상관(autocorrelation) 문제를 방지합니다.
+\end{enumerate}
+이러한 가정들의 유효성은 잔차 플롯(residual plots)과 통계적 검정을 통해 확인합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{R-제곱($R^2$)과 조정된 R-제곱(Adjusted $R^2$)}]
+\textbf{R-제곱($R^2$)}은 회귀 모델이 종속 변수의 전체 변동 중 얼마나 많은 부분을 설명하는지 나타내는 지표입니다. 0과 1 사이의 값을 가지며, 1에 가까울수록 모델의 설명력이 높다고 해석합니다.
+
+\textbf{다중 선형 회귀에서는 R-제곱 대신 '조정된 R-제곱(Adjusted $R^2$)'을 사용합니다.}
+그 이유는 다음과 같습니다:
+\begin{itemize}
+    \item \textbf{R-제곱의 한계:} 다중 회귀 모델에 새로운 독립 변수를 추가하면, 설령 그 변수가 종속 변수와 아무런 관계가 없더라도 R-제곱 값은 항상 증가하거나 최소한 감소하지 않습니다. 이는 모델에 불필요한 변수가 추가되어도 R-제곱이 모델의 설명력을 과대평가할 수 있음을 의미합니다.
+    \item \textbf{조정된 R-제곱의 역할:} 조정된 R-제곱은 이러한 R-제곱의 경향을 보정합니다. 모델에 추가된 독립 변수의 개수와 표본 크기를 고려하여 R-제곱을 조정합니다. 따라서, 불필요한 변수가 추가되면 조정된 R-제곱은 오히려 감소할 수 있습니다. 이는 모델의 진정한 설명력을 더 정확하게 반영합니다.
+\end{itemize}
+\textbf{결론적으로, 다중 선형 회귀에서는 모델의 전반적인 설명력을 평가할 때 항상 조정된 R-제곱을 사용해야 합니다.} 조정된 R-제곱은 일반적으로 R-제곱보다 작거나 같습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{변수의 유의성 검정 (Testing the Significance)}]
+조정된 R-제곱은 모델 전체의 설명력을 알려주지만, 모델에 포함된 \textbf{각 독립 변수가 종속 변수에 대해 유의미한 관계를 가지는지 여부}는 별도로 평가해야 합니다.
+
+\begin{itemize}
+    \item \textbf{귀무 가설 (Null Hypothesis, $H_0$):} 해당 독립 변수와 종속 변수 사이에는 아무런 관계가 없다. (즉, 해당 변수의 회귀 계수는 0이다.)
+    \item \textbf{대립 가설 (Alternative Hypothesis, $H_1$):} 해당 독립 변수와 종속 변수 사이에는 유의미한 관계가 있다. (즉, 해당 변수의 회귀 계수는 0이 아니다.)
+\end{itemize}
+각 독립 변수에 대한 \textbf{p-값(p-value)}을 계산하여 이 가설을 검정합니다.
+\begin{itemize}
+    \item \textbf{p-값 < 유의 수준($\alpha$):} 귀무 가설을 기각합니다. 이는 해당 독립 변수와 종속 변수 사이에 \textbf{유의미한 관계가 있다}는 것을 의미합니다. (일반적으로 유의 수준은 0.05 또는 0.01을 사용합니다.)
+    \item \textbf{p-값 $\ge$ 유의 수준($\alpha$):} 귀무 가설을 기각할 수 없습니다. 이는 해당 독립 변수와 종속 변수 사이에 \textbf{유의미한 관계가 있다고 보기 어렵다}는 것을 의미합니다. 이러한 변수는 모델에서 제거하는 것을 고려해야 합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\subsection{예시 1: 제약 회사 영업 사원 성과 평가}
+
+\begin{examplebox}[title=\textbf{문제 상황}]
+한 대형 제약 회사의 지역 관리자는 영업 사원의 성과를 평가하고자 합니다. 일반적으로 판촉 활동이 매출에 가장 중요한 요인이라고 생각됩니다. 50명의 영업 사원에 대한 데이터가 수집되었으며, 연구 목표는 \textbf{판촉 예산이 연간 매출에 미치는 영향}을 파악하는 것입니다.
+
+\begin{itemize}
+    \item \textbf{y:} 회사의 연간 제품 매출 (천 달러 단위)
+    \item \textbf{x:} 판촉 예산 (천 달러 단위)
+\end{itemize}
+이것은 하나의 독립 변수만을 사용하므로, 단순 선형 회귀 분석을 먼저 실행합니다.
+\end{examplebox}
+
+\begin{tcolorbox}[title=\textbf{Excel 출력: 단순 선형 회귀 분석}]
+아래 표는 판촉 예산(x)과 연간 매출(y) 간의 단순 선형 회귀 분석 결과입니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r}
+\toprule
+\textbf{회귀 통계량 (Regression Statistics)} & \\
+\midrule
+다중 R (Multiple R) & 0.63587376 \\
+R-제곱 (R Square) & 0.40433544 \\
+조정된 R-제곱 (Adjusted R Square) & 0.39192577 \\
+표준 오차 (Standard Error) & 1080.06248 \\
+관측치 수 (Observations) & 50 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 F (Significance F)} \\
+\midrule
+회귀 (Regression) & 1 & 38008353.3 & 38008353.3 & 32.5823 & 6.97799E-07 \\
+잔차 (Residual) & 48 & 55993678.5 & 1166534.97 & & \\
+총계 (Total) & 49 & 94002031.8 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+절편 (Intercept) & 8043.79161 & 387.114414 & 20.7788481 & 1.2E-25 & 7265.445917 & 8822.137311 \\
+판촉 예산 (Promotional budget) & 0.5793468 & 0.10149578 & 5.70808782 & 7E-07 & 0.375275869 & 0.78341774 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{분석:}
+\begin{itemize}
+    \item \textbf{R-제곱:} 0.4043 (약 40.43\%)입니다. 이는 판촉 예산이 연간 매출 변동의 약 40%를 설명한다는 의미입니다.
+    \item \textbf{판촉 예산의 p-값:} 7E-07 (0.0000007)로 매우 작습니다. 이는 유의 수준 0.05보다 훨씬 작으므로, 판촉 예산과 매출 사이에 \textbf{유의미한 관계가 있다}는 것을 알 수 있습니다.
+\end{itemize}
+\textbf{결론:} 판촉 예산은 매출에 유의미한 영향을 미치지만, 모델의 설명력(40%)은 만족스럽지 않습니다. 관리자는 더 나은 모델을 개발하도록 요청했습니다.
+\end{tcolorbox}
+
+\newpage
+\begin{examplebox}[title=\textbf{모델 개선: 다른 변수 추가}]
+영업 사원들의 의견을 바탕으로, 매출에 영향을 미칠 수 있는 네 가지 변수를 추가하여 모델을 개선하기로 결정했습니다.
+
+\begin{enumerate}
+    \item \textbf{영업 사원의 회사 근무 기간 (Sales agent time with company):} 경험이 많을수록 매출이 높을 수 있습니다.
+    \item \textbf{시장 잠재력 (Market potential):} 영업 지역의 시장 규모가 클수록 매출이 높을 수 있습니다.
+    \item \textbf{작년 대비 시장 잠재력 변화 (Market potential change since last year):} 시장의 성장 또는 축소가 매출에 영향을 미칠 수 있습니다.
+    \item \textbf{영업 사원에 대한 평균 고객 평점 (Average customer rating of the sales representative):} 고객 만족도가 높을수록 매출이 높을 수 있습니다.
+\end{enumerate}
+\end{examplebox}
+
+\begin{tcolorbox}[title=\textbf{새로운 회귀 변수 정의}]
+이제 종속 변수 $y$는 다섯 가지 독립 변수의 영향을 받는다고 가정합니다.
+
+\begin{itemize}
+    \item \textbf{y:} 회사의 연간 제품 매출 (천 달러 단위)
+    \item \textbf{$x_1$:} 판촉 예산 (천 달러 단위)
+    \item \textbf{$x_2$:} 영업 사원의 근무 개월 수
+    \item \textbf{$x_3$:} 시장 잠재력 (10만 달러 단위)
+    \item \textbf{$x_4$:} 1년 동안의 시장 점유율 변화 (백분율)
+    \item \textbf{$x_5$:} 영업 사원의 평균 평점 (1~5점)
+\end{itemize}
+이러한 모든 변수에 대한 데이터를 수집한 후, 다중 선형 회귀 모델을 실행합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Excel 출력: 다중 선형 회귀 분석 (초기 모델)}]
+아래 표는 5개의 독립 변수를 포함한 다중 선형 회귀 분석 결과입니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r}
+\toprule
+\textbf{회귀 통계량 (Regression Statistics)} & \\
+\midrule
+다중 R (Multiple R) & 0.8562096 \\
+R-제곱 (R Square) & 0.7330949 \\
+\textbf{조정된 R-제곱 (Adjusted R Square)} & \textbf{0.7027648} \\
+표준 오차 (Standard Error) & 75.512825 \\
+관측치 수 (Observations) & 50 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 F (Significance F)} \\
+\midrule
+회귀 (Regression) & 5 & 689124.0983 & 137824.8 & 24.171 & 1.29955E-11 \\
+잔차 (Residual) & 44 & 250896.2198 & 5702.187 & & \\
+총계 (Total) & 49 & 940020.318 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+절편 (Intercept) & 520.08453 & 73.8516445 & 7.042288 & 1E-08 & 371.2463239 & 668.92274 \\
+판촉 예산 (Promotional budget) & 3.0146845 & 0.840772413 & 3.585613 & 0.0008 & 1.32021902 & 4.7091499 \\
+근무 기간 (Time) & 5.2706174 & 1.132557877 & 4.653729 & 3E-05 & 2.988097025 & 7.5531379 \\
+시장 잠재력 (Market potential) & 0.0191646 & 0.006074822 & 3.154757 & 0.0029 & 0.006921585 & 0.0314076 \\
+\textbf{시장 점유율 변화 (Market Share change)} & \textbf{-74.322586} & \textbf{98.78631602} & \textbf{-0.752357} & \textbf{0.4558} & \textbf{-273.4133239} & \textbf{124.76815} \\
+고객 평점 (Customer rating) & 51.121931 & 17.83372083 & 2.866588 & 0.0063 & 15.18042783 & 87.063433 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{분석:}
+\begin{itemize}
+    \item \textbf{조정된 R-제곱:} 0.7027 (약 70.27\%)입니다. 이는 단순 선형 회귀 모델의 40%에 비해 크게 향상된 수치입니다. 이 모델은 매출 변동의 70%를 설명할 수 있습니다.
+    \item \textbf{변수 유의성 검정 (p-값):} 각 독립 변수의 p-값을 확인하여 유의 수준 0.05보다 작은지 확인합니다.
+    \begin{itemize}
+        \item 판촉 예산, 근무 기간, 시장 잠재력, 고객 평점: 모두 p-값이 0.05보다 작으므로 유의미합니다.
+        \item \textbf{시장 점유율 변화 (Market Share change):} p-값이 0.4558로 0.05보다 훨씬 큽니다. 이는 시장 점유율 변화 변수가 매출과 \textbf{유의미한 관계가 없다}는 것을 의미합니다.
+    \end{itemize}
+\end{itemize}
+\textbf{결론:} 모델의 설명력은 향상되었지만, '시장 점유율 변화' 변수는 유의미하지 않습니다. 유의미하지 않은 변수는 모델의 노이즈로 작용할 수 있으므로 제거하고 모델을 다시 실행해야 합니다.
+\end{tcolorbox}
+
+\newpage
+\begin{tcolorbox}[title=\textbf{모델 개선: 유의미하지 않은 변수 제거}]
+'시장 점유율 변화' 변수는 매출에 유의미한 영향을 미치지 않으므로, 이 변수를 모델에서 제거하고 회귀 분석을 다시 실행합니다.
+
+\textbf{Excel 출력: 다중 선형 회귀 분석 (개선된 모델)}
+아래 표는 '시장 점유율 변화' 변수를 제거한 후 4개의 독립 변수를 포함한 다중 선형 회귀 분석 결과입니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r}
+\toprule
+\textbf{회귀 통계량 (Regression Statistics)} & \\
+\midrule
+다중 R (Multiple R) & 0.854202129 \\
+R-제곱 (R Square) & 0.729661277 \\
+\textbf{조정된 R-제곱 (Adjusted R Square)} & \textbf{0.705631168} \quad \textit{(이전: 0.7027648)} \\
+표준 오차 (Standard Error) & 75.14783835 \\
+관측치 수 (Observations) & 50 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 F (Significance F)} \\
+\midrule
+회귀 (Regression) & 4 & 685896.43 & 171474.11 & 30.36446009 & 2.87686E-12 \\
+잔차 (Residual) & 45 & 254123.89 & 5647.1976 & & \\
+총계 (Total) & 49 & 940020.32 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+절편 (Intercept) & 523.1894893 & 73.379843 & 7.1298802 & 6.54228E-09 & 375.3949 & 670.9840792 \\
+판촉 예산 (Promotional budget) & 2.900752995 & 0.8230252 & 3.5245007 & 0.00098754 & 1.2430951 & 4.558410902 \\
+근무 기간 (Time) & 5.325191755 & 1.1247696 & 4.7344733 & 2.21462E-05 & 3.0597894 & 7.590594082 \\
+시장 잠재력 (Market potential) & 0.019537178 & 0.0060253 & 3.2425035 & 0.002234635 & 0.0074015 & 0.03167283 \\
+고객 평점 (Customer rating) & 50.32410335 & 17.716119 & 2.8405828 & 0.006740209 & 14.642008 & 86.00619871 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{분석:}
+\begin{itemize}
+    \item \textbf{조정된 R-제곱:} 0.7056 (약 70.56\%)로, 이전 모델의 0.7027보다 약간 증가했습니다. 이는 불필요한 변수를 제거함으로써 모델의 설명력이 실제로 개선되었음을 보여줍니다. 모델이 '시장 점유율 변화' 변수를 제거해도 손상되지 않았다는 것을 의미합니다.
+    \item \textbf{변수 유의성 검정 (p-값):} 이제 모든 독립 변수(판촉 예산, 근무 기간, 시장 잠재력, 고객 평점)의 p-값이 유의 수준 0.05보다 작습니다. 이는 모델에 남아있는 모든 변수가 매출과 \textbf{유의미한 관계를 가진다}는 것을 의미합니다.
+\end{itemize}
+\textbf{결론:} 이 모델은 이제 모든 변수가 유의미하며, 매출 변동의 약 70.56\%를 설명하는 만족스러운 예측 모델입니다.
+\end{tcolorbox}
+
+\newpage
+\begin{tcolorbox}[title=\textbf{회귀 방정식 작성 (Regression Equation)}]
+이제 최종적으로 만족스러운 모델을 얻었으므로, Excel 출력의 '계수(Coefficients)' 열에 있는 값을 사용하여 회귀 방정식을 작성할 수 있습니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+절편 (Intercept) & \textbf{523.1894893} & 73.379843 & 7.1298802 & 6.54228E-09 & 375.3949 & 670.9840792 \\
+판촉 예산 (Promotional budget) & \textbf{2.900752995} & 0.8230252 & 3.5245007 & 0.00098754 & 1.2430951 & 4.558410902 \\
+근무 기간 (Time) & \textbf{5.325191755} & 1.1247696 & 4.7344733 & 2.21462E-05 & 3.0597894 & 7.590594082 \\
+시장 잠재력 (Market potential) & \textbf{0.019537178} & 0.0060253 & 3.2425035 & 0.002234635 & 0.0074015 & 0.03167283 \\
+고객 평점 (Customer rating) & \textbf{50.32410335} & 17.716119 & 2.8405828 & 0.006740209 & 14.642008 & 86.00619871 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+회귀 방정식의 일반적인 형태는 다음과 같습니다:
+\[ \hat{y} = b_0 + b_1x_1 + b_2x_2 + \dots + b_kx_k \]
+위 표의 계수 값을 사용하여 최종 회귀 방정식을 작성하면:
+\[ \hat{y} = 523.18949 + 2.90075x_1 + 5.32519x_2 + 0.01954x_3 + 50.32410x_4 \]
+여기서:
+\begin{itemize}
+    \item $\hat{y}$: 연간 매출 예측치 (천 달러)
+    \item $x_1$: 판촉 예산 (천 달러)
+    \item $x_2$: 근무 개월 수
+    \item $x_3$: 시장 잠재력 (10만 달러)
+    \item $x_4$: 고객 평점 (1~5점)
+\end{itemize}
+이 방정식은 영업 사원의 근무 기간, 판촉 예산, 시장 잠재력, 평균 고객 평점과 매출 간의 관계를 나타냅니다.
+\end{tcolorbox}
+
+\newpage
+\begin{examplebox}[title=\textbf{예측하기 (Making a Prediction)}]
+이제 개발된 회귀 방정식을 사용하여 특정 영업 사원의 매출을 예측할 수 있습니다.
+
+\textbf{질문:} 근무 기간 5년, 판촉 예산 \$5,000, 시장 잠재력 \$8,000,000, 평균 고객 평점 4.3점인 영업 사원의 평균 매출 예측치는 얼마입니까?
+
+\textbf{변수 값 설정:}
+\begin{itemize}
+    \item $x_1$ (판촉 예산): \$5,000 $\rightarrow$ \textbf{5} (천 달러 단위로 입력)
+    \item $x_2$ (근무 기간): 5년 $\rightarrow$ \textbf{60} (개월 단위로 입력)
+    \item $x_3$ (시장 잠재력): \$8,000,000 $\rightarrow$ \textbf{8000} (10만 달러 단위로 입력, 즉 8000 * 1000 = 8,000,000)
+    \item $x_4$ (고객 평점): 4.3 $\rightarrow$ \textbf{4.3}
+\end{itemize}
+
+\textbf{회귀 방정식에 대입:}
+\[ \hat{y} = 523.18949 + 2.90075(5) + 5.32519(60) + 0.01954(8000) + 50.32410(4.3) \]
+\[ \hat{y} = 523.18949 + 14.50375 + 319.5114 + 156.32 + 216.39363 \]
+\[ \hat{y} = 1229.91827 \]
+
+\textbf{최종 예측:}
+매출은 천 달러 단위로 기록되었으므로, 예측 값에 1,000을 곱해야 합니다.
+\[ \hat{y} = 1229.91827 \times 1000 = \$1,229,918.27 \]
+따라서, 해당 영업 사원의 연간 매출 예측치는 약 \textbf{\$1,229,918.27}입니다. 이 값은 신뢰 구간의 중간 지점(point estimate)입니다.
+\end{examplebox}
+
+\begin{examplebox}[title=\textbf{연습 문제: 판촉 예산 증가의 영향}]
+\textbf{질문:} 위에서 개발된 회귀 방정식이 주어졌을 때, 판촉 예산이 \$10,000 증가하면 예상 매출은 얼마나 증가할까요?
+
+\textbf{회귀 방정식:}
+\[ \hat{y} = 523.18949 + \textbf{2.90075}x_1 + 5.32519x_2 + 0.01954x_3 + 50.32410x_4 \]
+여기서 $x_1$은 판촉 예산(천 달러)입니다.
+
+\textbf{풀이:}
+판촉 예산($x_1$)의 계수는 2.90075입니다. 이는 다른 모든 변수가 일정할 때, 판촉 예산이 1천 달러 증가할 때마다 매출이 2.90075천 달러 증가한다는 의미입니다.
+판촉 예산이 \$10,000 증가한다는 것은 $x_1$이 10 (천 달러) 증가한다는 의미입니다.
+따라서 예상 매출 증가는 다음과 같습니다:
+\[ \text{매출 증가} = 2.90075 \times 10 = 29.0075 \text{ (천 달러)} \]
+\[ \text{매출 증가} = \$29,007.5 \]
+판촉 예산이 \$10,000 증가하면 연간 매출은 약 \textbf{\$29,007.5} 증가할 것으로 예상됩니다.
+\end{examplebox}
+
+\newpage
+\begin{tcolorbox}[title=\textbf{가장 영향력 있는 변수 식별 (Most Impactful Variables)}]
+회귀 모델의 계수(Coefficients)를 살펴보면, 어떤 독립 변수가 종속 변수에 가장 큰 영향을 미치는지 파악할 수 있습니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} \\
+\midrule
+절편 (Intercept) & 523.1894893 \\
+\textbf{판촉 예산 (Promotional budget)} & \textbf{2.900752995} \\
+\textbf{근무 기간 (Time)} & \textbf{5.325191755} \\
+\textbf{시장 잠재력 (Market potential)} & \textbf{0.019537178} \\
+\textbf{고객 평점 (Customer rating)} & \textbf{50.32410335} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{계수 해석:}
+\begin{itemize}
+    \item \textbf{고객 평점 (Customer rating):} 계수 50.32410335. 다른 모든 변수가 일정할 때, 고객 평점이 1점 증가하면 매출은 50.32410335천 달러 (약 \$50,324) 증가합니다.
+    \item \textbf{근무 기간 (Time):} 계수 5.325191755. 다른 모든 변수가 일정할 때, 근무 기간이 1개월 증가하면 매출은 5.325191755천 달러 (약 \$5,325) 증가합니다.
+    \item \textbf{판촉 예산 (Promotional budget):} 계수 2.900752995. 다른 모든 변수가 일정할 때, 판촉 예산이 1천 달러 증가하면 매출은 2.900752995천 달러 (약 \$2,901) 증가합니다.
+    \item \textbf{시장 잠재력 (Market potential):} 계수 0.019537178. 다른 모든 변수가 일정할 때, 시장 잠재력이 10만 달러 증가하면 매출은 0.019537178천 달러 (약 \$19.54) 증가합니다.
+\end{itemize}
+
+\textbf{가장 큰 영향:}
+계수 값만 놓고 보면 \textbf{고객 평점}이 가장 큰 계수(50.324)를 가지며, 그 다음이 \textbf{근무 기간}(5.325)입니다. 이는 고객 평점이 1점 개선되면 매출이 약 \$50,324 증가하는 반면, 판촉 예산이 \$1,000 증가하면 매출이 약 \$2,901 증가하는 것을 의미합니다.
+
+\begin{cautionbox}
+\textbf{주의: 계수 크기 비교 시 단위 고려}
+계수의 절대적인 크기만으로 영향력을 비교할 때는 각 변수의 측정 단위를 반드시 고려해야 합니다. 예를 들어, 고객 평점은 1점 단위로 변화하고, 판촉 예산은 1천 달러 단위로 변화합니다. 만약 모든 독립 변수가 동일한 척도로 표준화되어 있다면 계수 크기를 직접 비교하는 것이 더 정확합니다. 이 예시에서는 텍스트에서 계수 크기를 직접 비교하여 영향력을 판단하고 있으므로, 그 흐름을 따르되 단위에 대한 설명을 추가합니다.
+\end{cautionbox}
+
+\textbf{경영학적 통찰:}
+이 분석 결과는 원래 판촉 예산이 가장 중요하다고 생각했던 것과는 다른 통찰력을 제공합니다.
+\begin{itemize}
+    \item \textbf{고객 평점의 중요성:} 고객 평점이 1점 향상되면 평균 매출이 약 \$50,324 증가하는 것으로 나타나, 고객 서비스 개선이 영업 사원 성과에 가장 긍정적인 영향을 미친다는 것을 알 수 있습니다.
+    \item \textbf{근무 기간의 영향:} 영업 사원의 근무 기간이 길어질수록 매출이 증가하는 경향을 보입니다. 이는 숙련된 영업 사원이 더 많은 판매를 할 수 있음을 시사합니다.
+\end{itemize}
+이러한 결과는 회사가 영업 사원들이 행복하게 오래 근무할 수 있는 환경을 제공하고, 전문적인 만족도가 우수한 고객 서비스로 이어지도록 장려하는 것이 회사의 수익에 매우 긍정적인 영향을 미칠 수 있음을 보여줍니다. 다중 회귀 분석을 통해 어떤 변수가 종속 변수에 영향을 미치는지, 그리고 그 영향의 정도는 어느 정도인지 파악할 수 있습니다.
+\end{tcolorbox}
+
+\newpage
+\subsubsection{Lesson 4-1.2: Excel에서 다중 회귀 모델 개발하기}
+
+이 섹션에서는 Excel의 '데이터 분석' 도구를 사용하여 다중 선형 회귀 모델을 개발하는 실제 절차를 단계별로 설명합니다.
+
+\begin{tcolorbox}[title=\textbf{데이터 준비: Sales Multiple Excel Worksheet}]
+\begin{itemize}
+    \item \textbf{데이터셋:} 'Multiple Sales' Excel 파일에는 'Sales', 'Promotional Budget', 'Time', 'Market Potential', 'Market Change', 'Customer Rating'의 6개 열이 있습니다.
+    \item \textbf{단위 확인:}
+    \begin{itemize}
+        \item Sales: 천 달러
+        \item Promotional Budget: 천 달러
+        \item Market Potential: 천 달러
+        \item Time: 개월 수
+        \item Customer Rating: 0~5점
+    \end{itemize}
+\end{itemize}
+
+\begin{cautionbox}
+\textbf{Excel 데이터 배열의 중요성}
+Excel에서 회귀 분석을 실행할 때, 모든 독립 변수(X 값)는 \textbf{연속된 열}에 위치해야 합니다. 예를 들어, 종속 변수(Y 값)가 첫 번째 열에 있고, 그 다음으로 모든 독립 변수들이 나란히 이어져야 합니다. 만약 독립 변수들 사이에 다른 데이터 열이 끼어 있다면, Excel은 이를 올바르게 인식하지 못합니다. 따라서 분석을 시작하기 전에 워크시트의 열을 재배열하여 모든 독립 변수가 연속된 열에 오도록 해야 합니다.
+\end{cautionbox}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Excel 데이터 분석 도구 사용하기}]
+\begin{enumerate}
+    \item \textbf{'데이터 분석' 실행:} Excel 상단 메뉴에서 [데이터] 탭을 클릭한 후, [데이터 분석]을 선택합니다. (만약 '데이터 분석'이 보이지 않으면, Excel 옵션에서 '분석 도구' 추가 기능을 활성화해야 합니다.)
+    \item \textbf{'회귀 분석' 선택:} '데이터 분석' 팝업 창에서 '회귀 분석(Regression)'을 선택하고 [확인]을 클릭합니다.
+    \item \textbf{입력 Y 범위 설정:} '회귀 분석' 대화 상자에서 [입력 Y 범위(Input Y Range)]에 종속 변수(Sales)가 있는 열 전체를 선택합니다. (예: \texttt{$A$1:$A$51})
+    \item \textbf{입력 X 범위 설정:} [입력 X 범위(Input X Range)]에 \textbf{모든 독립 변수(Promotional Budget, Time, Market Potential, Market Change, Customer Rating)가 있는 연속된 열 전체}를 선택합니다. (예: \texttt{$B$1:$F$51})
+    \item \textbf{'레이블' 확인:} 첫 행에 변수 이름(레이블)이 포함되어 있다면, [레이블(Labels)] 체크박스를 선택합니다. 이렇게 하면 출력 결과에 변수 이름이 표시되어 해석하기 용이합니다.
+    \item \textbf{'신뢰 수준' 설정:} [신뢰 수준(Confidence Level)]은 기본값인 95\%를 유지합니다.
+    \item \textbf{출력 옵션 설정:} [출력 옵션(Output Options)]에서 '새 워크시트(New Worksheet Ply)'를 선택하여 결과를 새로운 시트에 표시하도록 합니다.
+    \item \textbf{실행:} [확인] 버튼을 클릭하여 회귀 분석을 실행합니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{초기 Excel 출력 결과 해석}]
+회귀 분석을 실행하면 새로운 워크시트에 '요약 출력(Summary Output)'이 생성됩니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r}
+\toprule
+\textbf{회귀 통계량 (Regression Statistics)} & \\
+\midrule
+다중 R (Multiple R) & 0.85620961 \\
+R-제곱 (R Square) & 0.733094897 \\
+\textbf{조정된 R-제곱 (Adjusted R Square)} & \textbf{0.702764772} \\
+표준 오차 (Standard Error) & 75.51282548 \\
+관측치 수 (Observations) & 50 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 F (Significance F)} \\
+\midrule
+회귀 (Regression) & 5 & 689124.0983 & 137824.8 & 24.17052 & 1.3E-11 \\
+잔차 (Residual) & 44 & 250896.2198 & 5702.187 & & \\
+총계 (Total) & 49 & 940020.318 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+절편 (Intercept) & 520.0845335 & 73.8516445 & 7.042288 & 9.91E-09 & 371.2463 & 668.9227 \\
+판촉 예산 (Promotional Budget) & 3.014684478 & 0.840772413 & 3.585613 & 0.000838 & 1.320219 & 4.70915 \\
+근무 기간 (Time) & 5.270617446 & 1.132557877 & 4.653729 & 3E-05 & 2.988097 & 7.553138 \\
+시장 잠재력 (Market potential) & 0.019164585 & 0.006074822 & 3.154757 & 0.002895 & 0.006922 & 0.031408 \\
+\textbf{시장 점유율 변화 (Market Share change)} & \textbf{-74.32258581} & \textbf{98.78631602} & \textbf{-0.75236} & \textbf{0.455843} & \textbf{-273.413} & \textbf{124.76815} \\
+고객 평점 (Customer rating) & 51.12193052 & 17.83372083 & 2.866588 & 0.006344 & 15.18043 & 87.06343 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{해석 단계:}
+\begin{enumerate}
+    \item \textbf{조정된 R-제곱 확인:} 모델의 전반적인 설명력을 평가합니다. 여기서는 약 70.27\%입니다.
+    \item \textbf{각 변수의 p-값 확인:} '기타 통계량' 테이블의 'p-값' 열을 확인합니다. 유의 수준(일반적으로 0.05)보다 큰 p-값을 가진 변수가 있는지 찾습니다.
+    \item \textbf{유의미하지 않은 변수 식별:} 위 표에서 '시장 점유율 변화' 변수의 p-값은 0.455843으로 0.05보다 훨씬 큽니다. 이는 이 변수가 매출과 유의미한 관계가 없다는 것을 의미합니다. 이러한 변수는 모델에 '노이즈'를 추가하며, 예측력을 저해할 수 있습니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{모델 정리: 유의미하지 않은 변수 제거}]
+유의미하지 않은 변수를 모델에서 제거하는 것은 모델을 '정리(clean up)'하는 중요한 단계입니다.
+\begin{enumerate}
+    \item \textbf{변수 제거:} 원본 데이터 시트로 돌아가서, 유의미하지 않은 변수(여기서는 'Market Share change' 열)를 삭제합니다. (여러 개의 유의미하지 않은 변수가 있다면, p-값이 가장 높은 변수부터 하나씩 제거하고 매번 회귀 분석을 다시 실행하는 것이 좋습니다.)
+    \item \textbf{회귀 분석 재실행:} 변수를 제거한 후, 위에서 설명한 절차에 따라 '데이터 분석' 도구를 사용하여 회귀 분석을 다시 실행합니다. 이때, '입력 X 범위'가 변경된 열 범위에 맞게 올바르게 설정되었는지 확인해야 합니다.
+\end{enumerate}
+
+\textbf{개선된 모델의 Excel 출력 결과:}
+'시장 점유율 변화' 변수를 제거한 후의 회귀 분석 결과는 다음과 같습니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r}
+\toprule
+\textbf{회귀 통계량 (Regression Statistics)} & \\
+\midrule
+다중 R (Multiple R) & 0.854202129 \\
+R-제곱 (R Square) & 0.729661277 \\
+\textbf{조정된 R-제곱 (Adjusted R Square)} & \textbf{0.705631168} \\
+표준 오차 (Standard Error) & 75.14783835 \\
+관측치 수 (Observations) & 50 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 F (Significance F)} \\
+\midrule
+회귀 (Regression) & 4 & 685896.43 & 171474.11 & 30.36446009 & 2.87686E-12 \\
+잔차 (Residual) & 45 & 254123.89 & 5647.1976 & & \\
+총계 (Total) & 49 & 940020.32 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\vspace{0.5em}
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+절편 (Intercept) & 523.1894893 & 73.379843 & 7.1298802 & 6.54228E-09 & 375.3949 & 670.9840792 \\
+판촉 예산 (Promotional budget) & 2.900752995 & 0.8230252 & 3.5245007 & 0.00098754 & 1.2430951 & 4.558410902 \\
+근무 기간 (Time) & 5.325191755 & 1.1247696 & 4.7344733 & 2.21462E-05 & 3.0597894 & 7.590594082 \\
+시장 잠재력 (Market potential) & 0.019537178 & 0.0060253 & 3.2425035 & 0.002234635 & 0.0074015 & 0.03167283 \\
+고객 평점 (Customer rating) & 50.32410335 & 17.716119 & 2.8405828 & 0.006740209 & 14.642008 & 86.00619871 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{최종 확인:}
+\begin{itemize}
+    \item \textbf{조정된 R-제곱:} 0.7056으로 이전 모델(0.7027)보다 약간 향상되었습니다. 이는 제거된 변수가 모델의 설명력을 저해하는 '노이즈'였음을 확인시켜 줍니다.
+    \item \textbf{모든 p-값:} 이제 모든 독립 변수의 p-값이 0.05보다 작습니다. 이는 모델에 남아있는 모든 변수가 종속 변수(매출)와 유의미한 관계를 가진다는 것을 의미합니다.
+\end{itemize}
+이제 이 모델은 예측에 사용하기에 적합한 '좋은 모델'이라고 할 수 있습니다.
+\end{tcolorbox}
+
+\newpage
+\subsubsection{Lesson 4-1.3: 다중 회귀 Excel 출력 분석}
+
+이 섹션에서는 Excel에서 얻은 최종 회귀 모델 출력 결과를 활용하여 예측을 수행하고, 각 변수의 영향력을 분석하는 방법을 자세히 설명합니다.
+
+\begin{tcolorbox}[title=\textbf{회귀 방정식 작성 및 계수 해석}]
+우리가 최종적으로 얻은 Excel 출력의 '기타 통계량' 테이블은 회귀 방정식을 구성하는 데 필요한 모든 정보를 제공합니다.
+
+\begin{adjustbox}{max width=\textwidth, center}
+\begin{tabular}{l r r r r r r}
+\toprule
+\textbf{기타 통계량 (Other Statistics)} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+절편 (Intercept) & 523.189489 & 73.37984272 & 7.12988022 & 6.5423E-09 & 375.3948994 & 670.984079 \\
+판촉 예산 (Promotional Budget) & 2.900753 & 0.823025231 & 3.52450069 & 0.00098754 & 1.243095088 & 4.5584109 \\
+근무 기간 (Time) & 5.32519175 & 1.124769632 & 4.73447327 & 2.2146E-05 & 3.0589789428 & 7.59059408 \\
+시장 잠재력 (Market potential) & 0.01953718 & 0.006025337 & 3.24250349 & 0.00223463 & 0.007401525 & 0.03167283 \\
+고객 평점 (Customer rating) & 50.32410335 & 17.716119 & 2.8405828 & 0.006740209 & 14.642008 & 86.00619871 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{회귀 방정식:}
+\[ \hat{y} = 523.19 + 2.90x_1 + 5.33x_2 + 0.02x_3 + 50.32x_4 \]
+(여기서 계수들은 소수점 둘째 자리까지 반올림되었습니다.)
+
+\textbf{계수 해석:}
+각 독립 변수의 계수는 다른 모든 독립 변수가 일정하다는 가정 하에, 해당 변수가 1단위 증가할 때 종속 변수($\hat{y}$)가 얼마나 변화하는지를 나타냅니다.
+\begin{itemize}
+    \item \textbf{판촉 예산($x_1$) 계수 (2.90):} 판촉 예산이 1천 달러 증가하면, 매출은 2.90천 달러 (즉, \$2,900) 증가할 것으로 예상됩니다.
+    \item \textbf{근무 기간($x_2$) 계수 (5.33):} 근무 기간이 1개월 증가하면, 매출은 5.33천 달러 (즉, \$5,330) 증가할 것으로 예상됩니다.
+    \item \textbf{시장 잠재력($x_3$) 계수 (0.02):} 시장 잠재력이 10만 달러 증가하면, 매출은 0.02천 달러 (즉, \$20) 증가할 것으로 예상됩니다.
+    \item \textbf{고객 평점($x_4$) 계수 (50.32):} 고객 평점이 1점 증가하면, 매출은 50.32천 달러 (즉, \$50,320) 증가할 것으로 예상됩니다.
+\end{itemize}
+이러한 계수들을 통해 어떤 변수가 매출에 가장 큰 영향을 미치는지 파악할 수 있습니다. 예를 들어, 고객 평점 계수(50.32)는 다른 변수들에 비해 훨씬 크므로, 고객 서비스 개선이 매출 증대에 가장 효과적인 방법임을 시사합니다.
+\end{tcolorbox}
+
+\newpage
+\begin{tcolorbox}[title=\textbf{Excel을 이용한 예측 수행}]
+회귀 방정식을 사용하여 특정 조건에서의 매출을 예측하는 방법을 Excel에서 직접 실습해봅니다.
+
+\textbf{예측 시나리오:}
+근무 기간 5년, 판촉 예산 \$5,000, 시장 잠재력 \$8,000,000, 평균 고객 평점 4.3점인 영업 사원의 매출 예측.
+
+\textbf{단계:}
+\begin{enumerate}
+    \item \textbf{계수 복사:} Excel 출력에서 '계수(Coefficients)' 열의 값들을 새로운 셀에 복사합니다.
+    \item \textbf{독립 변수 값 입력:} 예측하고자 하는 시나리오에 맞춰 각 독립 변수의 값을 입력합니다. 이때, 데이터의 단위(천 달러, 개월 등)를 정확히 맞춰야 합니다.
+    \begin{itemize}
+        \item 절편: 해당 없음
+        \item 판촉 예산 ($x_1$): \$5,000 $\rightarrow$ \textbf{5} (천 달러)
+        \item 근무 기간 ($x_2$): 5년 $\rightarrow$ \textbf{60} (개월)
+        \item 시장 잠재력 ($x_3$): \$8,000,000 $\rightarrow$ \textbf{8000} (10만 달러)
+        \item 고객 평점 ($x_4$): 4.3 $\rightarrow$ \textbf{4.3}
+    \end{itemize}
+    \item \textbf{예측 계산 (SUMPRODUCT 함수 사용):} Excel의 \texttt{SUMPRODUCT} 함수를 사용하여 예측 값을 계산합니다. 이 함수는 두 배열의 해당 요소들을 곱한 후 그 합계를 반환합니다.
+    \begin{lstlisting}[language=Excel, caption=SUMPRODUCT 함수를 이용한 예측]
+=Intercept_Coefficient + SUMPRODUCT(Coefficients_Range, X_Values_Range)
+    \end{lstlisting}
+    예를 들어, 계수가 B28:B32에 있고 X 값이 C28:C32에 있다면:
+    \texttt{=B28 + SUMPRODUCT(B29:B32, C29:C32)}
+    \item \textbf{계수 범위 고정:} 만약 여러 시나리오에 대해 예측을 반복하고 싶다면, \texttt{SUMPRODUCT} 함수 내에서 계수 범위(예: \texttt{B29:B32})를 절대 참조(예: \texttt{$B$29:$B$32})로 고정합니다. (셀을 선택하고 \texttt{F4} 키를 누르면 됩니다.) 이렇게 하면 X 값만 변경하면서 쉽게 예측 값을 얻을 수 있습니다.
+    \item \textbf{단위 변환:} 최종 예측 값은 데이터의 원래 단위(여기서는 천 달러)로 나오므로, 필요한 경우 1,000을 곱하여 실제 달러 단위로 변환합니다.
+\end{enumerate}
+
+\textbf{예측 결과:}
+위 시나리오에 대한 예측 값은 약 \textbf{1229.89583} (천 달러)입니다.
+실제 달러로 변환하면 \textbf{\$1,229,895.83}이 됩니다.
+
+\textbf{변수 변화의 영향 시뮬레이션:}
+예를 들어, 판촉 예산을 \$5,000에서 \$6,000으로 (즉, $x_1$을 5에서 6으로) 증가시키면, 다른 모든 변수가 동일할 때 매출은 판촉 예산의 계수(2.90)만큼 증가합니다.
+새로운 예측 값에서 이전 예측 값을 빼면 정확히 2.90 (천 달러)의 차이가 나는 것을 확인할 수 있습니다. 이는 모델의 계수가 어떻게 개별 변수의 한계 효과(marginal effect)를 나타내는지 보여줍니다.
+이러한 방식으로 모델을 활용하여 다양한 비즈니스 시나리오를 시뮬레이션하고 의사결정을 지원할 수 있습니다.
+\end{tcolorbox}
+
+\newpage
+\section{FAQ: 초심자를 위한 질문과 답변}
+\addcontentsline{toc}{section}{FAQ: 초심자를 위한 질문과 답변}
+
+\begin{tcolorbox}[title=\textbf{자주 묻는 질문}]
+\begin{enumerate}
+    \item \textbf{Q: 단순 선형 회귀와 다중 선형 회귀의 가장 큰 차이점은 무엇인가요?}
+    \textbf{A:} 가장 큰 차이점은 독립 변수의 개수입니다. 단순 선형 회귀는 하나의 독립 변수만을 사용하여 종속 변수를 예측하는 반면, 다중 선형 회귀는 두 개 이상의 독립 변수를 동시에 사용하여 종속 변수를 예측합니다. 다중 회귀는 현실의 복잡한 관계를 더 잘 모델링할 수 있습니다.
+
+    \item \textbf{Q: 다중 회귀에서 R-제곱 대신 조정된 R-제곱을 사용하는 이유는 무엇인가요?}
+    \textbf{A:} R-제곱은 모델에 독립 변수를 추가하기만 해도 그 변수가 유의미하지 않더라도 항상 증가하거나 유지되는 경향이 있습니다. 이는 모델의 설명력을 과대평가할 수 있습니다. 조정된 R-제곱은 이러한 문제를 보정하여, 모델에 추가된 변수의 개수를 고려해 모델의 진정한 설명력을 더 정확하게 평가합니다.
+
+    \item \textbf{Q: Excel에서 회귀 분석을 실행할 때 독립 변수 열이 연속적이어야 하는 이유는 무엇인가요?}
+    \textbf{A:} Excel의 '데이터 분석' 도구는 '입력 X 범위'를 설정할 때 선택된 범위 내의 모든 열을 독립 변수로 간주합니다. 만약 독립 변수들 사이에 관련 없는 열이 있다면, Excel은 그 열도 독립 변수로 포함하여 잘못된 분석 결과를 도출할 수 있습니다. 따라서 정확한 분석을 위해 독립 변수들은 반드시 연속된 열에 배치되어야 합니다.
+
+    \item \textbf{Q: 회귀 분석 결과에서 p-값이 높은 변수는 어떻게 처리해야 하나요?}
+    \textbf{A:} p-값이 유의 수준(예: 0.05)보다 높은 변수는 종속 변수와 유의미한 통계적 관계가 없다고 판단됩니다. 이러한 변수는 모델의 예측력을 저해하는 '노이즈'로 작용할 수 있으므로, 모델에서 제거하고 회귀 분석을 다시 실행하는 것이 일반적인 절차입니다. p-값이 가장 높은 변수부터 하나씩 제거하는 것이 좋습니다.
+
+    \item \textbf{Q: 회귀 계수(Coefficients)의 크기가 클수록 해당 변수의 영향력이 크다고 볼 수 있나요?}
+    \textbf{A:} 일반적으로는 그렇지만, 항상 그런 것은 아닙니다. 계수의 크기를 비교할 때는 각 독립 변수의 측정 단위를 반드시 고려해야 합니다. 예를 들어, 1점 단위로 측정되는 평점 변수의 계수와 1000달러 단위로 측정되는 예산 변수의 계수를 직접 비교하는 것은 오해를 불러일으킬 수 있습니다. 모든 변수가 동일한 척도로 표준화되어 있다면 계수 크기를 직접 비교하는 것이 더 정확합니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+\addcontentsline{toc}{section}{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[title=\textbf{다중 선형 회귀 핵심 요약}]
+\textbf{개념:} 여러 독립 변수로 하나의 종속 변수 예측. 현실의 복잡한 문제 해결에 적합.
+\textbf{모델:} $\hat{y} = b_0 + b_1x_1 + b_2x_2 + \dots + b_kx_k$ (최소 제곱법 사용).
+\textbf{가정:} 잔차의 평균 0, 등분산성, 정규성, 독립성.
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{모델 평가 지표}]
+\textbf{조정된 R-제곱 (Adjusted $R^2$):}
+\begin{itemize}
+    \item 다중 회귀 모델의 전반적인 설명력 평가.
+    \item 독립 변수 개수에 따른 R-제곱의 과대평가 보정.
+    \item 값이 높을수록 모델의 설명력이 좋음.
+\end{itemize}
+\textbf{p-값 (p-value):}
+\begin{itemize}
+    \item 각 독립 변수의 유의성 검정.
+    \item p-값 < 유의 수준($\alpha$, 보통 0.05) $\rightarrow$ 유의미한 관계.
+    \item p-값 $\ge$ 유의 수준($\alpha$) $\rightarrow$ 유의미한 관계 없음 (모델에서 제거 고려).
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{Excel을 이용한 모델 개발 절차}]
+\begin{enumerate}
+    \item \textbf{데이터 준비:} 모든 독립 변수를 연속된 열에 배치.
+    \item \textbf{회귀 분석 실행:} [데이터] $\rightarrow$ [데이터 분석] $\rightarrow$ [회귀 분석].
+    \item \textbf{Y/X 범위 설정:} 종속 변수(Y)와 모든 독립 변수(X) 범위 지정. '레이블' 체크.
+    \item \textbf{초기 결과 해석:} 조정된 R-제곱 및 각 변수의 p-값 확인.
+    \item \textbf{모델 정리:} p-값이 높은(유의미하지 않은) 변수 제거.
+    \item \textbf{재실행 및 최종 확인:} 변수 제거 후 다시 회귀 분석 실행, 모든 변수의 유의성 확인.
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=\textbf{모델 활용}]
+\textbf{회귀 방정식 작성:} 최종 모델의 계수들을 사용하여 예측 방정식 구성.
+\textbf{예측 수행:} 방정식에 새로운 독립 변수 값 대입 (단위 주의).
+\textbf{영향력 분석:} 각 변수의 계수 크기를 비교하여 종속 변수에 미치는 상대적 영향력 파악 (단위 고려).
+\end{tcolorbox}
+
+\newpage
+
+\section{핵심 개념 및 원리: 질적 데이터와 더미 변수}
+
+\subsection{1. 질적 데이터의 회귀 모델 포함 필요성}
+지금까지 우리는 회귀 모델에 오직 양적(Quantitative) 데이터만을 포함하는 방법을 살펴보았습니다. 하지만 실제 세상의 많은 현상들은 성별, 지역, 전공과 같은 질적(Qualitative) 또는 기술적(Descriptive) 데이터의 영향을 받습니다.
+
+\begin{examplebox}
+\textbf{예시:}
+\begin{itemize}
+    \item \textbf{성별 임금 격차:} 성별이 개인의 급여에 영향을 미칠까요?
+    \item \textbf{우편번호와 기대 수명:} 거주하는 우편번호가 기대 수명에 영향을 미칠까요?
+\end{itemize}
+이러한 질문들은 모두 질적 데이터(성별, 우편번호)가 중요한 설명 변수가 될 수 있음을 보여줍니다. 우편번호는 숫자처럼 보이지만, 실제로는 수량을 나타내는 것이 아니라 지역이라는 '범주'를 나타내는 질적 데이터입니다.
+\end{examplebox}
+
+\subsection{2. 범주형 변수의 직접 입력 불가 및 더미 변수 도입}
+회귀 모델은 기본적으로 숫자 데이터를 기반으로 작동합니다. 따라서 '남성', '여성' 또는 '공학', '경영'과 같은 범주형 예측 변수는 회귀 모델에 직접 입력할 수 없습니다. 이러한 질적 데이터를 모델에 포함하기 위해서는 추가적인 단계, 즉 '코딩(Coding)'이 필요합니다.
+
+\begin{tcolorbox}[title=더미 변수(Dummy Variable)의 정의]
+더미 변수(또는 지표 변수, Indicator Variable)는 범주형 변수를 숫자로 표현하기 위해 사용됩니다.
+\begin{itemize}
+    \item 더미 변수는 항상 \textbf{0 또는 1}의 값을 가집니다.
+    \item 특정 범주에 해당하면 1, 그렇지 않으면 0으로 코딩합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{examplebox}
+\textbf{예시: 비만 계산기 연구}
+이전 강의에서 소개된 비만 계산기 연구에서는 다음과 같은 범주형 변수들이 있었습니다.
+\begin{itemize}
+    \item \textbf{임신 중 흡연 여부:} '예' 또는 '아니오'
+    \item \textbf{산모의 직업 범주:} 네 가지 선택지 중 하나
+\end{itemize}
+이러한 변수들은 그 의미가 숫자로 표현될 수 있도록 먼저 코딩되어야 합니다. 예를 들어, 임신 중 흡연 여부의 경우, '예'를 1로, '아니오'를 0으로 코딩할 수 있습니다.
+\end{examplebox}
+
+\subsection{3. 두 가지 범주를 가진 질적 데이터 처리}
+가장 간단한 경우로, 범주가 두 개인 질적 변수를 다루는 방법을 살펴봅니다.
+
+\subsubsection*{3.1. 더미 변수 생성의 원칙: 다중 공선성 회피}
+범주형 변수를 더미 변수로 코딩할 때, 중요한 원칙은 '다중 공선성(Collinearity)'을 피하는 것입니다.
+
+\begin{tcolorbox}[title=다중 공선성(Collinearity)이란?]
+다중 공선성은 다중 회귀 모델에서 \textbf{하나의 독립 변수가 다른 독립 변수와 매우 높은 상관관계를 가질 때 발생}합니다.
+\begin{itemize}
+    \item 이는 독립성 가정을 위반하며, 회귀 계수의 추정치를 불안정하게 만들고 모델의 신뢰성을 떨어뜨립니다.
+    \item 다중 공선성이 발생하면, 해당 변수 중 하나를 모델에서 제거해야 합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{cautionbox}
+\textbf{잘못된 더미 변수 코딩 예시 (다중 공선성 유발):}
+성별 변수(남성/여성)를 다음과 같이 코딩하는 것은 다중 공선성을 유발합니다.
+\begin{itemize}
+    \item \texttt{DummyFemale = 1} (여성 간호사), \texttt{0} (그 외)
+    \item \texttt{DummyMale = 1} (남성 간호사), \texttt{0} (그 외)
+\end{itemize}
+만약 \texttt{DummyFemale}이 1이면, 해당 간호사는 여성이고, 따라서 \texttt{DummyMale}은 반드시 0이 됩니다. 반대로 \texttt{DummyFemale}이 0이면, 해당 간호사는 남성이고, \texttt{DummyMale}은 1이 됩니다. 이 두 변수는 완벽하게 반대되는 관계(음의 상관관계)를 가지므로, 서로 완전히 상관되어 다중 공선성을 일으킵니다.
+\end{cautionbox}
+
+\begin{infobox}
+\textbf{다중 공선성을 피하는 올바른 더미 변수 코딩:}
+범주가 $K$개인 범주형 변수의 경우, \textbf{$K-1$개의 더미 변수}를 생성해야 합니다.
+\begin{itemize}
+    \item 두 가지 범주(예: 남성/여성)의 경우, \textbf{하나의 더미 변수}만 사용합니다.
+    \item 하나의 범주를 '기준(Reference)' 범주로 설정하고 0으로 코딩합니다.
+    \item 다른 범주를 1로 코딩합니다.
+\end{itemize}
+\end{infobox}
+
+\begin{examplebox}
+\textbf{올바른 성별 더미 변수 코딩 예시:}
+성별 변수(남성/여성)의 경우, 하나의 더미 변수 \texttt{DG}를 다음과 같이 정의할 수 있습니다.
+\begin{itemize}
+    \item \texttt{DG = 1} (남성 간호사)
+    \item \texttt{DG = 0} (여성 간호사)
+\end{itemize}
+여기서 '여성 간호사'가 기준 범주가 됩니다.
+\end{examplebox}
+
+\subsubsection*{3.2. 사례 연구: 간호사 성별 임금 격차}
+미국 남성 및 여성 간호사를 대상으로 한 연구에서 성별 임금 불평등이 존재한다는 사실이 밝혀졌습니다. 이 연구는 성별이 간호사의 급여를 예측하는 설명 변수임을 보여주었습니다. 유사한 데이터를 사용하여 성별과 급여 간의 상관관계를 확인하는 방법을 살펴보겠습니다.
+
+\textbf{연구 목표:} 성별이 급여에 영향을 미치는지 확인
+
+\textbf{변수 정의:}
+\begin{itemize}
+    \item \textbf{y:} 급여 (Salary)
+    \item \textbf{x1:} 경력 (개월 단위, Months of Experience)
+    \item \textbf{x2:} 성별 (Categorical, 남성 또는 여성)
+\end{itemize}
+
+\textbf{데이터 수집:} 120명의 남성 간호사와 120명의 여성 간호사의 급여와 경력(개월)을 무작위로 수집했습니다.
+
+\textbf{데이터 코딩 예시:}
+아래 표는 코딩된 데이터의 일부를 보여줍니다. 'DG' 열은 성별 더미 변수로, 남성 간호사는 1, 여성 간호사는 0으로 코딩되었습니다.
+
+\begin{table}[htbp]
+\centering
+\caption{간호사 급여 및 경력 데이터 (코딩된 성별 포함)}
+\label{tab:coded_nurse_data}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{급여 (Salary)} & \textbf{경력 (Months of Experience)} & \textbf{DG (성별)} \\
+\midrule
+\$70,124.00 & 46 & 1 \\
+\$66,992.00 & 13 & 1 \\
+\$71,922.00 & 60 & 1 \\
+\$68,601.00 & 21 & 1 \\
+\$76,875.00 & 116 & 1 \\
+\$73,400.00 & 107 & 1 \\
+\$67,298.00 & 1 & 1 \\
+\$66,273.00 & 69 & 0 \\
+\$62,701.00 & 25 & 0 \\
+\$67,892.00 & 68 & 0 \\
+\$71,482.00 & 118 & 0 \\
+\$67,971.00 & 99 & 0 \\
+\$65,637.00 & 56 & 0 \\
+\$65,622.00 & 45 & 0 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsubsection*{3.3. 회귀 분석 결과 해석 (Excel 출력)}
+코딩된 데이터를 사용하여 회귀 분석을 실행한 결과는 다음과 같습니다.
+
+\begin{table}[htbp]
+\centering
+\caption{회귀 통계 (성별 더미 변수 포함)}
+\label{tab:reg_stats_gender}
+\begin{adjustbox}{width=0.8\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{회귀 통계} & \textbf{값} \\
+\midrule
+Multiple R & 0.969796537 \\
+R Square & 0.940505323 \\
+Adjusted R Square & 0.940003258 \\
+Standard error & 850.7891425 \\
+Observations & 240 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{기타 통계 (계수, p-값 등)}
+\label{tab:other_stats_gender}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{변수} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+Intercept & 61149.40381 & 138.0981426 & 443.796715 & 0 & 60877.34716 & 61421.46 \\
+Months of experience & 83.30084538 & 1.668613537 & 49.3228921 & 1.2737E-126 & 79.01363665 & 85.588054 \\
+Gender & 4667.701219 & 110.7148371 & 42.159672 & 4.041E-112 & 4449.590331 & 4885.8121 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{결과 해석:}
+\begin{itemize}
+    \item \textbf{모델 적합도 (Adjusted R Square):} 0.940003258 (약 94\%). 이 모델에 포함된 설명 변수(경력, 성별)가 급여 데이터의 변동을 94\% 설명합니다. 이는 매우 좋은 모델입니다.
+    \item \textbf{변수의 유의성 (p-value):} 'Months of experience'와 'Gender' 모두 p-값이 매우 작습니다 (거의 0에 가까움). 이는 두 변수 모두 급여와 통계적으로 유의미한 관계를 가지고 있음을 의미합니다.
+\end{itemize}
+\end{summarybox}
+
+\subsubsection*{3.4. 회귀 모델 방정식 및 계수 해석}
+위 결과에 기반한 회귀 방정식은 다음과 같습니다.
+\[ \hat{y} = 61,149.40 + 82.3x_1 + 4667.7x_2 \]
+여기서:
+\begin{itemize}
+    \item $\hat{y}$: 예측 급여 (Predicted Salary)
+    \item $x_1$: 경력 (Months of experience)
+    \item $x_2$: 성별 더미 변수 (Gender, \textbf{1 = 남성, 0 = 여성})
+\end{itemize}
+
+\begin{tcolorbox}[title=더미 변수 계수 해석]
+\textbf{여성 간호사의 경우 ($x_2 = 0$):}
+\[ \hat{y} = 61,149.40 + 82.3x_1 + 4667.7(0) \]
+\[ \hat{y} = 61,149.40 + 82.3x_1 \]
+\textbf{남성 간호사의 경우 ($x_2 = 1$):}
+\[ \hat{y} = 61,149.40 + 82.3x_1 + 4667.7(1) \]
+\[ \hat{y} = 61,149.40 + 82.3x_1 + 4667.70 \]
+이것은 남성 간호사가 여성 간호사보다 \textbf{평균적으로 \$4,667.70 더 많은 급여}를 받는다는 것을 의미합니다. 즉, 더미 변수의 계수는 1로 코딩된 범주가 0으로 코딩된 기준 범주에 비해 종속 변수에 미치는 '추가적인 효과'를 나타냅니다.
+\end{tcolorbox}
+
+\begin{examplebox}
+\textbf{예측 급여 계산 예시:}
+평균 경력이 10개월인 두 그룹의 간호사(한 그룹은 남성, 다른 그룹은 여성)의 예측 평균 급여를 계산해 봅시다.
+
+\begin{itemize}
+    \item \textbf{그룹 1 (여성 간호사):} $x_1 = 10, x_2 = 0$
+    \[ \hat{y} = 61,149.40 + 82.3(10) + 4667.7(0) = 61,149.40 + 823 = \$61,972.41 \]
+    \item \textbf{그룹 2 (남성 간호사):} $x_1 = 10, x_2 = 1$
+    \[ \hat{y} = 61,149.40 + 82.3(10) + 4667.7(1) = 61,149.40 + 823 + 4667.70 = \$66,640.11 \]
+\end{itemize}
+두 그룹의 예측 급여 차이는 \$66,640.11 - \$61,972.41 = \$4,667.70으로, 성별 더미 변수의 계수와 정확히 일치합니다.
+\end{examplebox}
+
+\subsubsection*{3.5. 더미 변수 코딩 방식 변경 시 영향}
+만약 더미 변수 코딩을 반대로 했다면 어떻게 될까요? 즉, $x_2 = 1$ (여성 간호사), $x_2 = 0$ (남성 간호사)로 코딩했을 때의 결과를 살펴보겠습니다.
+
+\begin{table}[htbp]
+\centering
+\caption{회귀 통계 (성별 더미 변수 역코딩)}
+\label{tab:reg_stats_gender_rev}
+\begin{adjustbox}{width=0.8\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{회귀 통계} & \textbf{값} \\
+\midrule
+Multiple R & 0.969796537 \\
+R Square & 0.940505323 \\
+Adjusted R Square & 0.940003258 \\
+Standard error & 850.7891425 \\
+Observations & 240 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{ANOVA (성별 더미 변수 역코딩)}
+\label{tab:anova_gender_rev}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{Significance F} \\
+\midrule
+Regression & 2 & 2711910611 & 1355955305 & 1873.274826 & 5.9656E-146 \\
+Residual & 237 & 171550593.1 & 723842.165 & & \\
+Total & 239 & 2883461204 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{기타 통계 (계수, p-값 등) (성별 더미 변수 역코딩)}
+\label{tab:other_stats_gender_rev}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{변수} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+Intercept & 65817.10503 & 126.8307712 & 518.93641 & 0 & 65567.24537 & 66066.965 \\
+Months of experience & 82.30084538 & 1.668613537 & 49.3228921 & 1.2737E-126 & 79.01363665 & 85.588054 \\
+Gender & -4667.70122 & 110.7148371 & -42.159672 & 4.041E-112 & -4885.81211 & -4449.59 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{역코딩 결과 해석:}
+\begin{itemize}
+    \item \textbf{Adjusted R-squared:} 이전과 동일하게 0.940003258입니다. 모델의 전반적인 설명력은 변하지 않습니다.
+    \item \textbf{Gender 계수:} 값은 동일하지만 부호가 음수(-4667.70122)로 바뀌었습니다. 이는 여성 간호사가 남성 간호사(기준 범주)보다 평균적으로 \$4,667.70 적게 받는다는 것을 의미합니다.
+    \item \textbf{Intercept 계수:} 이전 모델의 절편(61149.40381)과 달라졌습니다 (65817.10503).
+\end{itemize}
+\end{summarybox}
+
+\begin{tcolorbox}[title=절편(Intercept)의 의미 변화]
+\textbf{절편은 모든 독립 변수가 0일 때 종속 변수의 예측값}입니다.
+\begin{itemize}
+    \item \textbf{남성=1, 여성=0으로 코딩했을 때:}
+    모든 변수가 0인 경우: 경력($x_1$) = 0 (신입), 성별($x_2$) = 0 (여성).
+    따라서 절편 \$61,149.40은 \textbf{신입 여성 간호사의 예상 시작 급여}를 의미합니다.
+    \item \textbf{여성=1, 남성=0으로 코딩했을 때:}
+    모든 변수가 0인 경우: 경력($x_1$) = 0 (신입), 성별($x_2$) = 0 (남성).
+    따라서 절편 \$65,817.10은 \textbf{신입 남성 간호사의 예상 시작 급여}를 의미합니다.
+\end{itemize}
+두 절편 값의 차이(\$65,817.10 - \$61,149.40 = \$4,667.70)는 성별에 따른 급여 차이와 정확히 일치합니다. 이는 어떤 범주를 0으로 코딩하느냐에 따라 절편의 해석이 달라진다는 것을 보여줍니다.
+\end{tcolorbox}
+
+\subsubsection*{3.6. 회귀 분석의 통찰력}
+단순히 두 그룹 간의 급여 차이를 가설 검정으로 확인할 수도 있지만, 회귀 분석은 더 많은 정보를 제공합니다.
+\begin{itemize}
+    \item \textbf{변수 효과 분리:} 회귀 분석은 각 변수의 효과를 분리하여 파악할 수 있게 해줍니다. 이 예시에서는 급여 차이의 두 가지 원인(경력과 성별)을 동시에 분석하고, 각각이 급여에 미치는 영향을 개별적으로 확인할 수 있었습니다.
+    \item \textbf{설명력 정량화:} 경력과 성별이 급여 변동의 94\%를 설명한다는 것을 알 수 있습니다. 만약 성별만으로 단순 선형 회귀를 실행했다면, 성별이 급여 변동의 약 33\%를 설명한다는 것을 알 수 있습니다.
+\end{itemize}
+회귀는 예측 모델로서 강력할 뿐만 아니라, 관심 변수에 영향을 미치는 변수들을 분리하여 그 영향을 파악하는 훌륭한 방법입니다. 이를 통해 우리는 독립 변수를 조정하여 더 나은 결과를 얻을 수 있습니다.
+
+\newpage
+\section{절차/방법: Excel에서 더미 변수 사용하기 (두 가지 범주)}
+
+\subsection{1. 데이터 준비: 원본 데이터 확인}
+\begin{itemize}
+    \item \textbf{파일 다운로드:} 'Nurses Salary Excel file'을 다운로드합니다. (Uncoded data - 첫 번째 워크시트 참조)
+    \item \textbf{원본 데이터:} 이 워크시트에는 남성 간호사의 급여와 경력, 여성 간호사의 급여와 경력이 각각 별도의 열에 정리되어 있습니다.
+\end{itemize}
+
+\subsection{2. 데이터 코딩: 더미 변수 생성}
+회귀 분석을 위해 범주형 변수인 '성별'을 숫자 값(0 또는 1)으로 코딩해야 합니다.
+
+\begin{enumerate}
+    \item \textbf{새 워크시트 생성:} 'Coded data'라는 새 탭을 만듭니다.
+    \item \textbf{열 헤더 설정:} 새 워크시트에 'Salary', 'Months of Experience', 'Gender'라는 세 개의 열 헤더를 입력합니다.
+    \item \textbf{남성 데이터 복사 및 코딩:}
+    \begin{itemize}
+        \item 'Uncoded data' 탭으로 돌아가 남성 간호사의 급여와 경력 데이터를 모두 선택하여 복사합니다.
+        \item 'Coded data' 탭의 'Salary' 및 'Months of Experience' 열에 붙여넣습니다.
+        \item 'Gender' 열에 해당 데이터의 첫 번째 행에 '1'을 입력합니다 (남성 간호사를 1로 코딩).
+        \item '1'이 입력된 셀의 오른쪽 하단 모서리를 더블 클릭하여 모든 남성 간호사 데이터에 '1'이 자동으로 채워지도록 합니다. (총 120명의 남성 간호사가 1로 코딩됩니다.)
+    \end{itemize}
+    \item \textbf{여성 데이터 복사 및 코딩:}
+    \begin{itemize}
+        \item 'Uncoded data' 탭으로 돌아가 여성 간호사의 급여와 경력 데이터를 모두 선택하여 복사합니다.
+        \item 'Coded data' 탭의 남성 데이터 바로 아래에 붙여넣습니다 (예: A122 셀부터 시작).
+        \item 'Gender' 열에 해당 데이터의 첫 번째 행에 '0'을 입력합니다 (여성 간호사를 0으로 코딩).
+        \item '0'이 입력된 셀의 오른쪽 하단 모서리를 더블 클릭하여 모든 여성 간호사 데이터에 '0'이 자동으로 채워지도록 합니다.
+    \end{itemize}
+    \item \textbf{데이터 확인:} 'Coded data' 탭에서 모든 데이터가 올바르게 복사되고 'Gender' 열이 0 또는 1로 코딩되었는지 확인합니다.
+\end{enumerate}
+
+\subsection{3. Excel에서 회귀 분석 실행}
+이제 모든 변수가 숫자이므로 회귀 분석을 실행할 수 있습니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 분석 도구 열기:} Excel 메뉴에서 '데이터' 탭을 클릭한 다음 '데이터 분석'을 클릭합니다.
+    \item \textbf{회귀 선택:} '데이터 분석' 대화 상자에서 '회귀(Regression)'를 선택하고 '확인'을 클릭합니다.
+    \item \textbf{입력 범위 설정:}
+    \begin{itemize}
+        \item \textbf{Input Y Range (입력 Y 범위):} 'Coded data' 탭에서 'Salary' 열 전체를 선택합니다 (예: \$A\$1:\$A\$241).
+        \item \textbf{Input X Range (입력 X 범위):} 'Coded data' 탭에서 'Months of Experience'와 'Gender' 열 전체를 선택합니다 (예: \$B\$1:\$C\$241).
+        \item \textbf{Labels (레이블):} 첫 행에 열 이름이 포함되어 있으므로 'Labels' 체크박스를 선택합니다.
+    \end{itemize}
+    \item \textbf{출력 옵션 설정:} 'Output Options (출력 옵션)' 섹션에서 'New Worksheet Ply (새 워크시트)'를 선택하여 결과를 새 시트에 출력하도록 합니다.
+    \item \textbf{실행:} '확인'을 클릭하여 회귀 분석을 실행합니다.
+\end{enumerate}
+
+\subsection{4. 회귀 분석 결과 해석}
+새로 생성된 워크시트에는 회귀 분석 결과가 요약되어 있습니다.
+
+\begin{table}[htbp]
+\centering
+\caption{Excel 회귀 통계 출력 예시}
+\label{tab:excel_reg_stats}
+\begin{adjustbox}{width=0.8\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{회귀 통계} & \textbf{값} \\
+\midrule
+Multiple R & 0.969504909 \\
+R Square & 0.939939769 \\
+Adjusted R Square & 0.939432931 \\
+Standard error & 867.9476988 \\
+Observations & 240 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Excel ANOVA 출력 예시}
+\label{tab:excel_anova}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{Significance F} \\
+\midrule
+Regression & 2 & 2.79E+09 & 1.4E+09 & 1854.519 & 1.8E-145 \\
+Residual & 237 & 1.79E+08 & 753333.2 & & \\
+Total & 239 & 2.97E+09 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Excel 기타 통계 출력 예시 (계수, p-값 등)}
+\label{tab:excel_other_stats}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{변수} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+Intercept & 60978.8066 & 140.8833 & 432.8321 & 0 & 60701.26 & 61256.35 \\
+Months of Experience & 82.18317197 & 1.702266 & 48.27869 & 1.3E-124 & 78.82967 & 85.53668 \\
+Gender & 4845.369626 & 112.9477 & 42.89923 & 1.1E-113 & 4622.86 & 5067.879 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{주요 해석:}
+\begin{itemize}
+    \item \textbf{모델 적합도 (Adjusted R Square):} 약 0.9394 (93.94\%). 모델의 설명력이 매우 높습니다.
+    \item \textbf{변수의 유의성 (p-value):} 'Months of Experience'와 'Gender' 모두 p-값이 매우 작으므로, 두 변수 모두 급여와 유의미한 관계를 가집니다.
+    \item \textbf{회귀 방정식:} $\hat{y} = 60,978.806 + 82.183x_1 + 4845.37x_2$
+        \begin{itemize}
+            \item $x_1$: 경력 (개월). 경력 1개월 증가 시 급여는 약 \$82.18 증가합니다.
+            \item $x_2$: 성별 더미 변수 (1=남성, 0=여성).
+        \end{itemize}
+    \item \textbf{절편 해석:} 절편 \$60,978.806은 $x_1=0$ (신입)이고 $x_2=0$ (여성)일 때의 예측 급여입니다. 즉, \textbf{신입 여성 간호사의 예상 시작 급여}입니다.
+    \item \textbf{Gender 계수 해석:} \$4,845.37은 남성 간호사가 여성 간호사보다 평균적으로 더 받는 급여를 나타냅니다.
+\end{itemize}
+\end{summarybox}
+
+\begin{examplebox}
+\textbf{예측 예시:}
+20개월 경력의 여성 간호사와 남성 간호사의 급여를 예측해 봅시다.
+
+\begin{itemize}
+    \item \textbf{20개월 경력 여성 간호사:} ($x_1=20, x_2=0$)
+    \[ \hat{y} = 60,978.806 + 82.183(20) + 4845.37(0) = 60,978.806 + 1643.66 = \$62,622.47 \]
+    \item \textbf{20개월 경력 남성 간호사:} ($x_1=20, x_2=1$)
+    \[ \hat{y} = 60,978.806 + 82.183(20) + 4845.37(1) = 60,978.806 + 1643.66 + 4845.37 = \$67,467.84 \]
+\end{itemize}
+두 급여의 차이는 \$4,845.37로, 'Gender' 계수와 정확히 일치합니다.
+\end{examplebox}
+
+\begin{infobox}
+\textbf{스스로 해보기:}
+성별 더미 변수를 반대로 코딩해 보세요 ($x_2=1$을 여성, $x_2=0$을 남성).
+\begin{itemize}
+    \item 'Gender' 계수의 부호가 음수로 바뀌고, 절편 값이 달라질 것입니다.
+    \item 새로운 절편은 신입 남성 간호사의 예상 시작 급여를 나타낼 것입니다.
+\end{itemize}
+\end{infobox}
+
+\newpage
+\section{핵심 개념 및 원리: 여러 범주를 가진 질적 데이터 처리}
+
+\subsection{1. 여러 범주를 가진 질적 데이터의 필요성}
+대학 상담사는 학생들이 열심히 공부하여 높은 GPA로 졸업하도록 동기를 부여하고 싶어 합니다. 이를 위해 졸업생의 시작 급여와 GPA 간의 관계 데이터를 보여주려고 합니다. 100명의 최근 졸업생 데이터를 가지고 있습니다.
+
+\textbf{초기 분석 (단순 선형 회귀):}
+GPA만을 독립 변수로 사용한 단순 선형 회귀 분석 결과는 다음과 같습니다.
+
+\begin{table}[htbp]
+\centering
+\caption{단순 선형 회귀 통계 (GPA만 포함)}
+\label{tab:simple_reg_gpa}
+\begin{adjustbox}{width=0.8\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{회귀 통계} & \textbf{값} \\
+\midrule
+Multiple R & 0.580085329 \\
+R Square & 0.336498989 \\
+Adjusted R Square & 0.32972857 \\
+Standard error & 2236.609365 \\
+Observations & 100 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{초기 분석 결과:}
+\begin{itemize}
+    \item GPA는 p-값이 매우 작아 통계적으로 매우 유의미합니다.
+    \item 하지만 Adjusted R Square는 약 0.3297 (32.97\%)에 불과합니다. 이는 GPA가 시작 급여 변동의 약 33\%만을 설명하며, 나머지 67\%는 알려지지 않은 요인에 의해 설명된다는 의미입니다.
+\end{itemize}
+상담사는 이 결과에 만족하지 못하고, 졸업생의 급여에 기여할 것이라고 생각하는 또 다른 변수인 '전공(Major)'을 분석에 추가하기로 결정했습니다.
+\end{summarybox}
+
+\textbf{새로운 설명 변수: 전공 (Major)}
+전공은 여러 가지 범주를 가질 수 있으므로, 분석을 단순화하기 위해 다음과 같이 네 가지 범주로 분류했습니다.
+\begin{enumerate}
+    \item 공학 (Engineering)
+    \item 경영 (Business)
+    \item 농업 (Agriculture)
+    \item 인문학 (Liberal Arts)
+\end{enumerate}
+
+\textbf{새로운 다중 회귀 모델의 변수:}
+\begin{itemize}
+    \item \textbf{GPA:} 숫자형 변수
+    \item \textbf{Major:} 범주형 변수 (네 가지 가능성)
+\end{itemize}
+전공은 범주형 변수이므로, 회귀 분석을 실행하기 전에 더미 변수를 생성해야 합니다.
+
+\subsection{2. 여러 범주에 대한 더미 변수 생성}
+두 가지 범주를 다룰 때와 마찬가지로, 다중 공선성을 피하기 위해 $K-1$개의 더미 변수를 생성해야 합니다.
+
+\begin{tcolorbox}[definition={더미 변수 생성 규칙 (여러 범주)}]
+범주가 $K$개인 범주형 변수의 경우, \textbf{$K-1$개의 더미 변수}를 생성합니다.
+\begin{itemize}
+    \item 이 예시에서는 전공이 네 가지 범주($K=4$)이므로, \textbf{세 가지 더미 변수}를 생성합니다.
+    \item 하나의 범주를 '기준(Reference)' 범주로 남겨두고, 이 범주에 해당하는 모든 더미 변수 값을 0으로 설정합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\textbf{전공 더미 변수 정의 예시:}
+네 가지 전공 범주에 대해 세 가지 더미 변수를 다음과 같이 정의할 수 있습니다.
+\begin{itemize}
+    \item \texttt{Engineering = 1} (공학 전공), \texttt{0} (그 외)
+    \item \texttt{Business = 1} (경영 전공), \texttt{0} (그 외)
+    \item \texttt{Liberal Arts = 1} (인문학 전공), \texttt{0} (그 외)
+\end{itemize}
+이 경우, \textbf{농업(Agriculture)} 전공은 어떤 더미 변수도 1이 아닌 경우(즉, 모든 더미 변수가 0인 경우)에 해당하므로 \textbf{기준 범주}가 됩니다.
+
+\begin{infobox}
+\textbf{어떤 범주를 기준 범주로 할 것인가?}
+어떤 범주를 기준 범주(0으로 코딩되는)로 남겨두는지는 분석 결과의 계수 값에 영향을 미치지만, 모델의 전반적인 설명력이나 통계적 유의성에는 영향을 미치지 않습니다. 즉, 어떤 범주를 제외하든 최종적인 분석과 결론은 동일합니다.
+\end{infobox}
+
+\subsection{3. 회귀 분석 결과 해석 (Excel 출력)}
+GPA와 전공 더미 변수를 모두 포함한 다중 회귀 분석 결과는 다음과 같습니다.
+
+\begin{table}[htbp]
+\centering
+\caption{다중 회귀 통계 (GPA 및 전공 더미 변수 포함)}
+\label{tab:multi_reg_gpa_major}
+\begin{adjustbox}{width=0.8\textwidth,center}
+\begin{tabular}{lc}
+\toprule
+\textbf{회귀 통계} & \textbf{값} \\
+\midrule
+Multiple R & 0.911820707 \\
+R Square & 0.831417001 \\
+Adjusted R Square & 0.82431877 \\
+Standard error & 1145.057951 \\
+Observations & 100 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{ANOVA (GPA 및 전공 더미 변수 포함)}
+\label{tab:anova_gpa_major}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{Significance F} \\
+\midrule
+Regression & 4 & 614304456.1 & 153576114 & 117.1302 & 7.604E-36 \\
+Residual & 95 & 124559982.6 & 1311157.7 & & \\
+Total & 99 & 738864438.8 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{기타 통계 (계수, p-값 등) (GPA 및 전공 더미 변수 포함)}
+\label{tab:other_stats_gpa_major}
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{변수} & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하위 95\% (Lower 95\%)} & \textbf{상위 95\% (Upper 95\%)} \\
+\midrule
+Intercept & 43244.90794 & 733.5203076 & 58.955297 & 1.27E-76 & & \\
+GPA & 1142.314932 & 239.8636456 & 4.7623512 & 6.85E-06 & & \\
+Engineering & 2830.256883 & 398.3591216 & 7.1047874 & 2.2E-10 & & \\
+Business & 1304.709995 & 411.1126276 & 3.1736072 & 0.002029 & & \\
+Liberal Arts & -2321.800796 & 344.4477666 & -6.740647 & 1.22E-09 & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{결과 해석:}
+\begin{itemize}
+    \item \textbf{모델 적합도 (Adjusted R Square):} 0.8243 (약 82.43\%). 이는 단순 선형 회귀 모델(32.97\%)보다 훨씬 개선된 결과입니다. GPA와 전공 변수가 시작 급여 변동의 82.43\%를 설명합니다.
+    \item \textbf{변수의 유의성 (p-value):} 모든 p-값이 매우 작습니다. 이는 GPA와 모든 전공 더미 변수(Engineering, Business, Liberal Arts)가 시작 급여에 통계적으로 유의미한 영향을 미친다는 것을 의미합니다.
+\end{itemize}
+\end{summarybox}
+
+\subsubsection*{3.1. 회귀 방정식 및 계수 해석}
+위 결과에 기반한 회귀 방정식은 다음과 같습니다.
+\[ \hat{y} = 43,244.91 + 1142.31(\text{GPA}) + 2830.26(\text{Engineering}) + 1304.71(\text{Business}) - 2321.80(\text{Liberal Arts}) \]
+여기서:
+\begin{itemize}
+    \item $\hat{y}$: 예측 시작 급여
+    \item GPA: 학점
+    \item Engineering: 공학 전공 더미 변수 (1=공학, 0=그 외)
+    \item Business: 경영 전공 더미 변수 (1=경영, 0=그 외)
+    \item Liberal Arts: 인문학 전공 더미 변수 (1=인문학, 0=그 외)
+\end{itemize}
+
+\begin{tcolorbox}[title=더미 변수 계수 해석 (기준 범주 대비)]
+이 모델의 계수들은 \textbf{기준 범주인 농업(Agriculture) 전공 학생들과 비교했을 때의 차이}를 나타냅니다. GPA가 동일하다고 가정할 때:
+\begin{itemize}
+    \item \textbf{Engineering 계수 (2830.26):} 공학 전공 학생은 농업 전공 학생보다 평균적으로 \textbf{\$2,830.26 더 높은 급여}를 받습니다.
+    \item \textbf{Business 계수 (1304.71):} 경영 전공 학생은 농업 전공 학생보다 평균적으로 \textbf{\$1,304.71 더 높은 급여}를 받습니다.
+    \item \textbf{Liberal Arts 계수 (-2321.80):} 인문학 전공 학생은 농업 전공 학생보다 평균적으로 \textbf{\$2,321.80 더 낮은 급여}를 받습니다.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[title=절편(Intercept)의 의미]
+절편 \$43,244.91은 모든 독립 변수가 0일 때의 예측값입니다.
+\begin{itemize}
+    \item GPA = 0
+    \item Engineering = 0, Business = 0, Liberal Arts = 0 (이는 농업 전공을 의미)
+\end{itemize}
+따라서 절편은 \textbf{GPA가 0인 농업 전공 학생의 예상 시작 급여}를 의미합니다.
+\end{tcolorbox}
+
+\subsection{4. 예측 및 추가 분석 연습}
+\begin{examplebox}
+\textbf{연습 문제 1: 동일 GPA를 가진 공학 전공자와 경영 전공자의 급여 차이}
+\textbf{질문:} 동일한 GPA를 가진 공학 전공 졸업생과 경영 전공 졸업생의 시작 급여 차이는 얼마입니까?
+
+\textbf{풀이:}
+공학 전공 계수와 경영 전공 계수의 차이를 계산합니다.
+\[ \$2830.26 - \$1304.71 = \$1525.55 \]
+\textbf{답변:} 공학 전공 졸업생은 경영 전공 졸업생보다 평균적으로 \textbf{\$1,525.55 더 높은 급여}를 받습니다.
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{연습 문제 2: 특정 GPA를 가진 인문학 전공 학생의 급여 예측}
+\textbf{질문:} GPA가 3.5이고 인문학을 전공한 학생의 예상 시작 급여는 얼마입니까?
+
+\textbf{풀이:}
+회귀 방정식에 GPA=3.5, Engineering=0, Business=0, Liberal Arts=1을 대입합니다.
+\[ \hat{y} = 43,244.91 + 1142.31(3.5) + 2830.26(0) + 1304.71(0) - 2321.80(1) \]
+\[ \hat{y} = 43,244.91 + 3998.085 - 2321.80 = \$44,921.20 \]
+\textbf{답변:} GPA 3.5인 인문학 전공 학생의 예상 시작 급여는 \textbf{\$44,921.20}입니다.
+\end{examplebox}
+
+\begin{examplebox}
+\textbf{연습 문제 3: 특정 GPA를 가진 농업 전공 학생의 급여 예측}
+\textbf{질문:} GPA가 3.5이고 농업을 전공한 학생의 예상 시작 급여는 얼마입니까?
+
+\textbf{풀이:}
+회귀 방정식에 GPA=3.5, Engineering=0, Business=0, Liberal Arts=0을 대입합니다 (농업 전공은 기준 범주이므로 모든 더미 변수가 0).
+\[ \hat{y} = 43,244.91 + 1142.31(3.5) + 2830.26(0) + 1304.71(0) - 2321.80(0) \]
+\[ \hat{y} = 43,244.91 + 3998.085 = \$47,243.00 \]
+\textbf{답변:} GPA 3.5인 농업 전공 학생의 예상 시작 급여는 \textbf{\$47,243.00}입니다.
+\end{examplebox}
+
+\begin{summarybox}
+\textbf{회귀 분석의 강력함:}
+회귀 분석은 여러 변수의 영향을 동시에 비교할 수 있게 해줍니다.
+\begin{itemize}
+    \item \textbf{집단적 영향:} 모든 변수가 함께 종속 변수에 미치는 총체적인 영향을 파악할 수 있습니다 (R-squared).
+    \item \textbf{개별적 영향:} 각 독립 변수가 종속 변수에 미치는 개별적인 영향을 분리하여 파악할 수 있습니다 (계수).
+\end{itemize}
+이러한 통찰력을 통해 우리는 비즈니스 결과를 개선하기 위해 독립 변수를 어떻게 변경해야 할지 전략을 세울 수 있습니다. 예를 들어, 건강 연구에서 운동, 식단, 수면 등이 건강에 미치는 영향을 파악하여 더 나은 건강 습관을 권장하는 것과 같습니다.
+\end{summarybox}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+\addcontentsline{toc}{section}{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=cyan!5!white, colframe=cyan!75!black, title=\textbf{질적 데이터와 회귀 모델}]
+\textbf{핵심:} 회귀 모델은 숫자 데이터만 처리 가능. 성별, 전공 같은 질적(범주형) 데이터는 직접 입력 불가.
+\textbf{해결책:} 더미 변수(Dummy Variable)를 사용하여 0 또는 1로 코딩하여 숫자로 변환.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=magenta!5!white, colframe=magenta!75!black, title=\textbf{더미 변수 생성 원칙: 다중 공선성 회피}]
+\textbf{문제:} 독립 변수 간 높은 상관관계(다중 공선성)는 모델 신뢰성 저해.
+\textbf{규칙:} 범주가 $K$개인 경우, \textbf{$K-1$개의 더미 변수}만 생성.
+\textbf{예시:}
+\begin{itemize}
+    \item \textbf{성별 (2범주):} 남성=1, 여성=0 (1개 더미 변수)
+    \item \textbf{전공 (4범주):} 공학=1, 경영=1, 인문학=1 (농업은 0으로 기준) (3개 더미 변수)
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=orange!5!white, colframe=orange!75!black, title=\textbf{회귀 계수 및 절편 해석}]
+\textbf{더미 변수 계수:} 1로 코딩된 범주가 0으로 코딩된 \textbf{기준 범주 대비 종속 변수에 미치는 영향의 차이}.
+\textbf{절편 (Intercept):} 모든 독립 변수(숫자형 변수 및 모든 더미 변수)가 0일 때의 종속 변수 예측값. 이는 \textbf{기준 범주에 해당하는 경우의 기본값}으로 해석됨.
+\textbf{예시:}
+\begin{itemize}
+    \item 성별(남성=1, 여성=0) 모델에서 Gender 계수 \$4667: 남성이 여성보다 \$4667 더 받음.
+    \item 성별(남성=1, 여성=0) 모델에서 절편 \$61149: 신입 여성 간호사의 시작 급여.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=teal!5!white, colframe=teal!75!black, title=\textbf{Excel 활용 절차}]
+\begin{enumerate}
+    \item 원본 범주형 데이터를 0/1로 코딩하여 새 데이터 시트 생성.
+    \item Excel '데이터 분석' $\rightarrow$ '회귀' 선택.
+    \item Y 범위(종속 변수), X 범위(독립 변수 + 더미 변수) 설정.
+    \item 결과 해석: R-squared (모델 설명력), p-value (변수 유의성), 계수 (영향력).
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=\textbf{회귀 분석의 가치}]
+\textbf{강점:} 여러 변수의 영향을 동시에 분석하고, 각 변수의 개별적인 영향을 분리하여 파악 가능.
+\textbf{활용:} 예측 모델 구축, 특정 변수가 결과에 미치는 영향 이해, 비즈니스 의사결정 개선.
+\end{tcolorbox}
+
+\newpage
+
+\section{핵심 개념 및 원리: 여러 범주를 가진 질적 데이터 처리}
+
+\subsection{1. 다중 범주 질적 데이터와 더미 변수}
+
+\begin{tcolorbox}[definition={핵심 요약: 다중 범주 더미 변수}]
+여러 개의 범주를 가진 질적 데이터(예: 전공, 지역)를 회귀 분석에 사용하려면, 각 범주를 0과 1로 표현하는 '더미 변수'로 변환해야 합니다. 이 과정에서 'N-1 규칙'을 적용하여 불필요한 중복을 피하고 모델의 안정성을 확보합니다.
+\end{tcolorbox}
+
+회귀 분석은 기본적으로 숫자 데이터를 다루는 통계 기법입니다. 하지만 현실의 많은 데이터는 '남성/여성', '서울/부산/대구', '경영/공학/인문/농업'과 같이 숫자가 아닌 범주(Category) 형태로 존재합니다. 이러한 데이터를 '질적 데이터' 또는 '범주형 데이터'라고 부릅니다.
+
+이러한 질적 데이터를 회귀 모델에 포함시키기 위해 우리는 '더미 변수(Dummy Variable)'라는 특별한 숫자 변수를 만듭니다. 더미 변수는 특정 범주에 속하면 1, 속하지 않으면 0의 값을 가지는 변수입니다.
+
+\begin{examplebox}[title={예시: 전공 데이터를 더미 변수로 변환}]
+만약 학생의 전공이 '경영', '공학', '인문', '농업'의 네 가지 범주로 나뉜다고 가정해 봅시다. 이 전공 정보를 회귀 모델에 직접 넣을 수는 없습니다. 대신 다음과 같이 더미 변수를 만들 수 있습니다.
+
+\begin{itemize}
+    \item \textbf{공학 더미 변수}: 학생이 공학 전공이면 1, 아니면 0.
+    \item \textbf{경영 더미 변수}: 학생이 경영 전공이면 1, 아니면 0.
+    \item \textbf{인문 더미 변수}: 학생이 인문 전공이면 1, 아니면 0.
+\end{itemize}
+이렇게 하면 각 학생의 전공을 숫자로 표현할 수 있게 됩니다.
+\end{examplebox}
+
+\subsection{2. N-1 규칙: 왜 하나를 제외하는가?}
+
+\begin{tcolorbox}[definition={핵심 요약: N-1 규칙}]
+N개의 범주를 가진 질적 변수를 더미 변수로 만들 때는 N-1개의 더미 변수만 사용해야 합니다. 나머지 하나의 범주는 '기준 범주(Reference Category)'가 되어, 다른 모든 범주들의 효과가 이 기준 범주와 비교되어 해석됩니다.
+\end{tcolorbox}
+
+위 예시에서 전공이 네 가지('경영', '공학', '인문', '농업')였는데, 우리는 세 개의 더미 변수('공학', '경영', '인문')만 만들었습니다. '농업' 전공에 대한 더미 변수는 따로 만들지 않았습니다. 이것이 바로 'N-1 규칙'입니다.
+
+\textbf{N-1 규칙의 이유 (다중공선성 방지):}
+만약 네 개의 전공에 대해 네 개의 더미 변수(공학, 경영, 인문, 농업)를 모두 만들고 회귀 모델에 넣는다면, 심각한 문제가 발생합니다. 예를 들어, 어떤 학생이 공학, 경영, 인문 더미 변수 모두 0이라면, 이 학생은 반드시 농업 전공이라는 것을 알 수 있습니다. 즉, '농업' 더미 변수는 다른 세 더미 변수의 조합으로 완벽하게 설명될 수 있습니다.
+
+이처럼 한 독립 변수가 다른 독립 변수들의 선형 조합으로 완벽하게 설명될 때, '다중공선성(Multicollinearity)' 문제가 발생합니다. 다중공선성은 회귀 모델의 계수 추정을 불안정하게 만들고, 통계적 유의성을 왜곡할 수 있습니다. N-1 규칙은 이러한 다중공선성 문제를 방지하기 위한 필수적인 방법입니다.
+
+\begin{tcolorbox}[example={기준 범주의 역할}]
+우리가 '농업' 전공을 더미 변수에서 제외했기 때문에, '농업' 전공은 이 모델의 '기준 범주'가 됩니다. 이는 모델의 모든 계수(예: 공학, 경영, 인문 전공의 계수)가 '농업' 전공 학생과 비교하여 해석된다는 의미입니다.
+
+예를 들어, '공학' 더미 변수의 계수가 양수라면, 이는 다른 조건이 동일할 때 공학 전공 학생이 농업 전공 학생보다 평균적으로 더 높은 급여를 받는다는 것을 의미합니다.
+\end{tcolorbox}
+
+\subsection{3. 회귀 모델의 해석: R-제곱, p-값, 계수}
+
+회귀 분석을 실행하면 다양한 통계량들이 산출됩니다. 이 중에서 모델의 전반적인 성능과 각 변수의 중요성을 평가하는 주요 지표들은 다음과 같습니다.
+
+\begin{itemize}
+    \item \textbf{R-제곱 조정 (Adjusted R-Squared)}:
+    \begin{itemize}
+        \item \textbf{한 줄 요약}: 모델이 종속 변수의 변동을 얼마나 잘 설명하는지 나타내는 비율입니다.
+        \item \textbf{직관적 비유}: 시험 점수를 예측하는 모델이 있다고 할 때, R-제곱 조정이 0.8이라면, 시험 점수 변동의 80\%를 모델이 설명할 수 있다는 뜻입니다.
+        \item \textbf{기술적 설명}: 0과 1 사이의 값을 가지며, 1에 가까울수록 모델의 설명력이 높습니다. 독립 변수의 수가 늘어날 때 단순히 R-제곱이 증가하는 경향을 보정하여, 모델에 추가된 변수가 실제로 설명력을 높이는지 판단하는 데 더 유용합니다.
+    \end{itemize}
+
+    \item \textbf{p-값 (p-value)}:
+    \begin{itemize}
+        \item \textbf{한 줄 요약}: 특정 변수가 종속 변수에 미치는 영향이 '우연히' 발생했을 확률입니다.
+        \item \textbf{직관적 비유}: 어떤 약이 효과가 있는지 실험했는데, p-값이 0.01이라면, 약이 효과가 없는데도 지금과 같은 결과가 나올 확률이 1\%밖에 안 된다는 뜻입니다. 따라서 약이 효과가 있다고 결론 내릴 수 있습니다.
+        \item \textbf{기술적 설명}: 일반적으로 p-값이 0.05(유의수준)보다 작으면 해당 변수가 종속 변수에 통계적으로 유의미한 영향을 미친다고 판단합니다. 이는 해당 변수의 계수가 0이 아니라고 말할 수 있는 충분한 증거가 있다는 의미입니다.
+    \end{itemize}
+
+    \item \textbf{계수 (Coefficient)}:
+    \begin{itemize}
+        \item \textbf{한 줄 요약}: 독립 변수가 한 단위 변할 때 종속 변수가 평균적으로 얼마나 변하는지를 나타내는 값입니다.
+        \item \textbf{직관적 비유}: GPA 계수가 1000이라면, GPA가 1점 오를 때마다 연봉이 평균적으로 1000달러 오른다고 예측할 수 있습니다.
+        \item \textbf{기술적 설명}: 더미 변수의 계수는 해당 범주가 기준 범주에 비해 종속 변수에 미치는 평균적인 추가 또는 감소 효과를 나타냅니다. 예를 들어, '공학' 더미 변수의 계수가 2830이라면, 공학 전공 학생은 농업 전공 학생보다 평균적으로 $2,830 더 높은 연봉을 받는다고 해석할 수 있습니다.
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{절차 및 방법: 엑셀을 이용한 다중 범주 더미 변수 회귀 분석}
+
+이 섹션에서는 엑셀의 '데이터 분석' 도구를 사용하여 다중 범주 더미 변수를 포함한 회귀 모델을 구축하는 구체적인 단계를 설명합니다.
+
+\subsection{1. 데이터 준비: 더미 변수 생성}
+
+먼저, 원본 데이터에서 질적 변수를 더미 변수로 변환해야 합니다.
+
+\begin{tcolorbox}[example={GPA, 전공, 연봉 데이터셋}]
+우리는 '시작 연봉(Starting Salary)', 'GPA', '전공(Major)' 데이터를 사용합니다. 전공은 '공학(Engineering)', '경영(Business)', '인문(Liberal Arts)', '농업(Agriculture)'의 네 가지 범주를 가집니다.
+
+\begin{itemize}
+    \item \textbf{종속 변수 (Y)}: 시작 연봉 (Starting Salary)
+    \item \textbf{독립 변수 (X)}: GPA, 공학, 경영, 인문
+\end{itemize}
+여기서 '농업' 전공은 기준 범주로 설정되어 더미 변수를 만들지 않습니다.
+\end{tcolorbox}
+
+\begin{enumerate}
+    \item \textbf{원본 데이터 확인}: 'GPA Major Salary' 엑셀 파일의 첫 번째 워크시트에는 'Starting Salary', 'GPA', 'Engineering', 'Business', 'Liberal Arts'의 다섯 개 열이 있습니다.
+    \item \textbf{더미 변수 코딩}:
+    \begin{itemize}
+        \item 'Engineering' 열: 학생이 공학 전공이면 1, 아니면 0.
+        \item 'Business' 열: 학생이 경영 전공이면 1, 아니면 0.
+        \item 'Liberal Arts' 열: 학생이 인문 전공이면 1, 아니면 0.
+        \item \textbf{기준 범주}: 만약 'Engineering', 'Business', 'Liberal Arts' 열이 모두 0이면, 해당 학생은 '농업(Ag)' 전공으로 간주됩니다. (이 모델에서는 이중 전공을 가정하지 않습니다.)
+    \end{itemize}
+\end{enumerate}
+
+\begin{tcolorbox}[example={더미 변수 코딩 예시}]
+어떤 학생의 데이터가 다음과 같다고 가정해 봅시다.
+\begin{itemize}
+    \item 시작 연봉: \$50,479
+    \item GPA: 3.04
+    \item Engineering: 0
+    \item Business: 1
+    \item Liberal Arts: 0
+\end{itemize}
+이 학생은 경영 전공 학생입니다. 만약 Engineering, Business, Liberal Arts가 모두 0이라면, 그 학생은 농업 전공 학생입니다.
+\end{tcolorbox}
+
+\subsection{2. 엑셀에서 회귀 분석 실행}
+
+데이터가 준비되면 엑셀의 '데이터 분석' 기능을 사용하여 회귀 모델을 실행합니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 분석 도구 열기}: 엑셀 메뉴에서 '데이터' 탭을 클릭한 후, '데이터 분석'을 선택합니다. ('데이터 분석'이 보이지 않으면, 엑셀 옵션에서 '추가 기능'을 통해 '분석 도구'를 활성화해야 합니다.)
+    \item \textbf{회귀 분석 선택}: '데이터 분석' 대화 상자에서 '회귀 분석(Regression)'을 선택하고 '확인'을 클릭합니다.
+    \item \textbf{입력 범위 설정}:
+    \begin{itemize}
+        \item \textbf{Input Y Range (종속 변수)}: 예측하고자 하는 '시작 연봉(Starting Salary)' 열 전체를 선택합니다. (예: \texttt{$A$1:$A$101})
+        \item \textbf{Input X Range (독립 변수)}: 'GPA', 'Engineering', 'Business', 'Liberal Arts' 열 전체를 선택합니다. (예: \texttt{$B$1:$E$101})
+    \end{itemize}
+    \item \textbf{옵션 설정}:
+    \begin{itemize}
+        \item \textbf{Labels (레이블)}: 첫 행에 변수 이름(레이블)이 포함되어 있다면 이 상자를 체크합니다.
+        \item \textbf{Confidence Level (신뢰 수준)}: 기본값인 95\%를 유지합니다.
+    \end{itemize}
+    \item \textbf{출력 옵션 설정}:
+    \begin{itemize}
+        \item \textbf{New Worksheet Ply (새 워크시트)}: 회귀 분석 결과가 새 워크시트에 표시되도록 이 옵션을 선택합니다.
+    \end{itemize}
+    \item \textbf{실행}: '확인' 버튼을 클릭하여 회귀 분석을 실행합니다.
+\end{enumerate}
+
+\newpage
+\section{실습 및 결과 해석}
+
+엑셀에서 회귀 분석을 실행하면 '요약 출력(Summary Output)'이라는 결과 보고서가 생성됩니다. 이 보고서를 통해 모델의 성능과 각 변수의 유의미성을 평가하고, 실제 예측에 활용할 수 있습니다.
+
+\subsection{1. 회귀 통계량 해석}
+
+\begin{tcolorbox}[summary={회귀 통계량 요약}]
+\begin{itemize}
+    \item \textbf{Adjusted R-Squared (R-제곱 조정)}: 0.824319
+    \item \textbf{해석}: 시작 연봉 변동의 약 82.4\%가 GPA와 전공(더미 변수)에 의해 설명됩니다. 이는 모델의 설명력이 매우 높다는 것을 의미합니다.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계량} & \textbf{값} \\
+\midrule
+Multiple R & 0.911821 \\
+R Square & 0.831417 \\
+\textbf{Adjusted R Square} & \textbf{0.824319} \\
+Standard error & 1145.058 \\
+Observations & 100 \\
+\bottomrule
+\end{tabular}
+\caption{엑셀 회귀 분석 요약 출력: 회귀 통계량}
+\label{tab:regression_stats}
+\end{adjustbox}
+
+'Adjusted R-Squared' 값은 모델의 설명력을 나타냅니다. 이 값이 0.824319라는 것은 졸업생의 시작 연봉 변동 중 82.4\%를 GPA와 전공이라는 변수들이 설명할 수 있다는 의미입니다. 이는 매우 높은 설명력으로, 모델이 연봉 예측에 매우 유용하다는 것을 시사합니다.
+
+\subsection{2. ANOVA 테이블 해석}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{Significance F} \\
+\midrule
+Regression & 4 & 6.14E+08 & 1.54E+08 & 117.1301611 & \textbf{7.60373E-36} \\
+Residual & 95 & 1.25E+08 & 1311158 & & \\
+Total & 99 & 7.39E+08 & & & \\
+\bottomrule
+\end{tabular}
+\caption{엑셀 회귀 분석 요약 출력: ANOVA 테이블}
+\label{tab:anova}
+\end{adjustbox}
+
+'Significance F' 값은 모델 전체의 통계적 유의성을 나타냅니다. 이 값이 7.60373E-36으로 매우 작기 때문에 (0.05보다 훨씬 작음), 이 회귀 모델은 통계적으로 매우 유의미하며, 최소한 하나 이상의 독립 변수가 종속 변수에 유의미한 영향을 미친다고 결론 내릴 수 있습니다.
+
+\subsection{3. 계수 테이블 해석}
+
+\begin{tcolorbox}[summary={계수 테이블 요약}]
+\begin{itemize}
+    \item 모든 변수(GPA, Engineering, Business, Liberal Arts)의 p-값이 0.05보다 작으므로, 모든 변수가 시작 연봉과 통계적으로 유의미한 관계를 가집니다.
+    \item \textbf{기준 범주}: 농업(Ag) 전공 학생.
+    \item \textbf{계수 해석}:
+    \begin{itemize}
+        \item \textbf{GPA}: GPA 1점 증가 시 시작 연봉이 평균 \$1,142.32 증가합니다.
+        \item \textbf{Engineering}: 농업 전공 학생 대비 공학 전공 학생의 시작 연봉이 평균 \$2,830.26 더 높습니다.
+        \item \textbf{Business}: 농업 전공 학생 대비 경영 전공 학생의 시작 연봉이 평균 \$1,304.71 더 높습니다.
+        \item \textbf{Liberal Arts}: 농업 전공 학생 대비 인문 전공 학생의 시작 연봉이 평균 \$2,321.80 더 낮습니다.
+    \end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{변수} & \textbf{Coefficients} & \textbf{Standard error} & \textbf{t-stat} & \textbf{p-value} & \textbf{Lower 95\%} & \textbf{Upper 95\%} \\
+\midrule
+Intercept & 43244.91 & 733.5203 & 58.9553 & 1.2694E-76 & 41788.68602 & 44701.12987 \\
+GPA & 1142.315 & 239.8636 & 4.762351 & \textbf{6.85279E-06} & 666.1253891 & 1618.504475 \\
+Engineering & 2830.257 & 398.3591 & 7.104787 & \textbf{2.2015E-10} & 2039.414037 & 3621.099729 \\
+Business & 1304.71 & 411.1126 & 3.173607 & \textbf{0.002029098} & 488.5482389 & 2120.871752 \\
+Liberal Arts & -2321.8 & 344.4478 & -6.74065 & \textbf{1.21523E-09} & -3005.61607 & -1637.985522 \\
+\bottomrule
+\end{tabular}
+\caption{엑셀 회귀 분석 요약 출력: 계수 테이블}
+\label{tab:coefficients}
+\end{adjustbox}
+
+이 테이블은 각 독립 변수가 종속 변수에 미치는 영향을 구체적으로 보여줍니다.
+
+\begin{itemize}
+    \item \textbf{p-값 확인}: 모든 변수(GPA, Engineering, Business, Liberal Arts)의 p-값이 0.05보다 훨씬 작습니다. 이는 GPA와 각 전공 더미 변수가 시작 연봉과 통계적으로 유의미한 관계를 가지고 있음을 의미합니다.
+    \item \textbf{Intercept (절편)}: GPA가 0이고 모든 더미 변수가 0일 때(즉, GPA 0인 농업 전공 학생의 경우)의 예상 시작 연봉은 \$43,244.91입니다.
+    \item \textbf{GPA 계수}: GPA가 1점 증가할 때마다 시작 연봉이 평균적으로 \$1,142.32 증가합니다.
+    \item \textbf{Engineering 계수}: 공학 전공 학생은 기준 범주인 농업 전공 학생보다 평균적으로 \$2,830.26 더 높은 시작 연봉을 받습니다.
+    \item \textbf{Business 계수}: 경영 전공 학생은 농업 전공 학생보다 평균적으로 \$1,304.71 더 높은 시작 연봉을 받습니다.
+    \item \textbf{Liberal Arts 계수}: 인문 전공 학생은 농업 전공 학생보다 평균적으로 \$2,321.80 더 낮은 시작 연봉을 받습니다. (음수 계수는 연봉이 감소한다는 의미입니다.)
+\end{itemize}
+
+\subsection{4. 회귀 모델을 이용한 예측}
+
+이제 위에서 얻은 계수들을 사용하여 특정 학생의 시작 연봉을 예측할 수 있습니다. 회귀 방정식은 다음과 같습니다.
+
+$\text{예측 연봉} = \text{절편} + (\text{GPA 계수} \times \text{GPA}) + (\text{공학 계수} \times \text{공학 더미}) + (\text{경영 계수} \times \text{경영 더미}) + (\text{인문 계수} \times \text{인문 더미})$
+
+엑셀에서는 \texttt{SUMPRODUCT} 함수를 사용하여 이 계산을 효율적으로 수행할 수 있습니다.
+
+\begin{lstlisting}[caption={엑셀 SUMPRODUCT 함수를 이용한 예측 공식}, label={lst:sumproduct_formula}]
+=$B$24 + SUMPRODUCT($B$25:$B$28, C25:C28)
+\end{lstlisting}
+여기서 \texttt{$B$24}는 절편 값, \texttt{$B$25:$B$28}은 GPA 및 더미 변수들의 계수 범위, \texttt{C25:C28}은 예측하고자 하는 학생의 GPA 및 더미 변수 값 범위입니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{변수} & \textbf{Coefficients} & \textbf{Student 1} & \textbf{Student 2} & \textbf{Student 3} & \textbf{Student 4} \\
+\midrule
+Intercept & 43244.91 & & & & \\
+GPA & 1142.315 & 3.6 & 2.6 & 2.6 & 4 \\
+Engineering & 2830.257 & 1 & 1 & 0 & 0 \\
+Business & 1304.71 & 0 & 0 & 0 & 0 \\
+Liberal Arts & -2321.8 & 0 & 0 & 0 & 1 \\
+\midrule
+\textbf{Point Estimate of Prediction} & & \textbf{\$50,187.50} & \textbf{\$49,045.18} & \textbf{\$46,214.93} & \textbf{\$45,492.37} \\
+\bottomrule
+\end{tabular}
+\caption{다양한 학생 유형에 대한 연봉 예측}
+\label{tab:prediction_examples}
+\end{adjustbox}
+
+\subsubsection*{예측 사례 분석}
+
+\begin{enumerate}
+    \item \textbf{학생 1}: GPA 3.6, 공학 전공
+    \begin{itemize}
+        \item 예측 연봉: \$50,187.50
+        \item 계산: $43244.91 + (1142.315 \times 3.6) + (2830.257 \times 1) + (1304.71 \times 0) + (-2321.8 \times 0) = 50187.50$
+    \end{itemize}
+
+    \item \textbf{학생 2}: GPA 2.6, 공학 전공
+    \begin{itemize}
+        \item 예측 연봉: \$49,045.18
+        \item 계산: $43244.91 + (1142.315 \times 2.6) + (2830.257 \times 1) + (1304.71 \times 0) + (-2321.8 \times 0) = 49045.18$
+        \item \textbf{해석}: 학생 1과 학생 2는 GPA만 1점 차이(3.6 vs 2.6) 나고 전공은 동일합니다. 예측 연봉 차이는 $50187.50 - 49045.18 = 1142.32$로, 이는 GPA 계수(\$1,142.315)와 거의 일치합니다. 즉, GPA 1점 하락 시 연봉이 약 \$1,142 감소함을 보여줍니다.
+    \end{itemize}
+
+    \item \textbf{학생 3}: GPA 2.6, 농업 전공
+    \begin{itemize}
+        \item 예측 연봉: \$46,214.93
+        \item 계산: $43244.91 + (1142.315 \times 2.6) + (2830.257 \times 0) + (1304.71 \times 0) + (-2321.8 \times 0) = 46214.93$
+        \item \textbf{해석}: 학생 2(공학, GPA 2.6)와 학생 3(농업, GPA 2.6)은 GPA는 같지만 전공이 다릅니다. 예측 연봉 차이는 $49045.18 - 46214.93 = 2830.25$로, 이는 공학 전공 계수(\$2,830.257)와 거의 일치합니다. 이는 농업 전공 학생 대비 공학 전공 학생이 평균적으로 \$2,830 더 높은 연봉을 받는다는 것을 다시 한번 확인시켜 줍니다.
+    \end{itemize}
+
+    \item \textbf{학생 4}: GPA 4.0, 인문 전공
+    \begin{itemize}
+        \item 예측 연봉: \$45,492.37
+        \item 계산: $43244.91 + (1142.315 \times 4.0) + (2830.257 \times 0) + (1304.71 \times 0) + (-2321.8 \times 1) = 45492.37$
+        \item \textbf{해석}: 인문 전공 학생은 GPA가 4.0으로 높음에도 불구하고, 인문 전공 계수가 음수(-2321.8)이기 때문에 농업 전공 학생보다 평균적으로 연봉이 낮게 예측됩니다. 이는 인문 전공이 기준 범주인 농업 전공에 비해 연봉에 부정적인 영향을 미친다는 것을 보여줍니다.
+    \end{itemize}
+\end{enumerate}
+
+\begin{tcolorbox}[warning={중요: 기준 범주와의 비교}]
+모든 더미 변수의 계수는 '기준 범주'와 비교하여 해석됩니다. 이 모델에서는 '농업' 전공이 기준 범주이므로, '공학' 전공 계수는 '농업' 전공 대비 '공학' 전공의 연봉 차이를 나타냅니다. '인문' 전공 계수가 음수인 것은 '농업' 전공보다 '인문' 전공의 연봉이 평균적으로 낮다는 의미입니다.
+\end{tcolorbox}
+
+\newpage
+\section{체크리스트}
+
+이 모듈의 학습 및 적용을 위한 점검표입니다.
+
+\begin{itemize}
+    \item \textbf{더미 변수 생성}:
+    \begin{itemize}
+        \item 질적 변수의 모든 범주를 식별했는가?
+        \item N개의 범주에 대해 N-1개의 더미 변수를 생성했는가?
+        \item 기준 범주(Reference Category)를 명확히 설정했는가?
+        \item 각 더미 변수가 0 또는 1로 올바르게 코딩되었는가?
+    \end{itemize}
+    \item \textbf{엑셀 회귀 분석 실행}:
+    \begin{itemize}
+        \item 종속 변수(Y)와 독립 변수(X) 범위를 정확히 지정했는가?
+        \item 'Labels' 옵션을 올바르게 체크했는가?
+        \item 출력 옵션(예: 새 워크시트)을 적절히 설정했는가?
+    \end{itemize}
+    \item \textbf{회귀 분석 결과 해석}:
+    \begin{itemize}
+        \item Adjusted R-Squared 값을 확인하고 모델의 설명력을 이해했는가?
+        \item Significance F 값을 확인하고 모델 전체의 유의성을 판단했는가?
+        \item 각 독립 변수의 p-값을 확인하고 통계적 유의성을 판단했는가?
+        \item 각 계수(Coefficient)의 의미를 기준 범주와 비교하여 올바르게 해석했는가?
+        \item 특히 더미 변수의 계수가 양수/음수일 때의 의미를 이해했는가?
+    \end{itemize}
+    \item \textbf{예측 수행}:
+    \begin{itemize}
+        \item 회귀 방정식을 사용하여 새로운 데이터에 대한 예측을 수행할 수 있는가?
+        \item 엑셀의 \texttt{SUMPRODUCT} 함수를 활용하여 예측을 자동화할 수 있는가?
+        \item 예측 결과가 각 변수의 계수와 어떻게 연관되는지 설명할 수 있는가?
+    \end{itemize}
+\end{itemize}
+
+\newpage
+\section{FAQ (자주 묻는 질문)}
+
+\begin{tcolorbox}[example={Q\&A: 더미 변수}]
+\textbf{Q1: 기준 범주를 바꾸면 회귀 분석 결과가 달라지나요?}
+\textbf{A1:} 네, 계수 값은 달라집니다. 예를 들어, 농업 대신 경영을 기준 범주로 설정하면, 공학 전공의 계수는 '경영 전공 대비 공학 전공의 연봉 차이'를 나타내게 됩니다. 하지만 모델의 전반적인 설명력(Adjusted R-Squared)이나 예측 결과 자체는 동일합니다. 어떤 범주를 기준으로 삼든, 변수들 간의 상대적인 관계는 변하지 않기 때문입니다.
+
+\textbf{Q2: N개의 범주에 대해 N개의 더미 변수를 모두 사용하면 안 되나요?}
+\textbf{A2:} 안 됩니다. N개의 더미 변수를 모두 사용하면 '다중공선성(Multicollinearity)'이라는 문제가 발생합니다. 이는 한 더미 변수가 다른 더미 변수들의 선형 조합으로 완벽하게 예측될 수 있음을 의미하며, 회귀 모델의 계수 추정을 불안정하게 만들고 통계적 유의성 판단을 어렵게 합니다. 따라서 반드시 N-1 규칙을 지켜야 합니다.
+
+\textbf{Q3: 더미 변수의 계수가 음수이면 무엇을 의미하나요?}
+\textbf{A3:} 더미 변수의 계수가 음수라는 것은 해당 범주에 속하는 경우, 기준 범주에 비해 종속 변수(예: 연봉)의 값이 평균적으로 감소한다는 것을 의미합니다. 예를 들어, 인문 전공 더미 변수의 계수가 음수라면, 인문 전공 학생은 농업 전공 학생보다 평균적으로 연봉이 낮다는 뜻입니다.
+
+\textbf{Q4: 더미 변수 외에 질적 데이터를 회귀 모델에 넣는 다른 방법이 있나요?}
+\textbf{A4:} 더미 변수는 가장 일반적이고 직관적인 방법입니다. 순서형 질적 데이터(예: 학점 등급 A, B, C)의 경우, 순서형 회귀(Ordinal Regression)와 같은 다른 고급 통계 기법을 사용할 수도 있습니다. 하지만 일반적인 명목형 질적 데이터(예: 전공)에는 더미 변수가 표준적인 접근 방식입니다.
+\end{tcolorbox}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=cyan!5!white, colframe=cyan!75!black, title=\textbf{핵심 요약: 다중 범주 더미 변수}]
+\textbf{목표}: 여러 범주를 가진 질적 데이터를 회귀 모델에 포함하여 예측력 높이기.
+
+\textbf{핵심 원리: N-1 규칙}
+\begin{itemize}
+    \item N개의 범주가 있다면, N-1개의 더미 변수만 생성.
+    \item 나머지 1개 범주는 '기준 범주'가 되어 모든 비교의 기준이 됨.
+    \item \textbf{이유}: 다중공선성 방지 (모델 안정성 확보).
+\end{itemize}
+
+\textbf{더미 변수 생성 (예시: 4개 전공)}
+\begin{itemize}
+    \item 전공: 경영, 공학, 인문, 농업
+    \item 더미 변수: 공학(1/0), 경영(1/0), 인문(1/0)
+    \item \textbf{기준 범주}: 농업 (모든 더미 변수가 0이면 농업 전공)
+\end{itemize}
+
+\textbf{엑셀 회귀 분석 단계}
+\begin{enumerate}
+    \item 데이터 준비: 질적 변수를 N-1 더미 변수로 코딩.
+    \item '데이터' $\rightarrow$ '데이터 분석' $\rightarrow$ '회귀 분석' 선택.
+    \item Y 범위(종속 변수: 시작 연봉), X 범위(독립 변수: GPA, 더미 변수들) 설정.
+    \item 'Labels' 체크, 'Confidence Level' 95\%, 'New Worksheet Ply' 선택.
+    \item '확인' 클릭.
+\end{enumerate}
+
+\textbf{결과 해석 (주요 지표)}
+\begin{itemize}
+    \item \textbf{Adjusted R-Squared (R-제곱 조정)}: 모델의 설명력 (예: 0.824319 $\rightarrow$ 82.4\% 설명).
+    \item \textbf{Significance F (F 유의성)}: 모델 전체의 통계적 유의성 (작을수록 유의미).
+    \item \textbf{p-value (p-값)}: 각 변수의 유의성 (0.05 미만이면 유의미).
+    \item \textbf{Coefficients (계수)}:
+    \begin{itemize}
+        \item GPA 계수: GPA 1점당 연봉 변화량.
+        \item 더미 변수 계수: 기준 범주 대비 해당 범주의 연봉 변화량.
+        \item \textbf{예시}: 공학 계수 \$2830 $\rightarrow$ 농업 전공 대비 공학 전공은 평균 \$2830 더 받음.
+        \item \textbf{예시}: 인문 계수 -\$2321 $\rightarrow$ 농업 전공 대비 인문 전공은 평균 \$2321 덜 받음.
+    \end{itemize}
+\end{itemize}
+
+\textbf{예측 (회귀 방정식 활용)}
+\begin{itemize}
+    \item $\text{예측 연봉} = \text{절편} + (\text{GPA 계수} \times \text{GPA}) + (\text{각 더미 계수} \times \text{해당 더미 값})$
+    \item 엑셀 \texttt{SUMPRODUCT} 함수로 쉽게 계산 가능.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

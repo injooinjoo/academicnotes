@@ -1,0 +1,1821 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{BADM-572: Data-Driven Decision Making}}
+\fancyhead[R]{\small\textit{Module 04}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={BADM-572: Data-Driven Decision Making - Module 04},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\thispagestyle{firstpage}
+
+\metainfo{BADM-572: Data-Driven Decision Making}{Module 4: 추론 통계}{Prof. Fataneh Taghaboni-Dutta}{신뢰 수준과 신뢰 구간, 가설 검정의 기본 개념을 학습하고 Excel을 활용한 통계적 추론 방법을 다룹니다.}
+
+\tableofcontents
+\newpage
+
+\section{신뢰 수준이 신뢰 구간에 미치는 영향 (Excel 활용)}
+
+이 섹션에서는 신뢰 수준(Confidence Level)이 신뢰 구간의 폭에 어떻게 영향을 미치는지 Excel을 통해 살펴보겠습니다. 90\%와 99\% 신뢰 수준에 대한 신뢰 구간을 계산하고 95\% 신뢰 구간과 비교합니다.
+
+\begin{tcolorbox}[title=슬라이드 54: 뉴욕 일일 기온 샘플 Excel 시트 (1/13)]
+이 슬라이드에는 기온 모집단에서 추출한 200개의 표본이 슬라이드 왼쪽에 나열되어 있습니다. 오른쪽에는 다음과 같은 통계량 목록이 세로로 배치되어 있으며 각각의 값이 있습니다: 표본 크기($n$) = 200. 이 표본의 평균 = 56.36345. 표본의 표준편차 = 17.90778. 표준 오차(표본 평균의 표준편차) = 1.266271. $t_{\alpha/2}$: 임계값(t-분포 사용) = 1.971957. $z_{\alpha/2}$: 임계값(정규 분포 사용) = 1.959964. 오차 한계 = 2.497032. 신뢰 구간: 하한 = 53.86642. 상한 = 58.86048.
+\end{tcolorbox}
+
+\textbf{강의 내용 요약:}
+이전 예시에서 95\% 신뢰 구간을 계산하는 방법을 보여드렸습니다. 이제 동일한 예시를 사용하여 90\%와 99\% 신뢰 구간을 계산하고, 신뢰 수준이 변경될 때 값들이 어떻게 변하는지 살펴보겠습니다.
+
+\subsection{신뢰 수준에 따른 임계값 변화}
+\addcontentsline{toc}{subsection}{신뢰 수준에 따른 임계값 변화}
+
+신뢰 수준이 달라지면 임계값($t_{\alpha/2}$)이 달라집니다. 이는 신뢰 구간의 폭을 결정하는 중요한 요소입니다.
+
+\begin{tcolorbox}[title=슬라이드 56: 뉴욕 일일 기온 샘플 Excel 시트 (3/13)]
+신뢰 수준은 바로 여기에 있을 것이고 90\%입니다. 90\%로 가면 이것이 의미하는 바입니다. 90\%라면 이 값, 즉 왼쪽의 모든 것, 나머지 10\% 중 5\%는 여기에 있고 5\%는 여기에 있으므로 이것은 0.95가 될 것입니다. 99\%의 경우, 이것이 99\%라면 여기에 0.005가 있고 여기에 0.005가 있습니다. 따라서 이 경우, 왼쪽의 모든 것은 0.995가 됩니다. 이것이 변하는 것입니다.
+\end{tcolorbox}
+
+\begin{figure}[h!]
+    \centering
+    % % \includegraphics[width=0.8\textwidth]{example-bell-curve-90-99.png}  % Image not found: example-bell-curve-90-99.png % Placeholder image
+    \begin{warningbox}[title=그림 설명: 다양한 신뢰 수준에 따른 누적 확률]
+    종 모양의 히스토그램에 벨 곡선이 그려져 있습니다.
+    \begin{itemize}
+        \item 90\% 신뢰 수준: 중앙 부분은 90\%로 음영 처리되어 있고, 양쪽 꼬리는 각각 5\%입니다. 오른쪽 꼬리까지의 누적 확률은 95\% (0.95)입니다.
+        \item 99\% 신뢰 수준: 중앙 부분은 99\%로 음영 처리되어 있고, 양쪽 꼬리는 각각 0.5\% (0.005)입니다. 오른쪽 꼬리까지의 누적 확률은 99.5\% (0.995)입니다.
+    \end{itemize}
+    \end{warningbox}
+    \caption{다양한 신뢰 수준에 따른 누적 확률}
+    \label{fig:confidence_level_prob}
+\end{figure}
+
+\textbf{Excel 계산 단계 (t-분포 임계값):}
+자유도는 $n-1 = 200-1 = 199$로 동일합니다.
+
+\begin{enumerate}
+    \item \textbf{90\% 신뢰 수준:}
+        \begin{itemize}
+            \item 임계값을 계산할 셀을 선택합니다.
+            \item \code{=T.INV(0.95, 199)}를 입력합니다. (90\% 신뢰 구간의 오른쪽 꼬리까지의 누적 확률은 90\% + 5\% = 95\% = 0.95)
+            \item \code{Enter}를 누릅니다.
+        \end{itemize}
+    \item \textbf{99\% 신뢰 수준:}
+        \begin{itemize}
+            \item 임계값을 계산할 셀을 선택합니다.
+            \item \code{=T.INV(0.995, 199)}를 입력합니다. (99\% 신뢰 구간의 오른쪽 꼬리까지의 누적 확률은 99\% + 0.5\% = 99.5\% = 0.995)
+            \item \code{Enter}를 누릅니다.
+        \end{itemize}
+\end{enumerate}
+\begin{infobox}[title=계산 결과: 신뢰 수준별 t-분포 임계값]
+\begin{itemize}
+    \item \textbf{90\% 신뢰 수준 ($t_{\alpha/2}$):} \textbf{1.6525}
+    \item \textbf{99\% 신뢰 수준 ($t_{\alpha/2}$):} \textbf{2.6007}
+\end{itemize}
+참고로, 95\% 신뢰 수준의 임계값은 1.9719였습니다. 신뢰 수준이 높아질수록 임계값이 커지는 것을 확인할 수 있습니다.
+\end{infobox}
+
+\subsection{신뢰 수준에 따른 오차 한계 변화}
+\addcontentsline{toc}{subsection}{신뢰 수준에 따른 오차 한계 변화}
+
+임계값이 변하면 오차 한계도 변합니다. 표준 오차는 표본 데이터에 따라 결정되므로, 신뢰 수준이 변해도 표준 오차는 동일하게 유지됩니다 (이전 계산에서 1.266271).
+
+\begin{tcolorbox}[title=슬라이드 61: 뉴욕 일일 기온 샘플 Excel 시트 (8/13)]
+이것이 오차 한계이고, 이것은 99\%의 오차 한계입니다. 이제 여러분이 알아차린 것 중 하나는 오차 한계가 증가한다는 것입니다. 90\%에서 95\%로 가면 오차 한계가 증가했고, 90\%에서 99\%로 가면 오차 한계가 증가합니다. 오차 한계가 신뢰 수준을 높일수록 점점 더 높아지기 때문에, 신뢰 구간의 폭도 증가하기 시작할 것입니다.
+\end{tcolorbox}
+
+\textbf{Excel 계산 단계 (오차 한계):}
+오차 한계 공식은 }임계값 * 표준 오차\texttt{입니다. 표준 오차는 1.266271입니다.
+
+\begin{enumerate}
+    \item \textbf{90\% 신뢰 수준:}
+        \begin{itemize}
+            \item 오차 한계를 계산할 셀을 선택합니다.
+            \item \code{= (90\% 임계값 셀) * (표준 오차 셀)}을 입력합니다.
+            \item 예를 들어, 90\% 임계값이 G11셀에 있고 표준 오차가 F7셀에 있다면, \code{=G11*F7}과 같이 입력합니다.
+            \item \code{Enter}를 누릅니다.
+        \end{itemize}
+    \item \textbf{99\% 신뢰 수준:}
+        \begin{itemize}
+            \item 오차 한계를 계산할 셀을 선택합니다.
+            \item \code{= (99\% 임계값 셀) * (표준 오차 셀)}을 입력합니다.
+            \item 예를 들어, 99\% 임계값이 H11셀에 있고 표준 오차가 F7셀에 있다면, \code{=H11*F7}과 같이 입력합니다.
+            \item \code{Enter}를 누릅니다.
+        \end{itemize}
+\end{enumerate}
+\begin{infobox}[title=계산 결과: 신뢰 수준별 오차 한계]
+\begin{itemize}
+    \item \textbf{90\% 신뢰 수준:} \textbf{2.0925}
+    \item \textbf{99\% 신뢰 수준:} \textbf{3.2932}
+\end{itemize}
+참고로, 95\% 신뢰 수준의 오차 한계는 2.4970이었습니다. 신뢰 수준이 높아질수록 오차 한계가 커지는 것을 확인할 수 있습니다.
+\end{infobox}
+
+\subsection{신뢰 수준에 따른 신뢰 구간 변화}
+\addcontentsline{toc}{subsection}{신뢰 수준에 따른 신뢰 구간 변화}
+
+오차 한계가 변함에 따라 신뢰 구간의 폭도 달라집니다. 표본 평균은 56.36으로 동일합니다.
+
+\textbf{Excel 계산 단계 (신뢰 구간):}
+신뢰 구간 공식은 }표본 평균 ± 오차 한계`입니다. 표본 평균은 56.36입니다.
+
+\begin{enumerate}
+    \item \textbf{90\% 신뢰 수준:}
+        \begin{itemize}
+            \item \textbf{하한:} \code{= (표본 평균 셀) - (90\% 오차 한계 셀)}
+            \item \textbf{상한:} \code{= (표본 평균 셀) + (90\% 오차 한계 셀)}
+        \end{itemize}
+    \item \textbf{99\% 신뢰 수준:}
+        \begin{itemize}
+            \item \textbf{하한:} \code{= (표본 평균 셀) - (99\% 오차 한계 셀)}
+            \item \textbf{상한:} \code{= (표본 평균 셀) + (99\% 오차 한계 셀)}
+        \end{itemize}
+\end{enumerate}
+\begin{infobox}[title=계산 결과: 신뢰 수준별 신뢰 구간]
+\begin{itemize}
+    \item \textbf{90\% 신뢰 구간:} \textbf{[54.27, 58.45]}
+        \begin{itemize}
+            \item 하한: 56.36 - 2.0925 = 54.2708
+            \item 상한: 56.36 + 2.0925 = 58.456
+        \end{itemize}
+    \item \textbf{95\% 신뢰 구간:} \textbf{[53.86, 58.86]} (이전 섹션 결과)
+    \item \textbf{99\% 신뢰 구간:} \textbf{[53.07, 59.65]}
+        \begin{itemize}
+            \item 하한: 56.36 - 3.2932 = 53.07018
+            \item 상한: 56.36 + 3.2932 = 59.6567
+        \end{itemize}
+\end{itemize}
+\end{infobox}
+
+\begin{tcolorbox}[title=슬라이드 66: 뉴욕 일일 기온 샘플 Excel 시트 (13/13)]
+여기 옆에 나란히 써서 비교해 보겠습니다. 이것은 90\% 신뢰 구간입니다. 이것은 95\% 신뢰 구간이고, 이것은 99\% 신뢰 구간입니다. 90\%는 54.27에서 58.45 사이입니다. 95\%는 53.86에서 58.86입니다. 그리고 99\%는 53.07에서 59.65입니다. 따라서 폭이 증가하기 시작합니다. 그래서 우리는 이 구간에 실제 모집단 평균이 포함될 것이라고 점점 더 확신하게 될 것입니다. 그러나 우리는 정밀도를 잃고 있습니다. 너무 넓습니다. 예를 들어, 99\%에서는 거의 3.5도 차이가 나는데, 이것은 큰 문제일 수 있습니다.
+\end{tcolorbox}
+
+\textbf{결론:}
+\begin{itemize}
+    \item \textbf{신뢰 수준 증가 $\rightarrow$ 오차 한계 증가 $\rightarrow$ 신뢰 구간 폭 증가}
+    \item 신뢰 수준이 높아질수록 모집단 모수를 포함할 확률은 높아지지만, 신뢰 구간의 폭이 넓어져 추정의 \textbf{정밀도(precision)}는 떨어집니다.
+    \item 예를 들어, 99\% 신뢰 구간은 90\% 신뢰 구간보다 훨씬 넓습니다. 이는 우리가 '더 확신'할 수 있지만, '어디에 있는지'에 대한 정보는 덜 구체적이라는 의미입니다.
+\end{itemize}
+
+\newpage
+\section{신뢰 구간: 모집단 비율}
+\addcontentsline{toc}{section}{신뢰 구간: 모집단 비율}
+
+이 섹션에서는 모집단 평균뿐만 아니라 모집단 비율(Population Proportion)에 대한 신뢰 구간을 계산하는 방법을 학습합니다. 이는 특정 특성을 가진 개체의 비율을 추정할 때 유용합니다.
+
+\subsection{모집단 비율에 대한 추론의 필요성}
+\addcontentsline{toc}{subsection}{모집단 비율에 대한 추론의 필요성}
+
+\begin{tcolorbox}[title=슬라이드 67: 모집단 비율]
+\begin{itemize}
+    \item 고객 중 몇 퍼센트가 친구에게 귀사의 사업을 추천할까요?
+    \item 유권자 중 몇 퍼센트가 후보 A에게 투표할까요?
+    \item 아메리칸 항공 항공편 중 몇 퍼센트가 정시에 출발할까요?
+\end{itemize}
+\end{tcolorbox}
+
+\textbf{강의 내용 요약:}
+우리는 종종 모집단 비율에 대해 추론하는 데 관심이 있습니다. 위 질문들처럼, 결과가 두 가지 중 하나로만 나오는 경우(예: 추천하거나 안 하거나, 투표하거나 안 하거나, 정시 출발하거나 안 하거나)에 해당합니다. 평균에 대한 추론과 마찬가지로, 표본 조사를 사용하여 모집단 비율에 대해 추론할 수 있습니다. 아이디어는 동일하지만, 수학적 계산이 다릅니다.
+
+\begin{tcolorbox}[title=슬라이드 68: 표본 비율]
+빨간색과 파란색 구슬이 들어있는 항아리 그림. 더 적은 구슬이 들어있는 작은 항아리 그림.
+\end{tcolorbox}
+
+\textbf{개념 설명:}
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 모집단 비율은 전체 집단에서 특정 특성을 가진 개체의 비율이며, 표본을 통해 추정합니다.
+    \item \textbf{직관적 예시/비유:} 큰 항아리(모집단)에 빨간 구슬(후보 A에게 투표할 유권자)과 파란 구슬(투표하지 않을 유권자)이 섞여 있다고 상상해 보세요. 항아리 전체를 세지 않고, 작은 국자(표본)로 구슬 몇 개를 떠서 빨간 구슬의 비율을 세어봅니다. 이 작은 국자의 비율을 가지고 큰 항아리 전체의 빨간 구슬 비율을 추측하는 것이 바로 모집단 비율 추정입니다.
+    \item \textbf{기술적 설명:} 정치 여론 조사와 같이, 우리는 선거일 전에 후보 A에게 투표할 유권자의 비율을 알고 싶어 합니다. 모집단 전체를 조사할 수 없으므로, 무작위로 표본을 추출하여 그 정보를 사용하여 전체 모집단에 대해 추론합니다. 표본은 무작위로 추출되기 때문에 통계적 추론에는 항상 어느 정도의 불확실성이 따르며, 이때 신뢰 구간이 중요해집니다.
+\end{itemize}
+
+\subsection{모집단 비율에 대한 신뢰 구간 공식}
+\addcontentsline{toc}{subsection}{모집단 비율에 대한 신뢰 구간 공식}
+
+모집단 비율에 대한 신뢰 구간은 표본 비율($\hat{p}$)을 중심으로 오차 한계를 더하고 빼서 계산합니다.
+
+\begin{tcolorbox}[title=슬라이드 69: 모집단 비율에 대한 신뢰 구간]
+\begin{itemize}
+    \item 원하는 신뢰 수준 ($1 - \alpha$)
+    \item 표본 비율 $\hat{p}$
+    \item 신뢰 구간: $\left[\hat{p} \pm z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\right]$
+    \item 오차 한계는 이 방정식의 이 부분입니다: $z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}$
+\end{itemize}
+\end{tcolorbox}
+
+\textbf{개념 설명:}
+\begin{itemize}
+    \item \textbf{한 줄 핵심 요약:} 모집단 비율의 신뢰 구간은 표본 비율을 중심으로 임계값과 표준 오차를 곱한 오차 한계를 더하고 빼서 구합니다.
+    \item \textbf{직관적 예시/비유:} 우리가 뽑은 구슬 표본에서 빨간 구슬이 50\% 나왔다고 합시다. 이 50\%가 '가장 가능성 있는' 모집단 비율이지만, 정확히 50\%라고 단정할 수는 없습니다. 그래서 '50\%에서 이만큼 더하고 빼면' 실제 모집단 비율이 그 안에 있을 것이라고 '확신'하는 구간을 만드는 것입니다. 이때 '이만큼'이 바로 오차 한계입니다.
+    \item \textbf{기술적 설명:}
+        \begin{itemize}
+            \item \textbf{표본 비율 ($\hat{p}$):} 표본에서 특정 특성을 가진 개체의 수($x$)를 전체 표본 크기($n$)로 나눈 값입니다. $\hat{p} = x/n$.
+            \item \textbf{표준 오차 (Standard Error for Proportion):} 표본 비율의 표본 분포의 표준편차입니다. 이는 $\formula{\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}}$으로 계산됩니다.
+            \item \textbf{임계값 ($z_{\alpha/2}$):} 원하는 신뢰 수준에 해당하는 Z-값입니다. 표본 크기가 충분히 크면 (일반적으로 $n\hat{p} \ge 10$ 이고 $n(1-\hat{p}) \ge 10$), 표본 비율의 분포는 정규 분포에 근사하므로 Z-분포를 사용합니다.
+            \item \textbf{오차 한계 (Margin of Error):} 임계값과 표준 오차를 곱한 값입니다. 이는 표본 비율이 모집단 비율과 얼마나 차이 날 수 있는지를 나타냅니다.
+        \end{itemize}
+\end{itemize}
+
+\subsection{예시: 지역 고용 시장 조건 (Gallup 설문)}
+\addcontentsline{toc}{subsection}{예시: 지역 고용 시장 조건 (Gallup 설문)}
+
+Gallup 설문조사 데이터를 사용하여 지역 고용 시장 조건에 대한 모집단 비율의 95\% 신뢰 구간을 계산해 보겠습니다.
+
+\begin{tcolorbox}[title=슬라이드 70: 지역 고용 시장 조건이 좋은가? (1/2)]
+2016년 3월 31일부터 4월 2일까지 Gallup은 미국 50개 주와 컬럼비아 특별구에 거주하는 성인 1,526명을 무작위로 표본 조사했습니다. 1,526명의 성인 중 779명이 시장 조건이 좋다고 생각했습니다.
+시장 조건이 좋다고 생각하는 모든 성인의 비율에 대한 95\% 신뢰 구간은 얼마입니까?
+\end{tcolorbox}
+
+\textbf{문제 분석:}
+\begin{itemize}
+    \item \textbf{표본 크기 ($n$):} 1,526명
+    \item \textbf{성공 횟수 ($x$):} 779명 (시장 조건이 좋다고 생각하는 성인)
+    \item \textbf{신뢰 수준:} 95\%
+\end{itemize}
+
+\subsubsection{표본 비율 계산}
+\addcontentsline{toc}{subsubsection}{표본 비율 계산}
+
+\begin{tcolorbox}[title=슬라이드 71: 지역 고용 시장 조건이 좋은가? (2/2)]
+먼저, 우리 표본에는 1,526명이 있습니다. 그리고 51\%는 고용 시장이 좋다고 믿는 표본 비율입니다.
+\formula{n = 1,526}
+\formula{\hat{p} = 779 \div 1526 = 0.51}
+\end{tcolorbox}
+
+\textbf{계산:}
+\formula{\hat{p} = \frac{x}{n} = \frac{779}{1526} \approx 0.51}
+표본 비율은 \textbf{0.51 (51\%)}입니다.
+
+\subsubsection{임계값 결정}
+\addcontentsline{toc}{subsubsection}{임계값 결정}
+
+95\% 신뢰 수준에 해당하는 Z-값을 사용합니다. 표본 크기가 충분히 크므로 (1,526명), 정규 분포를 사용할 수 있습니다.
+
+\begin{tcolorbox}[title=슬라이드 71: 지역 고용 시장 조건이 좋은가? (2/2)]
+신뢰 수준은 95\% ($z_{\alpha/2} = 1.96$)입니다.
+\end{tcolorbox}
+
+\textbf{계산:}
+95\% 신뢰 수준에 대한 $z_{\alpha/2}$ 값은 \textbf{1.96}입니다. (이전 섹션에서 \excel{NORM.S.INV(0.975)}로 계산한 값과 동일합니다.)
+
+\subsubsection{오차 한계 계산}
+\addcontentsline{toc}{subsubsection}{오차 한계 계산}
+
+\begin{tcolorbox}[title=슬라이드 71: 지역 고용 시장 조건이 좋은가? (2/2)]
+오차 한계: $z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} = 1.96 \times \sqrt{\frac{0.51 \times (1-0.51)}{1526}} = 0.025$
+\end{tcolorbox}
+
+\textbf{계산:}
+\formula{\text{표준 오차} = \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} = \sqrt{\frac{0.51 \times (1-0.51)}{1526}} = \sqrt{\frac{0.51 \times 0.49}{1526}} = \sqrt{\frac{0.2499}{1526}} \approx \sqrt{0.00016376} \approx 0.0128}
+\formula{\text{오차 한계} = z_{\alpha/2} \times \text{표준 오차} = 1.96 \times 0.0128 \approx 0.025}
+오차 한계는 \textbf{0.025 (2.5\%)}입니다.
+
+\subsubsection{신뢰 구간 계산}
+\addcontentsline{toc}{subsubsection}{신뢰 구간 계산}
+
+\begin{tcolorbox}[title=슬라이드 71: 지역 고용 시장 조건이 좋은가? (2/2)]
+$0.51 \pm 0.025 = [0.485, 0.535]$
+\end{tcolorbox}
+
+\textbf{계산:}
+\formula{\text{하한} = \hat{p} - \text{오차 한계} = 0.51 - 0.025 = 0.485}
+\formula{\text{상한} = \hat{p} + \text{오차 한계} = 0.51 + 0.025 = 0.535}
+95\% 신뢰 구간은 \textbf{[0.485, 0.535]}입니다.
+
+\textbf{해석:}
+우리는 95\% 확신을 가지고 모든 성인의 48.5\%에서 53.5\%가 지역 고용 시장 조건이 좋다고 생각한다고 말할 수 있습니다.
+
+\subsection{95\% "신뢰"의 진정한 의미}
+\addcontentsline{toc}{subsection}{95\% "신뢰"의 진정한 의미}
+
+신뢰 구간의 의미를 정확히 이해하는 것이 중요합니다.
+
+\begin{tcolorbox}[title=슬라이드 72: 95\% "신뢰"는 실제로 무엇을 의미하는가?]
+표준 오차 = $\sqrt{\frac{0.51 \times (1-0.51)}{1526}} = 0.0128$
+95\% 신뢰 구간: [0.485, 0.535]
+히스토그램은 95\%를 나타내는 종 모양 곡선으로 그려져 있습니다. 왼쪽 꼬리의 세 표준 오차는 0.51에서 3배의 0.128을 뺀 값인 0.4716으로 계산됩니다. 95\% 신뢰 구간의 두 표준 오차 지점에는 [0.485, 0.535] 마커가 있습니다.
+\end{tcolorbox}
+
+\textbf{강의 내용 요약:}
+\begin{itemize}
+    \item \textbf{중심 극한 정리 (Central Limit Theorem):} 모집단에서 표본을 계속해서 추출하면, 각 표본은 다른 표본과 약간 다른 평균이나 비율을 가질 것입니다. 이 표본 평균 또는 표본 비율들을 플로팅하면, 모집단 모수를 중심으로 하는 정규 분포를 형성합니다.
+    \item \textbf{표준 오차의 역할:} 이 분포의 퍼짐 정도는 표준 오차에 기반합니다. 95\% 신뢰 구간은 대략 표본 평균/비율에서 양쪽으로 두 표준 오차 범위 내에 있습니다.
+    \item \textbf{반복 추출의 의미:} 95\% 신뢰 구간은 100개의 표본을 추출했을 때, 그 중 95개의 표본에서 계산된 신뢰 구간이 실제 모집단 모수를 포함할 것이라는 의미입니다. 나머지 5개 정도의 표본은 꼬리 부분에 위치하여 모집단 모수를 포함하지 않는 신뢰 구간을 생성할 수 있습니다.
+\end{itemize}
+
+\begin{tcolorbox}[title=슬라이드 73: 애니메이션 예시 - 95\% 신뢰 구간]
+0.2에 선이 있고 그 선을 따라 여러 개의 녹색 막대와 몇 개의 빨간색 막대가 있는 막대 그래프.
+\end{tcolorbox}
+
+\textbf{애니메이션 설명:}
+\begin{itemize}
+    \item 이 시뮬레이션에서는 실제 모집단 비율이 0.2로 알려져 있다고 가정합니다 (검은색 실선).
+    \item 100개의 표본을 각각 100개의 관측치로 추출했습니다.
+    \item 이 시뮬레이션에서는 6개의 표본(빨간색 막대)이 모집단 비율을 포함하지 않는 신뢰 구간을 생성했습니다. 즉, 이 6개의 표본은 우리를 잘못된 결론으로 이끌었을 것입니다.
+    \item 나머지 94개의 표본(녹색 막대)은 실제 모집단 비율을 포함하는 95\% 신뢰 구간을 생성했습니다.
+\end{itemize}
+이것이 바로 95\% 신뢰 수준의 의미입니다. 우리가 하나의 표본을 가지고 계산한 신뢰 구간이 실제 모집단 모수를 포함할 확률이 95\%라는 뜻입니다.
+
+\subsection{승수(Multiplier)와 신뢰 수준}
+\addcontentsline{toc}{subsection}{승수(Multiplier)와 신뢰 수준}
+
+임계값($z_{\alpha/2}$)은 신뢰 수준을 나타내는 승수(multiplier)이며, 신뢰 구간의 폭을 결정합니다.
+
+\begin{tcolorbox}[title=슬라이드 74: 승수와 신뢰 수준]
+$z_{\alpha/2}$는 원하는 신뢰 수준을 나타내는 승수입니다 (임계값이라고도 함).
+$\left[\hat{p} \pm z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\right]$
+\end{tcolorbox}
+
+\textbf{강의 내용 요약:}
+$z_{\alpha/2}$는 표본 분포의 중심에서 얼마나 많은 표준 오차만큼 떨어져 있는지를 나타냅니다. 신뢰 수준이 높아질수록 이 승수(임계값)는 커지고, 결과적으로 신뢰 구간은 더 넓어집니다.
+
+\begin{tcolorbox}[title=슬라이드 76: 승수와 신뢰 수준 예시]
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{ll}
+\toprule
+\textbf{신뢰 수준} & \textbf{승수 ($z_{\alpha/2}$)} \\
+\midrule
+90\% & 1.645 \\
+95\% & 1.96 (종종 2로 반올림) \\
+98\% & 2.33 \\
+99\% & 2.58 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{tcolorbox}
+
+\subsection{연습: 99\% 신뢰 구간 계산}
+\addcontentsline{toc}{subsection}{연습: 99\% 신뢰 구간 계산}
+
+Gallup 예시를 다시 사용하여 99\% 신뢰 구간을 계산해 봅시다.
+
+\begin{tcolorbox}[title=슬라이드 77: 연습]
+2016년 3월 31일부터 4월 2일까지 Gallup은 미국 50개 주와 컬럼비아 특별구에 거주하는 성인 1,526명을 무작위로 표본 조사했습니다. 1,526명의 성인 중 779명이 시장 조건이 좋다고 생각했습니다.
+시장 조건이 좋다고 생각하는 모든 성인의 비율에 대한 99\% 신뢰 구간은 얼마입니까?
+\end{tcolorbox}
+
+\textbf{문제 분석:}
+\begin{itemize}
+    \item \textbf{표본 크기 ($n$):} 1,526명
+    \item \textbf{표본 비율 ($\hat{p}$):} 0.51 (이전과 동일)
+    \item \textbf{신뢰 수준:} 99\%
+\end{itemize}
+
+\subsubsection{임계값 결정}
+\addcontentsline{toc}{subsubsection}{임계값 결정}
+
+99\% 신뢰 수준에 해당하는 Z-값을 사용합니다.
+
+\begin{tcolorbox}[title=슬라이드 78: 연습 - 풀이]
+신뢰 수준 = 99\% ($z_{\alpha/2} = 2.58$)
+\end{tcolorbox}
+
+\textbf{계산:}
+99\% 신뢰 수준에 대한 $z_{\alpha/2}$ 값은 \textbf{2.58}입니다. (이는 \excel{NORM.S.INV(0.995)}로 계산할 수 있습니다.)
+
+\subsubsection{오차 한계 계산}
+\addcontentsline{toc}{subsubsection}{오차 한계 계산}
+
+\begin{tcolorbox}[title=슬라이드 78: 연습 - 풀이]
+오차 한계: $z_{\alpha/2} \times \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} = 2.58 \times \sqrt{\frac{0.51 \times (1-0.51)}{1526}} = 0.033$
+\end{tcolorbox}
+
+\textbf{계산:}
+표준 오차는 이전과 동일하게 약 0.0128입니다.
+\formula{\text{오차 한계} = z_{\alpha/2} \times \text{표준 오차} = 2.58 \times 0.0128 \approx 0.033}
+오차 한계는 \textbf{0.033 (3.3\%)}입니다.
+
+\subsubsection{신뢰 구간 계산}
+\addcontentsline{toc}{subsubsection}{신뢰 구간 계산}
+
+\begin{tcolorbox}[title=슬라이드 78: 연습 - 풀이]
+99\% 신뢰 구간: $0.51 \pm 0.033 = [0.477, 0.543]$
+95\% 신뢰 구간: $0.51 \pm 0.025 = [0.485, 0.535]$
+\end{tcolorbox}
+
+\textbf{계산:}
+\formula{\text{하한} = \hat{p} - \text{오차 한계} = 0.51 - 0.033 = 0.477}
+\formula{\text{상한} = \hat{p} + \text{오차 한계} = 0.51 + 0.033 = 0.543}
+99\% 신뢰 구간은 \textbf{[0.477, 0.543]}입니다.
+
+\textbf{비교:}
+\begin{itemize}
+    \item 95\% 신뢰 구간: [0.485, 0.535]
+    \item 99\% 신뢰 구간: [0.477, 0.543]
+\end{itemize}
+99\% 신뢰 구간이 95\% 신뢰 구간보다 더 넓은 것을 확인할 수 있습니다.
+
+\subsection{신뢰 수준과 신뢰 구간 폭의 관계}
+\addcontentsline{toc}{subsection}{신뢰 수준과 신뢰 구간 폭의 관계}
+
+\begin{tcolorbox}[title=슬라이드 79: 90\% 신뢰 구간 vs. 99\% 신뢰 구간]
+0.2에 선이 있고 그 선을 따라 여러 개의 녹색 막대와 몇 개의 빨간색 막대가 있는 90\% 신뢰 구간을 나타내는 막대 그래프. 0.2에 선이 있고 그 선을 따라 훨씬 더 많은 녹색 막대와 하나의 빨간색 막대가 있는 99\% 신뢰 구간을 나타내는 두 번째 막대 그래프.
+\end{tcolorbox}
+
+\textbf{강의 내용 요약:}
+\begin{itemize}
+    \item \textbf{폭의 증가:} 90\% 신뢰 구간과 99\% 신뢰 구간을 비교하면, 신뢰 수준이 높아질수록 신뢰 구간의 폭이 넓어집니다. 녹색 막대(신뢰 구간)의 길이가 99\%에서 더 길어진 것을 볼 수 있습니다.
+    \item \textbf{정확도 vs. 정밀도:} 신뢰 구간이 넓어지면 실제 모집단 모수를 포함할 확률(정확도)은 높아지지만, 추정의 정밀도(precision)는 떨어집니다. 즉, "더 확신하지만, 덜 구체적"입니다.
+    \item \textbf{오류 감소:} 99\% 신뢰 구간에서는 실제 모집단 모수를 놓치는 빨간색 막대가 90\% 신뢰 구간보다 적습니다 (예시에서는 99\%에서 1개, 90\%에서 6개). 이는 신뢰 수준이 높을수록 잘못된 결론을 내릴 확률이 줄어든다는 것을 의미합니다.
+\end{itemize}
+
+\subsection{표본 크기의 영향}
+\addcontentsline{toc}{subsection}{표본 크기의 영향}
+
+신뢰 구간의 정밀도를 높이는 또 다른 방법은 표본 크기를 늘리는 것입니다.
+
+\begin{tcolorbox}[title=슬라이드 80: 표본 크기의 영향]
+99\% 신뢰 구간, $n=100$을 나타내는 막대 그래프. 0.2에 선이 있고 그 선을 따라 여러 개의 녹색 막대와 하나의 빨간색 막대가 있습니다. 99\% 신뢰 구간, $n=1000$을 나타내는 두 번째 막대 그래프. 0.2에 선이 있고 그 선을 따라 여러 개의 더 작은 녹색 막대와 하나의 빨간색 막대가 있습니다.
+\end{tcolorbox}
+
+\textbf{강의 내용 요약:}
+\begin{itemize}
+    \item \textbf{폭의 감소:} 99\% 신뢰 수준에서 표본 크기가 100일 때와 1,000일 때를 비교하면, 표본 크기가 1,000일 때 신뢰 구간의 폭이 훨씬 좁아진 것을 볼 수 있습니다.
+    \item \textbf{정밀도 증가:} 표본 크기가 증가하면 표준 오차가 감소하므로, 오차 한계가 줄어들어 신뢰 구간이 좁아집니다. 이는 더 높은 정밀도를 제공합니다.
+    \item \textbf{정확도 유지:} 표본 크기를 늘려도 신뢰 수준(예: 99\%)은 유지되므로, 모집단 모수를 포함할 확률은 동일하게 높습니다.
+\end{itemize}
+따라서, 더 정확하고 정밀한 추정을 위해서는 적절한 표본 크기를 결정하는 것이 중요합니다. 다음 강의에서는 이 표본 크기 결정에 대해 더 자세히 탐구할 것입니다.
+
+\newpage
+\section{빠르게 훑어보기: 핵심 요약}
+\addcontentsline{toc}{section}{빠르게 훑어보기: 핵심 요약}
+
+\begin{summarybox}[title=\textbf{신뢰 구간의 기본 원리}]
+\begin{itemize}
+    \item \textbf{목표:} 표본 데이터를 사용하여 모집단 모수(평균, 비율)를 추정하는 구간을 제시.
+    \item \textbf{구성:} 표본 통계량 $\pm$ 오차 한계.
+    \item \textbf{오차 한계:} 임계값 $\times$ 표준 오차.
+\end{itemize}
+\end{summarybox}
+
+\begin{infobox}[title=\textbf{모집단 평균에 대한 신뢰 구간}]
+\begin{itemize}
+    \item \textbf{표준 오차:} $\formula{s / \sqrt{n}}$ (s: 표본 표준편차, n: 표본 크기).
+    \item \textbf{임계값:}
+    \begin{itemize}
+        \item 표본 크기가 크면 Z-분포 ($z_{\alpha/2}$) 사용 (\excel{NORM.S.INV}).
+        \item 일반적으로 t-분포 ($t_{\alpha/2}$) 사용 (\excel{T.INV(확률, 자유도)}), 자유도 = $n-1$.
+    \end{itemize}
+    \item \textbf{Excel 단계:} 평균 $\rightarrow$ 표준편차 $\rightarrow$ 표준 오차 $\rightarrow$ 임계값 $\rightarrow$ 오차 한계 $\rightarrow$ 신뢰 구간.
+\end{itemize}
+\end{infobox}
+
+\begin{importantbox}[title=\textbf{모집단 비율에 대한 신뢰 구간}]
+\begin{itemize}
+    \item \textbf{표본 비율 ($\hat{p}$):} $x/n$ (x: 성공 횟수, n: 표본 크기).
+    \item \textbf{표준 오차:} $\formula{\sqrt{\hat{p}(1-\hat{p})/n}}$.
+    \item \textbf{임계값:} Z-분포 ($z_{\alpha/2}$) 사용 (\excel{NORM.S.INV}).
+\end{itemize}
+\end{importantbox}
+
+\begin{warningbox}[title=\textbf{신뢰 수준 및 표본 크기의 영향}]
+\begin{itemize}
+    \item \textbf{신뢰 수준 증가:} 임계값 증가 $\rightarrow$ 오차 한계 증가 $\rightarrow$ 신뢰 구간 폭 증가 (정확도 $\uparrow$, 정밀도 $\downarrow$).
+    \item \textbf{표본 크기 증가:} 표준 오차 감소 $\rightarrow$ 오차 한계 감소 $\rightarrow$ 신뢰 구간 폭 감소 (정밀도 $\uparrow$, 정확도 유지).
+    \item \textbf{트레이드오프:} 높은 신뢰 수준과 높은 정밀도를 동시에 얻으려면 더 큰 표본 크기가 필요.
+\end{itemize}
+\end{warningbox}
+
+\newpage
+\section{FAQ: 자주 묻는 질문}
+\addcontentsline{toc}{section}{FAQ: 자주 묻는 질문}
+
+\begin{summarybox}[title=Q1: 95\% 신뢰 구간이 정확히 무엇을 의미하나요?]
+\textbf{A:} 95\% 신뢰 구간은 우리가 모집단에서 100개의 표본을 추출하여 각각 신뢰 구간을 계산한다면, 그 중 약 95개의 신뢰 구간이 실제 모집단 모수(평균 또는 비율)를 포함할 것이라는 의미입니다. 우리가 계산한 '하나의' 신뢰 구간이 모집단 모수를 포함할 확률이 95\%라는 뜻이기도 합니다.
+\end{summarybox}
+
+\begin{infobox}[title=Q2: 왜 평균 신뢰 구간에서는 t-분포를 사용하고, 비율 신뢰 구간에서는 Z-분포를 사용하나요?]
+\textbf{A:} 평균의 신뢰 구간을 계산할 때 모집단 표준편차를 모르는 경우가 많습니다. 이때 표본 표준편차를 사용하면 t-분포를 사용하는 것이 더 정확합니다. 반면, 비율의 신뢰 구간에서는 표본 크기가 충분히 크면 (일반적으로 $n\hat{p} \ge 10$ 및 $n(1-\hat{p}) \ge 10$), 표본 비율의 분포가 정규 분포에 근사하므로 Z-분포를 사용합니다.
+\end{infobox}
+
+\begin{importantbox}[title=Q3: 신뢰 수준을 높이면 항상 좋은 건가요?]
+\textbf{A:} 신뢰 수준을 높이면 모집단 모수를 포함할 확률은 높아지지만, 신뢰 구간의 폭이 넓어져 추정의 정밀도가 떨어집니다. 즉, "나는 99\% 확신하지만, 그 값은 10에서 100 사이에 있을 거야"라고 말하는 것보다 "나는 90\% 확신하지만, 그 값은 40에서 50 사이에 있을 거야"라고 말하는 것이 더 유용할 수 있습니다. 상황에 따라 적절한 균형을 찾아야 합니다.
+\end{importantbox}
+
+\begin{warningbox}[title=Q4: 표본 크기가 신뢰 구간에 어떤 영향을 미치나요?]
+\textbf{A:} 표본 크기가 커지면 표준 오차가 감소하고, 이에 따라 오차 한계가 줄어들어 신뢰 구간의 폭이 좁아집니다. 이는 추정의 정밀도를 높여줍니다. 따라서 더 정확하고 정밀한 추정을 원한다면 표본 크기를 늘리는 것이 효과적입니다.
+\end{warningbox}
+
+\newpage
+
+\section{개요}
+\addcontentsline{toc}{section}{개요}
+이 문서는 모집단 비율에 대한 신뢰 구간 추정 방법과 그 활용에 대해 다룹니다. 특히 Excel을 활용하여 실제 데이터를 분석하고, 신뢰 구간의 개념을 시각적으로 이해하며, 시작 급여와 같은 실제 비즈니스 문제에 적용하는 방법을 학습합니다. 표본 크기와 신뢰 수준이 신뢰 구간의 폭에 미치는 영향을 애니메이션을 통해 직관적으로 파악하고, 평균과 비율에 대한 신뢰 구간을 계산하는 구체적인 절차를 익힙니다.
+
+\newpage
+\section{용어 정리}
+\addcontentsline{toc}{section}{용어 정리}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+\textbf{신뢰 구간} & 모집단 모수가 존재할 것으로 예상되는 구간 & Confidence Interval & 특정 신뢰 수준에서 \\
+\textbf{모집단 비율} & 전체 집단에서 특정 특성을 가진 개체의 비율 & Population Proportion & 보통 $p$로 표기 \\
+\textbf{표본 비율} & 표본에서 특정 특성을 가진 개체의 비율 & Sample Proportion & 보통 $\hat{p}$로 표기 \\
+\textbf{표준 오차} & 표본 통계량의 변동성을 나타내는 척도 & Standard Error (SE) & 표본 통계량의 표준 편차 \\
+\textbf{Z-값} & 표준 정규 분포에서 특정 확률에 해당하는 값 & Z-value & 신뢰 구간 계산에 사용 \\
+\textbf{T-값} & T-분포에서 특정 확률에 해당하는 값 & T-value & 표본 크기가 작거나 모집단 표준편차를 모를 때 사용 \\
+\textbf{오차 한계} & 표본 통계량과 모집단 모수 간의 최대 예상 차이 & Margin of Error (ME) & 신뢰 구간의 절반 폭 \\
+\textbf{논리 함수} & 특정 조건에 따라 다른 값을 반환하는 함수 & Logical Function & Excel의 \excel{IF} 함수 등 \\
+\textbf{표본 크기} & 분석에 사용된 데이터 개수 & Sample Size & $n$으로 표기 \\
+\textbf{신뢰 수준} & 신뢰 구간이 모집단 모수를 포함할 확률 & Confidence Level & 보통 90\%, 95\%, 99\% \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{모집단 비율에 대한 신뢰 구간 (Excel 활용)}
+\addcontentsline{toc}{section}{모집단 비율에 대한 신뢰 구간 (Excel 활용)}
+이 섹션에서는 Excel을 사용하여 모집단 비율에 대한 신뢰 구간을 계산하는 방법을 배웁니다. 뉴욕 증권 거래소(NYSE)의 주식 데이터를 예시로 들어, 하루 동안 주식 가격이 상승한 비율을 추정하는 과정을 단계별로 살펴봅니다.
+
+\subsection{데이터 준비 및 초기 분석}
+\addcontentsline{toc}{subsection}{데이터 준비 및 초기 분석}
+우리는 2015년 9월 어느 날의 뉴욕 증권 거래소 마감 데이터를 사용합니다. 이 데이터는 주식 심볼, 마감 가격, 순 변동액, 그리고 백분율 변동액을 포함합니다. 저작권 문제로 인해 심볼은 변경되었습니다. 우리의 목표는 하루 동안 가격이 상승한 주식의 비율을 파악하는 것입니다.
+
+\begin{enumerate}
+    \item \textbf{데이터 확인}:
+    주식 데이터는 "\excel{New Symbols}", "\excel{Close}", "\excel{Net Chg}", "\excel{\% Chg}"의 네 가지 열로 구성되어 있습니다. 우리는 "\excel{\% Chg}" 열을 사용하여 주식 가격이 상승했는지 여부를 판단할 것입니다. 백분율 변동액이 양수이면 가격이 상승한 것이고, 음수이면 하락한 것입니다.
+
+    \item \textbf{주식 분류 (Up? 열 생성)}:
+    각 주식이 상승했는지 여부를 분류하기 위해 새로운 열 "\excel{Up?}"을 생성합니다. 이 열에는 Excel의 \excel{IF} 논리 함수를 사용합니다.
+    \begin{examplebox}[title=Excel IF 함수 사용법]
+        \textbf{목표}: "\excel{\% Chg}" 값이 0보다 크면 1(상승), 그렇지 않으면 0(하락)을 반환합니다.
+        \textbf{함수}: \code{=IF(logical\_test, [value\_if\_true], [value\_if\_false])}
+        \textbf{예시}: 첫 번째 데이터 셀(D4)의 값이 -2.38이라고 가정할 때, \code{=IF(D4>0,1,0)}을 입력합니다.
+        \textbf{결과}: D4가 -2.38이므로 0이 반환됩니다. 이 함수를 아래로 드래그하여 모든 주식에 적용합니다.
+    \end{examplebox}
+    이 과정을 통해 각 주식에 대해 상승 여부를 나타내는 0 또는 1의 값이 "\excel{Up?}" 열에 채워집니다. 예를 들어, D11 셀의 값이 0보다 크면 1이 반환되어 해당 주식이 상승했음을 나타냅니다.
+
+    \item \textbf{상승한 주식 수 계산 (\excel{No. Up})}:
+    "\excel{Up?}" 열의 모든 1의 값을 합산하여 상승한 주식의 총 수를 계산합니다. 0은 상승하지 않았음을 의미하므로, 1의 합계가 곧 상승한 주식의 수가 됩니다.
+    \begin{examplebox}[title=Excel SUM 함수 사용법]
+        \textbf{목표}: "\excel{Up?}" 열의 합계를 계산합니다.
+        \textbf{함수}: \code{=SUM(number1, number2, ...)}
+        \textbf{예시}: \code{=SUM(H:H)} 또는 \code{=SUM(H4:H2195)} (H열에 "Up?" 데이터가 있다고 가정)
+        \textbf{결과}: 이 예시에서는 383개의 주식이 상승했습니다.
+    \end{examplebox}
+
+    \item \textbf{총 주식 수 계산 (\excel{count})}:
+    전체 주식의 수를 파악하기 위해 "\excel{Up?}" 열의 데이터 개수를 셉니다.
+    \begin{examplebox}[title=Excel COUNT 함수 사용법]
+        \textbf{목표}: "\excel{Up?}" 열의 데이터 개수를 셉니다.
+        \textbf{함수}: \code{=COUNT(value1, value2, ...)}
+        \textbf{예시}: \code{=COUNT(H:H)} 또는 \code{=COUNT(H4:H2195)}
+        \textbf{결과}: 이 예시에서는 총 2,192개의 주식이 보고되었습니다.
+    \end{examplebox}
+
+    \item \textbf{상승 주식 비율 계산 (\excel{Prop 'up'})}:
+    상승한 주식의 수(\excel{No. Up})를 총 주식 수(\excel{count})로 나누어 전체 주식 중 상승한 주식의 비율을 계산합니다.
+    \begin{examplebox}[title=Excel 비율 계산]
+        \textbf{목표}: 상승 주식 비율을 계산합니다.
+        \textbf{함수}: \code{=No. Up 셀 / count 셀}
+        \textbf{예시}: \code{=H4/H5} (H4에 383, H5에 2192가 있다고 가정)
+        \textbf{결과}: 0.174726, 즉 약 17.5\%의 주식이 상승했습니다. 이는 시장이 좋지 않은 날이었음을 시사합니다.
+    \end{examplebox}
+\end{enumerate}
+
+\subsection{표본 데이터 분석 및 신뢰 구간 계산}
+\addcontentsline{toc}{subsection}{표본 데이터 분석 및 신뢰 구간 계산}
+이제 전체 모집단(모든 주식)이 아닌, 특정 표본(예: 127개 주식으로 구성된 개인 포트폴리오)을 사용하여 신뢰 구간을 추정하는 방법을 살펴봅니다.
+
+\begin{enumerate}
+    \item \textbf{표본 데이터 준비}:
+    새로운 워크시트에서 127개 주식으로 구성된 표본 포트폴리오 데이터를 사용합니다. 이전과 동일하게 "\excel{\% Chg}" 열을 기반으로 "\excel{Up?}" 열을 생성합니다.
+    \begin{examplebox}[title=Excel IF 함수 (표본 데이터)]
+        \textbf{목표}: 표본 주식에 대해 상승 여부를 분류합니다.
+        \textbf{함수}: \code{=IF(D5>0,1,0)} (D5는 첫 번째 표본 주식의 "\excel{\% Chg}" 값)
+        \textbf{결과}: 이 함수를 127개 주식 전체에 적용합니다.
+    \end{examplebox}
+
+    \item \textbf{표본 비율 계산}:
+    표본 포트폴리오에서 상승한 주식의 수(\excel{Sum up})와 총 주식 수(\excel{count})를 계산한 후, 표본 비율(\excel{Prop up})을 계산합니다.
+    \begin{examplebox}[title=표본 비율 계산 결과]
+        \textbf{상승 주식 수 (\excel{Sum up})}: 20
+        \textbf{총 주식 수 (\excel{count})}: 127
+        \textbf{표본 비율 (\excel{Prop up})}: \code{=I4/I5} (I4에 20, I5에 127이 있다고 가정) = 0.15748, 즉 약 15.75\%
+    \end{examplebox}
+
+    \item \textbf{Z-값 계산}:
+    모집단 비율에 대한 신뢰 구간을 계산할 때는 일반적으로 Z-값을 사용합니다. 95\% 신뢰 구간의 경우, 양쪽 꼬리 확률이 각각 2.5\%이므로, 누적 확률 0.975에 해당하는 Z-값을 찾습니다.
+    \begin{examplebox}[title=Excel NORM.S.INV 함수 사용법]
+        \textbf{목표}: 95\% 신뢰 수준에 해당하는 Z-값을 계산합니다.
+        \textbf{함수}: \code{=NORM.S.INV(probability)}
+        \textbf{예시}: \code{=NORM.S.INV(0.975)}
+        \textbf{결과}: 1.9599 (약 1.96)
+    \end{examplebox}
+    \begin{figure}[h!]
+        \centering
+        % 이미지 대신 텍스트로 설명
+        \begin{infobox}[title=Z-값 시각적 설명]
+            표준 정규 분포에서 95\% 신뢰 구간은 중앙 95\% 영역을 의미합니다. 이는 양쪽 꼬리에 각각 2.5\%의 확률이 있음을 뜻합니다. 따라서 왼쪽 끝에서부터 97.5\% (0.95 + 0.025)에 해당하는 Z-값을 찾으면 1.96이 됩니다.
+        \end{infobox}
+        \caption{95\% 신뢰 구간의 Z-값 개념}
+        \label{fig:z_value_concept}
+    \end{figure}
+
+    \item \textbf{표준 오차 (Standard Error, SE) 계산}:
+    표본 비율의 표준 오차는 다음 공식으로 계산됩니다.
+    \formula{SE = \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}}
+    여기서 $\hat{p}$는 표본 비율이고, $n$은 표본 크기입니다.
+    \begin{examplebox}[title=Excel SQRT 함수를 이용한 표준 오차 계산]
+        \textbf{목표}: 표본 비율의 표준 오차를 계산합니다.
+        \textbf{함수}: \code{=SQRT((I7*(1-I7))/I5)} (I7은 표본 비율 0.1574, I5는 표본 크기 127)
+        \textbf{결과}: 0.032322
+    \end{examplebox}
+
+    \item \textbf{오차 한계 (Margin of Error, ME) 계산}:
+    오차 한계는 Z-값과 표준 오차를 곱하여 계산됩니다.
+    \formula{ME = Z \times SE}
+    \begin{examplebox}[title=Excel 오차 한계 계산]
+        \textbf{목표}: 오차 한계를 계산합니다.
+        \textbf{함수}: \code{=I12*I13} (I12는 Z-값 1.9599, I13은 표준 오차 0.03232)
+        \textbf{결과}: 0.06335
+    \end{examplebox}
+
+    \item \textbf{신뢰 구간의 하한 (Lower) 및 상한 (Upper) 계산}:
+    신뢰 구간은 표본 비율에서 오차 한계를 빼고 더하여 계산됩니다.
+    \formula{\text{신뢰 구간} = \hat{p} \pm ME}
+    \begin{examplebox}[title=Excel 신뢰 구간 계산]
+        \textbf{하한 (\excel{Lower})}: \code{=I7-I15} (I7은 표본 비율 0.1574, I15는 오차 한계 0.06335) = 0.09413
+        \textbf{상한 (\excel{Upper})}: \code{=I7+I15} (I7은 표본 비율 0.1574, I15는 오차 한계 0.06335) = 0.2208
+    \end{examplebox}
+
+    \item \textbf{신뢰 구간 해석}:
+    계산된 신뢰 구간은 [9.4\%, 22\%]입니다. 이는 우리가 가진 127개 주식 포트폴리오를 표본으로 사용했을 때, 전체 주식 시장에서 가격이 상승한 주식의 실제 비율이 9.4\%에서 22\% 사이에 있을 것이라고 95\% 신뢰 수준으로 추정할 수 있음을 의미합니다. 실제 모집단 비율이 17.5\%였으므로, 이 신뢰 구간은 실제 값을 잘 포착하고 있습니다.
+\end{enumerate}
+
+\newpage
+\section{신뢰 구간 애니메이션을 통한 이해}
+\addcontentsline{toc}{section}{신뢰 구간 애니메이션을 통한 이해}
+이 섹션에서는 시뮬레이션 애니메이션을 통해 신뢰 수준과 표본 크기가 신뢰 구간의 폭에 미치는 영향을 시각적으로 탐구합니다.
+
+\subsection{신뢰 구간의 개념 시각화}
+\addcontentsline{toc}{subsection}{신뢰 구간의 개념 시각화}
+파란색과 주황색 구슬이 담긴 항아리를 상상해 봅시다. 파란색은 만족한 고객, 주황색은 불만족한 고객을 나타낼 수 있습니다. 이 항아리는 모집단을 의미하며, 우리는 이 모집단에서 표본을 추출하여 모집단 비율을 추정하려고 합니다.
+
+\begin{enumerate}
+    \item \textbf{모집단 비율 확인}:
+    애니메이션 도구에서 "Show p" 옵션을 선택하면 모집단 비율이 0.5 (50\%)로 표시됩니다. 즉, 파란색과 주황색 구슬이 50:50으로 섞여 있습니다.
+
+    \item \textbf{단일 표본 추출 및 신뢰 구간}:
+    표본 크기 50, 신뢰 수준 95\%를 설정하고 "Sample" 버튼을 클릭하여 하나의 표본을 추출합니다.
+    \begin{examplebox}[title=단일 표본 결과]
+        \textbf{표본 비율 (\excel{Sample p})}: 0.46 (예시)
+        \textbf{신뢰 구간}: 그래프에 수직 검은색 막대로 표시됩니다. 이 막대는 표본 비율 0.46을 중심으로 하는 신뢰 구간을 나타냅니다.
+    \end{examplebox}
+    이 신뢰 구간은 우리가 추출한 첫 번째 표본을 사용하여 얻은 것입니다. 실제 모집단 비율은 50\%이지만, 표본마다 비율이 다르게 나올 수 있습니다.
+
+    \item \textbf{여러 표본 추출}:
+    "Sample 100" 버튼을 클릭하여 100개의 표본을 추출하고 각각의 신뢰 구간을 그립니다.
+    \begin{examplebox}[title=100개 표본 결과]
+        \textbf{그래프}: 100개의 수직 막대가 그려집니다. 대부분의 막대는 실제 모집단 비율 0.5를 포함하지만, 일부 막대(빨간색으로 표시)는 0.5를 포함하지 않습니다.
+        \textbf{빨간색 막대}: 95\% 신뢰 수준에서는 약 5개(100개 중 5\%)의 표본이 실제 모집단 비율을 포함하지 않는 신뢰 구간을 생성할 수 있습니다. 이는 신뢰 수준의 정의와 일치합니다.
+    \end{examplebox}
+    만약 우리가 빨간색으로 표시된 표본 중 하나만 추출했다면, 잘못된 결론을 내렸을 것입니다.
+
+\subsection{표본 크기의 영향}
+\addcontentsline{toc}{subsection}{표본 크기의 영향}
+표본 크기가 신뢰 구간의 폭에 어떤 영향을 미치는지 살펴봅니다.
+
+\begin{enumerate}
+    \item \textbf{표본 크기 50 vs 100}:
+    동일한 모집단에서 표본 크기를 50에서 100으로 늘려 다시 100개의 표본을 추출합니다.
+    \begin{examplebox}[title=표본 크기 증가의 효과]
+        \textbf{신뢰 구간 폭}: 표본 크기가 100으로 증가하면 각 신뢰 구간(검은색 막대)의 폭이 \textbf{줄어듭니다}.
+        \textbf{오류 표본 수}: 실제 모집단 비율을 놓치는 빨간색 막대의 수도 \textbf{줄어듭니다}.
+        \textbf{정밀도 증가}: 신뢰 구간이 작아진다는 것은 추정의 \textbf{정밀도(Precision)}가 높아진다는 의미입니다. 즉, 추정 범위가 더 좁아져 실제 값에 더 가깝게 접근할 가능성이 커집니다.
+    \end{examplebox}
+
+    \item \textbf{표본 크기 100 vs 250}:
+    표본 크기를 250으로 더 늘려 100개의 표본을 추출합니다.
+    \begin{examplebox}[title=표본 크기 250 결과]
+        \textbf{신뢰 구간 폭}: 신뢰 구간의 폭은 더욱 \textbf{감소}합니다.
+        \textbf{오류 표본 수}: 95\% 신뢰 수준이므로 여전히 약 5개의 표본이 실제 모집단 비율을 놓칠 수 있습니다. 하지만 각 구간의 폭이 좁아져 더 정확한 추정을 가능하게 합니다.
+    \end{examplebox}
+    \begin{summarybox}
+        \textbf{핵심 요약}: 표본 크기가 증가할수록 신뢰 구간의 폭은 좁아집니다. 이는 추정의 정밀도가 높아진다는 것을 의미합니다.
+    \end{summarybox}
+
+\subsection{신뢰 수준의 영향}
+\addcontentsline{toc}{subsection}{신뢰 수준의 영향}
+표본 크기를 고정한 상태에서 신뢰 수준이 신뢰 구간의 폭에 어떤 영향을 미치는지 살펴봅니다.
+
+\begin{enumerate}
+    \item \textbf{신뢰 수준 95\% vs 99\%}:
+    표본 크기를 250으로 고정하고 신뢰 수준을 95\%에서 99\%로 변경합니다.
+    \begin{examplebox}[title=신뢰 수준 증가의 효과]
+        \textbf{신뢰 구간 폭}: 신뢰 수준이 99\%로 증가하면 신뢰 구간의 폭은 \textbf{넓어집니다}.
+        \textbf{Z-값}: 99\% 신뢰 수준에서는 Z-값이 약 2.5로 (95\%의 1.96보다) 커지기 때문입니다. Z-값이 커지면 오차 한계가 커지고, 결과적으로 신뢰 구간의 폭이 넓어집니다.
+        \textbf{오류 표본 수}: 100개의 표본 중 실제 모집단 비율을 놓치는 빨간색 막대의 수는 \textbf{줄어듭니다} (예: 1개). 이는 더 높은 신뢰도로 실제 값을 포함하려 하기 때문입니다.
+    \end{examplebox}
+
+    \item \textbf{신뢰 수준 99\% vs 90\%}:
+    신뢰 수준을 90\%로 변경하면 신뢰 구간의 폭은 \textbf{더욱 좁아집니다}. 90\% 신뢰 수준에서는 Z-값이 더 작아지기 때문입니다. 하지만 실제 모집단 비율을 놓치는 표본의 수는 \textbf{증가}할 수 있습니다 (예: 6개).
+
+    \item \textbf{표본 크기 50, 신뢰 수준 99\%}:
+    표본 크기가 작고(50), 신뢰 수준이 높으면(99\%) 신뢰 구간은 매우 \textbf{넓어집니다}. 이 경우 오차 한계가 커져 추정의 정밀도가 떨어집니다.
+    \begin{summarybox}
+        \textbf{핵심 요약}: 신뢰 수준이 증가할수록 신뢰 구간의 폭은 넓어집니다. 이는 실제 모집단 모수를 포함할 확률을 높이기 위함입니다.
+    \end{summarybox}
+\end{enumerate}
+
+\subsection{정확도와 정밀도 향상}
+\addcontentsline{toc}{subsection}{정확도와 정밀도 향상 전략}
+\begin{examplebox}[title=정확도와 정밀도 향상 전략]
+    \textbf{정확도 (Accuracy)}: 추정치가 실제 모집단 모수에 얼마나 가까운지를 나타냅니다. 신뢰 수준을 높이면 정확도가 높아집니다 (즉, 실제 값을 포함할 확률이 높아집니다).
+    \textbf{정밀도 (Precision)}: 추정치의 범위가 얼마나 좁은지를 나타냅니다. 표본 크기를 늘리면 정밀도가 높아집니다 (즉, 신뢰 구간의 폭이 좁아집니다).
+
+    \textbf{결론}: 정확도와 정밀도를 동시에 높이는 가장 좋은 방법은 \textbf{표본 크기를 늘리는 것}입니다. 표본 크기를 늘리면 신뢰 구간의 폭이 좁아지면서도, 실제 모집단 모수를 포함할 확률을 높일 수 있습니다. 신뢰 수준을 높이는 것은 정확도를 높이지만, 정밀도를 떨어뜨립니다 (신뢰 구간이 넓어짐).
+\end{examplebox}
+
+\newpage
+\section{시작 급여 예시 (Excel 활용)}
+\addcontentsline{toc}{section}{시작 급여 예시 (Excel 활용)}
+이 섹션에서는 커뮤니티 칼리지 졸업생의 시작 급여 데이터를 사용하여 평균과 특정 급여 이상을 받는 졸업생의 비율에 대한 신뢰 구간을 계산하는 방법을 배웁니다.
+
+\subsection{문제 정의 및 평균 급여 신뢰 구간 계산}
+\addcontentsline{toc}{subsection}{문제 정의 및 평균 급여 신뢰 구간 계산}
+커뮤니티 칼리지는 신입생 유치를 위해 졸업생의 시작 급여 정보를 제공합니다. 100명의 졸업생이 자신의 시작 급여를 자발적으로 제공했습니다. 이 데이터를 기반으로 다음 두 가지 질문에 답해야 합니다.
+\begin{enumerate}
+    \item 이 프로그램 졸업생의 평균 시작 급여에 대한 95\% 신뢰 구간은 얼마인가?
+    \item $26,500 이상을 버는 졸업생의 비율에 대한 95\% 신뢰 구간은 얼마인가? (입학처장은 $26,500 미만이면 학생들이 프로그램에 등록하지 않을 것이라고 생각함)
+\end{enumerate}
+
+먼저 평균 시작 급여에 대한 신뢰 구간을 계산합니다.
+
+\begin{enumerate}
+    \item \textbf{평균 급여 계산 (\excel{Avg Salary})}:
+    100명의 졸업생 시작 급여 데이터에서 평균을 계산합니다.
+    \begin{examplebox}[title=Excel AVERAGE 함수 사용법]
+        \textbf{목표}: 시작 급여의 평균을 계산합니다.
+        \textbf{함수}: \code{=AVERAGE(number1, number2, ...)}
+        \textbf{예시}: \code{=AVERAGE(A:A)} (A열에 시작 급여 데이터가 있다고 가정)
+        \textbf{결과}: $27,092
+    \end{examplebox}
+
+    \item \textbf{표준 편차 계산 (\excel{std dev})}:
+    표본의 표준 편차를 계산합니다.
+    \begin{examplebox}[title=Excel STDEV.S 함수 사용법]
+        \textbf{목표}: 표본의 표준 편차를 계산합니다.
+        \textbf{함수}: \code{=STDEV.S(number1, number2, ...)}
+        \textbf{예시}: \code{=STDEV.S(A:A)}
+        \textbf{결과}: $2,533.997 (약 $2,534)
+    \end{examplebox}
+
+    \item \textbf{표본 크기 계산 (\excel{Sample Size})}:
+    응답한 졸업생의 수를 셉니다.
+    \begin{examplebox}[title=Excel COUNT 함수 사용법]
+        \textbf{목표}: 표본 크기를 계산합니다.
+        \textbf{함수}: \code{=COUNT(value1, value2, ...)}
+        \textbf{예시}: \code{=COUNT(A:A)}
+        \textbf{결과}: 100
+    \end{examplebox}
+
+    \item \textbf{표준 오차 (Standard Error, SE) 계산}:
+    평균의 표준 오차는 표본 표준 편차를 표본 크기의 제곱근으로 나눈 값입니다.
+    \formula{\hat{\sigma}_{\bar{x}} = \frac{s}{\sqrt{n}}}
+    여기서 $s$는 표본 표준 편차이고, $n$은 표본 크기입니다.
+    \begin{examplebox}[title=Excel 표준 오차 계산]
+        \textbf{목표}: 평균의 표준 오차를 계산합니다.
+        \textbf{함수}: \code{=D4/SQRT(D6)} (D4는 표준 편차, D6는 표본 크기)
+        \textbf{결과}: 253.399794
+    \end{examplebox}
+
+    \item \textbf{T-값 계산 (\excel{95\%, t value})}:
+    표본 크기가 30 이상이더라도 모집단의 표준 편차를 모르는 경우 T-분포를 사용합니다. 95\% 신뢰 구간의 T-값을 계산합니다. 자유도는 $n-1$입니다.
+    \begin{examplebox}[title=Excel T.INV 함수 사용법]
+        \textbf{목표}: 95\% 신뢰 수준에 해당하는 T-값을 계산합니다.
+        \textbf{함수}: \code{=T.INV(probability, deg\_freedom)}
+        \textbf{예시}: \code{=T.INV(0.975, 99)} (자유도 = 100 - 1 = 99)
+        \textbf{결과}: 1.9842 (강의 자료에서는 0.972로 오타가 있었으나, 0.975가 올바른 값이며 t-값은 거의 동일합니다.)
+    \end{examplebox}
+    \begin{warningbox}
+        \textbf{주의}: 강의 자료에서 \code{T.INV(0.972,...)}로 오타가 있었으나, 95\% 신뢰 구간의 경우 누적 확률은 0.975가 올바릅니다. 두 값의 T-값은 매우 유사합니다.
+    \end{warningbox}
+
+    \item \textbf{오차 한계 (Margin of Error, ME) 계산}:
+    오차 한계는 T-값과 표준 오차를 곱하여 계산됩니다.
+    \formula{ME = t_{\alpha/2} \times \frac{s}{\sqrt{n}}}
+    \begin{examplebox}[title=Excel 오차 한계 계산]
+        \textbf{목표}: 평균의 오차 한계를 계산합니다.
+        \textbf{함수}: \code{=D10*D8} (D10은 T-값, D8은 표준 오차)
+        \textbf{결과}: 490.01142
+    \end{examplebox}
+
+    \item \textbf{신뢰 구간의 하한 (\excel{Lower}) 및 상한 (\excel{Upper}) 계산}:
+    신뢰 구간은 표본 평균에서 오차 한계를 빼고 더하여 계산됩니다.
+    \formula{\text{신뢰 구간} = \bar{x} \pm ME}
+    \begin{examplebox}[title=Excel 신뢰 구간 계산]
+        \textbf{하한 (\excel{Lower})}: \code{=D3-D12} (D3는 평균 급여, D12는 오차 한계) = 26602
+        \textbf{상한 (\excel{Upper})}: \code{=D3+D12} (D3는 평균 급여, D12는 오차 한계) = 27582
+    \end{examplebox}
+
+    \item \textbf{신뢰 구간 해석}:
+    95\% 신뢰 수준에서 이 프로그램 졸업생의 평균 시작 급여는 $26,602에서 $27,582 사이에 있을 것으로 추정됩니다. 입학처장이 우려하는 $26,500보다 높은 구간이므로 긍정적인 결과입니다.
+\end{enumerate}
+
+\subsection{특정 급여 이상을 받는 졸업생 비율 신뢰 구간 계산}
+\addcontentsline{toc}{subsection}{특정 급여 이상을 받는 졸업생 비율 신뢰 구간 계산}
+이제 두 번째 질문, 즉 $26,500 이상을 버는 졸업생의 비율에 대한 신뢰 구간을 계산합니다.
+
+\begin{enumerate}
+    \item \textbf{급여 조건 분류 (\excel{Makes more than 26500} 열 생성)}:
+    각 졸업생의 시작 급여가 $26,500보다 많은지 여부를 분류하는 새로운 열을 생성합니다.
+    \begin{examplebox}[title=Excel IF 함수 사용법]
+        \textbf{목표}: 급여가 $26,500보다 많으면 1, 그렇지 않으면 0을 반환합니다.
+        \textbf{함수}: \code{=IF(logical\_test, [value\_if\_true], [value\_if\_false])}
+        \textbf{예시}: \code{=IF(A2>26500,1,0)} (A2는 첫 번째 시작 급여)
+        \textbf{결과}: 이 함수를 모든 졸업생 급여에 적용합니다. 예를 들어, 급여가 $26,500 미만인 경우 0이 반환됩니다.
+    \end{examplebox}
+
+    \item \textbf{조건 만족 졸업생 수 계산 (\excel{Making > 26500})}:
+    $26,500 이상을 버는 졸업생의 수를 합산합니다.
+    \begin{examplebox}[title=Excel SUM 함수 사용법]
+        \textbf{목표}: "\excel{Makes more than 26500}" 열의 합계를 계산합니다.
+        \textbf{함수}: \code{=SUM(B:B)} (B열에 분류 데이터가 있다고 가정)
+        \textbf{결과}: 61명
+    \end{examplebox}
+
+    \item \textbf{표본 비율 계산 (\excel{Prop > 26500})}:
+    조건을 만족하는 졸업생 수(61)를 총 표본 크기(100)로 나누어 비율을 계산합니다.
+    \begin{examplebox}[title=표본 비율 계산 결과]
+        \textbf{조건 만족 졸업생 수}: 61
+        \textbf{표본 크기}: 100
+        \textbf{표본 비율}: 61 / 100 = 0.61 (61\%)
+    \end{examplebox}
+
+    \item \textbf{Z-값 계산 (\excel{95\%, z value})}:
+    모집단 비율에 대한 신뢰 구간이므로 Z-값을 사용합니다. 95\% 신뢰 구간의 Z-값은 1.96입니다.
+    \begin{examplebox}[title=Excel NORM.S.INV 함수 사용법]
+        \textbf{목표}: 95\% 신뢰 수준에 해당하는 Z-값을 계산합니다.
+        \textbf{함수}: \code{=NORM.S.INV(0.975)}
+        \textbf{결과}: 1.95996398 (약 1.96)
+    \end{examplebox}
+
+    \item \textbf{표준 오차 (Standard Error, SE) 계산}:
+    비율의 표준 오차는 다음 공식으로 계산됩니다.
+    \formula{SE = \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}}
+    여기서 $\hat{p}$는 표본 비율(0.61)이고, $n$은 표본 크기(100)입니다.
+    \begin{examplebox}[title=Excel SQRT 함수를 이용한 표준 오차 계산]
+        \textbf{목표}: 비율의 표준 오차를 계산합니다.
+        \textbf{함수}: \code{=SQRT((E7*(1-E7))/E8)} (E7은 표본 비율 0.61, E8은 표본 크기 100)
+        \textbf{결과}: 0.04877499
+    \end{examplebox}
+
+    \item \textbf{오차 한계 (Margin of Error, ME) 계산}:
+    오차 한계는 Z-값과 표준 오차를 곱하여 계산됩니다.
+    \formula{ME = Z \times \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}}
+    \begin{examplebox}[title=Excel 오차 한계 계산]
+        \textbf{목표}: 비율의 오차 한계를 계산합니다.
+        \textbf{함수}: \code{=E9*E10} (E9는 Z-값, E10은 표준 오차)
+        \textbf{결과}: 0.09559723
+    \end{examplebox}
+
+    \item \textbf{신뢰 구간의 하한 (\excel{Lower}) 및 상한 (\excel{Upper}) 계산}:
+    신뢰 구간은 표본 비율에서 오차 한계를 빼고 더하여 계산됩니다.
+    \formula{\text{신뢰 구간} = \hat{p} \pm ME}
+    \begin{examplebox}[title=Excel 신뢰 구간 계산]
+        \textbf{하한 (\excel{Lower})}: \code{=E7-E12} (E7은 표본 비율 0.61, E12는 오차 한계) = 0.5144
+        \textbf{상한 (\excel{Upper})}: \code{=E7+E12} (E7은 표본 비율 0.61, E12는 오차 한계) = 0.7055
+    \end{examplebox}
+
+    \item \textbf{신뢰 구간 해석 및 비즈니스 시사점}:
+    95\% 신뢰 수준에서 $26,500 이상을 버는 졸업생의 비율은 51.44\%에서 70.55\% 사이에 있을 것으로 추정됩니다.
+    \begin{warningbox}
+        \textbf{비즈니스 의사결정 시 고려사항}:
+        광고를 할 때 70\%라는 높은 수치에만 집중하고 싶을 수 있지만, 실제 비율은 51\%일 수도 있다는 점을 명심해야 합니다. 만약 51\%의 졸업생만이 $26,500 이상을 번다고 하면, 이는 광고에서 주장하는 70\%만큼 매력적이지 않을 수 있습니다. 통계를 오용하거나 오해하지 않도록 신뢰 구간 전체를 고려하여 신중하게 의사결정을 내려야 합니다. 어떤 임계값이 적절한지, 그리고 그 임계값이 고객에게 어떻게 받아들여질지 깊이 고민해야 합니다.
+    \end{warningbox}
+\end{enumerate}
+
+\newpage
+\section{핵심 요약 및 학습 가이드}
+\addcontentsline{toc}{section}{핵심 요약 및 학습 가이드}
+
+\begin{summarybox}
+    \textbf{핵심 요약: 모집단 비율 신뢰 구간 및 활용}
+    이 문서는 모집단 비율에 대한 신뢰 구간을 Excel로 계산하는 방법을 상세히 설명하고, 신뢰 수준 및 표본 크기가 신뢰 구간에 미치는 영향을 시각적으로 탐구했습니다. 뉴욕 증권 거래소 주식 데이터와 커뮤니티 칼리지 졸업생 시작 급여 데이터를 활용하여 실제 비즈니스 문제에 신뢰 구간을 적용하는 구체적인 절차를 다루었습니다. 특히, 표본 크기가 클수록 신뢰 구간의 폭이 좁아져 추정의 정밀도가 높아지며, 신뢰 수준이 높을수록 신뢰 구간의 폭이 넓어져 실제 모수를 포함할 확률이 높아진다는 점을 강조했습니다. 통계적 추정의 한계를 이해하고 신중하게 해석하는 것이 중요합니다.
+\end{summarybox}
+
+\begin{examplebox}[title=학습 로드맵: 신뢰 구간 마스터하기]
+    \begin{enumerate}
+        \item \textbf{기초 다지기}: 신뢰 구간의 기본 개념(신뢰 수준, 오차 한계, 표준 오차)을 확실히 이해합니다.
+        \item \textbf{Excel 실습}: Excel의 \excel{IF}, \excel{SUM}, \excel{COUNT}, \excel{NORM.S.INV}, \excel{T.INV}, \excel{SQRT} 함수를 사용하여 평균과 비율에 대한 신뢰 구간을 직접 계산해봅니다.
+        \item \textbf{개념 시각화}: 애니메이션을 통해 표본 크기와 신뢰 수준이 신뢰 구간의 폭에 미치는 영향을 직관적으로 파악합니다.
+        \item \textbf{실제 적용}: 제공된 시작 급여 예시처럼 실제 비즈니스 시나리오에 신뢰 구간을 적용하고 결과를 해석하는 연습을 합니다.
+        \item \textbf{해석 능력 강화}: 신뢰 구간의 의미와 한계를 이해하고, 통계적 결과를 비즈니스 의사결정에 어떻게 활용할지 비판적으로 사고하는 능력을 기릅니다.
+    \end{enumerate}
+\end{examplebox}
+
+\newpage
+
+\newpage
+\section{개요}
+\addcontentsline{toc}{section}{개요}
+이 문서는 'Exploring and Producing Data Module 4'의 마지막 부분으로, 신뢰 구간(Confidence Interval)의 핵심 요소인 오차 한계(Margin of Error)를 이해하고, 원하는 정확도와 정밀도를 얻기 위한 적절한 표본 크기(Sample Size)를 결정하는 방법을 다룹니다. 특히, 평균(Mean)과 비율(Proportion)에 대한 표본 크기 계산 공식과 그 경제적 의미를 설명합니다. 또한, Excel을 활용하여 표본 크기를 계산하고, 표본 크기가 신뢰 구간에 미치는 영향을 시각적으로 확인하는 실습 과정을 포함합니다. 이 문서를 통해 데이터 기반 의사결정에 필수적인 표본 설계 원리를 완벽하게 이해할 수 있습니다.
+
+\newpage
+\section{용어 정리}
+\addcontentsline{toc}{section}{용어 정리}
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{lllc}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+신뢰 구간 & 모집단 모수가 존재할 것으로 예상되는 구간 & Confidence Interval & \\
+오차 한계 & 표본 통계량과 모집단 모수 간의 최대 예상 오차 & Margin of Error (MOE) & 신뢰 구간의 폭을 결정 \\
+표본 크기 & 연구에 사용되는 데이터 포인트의 수 & Sample Size (\(n\)) & \\
+표본 평균 & 표본 데이터의 평균 & Sample Mean (\(\bar{x}\)) & \\
+표본 비율 & 표본에서 특정 특성을 가진 개체의 비율 & Sample Proportion (\(\hat{p}\)) & \\
+모집단 표준편차 & 모집단 데이터의 퍼진 정도 & Population Standard Deviation (\(\sigma\)) & \\
+표본 표준편차 & 표본 데이터의 퍼진 정도 & Sample Standard Deviation (\(s\)) & \\
+임계값 (z/t) & 신뢰 수준에 따라 결정되는 표준화된 값 & Critical Value (\(z_{\alpha/2}\), \(t_{\alpha/2}\)) & \\
+허용 오차 한계 & 연구자가 최대로 허용하는 오차 범위 & Acceptable Margin of Error (\(E\)) & \\
+자유도 & 통계적 추정에서 독립적으로 변할 수 있는 값의 수 & Degrees of Freedom (df) & \(n-1\) \\
+표준 오차 & 표본 통계량의 변동성 추정치 & Standard Error (SE) & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\section{핵심 개념 및 원리}
+
+\subsection{신뢰 구간과 오차 한계의 이해}
+신뢰 구간은 모집단의 특정 모수(예: 평균, 비율)가 존재할 것으로 예상되는 구간을 의미합니다. 이 구간은 표본 데이터를 기반으로 추정되며, 특정 신뢰 수준(예: 95\%, 99\%)을 가집니다. 신뢰 구간은 크게 두 부분으로 구성됩니다: 표본 통계량(예: 표본 평균, 표본 비율)과 오차 한계(Margin of Error)입니다.
+
+\begin{itemize}
+    \item \textbf{평균에 대한 신뢰 구간}: 표본 평균 \(\pm\) 오차 한계
+    \item \textbf{비율에 대한 신뢰 구간}: 표본 비율 \(\pm\) 오차 한계
+\end{itemize}
+
+우리는 추정의 \textbf{정확성(precision)}과 \textbf{정밀성(accuracy)}을 높이기 위해 오차 한계를 작게 만들고 싶어 합니다. 오차 한계는 우리가 표본을 통해 얻은 값이 실제 모집단의 값과 얼마나 차이 날 수 있는지를 나타내는 지표이기 때문입니다.
+
+\begin{summarybox}
+    오차 한계가 작을수록 추정치가 더 정확하고 정밀합니다.
+\end{summarybox}
+
+\subsection{오차 한계의 구성 요소}
+오차 한계는 여러 요소에 의해 결정됩니다. 이 요소들을 이해하는 것은 우리가 원하는 오차 한계를 달성하기 위해 표본 크기를 어떻게 조절해야 하는지 파악하는 데 중요합니다.
+
+\begin{itemize}
+    \item \textbf{평균에 대한 오차 한계}: \(t_{\alpha/2} \frac{s}{\sqrt{n}}\)
+    \item \textbf{비율에 대한 오차 한계}: \(z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}\)
+\end{itemize}
+여기서 각 기호는 다음과 같습니다:
+\begin{itemize}
+    \item \(t_{\alpha/2}\) 또는 \(z_{\alpha/2}\): 신뢰 수준에 따른 임계값 (critical value)
+    \item \(s\): 표본 표준편차 (sample standard deviation)
+    \item \(\hat{p}\): 표본 비율 (sample proportion)
+    \item \(n\): 표본 크기 (sample size)
+\end{itemize}
+
+이 공식들을 자세히 살펴보면, 오차 한계는 \textbf{표본 크기(\(n\))}에 의해 부분적으로 통제된다는 것을 알 수 있습니다. 표본 크기가 커질수록 분모의 \(\sqrt{n}\)이 커지므로 오차 한계는 작아집니다.
+
+\subsection{표본 크기 결정의 필요성}
+지금까지는 주어진 표본 크기로 오차 한계와 신뢰 구간을 계산하는 예시를 살펴보았습니다. 하지만 실제 연구에서는 반대로, 우리가 \textbf{원하는 최대 오차 한계(E)}를 먼저 정하고, 이 오차 한계를 달성하기 위해 \textbf{얼마나 큰 표본 크기(\(n\))}가 필요한지 역으로 계산해야 할 때가 많습니다.
+
+\begin{tipbox}
+    표본 크기 결정은 연구의 경제적 의사결정입니다. 더 큰 표본은 더 많은 시간과 노력을 필요로 하므로 비용이 증가합니다. 따라서 원하는 정확도와 비용 사이의 균형을 찾아야 합니다.
+\end{tipbox}
+
+\subsubsection*{표본 크기 결정의 경제적 의미}
+표본 크기 선택은 단순히 통계적 정확성뿐만 아니라 \textbf{경제적 결정}이기도 합니다.
+\begin{itemize}
+    \item \textbf{작은 표본의 위험}: 만약 시리얼 상자에 내용물이 너무 많이 들어가거나 적게 들어가서 품질 관리에 실패한다면, 생산 비용이 증가하거나 벌금을 물게 될 수 있습니다.
+    \item \textbf{큰 표본의 비용}: 더 큰 표본을 얻는 데는 더 많은 시간과 노력이 필요하며, 이는 곧 비용 증가로 이어집니다.
+    \item \textbf{오류의 심각성}: 만약 약을 생산하는데 성분 배합이 잘못되어 치명적인 결과를 초래할 수 있다면, 작은 오차도 용납할 수 없으므로 매우 큰 표본 크기가 필요할 것입니다.
+\end{itemize}
+따라서, '잘못될 경우의 비용'과 '더 큰 표본을 얻는 비용'을 비교하여 적절한 표본 크기를 결정해야 합니다.
+
+\subsection{평균 추정을 위한 표본 크기 결정}
+모집단 평균을 추정하기 위해 필요한 표본 크기 \((n)\)는 다음과 같은 공식을 사용하여 계산할 수 있습니다.
+
+\begin{equation*}
+    n = \left( \frac{z_{\alpha/2} \sigma}{E} \right)^2
+\end{equation*}
+여기서:
+\begin{itemize}
+    \item \(n\): 필요한 최소 표본 크기
+    \item \(z_{\alpha/2}\): 원하는 신뢰 수준에 해당하는 임계값 (예: 95\% 신뢰 수준에서 1.96)
+    \item \(\sigma\): 모집단 표준편차 (알 수 없는 경우, 사전 연구의 표본 표준편차 \(s\)를 사용하거나 소규모 예비 연구를 통해 추정)
+    \item \(E\): 연구자가 허용하는 최대 오차 한계 (desired margin of error)
+\end{itemize}
+
+\begin{cautionbox}
+    표본 크기 \(n\)은 항상 정수여야 하며, 계산 결과가 소수점 이하일 경우 \textbf{항상 올림(round up)}해야 합니다. 예를 들어, 188.23이 나오면 189로 올립니다. 이는 원하는 정확도를 보장하기 위함입니다.
+\end{cautionbox}
+
+\subsection{비율 추정을 위한 표본 크기 결정}
+모집단 비율을 추정하기 위해 필요한 표본 크기 \((n)\)는 다음과 같은 공식을 사용하여 계산할 수 있습니다.
+
+\begin{equation*}
+    n = p(1-p) \left( \frac{z_{\alpha/2}}{E} \right)^2
+\end{equation*}
+여기서:
+\begin{itemize}
+    \item \(n\): 필요한 최소 표본 크기
+    \item \(p\): 모집단 비율의 사전 추정치 (preliminary estimate of population proportion)
+    \item \(z_{\alpha/2}\): 원하는 신뢰 수준에 해당하는 임계값
+    \item \(E\): 연구자가 허용하는 최대 오차 한계
+\end{itemize}
+
+\begin{tipbox}
+    \textbf{모집단 비율 \(p\)를 모를 경우}:
+    \begin{itemize}
+        \item 소규모 예비 연구를 통해 \(\hat{p}\)를 얻을 수 있습니다.
+        \item 가장 보수적인(즉, 가장 큰) 표본 크기를 얻기 위해 \(p = 0.5\)를 사용할 수 있습니다. \(p(1-p)\) 값은 \(p=0.5\)일 때 최대값(0.25)을 가집니다. 이는 어떤 비율이든 커버할 수 있는 충분히 큰 표본 크기를 보장합니다.
+        \item 만약 예비 연구를 통해 신뢰 구간이 얻어졌다면, 그 신뢰 구간 내에서 0.5에 가장 가까운 비율 값을 \(p\)로 사용합니다. 이는 0.5를 사용하는 것보다 더 효율적인(작은) 표본 크기를 제공할 수 있습니다.
+    \end{itemize}
+\end{tipbox}
+
+\subsection{오차 한계를 결정하는 요인}
+신뢰 구간의 오차 한계에 영향을 미치는 세 가지 주요 요인은 다음과 같습니다.
+\begin{enumerate}
+    \item \textbf{표본 크기 (\(n\))}: 표본 크기가 증가하면 오차 한계는 감소합니다. (더 많은 데이터를 수집할수록 추정치가 더 정확해집니다.)
+    \item \textbf{신뢰 수준 (Confidence Level)}: 신뢰 수준이 증가하면 오차 한계는 증가합니다. (더 높은 신뢰도로 구간을 만들려면 더 넓은 구간이 필요합니다.)
+    \item \textbf{표본의 표준편차 (\(s\))}: 표준편차가 증가하면 오차 한계는 증가합니다. (데이터의 변동성이 클수록 추정치가 덜 정확해집니다.)
+\end{enumerate}
+
+\begin{summarybox}
+    \textbf{오차 한계 감소를 위한 전략}:
+    \begin{itemize}
+        \item 표본 크기 증가 (가장 효과적이고 직접적인 방법)
+        \item 신뢰 수준 감소 (원하는 신뢰도를 낮추는 것이므로 신중해야 함)
+        \item 표준편차 감소 (데이터 자체의 특성이므로 통제하기 어려움)
+    \end{itemize}
+\end{summarybox}
+
+\newpage
+\section{절차 및 방법: 표본 크기 계산 예시}
+
+\subsection{평균 추정을 위한 표본 크기 계산 예시}
+
+\begin{examplebox}
+    \textbf{예시: Speedy Lube의 15분 오일 교환 광고}
+
+    Speedy Lube는 고객들에게 15분 오일 교환을 광고하고 싶어 합니다. 매니저는 오일 교환 과정을 개선하는 데 많은 시간을 보냈고, 이제 15분 오일 교환을 광고할 수 있는지 확인하고 싶습니다. 만약 오차 한계를 30초(0.5분)로 하고 95\% 신뢰 구간을 찾으려면 얼마나 큰 표본 크기가 필요할까요?
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{주어진 정보 확인}:
+        \begin{itemize}
+            \item 원하는 오차 한계 (\(E\)) = 30초 = 0.5분
+            \item 원하는 신뢰 수준 = 95\%
+            \item 95\% 신뢰 수준에 대한 \(z_{\alpha/2}\) 값 = 1.96
+        \end{itemize}
+        \item \textbf{누락된 정보 확인}: 모집단 표준편차 \(\sigma\)를 모릅니다.
+        \item \textbf{해결책}: 표준편차를 알기 위해 소규모 예비 연구를 수행합니다.
+        \item \textbf{예비 연구 결과}: 100개의 무작위 관측치를 통해 평균 시간은 14.7분, 표준편차는 3.5분으로 나타났습니다. 이제 이 표본 표준편차 \(s = 3.5\)분을 \(\sigma\) 대신 사용합니다.
+        \item \textbf{표본 크기 계산}:
+        \begin{equation*}
+            n = \left( \frac{z_{\alpha/2} \sigma}{E} \right)^2 = \left( \frac{1.96 \times 3.5}{0.5} \right)^2
+        \end{equation*}
+        \begin{equation*}
+            n = \left( \frac{6.86}{0.5} \right)^2 = (13.72)^2 = 188.2384
+        \end{equation*}
+        \item \textbf{결과 반올림}: 표본 크기는 정수여야 하므로, 항상 올림하여 189가 됩니다.
+    \end{enumerate}
+    \textbf{결론}: 매니저가 원하는 정확도와 정밀도를 제공하기 위해 필요한 최소 표본 크기는 189개의 관측치입니다.
+\end{examplebox}
+
+\begin{examplebox}
+    \textbf{연습 문제: 시리얼 상자 무게}
+
+    시리얼 회사 매니저는 시리얼 상자의 평균 무게에 대해 0.15온스 이내의 신뢰 구간을 만들고 싶어 합니다. 이 공정의 표준편차는 0.5온스로 알려져 있습니다. 99\% 신뢰 구간을 위해 필요한 표본 크기는 얼마일까요?
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{주어진 정보 확인}:
+        \begin{itemize}
+            \item 원하는 오차 한계 (\(E\)) = 0.15온스
+            \item 모집단 표준편차 (\(\sigma\)) = 0.5온스
+            \item 원하는 신뢰 수준 = 99\%
+            \item 99\% 신뢰 수준에 대한 \(z_{\alpha/2}\) 값 = 2.575
+        \end{itemize}
+        \item \textbf{표본 크기 계산}:
+        \begin{equation*}
+            n = \left( \frac{z_{\alpha/2} \sigma}{E} \right)^2 = \left( \frac{2.575 \times 0.5}{0.15} \right)^2
+        \end{equation*}
+        \begin{equation*}
+            n = \left( \frac{1.2875}{0.15} \right)^2 = (8.5833)^2 = 73.679 \approx 73.72
+        \end{equation*}
+        \item \textbf{결과 반올림}: 표본 크기는 정수여야 하므로, 항상 올림하여 74가 됩니다.
+    \end{enumerate}
+    \textbf{결론}: 99\% 신뢰 수준에서 0.15온스 이내의 오차 한계를 달성하기 위해 필요한 최소 표본 크기는 74개입니다.
+\end{examplebox}
+
+\subsection{비율 추정을 위한 표본 크기 계산 예시}
+
+\begin{examplebox}
+    \textbf{예시: 지구 온난화에 대한 인식 (사전 정보 없음)}
+
+    우리는 지구 온난화가 실제라고 생각하는 인구의 비율을 알고 싶습니다. 오차 한계를 1\% 이내로 하고 95\% 신뢰 구간을 만들려면 얼마나 큰 표본 크기가 필요할까요?
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{주어진 정보 확인}:
+        \begin{itemize}
+            \item 원하는 오차 한계 (\(E\)) = 1\% = 0.01
+            \item 원하는 신뢰 수준 = 95\%
+            \item 95\% 신뢰 수준에 대한 \(z_{\alpha/2}\) 값 = 1.96
+        \end{itemize}
+        \item \textbf{누락된 정보 확인}: 모집단 비율 \(p\)를 모릅니다.
+        \item \textbf{해결책}: 모집단 비율에 대한 사전 정보가 없으므로, 가장 보수적인 추정치인 \(p = 0.5\)를 사용합니다.
+        \item \textbf{표본 크기 계산}:
+        \begin{equation*}
+            n = p(1-p) \left( \frac{z_{\alpha/2}}{E} \right)^2 = 0.5 \times (1-0.5) \times \left( \frac{1.96}{0.01} \right)^2
+        \end{equation*}
+        \begin{equation*}
+            n = 0.25 \times (196)^2 = 0.25 \times 38416 = 9604
+        \end{equation*}
+    \end{enumerate}
+    \textbf{결론}: 95\% 신뢰 수준에서 1\% 이내의 오차 한계를 달성하기 위해 필요한 최소 표본 크기는 9,604명입니다.
+\end{examplebox}
+
+\begin{examplebox}
+    \textbf{연습 문제: 지구 온난화에 대한 인식 (오차 한계 변경)}
+
+    위 예시에서 표본 크기가 너무 크다고 판단하여, 오차 한계를 4\%로 완화한다면 새로운 표본 크기는 얼마가 될까요?
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{주어진 정보 확인}:
+        \begin{itemize}
+            \item 원하는 오차 한계 (\(E\)) = 4\% = 0.04 (변경됨)
+            \item 원하는 신뢰 수준 = 95\%
+            \item 95\% 신뢰 수준에 대한 \(z_{\alpha/2}\) 값 = 1.96
+            \item 모집단 비율 \(p\) = 0.5 (사전 정보 없음 가정)
+        \end{itemize}
+        \item \textbf{표본 크기 계산}:
+        \begin{equation*}
+            n = p(1-p) \left( \frac{z_{\alpha/2}}{E} \right)^2 = 0.5 \times (1-0.5) \times \left( \frac{1.96}{0.04} \right)^2
+        \end{equation*}
+        \begin{equation*}
+            n = 0.25 \times (49)^2 = 0.25 \times 2401 = 600.25
+        \end{equation*}
+        \item \textbf{결과 반올림}: 표본 크기는 정수여야 하므로, 항상 올림하여 601이 됩니다.
+    \end{enumerate}
+    \textbf{결론}: 오차 한계를 4\%로 완화하면 필요한 표본 크기는 601명으로 크게 줄어듭니다. 이는 정밀도를 낮추면 표본 크기를 줄일 수 있음을 보여줍니다.
+\end{examplebox}
+
+\begin{examplebox}
+    \textbf{예시: 지구 온난화에 대한 인식 (초기 설문조사 활용)}
+
+    우리는 지구 온난화가 실제라고 생각하는 인구의 비율을 1\% 이내로 알고 싶습니다. 95\% 신뢰 구간을 만들려면 얼마나 큰 표본 크기가 필요할까요?
+    이번에는 초기 설문조사를 통해 100명의 성인 중 15\%가 지구 온난화를 믿지 않는다는 사실을 알게 되었습니다.
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{주어진 정보 확인}:
+        \begin{itemize}
+            \item 원하는 오차 한계 (\(E\)) = 1\% = 0.01
+            \item 원하는 신뢰 수준 = 95\%
+            \item 95\% 신뢰 수준에 대한 \(z_{\alpha/2}\) 값 = 1.96
+            \item 초기 설문조사 결과: \(n=100\), \(\hat{p}=0.15\) (믿지 않는 비율)
+        \end{itemize}
+        \item \textbf{모집단 비율 \(p\) 추정}: 초기 설문조사에서 얻은 \(\hat{p}=0.15\)를 바로 사용하는 것은 위험할 수 있습니다. 이 \(\hat{p}\)는 표본에 기반한 것이므로, 먼저 이 표본 비율에 대한 신뢰 구간을 계산해야 합니다.
+        \begin{equation*}
+            \hat{p} \pm z_{\alpha/2} \sqrt{\frac{\hat{p}(1-\hat{p})}{n}} = 0.15 \pm 1.96 \times \sqrt{\frac{0.15(1-0.15)}{100}}
+        \end{equation*}
+        \begin{equation*}
+            = 0.15 \pm 1.96 \times \sqrt{\frac{0.15 \times 0.85}{100}} = 0.15 \pm 1.96 \times \sqrt{0.001275}
+        \end{equation*}
+        \begin{equation*}
+            = 0.15 \pm 1.96 \times 0.0357 = 0.15 \pm 0.069972 \approx 0.15 \pm 0.07
+        \end{equation*}
+        따라서 신뢰 구간은 \([0.08, 0.22]\)입니다.
+        \item \textbf{표본 크기 계산을 위한 \(p\) 선택}: 이 신뢰 구간 \([0.08, 0.22]\) 내에서 0.5에 가장 가까운 값을 \(p\)로 선택해야 합니다. 이는 표본 크기가 충분히 크게 보장되도록 합니다. 이 경우, 0.22가 0.5에 더 가깝습니다 (0.5 - 0.22 = 0.28, 0.5 - 0.08 = 0.42). 따라서 \(p = 0.22\)를 사용합니다.
+        \item \textbf{표본 크기 계산}:
+        \begin{equation*}
+            n = p(1-p) \left( \frac{z_{\alpha/2}}{E} \right)^2 = 0.22 \times (1-0.22) \times \left( \frac{1.96}{0.01} \right)^2
+        \end{equation*}
+        \begin{equation*}
+            n = 0.22 \times 0.78 \times (196)^2 = 0.1716 \times 38416 = 6591.8816
+        \end{equation*}
+        \item \textbf{결과 반올림}: 표본 크기는 정수여야 하므로, 항상 올림하여 6,592가 됩니다.
+    \end{enumerate}
+    \textbf{결론}: 초기 설문조사 정보를 활용하여 \(p=0.22\)를 사용했을 때 필요한 표본 크기는 6,592명입니다. 이는 사전 정보 없이 \(p=0.5\)를 사용했을 때의 9,604명보다 훨씬 적은 수치입니다. 이처럼 초기 정보를 활용하면 더 효율적인 표본 크기를 결정할 수 있습니다.
+\end{examplebox}
+
+\begin{tipbox}
+    \textbf{표본 비율 \(p\)가 0 또는 1에 가까울 때}:
+    만약 모집단 비율 \(p\)가 0 또는 1에 가깝다면, 대부분의 개체가 동일한 특성이나 의견을 가지고 있다는 의미입니다. 이 경우 자연적인 변동성(variability)이 매우 작아지므로, 오차 한계는 \(p\)가 0.5에 가까울 때보다 작아집니다. 즉, \(p\)가 0.5일 때 가장 큰 표본 크기가 필요하며, 이는 가장 보수적인 추정치입니다.
+\end{tipbox}
+
+\newpage
+\section{실습: Excel을 활용한 표본 크기 결정}
+
+\subsection{비율 추정 시 표본 크기 결정 (Excel)}
+Excel을 사용하여 원하는 오차 한계를 달성하기 위한 표본 크기를 계산하는 방법을 살펴보겠습니다.
+
+\begin{examplebox}
+    \textbf{예시: 주식 포트폴리오의 비율 추정}
+
+    이전 강의에서 127개 주식으로 구성된 포트폴리오의 오차 한계가 6\%라고 결정했습니다. 만약 원하는 오차 한계를 4\%로 줄이고 싶다면, 몇 개의 주식을 표본으로 추출해야 할까요?
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{공식 확인}: 비율 추정을 위한 표본 크기 공식은 \(n = p(1-p) \left( \frac{z_{\alpha/2}}{E} \right)^2\) 입니다.
+        \item \textbf{주어진 정보}:
+        \begin{itemize}
+            \item 원하는 오차 한계 (\(E\)) = 4\% = 0.04
+            \item 신뢰 수준 = 95\% (강의에서 1.96 사용) \(\rightarrow z_{\alpha/2} = 1.96\)
+            \item 이전 분석에서 얻은 신뢰 구간: 예를 들어, \([0.09, 0.22]\) (강의 슬라이드 139에서 'Upper 0.220831' 언급)
+        \end{itemize}
+        \item \textbf{\(p\) 값 선택}: 신뢰 구간 \([0.09, 0.22]\) 내에서 0.5에 가장 가까운 값을 \(p\)로 선택합니다. 이 경우 0.220831이 0.5에 가장 가깝습니다. (0.5 - 0.220831 = 0.279169, 0.5 - 0.09 = 0.41)
+        \item \textbf{Excel 계산}:
+        \begin{itemize}
+            \item \(p\) 값: 0.220831
+            \item \(1-p\) 값: \(1 - 0.220831 = 0.779169\)
+            \item \(z_{\alpha/2}\) 값: 1.96
+            \item \(E\) 값: 0.04
+        \end{itemize}
+        Excel 셀에 다음과 같이 입력합니다:
+        
+        \begin{lstlisting}[caption={Excel을 이용한 비율 표본 크기 계산}, label={lst:excel_prop_ss}]
+=0.220831 * (1-0.220831) * (1.96/0.04)^2
+        \end{lstlisting}
+        \item \textbf{결과}: 계산 결과는 413.117이 나옵니다.
+        \item \textbf{반올림}: 표본 크기는 항상 올림하므로, 414개의 주식을 표본으로 추출해야 합니다.
+    \end{enumerate}
+    \textbf{결론}: 원하는 오차 한계 4\%를 달성하기 위해 414개의 주식을 표본으로 추출해야 합니다. 이는 9\%에서 22\% 사이의 모든 가능성을 커버할 수 있는 충분히 큰 표본 크기를 보장합니다.
+\end{examplebox}
+
+\subsection{평균 추정 시 표본 크기 결정 (Excel)}
+Excel을 사용하여 평균 추정을 위한 표본 크기를 계산하는 방법을 살펴보겠습니다.
+
+\begin{examplebox}
+    \textbf{예시: 뉴욕 증권 거래소 주식의 평균 변화율}
+
+    뉴욕 증권 거래소의 종가 데이터를 사용하여 주식의 평균 변화율에 대한 신뢰 구간을 만들고, 원하는 오차 한계를 달성하기 위한 표본 크기를 계산합니다.
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{데이터 준비}: 뉴욕 증권 거래소의 주식 데이터에서 'Percent Change' 열을 사용합니다.
+        \item \textbf{표본 평균 및 표준편차 계산}:
+        \begin{itemize}
+            \item \textbf{평균 (\(\bar{x}\))}: Excel의 \texttt{AVERAGE} 함수를 사용하여 'Percent Change' 열의 평균을 계산합니다.
+            
+            \begin{lstlisting}[caption={Excel 평균 계산}, label={lst:excel_mean}]
+=AVERAGE(D:D) % D열 전체 선택
+            \end{lstlisting}
+            결과: 약 -1.278 (이 날 주식 시장이 전체적으로 하락했음을 의미)
+            \item \textbf{표준편차 (\(s\))}: Excel의 \texttt{STDEV.S} 함수를 사용하여 'Percent Change' 열의 표본 표준편차를 계산합니다.
+            
+            \begin{lstlisting}[caption={Excel 표준편차 계산}, label={lst:excel_stdev}]
+=STDEV.S(D:D) % D열 전체 선택
+            \end{lstlisting}
+            결과: 약 2.2658
+        \end{itemize}
+        \item \textbf{실제 표본 크기 확인}: 데이터에 결측치가 있을 수 있으므로, \texttt{COUNT} 함수를 사용하여 실제 분석에 사용된 데이터 포인트 수를 확인합니다.
+        
+        \begin{lstlisting}[caption={Excel 표본 크기 계산}, label={lst:excel_count}]
+=COUNT(D:D) % D열 전체 선택
+        \end{lstlisting}
+        결과: 예를 들어, 127개 주식 중 2개가 거래되지 않아 실제 표본 크기는 125가 될 수 있습니다. (강의에서는 125를 사용)
+        \item \textbf{임계값 (\(t_{\alpha/2}\)) 계산}: 평균 추정 시에는 일반적으로 t-분포를 사용합니다. 95\% 신뢰 수준을 가정합니다.
+        \begin{itemize}
+            \item 신뢰 수준 = 95\% \(\rightarrow \alpha = 0.05 \rightarrow \alpha/2 = 0.025\)
+            \item t.inv 함수는 누적 확률을 사용하므로, 왼쪽 꼬리 확률은 \(1 - \alpha/2 = 0.975\) 입니다.
+            \item 자유도 (df) = \(n - 1 = 125 - 1 = 124\)
+        \end{itemize}
+        Excel 셀에 다음과 같이 입력합니다:
+        
+        \begin{lstlisting}[caption={Excel t-값 계산}, label={lst:excel_tvalue}]
+=T.INV(0.975, 124)
+        \end{lstlisting}
+        결과: 약 1.97928 (z-값 1.96과 유사하지만 더 정확함)
+        \item \textbf{표준 오차 (SE) 계산}: 표준 오차는 \(\frac{s}{\sqrt{n}}\) 입니다.
+        Excel 셀에 다음과 같이 입력합니다:
+        
+        \begin{lstlisting}[caption={Excel 표준 오차 계산}, label={lst:excel_se}]
+=StdDev_Cell / SQRT(Sample_Size_Cell) % 예: I6/SQRT(I8)
+        \end{lstlisting}
+        결과: 약 0.18
+        \item \textbf{오차 한계 (ME) 계산}: 오차 한계는 \(t_{\alpha/2} \times SE\) 입니다.
+        Excel 셀에 다음과 같이 입력합니다:
+        
+        \begin{lstlisting}[caption={Excel 오차 한계 계산}, label={lst:excel_moe}]
+=T_Value_Cell * SE_Cell % 예: I10*I12
+        \end{lstlisting}
+        결과: 약 0.361708
+        \item \textbf{신뢰 구간 계산}:
+        \begin{itemize}
+            \item 하한: 평균 - 오차 한계
+            \item 상한: 평균 + 오차 한계
+        \end{itemize}
+        결과: 예를 들어, [-1.69979, -0.97637]
+        \item \textbf{원하는 오차 한계에 대한 표본 크기 계산}:
+        만약 현재 오차 한계(0.361708)가 만족스럽지 않고, 원하는 오차 한계 (\(E\))를 0.3으로 설정하고 싶다면, 필요한 표본 크기를 계산합니다.
+        공식: \(n = \left( \frac{t_{\alpha/2} s}{E} \right)^2\)
+        Excel 셀에 다음과 같이 입력합니다:
+        
+        \begin{lstlisting}[caption={Excel을 이용한 평균 표본 크기 계산}, label={lst:excel_mean_ss}]
+=(T_Value_Cell * StdDev_Cell / Desired_E_Cell)^2 % 예: (I10*I6/0.3)^2
+        \end{lstlisting}
+        결과: 약 181.7
+        \item \textbf{반올림}: 표본 크기는 항상 올림하므로, 182개의 주식을 표본으로 추출해야 합니다.
+    \end{enumerate}
+    \textbf{결론}: 평균 변화율에 대해 0.3의 오차 한계를 달성하려면 182개의 주식을 표본으로 추출해야 합니다. 이는 기존 125개보다 더 큰 포트폴리오가 필요함을 의미합니다.
+\end{examplebox}
+
+\subsection{표본 크기가 신뢰 구간에 미치는 영향 (Excel)}
+표본 크기가 신뢰 구간의 폭에 어떻게 영향을 미치는지 Excel을 통해 시각적으로 확인합니다.
+
+\begin{examplebox}
+    \textbf{예시: 다양한 표본 크기에서의 신뢰 구간 비교}
+
+    평균과 표준편차가 동일한 세 가지 가상의 표본(크기 50, 200, 500)을 가정하고, 각 표본 크기가 표준 오차, 임계값, 오차 한계, 그리고 신뢰 구간에 미치는 영향을 비교합니다.
+
+    \textbf{가정}:
+    \begin{itemize}
+        \item 표본 평균 (\(\bar{x}\)) = 56.3645 (모든 표본 크기에서 동일)
+        \item 표본 표준편차 (\(s\)) = 17.90778 (모든 표본 크기에서 동일)
+        \item 신뢰 수준 = 95\%
+    \end{itemize}
+
+    \textbf{문제 해결 단계:}
+    \begin{enumerate}
+        \item \textbf{표준 오차 (SE) 계산}: \(SE = \frac{s}{\sqrt{n}}\)
+        \begin{itemize}
+            \item \(n=50\): \(17.90778 / \sqrt{50} \approx 2.5325\)
+            \item \(n=200\): \(17.90778 / \sqrt{200} \approx 1.2663\)
+            \item \(n=500\): \(17.90778 / \sqrt{500} \approx 0.8009\)
+        \end{itemize}
+        \textbf{관찰}: 표본 크기가 커질수록 표준 오차는 감소합니다. 이는 표본 평균의 변동성이 줄어든다는 것을 의미합니다.
+
+        \item \textbf{임계값 (\(t_{\alpha/2}\)) 계산}: \(t.inv(0.975, n-1)\)
+        \begin{itemize}
+            \item \(n=50\): \(t.inv(0.975, 49) \approx 2.0010\)
+            \item \(n=200\): \(t.inv(0.975, 199) \approx 1.9720\)
+            \item \(n=500\): \(t.inv(0.975, 499) \approx 1.9647\)
+        \end{itemize}
+        \textbf{관찰}: 표본 크기가 커질수록 t-값은 z-값(1.96)에 가까워집니다. 이는 표본 크기가 충분히 크면 t-분포가 정규 분포와 유사해진다는 것을 보여줍니다.
+
+        \item \textbf{오차 한계 (ME) 계산}: \(ME = t_{\alpha/2} \times SE\)
+        \begin{itemize}
+            \item \(n=50\): \(2.0010 \times 2.5325 \approx 5.0893\)
+            \item \(n=200\): \(1.9720 \times 1.2663 \approx 2.4970\)
+            \item \(n=500\): \(1.9647 \times 0.8009 \approx 1.5735\)
+        \end{itemize}
+        \textbf{관찰}: 표본 크기가 커질수록 오차 한계는 크게 감소합니다. 이는 표준 오차와 t-값 모두 감소하기 때문입니다.
+
+        \item \textbf{신뢰 구간 계산}: \(\bar{x} \pm ME\)
+        \begin{itemize}
+            \item \(n=50\): \(56.3645 \pm 5.0893 \rightarrow [51.2752, 61.4538]\) (폭: 약 10.18)
+            \item \(n=200\): \(56.3645 \pm 2.4970 \rightarrow [53.8675, 58.8615]\) (폭: 약 4.99)
+            \item \(n=500\): \(56.3645 \pm 1.5735 \rightarrow [54.7910, 57.9380]\) (폭: 약 3.15)
+        \end{itemize}
+        \textbf{관찰}: 표본 크기가 커질수록 신뢰 구간의 폭이 좁아집니다. 이는 추정의 정밀도가 높아진다는 것을 의미합니다.
+    \end{enumerate}
+    \textbf{결론}: 표본 크기가 증가하면 표준 오차와 임계값이 감소하여 오차 한계가 줄어들고, 결과적으로 신뢰 구간의 폭이 좁아져 추정의 정확도와 정밀도가 향상됩니다. 높은 신뢰 수준과 정밀도를 동시에 얻기 위한 가장 효과적인 방법은 표본 크기를 늘리는 것입니다.
+\end{examplebox}
+
+\newpage
+\section{체크리스트}
+이 문서를 통해 다음 사항들을 이해하고 있는지 확인해 보세요.
+
+\begin{itemize}
+    \item 신뢰 구간과 오차 한계의 개념을 정확히 설명할 수 있는가?
+    \item 평균과 비율에 대한 오차 한계 공식을 이해하고 있는가?
+    \item 원하는 오차 한계를 달성하기 위한 표본 크기 결정의 중요성을 설명할 수 있는가?
+    \item 평균 추정을 위한 표본 크기 공식을 사용하여 계산할 수 있는가?
+    \item 비율 추정을 위한 표본 크기 공식을 사용하여 계산할 수 있는가?
+    \item 비율 추정 시 \(p\) 값을 모를 경우 어떻게 처리해야 하는지 아는가?
+    \item 표본 크기, 신뢰 수준, 표준편차가 오차 한계에 미치는 영향을 설명할 수 있는가?
+    \item Excel을 사용하여 평균 및 비율에 대한 표본 크기를 계산할 수 있는가?
+    \item Excel을 사용하여 표본 크기 변화가 신뢰 구간에 미치는 영향을 시각적으로 확인할 수 있는가?
+    \item 계산된 표본 크기가 소수점일 때 항상 올림해야 하는 이유를 아는가?
+\end{itemize}
+
+\newpage
+\section{FAQ}
+
+\begin{itemize}
+    \item \textbf{Q: 표본 크기가 커지면 왜 오차 한계가 줄어드나요?}
+    \textbf{A:} 표본 크기가 커지면 표본 평균이나 표본 비율이 모집단의 실제 값에 더 가까워질 가능성이 높아집니다. 통계적으로는 표본 크기 \(n\)이 오차 한계 공식의 분모에 \(\sqrt{n}\) 형태로 들어가기 때문에, \(n\)이 커지면 오차 한계가 작아집니다. 이는 표본 통계량의 변동성(표준 오차)이 줄어들기 때문입니다.
+
+    \item \textbf{Q: 비율 추정 시 모집단 비율 \(p\)를 모를 때 왜 0.5를 사용하나요?}
+    \textbf{A:} \(p(1-p)\) 값은 \(p=0.5\)일 때 최대값인 0.25를 가집니다. 이 값을 사용하면 계산되는 표본 크기가 가장 커지므로, 어떤 실제 모집단 비율이든 원하는 오차 한계를 달성할 수 있는 가장 보수적인(안전한) 표본 크기를 얻을 수 있습니다.
+
+    \item \textbf{Q: 표본 크기 계산 결과가 소수점일 때 항상 올림해야 하는 이유는 무엇인가요?}
+    \textbf{A:} 표본 크기는 사람이나 물건의 개수이므로 정수여야 합니다. 만약 계산된 표본 크기보다 작은 값을 사용하면, 우리가 설정한 원하는 오차 한계를 달성하지 못할 수 있습니다. 따라서 원하는 정확도를 보장하기 위해 항상 올림하여 최소한의 필요한 표본 크기를 확보해야 합니다.
+
+    \item \textbf{Q: 신뢰 수준을 높이면 오차 한계는 왜 증가하나요?}
+    \textbf{A:} 신뢰 수준을 높인다는 것은 모집단 모수를 포함할 확률을 더 높게 가져가겠다는 의미입니다. 예를 들어, 95\% 신뢰 구간보다 99\% 신뢰 구간이 모집단 모수를 포함할 가능성이 더 높습니다. 이를 위해서는 더 넓은 구간이 필요하며, 이는 오차 한계가 커진다는 것을 의미합니다. 통계적으로는 신뢰 수준이 높아질수록 임계값(\(z_{\alpha/2}\) 또는 \(t_{\alpha/2}\))이 커지기 때문입니다.
+\end{itemize}
+
+\newpage
+\section{빠르게 훑어보기 (1페이지 요약)}
+
+\begin{tcolorbox}[colback=boxblue!10!white, colframe=boxblue!75!black, title=\textbf{표본 크기 결정 핵심 요약}]
+\begin{itemize}
+    \item \textbf{목표}: 원하는 오차 한계(E)를 달성하기 위한 최소 표본 크기(n) 계산.
+    \item \textbf{오차 한계 영향 요인}:
+    \begin{itemize}
+        \item \(\uparrow\) 표본 크기 (\(n\)) \(\rightarrow \downarrow\) 오차 한계
+        \item \(\uparrow\) 신뢰 수준 \(\rightarrow \uparrow\) 오차 한계
+        \item \(\uparrow\) 표준편차 (\(s\)) \(\rightarrow \uparrow\) 오차 한계
+    \end{itemize}
+    \item \textbf{평균 추정 공식}: \(n = \left( \frac{z_{\alpha/2} \sigma}{E} \right)^2\)
+    \item \textbf{비율 추정 공식}: \(n = p(1-p) \left( \frac{z_{\alpha/2}}{E} \right)^2\)
+    \item \textbf{핵심 팁}:
+    \begin{itemize}
+        \item \(n\)은 항상 \textbf{올림}.
+        \item 비율 \(p\)를 모르면 \textbf{0.5} 사용 (가장 보수적).
+        \item 초기 연구로 얻은 신뢰 구간이 있다면, \textbf{0.5에 가장 가까운 값}을 \(p\)로 사용.
+    \end{itemize}
+    \item \textbf{경제적 결정}: 표본 크기는 비용과 정확도 사이의 균형. 오류 비용이 높으면 더 큰 표본 필요.
+    \item \textbf{Excel 활용}: \texttt{AVERAGE}, \texttt{STDEV.S}, \texttt{COUNT}, \texttt{T.INV}, \texttt{SQRT} 함수를 사용하여 계산 및 영향 분석.
+\end{itemize}
+\end{tcolorbox}
+
+
+% Auto-added missing environment closes:
+\end{enumerate}  % Auto-closed
+\end{enumerate}  % Auto-closed
+
+\end{document}

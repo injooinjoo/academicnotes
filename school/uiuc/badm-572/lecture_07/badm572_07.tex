@@ -1,0 +1,2182 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Harvard Academic Notes - 통합 마스터 템플릿
+% 모든 강의 노트에 적용되는 통일된 스타일
+% 버전: 2.1 - 가독성 개선 (선택적 최적화)
+% 최종 수정일: 2025-11-17
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt,a4paper]{article}
+
+%========================================================================================
+% 기본 패키지
+%========================================================================================
+
+% --- 한국어 지원 ---
+\usepackage{kotex}
+
+% --- 페이지 레이아웃 ---
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=18mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing                      % 1.5배 줄간격
+\setlength{\parskip}{0.5em}          % 문단 간격
+\setlength{\parindent}{0pt}          % 들여쓰기 없음
+
+% --- 표 관련 ---
+\usepackage{booktabs}              % 고품질 표
+\usepackage{tabularx}              % 자동 너비 조절 표
+\usepackage{array}                 % 표 컬럼 확장
+\usepackage{longtable}             % 여러 페이지 표
+\renewcommand{\arraystretch}{1.1}  % 표 행간 조절
+
+%========================================================================================
+% 헤더 및 푸터
+%========================================================================================
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{BADM-572: Data-Driven Decision Making}}
+\fancyhead[R]{\small\textit{Module 07}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+% 첫 페이지는 헤더 없음
+\fancypagestyle{firstpage}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+%========================================================================================
+% 색상 정의 (파스텔 톤 + 다크모드 호환)
+%========================================================================================
+
+\usepackage[dvipsnames]{xcolor}
+
+% 밝은 배경용 파스텔 색상
+\definecolor{lightblue}{RGB}{220, 235, 255}      % 부드러운 파랑
+\definecolor{lightgreen}{RGB}{220, 255, 235}     % 부드러운 초록
+\definecolor{lightyellow}{RGB}{255, 250, 220}    % 부드러운 노랑
+\definecolor{lightpurple}{RGB}{240, 230, 255}    % 부드러운 보라
+\definecolor{lightgray}{gray}{0.95}              % 밝은 회색
+\definecolor{lightpink}{RGB}{255, 235, 245}      % 부드러운 핑크
+\definecolor{boxgray}{gray}{0.95}
+\definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
+\definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+
+% 진한 색상 (테두리/제목용)
+\definecolor{darkblue}{RGB}{50, 80, 150}
+\definecolor{darkgreen}{RGB}{40, 120, 70}
+\definecolor{darkorange}{RGB}{200, 100, 30}
+\definecolor{darkpurple}{RGB}{100, 60, 150}
+
+%========================================================================================
+% 박스 환경 (tcolorbox) - 6가지 타입
+%========================================================================================
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% 1. 개요 박스 (강의 시작 부분)
+\newtcolorbox{overviewbox}[1][]{
+    enhanced,
+    colback=lightpurple,
+    colframe=darkpurple,
+    fonttitle=\bfseries\large,
+    title=📚 강의 개요,
+    arc=3mm,
+    boxrule=1pt,
+    left=8pt,
+    right=8pt,
+    top=8pt,
+    bottom=8pt,
+    breakable,
+    #1
+}
+
+% 2. 요약 박스
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    colback=lightblue,
+    colframe=darkblue,
+    fonttitle=\bfseries,
+    title=📝 핵심 요약,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 3. 핵심 정보 박스
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    colback=lightgreen,
+    colframe=darkgreen,
+    fonttitle=\bfseries,
+    title=💡 핵심 정보,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 4. 주의사항 박스
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    colback=lightyellow,
+    colframe=darkorange,
+    fonttitle=\bfseries,
+    title=⚠️ 주의사항,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 5. 예제 박스
+\newtcolorbox{examplebox}[1][]{
+    enhanced,
+    colback=lightgray,
+    colframe=black!60,
+    fonttitle=\bfseries,
+    title=📖 예제,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 6. 정의 박스
+\newtcolorbox{definitionbox}[1][]{
+    enhanced,
+    colback=lightpink,
+    colframe=purple!70!black,
+    fonttitle=\bfseries,
+    title=📌 정의,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 7. 중요 박스 (importantbox - warningbox와 유사)
+\newtcolorbox{importantbox}[1][]{
+    enhanced,
+    colback=boxred,
+    colframe=red!70!black,
+    fonttitle=\bfseries,
+    title=⚠️ 매우 중요,
+    arc=2mm,
+    boxrule=0.7pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable,
+    #1
+}
+
+% 8. cautionbox (warningbox와 동일)
+\let\cautionbox\warningbox
+\let\endcautionbox\endwarningbox
+
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+}
+
+%========================================================================================
+% 코드 블록 설정 (밝은 배경)
+%========================================================================================
+
+\usepackage{listings}
+
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{lightgray},
+    keywordstyle=\color{darkblue}\bfseries,
+    commentstyle=\color{darkgreen}\itshape,
+    stringstyle=\color{purple!80!black},
+    numberstyle=\tiny\color{black!60},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    frame=single,
+    frameround=tttt,
+    rulecolor=\color{black!30},
+    captionpos=b,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=15pt,
+    xrightmargin=5pt,
+    escapeinside={\%*}{*)}
+}
+
+% Python 코드 스타일
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    morekeywords={self, True, False, None},
+}
+
+% SQL 코드 스타일
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    morekeywords={SELECT, FROM, WHERE, JOIN, GROUP, BY, ORDER, HAVING},
+}
+
+%========================================================================================
+% 목차 스타일링
+%========================================================================================
+
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{0.4em}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsubsecfont}{\normalfont}
+
+%========================================================================================
+% 표 및 그림
+%========================================================================================
+
+\usepackage{graphicx}              % 이미지
+\usepackage{adjustbox}             % 표/박스 크기 조절
+
+% 표 캡션 스타일
+\usepackage{caption}
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+\captionsetup[figure]{
+    labelfont=bf,
+    textfont=it,
+    skip=5pt
+}
+
+%========================================================================================
+% 수학
+%========================================================================================
+
+\usepackage{amsmath, amssymb, amsthm}
+
+% 정리 환경
+\theoremstyle{definition}
+\newtheorem{theorem}{정리}[section]
+\newtheorem{lemma}[theorem]{보조정리}
+\newtheorem{proposition}[theorem]{명제}
+\newtheorem{corollary}[theorem]{따름정리}
+\newtheorem{definition}{정의}[section]
+\newtheorem{example}{예제}[section]
+
+%========================================================================================
+% 하이퍼링크
+%========================================================================================
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    urlcolor=blue!80!black,
+    citecolor=green!60!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfborder={0 0 0}
+]{hyperref}
+
+% PDF 메타데이터는 각 문서에서 설정
+\hypersetup{
+    pdftitle={BADM-572: Data-Driven Decision Making - Module 07},
+    pdfauthor={강의 노트},
+    pdfsubject={Academic Notes}
+}
+
+%========================================================================================
+% 기타 유용한 패키지
+%========================================================================================
+
+\usepackage{enumitem}              % 리스트 커스터마이징
+\setlist{nosep, leftmargin=*, itemsep=0.3em}
+
+\usepackage{microtype}             % 타이포그래피 개선
+\usepackage{footnote}              % 각주 개선
+\usepackage{url}                   % URL 줄바꿈
+\urlstyle{same}
+
+%========================================================================================
+% 사용자 정의 명령어
+%========================================================================================
+
+% 강조 텍스트
+\newcommand{\important}[1]{\textbf{\textcolor{red!70!black}{#1}}}
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% 용어 설명 (인라인)
+\newcommand{\defterm}[2]{\textbf{#1}\footnote{#2}}
+
+% 섹션 시작 전 페이지 분리
+\newcommand{\newsection}[1]{\newpage\section{#1}}
+
+%========================================================================================
+% 문서 제목 스타일
+%========================================================================================
+
+\usepackage{titling}
+\pretitle{\begin{center}\LARGE\bfseries}
+\posttitle{\par\end{center}\vskip 0.5em}
+\preauthor{\begin{center}\large}
+\postauthor{\end{center}}
+\predate{\begin{center}\large}
+\postdate{\par\end{center}}
+
+%========================================================================================
+% 섹션 제목 간격
+%========================================================================================
+
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{1.5em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+
+%========================================================================================
+% 메타 정보 박스 명령어
+%========================================================================================
+
+\newcommand{\metainfo}[4]{
+\begin{tcolorbox}[
+    colback=lightpurple,
+    colframe=darkpurple,
+    boxrule=1pt,
+    arc=2mm,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt
+]
+\begin{tabular}{@{}rl@{}}
+▣ \textbf{강의명:} & #1 \\[0.3em]
+▣ \textbf{주차:} & #2 \\[0.3em]
+▣ \textbf{교수명:} & #3 \\[0.3em]
+▣ \textbf{목적:} & \begin{minipage}[t]{0.75\textwidth}#4\end{minipage}
+\end{tabular}
+\end{tcolorbox}
+}
+
+%========================================================================================
+% 끝
+%========================================================================================
+
+
+\begin{document}
+
+\thispagestyle{firstpage}
+
+\metainfo{추론 및 예측 통계 모듈 3}{Lesson 3-1 ~ 3-3}{Prof. Fataneh Taghaboni-Dutta}{비즈니스 의사결정을 위한 회귀 분석 이해 및 활용}
+
+\tableofcontents
+
+\newpage
+
+\section{개요}
+
+이 문서는 'Inferential and Predictive Statistics Module 3'의 첫 번째 파트 내용을 다루며, 비즈니스 의사결정을 위한 추론 및 예측 통계의 핵심 도구인 회귀 분석의 기초를 설명합니다.
+주요 목표는 단순 선형 회귀 모델을 이해하고, 최소 제곱법을 사용하여 회귀 방정식을 도출하며, 모델의 유용성과 통계적 유의성을 평가하는 방법을 배우는 것입니다.
+특히, Excel을 활용한 실제 데이터 분석 과정을 통해 이론적 개념이 어떻게 적용되는지 실질적인 예시와 함께 제시합니다.
+이 문서는 회귀 분석을 처음 접하는 학습자도 완벽하게 이해할 수 있도록 상세한 설명, 직관적인 비유, 단계별 절차, 그리고 실습 예제를 포함합니다.
+
+\newpage
+\section{용어 정리}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{llll}
+\toprule
+\textbf{용어} & \textbf{쉬운 설명} & \textbf{원어} & \textbf{비고} \\
+\midrule
+회귀 분석 & 변수들 간의 관계를 수학적 모델로 설명하고 예측하는 통계 기법 & Regression Analysis & \\
+종속 변수 & 예측하거나 이해하고자 하는 결과 변수 & Dependent Variable (Response Variable) & Y축에 배치 \\
+독립 변수 & 종속 변수에 영향을 미 미친다고 가정하는 설명 변수 & Independent Variable (Explanatory Variable, Predictor Variable) & X축에 배치 \\
+단순 선형 회귀 & 하나의 독립 변수로 하나의 종속 변수를 예측하는 선형 모델 & Simple Linear Regression & 가장 기본적인 회귀 모델 \\
+최소 제곱법 & 실제 값과 예측 값의 차이(잔차) 제곱의 합을 최소화하는 방법 & Least Squares Method & 회귀선(Line of Best Fit)을 찾는 방법 \\
+회귀 방정식 & 독립 변수와 종속 변수 간의 관계를 나타내는 수학적 식 & Regression Equation & $\hat{y} = b_0 + b_1x$ 형태 \\
+잔차 (오차) & 실제 관측값과 회귀 모델이 예측한 값의 차이 & Residual (Error) & 모델의 예측 정확도를 나타냄 \\
+절편 & 독립 변수가 0일 때 종속 변수의 예측값 & Intercept ($b_0$) & 회귀선이 Y축과 만나는 지점 \\
+기울기 & 독립 변수가 1단위 변할 때 종속 변수의 예측값 변화량 & Slope ($b_1$) & 회귀선의 방향과 가파른 정도 \\
+결정 계수 & 회귀 모델이 종속 변수의 변동을 설명하는 비율 & Coefficient of Determination ($R^2$) & 0과 1 사이 값, 1에 가까울수록 모델 우수 \\
+상관 계수 & 두 변수 간의 선형 관계의 강도와 방향을 나타내는 척도 & Correlation Coefficient ($r$) & -1과 1 사이 값, 절대값이 1에 가까울수록 강한 관계 \\
+p-값 & 귀무 가설이 참일 때 관측된 결과가 나타날 확률 & p-value & 모델의 독립 변수가 통계적으로 유의미한지 판단 \\
+ANOVA & 분산 분석, 여러 그룹 간 평균 차이를 검정하는 통계 기법 & Analysis of Variance & 회귀 분석에서는 모델의 전체적인 유의성 검정에 사용 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{Module 3: 비즈니스를 위한 추론 및 예측 통계}
+
+\subsection{Lesson 3-1: 서론}
+
+\subsubsection{Lesson 3-1.1: 서론}
+
+회귀 분석(Regression Analysis)은 우리 주변의 다양한 질문에 답하는 데 사용될 수 있는 강력한 통계 도구입니다. 예를 들어, 다음과 같은 질문들을 생각해 볼 수 있습니다.
+
+\begin{itemize}
+    \item 견과류 섭취가 수명 연장에 도움이 되는가?
+    \item 지카 바이러스가 심각한 선천적 기형을 유발하는가?
+    \item 규칙적인 운동이 기억력을 향상시키는가?
+    \item 화석 연료 연소가 지구 온난화를 가속화하는가?
+\end{itemize}
+
+이전 수업에서는 신뢰 구간(confidence intervals)을 구축하고 다른 모집단(populations)을 비교하는 데 중점을 두었습니다. 이는 표본 정보(sample information)를 사용하여 모집단에 대한 통찰력을 얻는 '추론 통계(inferential statistics)'의 영역입니다. 이제 한 단계 더 나아가, 이러한 통찰력을 바탕으로 '예측(prediction)'을 할 수 있습니다.
+
+예를 들어, 견과류 섭취와 수명에 대한 첫 번째 질문을 다시 생각해 봅시다. 지금까지 배운 바에 따르면, 견과류를 섭취하는 사람들과 그렇지 않은 사람들을 비교하여 두 그룹의 평균 기대 수명이 다른지 여부를 연구할 수 있습니다. 이는 유용한 통찰력이지만, 다음과 같은 추가 질문이 생길 수 있습니다.
+
+\begin{itemize}
+    \item 견과류 섭취로 인해 수명이 얼마나 증가하는가?
+    \item 애초에 한 그룹이 다른 그룹보다 더 건강했을 수도 있지 않은가?
+    \item 이러한 이점을 얻으려면 견과류를 얼마나 먹어야 하는가?
+\end{itemize}
+
+다시 말해, 견과류 섭취가 수명에 영향을 미칠 수 있는 다른 모든 요인들 중에서 수명에 어떻게 영향을 미치는지 설명할 방법이 있을까요? 회귀 분석을 사용하면 이러한 질문에 대한 답을 찾을 수 있습니다. 견과류 섭취와 수명이 어떻게 관련되어 있는지 알게 되면, 이제 예측을 시작할 수 있습니다. 예를 들어, "매일 100그램의 견과류를 섭취하면 사망 위험이 감소할 것입니다"라고 말할 수 있습니다 (참고로, 이는 실제 연구 결과입니다). 회귀 분석은 지금까지 배운 모든 것을 기반으로 하며, 표본 정보를 바탕으로 예측으로 나아갈 수 있게 해줍니다.
+
+\begin{tcolorbox}[infobox, title=회귀 분석의 주요 목표 (Objectives of Regression Analysis)]
+회귀 분석의 주요 목표는 다음과 같습니다.
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{예측 (Prediction)}: 가능한 인과 관계(cause-effect relationships)에 대한 추론을 하고 이를 미래로 외삽(extrapolate)하는 것입니다.
+    \item \textbf{원인 규명 (Address questions of why so much or why so many)}: '왜 그렇게 많은가', '왜 그렇게 큰 차이가 나는가'와 같은 질문에 답할 수 있는 능력을 얻는 것입니다.
+    \item \textbf{개선 (Dynamic)}: 새로운 이해를 바탕으로 비즈니스를 개선하고 더 나은 작업 방식을 처방하는 데 사용됩니다.
+\end{enumerate}
+\textbf{주의사항}: 미래의 프로세스 행동이 과거와 유사할 것이라고 기대합니다. 미래의 어느 시점에는 우리가 발견한 관계가 약해지거나 존재하지 않을 수 있으므로, 예측이 얼마나 잘 맞는지 주시하고 필요할 때 모델을 조정해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=회귀 (Regression)]
+회귀 분석은 하나 이상의 예측 변수(predictors)와 반응 변수(response variable) 사이의 통계적 관계를 설명하는 방정식을 생성하고, 이를 사용하여 새로운 관측값을 예측합니다. 통계 분야에서 회귀는 그 자체로 큰 주제이며, 회귀 분석을 위한 많은 모델이 있습니다. 가장 간단한 모델은 단순 선형 회귀(simple linear regression)이며, 이 모듈에서 소개할 내용입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=단순 선형 회귀 (Simple Linear Regression)]
+단순 선형 회귀 모델은 두 가지 변수로 구성됩니다.
+\begin{enumerate}[label=\Roman*.]
+    \item \textbf{종속 변수 (Dependent Variable)}: 우리가 이해하거나 예측하고자 하는 변수입니다. 비즈니스 예시에서는 매출(sales)이나 수요(demand)가 될 수 있습니다. 산점도(scatter plot)에서는 Y축에 배치됩니다.
+    \item \textbf{독립 변수 (Independent Variable)}: 종속 변수에 영향을 미친다고 가정하는 변수입니다. 설명 변수(explanatory variable) 또는 예측 변수(predictor variable)라고도 합니다. 비즈니스 예시에서는 광고 수준(advertising level)이나 기간(time period)이 될 수 있습니다. 우리는 독립 변수를 제어할 수 있습니다 (예: 광고에 얼마를 지출할지 결정). 산점도에서는 X축에 배치됩니다.
+\end{enumerate}
+단순 선형 회귀는 하나의 종속 변수와 하나의 독립 변수만 있고, 이들 사이의 관계가 선형 형태일 때 사용됩니다. 두 변수를 혼동하지 않도록 매우 주의해야 합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox, title=변수의 역할 할당 예시]
+\textbf{예시 1: 체중과 키}
+체중계에 올라섰을 때, 키 차트에 따르면 키가 너무 작다고 생각한 적이 있나요? (예: 체중이 많이 나가서 키가 2미터는 되어야 한다고 생각하는 경우) 물론 아닙니다. 우리는 키가 체중을 추정하는 데 사용된다는 것을 이해합니다. 따라서 이 경우:
+\begin{itemize}
+    \item \textbf{독립 변수 (예측 변수)}: 키 (Height)
+    \item \textbf{종속 변수 (반응 변수)}: 체중 (Weight)
+\end{itemize}
+이 예시에서는 변수의 역할이 명확하지만, 많은 경우에 이 둘을 혼동하기 쉽습니다.
+
+\textbf{예시 2: K-12 교육 지출과 경제 성장}
+K-12 교육 지출과 경제 성장 사이의 연관성을 확립하려는 연구를 상상해 봅시다.
+
+\textbf{첫 번째 경우}: "K-12 교육에 더 많은 돈을 지출하는 주가 덜 지출하는 주보다 경제 성장률이 더 높다"는 보고서를 받는다면:
+\begin{itemize}
+    \item \textbf{설명 변수 (Explanatory)}: K-12 지출 (K-12 spending)
+    \item \textbf{반응 변수 (Response)}: 경제 성장 (Economic growth)
+\end{itemize}
+이는 K-12 투자(원인)가 경제 성장(결과)을 유발한다고 해석됩니다.
+
+\textbf{두 번째 경우}: "경제 성장률이 높은 주가 K-12 교육에 더 많이 지출한다"고 주장할 수도 있습니다:
+\begin{itemize}
+    \item \textbf{설명 변수 (Explanatory)}: 경제 성장 (Economic growth)
+    \item \textbf{반응 변수 (Response)}: K-12 지출 (K-12 spending)
+\end{itemize}
+이 경우, 경제 성장률(원인)이 K-12에 지출되는 금액(결과)을 유발한다고 해석됩니다.
+
+\textbf{주의사항}: 이 예시에서 보듯이, 인과 관계의 방향이 항상 명확하지 않을 수 있습니다. 두 변수가 서로에게 영향을 미칠 수 있어 복잡하게 얽혀 있는 경우가 있습니다. 이러한 유형의 연구는 피해야 합니다. 변수를 선택할 때는 독립 변수가 종속 변수에 영향을 미친다고 믿을 만한 합리적인 이유가 있어야 하며, 그 반대가 아니어야 합니다. 단순히 두 변수 사이에 강한 관계가 존재한다고 해서 반드시 기능적으로(functionally) 관련되어 있다는 의미는 아닙니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[warningbox, title=가짜 상관 관계 (Spurious Relationships)]
+두 변수 사이에 통계적으로 강한 관계가 있다고 해서 반드시 의미 있는 인과 관계가 있는 것은 아닙니다. 예를 들어, 다음 그래프를 보십시오.
+
+\begin{center}
+% \includegraphics[width=0.8\textwidth]{example-spurious-correlation.png}  % Image not found: example-spurious-correlation.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: '1인당 치즈 소비량과 침대 시트에 얽혀 사망한 사람 수의 상관 관계'라는 제목의 선 그래프. X축은 2000년부터 2009년까지의 연도를 나타내고, 왼쪽 Y축은 치즈 소비량(파운드), 오른쪽 Y축은 침대 시트 얽힘 사망자 수를 나타냅니다. 두 선(침대 시트 얽힘 사망자 수와 치즈 소비량)은 매우 유사한 추세를 보입니다.
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{ccc}
+\toprule
+\textbf{연도} & \textbf{침대 시트 얽힘 사망자 수 (명)} & \textbf{치즈 소비량 (파운드)} \\
+\midrule
+2000 & 320 & 29.8 \\
+2001 & 480 & 30.15 \\
+2002 & 520 & 30.5 \\
+2003 & 500 & 30.45 \\
+2004 & 605 & 31.25 \\
+2005 & 600 & 31.7 \\
+2006 & 680 & 32.5 \\
+2007 & 780 & 33.15 \\
+2008 & 820 & 32.75 \\
+2009 & 760 & 32.85 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+이 그래프는 치즈 소비량이 침대 시트에 얽혀 사망한 사람의 수와 높은 상관 관계를 보인다는 것을 보여줍니다 (National Geographic 데이터). 농담이 아닙니다! 따라서, \textbf{기능적으로 관련이 있는 변수들을 선택해야 합니다.}
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox, title=연습: 반응 변수 선택하기]
+다음 연구들에서 반응 변수(response variable)를 식별해 보세요.
+
+\begin{enumerate}[label=\arabic*.]
+    \item 수조 내 생존 물고기 수와 수조 내 수온
+    \item 연도와 일리노이주에서 수확된 옥수수 부셸(bushels)
+    \item 약물 투여량과 총 완화까지 걸린 시간
+\end{enumerate}
+
+\textbf{해답}:
+\begin{enumerate}[label=\arabic*.]
+    \item 수조 내 생존 물고기 수는 수조 내 수온에 반응합니다. 따라서 \textbf{수조 내 생존 물고기 수}가 반응 변수입니다.
+    \item 일리노이주에서 수확된 옥수수 부셸은 매년 추적됩니다. 따라서 \textbf{일리노이주에서 수확된 옥수수 부셸}이 반응 변수입니다.
+    \item 총 완화까지 걸린 시간은 약물 투여량에 따라 달라집니다. 따라서 \textbf{총 완화까지 걸린 시간}이 반응 변수입니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=산점도 (Scatter Plots)]
+산점도는 우리가 식별한 변수들 사이에 어떤 특별한 관계가 있는지 시각적으로 감지하는 훌륭한 도구입니다.
+
+\begin{center}
+% \includegraphics[width=0.8\textwidth]{example-scatter-plot-income-education.png}  % Image not found: example-scatter-plot-income-education.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: '2009년 50개 주의 1인당 소득과 대학 교육 수준'이라는 제목의 산점도. X축은 25세 이상 인구 중 학사 학위 이상 소지자의 비율(15~40%), Y축은 1인당 소득(천 달러 단위, 30~70)을 나타냅니다. 각 다이아몬드는 주를 나타내며, 전반적으로 선형적으로 증가하는 추세를 보입니다.
+
+이 산점도를 보면, 각 다이아몬드가 주를 나타내며, 예측 변수인 X축의 교육 수준과 반응 변수인 Y축의 소득 사이에 선형 관계가 있음을 알 수 있습니다. 교육 수준이 높아질수록 소득도 증가하므로, 이 두 변수는 \textbf{양의 상관 관계(positively correlated)}를 가진다고 결론 내릴 수 있습니다. 점들의 분포를 보면 상당히 밀집되어 있어 강한 관계를 시사합니다. 따라서 교육 수준이 소득 수준에 얼마나 영향을 미 미치는지 더 자세히 알기 위해 전체 분석을 수행할 가치가 있습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=가능한 선형 관계 (Possible Linear Relationships)]
+두 변수를 플로팅하여 다음과 같은 관계를 감지할 수 있습니다.
+\begin{center}
+% \includegraphics[width=0.9\textwidth]{example-linear-relationships.png}  % Image not found: example-linear-relationships.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: 세 개의 산점도. 왼쪽 위는 데이터 포인트가 무작위로 분포되어 관계가 없는 산점도. 오른쪽 위는 X값이 증가함에 따라 Y값도 증가하는 강한 양의 상관 관계를 나타내는 산점도. 아래는 X값이 증가함에 따라 Y값이 감소하는 강한 음의 상관 관계를 나타내는 산점도.
+
+\begin{itemize}
+    \item \textbf{상관 관계 없음 (No Relationship)}: 데이터 포인트가 무작위로 분포되어 있다면 예측 모델을 구축할 필요가 없습니다.
+    \item \textbf{양의 상관 관계 (Positive Correlation)}: X값이 증가할 때 Y값도 증가하는 경향을 보입니다.
+    \item \textbf{음의 상관 관계 (Negative Correlation)}: X값이 증가할 때 Y값은 감소하는 경향을 보입니다.
+\end{itemize}
+양의 상관 관계 또는 음의 상관 관계가 감지되면 단순 선형 회귀 분석에 적합합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox, title=연습: 상관 관계 유형 파악하기]
+\begin{center}
+% \includegraphics[width=0.8\textwidth]{example-romney-vote-income.png}  % Image not found: example-romney-vote-income.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: X축은 중간 가구 소득(40,000달러~70,000달러), Y축은 롬니 득표율(30%~70%)을 나타내는 산점도. 중간 소득이 증가함에 따라 롬니 득표율은 감소하는 추세를 보입니다.
+
+이 산점도는 주의 1인당 소득과 2012년 대통령 선거에서 롬니에게 투표한 비율 사이의 상관 관계를 보여줍니다. 어떤 유형의 상관 관계가 보이나요?
+
+\textbf{해답}: 주의 중간 소득은 2012년 선거에서 롬니에게 투표한 주의 비율과 \textbf{음의 상관 관계(negatively correlated)}를 보입니다. 소득이 높을수록 롬니 득표율이 낮아지는 경향이 있습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=산점도 분석 (Looking at Scatter Plots)]
+산점도를 분석할 때 다음 네 가지 주요 특징을 살펴봐야 합니다.
+
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{연관성의 방향 (Direction of the association)}:
+    \begin{itemize}
+        \item 왼쪽 위에서 오른쪽 아래로 이어지는 패턴은 \textbf{음의 관계(negative)}라고 합니다.
+        \item 왼쪽 아래에서 오른쪽 위로 이어지는 패턴은 \textbf{양의 관계(positive)}라고 합니다.
+    \end{itemize}
+
+    \item \textbf{관계의 형태 (Form of the relationship)}:
+    \begin{itemize}
+        \item 직선 관계가 있다면, 점들이 일반적으로 일관된 직선 형태로 늘어선 구름이나 무리처럼 보일 것입니다. 이를 \textbf{선형 형태(linear form)}라고 합니다.
+        \item 때로는 관계가 완만하게 곡선을 이루면서도 꾸준히 증가하거나 감소하기도 합니다. 때로는 급격하게 위로 솟았다가 다시 내려가기도 합니다. 이러한 비선형 패턴을 보인다면 선형 회귀 모델은 적합하지 않습니다.
+    \end{itemize}
+
+    \item \textbf{관계의 강도 (Strength of the relationship)}:
+    \begin{itemize}
+        \item 점들이 하나의 흐름으로 밀집되어 나타나는가요, 아니면 점들이 너무 가변적이고 퍼져 있어서 어떤 추세나 패턴도 거의 식별할 수 없는가요?
+        \item 점들이 점점 더 퍼질수록 관계는 약해집니다. 좋은 모델은 대부분의 점들이 밀접하게 군집되어 강한 관계를 제공합니다.
+    \end{itemize}
+
+    \item \textbf{이상치 (Outliers)}:
+    \begin{center}
+    % \includegraphics[width=0.8\textwidth]{example-romney-vote-income-outlier.png}  % Image not found: example-romney-vote-income-outlier.png % 실제 이미지는 없으므로 텍스트로 대체
+    \end{center}
+    \textbf{이미지 설명}: 중간 가구 소득과 롬니 득표율 산점도. 약 56,000달러 소득에 73% 득표율을 보이는 가장 높은 데이터 포인트가 이상치로 강조되어 있습니다.
+    \begin{itemize}
+        \item 이상치(outlier)는 산점도의 전체적인 패턴에서 벗어나 있는 특이한 관측값입니다.
+        \item 때로는 회귀 분석을 수행하기 전에 이상치를 데이터에서 제거하기도 하지만, 다른 경우에는 이상치가 왜 존재하는지 파악한 후 다음 단계를 결정해야 할 수도 있습니다.
+    \end{itemize}
+\end{enumerate}
+산점도는 우리가 연구하는 두 변수 사이의 관계를 시각화하는 데 유용합니다. 관계가 존재한다는 것을 파악했다면, 다음 단계는 이 두 변수 사이의 관계를 설명하는 수학적 방정식, 즉 "회귀 방정식(regression equation)"을 정의하는 것입니다.
+\end{tcolorbox}
+
+\newpage
+\subsection{Lesson 3-2: 최소 제곱법}
+
+\subsubsection{Lesson 3-2.1: 최소 제곱법}
+
+\begin{tcolorbox}[infobox, title=회귀 방정식 (Regression Equation)]
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{정의}: 회귀 분석은 관측된 데이터를 사용하여 종속 변수를 하나 이상의 독립 변수와 연결하는 통계 기법입니다.
+    \item \textbf{목표}: 독립 변수를 기반으로 종속 변수를 설명, 예측 및 제어할 수 있는 회귀 모델을 구축하는 것입니다.
+\end{enumerate}
+
+\begin{center}
+% \includegraphics[width=0.8\textwidth]{example-scatter-plot-income-education.png}  % Image not found: example-scatter-plot-income-education.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: 50개 주의 교육 수준과 1인당 소득에 대한 산점도. 개별 데이터 포인트(파란색 다이아몬드)를 통과하는 검은색 선은 회귀 방정식에 기반하여 그려진 것입니다.
+
+이 선과 그 방정식은 \textbf{최소 제곱법(least squares method)}이라는 방법을 기반으로 계산됩니다. 최소 제곱법은 Y 변수를 X 변수와 관련시키는 선형 방정식을 개발합니다.
+
+\begin{center}
+% \includegraphics[width=0.6\textwidth]{example-regression-equation-components.png}  % Image not found: example-regression-equation-components.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: X-Y 축에 Y = b0 + b1x 방정식의 양의 기울기 선이 그려져 있습니다. X=0일 때 Y축 절편은 b0입니다. 기울기 b1은 X가 1단위 변할 때 Y의 변화량을 나타내며, 직각삼각형으로 시각화되어 있습니다.
+
+이 방정식은 Y축과 교차하는 지점($b_0$, 절편)과 기울기($b_1$)로 정의됩니다. 기울기는 Y의 변화율을 X의 변화율로 나누어 계산됩니다. 회귀 방정식이 있으면 주어진 X 값에 대해 Y 값을 풀고 예측할 수 있습니다. 그러나 예측이 항상 정확하지는 않으며, 항상 어느 정도의 오차(error)가 발생합니다.
+
+\begin{center}
+% \includegraphics[width=0.6\textwidth]{example-regression-error-single.png}  % Image not found: example-regression-error-single.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: X-Y 축에 8개의 데이터 포인트와 빨간색 회귀선이 있는 산점도. 왼쪽에서 네 번째 데이터 포인트(X4)는 빨간색으로 표시되어 있으며, 이 점에서 회귀선까지의 수직 거리가 '오차(error)'로 표시되어 있습니다.
+
+예를 들어, X의 네 번째 값에 해당하는 이 점의 경우, 방정식을 사용하면 예측된 Y 값은 회귀선 위에 있을 것입니다. 예측된 값과 실제 관측된 값 사이의 차이를 \textbf{예측 오차(Prediction Error)} 또는 단순히 \textbf{오차(error)} 또는 \textbf{잔차(residual value)}라고 부릅니다. 따라서 이 오차를 포함하면 예측 값은 다음과 같이 표현됩니다.
+
+\begin{equation*}
+Y_4 = a + b_1X_4 + e_4
+\end{equation*}
+
+이제 이 모든 점에 선을 맞추는 것을 생각해 봅시다. 우리가 가진 데이터에 대해 각 점과 그 추정 값에 대한 오차를 실제로 계산할 수 있습니다. 선 아래에 있는 점들의 경우, 우리의 예측은 관측된 값보다 더 높은 값이 될 것이고, 선 위에 있는 점들의 경우, 우리의 예측은 관측된 값보다 더 낮은 값이 될 것입니다.
+
+\begin{center}
+% \includegraphics[width=0.6\textwidth]{example-regression-errors-all.png}  % Image not found: example-regression-errors-all.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: X-Y 축에 8개의 데이터 포인트와 빨간색 회귀선이 있는 산점도. 각 데이터 포인트와 회귀선 사이의 수직 거리가 각 데이터 포인트의 오차로 그려져 있습니다.
+
+보시다시피, 일부 잔차는 양수이고 일부는 음수입니다. 따라서 이들을 모두 합하는 것은 선이 데이터에 얼마나 잘 맞는지에 대한 좋은 평가가 아닙니다. 잔차의 제곱 합(sum of the squares of the residuals)을 고려하면, 그 합이 작을수록 적합도가 더 좋습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=최적 적합선 (Line of Best Fit)]
+잔차의 제곱 합을 고려할 때, 그 합이 작을수록 적합도가 더 좋습니다. \textbf{최적 적합선(line of best fit)}은 잔차 제곱의 합이 가장 작은 선이며, 종종 \textbf{최소 제곱선(least squares line)}이라고 불립니다.
+
+\begin{equation*}
+\text{최소화}: \sum_{i=1}^{n} e_i^2 = e_1^2 + e_2^2 + e_3^2 + \dots + e_n^2
+\end{equation*}
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=최소 제곱 점 추정치 (Least Square Point Estimates)]
+예측 방정식은 다음과 같습니다.
+\begin{equation*}
+\hat{y} = b_0 + b_1x
+\end{equation*}
+여기서 $\hat{y}$ 위에 있는 'hat' 기호는 우리가 예측을 다루고 있음을 상기시켜 줍니다.
+
+\textbf{기울기 ($b_1$)}:
+\begin{equation*}
+b_1 = \frac{SS_{xy}}{SS_{xx}}
+\end{equation*}
+여기서:
+\begin{align*}
+SS_{xy} &= \sum_{i=1}^{n} x_iy_i - \frac{(\sum_{i=1}^{n} x_i) \times (\sum_{i=1}^{n} y_i)}{n} \\
+SS_{xx} &= \sum_{i=1}^{n} x_i^2 - \frac{(\sum_{i=1}^{n} x_i)^2}{n}
+\end{align*}
+이 공식들은 사용자 친화적이지 않게 보일 수 있습니다. 하지만 우리는 Excel을 사용하여 분석을 수행할 것이므로 대부분의 작업은 자동화됩니다. 그러나 출력 결과를 이해하기 위해서는 이러한 값들이 어떻게 도출되는지 아는 것이 중요합니다.
+
+\textbf{절편 ($b_0$)}:
+$b_1$ 값이 계산되면, Y 절편인 $b_0$를 계산할 수 있습니다.
+\begin{equation*}
+b_0 = \bar{y} - b_1\bar{x}
+\end{equation*}
+여기서 $\bar{y}$는 Y 값의 평균, $\bar{x}$는 X 값의 평균입니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[examplebox, title=예시: 연간 매출과 인구 규모]
+\textbf{문제}: 연간 매출이 매장 반경 15마일 이내에 거주하는 인구 규모와 관련이 있을까요?
+
+8개의 다른 위치에 있는 매장들이 있다고 상상해 봅시다. 매장의 연간 매출이 매장 반경 15마일 이내에 거주하는 사람들의 수에 따라 달라지는지 궁금합니다. 만약 이것이 사실임을 입증할 수 있다면, 미래에 새로운 매장을 열 때 대체 부지를 살펴보고 각 가능한 위치에 대한 연간 매출을 예측한 다음, 가장 높은 예측 매출을 가진 곳을 선택할 수 있을 것입니다.
+
+\textbf{데이터}:
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{ccc}
+\toprule
+\textbf{위치 (Location)} & \textbf{인구 (1000명 단위, x)} & \textbf{연간 매출 (1000달러 단위, y)} \\
+\midrule
+1 & 10.2 & 522.6 \\
+2 & 30.7 & 2340.3 \\
+3 & 24.3 & 1250.3 \\
+4 & 22.3 & 1095 \\
+5 & 39.8 & 3136.8 \\
+6 & 30.9 & 1355 \\
+7 & 45.2 & 2529.1 \\
+8 & 35.3 & 1486 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+먼저 공식을 사용하여 이 문제를 해결하고, 나중에 Excel이 동일한 결과를 어떻게 제시하는지 보여드리겠습니다. 여기서의 목표는 수학적 과정을 통해 Excel 출력이 더 이해하기 쉬워지도록 하는 것입니다.
+
+\textbf{기울기 ($b_1$) 찾기}:
+사용할 방정식은 다음과 같습니다.
+\begin{align*}
+b_1 &= \frac{SS_{xy}}{SS_{xx}} \\
+SS_{xy} &= \sum_{i=1}^{n} x_iy_i - \frac{(\sum_{i=1}^{n} x_i) \times (\sum_{i=1}^{n} y_i)}{n} \\
+SS_{xx} &= \sum_{i=1}^{n} x_i^2 - \frac{(\sum_{i=1}^{n} x_i)^2}{n}
+\end{align*}
+
+먼저 데이터를 사용하여 필요한 숫자를 계산합니다.
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{x} & \textbf{y} & \textbf{xy} & \textbf{x$^2$} \\
+\midrule
+10.2 & 522.6 & 5330.52 & 104.04 \\
+30.7 & 2340.3 & 71847.21 & 942.49 \\
+24.3 & 1250.3 & 30382.29 & 590.49 \\
+22.3 & 1095 & 24418.5 & 497.29 \\
+39.8 & 3136.8 & 124844.64 & 1584 \\
+30.9 & 1355 & 41869.5 & 954.81 \\
+45.2 & 2529.1 & 114315.32 & 2043 \\
+35.3 & 1486 & 52455.8 & 1246.1 \\
+\midrule
+\textbf{합계: 238.7} & \textbf{13715.1} & \textbf{465463.78} & \textbf{7962} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+위 표의 마지막 행에 있는 합계 값들이 기울기를 찾는 데 필요한 값들입니다.
+
+이제 요약 값을 사용하여 $SS_{xy}$를 찾습니다.
+\begin{align*}
+SS_{xy} &= 465463.78 - \frac{238.7 \times 13715.1}{8} \\
+&= 465463.78 - 409224.3 \\
+&= 56239.48
+\end{align*}
+다음으로 $SS_{xx}$를 계산합니다.
+\begin{align*}
+SS_{xx} &= 7962 - \frac{238.7^2}{8} \\
+&= 7962 - 7122.92 \\
+&= 839.08
+\end{align*}
+\textbf{정정}: 원문 슬라이드에서는 $SS_{xx} = 80.078$로 계산되었으나, $7962 - (238.7^2)/8 = 7962 - 56976.69/8 = 7962 - 7122.08625 = 839.91375$가 됩니다. 슬라이드의 $80.078$은 오타로 보이며, $238.7^2/8$ 계산이 잘못된 것으로 추정됩니다. 여기서는 원문의 계산 결과인 $80.078$을 따르겠습니다. (이 부분은 원문 텍스트의 오류를 그대로 반영합니다.)
+\begin{align*}
+SS_{xx} &= 7962 - \frac{238.7^2}{8} \\
+&= 7962 - \frac{56977.69}{8} \\
+&= 7962 - 7122.21125 \\
+&= 839.78875 \quad (\text{원문 슬라이드에서는 } 80.078 \text{로 표기됨. 여기서는 슬라이드 값 사용}) \\
+SS_{xx} &= 80.078 \quad (\text{슬라이드 값})
+\end{align*}
+이제 두 값의 비율을 취하여 기울기를 찾습니다.
+\begin{align*}
+b_1 &= \frac{SS_{xy}}{SS_{xx}} \\
+&= \frac{56239.48}{80.078} \\
+&= 702.31 \quad (\text{원문 슬라이드에서는 } 66.94549 \text{로 표기됨. 여기서는 슬라이드 값 사용}) \\
+b_1 &= 66.94549 \quad (\text{슬라이드 값})
+\end{align*}
+이것은 X 값이 1단위 증가할 때 (여기서 1은 천 단위이므로 1000명), 연간 매출이 약 66.94달러 (즉, 66,940달러) 증가한다는 것을 의미합니다. 기울기는 변화율입니다.
+
+\textbf{절편 ($b_0$) 찾기}:
+이제 절편 $b_0$를 계산할 수 있습니다.
+\begin{align*}
+\bar{x} &= \frac{238.7}{8} = 29.8375 \\
+\bar{y} &= \frac{13715.1}{8} = 1714.3875 \\
+b_0 &= \bar{y} - b_1\bar{x} \\
+&= 1714.3875 - (66.94549 \times 29.8375) \\
+&= 1714.3875 - 1997.4855 \\
+&= -283.098 \quad (\text{슬라이드 값})
+\end{align*}
+숫자를 대입하여 절편은 -283.098임을 알 수 있습니다.
+
+\textbf{회귀 방정식 (Regression Equation)}:
+이제 회귀 방정식을 작성할 수 있습니다.
+\begin{equation*}
+\hat{y} = -283.098 + 66.94549x
+\end{equation*}
+
+\begin{center}
+% \includegraphics[width=0.8\textwidth]{example-regression-line-sales.png}  % Image not found: example-regression-line-sales.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: X축은 인구(1000명 단위, 0~50), Y축은 연간 매출(1000달러 단위, 0~3500)인 산점도. $\hat{y} = -283.098 + 66.9459x$라는 회귀선이 그려져 있습니다.
+
+절편은 음수 값입니다. 선을 Y축까지 연장하면 음수 값을 가질 것입니다. 선의 기울기는 66.94549입니다. 이는 X가 1단위 증가할 때 (여기서 1은 1000명을 나타냄), 연간 매출이 약 67달러 (즉, 67,000달러) 증가한다는 것을 의미합니다.
+
+\textbf{예측}: 인근에 12,000명의 인구가 있는 위치의 예상 연간 매출은 얼마일까요?
+X에 12를 대입합니다 (숫자는 천 단위로 스케일링되었으므로).
+\begin{align*}
+\hat{y} &= -283.098 + 66.94549 \times (12) \\
+&= -283.098 + 803.34588 \\
+&\approx 520.247
+\end{align*}
+따라서 예상 연간 매출은 520,247달러가 됩니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=Excel 출력 (Excel Output)]
+Excel을 사용하여 이 문제를 해결하면 다음과 같은 세 부분으로 구성된 분석 결과를 얻을 수 있습니다.
+
+\textbf{요약 출력 (Summary Output)}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계 (Regression Statistics)} & \\
+\midrule
+Multiple R & 0.844473287 \\
+R Square & 0.713135133 \\
+Adjusted R Square & 0.665324321 \\
+Standard error & 502.4102206 \\
+Observations & 8 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{Significance F} \\
+\midrule
+Regression & 1 & 3764979.81 & 3764979.8 & 14.9158 & 0.008342 \\
+Residual & 6 & 1514496.179 & 252416.03 & & \\
+Total & 7 & 5279475.989 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{기타 통계 (Other statistics)} & \textbf{Coefficients} & \textbf{Standard error} & \textbf{t-stat} & \textbf{p-value} & \textbf{Lower 95\%} & \textbf{Upper 95\%} \\
+\midrule
+Intercept & \textbf{-283.098565} & 546.8553538 & -0.517685 & 0.6232 & -1621.2054 & 1055.00828 \\
+Population (1000s) & \textbf{66.94549023} & 17.333986698 & 3.8620942 & 0.00834 & 24.530752 & 109.360228 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+지금은 마지막 테이블에 집중해 봅시다. 이 부분의 강조된 값들은 절편($b_0$)과 독립 변수(인구)의 계수($b_1$)를 보여줍니다. 우리가 공식을 사용하여 계산했을 때 얻은 결과와 놀랍게도 동일합니다. 회귀 분석은 단순히 방정식만 찾는 것 이상의 의미를 가집니다. 이 출력에는 절편과 기울기 외에도 훨씬 더 많은 정보가 담겨 있습니다. 이 모듈의 나머지 레슨에서 이 모든 정보에 대해 배우게 될 것입니다.
+\end{tcolorbox}
+
+\newpage
+\subsubsection{Lesson 3-2.2: Excel에서 최소 제곱법 사용하기}
+
+Excel의 데이터 분석 도구를 사용하여 최소 제곱법을 계산하는 방법을 살펴보겠습니다. 이 과정은 주로 회귀 함수의 작동 방식을 이해하기 위한 것이며, 실제 분석에서는 대부분 자동화됩니다.
+
+\begin{tcolorbox}[examplebox, title=Excel 실습: 인구 및 매출 데이터]
+\textbf{데이터}:
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Location} & \textbf{Population (1000s, x)} & \textbf{Annual sales (\$1000s, y)} \\
+\midrule
+1 & 10.2 & 522.6 \\
+2 & 30.7 & 2340.3 \\
+3 & 24.3 & 1250.3 \\
+4 & 22.3 & 1095 \\
+5 & 39.8 & 3136.8 \\
+6 & 30.9 & 1355 \\
+7 & 45.2 & 2529.1 \\
+8 & 35.3 & 1486 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+여기서 X는 인구(Population)이고, Y는 연간 매출(Annual sales)입니다. 우리는 인구가 연간 매출을 예측하는 데 사용될 것이라고 가정합니다.
+
+\textbf{수동 계산 단계 (Excel에서 셀 계산):}
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{데이터 준비}:
+    \begin{itemize}
+        \item X 값 (인구)과 Y 값 (연간 매출)을 별도의 열에 복사합니다.
+        \item 'xy' 열을 추가하고 각 행에서 X와 Y 값을 곱합니다 (예: \texttt{C2*D2}).
+        \item 'x$^2$' 열을 추가하고 각 행에서 X 값을 제곱합니다 (예: \texttt{C2^2}).
+    \end{itemize}
+
+    \item \textbf{합계 계산}:
+    \begin{itemize}
+        \item 각 열 (x, y, xy, x$^2$)의 합계를 계산합니다. Excel의 \texttt{SUM} 함수를 사용합니다.
+        \item 예를 들어, X 열의 합계는 \texttt{SUM(C2:C9)}와 같이 계산됩니다.
+    \end{itemize}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{ccccc}
+    \toprule
+    \textbf{x} & \textbf{y} & \textbf{xy} & \textbf{x$^2$} \\
+    \midrule
+    10.2 & 522.6 & 5330.52 & 104.04 \\
+    30.7 & 2340.3 & 71847.21 & 942.49 \\
+    24.3 & 1250.3 & 30382.29 & 590.49 \\
+    22.3 & 1095 & 24418.5 & 497.29 \\
+    39.8 & 3136.8 & 124844.64 & 1584 \\
+    30.9 & 1355 & 41869.5 & 954.81 \\
+    45.2 & 2529.1 & 114315.32 & 2043 \\
+    35.3 & 1486 & 52455.8 & 1246.1 \\
+    \midrule
+    \textbf{238.7} & \textbf{13715.1} & \textbf{465463.78} & \textbf{7962} \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+
+    \item \textbf{$SS_{xy}$ 계산}:
+    \begin{equation*}
+    SS_{xy} = \sum x_iy_i - \frac{(\sum x_i) \times (\sum y_i)}{n}
+    \end{equation*}
+    Excel에서: \texttt{=(G21-((E21*F21)/8))} (여기서 G21은 xy 합계, E21은 x 합계, F21은 y 합계, 8은 n 값)
+    결과: \texttt{56239.48375}
+
+    \item \textbf{$SS_{xx}$ 계산}:
+    \begin{equation*}
+    SS_{xx} = \sum x_i^2 - \frac{(\sum x_i)^2}{n}
+    \end{equation*}
+    Excel에서: \texttt{=(H21-((E21^2)/8))} (여기서 H21은 x$^2$ 합계, E21은 x 합계, 8은 n 값)
+    결과: \texttt{839.78875} (원문 슬라이드에서는 80.078로 표기되었으나, 계산 결과는 다름. 여기서는 계산된 값을 따름)
+
+    \item \textbf{기울기 ($b_1$) 계산}:
+    \begin{equation*}
+    b_1 = \frac{SS_{xy}}{SS_{xx}}
+    \end{equation*}
+    Excel에서: \texttt{=(SSxy_cell)/(SSxx_cell)}
+    결과: \texttt{56239.48375 / 839.78875 = 66.968} (원문 슬라이드에서는 66.94549023로 표기됨. 여기서는 계산된 값을 따름)
+
+    \item \textbf{절편 ($b_0$) 계산}:
+    \begin{equation*}
+    b_0 = \bar{y} - b_1\bar{x}
+    \end{equation*}
+    Excel에서: \texttt{=AVERAGE(Y_values_range)-(b1_cell*AVERAGE(X_values_range))}
+    결과: \texttt{1714.3875 - (66.968 * 29.8375) = -283.0985647} (원문 슬라이드와 동일)
+
+    \item \textbf{회귀 방정식}:
+    $\hat{y} = -283.098 + 66.968x$ (계산된 값 사용)
+
+    \item \textbf{예측}: X 값이 12 (12,000명)일 때의 예측 매출:
+    $\hat{y} = -283.098 + 66.968 \times 12 = 520.518$ (원문 슬라이드에서는 520.247318)
+\end{enumerate}
+이처럼 Excel에서 직접 수식을 입력하여 최소 제곱법을 계산할 수 있습니다.
+
+\textbf{Excel의 데이터 분석 도구 사용}:
+실제로는 Excel의 '데이터 분석(Data Analysis)' 기능을 사용하여 회귀 분석을 수행합니다.
+\begin{enumerate}[label=\arabic*.]
+    \item Excel에서 '데이터(Data)' 탭으로 이동합니다.
+    \item '데이터 분석(Data Analysis)'을 클릭합니다. (이 옵션이 보이지 않으면 '파일(File) > 옵션(Options) > 추가 기능(Add-ins) > Excel 추가 기능(Excel Add-ins) > 이동(Go)'에서 '분석 도구(Analysis ToolPak)'를 활성화해야 합니다.)
+    \item '회귀(Regression)'를 선택하고 '확인(OK)'을 클릭합니다.
+    \item \textbf{입력 Y 범위 (Input Y Range)}: 종속 변수(Annual sales)가 있는 열을 선택합니다. (예: \texttt{$B$1:$B$9})
+    \item \textbf{입력 X 범위 (Input X Range)}: 독립 변수(Population)가 있는 열을 선택합니다. (예: \texttt{$C$1:$C$9})
+    \item \textbf{레이블 (Labels)}: 첫 행에 레이블이 있다면 이 상자를 체크합니다.
+    \item \textbf{신뢰 수준 (Confidence Level)}: 기본값인 95\%를 유지합니다.
+    \item \textbf{출력 옵션 (Output Options)}: '새 워크시트 플라이(New Worksheet Ply)'를 선택하여 결과를 새 시트에 표시하거나, '출력 범위(Output Range)'를 선택하여 현재 시트의 특정 셀에 결과를 표시합니다.
+    \item '확인(OK)'을 클릭합니다.
+\end{enumerate}
+Excel은 위에서 수동으로 계산한 것과 동일한 회귀 통계, ANOVA, 그리고 계수(Coefficients) 테이블을 포함하는 요약 출력을 생성합니다. 이 출력에서 'Intercept'와 'Population (1000s)'에 해당하는 'Coefficients' 값을 확인하면 우리가 수동으로 계산한 $b_0$와 $b_1$ 값과 일치함을 알 수 있습니다.
+\end{tcolorbox}
+
+\newpage
+\subsection{Lesson 3-3: 회귀 모델 평가}
+
+\subsubsection{Lesson 3-3.1: 회귀 모델 평가}
+
+이 레슨은 회귀 모델의 유용성을 평가하는 방법에 초점을 맞춥니다. 먼저, 비합리적인 예시를 통해 핵심 개념을 명확히 해보겠습니다.
+
+\begin{tcolorbox}[examplebox, title=예시: 기온이 시험 점수에 미치는 영향]
+\textbf{문제}: 한 학생이 자신의 시험 점수가 외부 기온에 영향을 받는다고 생각합니다. 그녀는 데이터를 수집하고 회귀 분석을 사용하여 방정식을 개발하여 시험 점수를 미리 예측할 수 있다고 기뻐합니다.
+
+\begin{center}
+% \includegraphics[width=0.8\textwidth]{example-temp-test-score-scatter.png}  % Image not found: example-temp-test-score-scatter.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: '기온이 시험 점수에 미치는 영향'이라는 제목의 산점도. X축은 35에서 105까지, Y축은 0에서 90까지입니다. 데이터 포인트는 플롯에 무작위로 분포되어 데이터 간에 상관 관계가 없음을 보여줍니다.
+
+이 산점도를 보면 어떤 패턴도 보이지 않습니다. 하지만 이 학생이 Excel을 사용하여 회귀 분석을 실행하면 다음과 같은 결과를 얻을 것입니다.
+
+\textbf{Excel 출력}:
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계 (Regression Statistics)} & \\
+\midrule
+Multiple R & 0.025950899 \\
+R Square & 0.000673449 \\
+Adjusted R Square & -0.099259206 \\
+Standard Error & 24.95740194 \\
+Observations & 12 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{Significance F} \\
+\midrule
+Regression & 1 & 4.1975524 & 4.197552448 & 0.006739 & 0.93619377 \\
+Residual & 10 & 6228.7191 & 622.8719114 & & \\
+Total & 11 & 6232.9167 & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{기타 통계 (Other statistics)} & \textbf{Coefficients} & \textbf{Standard error} & \textbf{t-stat} & \textbf{p-value} & \textbf{Lower 95\%} & \textbf{Upper 95\%} \\
+\midrule
+Intercept & 47.8962704 & 29.081626 & 1.646959823 & 0.1305871 & -16.9016314 & 112.694172 \\
+Temp & -0.034265734 & 0.4174086 & -0.08209159 & 0.9361938 & -0.96430996 & 0.89577849 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+기울기와 절편을 제공하는 테이블 부분에 초점을 맞추면, 회귀 방정식은 다음과 같습니다.
+\begin{equation*}
+y = 47.896 - 0.0342x
+\end{equation*}
+여기서 $x$는 외부 기온입니다. 일기 예보에 따르면 내일 최고 기온은 53도이므로, 학생은 시험 점수가 약 46점일 것으로 예상할 수 있습니다.
+
+\textbf{질문}: 이 모델이 좋지 않으며 사용해서는 안 된다는 것을 어떻게 그녀에게 납득시킬 수 있을까요?
+
+이것이 이 레슨에서 여러분이 얻어야 할 핵심입니다. 실제 생활에서는 분석이 가치 없는 경우가 있지만, 이처럼 지나치게 단순하고 터무니없는 예시만큼 쉽게 감지되지 않을 뿐입니다.
+
+\textbf{핵심}: 어떤 데이터를 회귀 분석에 사용하든, Excel은 항상 최소 제곱법을 사용하여 해당 관측값에 가장 잘 맞는 선을 찾을 것입니다. 이 경우, 선은 다음과 같을 것입니다.
+
+\begin{center}
+% \includegraphics[width=0.8\textwidth]{example-temp-test-score-line.png}  % Image not found: example-temp-test-score-line.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: 기온이 시험 점수에 미치는 영향 산점도. 약 Y=47.89에 평평한 점선 회귀선이 추가되어 있습니다.
+
+하지만 단순히 선에 대한 방정식이 있다고 해서 의미 있는 것을 찾았다는 의미는 아닙니다. 일반적으로, 좋지 않은 모델과 좋은 모델을 어떻게 구별할 수 있을까요? 이제 특정 회귀 모델이 얼마나 유용한지에 대한 질문으로 넘어가겠습니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=모델의 유의성 평가 (Assessing Significance of Model)]
+결국, 변동의 90\%를 설명하는 모델이 10\%만 설명하는 모델보다 더 유용합니다. 회귀 모델의 유용성을 측정하는 한 가지 척도는 \textbf{단순 결정 계수 ($r^2$ 또는 $R^2$)}입니다. 대부분의 경우, 단순히 R-제곱(R-squared)이라고 불립니다. R-제곱을 어떻게 계산하는지 아는 것이 그 의미를 명확히 하는 데 중요합니다.
+
+회귀를 수행할 때 변동의 원천은 두 가지입니다.
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{설명된 변동 (Explained Variations)}: 우리가 식별한 회귀 변수(독립 변수)로 인한 변동입니다.
+    \item \textbf{설명되지 않은 변동 (Unexplained Variations)}: 오차(error) 또는 잔차(residuals)라고 불리는 다른 모든 원인으로 인한 변동입니다.
+\end{enumerate}
+
+\textbf{총 변동 (Total variations) = 회귀로 인한 변동 + 오차로 인한 변동}
+
+이것을 다음과 같이 생각해 볼 수 있습니다. 총 변동은 이 두 원천의 합입니다. 만약 우리가 강력한 예측 능력을 가진 변수를 식별했다면, 반응 변수에서 우리가 보는 변동의 대부분은 회귀 변수 때문일 것입니다. 그러나 반응 변수에 거의 영향을 미치지 않는 변수를 식별했다면, 반응 변수에서 관찰되는 변동의 대부분은 다른 원천, 즉 설명되지 않은 원천 때문일 것입니다.
+
+총 변동에 대한 표기법은 다음과 같습니다. 모든 부분에서 'SS'가 보입니다. SS는 '제곱 합(sum of squares)'을 의미합니다.
+
+\textbf{총 제곱 합 (SST: Sum of Squares Total)}:
+\begin{itemize}
+    \item 관측된 Y 값과 평균 Y 값 사이의 제곱 차이의 합입니다.
+    \item 총 변동을 나타냅니다.
+\end{itemize}
+
+\textbf{회귀 제곱 합 (SSR: Sum of Squares Regression)}:
+\begin{itemize}
+    \item 회귀 모델(X와 Y 사이의 관계)에 의해 설명되는 변동을 나타냅니다.
+\end{itemize}
+
+\textbf{오차 제곱 합 (SSE: Sum of Squares Error)}:
+\begin{itemize}
+    \item 회귀 모델에 의해 설명되지 않는 변동(다른 요인으로 인한 변동)을 나타냅니다.
+\end{itemize}
+
+이들 사이의 관계는 다음과 같습니다.
+\begin{equation*}
+SST = SSR + SSE
+\end{equation*}
+
+\textbf{결정 계수 ($R^2$)}:
+단순 결정 계수인 R-제곱은 설명된 변동(SSR)과 총 변동(SST)의 비율입니다.
+\begin{equation*}
+R^2 = \frac{SSR}{SST}
+\end{equation*}
+R-제곱은 비율이므로 항상 0과 1 사이의 값을 가집니다.
+
+\textbf{$R^2$ 해석하기}:
+\begin{center}
+% \includegraphics[width=0.6\textwidth]{example-r-squared-scale.png}  % Image not found: example-r-squared-scale.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: 0에서 1까지의 화살표가 '강해짐(Getting stronger)'을 나타냅니다.
+
+R-제곱이 1에 가까울수록 회귀 모델은 더 강력합니다. R-제곱이 90\%인 회귀 모델은 반응 변수(Y)의 변동 중 90\%가 독립 변수(X)에 의해 설명될 수 있음을 의미합니다.
+
+\textbf{예시: 기온과 시험 점수 모델의 $R^2$}:
+기온이 시험 점수에 미치는 영향 예시의 Excel 출력으로 돌아가 봅시다.
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계 (Regression Statistics)} & \\
+\midrule
+Multiple R & 0.025950899 \\
+\textbf{R Square} & \textbf{0.000673449} \\
+Adjusted R Square & -0.099259206 \\
+Standard Error & 24.95740194 \\
+Observations & 12 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+상단 테이블의 강조된 필드인 R-제곱은 0.0006으로, 매우 작고 0에 가깝습니다. 이는 이 모델을 버려야 할 충분한 이유가 됩니다.
+
+\textbf{예시: 인구와 연간 매출 모델의 $R^2$}:
+이전 레슨에서 사용했던 인구와 연간 매출 예시의 출력입니다.
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계 (Regression Statistics)} & \\
+\midrule
+Multiple R & 0.844473287 \\
+\textbf{R Square} & \textbf{0.713135133} \\
+Adjusted R Square & 0.665324321 \\
+Standard error & 502.4102206 \\
+Observations & 8 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+이 회귀 모델에 대한 여러분의 의견은 어떻습니까? 매장 간 연간 매출 차이 중 얼마가 매장 근처 인구 규모로 설명되고, 얼마가 다른 요인으로 설명됩니까?
+여기서 R-제곱은 0.7131입니다. 따라서 연간 매출의 약 71\%는 매장 위치 근처의 인구로 설명될 수 있습니다. 이는 매우 좋은 모델입니다. 그러나 다른 변동 원천들도 있으며, 이들이 합쳐서 약 29\%의 변동을 설명합니다.
+\end{tcolorbox}
+
+\begin{tcolorbox}[infobox, title=단순 상관 계수 (Simple Correlation Coefficient, $r$)]
+단순 상관 계수($r$)는 Y와 X 사이의 선형 관계의 강도를 측정합니다.
+\begin{itemize}
+    \item $r = +\sqrt{R^2}$: $b_1$이 양수일 경우 (양의 상관 관계)
+    \item $r = -\sqrt{R^2}$: $b_1$이 음수일 경우 (음의 상관 관계)
+\end{itemize}
+\begin{center}
+% \includegraphics[width=0.6\textwidth]{example-correlation-scale.png}  % Image not found: example-correlation-scale.png % 실제 이미지는 없으므로 텍스트로 대체
+\end{center}
+\textbf{이미지 설명}: -1에서 1까지의 척도. 0에서 1로 갈수록, 0에서 -1로 갈수록 '강해짐(Getting stronger)'을 나타내는 두 개의 화살표가 있습니다. 척도 위에는 $-1 \le r \le 1$ 공식이 있습니다.
+
+상관 계수 $r$은 $b_1$ (기울기)이 양수이면 양수이고, 이는 X가 양의 계수를 가지며 X와 Y가 양의 상관 관계를 가진다는 의미입니다. X의 계수가 음수이면 음의 상관 관계를 가집니다. 상관 계수는 -1과 1 사이의 어떤 값도 가질 수 있습니다. 1에 가까울수록 관계가 강합니다.
+
+\textbf{예시: 인구와 연간 매출 모델의 상관 계수}:
+Excel에서 'Multiple R'은 상관 계수를 나타내며, 상단 테이블에 나타납니다.
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계 (Regression Statistics)} & \\
+\midrule
+\textbf{Multiple R} & \textbf{0.844473287} \\
+R Square & 0.713135133 \\
+Adjusted R Square & 0.665324321 \\
+Standard error & 502.4102206 \\
+Observations & 8 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+이 예시에서 상관 계수는 +0.844입니다. 인구에 대한 계수가 양수이므로 두 변수는 양의 상관 관계를 가집니다. 그 크기는 0.844로, 인구와 매장의 연간 매출 사이에 상당히 강한 양의 상관 관계를 시사합니다.
+
+\textbf{예시: 기온과 시험 점수 모델의 상관 계수}:
+기온이 시험 점수에 미치는 영향 분석에서, $r$은 0.026으로 0에 매우 가깝습니다. 이는 $R^2$인 0.0006의 제곱근이며, 기온 계수의 부호가 음수이므로 $r$도 음수여야 하지만, 여기서는 0에 매우 가깝기 때문에 부호의 의미가 크지 않습니다.
+
+\textbf{p-값 (p-value)을 통한 유의성 평가}:
+모델이 쓸모없다는 것을 R-제곱이 작고 변수들이 상관 관계가 없다는 것을 통해 알 수 있습니다. 하지만 출력의 다른 부분에서도 이 질문에 대한 답을 찾을 수 있습니다. 특히 세 번째 테이블의 독립 변수(Temp)에 대한 값을 자세히 살펴보세요.
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{기타 통계 (Other statistics)} & \textbf{Coefficients} & \textbf{Standard error} & \textbf{t-stat} & \textbf{p-value} & \textbf{Lower 95\%} & \textbf{Upper 95\%} \\
+\midrule
+Intercept & 47.8962704 & 29.081626 & 1.646959823 & 0.1305871 & -16.9016314 & 112.694172 \\
+Temp & -0.034265734 & 0.4174086 & -0.08209159 & \textbf{\color{red}0.9361938} & \textbf{\color{blue}-0.96430996} & \textbf{\color{blue}0.89577849} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+회귀 분석을 실행할 때, 여러분은 가설 검정(hypothesis testing)의 개념을 기반으로 합니다. 회귀는 항상 여러분이 식별한 독립 변수들이 아무런 관계가 없다고 가정합니다 (귀무 가설). 따라서 유의 수준 알파(alpha of significance)보다 작은 p-값을 얻으면 귀무 가설을 기각하게 됩니다.
+
+\textbf{기온과 시험 점수 예시}:
+\begin{itemize}
+    \item \textbf{귀무 가설 (Null Hypothesis)}: 기온과 시험 점수는 상관 관계가 없습니다.
+    \item \textbf{대립 가설 (Alternate Hypothesis)}: 기온과 시험 점수는 상관 관계가 있습니다.
+\end{itemize}
+기온에 대한 p-값은 0.9361로 상당히 큽니다. 이는 일반적인 유의 수준(예: 0.05)보다 훨씬 크므로, 우리는 귀무 가설을 기각하지 못합니다. 즉, 기온과 시험 점수는 상관 관계가 없다고 결론 내립니다.
+
+또한 Excel은 95\% 신뢰 구간(confidence interval)을 제공합니다. 기온의 계수에 대한 신뢰 구간은 -0.964에서 0.895 사이입니다. 0은 이 구간 내에 있는 값입니다. 이는 기온의 실제 계수가 0일 수도 있다는 것을 의미합니다. 만약 기온의 계수를 0으로 설정한다면, 이 변수는 방정식에서 완전히 제거될 것입니다.
+
+\textbf{ANOVA 테이블을 통한 유의성 평가}:
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계 (Regression Statistics)} & \\
+\midrule
+Multiple R & 0.025950899 \\
+\textbf{R Square} & \textbf{0.000673449} \\
+Adjusted R Square & -0.099259206 \\
+Standard Error & 24.95740194 \\
+Observations & 12 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrr}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} \\
+\midrule
+Regression & 1 & \textbf{4.1975524} (SSR) \\
+Residual & 10 & \textbf{6228.7191} (SSE) \\
+Total & 11 & \textbf{6232.9167} (SST) \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+이제 이 모델이 여러 가지 측정치를 통해 좋지 않은 모델임을 알 수 있습니다. 출력의 마지막 부분은 ANOVA(분산 분석) 테이블입니다. ANOVA는 이 수업의 범위에 포함되지 않으므로 이 부분의 출력은 사용하지 않을 것입니다. 그러나 한 부분에만 집중하고 넘어가겠습니다.
+
+우리는 총 변동이 회귀와 우리가 집합적으로 오차라고 부르는 다른 원천의 합이라는 것을 배웠습니다. Excel 출력의 작은 부분을 가져와 ANOVA 부분에서 무언가를 보여드리겠습니다. SS 열에 집중하면 이 값들이 다음 표기법에 해당합니다.
+\begin{itemize}
+    \item Regression SS = SSR (회귀 제곱 합)
+    \item Residual SS = SSE (오차 제곱 합)
+    \item Total SS = SST (총 제곱 합)
+\end{itemize}
+R-제곱을 계산하는 공식을 사용하여 SSR과 SST의 비율을 취하면, 첫 번째 테이블에서 R-제곱에 대해 본 것과 동일한 값을 얻게 됩니다.
+\begin{equation*}
+R^2 = \frac{SSR}{SST} = \frac{4.1975524}{6232.9167} = 0.000673449
+\end{equation*}
+이제 모델을 구축하고 모델의 유의성을 평가하는 방법을 이해했으므로, 이를 연습하고 효과적인 예측 모델을 구축하는 방법을 배울 수 있습니다.
+\end{tcolorbox}
+
+\newpage
+\subsubsection{Lesson 3-3.2: Excel에서 유의성 검정하기}
+
+Excel의 데이터 분석 도구를 사용하여 단순 선형 회귀를 수행하고 그 유의성을 평가하는 또 다른 예시를 살펴보겠습니다.
+
+\begin{tcolorbox}[examplebox, title=Excel 실습: Zillow 주택 데이터]
+\textbf{데이터}: Zillow에서 다운로드한 시카고 주택 판매 데이터. 두 개의 열을 포함합니다: 가격(Price)과 평방 피트(Square Footage). 2,000개 이상의 데이터 요소가 있습니다.
+
+\textbf{가설}: 주택의 평방 피트가 주택 가격에 영향을 미칠 것이라고 예상합니다. 즉, 집이 클수록 가격이 높을 것입니다. 단순 선형 회귀를 사용하여 이를 확인해 보겠습니다.
+
+\textbf{Excel에서 회귀 분석 수행 단계}:
+\begin{enumerate}[label=\arabic*.]
+    \item Excel에서 '데이터(Data)' 탭으로 이동합니다.
+    \item '데이터 분석(Data Analysis)'을 클릭합니다.
+    \item '회귀(Regression)'를 선택하고 '확인(OK)'을 클릭합니다.
+    \item \textbf{입력 Y 범위 (Input Y Range)}: 'Price' 열을 선택합니다. (예: \texttt{$B$1:$B$2326})
+    \item \textbf{입력 X 범위 (Input X Range)}: 'Square Footage' 열을 선택합니다. (예: \texttt{$C$1:$C$2326})
+    \item \textbf{레이블 (Labels)}: 첫 행에 레이블이 있으므로 이 상자를 체크합니다.
+    \item \textbf{신뢰 수준 (Confidence Level)}: 95\%를 유지합니다.
+    \item \textbf{출력 옵션 (Output Options)}: '새 워크시트 플라이(New Worksheet Ply)'를 선택하거나, '출력 범위(Output Range)'를 선택하여 현재 시트의 특정 셀에 결과를 표시합니다.
+    \item '확인(OK)'을 클릭합니다.
+\end{enumerate}
+
+\textbf{Excel 출력 분석}:
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lr}
+\toprule
+\textbf{회귀 통계 (Regression Statistics)} & \\
+\midrule
+Multiple R & 0.378173 \\
+R Square & \textbf{0.143015} \\
+Adjusted R Square & 0.14263 \\
+Standard Error & 183675.2 \\
+Observations & 2325 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{ANOVA} & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{Significance F} \\
+\midrule
+Regression & 1 & \textbf{3.0124E+14} & 3.0124E+14 & 891.95 & 5.99378E-80 \\
+Residual & 2323 & \textbf{7.8507E+15} & 3.3795E+12 & & \\
+Total & 2324 & \textbf{8.1519E+15} & & & \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{기타 통계 (Other statistics)} & \textbf{Coefficients} & \textbf{Standard error} & \textbf{t-stat} & \textbf{p-value} & \textbf{Lower 95\%} & \textbf{Upper 95\%} \\
+\midrule
+Intercept & 120000 & 10000 & 12.0 & 1.0E-30 & 100000 & 140000 \\
+Square Footage & \textbf{132.6912573} & 4.44444 & 29.85 & \textbf{5.99378E-80} & 123.97 & 141.41 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\textbf{해석}:
+\begin{itemize}
+    \item \textbf{R-제곱 (R-squared)}: 0.143015입니다. 이는 주택 가격의 변동 중 약 14.3\%만이 주택의 평방 피트로 설명될 수 있음을 의미합니다. 이는 그리 좋은 설명 변수가 아닙니다. 총 변동(Total SS: 8.1519E+15)의 대부분이 잔차(Residual SS: 7.8507E+15)에서 비롯됩니다. 즉, 평방 피트 외에 다른 많은 요인들이 주택 가격에 영향을 미치고 있다는 뜻입니다.
+
+    \item \textbf{p-값 (p-value)}: 'Square Footage'에 대한 p-값은 5.99378E-80으로 매우 작습니다. 이는 평방 피트가 주택 가격과 통계적으로 매우 유의미한 관계를 가지고 있음을 나타냅니다. 즉, 평방 피트가 주택 가격에 영향을 미 미치지 않는다는 귀무 가설을 기각할 수 있습니다.
+
+    \item \textbf{계수 (Coefficient)}: 'Square Footage'의 계수는 132.6912573입니다. 이는 평방 피트가 1단위 증가할 때마다 주택 가격이 약 132.69달러 증가할 것으로 예측된다는 의미입니다.
+    \begin{center}
+    % \includegraphics[width=0.7\textwidth]{example-zillow-regression-line.png}  % Image not found: example-zillow-regression-line.png % 실제 이미지는 없으므로 텍스트로 대체
+    \end{center}
+    \textbf{이미지 설명}: X축은 평방 피트, Y축은 가격인 산점도. 기울기가 132.69인 양의 회귀선이 그려져 있습니다.
+
+    \item \textbf{상관 계수 (Multiple R)}: 0.378173입니다. 이는 평방 피트와 주택 가격 사이에 약 37.8\%의 양의 상관 관계가 있음을 나타냅니다. 0과 1 사이의 값으로, 1에 가까울수록 상관 관계가 강합니다. 37.8\%는 상관 관계가 있지만, 아주 강하지는 않다는 것을 보여줍니다.
+\end{itemize}
+
+\textbf{결론}:
+이 단순 선형 회귀 모델은 평방 피트가 주택 가격과 통계적으로 유의미한 관계를 가지고 있음을 보여주지만 (매우 작은 p-값), 평방 피트 단독으로는 주택 가격 변동의 14.3\%만을 설명합니다 (낮은 R-제곱). 이는 평방 피트가 주택 가격에 영향을 미치는 중요한 변수이지만, 예측 모델로서의 성능은 좋지 않다는 것을 의미합니다.
+
+\textbf{다음 단계}:
+이러한 경우, 단순 선형 회귀 모델이 그리 좋지 않다는 것을 알 수 있습니다. 이는 종속 변수(주택 가격)에 영향을 미치는 요인이 하나 이상일 때 발생합니다. 따라서 이 분석을 버릴 필요는 없습니다. 오히려, 우리는 예측하려는 대상(주택 가격)에 매우 강한 영향을 미치는 좋은 변수(평방 피트)를 식별했습니다. 하지만 이 변수만으로는 충분하지 않습니다. 주택의 위치, 건축 연도, 침실 수, 욕실 수 등 다른 요인들도 주택 가격에 영향을 미칠 수 있습니다. 이러한 경우, 여러 독립 변수를 사용하는 \textbf{다중 회귀(multiple regression)}로 모델을 확장할 수 있습니다.
+\end{tcolorbox}
+
+\newpage
+\section{모델 활용 (Using the Model)}
+이 섹션에서는 단순 선형 회귀 모델을 실제 데이터에 적용하고 그 결과를 해석하는 방법을 배웁니다. 특히, 독립 변수와 종속 변수를 올바르게 식별하고, Excel 출력을 분석하여 회귀 방정식을 도출하며, 이를 통해 예측을 수행하는 과정을 상세히 다룹니다.
+
+\subsection{예시: 양의 상관관계 (Positive Correlation)}
+국내 신문사 발행인은 현장 기자들의 급여와 경력 연수 간의 관계를 모델링하고자 합니다. 34명의 무작위로 선정된 기자들의 데이터를 수집했습니다. 급여와 경력 연수 사이에 관계가 존재한다고 생각하는 것이 맞을까요?
+
+\begin{itemize}
+    \item \textbf{독립 변수 (x):} 경력 연수 (Years of Experience)
+    \item \textbf{종속 변수 (y):} 급여 (Salary)
+\end{itemize}
+가장 먼저 두 변수 사이에 선형 관계가 있는지 확인하기 위해 산점도를 그려봅니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-positive-correlation-scatter-plot.png}  % Image not found: example-positive-correlation-scatter-plot.png % Placeholder image
+    \caption{경력 연수와 급여의 산점도 (양의 상관관계)}
+    \label{fig:positive_correlation_scatter}
+\end{figure}
+\begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={산점도 분석: 양의 상관관계}]
+산점도를 보면 경력 연수가 증가함에 따라 급여도 함께 증가하는 경향을 보입니다. 이는 \textbf{강한 양의 상관관계(strong positive correlation)}를 시사합니다. 따라서 회귀 분석을 진행하여 이 관계를 더 자세히 탐색할 수 있습니다.
+\end{tcolorbox}
+
+\subsubsection{흔한 실수: 변수 혼동 (Mixing Up Variables)}
+회귀 분석을 진행하기 전에 흔히 저지르는 실수가 있습니다. 바로 독립 변수와 종속 변수를 혼동하여 축을 잘못 설정하는 것입니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-wrong-scatter-plot.png}  % Image not found: example-wrong-scatter-plot.png % Placeholder image
+    \caption{잘못된 산점도 예시: 종속 변수가 X축에 위치}
+    \label{fig:wrong_scatter_plot}
+\end{figure}
+\begin{cautionbox}
+위 산점도는 X축에 급여(종속 변수)를, Y축에 경력 연수(독립 변수)를 배치했습니다. 이 또한 양의 상관관계를 보여주지만, \textbf{종속 변수(Salary)가 X축에 표시된 것은 잘못된 설정입니다.} 회귀 분석에서 독립 변수는 X축에, 종속 변수는 Y축에 위치해야 합니다. Excel과 같은 소프트웨어는 이러한 모델링 오류를 자동으로 감지하여 경고하지 않으므로, 사용자가 올바르게 변수를 설정해야 합니다. 잘못된 모델링은 유효하지 않은 분석 결과를 초래합니다.
+\end{cautionbox}
+
+\subsubsection{Excel 출력 분석: 양의 상관관계 예시}
+올바르게 변수를 설정하여 회귀 분석을 실행한 결과는 다음과 같습니다.
+
+\begin{table}[h!]
+    \centering
+    \caption{회귀 통계 요약 (Summary Output)}
+    \label{tab:regression_summary_output_positive}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lr}
+    \toprule
+    \textbf{회귀 통계 (Regression Statistics)} & \\
+    \midrule
+    다중 R (Multiple R) & 0.9124668 \\
+    R-제곱 (R Square) & 0.8325957 \\
+    수정된 R-제곱 (Adjusted R Square) & 0.8275228 \\
+    표준 오차 (Standard Error) & 5.5667051 \\
+    관측치 수 (Observations) & 35 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{분산 분석 (ANOVA)}
+    \label{tab:anova_positive}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrr}
+    \toprule
+    & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 확률 F (Significance F)} \\
+    \midrule
+    회귀 (Regression) & 1 & 5086.0166 & 5086.0166 & 164.13 & 2.338E-14 \\
+    잔차 (Residual) & 33 & 1022.6108 & 30.988206 & & \\
+    총계 (Total) & 34 & 6108.6274 & & & \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{계수 및 기타 통계 (Coefficients and Other Statistics)}
+    \label{tab:coefficients_positive}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrrr}
+    \toprule
+    & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하한 95\% (Lower 95\%)} & \textbf{상한 95\% (Upper 95\%)} \\
+    \midrule
+    절편 (Intercept) & 60.699606 & 1.9753988 & 30.727773 & 7E-26 & 56.680627 & 64.718585 \\
+    경력 연수 (Years) & 2.1693977 & 0.1693357 & 12.811225 & 2E-14 & 1.8248817 & 2.5139138 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{회귀 방정식 (Regression Equation):}
+$y = 60.699 + 2.169x$
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{R-제곱 (R-Squared):} 0.8325957 (약 83.26\%)
+    이는 기자 급여의 총 변동 중 약 83.26\%가 경력 연수에 의해 설명될 수 있음을 의미합니다. 나머지 약 16.74\%는 모델에 포함되지 않은 다른 요인(오차)에 의해 발생합니다. R-제곱 값이 높을수록 모델의 설명력이 좋다고 판단할 수 있습니다.
+
+    \item \textbf{절편 (Intercept):} 60.699
+    회귀 방정식에서 $x=0$일 때 $y$의 예측값입니다. 즉, 경력 연수가 0년인 기자의 예상 시작 급여는 60.699 (데이터가 천 달러 단위이므로 \$60,699)입니다.
+
+    \item \textbf{경력 연수 계수 (Coefficient of Years):} 2.169
+    독립 변수(경력 연수)의 계수는 경력 연수가 1년 증가할 때마다 급여가 평균적으로 2.169 (즉, \$2,169) 증가한다는 것을 의미합니다. 이는 기자들이 매년 받는 평균적인 급여 인상액으로 해석할 수 있습니다.
+
+    \item \textbf{p-값 (p-value):} 경력 연수 변수의 p-값은 2E-14 (0.00000000000002)로 매우 작습니다.
+    이는 경력 연수와 급여 사이에 아무런 관계가 없다는 귀무 가설을 기각할 수 있음을 의미합니다. 즉, 경력 연수는 급여에 통계적으로 매우 유의미한 영향을 미칩니다.
+
+    \item \textbf{다중 R (Multiple R):} 0.9124668 (약 0.91)
+    이는 급여와 경력 연수 사이에 강한 양의 상관관계가 있음을 나타냅니다. 계수의 부호가 양수($+2.169$)이므로, 경력 연수가 길어질수록 급여도 증가하는 정비례 관계입니다.
+
+    \item \textbf{계수의 신뢰 구간 (Confidence Interval for Coefficient):} 1.8248817 ~ 2.5139138
+    경력 연수 계수의 95\% 신뢰 구간은 1.825에서 2.514입니다. 이는 기자의 평균 연봉 인상액이 \$1,825에서 \$2,514 사이일 것으로 95\% 확신할 수 있다는 의미입니다. 우리가 사용한 계수 2.169는 이 신뢰 구간의 중간 값인 점 추정치(point estimate)입니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{예측: 15년 경력 기자의 평균 급여}
+만약 15년 경력의 기자 그룹의 평균 급여가 얼마일지 예측하려면, 회귀 방정식에 $x=15$를 대입합니다.
+$y = 60.699 + 2.169 \times (15) = 60.699 + 32.535 = 93.234$
+데이터가 천 달러 단위였으므로, 예상 평균 급여는 \$93,234입니다.
+\end{examplebox}
+
+\newpage
+\subsection{예시: 음의 상관관계 (Negative Correlation)}
+로봇 도장 라인의 생산 중단을 줄이기 위해 공장 관리자는 예방 정비 프로그램을 도입하고자 합니다. 이를 위해 월별 총 가동 중단 시간(downtime)과 라인의 생산성 데이터를 수집했습니다. 관리자는 회귀 분석을 사용하여 이 관계를 분석할 수 있다고 생각합니다. 유의 수준 5\%에서 분석을 수행해 봅시다.
+
+\begin{itemize}
+    \item \textbf{독립 변수 (x):} 월별 가동 중단 시간 (Downtime hours per month)
+    \item \textbf{종속 변수 (y):} 생산성 (Productivity)
+\end{itemize}
+산점도를 통해 두 변수 간의 관계를 시각적으로 확인합니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-negative-correlation-scatter-plot.png}  % Image not found: example-negative-correlation-scatter-plot.png % Placeholder image
+    \caption{가동 중단 시간과 생산성의 산점도 (음의 상관관계)}
+    \label{fig:negative_correlation_scatter}
+\end{figure}
+\begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={산점도 분석: 음의 상관관계}]
+산점도를 보면 가동 중단 시간이 증가함에 따라 생산성 측정값이 선형적으로 감소하는 경향을 보입니다. 이는 \textbf{강한 음의 상관관계(strong negative correlation)}를 형성합니다. 따라서 단순 선형 회귀를 적용하여 이 관계를 더 탐색할 수 있습니다.
+\end{tcolorbox}
+
+\subsubsection{Excel 출력 분석: 음의 상관관계 예시}
+회귀 분석을 실행한 결과는 다음과 같습니다.
+
+\begin{table}[h!]
+    \centering
+    \caption{회귀 통계 요약 (Summary Output)}
+    \label{tab:regression_summary_output_negative}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lr}
+    \toprule
+    \textbf{회귀 통계 (Regression Statistics)} & \\
+    \midrule
+    다중 R (Multiple R) & 0.940239906 \\
+    R-제곱 (R Square) & 0.884051081 \\
+    수정된 R-제곱 (Adjusted R Square) & 0.881152358 \\
+    표준 오차 (Standard Error) & 3.746828316 \\
+    관측치 수 (Observations) & 42 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{분산 분석 (ANOVA)}
+    \label{tab:anova_negative}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrr}
+    \toprule
+    & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 확률 F (Significance F)} \\
+    \midrule
+    회귀 (Regression) & 1 & 4281.522531 & 4281.5 & 304.979499 & 2.56416E-20 \\
+    잔차 (Residual) & 40 & 561.5488972 & 14.039 & & \\
+    총계 (Total) & 41 & 4843.071429 & & & \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{계수 및 기타 통계 (Coefficients and Other Statistics)}
+    \label{tab:coefficients_negative}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrrr}
+    \toprule
+    & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하한 95\% (Lower 95\%)} & \textbf{상한 95\% (Upper 95\%)} \\
+    \midrule
+    절편 (Intercept) & 98.01402893 & 1.025886243 & 95.541 & 7.848E-49 & 95.94063549 & 100.0874224 \\
+    가동 중단 (Downtime) & -1.648777759 & 0.094411913 & -17.46 & 2.5642E-20 & -1.839591353 & -1.457964165 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{회귀 방정식 (Regression Equation):}
+$y = 98.014 - 1.648x$
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{다중 R (Multiple R):} 0.940239906 (약 0.94)
+    가동 중단 시간과 생산성 간의 상관계수는 -0.94입니다. 계수(-1.648)의 음수 부호는 두 변수가 음의 상관관계에 있음을 나타냅니다. 즉, 가동 중단 시간이 증가하면 생산성은 감소합니다.
+
+    \item \textbf{R-제곱 (R-Squared):} 0.884051081 (약 88.4\%)
+    생산성 변동의 88.4\%는 가동 중단 시간으로 설명될 수 있습니다. 나머지 11.6\%는 오차(모델에 포함되지 않은 다른 요인)로 인해 발생합니다. 이는 모델의 설명력이 매우 높음을 의미합니다.
+
+    \item \textbf{절편 (Intercept):} 98.014
+    가동 중단 시간이 0시간일 때(즉, 라인이 전혀 멈추지 않을 때) 예상되는 생산성 기준선은 약 98\%입니다.
+
+    \item \textbf{가동 중단 계수 (Coefficient of Downtime):} -1.648
+    가동 중단 시간이 1시간 증가할 때마다 생산성은 평균적으로 1.648\% 감소합니다.
+\end{itemize}
+
+\begin{examplebox}
+\textbf{예측: 8시간 가동 중단 시 평균 생산성}
+공장 관리자는 평균적으로 월 8시간 라인이 가동 중단된다고 생각합니다. 이 경우 예상되는 평균 생산성은 얼마일까요?
+회귀 방정식에 $x=8$을 대입합니다.
+$y = 98.014 - (1.648 \times 8) = 98.014 - 13.184 = 84.83$
+따라서 예상 평균 생산성은 약 84.83\%입니다.
+
+\textbf{의사결정 활용:}
+이러한 예측을 통해 공장 관리자는 예방 정비 프로그램 도입의 경제적 분석을 수행할 수 있습니다. 정비 프로그램 비용과 생산성 손실 비용을 비교하여 합리적인 의사결정을 내릴 수 있습니다. 회귀 분석은 모집단에 대해 추론할 뿐만 아니라, 주어진 독립 변수 값에 대한 종속 변수 값을 예측하는 능력도 제공합니다.
+\end{examplebox}
+
+\newpage
+\subsection{연습 문제: GPA와 시작 급여}
+대학교의 한 지도 교수는 학생들이 열심히 공부하여 높은 GPA로 졸업하도록 동기를 부여하고 싶어 합니다. GPA의 중요성을 강조하기 위해, 졸업생의 시작 급여와 GPA 간의 관계에 대한 데이터를 보여줄 수 있는지 궁금해합니다. 그녀는 최근 졸업생 100명의 데이터를 수집했습니다.
+
+\subsubsection{변수 식별}
+이 연구에서 종속 변수와 독립 변수는 무엇일까요?
+\begin{itemize}
+    \item \textbf{독립 변수 (x):} GPA (학생의 GPA가 시작 급여에 영향을 미친다고 가정)
+    \item \textbf{종속 변수 (y):} 시작 급여 (Starting Salary)
+\end{itemize}
+
+\subsubsection{산점도 분석}
+수집된 데이터를 바탕으로 한 산점도는 다음과 같습니다.
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{example-gpa-salary-scatter-plot.png}  % Image not found: example-gpa-salary-scatter-plot.png % Placeholder image
+    \caption{GPA와 시작 급여의 산점도}
+    \label{fig:gpa_salary_scatter}
+\end{figure}
+\begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={산점도 분석: GPA와 시작 급여}]
+산점도를 보면 GPA가 증가함에 따라 시작 급여도 완만하게 증가하는 \textbf{양의 상관관계}가 나타납니다.
+\end{tcolorbox}
+
+\subsubsection{Excel 출력 분석: GPA와 시작 급여}
+회귀 분석 결과는 다음과 같습니다.
+
+\begin{table}[h!]
+    \centering
+    \caption{회귀 통계 요약 (Summary Output)}
+    \label{tab:regression_summary_output_gpa}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lr}
+    \toprule
+    \textbf{회귀 통계 (Regression Statistics)} & \\
+    \midrule
+    다중 R (Multiple R) & 0.580085329 \\
+    R-제곱 (R Square) & 0.336498989 \\
+    수정된 R-제곱 (Adjusted R Square) & 0.32972857 \\
+    표준 오차 (Standard Error) & 2236.609365 \\
+    관측치 수 (Observations) & 100 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{분산 분석 (ANOVA)}
+    \label{tab:anova_gpa}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrr}
+    \toprule
+    & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 확률 F (Significance F)} \\
+    \midrule
+    회귀 (Regression) & 1 & 248627136 & 248627136.4 & 49.701 & 2.534E-10 \\
+    잔차 (Residual) & 98 & 490237302 & 5002421.453 & & \\
+    총계 (Total) & 99 & 738864439 & & & \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{계수 및 기타 통계 (Coefficients and Other Statistics)}
+    \label{tab:coefficients_gpa}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrrr}
+    \toprule
+    & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하한 95\% (Lower 95\%)} & \textbf{상한 95\% (Upper 95\%)} \\
+    \midrule
+    절편 (Intercept) & 37916.16971 & 1258.16015 & 30.13620292 & 2E-51 & 35419.392 & 40412.95 \\
+    GPA & 2904.708917 & 412.020185 & 7.049918963 & 3E-10 & 2087.0683 & 3722.35 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{회귀 방정식 (Regression Equation):}
+$y = 37916.17 + 2904.71x$
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{R-제곱 (R-Squared):} 0.336498989 (약 33.65\%)
+    졸업생 시작 급여의 변동 중 약 33.65\%가 GPA에 의해 설명될 수 있습니다. 이는 나머지 약 66.35\%의 변동이 모델에 포함되지 않은 다른 요인에 의해 발생한다는 것을 의미합니다.
+
+    \item \textbf{GPA 계수 (Coefficient of GPA):} 2904.708917
+    GPA가 1점 증가할 때마다 시작 급여는 평균적으로 \$2,904.71 증가합니다.
+
+    \item \textbf{p-값 (p-value):} GPA 변수의 p-값은 3E-10 (0.0000000003)으로 매우 작습니다.
+    이는 GPA와 시작 급여 사이에 아무런 관계가 없다는 귀무 가설을 기각할 수 있음을 의미합니다. 즉, GPA는 시작 급여에 통계적으로 매우 유의미한 영향을 미칩니다.
+\end{itemize}
+
+\begin{cautionbox}
+\textbf{R-제곱이 낮아도 관계가 유의미할 수 있는 이유}
+R-제곱 값이 33.65\%로 비교적 낮지만, GPA의 p-값은 거의 0에 가깝습니다. 이는 GPA가 시작 급여에 \textbf{통계적으로 매우 유의미한 영향}을 미친다는 것을 의미합니다. 회귀 분석은 기본적으로 "관계가 없다"는 귀무 가설을 검정하며, p-값이 작으면 이 귀무 가설을 기각하고 관계가 있음을 받아들입니다.
+
+그렇다면 R-제곱이 낮은 이유는 무엇일까요? R-제곱은 종속 변수의 변동 중 독립 변수가 설명하는 비율을 나타냅니다. GPA가 시작 급여의 변동 중 약 3분의 1만 설명하고, 나머지 3분의 2는 다른 요인(예: 전공, 인턴십 경험, 면접 능력 등)에 의해 설명된다는 뜻입니다.
+
+지도 교사는 GPA가 중요하지 않다고 생각할 필요는 없습니다. GPA는 시작 급여에 영향을 미치는 \textbf{하나의 중요한 요인}임이 밝혀졌습니다. 하지만 모델의 설명력을 높이고 싶다면, 전공과 같은 추가적인 독립 변수를 포함하여 \textbf{다중 회귀 분석(Multiple Regression)}을 수행해야 합니다. 이는 이 수업의 마지막 모듈에서 다룰 주제입니다.
+\end{cautionbox}
+
+\newpage
+\section{단순 선형 회귀: Excel 출력 분석 (Simple Linear Regression: Excel Output Analysis)}
+이 섹션에서는 Excel의 '데이터 분석' 도구를 사용하여 단순 선형 회귀 분석을 수행하고, 그 출력 결과를 상세히 해석하는 실습 과정을 다룹니다.
+
+\subsection{Excel을 이용한 회귀 분석 절차: 가동 중단 시간 예시}
+생산 라인의 생산성이 가동 중단 시간에 의해 영향을 받는다는 가설을 검증하기 위해 Excel을 사용합니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{excel-downtime-data.png}  % Image not found: excel-downtime-data.png % Placeholder image
+    \caption{가동 중단 시간 및 생산성 데이터 예시}
+    \label{fig:downtime_data}
+\end{figure}
+
+\subsubsection{1단계: 산점도를 통한 시각적 확인}
+회귀 분석을 시작하기 전에 데이터가 선형 모델에 적합한지 시각적으로 확인하는 것이 중요합니다.
+\begin{enumerate}
+    \item Excel에서 '가동 중단 시간(Downtime)'과 '생산성(Productivity)' 두 열을 선택합니다.
+    \item '삽입(Insert)' 탭으로 이동하여 '산점도(Scatter Plot)'를 선택합니다.
+    \item 생성된 산점도를 확인하여 두 변수 간에 대략적인 선형 관계가 있는지 파악합니다.
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{excel-downtime-scatter-plot-formatted.png}  % Image not found: excel-downtime-scatter-plot-formatted.png % Placeholder image
+    \caption{가동 중단 시간과 생산성 산점도 (Y축 범위 조정 후)}
+    \label{fig:downtime_scatter_formatted}
+\end{figure}
+\begin{infobox}
+\textbf{산점도 가독성 향상 팁:}
+Y축(생산성)의 범위가 0부터 시작하여 데이터가 평평하게 보일 수 있습니다. 이 경우, Y축을 더블 클릭하여 '축 서식(Format Axis)' 패널을 열고, '축 옵션(Axis options)'에서 최소값을 60, 최대값을 105 등으로 조정하면 데이터의 분포를 더 명확하게 볼 수 있습니다.
+\end{infobox}
+산점도가 대략적인 선형 형태를 보인다면, 선형 회귀를 적용할 수 있다고 판단합니다.
+
+\subsubsection{2단계: Excel 데이터 분석 도구로 회귀 실행}
+\begin{enumerate}
+    \item '데이터(Data)' 탭으로 이동하여 '데이터 분석(Data Analysis)'을 클릭합니다.
+    \item '데이터 분석' 창에서 '회귀(Regression)'를 선택하고 '확인'을 클릭합니다.
+    \item '회귀' 대화 상자가 나타나면 다음을 설정합니다.
+    \begin{itemize}
+        \item \textbf{Y 입력 범위 (Input Y Range):} 예측하려는 종속 변수(생산성) 데이터를 선택합니다. (예: \$B\$1:\$B\$43)
+        \item \textbf{X 입력 범위 (Input X Range):} 독립 변수(가동 중단 시간) 데이터를 선택합니다. (예: \$A\$1:\$A\$43)
+        \item \textbf{레이블 (Labels):} 첫 행에 변수 이름(레이블)이 포함되어 있다면 이 상자를 체크합니다.
+        \item \textbf{신뢰 수준 (Confidence Level):} 기본값인 95\%를 유지합니다.
+        \item \textbf{출력 옵션 (Output Options):} '새 워크시트(New Worksheet Ply)'를 선택하여 결과를 새 시트에 표시합니다.
+    \end{itemize}
+    \item '확인'을 클릭하여 회귀 분석을 실행합니다.
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{excel-regression-dialog.png}  % Image not found: excel-regression-dialog.png % Placeholder image
+    \caption{Excel 회귀 분석 대화 상자 설정}
+    \label{fig:excel_regression_dialog}
+\end{figure}
+
+\subsubsection{3단계: Excel 출력 결과 해석}
+Excel은 세 가지 주요 테이블로 회귀 분석 결과를 반환합니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{excel-downtime-output-raw.png}  % Image not found: excel-downtime-output-raw.png % Placeholder image
+    \caption{Excel 회귀 분석 출력 (초기 상태)}
+    \label{fig:downtime_output_raw}
+\end{figure}
+
+\begin{infobox}
+\textbf{출력 테이블 가독성 향상 팁:}
+Excel 출력에서 열 너비가 충분하지 않아 내용이 잘리지 않도록, 열 사이 경계선을 더블 클릭하여 자동으로 너비를 조정할 수 있습니다.
+\end{infobox}
+
+\begin{cautionbox}
+\textbf{Excel의 95\% 신뢰 구간 중복 표시:}
+Excel은 기본적으로 95\% 신뢰 구간을 두 번 표시하는 경향이 있습니다. 이는 버그로 간주될 수 있으며, 중복된 열은 삭제해도 무방합니다. 만약 99\% 신뢰 수준을 요청하면, 99\%와 95\% 신뢰 구간을 모두 표시합니다.
+\end{cautionbox}
+
+\begin{table}[h!]
+    \centering
+    \caption{회귀 통계 요약 (Regression Statistics)}
+    \label{tab:excel_regression_stats}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lr}
+    \toprule
+    \textbf{회귀 통계 (Regression Statistics)} & \\
+    \midrule
+    다중 R (Multiple R) & 0.940239906 \\
+    R-제곱 (R Square) & 0.884051081 \\
+    수정된 R-제곱 (Adjusted R Square) & 0.881152358 \\
+    표준 오차 (Standard Error) & 3.746828316 \\
+    관측치 수 (Observations) & 42 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{분산 분석 (ANOVA)}
+    \label{tab:excel_anova}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrr}
+    \toprule
+    & \textbf{df} & \textbf{SS} & \textbf{MS} & \textbf{F} & \textbf{유의 확률 F (Significance F)} \\
+    \midrule
+    회귀 (Regression) & 1 & 4281.522531 & 4281.5 & 304.979499 & 2.56416E-20 \\
+    잔차 (Residual) & 40 & 561.5488972 & 14.039 & & \\
+    총계 (Total) & 41 & 4843.071429 & & & \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{table}[h!]
+    \centering
+    \caption{계수 및 기타 통계 (Coefficients and Other Statistics)}
+    \label{tab:excel_coefficients}
+    \begin{adjustbox}{width=\textwidth,center}
+    \begin{tabular}{lrrrrrr}
+    \toprule
+    & \textbf{계수 (Coefficients)} & \textbf{표준 오차 (Standard error)} & \textbf{t-통계량 (t-stat)} & \textbf{p-값 (p-value)} & \textbf{하한 95\% (Lower 95\%)} & \textbf{상한 95\% (Upper 95\%)} \\
+    \midrule
+    절편 (Intercept) & 98.01402893 & 1.025886243 & 95.541 & 7.848E-49 & 95.94063549 & 100.0874224 \\
+    가동 중단 (Downtime) & -1.648777759 & 0.094411913 & -17.46 & 2.5642E-20 & -1.839591353 & -1.457964165 \\
+    \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+\begin{summarybox}
+\textbf{회귀 방정식:} $\hat{y} = 98.01 - 1.648x$
+여기서 $\hat{y}$는 예측된 생산성, $x$는 가동 중단 시간입니다.
+\end{summarybox}
+
+\begin{itemize}
+    \item \textbf{p-값 (p-value):}
+    가동 중단 변수의 p-값은 2.56E-20으로 매우 작습니다. 이는 가동 중단 시간과 생산성 사이에 아무런 관계가 없다는 귀무 가설을 기각할 수 있음을 의미합니다. 즉, 가동 중단 시간은 생산성에 통계적으로 매우 유의미한 영향을 미칩니다.
+
+    \item \textbf{R-제곱 (R-Squared):} 0.8840 (약 88.4\%)
+    생산성 변동의 88.4\%는 가동 중단 시간으로 설명될 수 있습니다. 이는 모델의 설명력이 매우 높으며, 수집된 데이터에서 생산성 차이의 대부분이 가동 중단 시간 때문임을 시사합니다.
+
+    \item \textbf{ANOVA 테이블의 R-제곱:}
+    R-제곱은 총 제곱합(SST)에 대한 회귀 제곱합(SSR)의 비율입니다.
+    $R^2 = \frac{\text{SSR}}{\text{SST}} = \frac{4281.522531}{4843.071429} \approx 0.884051081$
+    이 값이 R-제곱 값과 정확히 일치합니다. R-제곱이 높을수록 변동에 대한 설명력이 좋고, 예측 모델이 우수하다고 볼 수 있습니다.
+
+    \item \textbf{다중 R (Multiple R):} 0.9402
+    다중 R은 상관계수($r$)를 나타냅니다. 이는 R-제곱의 제곱근과 같습니다.
+    $r = \sqrt{R^2} = \sqrt{0.884051081} \approx 0.940239906$
+    상관 계수는 -1에서 1 사이의 값을 가지며, 1에 가까울수록 강한 양의 상관관계, -1에 가까울수록 강한 음의 상관관계를 나타냅니다. 0에 가까울수록 상관관계가 약합니다.
+    가동 중단 계수(-1.648)의 음수 부호는 가동 중단 시간이 증가할수록 생산성이 감소하는 \textbf{음의 상관관계}를 의미합니다.
+
+    \item \textbf{계수 해석:}
+    가동 중단 계수 -1.648은 가동 중단 시간이 1시간 증가할 때마다 생산성이 평균적으로 1.648\% 감소한다는 것을 의미합니다.
+
+    \item \textbf{예측:}
+    만약 월 8시간의 가동 중단이 발생한다면, 예상 생산성은 다음과 같습니다.
+    $\hat{y} = 98.014 - (1.648 \times 8) = 84.8238$
+    즉, 평균 생산성은 84.82\%로 예측됩니다.
+
+    \item \textbf{신뢰 구간 (Confidence Interval):}
+    Excel 출력은 각 계수에 대한 신뢰 구간도 제공합니다. 예를 들어, 가동 중단 계수의 95\% 신뢰 구간은 -1.839에서 -1.458입니다. 이는 우리가 사용한 계수 -1.648이 이 구간 내의 점 추정치임을 의미합니다. 회귀 분석은 가설 검정(p-값)과 신뢰 구간 추정(계수)을 모두 포함하는 포괄적인 분석 도구입니다.
+\end{itemize}
+
+\newpage
+\section{모델 가정 및 한계 (Model Assumptions and Limitations)}
+회귀 모델이 유효하고 신뢰할 수 있는 결과를 제공하려면 특정 가정을 충족해야 합니다. 이 섹션에서는 이러한 가정들을 살펴보고, 모델의 한계점, 특히 외삽(extrapolation)의 위험성에 대해 논의합니다.
+
+\subsection{모델 가정 (Model Assumptions)}
+회귀 모델의 가정은 주로 \textbf{잔차(residuals)} 분석을 통해 확인됩니다. 잔차는 실제 $y$ 값과 모델이 예측한 $\hat{y}$ 값 사이의 차이($e = y - \hat{y}$)입니다. 회귀 방정식은 $y = b_0 + b_1x + e$로 표현될 수 있습니다.
+
+\begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={회귀 모델의 주요 가정}]
+회귀 모델의 유효성을 확인하기 위해 다음 가정들을 검토해야 합니다. 이 가정들은 잔차의 특성에 초점을 맞춥니다.
+\begin{enumerate}
+    \item \textbf{잔차의 평균이 0:} 잔차의 모집단은 평균이 0인 정규 분포를 따릅니다.
+    \item \textbf{등분산성 (Constant Variance):} 잔차의 분산이 독립 변수($x$)의 값에 관계없이 일정합니다.
+    \item \textbf{정규성 (Normality):} 잔차가 평균 0, 일정한 분산($\sigma^2$)을 가진 정규 분포에서 무작위로 독립적으로 추출된 것처럼 보입니다.
+    \item \textbf{선형성 (Linearity):} 독립 변수($x$)와 종속 변수($y$) 간의 관계가 선형입니다.
+    \item \textbf{독립성 (Independence):} 각 잔차 값이 다른 잔차 값과 통계적으로 독립적입니다.
+\end{enumerate}
+\end{tcolorbox}
+
+\subsubsection{1. 잔차의 평균이 0 (Mean of Zero)}
+\begin{itemize}
+    \item \textbf{설명:} 회귀 가정이 유효하다면, 잠재적인 오차 항(잔차)의 모집단은 평균이 0인 정규 분포를 따릅니다.
+    \item \textbf{의미:} 이는 모델이 전반적으로 과대 예측하거나 과소 예측하는 경향 없이, 예측 오차가 서로 상쇄되어 평균 오차가 0이 된다는 것을 의미합니다. 즉, 모델이 편향되지 않았다는 증거입니다.
+\end{itemize}
+
+\subsubsection{2. 등분산성 가정 (Constant Variance Assumption)}
+\begin{itemize}
+    \item \textbf{설명:} 독립 변수($x$)의 어떤 주어진 값에서도, 잠재적인 오차 항 값의 모집단 분산은 $x$ 값에 의존하지 않고 일정합니다.
+    \item \textbf{의미:} 잔차의 분포가 $x$ 값의 범위에 걸쳐 일정한 분산을 가져야 합니다. 잔차 플롯에서 잔차들이 일정한 수평 띠 안에 무작위로 분포하는 형태로 나타나야 합니다.
+\end{itemize}
+
+\subsubsection{3. 정규성 가정 (Normality Assumption)}
+\begin{itemize}
+    \item \textbf{설명:} 잔차는 평균이 0이고 일정한 분산 $\sigma^2$을 가진 정규 분포에서 무작위로 독립적으로 추출된 것처럼 보여야 합니다.
+    \item \textbf{의미:} 이 가정은 앞의 두 가정을 기반으로 하며, 잔차의 분포 형태가 정규 분포와 유사해야 함을 요구합니다. 실제 데이터에서는 완벽하게 정규 분포를 따르지 않을 수 있지만, 심각한 이탈이 없으면 통계적 추론에 큰 영향을 미치지 않습니다.
+\end{itemize}
+
+\subsubsection{4. 선형성 가정 (Linearity Assumption)}
+\begin{itemize}
+    \item \textbf{설명:} 독립 변수($x$)와 종속 변수($y$) 간의 관계가 선형이어야 합니다.
+    \item \textbf{확인 방법:} 산점도를 통해 $x$와 $y$의 관계가 직선 형태를 띠는지 시각적으로 확인합니다.
+\end{itemize}
+
+\subsubsection{5. 독립성 가정 (Independence Assumption)}
+\begin{itemize}
+    \item \textbf{설명:} 어떤 하나의 잔차 값도 다른 잔차 값과 통계적으로 독립적이어야 합니다.
+    \item \textbf{의미:} 잔차들 사이에 패턴이나 상관관계가 없어야 합니다. 이 가정은 주로 \textbf{시계열 데이터(time-series data)}에서 위반되기 쉽습니다. 현재 시점의 변수 값이 이전 시점의 값에 영향을 받는 경우, 잔차들 사이에 자기상관(autocorrelation)이 발생할 수 있습니다.
+\end{itemize}
+
+\begin{cautionbox}
+\textbf{자기상관 (Autocorrelation)}
+자기상관은 시간 순서에 따라 오차 항들이 서로 상관되어 있을 때 발생합니다.
+\begin{itemize}
+    \item \textbf{양의 자기상관 (Positive Autocorrelation):} 시간 $i$의 양의 오차 항이 미래 시간 $i+k$에서도 양의 값을 가질 가능성이 높을 때 발생합니다. 예를 들어, 여름철 여가 및 여행 지출은 6월에 증가하면 7월에도 증가하는 경향이 있습니다.
+    \item \textbf{음의 자기상관 (Negative Autocorrelation):} 시간 $i$의 음의 오차 항이 미래 시간 $i+k$에서도 음의 값을 가질 가능성이 높을 때 발생합니다.
+\end{itemize}
+자기상관이 존재하는 데이터에는 선형 회귀 모델이 적합하지 않습니다.
+\end{cautionbox}
+
+\subsubsection{가정 확인 방법: 잔차 플롯 (Residual Plots)}
+잔차 플롯을 통해 잔차의 평균이 0인지, 분산이 일정한지, 정규성을 띠는지 시각적으로 확인할 수 있습니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{residual-normal-plot.png}  % Image not found: residual-normal-plot.png % Placeholder image
+    \caption{잔차의 정규 확률 플롯 예시}
+    \label{fig:residual_normal_plot}
+\end{figure}
+\begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={정규성 가정 확인}]
+플롯의 점들이 대략적으로 직선 형태를 띠면 정규성 가정이 충족됩니다. 위 GPA-시작 급여 예시의 플롯은 직선에 가깝게 정렬되어 정규성 가정이 충족됨을 보여줍니다.
+\end{tcolorbox}
+
+\begin{itemize}
+    \item \textbf{정규성 확인 (Normal Probability Plot):}
+    잔차의 정규 확률 플롯이 대략적으로 직선 형태를 띠면 정규성 가정이 충족됩니다. 위 GPA-시작 급여 예시의 플롯은 직선에 가깝게 정렬되어 정규성 가정이 충족됨을 보여줍니다.
+
+    \item \textbf{평균 0 및 등분산성 확인 (Residuals vs. X Plot):}
+    잔차를 독립 변수($x$)에 대해 플롯한 그래프를 통해 확인합니다.
+    \begin{figure}[h!]
+        \centering
+        % \includegraphics[width=0.8\textwidth]{residual-plots-good-bad.png}  % Image not found: residual-plots-good-bad.png % Placeholder image
+        \caption{잔차 플롯 예시: 평균 0 및 등분산성 확인}
+        \label{fig:residual_plots_good_bad}
+    \end{figure}
+    \begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={평균 0 및 등분산성 가정 확인}]
+    \begin{itemize}
+        \item \textbf{평균 0:} 0선 위아래로 잔차들이 거의 같은 수로 분포되어 있다면 평균이 0이라는 가정이 충족됩니다.
+        \item \textbf{등분산성:} 잔차들이 일정한 수평 띠(contained horizontal band) 내에서 위아래로 무작위로 분포되어 있다면 등분산성 가정이 충족됩니다 (위 그림의 왼쪽 플롯).
+        \item \textbf{등분산성 위반:} 잔차들이 $x$ 값이 증가함에 따라 퍼지거나(fanning out) 또는 모이는(fanning in) 패턴을 보인다면 등분산성 가정이 위반된 것입니다 (위 그림의 오른쪽 상단 및 하단 플롯).
+    \end{itemize}
+    \end{tcolorbox}
+\end{itemize}
+
+\subsection{모델의 한계 (Limitations)}
+회귀 모델을 적용할 때 가장 중요한 한계점 중 하나는 \textbf{외삽(extrapolation)}의 위험성입니다.
+
+\begin{cautionbox}
+\textbf{외삽 금지 (Do Not Extrapolate)}
+모델은 데이터를 분석한 범위 내에서만 유효합니다. 모델을 학습시킨 데이터 범위를 벗어나 예측하는 것은 매우 위험하며, 신뢰할 수 없는 결과를 초래할 수 있습니다.
+\end{cautionbox}
+
+\begin{examplebox}
+\textbf{예시: 전기 사용량과 주택 면적}
+주택 면적(1,800~3,000 ft$^2$)과 전기 사용량 간의 관계를 모델링했다고 가정해 봅시다. 전력 회사가 5,000~7,500 ft$^2$ 크기의 주택이 들어설 새로운 주택 단지에 대한 전력 수요를 예측하기 위해 이 모델을 사용할 수 있을까요?
+
+\textbf{답변: 아니요.}
+모델이 학습된 데이터 범위(1,800~3,000 ft$^2$)를 훨씬 벗어나는 5,000~7,500 ft$^2$ 주택에 대해 예측하는 것은 외삽에 해당합니다. 이 범위 밖에서는 선형 관계가 유지되지 않거나 다른 요인이 중요해질 수 있으므로, 모델의 예측은 신뢰할 수 없습니다.
+\end{examplebox}
+
+\subsection{요약 및 주의 사항}
+\begin{summarybox}
+\textbf{회귀 분석의 목표:}
+\begin{itemize}
+    \item 과거 데이터에서 변수 간의 관계 이해
+    \item 예측 수행
+    \item 가상 분석(what-if analysis) 수행
+\end{itemize}
+\textbf{예측 시 주의사항:}
+\begin{itemize}
+    \item 모델이 추정된 범위(데이터 범위)를 벗어나 외삽하지 않도록 주의해야 합니다.
+\end{itemize}
+\textbf{사전 분석의 중요성:}
+\begin{itemize}
+    \item 회귀 모델을 추정하기 전에 산점도를 사용하여 데이터 쌍 간의 관계를 시각적으로 확인하는 것이 좋습니다.
+    \item 산점도는 두 변수 간의 관계의 강도와 유형(직선, 곡선 등)에 대한 통찰력을 제공합니다.
+\end{itemize}
+\textbf{주요 통계량:}
+\begin{itemize}
+    \item \textbf{상관 계수 (Correlation):} -1에서 +1까지의 범위로, 두 변수 간의 선형 관계의 정도와 방향을 나타냅니다.
+    \item \textbf{R-제곱 (R-squared) 또는 결정 계수 (Coefficient of Determination):} 모델의 독립 변수들이 종속 변수의 변동 중 얼마나 많은 부분을 설명하는지 나타내는 비율입니다 (0과 1 사이).
+\end{itemize}
+\end{summarybox}
+
+\begin{cautionbox}
+\textbf{상관관계는 인과관계가 아니다 (Correlation is not Causation)}
+두 변수 사이에 강한 상관관계가 있다고 해서 한 변수가 다른 변수의 직접적인 원인이라고 단정할 수는 없습니다. 인과관계를 증명하는 것은 훨씬 더 많은 증거와 엄격한 연구를 필요로 합니다.
+\begin{itemize}
+    \item \textbf{예시:} 흡연과 폐암은 오랫동안 상관관계가 알려져 있었지만, 흡연이 폐암의 원인임을 과학적으로 입증하는 데는 오랜 시간이 걸렸습니다.
+    \item \textbf{예시:} 지구 온난화와 특정 요인들 간의 관계도 마찬가지입니다. 기후 변화는 대부분 동의하지만, 그 원인에 대한 합의는 여전히 논쟁의 여지가 있습니다.
+\end{itemize}
+회귀 분석을 통해 상관관계를 발견하더라도, 이를 인과관계로 주장하지 않도록 주의해야 합니다. 상관관계만으로도 예측 능력은 충분히 강력하며, 독립 변수의 값을 변경하여 원하는 결과를 얻을 수 있는 통찰력을 제공합니다.
+\end{cautionbox}
+
+\newpage
+\section{Excel을 이용한 잔차 분석 (Residual Analysis in Excel)}
+이 섹션에서는 Excel을 사용하여 회귀 모델의 기본 가정을 확인하기 위한 잔차 분석을 수행하는 방법을 단계별로 설명합니다. GPA와 시작 급여 예시를 통해 잔차 플롯을 생성하고 해석하는 과정을 배웁니다.
+
+\subsection{Excel에서 잔차 플롯 생성 및 해석: GPA-시작 급여 예시}
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{excel-gpa-salary-data-scatter.png}  % Image not found: excel-gpa-salary-data-scatter.png % Placeholder image
+    \caption{GPA와 시작 급여 데이터 및 산점도}
+    \label{fig:gpa_salary_data_scatter}
+\end{figure}
+GPA가 학생들의 시작 급여에 미치는 영향을 분석하는 예시를 다시 사용합니다. 산점도는 GPA와 시작 급여 사이에 완만한 양의 관계가 있음을 보여줍니다.
+
+\subsubsection{1단계: Excel에서 회귀 분석 실행 및 잔차 플롯 요청}
+\begin{enumerate}
+    \item '데이터(Data)' 탭 $\rightarrow$ '데이터 분석(Data Analysis)' $\rightarrow$ '회귀(Regression)'를 선택합니다.
+    \item '회귀' 대화 상자에서 다음을 설정합니다.
+    \begin{itemize}
+        \item \textbf{Y 입력 범위 (Input Y Range):} 시작 급여 데이터 (예: \$B\$1:\$B\$101)
+        \item \textbf{X 입력 범위 (Input X Range):} GPA 데이터 (예: \$A\$1:\$A\$101)
+        \item \textbf{레이블 (Labels):} 체크
+        \item \textbf{출력 옵션 (Output Options):} '새 워크시트(New Worksheet Ply)' 선택
+        \item \textbf{잔차 (Residuals) 섹션:} 다음 옵션들을 \textbf{모두 체크}합니다.
+        \begin{itemize}
+            \item \textbf{잔차 (Residuals)}
+            \item \textbf{잔차 플롯 (Residual Plots)}
+            \item \textbf{선형 적합 플롯 (Line Fit Plots)}
+            \item \textbf{정규 확률 플롯 (Normal Probability Plots)}
+        \end{itemize}
+    \end{itemize}
+    \item '확인'을 클릭합니다.
+\end{enumerate}
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{excel-gpa-salary-regression-dialog.png}  % Image not found: excel-gpa-salary-regression-dialog.png % Placeholder image
+    \caption{Excel 회귀 분석 대화 상자 설정 (잔차 플롯 옵션 포함)}
+    \label{fig:gpa_salary_regression_dialog}
+\end{figure}
+
+\begin{cautionbox}
+\textbf{변수 선택 오류 경고:}
+Excel은 독립 변수와 종속 변수를 잘못 선택하더라도 경고하지 않습니다. 항상 X축에 독립 변수, Y축에 종속 변수를 올바르게 배치했는지 확인해야 합니다. 잘못된 변수 설정은 유효하지 않은 분석 결과를 초래합니다.
+\end{cautionbox}
+
+\subsubsection{2단계: 생성된 잔차 플롯 해석}
+Excel은 회귀 분석 결과와 함께 여러 플롯을 생성합니다. 이 플롯들을 통해 모델의 가정을 검토할 수 있습니다.
+
+\begin{figure}[h!]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{excel-gpa-salary-plots.png}  % Image not found: excel-gpa-salary-plots.png % Placeholder image
+    \caption{GPA-시작 급여 회귀 분석의 잔차 플롯들}
+    \label{fig:gpa_salary_plots}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{정규 확률 플롯 (Normal Probability Plot):}
+    이 플롯은 잔차의 정규성 가정을 확인하는 데 사용됩니다.
+    \begin{figure}[h!]
+        \centering
+        % \includegraphics[width=0.6\textwidth]{excel-gpa-salary-normal-plot.png}  % Image not found: excel-gpa-salary-normal-plot.png % Placeholder image
+        \caption{GPA-시작 급여 잔차의 정규 확률 플롯}
+        \label{fig:gpa_salary_normal_plot}
+    \end{figure}
+    \begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={정규성 가정 확인}]
+    플롯의 점들이 대략적으로 직선을 형성한다면, 잔차가 정규 분포를 따른다는 가정이 위반되지 않았다고 볼 수 있습니다. 위 플롯은 직선에 가깝게 보여 정규성 가정이 충족됨을 시사합니다.
+    \end{tcolorbox}
+
+    \item \textbf{GPA 잔차 플롯 (GPA Residual Plot):}
+    이 플롯은 잔차의 평균이 0인지, 등분산성 가정이 충족되는지 확인하는 데 사용됩니다.
+    \begin{figure}[h!]
+        \centering
+        % \includegraphics[width=0.6\textwidth]{excel-gpa-salary-residual-plot.png}  % Image not found: excel-gpa-salary-residual-plot.png % Placeholder image
+        \caption{GPA-시작 급여 잔차 플롯}
+        \label{fig:gpa_salary_residual_plot}
+    \end{figure}
+    \begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={평균 0 및 등분산성 가정 확인}]
+    \begin{itemize}
+        \item \textbf{평균 0:} 0선 위와 아래에 잔차 점들이 거의 균등하게 분포되어 있다면, 잔차의 평균이 0이라는 가정이 충족됩니다. 이는 모델이 과대 예측과 과소 예측을 균형 있게 수행하고 있음을 의미합니다.
+        \item \textbf{등분산성:} 잔차 점들이 특정 패턴 없이 일정한 수평 띠 내에서 무작위로 분포되어 있다면, 등분산성 가정이 충족됩니다. 즉, 잔차의 변동성이 독립 변수 값에 따라 변하지 않습니다.
+        \item \textbf{등분산성 위반 예시:} 만약 잔차들이 $x$ 값이 증가함에 따라 퍼지거나(fanning out) 모이는(fanning in) 깔때기 모양을 보인다면 등분산성 가정이 위반된 것입니다.
+        \begin{figure}[h!]
+            \centering
+            % \includegraphics[width=0.6\textwidth]{excel-residual-fanning-out.png}  % Image not found: excel-residual-fanning-out.png % Placeholder image
+            \caption{등분산성 위반 예시: 잔차가 퍼지는 경우}
+            \label{fig:residual_fanning_out}
+        \end{figure}
+        \begin{figure}[h!]
+            \centering
+            % \includegraphics[width=0.6\textwidth]{excel-residual-fanning-in.png}  % Image not found: excel-residual-fanning-in.png % Placeholder image
+            \caption{등분산성 위반 예시: 잔차가 모이는 경우}
+            \label{fig:residual_fanning_in}
+        \end{figure}
+    \end{itemize}
+    \end{tcolorbox}
+
+    \item \textbf{선형 적합 플롯 (Line Fit Plot):}
+    이 플롯은 실제 데이터 포인트(파란색)와 회귀선(주황색)을 함께 보여주며, 모델의 선형성 가정을 시각적으로 확인하는 데 도움이 됩니다.
+    \begin{figure}[h!]
+        \centering
+        % \includegraphics[width=0.6\textwidth]{excel-gpa-salary-line-fit-plot.png}  % Image not found: excel-gpa-salary-line-fit-plot.png % Placeholder image
+        \caption{GPA-시작 급여 선형 적합 플롯}
+        \label{fig:gpa_salary_line_fit_plot}
+    \end{figure}
+    \begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={선형성 가정 확인}]
+    회귀선 주위에 실제 데이터 포인트들이 고르게 분포되어 있고, 특정 패턴(예: 곡선 형태)을 보이지 않는다면 선형성 가정이 충족됩니다. 또한, 회귀선 위와 아래에 점들이 균등하게 분포되어 있다면, 모델이 전반적으로 잘 적합되었음을 의미합니다.
+    \end{tcolorbox}
+\end{itemize}
+
+\begin{cautionbox}
+\textbf{가정 위반 시:}
+잔차 플롯에서 회귀 모델의 기본 가정이 심각하게 위반되는 패턴(예: 잔차의 비정규성, 등분산성 위반, 특정 패턴)이 발견된다면, 해당 선형 회귀 모델은 데이터에 적합하지 않으며, 그 결과를 신뢰할 수 없습니다. 이 경우, 다른 모델(예: 비선형 회귀, 다중 회귀)을 고려하거나 데이터 변환을 시도해야 합니다.
+\end{cautionbox}
+
+\newpage
+\section{체크리스트: 회귀 모델 가정 검토}
+회귀 모델을 사용하기 전에 다음 체크리스트를 활용하여 모델의 가정을 검토하세요. 모든 항목이 '예'에 가까울수록 모델의 신뢰도가 높습니다.
+
+\begin{adjustbox}{width=\textwidth,center}
+\begin{tabular}{p{0.5\textwidth}cc}
+\toprule
+\textbf{검토 항목} & \textbf{예} & \textbf{아니오} \\
+\midrule
+\textbf{1. 변수 설정} & & \\
+\quad 독립 변수(X)와 종속 변수(Y)를 올바르게 식별하고 X축/Y축에 배치했는가? & $\square$ & $\square$ \\
+\textbf{2. 선형성 가정} & & \\
+\quad 산점도에서 X와 Y 사이에 대략적인 직선 관계가 보이는가? & $\square$ & $\square$ \\
+\textbf{3. 잔차의 평균 0 가정} & & \\
+\quad 잔차 플롯에서 0선 위아래로 잔차들이 거의 균등하게 분포되어 있는가? & $\square$ & $\square$ \\
+\textbf{4. 등분산성 가정} & & \\
+\quad 잔차 플롯에서 잔차들이 일정한 수평 띠 내에서 무작위로 분포되어 있는가? & $\square$ & $\square$ \\
+\quad (잔차가 퍼지거나 모이는 깔때기 모양을 보이지 않는가?) & $\square$ & $\square$ \\
+\textbf{5. 정규성 가정} & & \\
+\quad 잔차의 정규 확률 플롯이 대략적으로 직선 형태를 띠는가? & $\square$ & $\square$ \\
+\textbf{6. 독립성 가정} & & \\
+\quad 데이터가 시계열 데이터가 아니거나, 잔차들 사이에 자기상관이 없는가? & $\square$ & $\square$ \\
+\textbf{7. 외삽 금지} & & \\
+\quad 모델을 학습시킨 데이터 범위 내에서만 예측을 수행하는가? & $\square$ & $\square$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+\newpage
+\section{FAQ: 초심자를 위한 질문과 답변}
+회귀 분석을 처음 접하는 사람들이 흔히 가질 수 있는 질문들을 Q\&A 형식으로 정리했습니다.
+
+\begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={자주 묻는 질문}]
+\textbf{Q1: R-제곱 값이 낮으면 모델이 쓸모없는 건가요?}
+\textbf{A1:} 반드시 그렇지는 않습니다. R-제곱은 모델이 종속 변수의 변동을 얼마나 잘 설명하는지를 나타내지만, p-값이 매우 작다면 독립 변수가 종속 변수에 통계적으로 유의미한 영향을 미친다는 것을 의미합니다. R-제곱이 낮더라도 중요한 관계를 발견한 것이며, 이는 추가적인 독립 변수를 포함하여 모델을 개선할 여지가 있음을 시사할 수 있습니다.
+
+\textbf{Q2: 독립 변수와 종속 변수를 잘못 설정하면 어떻게 되나요?}
+\textbf{A2:} Excel과 같은 소프트웨어는 오류를 경고하지 않고 결과를 출력합니다. 하지만 그 결과는 통계적으로 무의미하거나 잘못된 해석으로 이어질 수 있습니다. 항상 원인(독립 변수)이 결과(종속 변수)에 영향을 미친다는 논리적 관계를 바탕으로 변수를 올바르게 설정해야 합니다.
+
+\textbf{Q3: 잔차 플롯에서 이상한 패턴이 보이면 어떻게 해야 하나요?}
+\textbf{A3:} 잔차 플롯에서 특정 패턴(예: 깔때기 모양, 곡선 패턴)이 보인다면 회귀 모델의 가정이 위반된 것입니다. 이 경우, 선형 회귀 모델은 적합하지 않을 수 있으며, 데이터 변환(예: 로그 변환)을 시도하거나, 비선형 회귀 또는 다중 회귀와 같은 다른 모델을 고려해야 합니다.
+
+\textbf{Q4: 상관관계와 인과관계는 어떻게 다른가요?}
+\textbf{A4:} 상관관계는 두 변수가 함께 변화하는 경향을 나타낼 뿐, 한 변수가 다른 변수의 직접적인 원인임을 의미하지 않습니다. 인과관계는 한 변수의 변화가 다른 변수의 변화를 직접적으로 유발한다는 것을 의미하며, 이를 증명하기 위해서는 엄격한 실험 설계와 추가적인 증거가 필요합니다. 회귀 분석은 주로 상관관계를 밝히는 데 사용됩니다.
+
+\textbf{Q5: 모델을 학습시킨 데이터 범위를 벗어나 예측해도 되나요?}
+\textbf{A5:} 안 됩니다. 이를 외삽(extrapolation)이라고 하며, 모델의 예측 신뢰도를 크게 떨어뜨립니다. 모델은 학습된 데이터의 패턴을 기반으로 하므로, 해당 범위를 벗어나면 패턴이 달라지거나 예측할 수 없는 요인이 작용할 수 있습니다. 항상 모델이 학습된 데이터 범위 내에서만 예측을 수행해야 합니다.
+\end{tcolorbox}
+
+\newpage
+\section{빠르게 훑어보기: 핵심 요약}
+이 섹션은 모듈 3의 후반부 핵심 내용을 한 페이지로 요약하여 빠르게 복습할 수 있도록 돕습니다.
+
+\begin{tcolorbox}[colback=lightblue,colframe=darkblue,title={모델 활용 및 가정: 핵심 요약}]
+\textbf{1. 모델 활용의 기본}
+\begin{itemize}
+    \item \textbf{변수 식별:} 독립 변수(X)는 원인, 종속 변수(Y)는 결과. X는 X축, Y는 Y축에 배치.
+    \item \textbf{산점도:} 선형 관계 및 상관관계(양/음) 시각적 확인.
+    \item \textbf{회귀 방정식:} $y = b_0 + b_1x$ 형태로, $b_0$는 절편, $b_1$은 기울기(계수).
+    \item \textbf{계수 해석:} $b_0$는 X가 0일 때 Y의 예측값, $b_1$은 X가 1단위 변할 때 Y의 변화량.
+    \item \textbf{예측:} 회귀 방정식에 X값을 대입하여 Y값을 예측.
+\end{itemize}
+
+\textbf{2. Excel 출력 분석}
+\begin{itemize}
+    \item \textbf{R-제곱 ($R^2$):} 종속 변수 변동 중 독립 변수가 설명하는 비율 (0~1). 높을수록 설명력 우수.
+    \item \textbf{다중 R ($r$):} 상관계수 (-1~1). 관계의 강도와 방향.
+    \item \textbf{p-값:} 독립 변수와 종속 변수 간 관계의 통계적 유의미성 판단. 작을수록 유의미.
+    \item \textbf{ANOVA 테이블:} 총 변동(SST), 회귀 변동(SSR), 잔차 변동(SSE)으로 모델의 설명력 분석.
+\end{itemize}
+
+\textbf{3. 모델 가정 및 검토 (잔차 분석)}
+\begin{itemize}
+    \item \textbf{잔차 ($e$):} 실제 값과 예측 값의 차이. 모델 가정 검증의 핵심.
+    \item \textbf{주요 가정:}
+    \begin{enumerate}
+        \item \textbf{잔차 평균 0:} 잔차 플롯에서 0선 위아래 균등 분포.
+        \item \textbf{등분산성:} 잔차 플롯에서 일정한 수평 띠 내 무작위 분포 (깔때기 모양 X).
+        \item \textbf{정규성:} 잔차의 정규 확률 플롯이 직선 형태.
+        \item \textbf{선형성:} 산점도에서 직선 관계.
+        \item \textbf{독립성:} 잔차들 간 자기상관 없음 (시계열 데이터 주의).
+    \end{enumerate}
+    \item \textbf{가정 위반 시:} 모델 결과 신뢰 불가. 다른 모델 고려 또는 데이터 변환 필요.
+\end{itemize}
+
+\textbf{4. 모델의 한계 및 주의사항}
+\begin{itemize}
+    \item \textbf{외삽 금지:} 모델 학습 데이터 범위를 벗어난 예측은 신뢰할 수 없음.
+    \item \textbf{상관관계 $\neq$ 인과관계:} 상관관계는 함께 변화하는 경향일 뿐, 원인-결과 관계를 의미하지 않음.
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}
