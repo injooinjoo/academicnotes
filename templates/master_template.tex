@@ -64,6 +64,7 @@
 \definecolor{boxgray}{gray}{0.95}
 \definecolor{boxblue}{rgb}{0.9, 0.95, 1.0}
 \definecolor{boxred}{rgb}{1.0, 0.95, 0.95}
+\definecolor{myblue}{RGB}{50, 100, 180}
 
 % 진한 색상 (테두리/제목용)
 \definecolor{darkblue}{RGB}{50, 80, 150}
@@ -152,7 +153,7 @@
     colback=lightgray,
     colframe=black!60,
     fonttitle=\bfseries,
-    title=📖 예제: #1,
+    title=📖 예제,
     arc=2mm,
     boxrule=0.7pt,
     left=6pt,
@@ -160,6 +161,7 @@
     top=6pt,
     bottom=6pt,
     breakable,
+    #1
 }
 
 % 6. 정의 박스
@@ -168,7 +170,7 @@
     colback=lightpink,
     colframe=purple!70!black,
     fonttitle=\bfseries,
-    title=📌 정의: #1,
+    title=📌 정의,
     arc=2mm,
     boxrule=0.7pt,
     left=6pt,
@@ -176,6 +178,7 @@
     top=6pt,
     bottom=6pt,
     breakable,
+    #1
 }
 
 % 7. 중요 박스 (importantbox - warningbox와 유사)
@@ -184,7 +187,7 @@
     colback=boxred,
     colframe=red!70!black,
     fonttitle=\bfseries,
-    title=⚠️ 매우 중요: #1,
+    title=⚠️ 매우 중요,
     arc=2mm,
     boxrule=0.7pt,
     left=6pt,
@@ -192,11 +195,31 @@
     top=6pt,
     bottom=6pt,
     breakable,
+    #1
 }
 
 % 8. cautionbox (warningbox와 동일)
 \let\cautionbox\warningbox
 \let\endcautionbox\endwarningbox
+
+% tcbset 스타일 정의 (\begin{tcolorbox}[summarybox] 형식 사용 시 호환)
+\tcbset{
+    summarybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title=핵심 요약, arc=2mm, boxrule=0.7pt, breakable},
+    warningbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    examplebox/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title=예제, arc=2mm, boxrule=0.7pt, breakable},
+    definitionbox/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title=정의, arc=2mm, boxrule=0.7pt, breakable},
+    importantbox/.style={enhanced, colback=boxred, colframe=red!70!black, fonttitle=\bfseries, title=매우 중요, arc=2mm, boxrule=0.7pt, breakable},
+    infobox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=핵심 정보, arc=2mm, boxrule=0.7pt, breakable},
+    conceptbox/.style={enhanced, colback=lightgreen, colframe=darkgreen, fonttitle=\bfseries, title=개념, arc=2mm, boxrule=0.7pt, breakable},
+    analogybox/.style={enhanced, colback=green!5!white, colframe=green!60!black, fonttitle=\bfseries, title=비유, arc=2mm, boxrule=0.7pt, breakable},
+    overviewbox/.style={enhanced, colback=lightpurple, colframe=darkpurple, fonttitle=\bfseries\large, title=강의 개요, arc=3mm, boxrule=1pt, breakable},
+    cautionbox/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title=주의, arc=2mm, boxrule=0.7pt, breakable},
+    mybox/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    definition/.style={enhanced, colback=lightpink, colframe=purple!70!black, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    example/.style={enhanced, colback=lightgray, colframe=black!60, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    summary/.style={enhanced, colback=lightblue, colframe=darkblue, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+    warning/.style={enhanced, colback=lightyellow, colframe=darkorange, fonttitle=\bfseries, title={#1}, arc=2mm, boxrule=0.7pt, breakable},
+}
 
 %========================================================================================
 % 코드 블록 설정 (밝은 배경)
